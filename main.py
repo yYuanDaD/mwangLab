@@ -1,10 +1,11 @@
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain.agents import create_agent
 
 
-from tools.seacdm_tools import extract_sea_cdm_conditions, extract_sea_cdm_tables
+from tools.seacdm_tools import extract_sea_cdm_tables
 from tools.geo_tools import download_geo_data, download_supplementary_files, fetch_geo_description, search_geo_studies
 from tools.deseq2_tools import run_deseq2_analysis, inspect_metadata
 from tools.limma_tools import run_limma_analysis
@@ -18,8 +19,11 @@ from tools.methylation_tools import run_methylation_da
 from tools.evaluation_tools import evaluate_repeated_subset_results
 from tools.kg_export_tools import export_kg_style_results
 from tools.cohort_tools import run_agent_a_cohort_tool
-from tools.paper_tools import search_papers, fetch_paper_text, extract_geo_accession, assemble_agent_a_record
+from tools.paper_tools import search_papers, fetch_paper_text, extract_geo_accession
 from tools.guards import guard_tools
+from tools.tool_router import select_tools
+from tools.run_status import ConsoleStatusRenderer, RunStatusTracker
+from tools.agent_state import BioinformaticsAgentState, RuntimeStateMiddleware
 
 # 2. Load environment variables
 load_dotenv()
@@ -37,7 +41,6 @@ llm = ChatAnthropic(
 
 # 4. Register tools, wrapped with programmatic guards (dedupe + per-tool cap)
 raw_tools = [
-    extract_sea_cdm_conditions,
     extract_sea_cdm_tables,
     run_agent_a_cohort_tool,
     search_papers,
@@ -65,9 +68,7 @@ raw_tools = [
     run_methylation_da,
     evaluate_repeated_subset_results,
     export_kg_style_results,
-    assemble_agent_a_record,
 ]
-tools = guard_tools(raw_tools, max_calls_per_tool=3)
 
 # 5. System prompt
 system_prompt = """
@@ -102,175 +103,119 @@ PROTEOMICS DISPATCH (call in this order):
 - preprocess_proteomics_matrix(quant_path, labeling): THIRD step. Reads the downloaded matrix (mzTab parser handles PRH/PRT sections + decoy filtering; CSV/TSV/XLSX via pandas), log2-transforms if linear, then branches on labeling: labeled → sample-level median centering (v0 — no IRS); label_free → missingness filter + MinProb imputation + median centering. Writes <base>_preprocessed.csv ready for run_limma_analysis. Pass `labeling` from the identify_proteomics_labeling result.
 - After preprocessing: hand the _preprocessed.csv to run_limma_analysis (same tool used for log-scale RNA-seq) with a metadata CSV that the user supplies — sample IDs in metadata must match the column names of the preprocessed matrix.
 
-PAPER-FIRST CURATION WORKFLOW (Agent A):
-When the user starts from the literature — a topic/keyword, a paper title, or a DOI/PDF URL — rather than a known GEO accession, run this chain to find and analyze the paper's data:
-1. search_papers(keyword): get a triage list of open-access papers (saved to a CSV). Prefer candidates that already expose a GEO id in the abstract (geo_in_abstract), then those flagged [seq-signal].
-2. fetch_paper_text on a promising candidate: pass search_index=N — the [#N] rank from the search_papers list. The tool resolves that hit's exact PMCID/PDF for you. Do NOT retype a PMCID into the call (mistyping the digits silently fetches an unrelated paper); just pass the index. It returns the GEO/SRA/ArrayExpress accessions with a context snippet. If a fetch fails or finds no accession, move on to the NEXT candidate (a different index); do not retry the same input.
-3. Decide which accession is the paper's OWN deposited data vs. a citation of another study — read the context snippet (look for "deposited", "data availability", "available at", "GEO accession"). You may also run extract_geo_accession on the saved .txt path to re-list accessions.
-4. Hand the chosen GSE to the analysis backend via run_batch_geo_pipeline(accessions=[GSE], organism=..., treatment_keywords=..., control_keywords=..., run_label=...) — even for a single study. It runs download -> contrast auto-detection (+ LLM validation) -> DESeq2 -> GSEA and writes a decision log; this is the hardened path and avoids you having to pick the contrast by hand. REMEMBER the run_label you used — step 6 needs it.
-5. Call extract_sea_cdm_conditions on the paper text to capture study- and assay-level structured info from the paper (it writes output/{study_id}_seacdm.json). Use chosen_gse as study_id.
-6. Call assemble_agent_a_record LAST to produce the FINAL Agent A deliverable — a single JSON file at output/agentA/{stem}.json. Pass:
-   - paper_id (the literal 'paperId' from the search_papers row; pass "" if you started from a known PMCID)
-   - pmcid (same one you passed to fetch_paper_text)
-   - chosen_gse (the OWN GSE)
-   - chosen_reason (a short tag, e.g. "deposition language: 'are deposited'")
-   - rejected_gses (list of {"gse": "...", "reason": "..."} dicts for EVERY other GSE the text contained; pass [] if none)
-   - cohort_run_label (exactly what you passed to run_batch_geo_pipeline)
-   - paper_title, paper_year, paper_doi, paper_pmid, organism (all from the search_papers row + what you used)
-   This tool re-reads everything from disk and writes the single artifact the mentor reviews per paper.
-7. In your final answer, reference the path returned by assemble_agent_a_record plus a one-paragraph human summary.
+PAPER-FIRST CURATION (Agent A):
+- For a literature keyword/topic cohort, call `run_agent_a_cohort` ONCE. Do not manually call
+  search_papers, fetch_paper_text, GSE selection, batch analysis, SEA-CDM extraction, or final
+  assembly around it. Python owns that sequence, validates/normalizes all arguments, carries the
+  run label and intermediate IDs, enforces own-vs-cited GSE rules, records workflow_state.json,
+  and stops safely on missing evidence or search failure.
+- Set with_analysis=True only when the user requests computed differential expression/pathways;
+  otherwise leave it False for text/SEA-CDM extraction only. Pass the user's organism and arm
+  keywords if supplied; do not invent them.
+- For a known GEO accession with no paper-first request, call `run_batch_geo_pipeline` directly.
+- Use the lower-level paper tools only when the user explicitly asks for one isolated operation
+  such as searching papers, fetching a particular paper, or inspecting accession evidence.
 
-(If the user gave you a known accession directly — no paper — skip steps 1-3, 5, 6 and just run the analysis backend.)
-
-PAPER-FIRST GUARDRAILS (critical — every bullet is a hard rule, not a suggestion):
-- To read a search hit, pass search_index=N to fetch_paper_text — NEVER retype its PMCID. The tool looks up the exact id; a hand-typed PMCID that isn't in the search results is rejected. NEVER construct, guess, or derive a PMCID from a GSE number or training memory — a wrong id silently fetches a completely unrelated paper.
-- The chosen_gse you hand to run_batch_geo_pipeline and assemble_agent_a_record MUST appear LITERALLY in the text returned by fetch_paper_text or extract_geo_accession for a candidate you actually fetched. NEVER use a GSE number from your training memory, from search_geo_studies, or from any other source. assemble_agent_a_record cross-checks this and will flag a CRITICAL issue if the GSE is not in the paper text — that means the record is publicly broken.
-- If after fetching 2-3 candidate papers NONE of them contains a GSE in its fetched text, STOP. Call assemble_agent_a_record with chosen_gse="" and chosen_reason describing the situation (e.g. "no GSE accession found in 3 fetched candidates; data may be in supplementary tables or another repository — manual review needed"). Do NOT then call run_batch_geo_pipeline (there is no valid GSE to analyze), do NOT fall back to search_geo_studies, do NOT invent a GSE. An honest "no-data" record is correct output; a fabricated chosen_gse is a serious integrity failure.
-- If search_papers is unavailable (e.g. it returns a 429 rate-limit message), do NOT improvise: do not switch to search_geo_studies, and do not invent accessions or PMCIDs. State plainly that the paper search was rate-limited and stop.
-- Do not call search_papers more than twice. If it is rate-limited, immediate retries will also fail — stop and report rather than churning through tool calls.
-
-SEA-CDM v1 — PREFERRED for structured output (use these instead of the older flat extractor):
-- run_agent_a_cohort(keyword, ...): the ONE-CALL full Agent A pipeline. Turns a keyword into the
-  13 SEA-CDM CSVs from the top hits, running internally: own-vs-cited GSE disambiguation; the 9
-  text tables with per-field provenance; subject/sample/groups/assay derived DETERMINISTICALLY
-  from each study's GEO metadata CSV (re-runs give byte-identical structural tables); the paper's
-  text-mined findings; and the pathway->gene->exercise mechanism chain. Pass with_analysis=True
-  (plus treatment_keywords/control_keywords) to also compute DESeq2/edgeR/limma-voom + GSEA on
-  strictly-own GSEs and the computed-vs-reported agreement. Use this when the user wants the whole
-  keyword->SEA-CDM cohort deliverable; you do NOT need to hand-orchestrate steps 1-7 above.
+SEA-CDM v1 — PREFERRED for structured output:
+- `run_agent_a_cohort` produces the complete cohort deliverable and its machine-readable state.
 - extract_sea_cdm_tables(study_id, paper_text_path, organism, csv_out_dir, metadata_csv): the
-  SINGLE-STUDY v1 successor to extract_sea_cdm_conditions. Produces the full multi-table SEA-CDM
+  single-study audited extractor. Produces the full multi-table SEA-CDM
   (study/experiment/subject/sample/groups/interventions/assay/material/documentation) with
   per-field provenance and the same deterministic metadata-derived structural tables. Prefer it
-  over extract_sea_cdm_conditions for step 5 when you want the relational 13-table output for one
-  study. (extract_sea_cdm_conditions remains only for the legacy flat single-JSON output.)
+  for one study. The flat single-JSON extractor is Legacy and is not exposed to the agent.
 """
 
-# 6. Create Agent via langchain
-agent_executor = create_agent(
-    model=llm,
-    tools=tools,
-    system_prompt=system_prompt
-)
+def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None):
+    """Build a per-request agent with only the relevant tool profile exposed.
 
-# ==========================================
-# 7. Test Agent
-# ==========================================
+    Rebuilding the guarded wrappers also scopes dedupe/call counters to this
+    request instead of leaking guard state across multiple CLI tasks.
+    """
+    selected_raw_tools, routing = select_tools(user_query, raw_tools)
+    if status_tracker is not None:
+        status_tracker.set_profile("+".join(routing.profiles))
+    request_tools = guard_tools(selected_raw_tools, max_calls_per_tool=3)
+    routed_prompt = (
+        system_prompt
+        + "\n\nACTIVE TOOL SCOPE:\n"
+        + f"This request was routed to: {', '.join(routing.profiles)}. "
+          "Use only the tools currently exposed. If the request is outside this scope, "
+          "state that clearly instead of inventing a tool."
+    )
+    executor = create_agent(
+        model=llm, tools=request_tools, system_prompt=routed_prompt,
+        state_schema=BioinformaticsAgentState,
+        middleware=[RuntimeStateMiddleware(status_tracker)],
+    )
+    return executor, routing
+
 if __name__ == "__main__":
     print("========================================")
     print("   Claude Bioinformatics Agent Ready")
     print("========================================\n")
-
-
-    # Full keyword-driven paper-first chain (search -> fetch -> disambiguate -> analyze
-    # -> extract -> assemble). Requires a working Semantic Scholar (S2_API_KEY in .env)
-    # AND a candidate paper that exposes its GSE in main text — for some keywords most
-    # 2024+ papers put accessions in supplementary tables only, in which case the
-    # GUARDRAILS will (correctly) make the agent stop with an honest "no-data" record.
-    # Swap names with `test_query` below to use this as the active run.
-    test_query_keyword_driven = """
-  Run the paper-first Agent A workflow end-to-end on a real exercise skeletal-muscle study
-  and produce the final Agent A deliverable JSON.
-
-  Steps:
-  1) search_papers with keyword "exercise skeletal muscle transcriptome". Remember the row
-     fields of whichever candidate you pick (paperId, title, year, pmcid, pmid, doi).
-  2) Pick a candidate that looks like it generated RNA-seq data (a GEO id in the abstract, or a
-     [seq-signal] flag, and a PMCID rather than pdf-only). Call fetch_paper_text(search_index=N)
-     using that hit's [#N] number — do NOT type its PMCID. If a fetch finds no accession, move on
-     to the NEXT candidate (a different index) — do not retry the same input. Try at most 3 before stopping.
-  3) From the extracted text, identify the GEO GSE accession that THIS paper DEPOSITED — use
-     the context snippets the tool returned to distinguish the paper's own data (phrasing
-     like "deposited", "data availability") from data it merely reused ("downloaded from",
-     "obtained from"). Only use a GSE that literally appears in the tool output.
-  4) Hand that single GSE to run_batch_geo_pipeline:
-     - accessions: [the OWN GSE]
-     - organism: the study's species — "Human" or "Mouse" — based on the context snippet
-       (most "exercise skeletal muscle" studies are Human; mouse studies say "mouse" in the
-       snippet). Getting this right matters: GSEA uses species-specific Hallmark gene sets.
-     - treatment_keywords: ["exercise", "training", "treadmill", "endurance", "trained",
-         "voluntary wheel", "run", "aerobic", "exe", "acute"]
-     - control_keywords: ["sedentary", "sham", "control", "sed", "rest", "untrained",
-         "inactive", "baseline", "pre", "basal"]
-     - run_label: "paperA_exercise"  (remember this exact value — step 6 needs it)
-  5) After the batch returns, call extract_sea_cdm_conditions to capture study- and
-     assay-level structured info from the paper text. Use the chosen GSE as study_id.
-  6) Call assemble_agent_a_record LAST with everything you accumulated:
-       paper_id        = the paperId from the search row
-       pmcid           = the PMCID you passed to fetch_paper_text
-       chosen_gse      = the OWN GSE
-       chosen_reason   = short tag, e.g. "deposition language: 'are deposited'"
-       rejected_gses   = list of {"gse": "...", "reason": "..."} for EVERY other GSE found
-                         in the text (e.g. cited prior datasets); pass [] if none
-       cohort_run_label= "paperA_exercise"
-       paper_title, paper_year, paper_doi, paper_pmid, organism = all from the search row + what you used
-     This writes output/agentA/{stem}.json — the final deliverable.
-  7) Final answer (English): one paragraph summarizing the paper / chosen GSE / contrast /
-     n_DEG / top pathways, and reference the agentA JSON path returned by step 6.
-  """
-
-    # ACTIVE — seeded query. Known-good demo for the mentor: PMC12248044 has mixed
-    # own/cited GSEs (deposit GSE279359, cited GSE87749 + GSE151066) so it directly
-    # exercises the own-vs-cited disambiguation guardrail and produces a clean record.
-    # Decoupled from Semantic Scholar (skips search_papers).
-    test_query = """
-  Validate the paper-first analysis chain starting from a KNOWN open-access paper. This run
-  intentionally SKIPS search_papers, so do NOT call search_papers or search_geo_studies.
-  The paper is PubMed Central PMC12248044 ("Impact of Acute Endurance Exercise on
-  Alternative Splicing in Skeletal Muscle").
-
-  Steps:
-  1) fetch_paper_text with pmcid="PMC12248044" (no pdf_url needed — it uses Europe PMC full text).
-  2) From the reported accessions and their context snippets, identify the single GEO GSE that
-     THIS paper DEPOSITED itself. Distinguish the paper's OWN data (phrasing like "deposited",
-     "data availability") from data it merely REUSED ("downloaded from", "obtained from").
-     Only use a GSE that literally appears in the tool output — never invent or alter an id.
-  3) Hand that single OWN GSE to run_batch_geo_pipeline:
-     - accessions: [the OWN GSE]
-     - organism: set to that dataset's species (Human or Mouse) based on the context snippet.
-     - treatment_keywords: ["exercise", "training", "treadmill", "endurance", "trained",
-         "voluntary wheel", "run", "aerobic", "exe", "acute"]
-     - control_keywords: ["sedentary", "sham", "control", "sed", "rest", "untrained",
-         "inactive", "baseline", "pre", "basal"]
-     - run_label: "paperA_seed"
-  4) Call extract_sea_cdm_conditions (study_id = the OWN GSE).
-  5) Call assemble_agent_a_record(paper_id="", pmcid="PMC12248044", chosen_gse=..., chosen_reason=...,
-     rejected_gses=[...], cohort_run_label="paperA_seed", organism=...).
-  6) Summarize:
-     - The GSE you chose and WHY it is the paper's own data (quote the snippet).
-     - Which GSE(s) you rejected as cited/reused data.
-     - The organism you used.
-     - How far the analysis got: the status, n_deg and top pathways if it ran, or the
-       explicit fail-loud reason if the study was skipped (e.g. no raw counts).
-
-  Respond in English.
-  """
-    
-
-
+    test_query = input("请输入分析任务：").strip()
+    if not test_query:
+        raise SystemExit("No task provided.")
+    status_run_id = "agent_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+    status_dir = os.path.join("output", status_run_id)
+    status_tracker = RunStatusTracker(
+        os.path.join(status_dir, "run_status.json"), run_id=status_run_id,
+        profile="routing", stages=["routing", "reasoning", "tool", "final"],
+        renderer=ConsoleStatusRenderer(),
+    )
+    status_tracker.start("agent initialized")
+    agent_executor, routing = build_agent(test_query, status_tracker=status_tracker)
+    status_tracker.set_stage("routing", message=routing.reason)
+    print(f"Tool routing: {', '.join(routing.profiles)} "
+          f"({len(routing.tool_names)}/{len(raw_tools)} tools exposed)")
     print("Agent is working...\n")
     safety_config = {"recursion_limit": 50}
 
 
-    for chunk in agent_executor.stream({"messages": [("user", test_query)]}, config=safety_config):
-        for node_name, node_state in chunk.items():
-            print(f"\n[{node_name.upper()}] -------------------------")
+    try:
+        status_tracker.set_stage("reasoning", message="interpreting request")
+        initial_state = {
+            "messages": [("user", test_query)],
+            "analysis_request": {
+                "raw_query": test_query,
+                "profiles": list(routing.profiles),
+                "tool_names": list(routing.tool_names),
+            },
+            "run_status": status_tracker.snapshot(),
+            "artifacts": [],
+            "evidence_ids": [],
+            "execution_budget": {"max_calls_per_tool": 3},
+        }
+        for chunk in agent_executor.stream(initial_state, config=safety_config):
+            for node_name, node_state in chunk.items():
+                print(f"\n[{node_name.upper()}] -------------------------")
 
-            latest_msg = node_state["messages"][-1]
+                latest_msg = node_state["messages"][-1]
 
-            if hasattr(latest_msg, "tool_calls") and latest_msg.tool_calls:
-                for tool_call in latest_msg.tool_calls:
-                    print(f" Agent calling tool: {tool_call['name']}")
-                    print(f" Arguments: {tool_call['args']}")
+                if hasattr(latest_msg, "tool_calls") and latest_msg.tool_calls:
+                    for tool_call in latest_msg.tool_calls:
+                        status_tracker.set_stage("tool", current_tool=tool_call["name"],
+                                                 message="tool call in progress")
+                        print(f" Agent calling tool: {tool_call['name']}")
+                        print(f" Arguments: {tool_call['args']}")
 
-            elif latest_msg.type == "ai" and latest_msg.content:
-                print(f" Agent: {latest_msg.content}")
+                elif latest_msg.type == "ai" and latest_msg.content:
+                    status_tracker.set_stage("final", message="answer produced")
+                    print(f" Agent: {latest_msg.content}")
 
-            elif latest_msg.type == "tool":
-                print(f" Tool [{latest_msg.name}] finished.")
-                preview_text = str(latest_msg.content)[:300]
-                print(f" Result preview: {preview_text}...\n")
+                elif latest_msg.type == "tool":
+                    status_tracker.set_stage("reasoning", current_tool=None,
+                                             message=f"{latest_msg.name} completed")
+                    print(f" Tool [{latest_msg.name}] finished.")
+                    preview_text = str(latest_msg.content)[:300]
+                    print(f" Result preview: {preview_text}...\n")
+        status_tracker.finish("completed", "agent task completed")
+    except Exception as e:
+        status_tracker.add_failure(f"{type(e).__name__}: {e}")
+        status_tracker.finish("failed", str(e))
+        raise
 
     print("\n========================================")
     print("All tasks completed! Check the project directory for output files.")
+    print(f"Run status: {os.path.join(status_dir, 'run_status.json')}")
     print("========================================")

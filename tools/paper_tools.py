@@ -448,12 +448,6 @@ def extract_geo_accession(text_or_path: str) -> str:
 
 
 # -----------------------------------------------------------------------------
-# Agent A — final assembly: gather everything the chain produced for one paper
-# into a single SEA-CDM-aligned (v0 subset) JSON record. This is the deliverable
-# artifact a human reviewer (mentor) opens to see what Agent A did per paper.
-# -----------------------------------------------------------------------------
-
-
 @tool
 def assemble_agent_a_record(
     paper_id: str,
@@ -469,23 +463,10 @@ def assemble_agent_a_record(
     organism: str = "",
     output_dir: str = "./output/agentA",
 ) -> str:
-    """
-    Assemble the FINAL Agent A deliverable for one paper — a single JSON file at
-    output/agentA/{stem}.json — by reading the artifacts the prior tools wrote to
-    disk (paper text, cohort summary.csv, decisions.json, study-level SEA-CDM
-    extraction). Call this LAST, after run_batch_geo_pipeline and (optionally)
-    extract_sea_cdm_conditions have run.
+    """LEGACY: assemble the deprecated flat Agent A v0 record.
 
-    The produced record is a v0 SUBSET of the full SEA-CDM schema (it populates
-    paper / study + assay info / one informal `analysis` row); full alignment to
-    the 13-table SEA-CDM (study/experiment/assay/analysis/results/subject/sample/
-    groups/interventions/material/occurence/documentation/ontology) is a later
-    iteration. The file is what the mentor opens to review one paper's curation.
-
-    Snippets in `data_discovery.rejected_gses[*].snippet_verified` and
-    `data_discovery.chosen_snippet_verified` are RE-DERIVED from the saved paper
-    text by this tool — they cross-check the agent's free-text `reason` fields
-    against the actual document, so the record is self-verifying.
+    Kept for compatibility with historical scripts. New workflows must use
+    ``run_agent_a_cohort`` and its relational SEA-CDM outputs.
 
     Args:
         paper_id: Semantic Scholar paperId from search_papers' CSV. Pass "" if
@@ -506,7 +487,7 @@ def assemble_agent_a_record(
     try:
         norm_pmcid = _normalize_pmcid(pmcid) or pmcid
         record = {
-            "version": "v0.1 — subset of SEA-CDM (paper + study/assay info + one schema-aligned analysis row); full 13-table alignment pending",
+            "version": "LEGACY v0.1 — deprecated SEA-CDM subset",
             "generated_at": datetime.now().isoformat(timespec="seconds"),
             "paper": {
                 "paperId": paper_id,
@@ -526,17 +507,7 @@ def assemble_agent_a_record(
             "study_extracted": None,
             "secondary_analysis": None,
             "provenance": {},
-            "sea_cdm_alignment_notes": (
-                "Currently populates: paper (~ documentation row), study + assay-level info "
-                "(via extract_sea_cdm_conditions, NOT YET aligned to real `study`/`assay` field "
-                "names — Sprint 1 task #35), and one schema-aligned `analysis` row from the "
-                "batch run (Sprint 1 task #34 — fields match the real SEA-CDM `analysis` table; "
-                "pipeline-internal metadata moved to `contrast` / `outcome` / `decisions` "
-                "subsections). Full SEA-CDM has 13 tables (study, experiment, assay, analysis, "
-                "results, subject, sample, groups, interventions, material, occurence, "
-                "documentation, ontology) — see docs/SEACDM_SCHEMA.md for full field reference "
-                "and docs/reviews/REVIEW_NOTES_AGENT_A.md for the v0 → v1 alignment plan."
-            ),
+            "sea_cdm_alignment_notes": "Deprecated flat subset; use run_agent_a_cohort.",
             "issues": [],
         }
 
@@ -625,17 +596,8 @@ def assemble_agent_a_record(
             except Exception as e:
                 record["issues"].append(f"summary.csv unreadable: {e}")
 
-        # 4. Build secondary_analysis section. The `analysis` sub-block uses real SEA-CDM
-        # `analysis`-table field names (see docs/SEACDM_SCHEMA.md §4); pipeline-internal
-        # metadata that doesn't map to any SEA-CDM column lives under `contrast` (the actual
-        # 2-group comparison spec), `outcome` (numeric results + status + file paths), and
-        # `decisions` (LLM-A reasoning + QC verdicts). Splitting these makes it visually
-        # obvious which fields a v1 schema-faithful exporter could consume directly vs which
-        # are diagnostic-only and won't survive the migration.
         if decisions or summary_row:
             da_method = (summary_row or {}).get("da_method") or "unknown"
-            # Map our pipeline's da_method to the kind of input the analysis consumed —
-            # DESeq2 takes raw integer counts; limma takes a log-scale matrix.
             input_data_descriptions = {
                 "deseq2": "Raw RNA-seq integer counts (per-gene, per-sample matrix)",
                 "limma": "Log-scale expression matrix (log2-transformed CPM / FPKM / TPM)",
@@ -651,15 +613,14 @@ def assemble_agent_a_record(
                         break
 
             analysis_row = {
-                # SEA-CDM analysis-table fields — see docs/SEACDM_SCHEMA.md §4
                 "analysis_id": f"{chosen_gse}_DE_v0" if chosen_gse else None,
-                "group_id": None,         # groups table not populated in v0
-                "documentation_id": None, # documentation table not populated in v0
+                "group_id": None,
+                "documentation_id": None,
                 "input_data": input_data_descriptions.get(da_method),
                 "input_data_id": chosen_gse or None,
                 "file_access": f"https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={chosen_gse}" if chosen_gse else None,
                 "analysis_name": "Differential expression analysis" + (f" + GSEA (Hallmark)" if gsea_csvs else ""),
-                "analysis_name_id": None,  # ontology stub — see Mentor Question #4
+                "analysis_name_id": None,
                 "reference_source": "GEO" if chosen_gse else None,
                 "reference_source_id": chosen_gse or None,
             }
@@ -690,13 +651,6 @@ def assemble_agent_a_record(
             }
             record["secondary_analysis"] = sa
 
-        # 5. Study-level structured extraction (from extract_sea_cdm_conditions).
-        # The extraction tool currently emits a flat v0 shape that conflates several SEA-CDM
-        # tables (study / experiment / subject / sample / groups). For Sprint 1 we reshape the
-        # output here using REAL SEA-CDM field names for `study` and `assay` (docs/SEACDM_SCHEMA.md
-        # §1 + §3) while preserving the raw extraction under `_extraction_source` so Sprint 2's
-        # full multi-table rewrite has the source data intact. Fields the v0 extraction does not
-        # produce are explicitly null (not omitted), so a v1 schema-faithful reader sees the gap.
         seacdm_path = os.path.join("output", f"{chosen_gse}_seacdm.json")
         if os.path.isfile(seacdm_path):
             try:
@@ -704,12 +658,11 @@ def assemble_agent_a_record(
                     raw = json.load(f)
                 record["provenance"]["study_seacdm"] = seacdm_path
 
-                # Build the schema-aligned `study` row from raw fields.
                 study_row = {
                     "study_id": raw.get("study_id"),
-                    "study_name": None,                                    # v0 extraction has no name field
-                    "study_description": raw.get("study_objective"),       # closest match — "objective" → "description"
-                    "study_type": None,                                    # Sprint 2 / ontology
+                    "study_name": None,
+                    "study_description": raw.get("study_objective"),
+                    "study_type": None,
                     "study_type_id": None,
                     "study_focus": None,
                     "study_focus_id": None,
@@ -720,27 +673,24 @@ def assemble_agent_a_record(
                     "comments": None,
                 }
 
-                # Build schema-aligned `assay` rows from raw `assays` list.
                 assay_rows = []
                 for i, a in enumerate(raw.get("assays", []) or []):
                     assay_rows.append({
                         "assay_id": f"{raw.get('study_id') or 'unknown'}_assay_{i+1}",
-                        "documentation_id": None,                          # Sprint 2 — documentation table
-                        "assay_name": a.get("assay_type"),                 # v0 calls it assay_type; real schema's assay_name is the friendly label
-                        "assay_name_id": None,                             # OBI ontology stub — Mentor Question #4
-                        "assay_type": "Experimental Assay",                # all GEO RNA-seq is experimental
-                        "organism_input": True,                            # always true for our cohort (uses biosample)
-                        "reagents": [],                                    # not extracted in v0
-                        "platform": [a.get("platform")] if a.get("platform") else [],  # v0 has free-text; v1 will use material_ids
+                        "documentation_id": None,
+                        "assay_name": a.get("assay_type"),
+                        "assay_name_id": None,
+                        "assay_type": "Experimental Assay",
+                        "organism_input": True,
+                        "reagents": [],
+                        "platform": [a.get("platform")] if a.get("platform") else [],
                     })
 
                 record["study_extracted"] = {
                     "study": study_row,
                     "assays": assay_rows,
-                    "_extraction_source": raw,  # original v0 flat shape, kept for Sprint 2 multi-table mapping
+                    "_extraction_source": raw,
                     "_unmapped_fields": [
-                        # These v0 fields belong to OTHER SEA-CDM tables not populated in Sprint 1;
-                        # Sprint 2 will route them to the right tables.
                         "experiments[].subject_species  → subject.species",
                         "experiments[].treatment_group  → groups + interventions",
                         "experiments[].control_group    → groups",
@@ -752,17 +702,13 @@ def assemble_agent_a_record(
                 record["issues"].append(f"{seacdm_path} unreadable: {e}")
         else:
             record["issues"].append(
-                f"{seacdm_path} not found — call extract_sea_cdm_conditions on the paper "
-                f"text before assembling for richer study/assay metadata; record proceeds without it."
+                f"{seacdm_path} not found — Legacy flat extraction was not run."
             )
 
-        # 6. Metadata file (for downstream provenance).
         metadata_path = os.path.join("data", chosen_gse, f"{chosen_gse}_metadata.csv")
         if os.path.isfile(metadata_path):
             record["provenance"]["metadata_csv"] = metadata_path
 
-        # 7. Write the record. Prefer PMCID as the filename stem (human-readable);
-        #    fall back to paper_id (an S2 hex hash) or "unknown".
         os.makedirs(output_dir, exist_ok=True)
         stem_raw = norm_pmcid or paper_id or "unknown_paper"
         stem = "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in stem_raw)
@@ -770,12 +716,10 @@ def assemble_agent_a_record(
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(record, f, indent=2, ensure_ascii=False)
 
-        # 8. Report. Split critical from informational issues — critical means the
-        # record itself is suspect (likely fabricated GSE), not just a missing artifact.
         crit = [i for i in record["issues"] if i.startswith("CRITICAL")]
         info = [i for i in record["issues"] if not i.startswith("CRITICAL")]
         lines = [
-            f"Agent A v0 record written: {out_path}",
+            f"LEGACY Agent A v0 record written: {out_path}",
             f"- paper: paperId={paper_id or '∅'} | pmcid={norm_pmcid or '∅'} | year={record['paper']['year'] or '∅'}",
         ]
         if chosen_gse:
@@ -797,9 +741,9 @@ def assemble_agent_a_record(
         else:
             lines.append("- secondary analysis: no cohort artifacts found")
         if record["study_extracted"]:
-            lines.append("- study_extracted: present (from extract_sea_cdm_conditions)")
+            lines.append("- study_extracted: present (Legacy flat extractor)")
         else:
-            lines.append("- study_extracted: absent (extract_sea_cdm_conditions not called)")
+            lines.append("- study_extracted: absent (Legacy flat extractor not called)")
         if crit:
             lines.append(f"!!! CRITICAL issues ({len(crit)}) — record is likely fabricated:")
             for issue in crit:

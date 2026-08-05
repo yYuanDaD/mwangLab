@@ -5,6 +5,7 @@ metadata sample IDs. This tries a cascade of strategies in order of specificity
 and stops on the first one that matches at least `min_match_fraction` of the
 counts columns. Used by deseq2_tools and stats_tools."""
 
+import math
 import re
 
 _TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9]+|[0-9]+")
@@ -38,15 +39,18 @@ def align_samples(counts_cols, metadata_df, min_match_fraction: float = 0.5,
 
     counts_set = set(counts_cols)
     meta_idx = [str(x) for x in metadata_df.index]
+    required = max(1, int(math.ceil(min(n, len(meta_idx)) * min_match_fraction)))
 
-    # 1. Exact intersection
+    # 1. Exact intersection. A tiny accidental intersection is not enough to
+    # short-circuit the remaining strategies.
     common = counts_set & set(meta_idx)
-    if common:
+    exact_mapping = {c: c for c in common}
+    if len(exact_mapping) >= required:
         return {c: c for c in common}, f"exact ({len(common)}/{n})"
 
     # 2. Substring (counts col appears in metadata row text)
-    mapping = {}
-    used = set()
+    mapping = dict(exact_mapping)
+    used = set(exact_mapping.values())
     for idx, row in metadata_df.iterrows():
         row_text = " ".join(str(x) for x in row.values).lower()
         for col in counts_cols:
@@ -56,13 +60,13 @@ def align_samples(counts_cols, metadata_df, min_match_fraction: float = 0.5,
                 mapping[idx] = col
                 used.add(col)
                 break
-    if len(mapping) >= n * min_match_fraction:
+    if len(mapping) >= required:
         return mapping, f"substring ({len(mapping)}/{n})"
 
     # 3. Token overlap (greedy by max overlap per metadata row)
     col_tokens = {col: _tokens(col) for col in counts_cols}
-    mapping = {}
-    used = set()
+    mapping = dict(exact_mapping)
+    used = set(exact_mapping.values())
     for idx, row in metadata_df.iterrows():
         row_tokens = set()
         for v in row.values:
@@ -79,7 +83,7 @@ def align_samples(counts_cols, metadata_df, min_match_fraction: float = 0.5,
             best_col = candidates[0][1]
             mapping[idx] = best_col
             used.add(best_col)
-    if len(mapping) >= n * min_match_fraction:
+    if len(mapping) >= required:
         return mapping, f"token_overlap ({len(mapping)}/{n})"
 
     return {}, "no_match"

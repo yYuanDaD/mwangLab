@@ -5,6 +5,10 @@ import pandas as pd
 from pydeseq2.dds import DeseqDataSet
 from pydeseq2.ds import DeseqStats
 from langchain_core.tools import tool
+from tools.analysis_policy import (
+    PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
+    select_valid_two_group_design,
+)
 
 
 _FNAME_BAD = re.compile(r'[<>:"/\\|?*\s]+')
@@ -68,6 +72,7 @@ def run_deseq2_analysis(
     try:
         print("Loading data for DESeq2 analysis...")
         counts_df = pd.read_csv(counts_csv, index_col=0, sep=None, engine="python")
+        counts_df = numeric_matrix(counts_df, label="DESeq2 counts matrix")
         counts_df = collapse_duplicate_genes(counts_df, "DESeq2")
         metadata_df = pd.read_csv(metadata_csv, index_col=0)
 
@@ -78,7 +83,9 @@ def run_deseq2_analysis(
         counts_cols = counts_df.columns.tolist()
         meta_index = metadata_df.index.tolist()
 
-        if len(set(counts_cols).intersection(set(meta_index))) == 0:
+        exact_n = len(set(counts_cols).intersection(set(meta_index)))
+        exact_required = max(1, (min(len(counts_cols), len(meta_index)) + 1) // 2)
+        if exact_n < exact_required:
             print("Sample names do not match between counts and metadata. Attempting smart alignment...")
             from tools.llm_helpers import align_samples_with_llm_fallback
             mapping, method = align_samples_with_llm_fallback(counts_cols, metadata_df)
@@ -100,26 +107,18 @@ def run_deseq2_analysis(
         counts_df = counts_df.loc[common_samples]
         metadata_df = metadata_df.loc[common_samples]
 
-        all_available_groups = metadata_df[design_column].unique().tolist()
-
-        mask = metadata_df[design_column].isin([control_group, treatment_group])
-        metadata_df = metadata_df[mask]
-
-        group_stats = metadata_df[design_column].value_counts()
+        metadata_df, group_stats = select_valid_two_group_design(
+            metadata_df, design_column=design_column, control_group=control_group,
+            treatment_group=treatment_group, available_samples=counts_df.index,
+        )
         print(f"Sample distribution after filtering:\n{group_stats}")
 
-        if len(group_stats) < 2:
-            return (f"FATAL ERROR: cannot run differential analysis. File {os.path.basename(counts_csv)} "
-                    f"does not contain both '{control_group}' and '{treatment_group}'.\n"
-                    f"Currently available groups: {group_stats.index.tolist()}\n"
-                    f"All groups in metadata column '{design_column}': {all_available_groups}\n"
-                    f"Suggestion: check that the correct counts file was selected and that the metadata column name matches.")
-
         counts_df = counts_df.loc[metadata_df.index]
+        enforce_method_matrix_compatibility(counts_df, method="deseq2")
 
         # Drop genes with zero counts across all samples; PyDESeq2 needs integer counts.
         counts_df = counts_df.loc[:, (counts_df != 0).any(axis=0)]
-        counts_df = counts_df.round().astype(int)
+        counts_df = counts_df.astype(int)
 
         # pydeseq2 builds a patsy formula `~ <design_factor>` from the column NAME, which breaks
         # when a GEO metadata column has spaces/slashes (e.g. 'characteristics_ch1.2.running protocole'
@@ -162,6 +161,8 @@ def run_deseq2_analysis(
                 f"- Up-regulated genes: {len(up_regulated)}\n"
                 f"- Down-regulated genes: {len(down_regulated)}")
 
+    except PolicyViolation as e:
+        return f"POLICY BLOCKED: {e}"
     except Exception as e:
         print(f"Tool Error: {str(e)}")
         return f"DESeq2 analysis failed. Error: {str(e)}"

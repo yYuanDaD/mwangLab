@@ -19,11 +19,14 @@ import shutil
 import subprocess
 import tempfile
 
-import numpy as np
 import pandas as pd
 from langchain_core.tools import tool
 
 from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
+from tools.analysis_policy import (
+    PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
+    select_valid_two_group_design,
+)
 
 _R_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "limma_voom.R")
 
@@ -81,17 +84,15 @@ def run_limma_voom_analysis(
         metadata_df = pd.read_csv(metadata_csv, index_col=0)
 
         # Drop entirely non-numeric columns (annotation columns some GEO files mix in).
-        coerced = counts_df.apply(pd.to_numeric, errors="coerce")
-        non_numeric = coerced.columns[coerced.isna().all(axis=0)].tolist()
-        if non_numeric:
-            print(f"   Dropping {len(non_numeric)} non-numeric columns (likely annotations): {non_numeric}")
-            counts_df = counts_df.drop(columns=non_numeric)
+        counts_df = numeric_matrix(counts_df, label="limma-voom counts matrix")
         counts_df = collapse_duplicate_genes(counts_df, "limma-voom")
 
         # Smart sample alignment (exact/substring/token-overlap/LLM) — same cascade as DESeq2/limma/edgeR.
         counts_cols = counts_df.columns.tolist()
         meta_index = metadata_df.index.tolist()
-        if len(set(counts_cols).intersection(set(meta_index))) == 0:
+        exact_n = len(set(counts_cols).intersection(set(meta_index)))
+        exact_required = max(1, (min(len(counts_cols), len(meta_index)) + 1) // 2)
+        if exact_n < exact_required:
             print("Sample names do not match between counts and metadata. Attempting smart alignment...")
             from tools.llm_helpers import align_samples_with_llm_fallback
             mapping, method = align_samples_with_llm_fallback(counts_cols, metadata_df)
@@ -102,23 +103,20 @@ def run_limma_voom_analysis(
             metadata_df = metadata_df[~metadata_df.index.duplicated(keep="first")]
             print(f"Aligned via {method}.")
 
-        all_available_groups = metadata_df[design_column].dropna().unique().tolist()
-        mask = metadata_df[design_column].isin([control_group, treatment_group])
-        metadata_df = metadata_df[mask]
-        group_stats = metadata_df[design_column].value_counts()
+        metadata_df, group_stats = select_valid_two_group_design(
+            metadata_df, design_column=design_column, control_group=control_group,
+            treatment_group=treatment_group, available_samples=counts_df.columns,
+        )
         print(f"Sample distribution after filtering:\n{group_stats}")
-        if len(group_stats) < 2:
-            return (f"FATAL ERROR: cannot run differential analysis. File {os.path.basename(counts_csv)} "
-                    f"does not contain both '{control_group}' and '{treatment_group}'.\n"
-                    f"Currently available groups: {group_stats.index.tolist()}\n"
-                    f"All groups in metadata column '{design_column}': {all_available_groups}")
 
         common = [s for s in metadata_df.index if s in counts_df.columns]
         if len(common) < 4:
             return (f"FATAL ERROR: only {len(common)} samples remain after alignment + group filtering. "
                     f"limma-voom needs at least 2 samples per group (4 total).")
         metadata_df = metadata_df.loc[common]
-        counts_sub = counts_df[common].round().astype(int)
+        counts_sub = counts_df[common]
+        enforce_method_matrix_compatibility(counts_sub, method="limma-voom")
+        counts_sub = counts_sub.astype(int)
         counts_sub = counts_sub.loc[(counts_sub != 0).any(axis=1)]
         n_genes, n_samples = counts_sub.shape
         print(f"Running limma-voom (R) on {n_samples} samples and {n_genes} genes...")
@@ -156,6 +154,8 @@ def run_limma_voom_analysis(
                 f"- Up-regulated genes: {len(up)}\n"
                 f"- Down-regulated genes: {len(down)}")
 
+    except PolicyViolation as e:
+        return f"POLICY BLOCKED: {e}"
     except subprocess.TimeoutExpired:
         return "limma-voom (R) timed out after 600s."
     except Exception as e:

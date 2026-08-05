@@ -17,6 +17,7 @@ Two fallback hooks:
 """
 
 import json
+import math
 import os
 from typing import Optional
 
@@ -498,14 +499,12 @@ def align_samples_with_llm_fallback(counts_cols, metadata_df,
     if dropped:
         print(f"  [llm-align] dropped {dropped} invalid pairs (unknown id/col or duplicate)")
 
-    # Threshold semantic: did most of what the LLM proposed survive validation?
-    # We deliberately use len(raw) (LLM proposal size) — not len(counts_cols) —
-    # because expression files often mix in non-sample numeric columns (derived
-    # statistics like `diffexp_log2FC`, plex-summary columns, etc.) that the LLM
-    # correctly excludes from its mapping. Using len(counts_cols) as denominator
-    # punished correct mappings on those files (GSE317978: 6 valid / 13 cols ≈ 0.46
-    # rejected a perfect 6-sample mapping).
-    proposed_n = len(raw)
-    if proposed_n > 0 and len(valid) >= proposed_n * min_match_fraction:
-        return valid, f"llm ({len(valid)}/{proposed_n})"
-    return {}, f"no_match_llm_too_few ({len(valid)}/{proposed_n})"
+    # Require coverage of the smaller side, not merely survival of whatever tiny
+    # subset the LLM chose to propose. This still accepts a six-sample metadata
+    # table matched against a matrix with extra numeric statistic columns
+    # (target=min(13, 6)=6), while rejecting a misleading 2/20 proposal.
+    target_n = min(len(counts_cols), len(meta_idx_set))
+    required_n = max(1, int(math.ceil(target_n * min_match_fraction)))
+    if len(valid) >= required_n:
+        return valid, f"llm ({len(valid)}/{target_n})"
+    return {}, f"no_match_llm_too_few ({len(valid)}/{target_n}; required={required_n})"

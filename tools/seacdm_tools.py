@@ -1,37 +1,4 @@
-"""SEA-CDM extraction tools.
-
-Two generations live here:
-
-* v0 (`extract_sea_cdm_conditions`) — the original flat single-call extractor.
-  Kept for backward compatibility with `main.py`'s current wiring; will be
-  retired once Phase 3 rewires the agent.
-
-* v1 (`extract_sea_cdm_tables`) — Phase 2/3 build. Grouped, multi-table,
-  multi-experiment extraction with per-field provenance. Reads a paper's full
-  text and makes THREE focused `with_structured_output` LLM calls, each with a
-  FLAT schema (lists of simple objects — NOT deeply nested, which proved
-  unreliable: a single experiments[]-of-nested-lists call returned 0 experiments
-  for the same paper that a flat call extracts fully):
-
-    Group 1 (study level)   -> study + documentation + material
-    Group 2 (design)        -> experiments[] + subjects[] + groups[]
-    Group 3 (methods)       -> samples[] + interventions[] + assays[]
-
-  Child rows (subject/sample/group/intervention/assay) carry an
-  `experiment_index` (1-based, default 1) attributing them to an experiment, so
-  multi-experiment papers stay linked without nesting. A deterministic flattener
-  then assigns the IDs / FKs from `tools/sea_cdm_schema.py`'s convention (the LLM
-  never invents IDs) and emits rows keyed to each table's `csv_columns(...)`.
-  Output: one `output/{study_id}/seacdm_tables.json` per study, plus optional
-  append into the SEA-CDM cohort CSVs (Phase 3 uses the same writer).
-
-Design notes:
-  - Every text-extracted descriptive field is a `Sourced` value (value + a
-    verbatim `source` quote). The prompts forbid inventing the source.
-  - Ontology `*_name_id` columns are never produced (Q4 / Agent B's job).
-  - The pipeline tables (analysis / results) are NOT filled here — they come
-    from `run_batch_geo_pipeline`. This tool only fills the 9 text tables.
-"""
+"""Audited SEA-CDM extraction plus compatibility-only Legacy extractors."""
 
 import os
 import re
@@ -45,9 +12,7 @@ from tools.sea_cdm_schema import Sourced, SEA_TABLES, csv_columns
 from tools.metadata_structural import build_structural_tables, META_SOURCE_PREFIX
 
 
-# ======================================================================================
-# v0 — original flat extractor (kept for backward compatibility with main.py)
-# ======================================================================================
+# LEGACY: flat v0 compatibility API. Do not use for new workflows.
 
 class AssayInfo(BaseModel):
     assay_type: str = Field(description="Assay type, e.g. RNA-Seq")
@@ -70,7 +35,7 @@ class SEACDM_Record(BaseModel):
 
 @tool(args_schema=SEACDM_Record)
 def extract_sea_cdm_conditions(study_id: str, study_objective: str, experiments: list, assays: list) -> str:
-    """Extract experiment conditions and save as a local SEA CDM JSON file."""
+    """LEGACY: write the deprecated flat SEA-CDM v0 JSON. Use extract_sea_cdm_tables."""
     os.makedirs("./output", exist_ok=True)
     dict_experiments = [exp.model_dump() if hasattr(exp, 'model_dump') else exp for exp in experiments]
     dict_assays = [assay.model_dump() if hasattr(assay, 'model_dump') else assay for assay in assays]
@@ -83,18 +48,10 @@ def extract_sea_cdm_conditions(study_id: str, study_objective: str, experiments:
     save_path = f"./output/{study_id}_seacdm.json"
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(record, f, indent=4, ensure_ascii=False)
-    return f"Experiment conditions saved successfully to: {save_path}"
+    return f"LEGACY flat SEA-CDM record saved to: {save_path}"
 
 
-# ======================================================================================
-# v1 — grouped multi-table extraction (3 flat calls)
-# ======================================================================================
-
-# --- Extraction models -----------------------------------------------------------------
-# These mirror the *descriptive* (Sourced) fields of the schema models in
-# tools/sea_cdm_schema.py, but deliberately OMIT the id/FK fields — those are assigned
-# deterministically by the flattener so the LLM cannot hallucinate IDs. Child rows carry
-# `experiment_index` (1-based) to attribute them to an experiment without deep nesting.
+# Current extraction models omit IDs/FKs; Python assigns them deterministically.
 
 class StudyExtract(BaseModel):
     study_name: Sourced = Field(default_factory=Sourced, description="The study's title / name")
@@ -236,33 +193,16 @@ class MethodsExtraction(_CoerceJSONContainer):
 
 
 class LeanExtraction(_CoerceJSONContainer):
-    """req #4 — single merged container for the LEAN extraction path.
-
-    After req #3, when a GEO metadata CSV is present the subject/sample/groups/assay tables are
-    derived deterministically from it, so the design and methods group calls would only contribute
-    `experiments` and `interventions` respectively — the rest of their (expensive) output is
-    discarded. This container merges the still-needed descriptive tables into ONE flat call
-    (study + documentation + material + experiments + interventions), so the full paper text is
-    sent to the LLM ONCE instead of three times (~66% input-token cut on the dominant cost).
-    Flat lists only — no nesting, so the documented '0 experiments' nested-schema failure does
-    not apply."""
+    """Single-call extraction used when GEO metadata supplies structural tables."""
     study: StudyExtract = Field(default_factory=StudyExtract)
     documentation: List[DocumentationExtract] = Field(default_factory=list)
     material: List[MaterialExtract] = Field(default_factory=list)
     experiments: List[ExperimentLite] = Field(default_factory=list)
     interventions: List[InterventionExtract] = Field(default_factory=list)
-    # req #3 (one-pass extraction): the paper's OWN reported findings (#5) are pulled in the SAME
-    # merged call as the descriptive tables — no separate findings LLM call on the lean (own-GSE)
-    # path (2 calls -> 1). `ReportedFinding` is defined below; forward-ref resolved by model_rebuild.
     reported_findings: List["ReportedFinding"] = Field(default_factory=list)
 
 
-# --- req #5: reported-findings extraction (what the PAPER says changed) -----------------
-# For studies we cannot (or do not) compute differential expression for — no own GSE, no
-# analyzable matrix (SRA-only / methylation / scRNA), or analysis disabled — the `results`
-# table would otherwise be empty. This pulls the molecular/physiological findings the paper
-# itself REPORTS (gene/protein/metabolite/lipid/phenotype claims and their direction), each with
-# a verbatim source quote, so the results table carries the paper's own conclusions.
+# Paper-reported findings used when computed results are unavailable.
 
 class ReportedFinding(BaseModel):
     entity: str = Field(description="the molecule/gene/protein/metabolite/lipid/phenotype that "
@@ -281,8 +221,6 @@ class ReportedFindingsExtraction(_CoerceJSONContainer):
     findings: List[ReportedFinding] = Field(default_factory=list)
 
 
-# Resolve LeanExtraction's forward reference to ReportedFinding (defined just above), so the
-# one-pass (req #3) merged extraction container validates with the findings field present.
 LeanExtraction.model_rebuild()
 
 
@@ -342,6 +280,7 @@ _PROVENANCE_RULES = (
 
 
 def _extract_study_level(paper_text: str, study_id: str, organism: str, usage=None) -> StudyLevelExtraction:
+    """LEGACY FULL-mode group; retained when GEO metadata is unavailable."""
     llm = _get_llm()
     if llm is None:
         return StudyLevelExtraction()
@@ -368,6 +307,7 @@ Extract THREE things from the paper text below:
 
 
 def _extract_design(paper_text: str, study_id: str, organism: str, usage=None) -> DesignExtraction:
+    """LEGACY FULL-mode group; retained when GEO metadata is unavailable."""
     llm = _get_llm()
     if llm is None:
         return DesignExtraction()
@@ -400,6 +340,7 @@ ONE named group put that group's name verbatim in `group_label`; if it spans all
 
 
 def _extract_methods(paper_text: str, study_id: str, organism: str, usage=None) -> MethodsExtraction:
+    """LEGACY FULL-mode group; retained when GEO metadata is unavailable."""
     llm = _get_llm()
     if llm is None:
         return MethodsExtraction()
@@ -430,9 +371,7 @@ verbatim in `group_label`; otherwise leave it null.
 
 
 def _extract_lean(paper_text: str, study_id: str, organism: str, usage=None) -> LeanExtraction:
-    """req #4 — one merged call for the descriptive tables that the GEO metadata can't supply
-    (study / documentation / material / experiments / interventions). subject / sample / groups /
-    assay are NOT requested here; they come from the metadata CSV in flatten_extraction."""
+    """Extract descriptive fields not supplied by GEO metadata."""
     llm = _get_llm()
     if llm is None:
         return LeanExtraction()
@@ -517,7 +456,7 @@ def flatten_extraction(
     returns children but no experiments, a single default experiment (exp1) is synthesized
     so nothing is orphaned.
 
-    req #3 determinism: when `metadata_csv` points to a readable GEO metadata CSV, the four
+    When `metadata_csv` points to a readable GEO metadata CSV, the four
     per-sample STRUCTURAL tables (subject / sample / groups / assay) are REPLACED with rows
     derived deterministically from that CSV (tools/metadata_structural.build_structural_tables)
     instead of the run-to-run-varying LLM lists. The LLM still fills the descriptive tables
@@ -558,7 +497,7 @@ def flatten_extraction(
         _emit(mrow, "organization", m.organization)
         tables["material"].append(_order_row("material", mrow))
 
-    # ---- experiments: EXACTLY ONE per study (Option B, req #8/#3) ----
+    # One experiment per study; arms and timepoints remain groups/contrasts.
     # The LLM's experiment COUNT is non-deterministic (1 vs 6 on the same paper — see the
     # determinism check). Time/duration arms are captured as `groups` and split per-contrast in the
     # analysis layer, so we pin a single experiment here and attach every child to it (ei is forced
@@ -714,7 +653,7 @@ def flatten_extraction(
         _emit(arow, "platform", asy.platform)
         tables["assay"].append(_order_row("assay", arow))
 
-    # req #3: override the four per-sample structural tables with a DETERMINISTIC read of the
+    # Override structural tables with a deterministic read of the
     # GEO metadata CSV (one row per real sample, distinct organisms, distinct design-column arms,
     # distinct platforms). This is what makes the structural table SHAPE reproducible run-to-run; the
     # experiment table is already pinned to one row above. Fail-soft: keep the LLM tables on error.
@@ -1236,8 +1175,7 @@ def verify_provenance(tables: dict, paper_text: str) -> dict:
                     n_unverified += 1
                     continue
                 n_total += 1
-                # req #3: rows derived from the GEO metadata CSV cite a metadata COLUMN, not a paper
-                # quote — structured provenance, exempt from the verbatim-paper-substring check.
+                # Metadata column references are structured provenance, not paper quotes.
                 if str(raw).startswith(META_SOURCE_PREFIX):
                     continue
                 if _quote_is_verbatim(str(raw), norm_text):
@@ -1267,29 +1205,12 @@ def extract_tables_from_text(
     lean: Optional[bool] = None,
     usage: Optional[list] = None,
 ) -> dict:
-    """Run the grouped extraction calls and flatten to {table: [rows]}. Pure (no disk writes)
-    so callers (the @tool, the cohort orchestrator) decide where to persist. Returns the
-    SEA-CDM table dict (text tables filled; pipeline/rare/deferred empty).
+    """Extract SEA-CDM tables without writing files.
 
-    Two extraction modes (req #4 cost):
-      * FULL (3 calls): study_level + design + methods, each sent the whole paper text. Used when
-        no GEO metadata CSV is available (the design/methods calls must supply subject/sample/
-        groups/assay from text).
-      * LEAN (1 call): when a GEO metadata CSV IS available, subject/sample/groups/assay come from
-        it deterministically (req #3), so only the descriptive tables still need the LLM — those
-        are extracted in ONE merged call (`_extract_lean`). This sends the full text once instead
-        of three times (~66% input-token cut). `lean` defaults to auto (lean iff metadata present);
-        pass lean=False to force the 3-call path, lean=True to require it (it still needs metadata).
-
-    When `verify` (default), every Sourced `_source` quote is checked against `paper_text` and
-    fabricated/paraphrased quotes are marked '[UNVERIFIED]' in place. If a `report` dict is passed,
-    it gets the verification summary plus extraction_mode/metadata_structural. If `usage` is a list,
-    each LLM call's (input_tokens, output_tokens) is appended for the cost profiler.
-
-    Every group call is FAIL-SOFT: a structured-output validation error degrades THAT call to an
-    empty container, logged in report['group_errors'] — the paper still produces tables."""
-    # req #3: resolve the study's structured GEO metadata up front — it decides both the structural
-    # derivation AND (req #4) whether the lean single-call path applies.
+    The current LEAN path uses one structured LLM call and derives structural tables from GEO
+    metadata. The three-call FULL fallback is Legacy and runs only when metadata is unavailable
+    or explicitly requested with ``lean=False``. Source quotes are verified by default.
+    """
     if metadata_csv is None:
         _cand = os.path.join("data", study_id, f"{study_id}_metadata.csv")
         if os.path.exists(_cand):
@@ -1311,16 +1232,11 @@ def extract_tables_from_text(
 
     if use_lean:
         lean_ext = _safe(_extract_lean, LeanExtraction(), "lean")
-        # subjects/groups/samples/assays intentionally empty — the metadata override fills them.
         study_level = StudyLevelExtraction(study=lean_ext.study,
                                            documentation=lean_ext.documentation,
                                            material=lean_ext.material)
         design = DesignExtraction(experiments=lean_ext.experiments, subjects=[], groups=[])
         methods = MethodsExtraction(samples=[], interventions=lean_ext.interventions, assays=[])
-        # req #3 (one-pass): the paper's reported findings (#5) came back in this SAME call. Verify
-        # them verbatim and stash on `report` so the cohort reuses them instead of a separate #5
-        # call. Always set the key in lean mode (even to []) so the cohort can tell "lean ran" from
-        # "full path" (key absent → build_reported_findings makes its own call).
         lean_findings = [f.model_dump() for f in lean_ext.reported_findings]
         if verify and lean_findings:
             frep = verify_findings_provenance(lean_findings, paper_text)
@@ -1329,17 +1245,16 @@ def extract_tables_from_text(
         if report is not None:
             report["reported_findings"] = lean_findings
     else:
+        # LEGACY fallback: three full-text calls. Kept for papers without GEO metadata.
         study_level = _safe(_extract_study_level, StudyLevelExtraction(), "study_level")
         design = _safe(_extract_design, DesignExtraction(), "design")
         methods = _safe(_extract_methods, MethodsExtraction(), "methods")
 
     tables = flatten_extraction(study_id, study_level, design, methods, metadata_csv=metadata_csv)
-    # Paper text is retained as reported-findings evidence, but does not populate
-    # gene.csv/pathway.csv directly. Those tables are computed from data products:
-    # DEG -> gene, GSEA/GMT -> pathway/enrichment.
     if report is not None:
         report["metadata_structural"] = have_meta
         report["extraction_mode"] = "lean(1-call)" if use_lean else "full(3-call)"
+        report["legacy_mode"] = not use_lean
         if metadata_csv:
             report["metadata_csv"] = metadata_csv
     if report is not None and group_errors:
@@ -1351,7 +1266,7 @@ def extract_tables_from_text(
     return tables
 
 
-# --- req #5: reported-findings extraction + result rows --------------------------------
+# Reported-findings extraction and result rows.
 
 _FINDINGS_COLUMNS = ["entity", "entity_type", "direction", "magnitude", "comparison", "source"]
 
@@ -1541,14 +1456,14 @@ def build_reported_findings(study_id: str, paper_text: str, findings_csv_path: s
                             prefetched_findings: Optional[list] = None,
                             existing_tables: Optional[dict] = None,
                             usage=None) -> dict:
-    """req #5 end-to-end: extract the paper's reported findings, WRITE them to findings_csv_path,
+    """Extract reported findings, write them to findings_csv_path,
     and return {'analysis': [row], 'results': [row]} contributions for the SEA-CDM model so a study
     with no computable data still has non-empty results. Returns empty lists when no findings.
 
     IDs are text-specific ('{study}_analysis_text1' / '{study}_res_text1') so they never collide
     with the computational analysis/results rows that run_batch_geo_pipeline produces for own GSEs.
 
-    req #3 (one-pass): when `prefetched_findings` is provided (the lean merged extraction already
+    When `prefetched_findings` is provided (the lean merged extraction already
     pulled them — see extract_tables_from_text), they are REUSED directly and NO separate findings
     LLM call is made. Pass None to keep the standalone behavior (one dedicated call)."""
     import csv
@@ -1606,7 +1521,7 @@ def build_reported_findings(study_id: str, paper_text: str, findings_csv_path: s
 
 def build_reconciliation_rows(study_id: str, agreement_csv_path: str, summary: dict,
                               n_findings: int = 0) -> dict:
-    """req #2 — promote the computed-vs-reported reconciliation into the SEA-CDM result layer.
+    """Promote computed-vs-reported reconciliation into the SEA-CDM result layer.
 
     The #6 agreement table (`agreement_csv_path`) already holds, per paper finding, the paper's
     claim (entity/direction/source) ALONGSIDE our computed value (log2FC/padj/significant) and a
@@ -1626,7 +1541,7 @@ def build_reconciliation_rows(study_id: str, agreement_csv_path: str, summary: d
         "study_id": study_id,
         "input_data": "Paper reported findings (#5) joined to our computed DEG (#1/#8)",
         "input_data_id": study_id,
-        "analysis_name": "Computed-vs-reported reconciliation (req #6)",
+        "analysis_name": "Computed-vs-reported reconciliation",
         "da_method": "reconciliation",
         "n_deg": str(n_disagree),  # repurposed: count of DISAGREEMENTS (contradicted + not_detected)
         "reference_source": "GEO",
@@ -1670,7 +1585,7 @@ def extract_sea_cdm_tables(
         max_chars: truncate paper text to this many chars (cost guard).
         metadata_csv: optional path to the study's GEO metadata CSV. When given (or when
             data/{study_id}/{study_id}_metadata.csv exists), subject/sample/groups/assay are
-            derived DETERMINISTICALLY from it instead of from the LLM (req #3 determinism).
+            derived deterministically from it instead of from the LLM.
     """
     if not os.path.exists(paper_text_path):
         return f"ERROR: paper text not found at {paper_text_path}"

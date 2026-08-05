@@ -19,7 +19,7 @@ from tools.sea_cdm_schema import csv_columns, SEA_TABLES
 from tools.cohort_tools import (
     classify_gse_ownership, choose_own_gse,
     init_cohort_csvs, build_pipeline_rows, _count_csv_rows,
-    run_agent_a_cohort, _is_exercise_relevant_search_hit,
+    run_agent_a_cohort, _is_exercise_relevant_search_hit, normalize_agent_a_request,
 )
 
 
@@ -100,6 +100,28 @@ def test_exercise_relevance_gate_offline():
     print("[offline] exercise relevance gate: PASS")
 
 
+def test_request_normalization_offline():
+    req = normalize_agent_a_request(
+        keyword="  exercise RNA-seq  ", organism="human", max_papers=0,
+        search_pool=1, run_label=" unsafe / cohort ",
+        treatment_keywords=["Exercise", "exercise", " trained "],
+        control_keywords=["Control", "control", "sedentary"],
+    )
+    assert req.keyword == "exercise RNA-seq"
+    assert req.organism == "Human"
+    assert req.max_papers == 1 and req.search_pool == 1
+    assert req.run_label == "unsafe_cohort"
+    assert req.treatment_keywords == ["Exercise", "trained"]
+    assert req.control_keywords == ["Control", "sedentary"]
+    try:
+        normalize_agent_a_request(keyword="x", treatment_keywords=["control"],
+                                  control_keywords=["Control"])
+        raise AssertionError("overlapping arm keywords should be rejected")
+    except ValueError as exc:
+        assert "overlap" in str(exc)
+    print("[offline] request normalization + validation: PASS")
+
+
 def test_cohort_live():
     out_base = "test/output/smoke_test"
     label = "cohort_live"
@@ -127,6 +149,7 @@ if __name__ == "__main__":
     test_ownership_offline()
     test_scaffold_and_pipeline_rows_offline()
     test_exercise_relevance_gate_offline()
+    test_request_normalization_offline()
     if "--live" in sys.argv:
         test_cohort_live()
     else:

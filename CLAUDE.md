@@ -36,7 +36,7 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
 
 *Single-study workflow:*
 - `geo_tools.py` — `download_geo_data`, `download_supplementary_files`, `fetch_geo_description`, **`search_geo_studies`** (NCBI E-utilities keyword search, returns a curated GEO series list). Saves expression matrix and metadata as CSV to `./data/{accession}/`, auto-converts supplementary `.xlsx` → `.csv`. `download_supplementary_files` does NOT auto-unpack `_RAW.tar` archives (the batch pipeline handles that — see `batch_tools.py`).
-- `seacdm_tools.py` — `extract_sea_cdm_conditions`. Uses Pydantic schema (`SEACDM_Record`) as `args_schema` to force structured LLM output, saves to `./output/{study_id}/seacdm.json`.
+- `seacdm_tools.py` — `extract_sea_cdm_tables` is current. `extract_sea_cdm_conditions` is **Legacy**, retained only for old scripts.
 - `preprocess_tools.py` — `preprocess_counts`. Drops all-NaN annotation columns, filters low-expression genes, log2(CPM+1) normalization. Reads CSV/TSV/.gz transparently via pandas separator sniffing (see "TSV silent-failure fix" below). Outputs `<base>_filtered.csv` and `<base>_normalized.csv`.
 - `stats_tools.py` — `run_pca`, `sample_correlation_heatmap`, `sample_qc_summary`. Each tool accepts an optional `metadata_csv` so it can intersect against true sample IDs and ignore annotation columns. All tools call `_reject_if_metadata` at entry to refuse a metadata CSV passed where a counts CSV was expected.
 - `deseq2_tools.py` — `run_deseq2_analysis`, `inspect_metadata`. Uses the shared `align_samples()` cascade (see `sample_align.py`) when counts/metadata sample IDs don't match exactly.
@@ -67,7 +67,7 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
 
 **Key design choice — programmatic guardrails:** System prompts asking the LLM "do not loop" are insufficient on their own. `guard_tools` enforces dedupe + cap in Python so loops are structurally impossible. With Claude Sonnet 4.6 this is belt-and-suspenders — Claude does not in practice loop — but it caps the worst-case bill at ~30 tool calls per run.
 
-**Key design choice — structured tool outputs via Pydantic:** The `@tool(args_schema=SEACDM_Record)` decorator on `extract_sea_cdm_conditions` forces the LLM to emit a validated Pydantic model before the tool function runs, ensuring data quality without post-processing.
+**Key design choice — structured tool outputs via Pydantic:** Current extraction uses validated Pydantic output; Python assigns IDs/FKs and writes relational tables.
 
 **Key design choice — fail loudly, not silently.** `align_samples` deliberately omits a position-based fallback (would corrupt biology silently); `_find_raw_counts_file` skips with explicit reason codes instead of best-effort matching; `_classify_matrix` rejects FPKM/TPM rather than feeding them to DESeq2 (statistical model assumes integer counts).
 

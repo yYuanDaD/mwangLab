@@ -27,16 +27,16 @@ with_analysis=True (default off — text tables first, fast and stable).
 
 import csv
 import glob
+import json
 import os
 import re
+from dataclasses import asdict, dataclass
 from datetime import datetime
 
 import pandas as pd
 from dotenv import load_dotenv
 
-# Load .env so S2_API_KEY (search_papers) and CLAUDE_API_KEY (extraction LLM) are present.
-# main.py loads it at agent startup, but this orchestrator is also called standalone (tests,
-# Phase 3 cohort runs); without the key search_papers falls back to S2's throttled anon pool.
+# Also supports standalone and test invocation outside main.py.
 load_dotenv()
 
 import tools.paper_tools as pt
@@ -50,6 +50,113 @@ from tools.seacdm_tools import (
 )
 from tools.sea_cdm_schema import SEA_TABLES, csv_columns
 from tools.geo_tools import download_geo_data
+
+
+_VALID_ORGANISMS = {"": "", "human": "Human", "mouse": "Mouse"}
+_VALID_RAW_DA_METHODS = {"deseq2", "edger", "limma-voom", "auto", "auto-llm", "all"}
+
+
+@dataclass(frozen=True)
+class AgentACohortRequest:
+    """Normalized, deterministic input consumed by the cohort orchestrator.
+
+    The interactive agent supplies user intent once. Python owns defaults, bounds, label
+    generation and keyword cleanup so later stages never depend on the model remembering or
+    reformatting intermediate values.
+    """
+
+    keyword: str
+    max_papers: int
+    organism: str
+    with_analysis: bool
+    treatment_keywords: list[str]
+    control_keywords: list[str]
+    raw_da_method: str
+    require_pdf: bool
+    min_year: int
+    search_pool: int
+    run_label: str
+    output_base: str
+    max_chars: int
+    extract_findings: bool
+    require_exercise_relevance: bool
+
+
+def _clean_keywords(values) -> list[str]:
+    """Return non-empty, case-insensitively unique keywords in stable input order."""
+    out, seen = [], set()
+    for value in values or []:
+        text = str(value).strip()
+        key = text.casefold()
+        if text and key not in seen:
+            seen.add(key)
+            out.append(text)
+    return out
+
+
+def normalize_agent_a_request(**kwargs) -> AgentACohortRequest:
+    """Validate and normalize all model-facing arguments before any network or file work."""
+    keyword = str(kwargs.get("keyword") or "").strip()
+    if not keyword:
+        raise ValueError("keyword must be a non-empty search query")
+
+    organism_raw = str(kwargs.get("organism") or "").strip().casefold()
+    if organism_raw not in _VALID_ORGANISMS:
+        raise ValueError("organism must be 'Human', 'Mouse', or empty")
+
+    method = str(kwargs.get("raw_da_method") or "deseq2").strip().lower()
+    if method not in _VALID_RAW_DA_METHODS:
+        allowed = ", ".join(sorted(_VALID_RAW_DA_METHODS))
+        raise ValueError(f"raw_da_method must be one of: {allowed}")
+
+    treatment = _clean_keywords(kwargs.get("treatment_keywords"))
+    control = _clean_keywords(kwargs.get("control_keywords"))
+    overlap = {x.casefold() for x in treatment} & {x.casefold() for x in control}
+    if overlap:
+        raise ValueError(f"treatment/control keywords overlap: {sorted(overlap)}")
+
+    raw_label = str(kwargs.get("run_label") or keyword).strip()
+    label = re.sub(r"_+", "_", re.sub(r"[^A-Za-z0-9.-]+", "_", raw_label)).strip("_.-")[:40]
+    if not label:
+        label = "agent_a"
+
+    max_papers = max(1, min(int(kwargs.get("max_papers", 5)), 50))
+    search_pool = max(max_papers, min(int(kwargs.get("search_pool", 30)), 100))
+    max_chars = max(5000, min(int(kwargs.get("max_chars", 100000)), 500000))
+    min_year = max(0, int(kwargs.get("min_year", 0)))
+
+    return AgentACohortRequest(
+        keyword=keyword,
+        max_papers=max_papers,
+        organism=_VALID_ORGANISMS[organism_raw],
+        with_analysis=bool(kwargs.get("with_analysis", False)),
+        treatment_keywords=treatment,
+        control_keywords=control,
+        raw_da_method=method,
+        require_pdf=bool(kwargs.get("require_pdf", True)),
+        min_year=min_year,
+        search_pool=search_pool,
+        run_label=label,
+        output_base=str(kwargs.get("output_base") or "./output"),
+        max_chars=max_chars,
+        extract_findings=bool(kwargs.get("extract_findings", True)),
+        require_exercise_relevance=bool(kwargs.get("require_exercise_relevance", True)),
+    )
+
+
+def _write_workflow_state(cohort_dir: str, request: AgentACohortRequest, state: str, **details) -> str:
+    """Persist one machine-readable checkpoint; Python, not the agent, carries workflow state."""
+    os.makedirs(cohort_dir, exist_ok=True)
+    path = os.path.join(cohort_dir, "workflow_state.json")
+    payload = {
+        "state": state,
+        "updated_at": datetime.now().isoformat(timespec="seconds"),
+        "request": asdict(request),
+        "details": details,
+    }
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, indent=2, ensure_ascii=False)
+    return path
 
 
 # ---- own-vs-cited GSE classification --------------------------------------------------
@@ -206,11 +313,7 @@ def build_pipeline_rows(study_id: str, summary_row: dict, batch_study_dir: str) 
     da_method = (summary_row or {}).get("da_method") or None
     is_all = bool(da_method and da_method.startswith("all"))
     gsea_csvs = sorted(glob.glob(os.path.join(batch_study_dir, "*_GSEA_*.csv")))
-    # The DEG glob 'DEG_results_*.csv' ALSO matches derived enrichment outputs, which are named
-    # '<deg_base>_GSEA_Hallmark.csv' / '<deg_base>_GO_*.csv' / '<deg_base>_KEGG_*.csv' (deg_base
-    # itself starts with 'DEG_results_'). Excluding them prevents a GSEA/ORA file from being
-    # double-counted as a differential-expression result — req #8 emits several DEG + GSEA files
-    # per study, which amplifies the miscount.
+    # Exclude enrichment files whose names inherit the DEG prefix.
     _DERIVED = ("_GSEA_", "_GO_", "_KEGG_", "_Reactome_", "_MSigDB_")
     all_deg = sorted(p for p in glob.glob(os.path.join(batch_study_dir, "DEG_results_*.csv"))
                      if not any(tok in os.path.basename(p) for tok in _DERIVED))
@@ -316,10 +419,9 @@ def run_agent_a_cohort(
     """Run the full keyword -> 13-CSV Agent A (SEA-CDM v1) cohort pipeline in ONE call. Returns a
     text report; all artifacts land under output_base/agentA_cohort_{run_label}/.
 
-    This is the v1 successor to the manual search_papers -> fetch_paper_text -> run_batch_geo_pipeline
-    -> extract_sea_cdm_conditions -> assemble_agent_a_record sequence. It runs, per top hit:
+    This replaces the Legacy manual paper-first sequence. It runs, per top hit:
     own-vs-cited GSE disambiguation; the 9 SEA-CDM text tables with per-field provenance; subject/
-    sample/groups/assay derived DETERMINISTICALLY from the GEO metadata CSV (req #3 — byte-identical
+    sample/groups/assay derived deterministically from the GEO metadata CSV (byte-identical
     across re-runs); the paper's text-mined reported findings (#5); the computed-vs-reported agreement
     annotation (#6, when with_analysis); and the pathway->gene->exercise mechanism chain (#7). With
     with_analysis=True it also runs run_batch_geo_pipeline on strictly-own GSEs (DESeq2/edgeR/
@@ -346,20 +448,45 @@ def run_agent_a_cohort(
         require_exercise_relevance: if True, skip search hits whose title/abstract do not clearly
             describe an exercise intervention/exposure context before fetching/extracting.
     """
-    label = run_label or "".join(c if c.isalnum() else "_" for c in keyword).strip("_")[:40]
+    request = normalize_agent_a_request(
+        keyword=keyword, max_papers=max_papers, organism=organism,
+        with_analysis=with_analysis, treatment_keywords=treatment_keywords,
+        control_keywords=control_keywords, raw_da_method=raw_da_method,
+        require_pdf=require_pdf, min_year=min_year, search_pool=search_pool,
+        run_label=run_label, output_base=output_base, max_chars=max_chars,
+        extract_findings=extract_findings,
+        require_exercise_relevance=require_exercise_relevance,
+    )
+    # From here onward every stage consumes the normalized values. This deliberately keeps
+    # intermediate state out of the ReAct loop and preserves the existing public signature.
+    keyword = request.keyword
+    max_papers = request.max_papers
+    organism = request.organism
+    with_analysis = request.with_analysis
+    treatment_keywords = request.treatment_keywords
+    control_keywords = request.control_keywords
+    raw_da_method = request.raw_da_method
+    require_pdf = request.require_pdf
+    min_year = request.min_year
+    search_pool = request.search_pool
+    output_base = request.output_base
+    max_chars = request.max_chars
+    extract_findings = request.extract_findings
+    require_exercise_relevance = request.require_exercise_relevance
+    label = request.run_label
     cohort_dir = os.path.join(output_base, f"agentA_cohort_{label}")
     csv_dir = os.path.join(cohort_dir, "csv")
     studies_dir = os.path.join(cohort_dir, "studies")
     os.makedirs(studies_dir, exist_ok=True)
     init_cohort_csvs(csv_dir)
+    state_path = _write_workflow_state(cohort_dir, request, "INITIALIZED")
     log_lines = [f"# Agent A cohort run  keyword={keyword!r}  label={label}  with_analysis={with_analysis}"]
 
     def log(msg):
         print(msg)
         log_lines.append(msg)
 
-    # Per-stage timer + token/$ accounting (user directive 2026-06-23): every stage gets a wall
-    # timer; LLM stages also get token→$ (Sonnet 4.6 $3/$15 per Mtok). Written to cost_timing.csv.
+    # Track wall time and LLM token cost per stage.
     from tools.cost_timing import RunProfiler
     prof = RunProfiler()
 
@@ -374,7 +501,9 @@ def run_agent_a_cohort(
     if not rows:
         log(search_report)
         _write_log(cohort_dir, log_lines)
+        _write_workflow_state(cohort_dir, request, "NO_SEARCH_RESULTS", search_report=str(search_report))
         return f"No papers to process for {keyword!r}.\n{search_report}"
+    _write_workflow_state(cohort_dir, request, "SEARCHED", n_search_results=len(rows))
     manifest = []
 
     def _base_manifest_row(row: dict, status: str = "", reason: str = "") -> dict:
@@ -414,6 +543,10 @@ def run_agent_a_cohort(
         man_path = os.path.join(cohort_dir, "papers.csv")
         pd.DataFrame(manifest).to_csv(man_path, index=False)
         _write_log(cohort_dir, log_lines)
+        _write_workflow_state(
+            cohort_dir, request, "NO_RELEVANT_PAPERS",
+            papers_considered=len(manifest), manifest=man_path,
+        )
         return (f"No exercise-relevant papers to process for {keyword!r}. "
                 f"Skipped {len(skipped_relevance)} search hits. Manifest: {man_path}")
 
@@ -459,11 +592,7 @@ def run_agent_a_cohort(
         gse_summary = ", ".join(f"{c['gse']}:{c['ownership']}" for c in classes) or "none"
         log(f"      GSEs: {gse_summary} | study_id={study_id} ({ownership or 'pmcid-keyed'})")
 
-        # req #3: ensure the study's structured GEO metadata is present BEFORE extraction so
-        # subject/sample/groups/assay are derived deterministically from it (one row per real
-        # sample / distinct organism / distinct arm / distinct platform) instead of from the
-        # run-to-run-varying LLM lists. Cheap — GEOparse fetches only the SOFT family file, not
-        # the supplementary matrices. Only the paper's OWN GSE has metadata to bind to.
+        # Fetch metadata first so structural tables are deterministic.
         meta_csv = None
         if ownership == "own" and chosen_gse:
             meta_csv = os.path.join("data", chosen_gse, f"{chosen_gse}_metadata.csv")
@@ -475,9 +604,6 @@ def run_agent_a_cohort(
                     log(f"      metadata fetch for {chosen_gse} failed: {type(e).__name__}: {e}")
             meta_csv = meta_csv if os.path.exists(meta_csv) else None
 
-        # extract 9 text tables (3 grouped structured-output calls); verify provenance quotes.
-        # `ext_usage` captures the call(s)' real token counts → cost profiler (extraction is the
-        # dominant LLM cost; on the lean path it ALSO carries the #5 findings via the one-pass merge).
         prov: dict = {}
         ext_usage: list = []
         try:
@@ -491,7 +617,6 @@ def run_agent_a_cohort(
             manifest.append(mrow)
             continue
 
-        # persist per-study json + append to cohort CSVs
         _write_study_json(studies_dir, study_id, tables)
         append_tables_to_csvs(tables, csv_dir)
         n_exp = len(tables["experiment"])
@@ -513,17 +638,12 @@ def run_agent_a_cohort(
                else " | subject/sample/groups/assay = LLM (no metadata)")
             + (f" | PARTIAL: group(s) {sorted(gerr)} failed -> empty" if gerr else ""))
 
-        # req #5: mine the paper's OWN reported findings (which molecules changed) so `results` is
-        # populated even when no GSE/matrix can be computed. Coexists with the computational results
-        # phase 3 may add for own GSEs (distinct text-specific IDs); enables the #6 comparison later.
+        # Preserve paper findings even when computed analysis is unavailable.
         if extract_findings:
             try:
                 frep: dict = {}
                 findings_csv = os.path.join(studies_dir, f"{study_id}_reported_findings.csv")
-                # req #3 (one-pass): if the lean merged extraction already pulled NON-EMPTY
-                # findings, reuse them. An empty list is not a reliable "no findings" signal
-                # because long/gene-dense papers can hit the structured-output cap before the
-                # merged findings block is populated; fall back to the standalone #5 call.
+                # Empty merged findings trigger the chunked fallback.
                 prefetched_raw = prov.get("reported_findings")
                 prefetched = prefetched_raw if prefetched_raw else None
                 one_pass = prefetched is not None
@@ -601,8 +721,7 @@ def run_agent_a_cohort(
             except Exception as e:
                 log(f"      [#gene] DEG-derived gene load failed: {type(e).__name__}: {e}")
 
-            # req #6: annotate whether our computed DEG agrees with the paper's reported findings
-            # (#5). Joins the two result sources gene-by-gene -> a per-finding verdict CSV + summary.
+            # Compare computed DEG with paper-reported findings.
             findings_csv = os.path.join(studies_dir, f"{study_id}_reported_findings.csv")
             if os.path.isfile(findings_csv):
                 try:
@@ -620,11 +739,6 @@ def run_agent_a_cohort(
                     summ_str = ", ".join(f"{k}={v}" for k, v in sorted((arep.get("summary") or {}).items()))
                     log(f"      [#6] agreement: {summ_str or 'none'} "
                         f"({arep.get('n_symbols_mapped', 0)} genes ID-mapped) -> {os.path.basename(agree_csv)}")
-                    # req #2: promote the reconciliation into the CDM result layer — a results row
-                    # (+ analysis row) pointing at the per-finding table that carries BOTH the paper's
-                    # claim AND our computed value, with disagreements (contradicted/not_detected)
-                    # flagged. So 'text conclusion + data result, even when inconsistent' lives in
-                    # `results`, not just a side CSV.
                     recon_rows = build_reconciliation_rows(
                         study_id, agree_csv, arep.get("summary") or {},
                         n_findings=arep.get("n_findings", 0))
@@ -637,10 +751,7 @@ def run_agent_a_cohort(
                 except Exception as e:
                     log(f"      [#6] agreement annotation failed: {type(e).__name__}: {e}")
 
-            # req #7: exercise -> pathway -> gene mechanism chain. Joins our GSEA Hallmark pathways
-            # (NES/direction + leading-edge genes + the exercise contrast) with the paper's text-mined
-            # findings (#5) — cross-linking each computational pathway to the paper's reported driver
-            # genes and naming, and flagging text-claimed pathways our GSEA missed (gap analysis).
+            # Build the exercise → pathway → gene chain.
             try:
                 gsea_csvs = sorted(glob.glob(os.path.join(study_batch_dir, "*_GSEA_*.csv")))
                 if gsea_csvs or os.path.isfile(findings_csv):
@@ -659,12 +770,7 @@ def run_agent_a_cohort(
             except Exception as e:
                 log(f"      [#7] pathway chain failed: {type(e).__name__}: {e}")
 
-            # req #7b: pathway<->exercise RELATIONAL tables. Re-house this study's GSEA Hallmark
-            # results into the schema's `pathway` (node) + `enrichment` (edge) rows so the chain is
-            # a JOIN, not a file parse. Zero-LLM: numbers come from the *_GSEA_*.csv already on disk;
-            # each GSEA-analysis row's treatment/control group FKs are resolved to the REAL phase-2
-            # groups by matching the contrast arm labels to groups.subject_group. pathway.n_genes is
-            # pulled once per cohort from the same MSigDB GMT the GSEA used (network; empty on failure).
+            # Materialize pathway and enrichment rows from GSEA.
             try:
                 if gsea_csvs:
                     from tools.enrichment_loader import enrichment_rows_for_study, load_hallmark_gmt_sizes
@@ -766,8 +872,7 @@ def run_agent_a_cohort(
     else:
         log("\n[3/3] with_analysis=False — skipped (run with with_analysis=True to fill analysis/results rows).")
 
-    # per-stage cost/timing report (user directive 2026-06-23): wall time for every stage + token→$
-    # for the LLM stages. $ is an estimate at Sonnet 4.6 $3/$15 per Mtok (see cost_timing.py).
+    # Persist per-stage timing and estimated LLM cost.
     cost_csv = os.path.join(cohort_dir, "cost_timing.csv")
     prof.write_csv(cost_csv)
     log("\n[cost/timing] per-stage wall time + LLM token/$ (Sonnet 4.6 $3/$15 per Mtok):")
@@ -789,6 +894,11 @@ def run_agent_a_cohort(
                  and not str(m["status"]).startswith("skipped_"))
     n_anal = sum(1 for m in manifest if m["analyzed"])
     csv_counts = _count_csv_rows(csv_dir)
+    _write_workflow_state(
+        cohort_dir, request, "COMPLETED", papers_considered=len(manifest),
+        papers_text_extracted=n_text, papers_failed=n_fail, papers_analyzed=n_anal,
+        manifest=man_path, csv_dir=csv_dir,
+    )
     report = [
         f"Agent A cohort complete: keyword={keyword!r}  ->  {cohort_dir}",
         f"- papers: {len(manifest)} considered | {n_skip} skipped_not_exercise | "
@@ -797,6 +907,7 @@ def run_agent_a_cohort(
         f"- cost/timing: {cost_csv}  |  est ${prof.total_usd():.4f} LLM, {prof.total_wall():.0f}s wall "
         f"({prof.total_llm()} LLM calls, {prof.total_in()} in / {prof.total_out()} out tok)",
         f"- manifest: {man_path}",
+        f"- workflow state: {state_path}",
         f"- per-study JSON: {studies_dir}/<study_id>/seacdm_tables.json",
         f"- log: {os.path.join(cohort_dir, 'cohort.log')}",
     ]
@@ -843,11 +954,7 @@ def _count_csv_rows(csv_dir: str) -> dict:
     return counts
 
 
-# --- interactive-agent entry point -----------------------------------------------------
-# Expose the cohort orchestrator to the main.py ReAct agent WITHOUT rebinding the plain
-# function: test/demo scripts call run_agent_a_cohort(...) directly, while the agent uses this
-# StructuredTool. tool() reflects the function's signature + (now v1-describing) docstring into
-# the agent-tool schema; .name == "run_agent_a_cohort".
+# LangChain wrapper; scripts continue to call the plain function.
 from langchain_core.tools import tool as _tool  # noqa: E402
 
 run_agent_a_cohort_tool = _tool(run_agent_a_cohort)

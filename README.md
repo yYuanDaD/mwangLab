@@ -15,9 +15,14 @@
 - **失败显式化**：无法识别矩阵、样本无法对齐、实验设计不明确或 GSEA 失败时明确记录原因，不用静默降级掩盖问题。
 - **批处理故障隔离**：单个研究失败不会中断整个 cohort；每次运行生成统一 summary、完整 workflow log、failure log 和结构化 decision log。
 - **程序化 Agent 护栏**：工具调用支持参数级去重、结果缓存和单工具调用次数上限，从代码层阻止重复调用循环。
+- **动态工具暴露**：每次请求先由确定性路由器识别 bulk、单细胞、甲基化、蛋白组、论文队列等 profile，仅向 Agent 暴露相关工具；模态不明确时安全回退完整工具集。
+- **代码级科学策略**：矩阵—方法兼容性、双组设计、最小重复数和样本映射覆盖率由 Python 强制校验，不依赖模型记住提示词。
 - **结构化科研数据提取**：通过 Pydantic 约束 LLM 输出，并将论文、实验设计、分析结果与 provenance 整理为 SEA-CDM 风格记录。
 - **论文优先的数据发现**：支持论文搜索、全文抓取、数据 accession 提取、论文自有数据与引用数据辨别，以及论文级交付记录组装。
 - **可追溯与可复现**：记录数据来源、自动决策、LLM 判断、统计方法、contrast 和输出文件路径，并支持重复子集分析的一致性评估。
+- **统一证据模型**：每个 batch study 生成 `evidence.json`，统一记录 source、claim、decision、artifact、决策方法、置信度、文件哈希和证据引用关系。
+- **实时运行状态**：CLI 显示当前 profile、工具、研究和阶段；Agent 与 batch 持续原子写入 `run_status.json`，记录阶段进度、耗时、warning/failure、成本字段和证据指针。
+- **消息与运行状态分离**：自定义 LangGraph `BioinformaticsAgentState` 保存 request、status、artifacts、evidence 和预算；middleware 只在模型调用时临时投影决策相关摘要，不向 ReAct `messages` 追加状态栏消息。
 
 ## TODO
 
@@ -32,4 +37,3 @@
 - [ ] 接入 MoTrPAC 公共数据与官方结果，验证差异基因和通路结果的一致性。
 - [ ] 统一旧版 `seacdm.json` 与新版表结构输出路径，清理仍在使用的兼容层。
 - [ ] 为核心模块补齐统一的自动化测试入口、依赖锁定和持续集成配置。
-

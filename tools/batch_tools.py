@@ -81,6 +81,8 @@ from tools.llm_helpers import (
     summarize_metadata_for_llm, validate_contrast_with_llm, choose_raw_da_method_with_llm,
     choose_raw_da_method_rule, classify_matrix_with_llm,
 )
+from tools.evidence import EvidenceRecorder, SCHEMA_VERSION
+from tools.run_status import ConsoleStatusRenderer, RunStatusTracker
 
 # Raw-counts DA methods (the mentor's matrix: any of the three). The log/FPKM branch always
 # uses limma-trend. 'auto' picks by DETERMINISTIC RULE (DESeq2 default, no LLM — req #1);
@@ -102,6 +104,35 @@ class _DecisionLog:
         self.accession = accession
         self.started = datetime.now().isoformat(timespec="seconds")
         self.entries = []
+        self.evidence = EvidenceRecorder(
+            run_id=f"batch:{accession}:{self.started}", subject_id=accession,
+        )
+        self.pipeline_source = self.evidence.add_source(
+            "computation", "run_batch_geo_pipeline", locator=accession,
+        )
+
+    @staticmethod
+    def _method(step, decision):
+        text = f"{step} {decision}".lower()
+        if "llm" in text:
+            return "llm", "llm", "Claude structured decision"
+        if decision == "param":
+            return "user", "user", "user-supplied pipeline parameter"
+        if step in {"gsea", "deseq2", "edger", "limma", "limma-voom",
+                    "differential_expression", "subset_evaluation", "sex_check"}:
+            return "computation", "computation", f"computed pipeline stage: {step}"
+        if step == "download":
+            return "computation", "external_api", "GEO/download result"
+        return "rule", "rule", f"deterministic pipeline rule: {step}"
+
+    @staticmethod
+    def _artifact_candidates(details):
+        extensions = (".csv", ".tsv", ".json", ".png", ".pdf", ".gz", ".txt", ".tar")
+        for key, value in details.items():
+            values = value if isinstance(value, (list, tuple)) else [value]
+            for item in values:
+                if isinstance(item, str) and item.lower().endswith(extensions):
+                    yield key, item
 
     def record(self, step, decision, reason="", **details):
         self.entries.append({
@@ -110,17 +141,38 @@ class _DecisionLog:
             "reason": reason,
             "details": details,
         })
+        method, origin, label = self._method(step, decision)
+        source_id = self.evidence.add_source(origin, label, locator=self.accession)
+        decision_id = self.evidence.add_decision(
+            step, decision, reason=reason, method=method,
+            evidence_ids=[source_id], details=details,
+        )
+        for role, path in self._artifact_candidates(details):
+            self.evidence.add_artifact(
+                path, role=role, produced_by=decision_id, evidence_ids=[source_id],
+            )
 
     def save(self, path, status=None, error=None):
+        evidence_path = os.path.join(os.path.dirname(path), "evidence.json")
+        self.evidence.finish(status=status, error=error)
+        if status is not None:
+            self.evidence.add_claim(
+                self.accession, "pipeline_status", status,
+                f"Batch pipeline finished with status {status}", method="computation",
+                evidence_ids=[self.pipeline_source], status="computed",
+            )
         payload = {
+            "schema_version": SCHEMA_VERSION,
             "accession": self.accession,
             "started": self.started,
             "finished": datetime.now().isoformat(timespec="seconds"),
             "final_status": status,
             "error": error,
             "decisions": self.entries,
+            "evidence_file": evidence_path,
         }
         try:
+            self.evidence.save(evidence_path)
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(payload, f, indent=2, ensure_ascii=False)
         except Exception as e:
@@ -982,7 +1034,8 @@ def _align_metadata_to_expression(metadata_csv, expr_path, study_out, acc):
     # Fast path: counts cols are already in metadata index — no LLM call needed.
     meta_idx_set = set(str(x) for x in meta_df.index)
     common_exact = meta_idx_set & set(sample_cols)
-    if common_exact:
+    exact_target = min(len(sample_cols), len(meta_df))
+    if common_exact and len(common_exact) >= max(1, int(np.ceil(exact_target * 0.5))):
         info["verdict"] = "exact_match"
         info["n_aligned"] = len(common_exact)
         if len(common_exact) < len(meta_df):
@@ -1255,6 +1308,14 @@ def run_batch_geo_pipeline(
     safe_label = "".join(c if c.isalnum() or c in ("_", "-") else "_" for c in label)
     run_dir = os.path.join(output_base, f"cohort_{safe_label}")
     os.makedirs(run_dir, exist_ok=True)
+    status_path = os.path.join(run_dir, "run_status.json")
+    status_tracker = RunStatusTracker(
+        status_path, run_id=f"cohort_{safe_label}", profile="geo_batch",
+        stages=("acquire", "classify", "preprocess", "qc", "align", "design",
+                "analyze_enrich", "evaluate", "report"),
+        study_total=len(accessions), renderer=ConsoleStatusRenderer(sys.stdout),
+    )
+    status_tracker.start("batch initialized")
     fail_log = os.path.join(run_dir, "failures.log")
     log_path = os.path.join(run_dir, "workflow.log")
     auto_deg = bool(treatment_keywords and control_keywords)
@@ -1283,6 +1344,9 @@ def run_batch_geo_pipeline(
 
         summary_rows = []
         for i, acc in enumerate(accessions, 1):
+            status_tracker.begin_study(acc, i, len(accessions))
+            status_tracker.set_stage("acquire", current_tool="download_geo_data",
+                                     message="downloading GEO metadata and supplements")
             print(f"\n========== [{i}/{len(accessions)}] {acc} ==========")
             row = {
                 "accession": acc, "status": "started", "n_samples": None,
@@ -1324,6 +1388,7 @@ def run_batch_geo_pipeline(
 
                 print(download_supplementary_files.invoke({"geo_accession": acc, "base_dir": "data"})[:200])
 
+                status_tracker.set_stage("classify", message="selecting and classifying expression matrix")
                 counts_path, matrix_type = _find_expression_file(data_dir)
                 matrix_type_source = "heuristic"
 
@@ -1350,6 +1415,8 @@ def run_batch_geo_pipeline(
 
                 if counts_path is None:
                     row["status"] = f"skipped_{matrix_type}"
+                    status_tracker.add_warning(f"{acc}: {row['status']}")
+                    status_tracker.set_stage("report", message="recording skipped study")
                     dlog.record("counts_detection", "skip", reason=matrix_type)
                     dlog.save(decisions_path, status=row["status"])
                     summary_rows.append(row)
@@ -1393,6 +1460,7 @@ def run_batch_geo_pipeline(
                 # FPKM/TPM produces double-normalized garbage and to log_transformed produces values
                 # like log2(CPM(log2(x+1))) which is biologically meaningless.
                 is_raw = (matrix_type in ("raw_counts", "raw_counts_from_tar"))
+                status_tracker.set_stage("preprocess", message=f"preparing {matrix_type} matrix")
                 da_methods = None  # set only for raw_da_method='all'; else falls back to [da_method]
                 if is_raw:
                     print(preprocess_counts.invoke({"counts_csv": counts_path, "output_dir": study_out})[:200])
@@ -1465,6 +1533,8 @@ def run_batch_geo_pipeline(
                 if da_methods is None:
                     da_methods = [row["da_method"]]
 
+                status_tracker.set_stage("qc", current_tool="sample_qc_summary",
+                                         message="running sample quality summary")
                 print(sample_qc_summary.invoke({
                     "counts_csv": da_input_path, "metadata_csv": metadata_csv, "output_dir": study_out,
                 })[:200])
@@ -1481,11 +1551,13 @@ def run_batch_geo_pipeline(
                 dlog.record("sex_check", sex["verdict"], reason=sex["summary"],
                             n_mismatch=sex["n_mismatch"], mismatched=sex["mismatched"])
                 if sex["mismatched"]:
+                    status_tracker.add_warning(f"{acc}: sex metadata mismatch")
                     print(f"  [sex-check] WARNING {len(sex['mismatched'])} mismatch(es) vs metadata: {sex['mismatched']}")
                 else:
                     print(f"  [sex-check] {sex['verdict']} ({sex['summary']})")
 
                 if auto_deg:
+                    status_tracker.set_stage("align", message="aligning metadata to expression samples")
                     # Pre-align metadata to actual expression-file samples BEFORE LLM-A
                     # reads it. Prevents the GSE317978-class bug where LLM-A picks a
                     # contrast whose samples don't exist in the expression matrix.
@@ -1503,6 +1575,7 @@ def run_batch_geo_pipeline(
                               f"to expression cols; LLM-A will reason over full metadata "
                               f"({align_info.get('method')})")
 
+                    status_tracker.set_stage("design", message="detecting control-treatment contrasts")
                     contrasts = _auto_detect_contrasts(
                         metadata_for_design, treatment_keywords, control_keywords)
                     design = contrasts[0] if contrasts else None  # representative for LLM validation
@@ -1589,6 +1662,7 @@ def run_batch_geo_pipeline(
 
                     if not final_contrasts:
                         row["status"] = "preprocess_ok_no_design"
+                        status_tracker.add_warning(f"{acc}: no clean contrast")
                         dlog.record("differential_expression", "skipped",
                                     reason="no clean 2-group contrast")
                     else:
@@ -1603,6 +1677,8 @@ def run_batch_geo_pipeline(
                               f"method={'+'.join(da_methods) if multi else da_methods[0]}")
                         cres = []
                         eval_results = []
+                        status_tracker.set_stage("analyze_enrich",
+                                                 message=f"running {len(final_contrasts)} contrast(s)")
                         for (col, ctrl, treat) in final_contrasts:
                             print(f"  --- contrast: {col} | {ctrl} vs {treat} ---")
                             if multi:
@@ -1617,6 +1693,7 @@ def run_batch_geo_pipeline(
                                     dlog, fail_log, acc)
                             cres.append(r)
                             if evaluate_subsets and r.get("n_deg") is not None:
+                                status_tracker.set_stage("evaluate", message="evaluating subset stability")
                                 eval_method = da_methods[0]
                                 print(f"  [eval] subset stability enabled: {evaluation_runs} runs, "
                                       f"fraction={evaluation_subset_fraction}, method={eval_method}, "
@@ -1698,10 +1775,15 @@ def run_batch_geo_pipeline(
             except Exception as e:
                 row["status"] = "exception"
                 row["error"] = f"{type(e).__name__}: {e}"
+                status_tracker.add_failure(f"{acc}: {row['error']}")
                 dlog.record("exception", type(e).__name__, reason=str(e))
                 with open(fail_log, "a", encoding="utf-8") as f:
                     f.write(f"{acc} | {row['error']}\n")
                 print(f"[ERROR] {acc}: {row['error']}")
+            status_tracker.set_stage(
+                "report", message=f"saving {acc} results",
+                evidence_ids=[f"{acc}:{d.decision_id}" for d in dlog.evidence.bundle.decisions],
+            )
             dlog.save(decisions_path, status=row["status"], error=row["error"])
             summary_rows.append(row)
 
@@ -1728,13 +1810,22 @@ def run_batch_geo_pipeline(
         lines.append("")
         lines.append(f"Summary CSV: {summary_path}")
         lines.append(f"Workflow log: {log_path}")
+        lines.append(f"Run status: {status_path}")
         lines.append(f"Per-study decision logs: {run_dir}/<accession>/decisions.json")
         if os.path.exists(fail_log):
             lines.append(f"Failure log: {fail_log}")
         result = "\n".join(lines)
+        partial_statuses = {"exception", "deg_failed", "deg_ok_gsea_failed"}
+        is_partial = any(str(x).startswith("skipped_") or x in partial_statuses
+                         for x in summary_df["status"].tolist())
+        status_tracker.finish("partial" if is_partial else "completed",
+                              "batch completed with issues" if is_partial else "batch completed")
         print()
         print(result)
         return result
     finally:
+        if status_tracker.state.status in ("pending", "running", "waiting_approval"):
+            status_tracker.add_failure("batch terminated before final report")
+            status_tracker.finish("failed", "batch terminated before final report")
         sys.stdout, sys.stderr = old_stdout, old_stderr
         log_file.close()

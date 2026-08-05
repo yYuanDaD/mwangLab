@@ -1,11 +1,14 @@
 import os
-import numpy as np
 import pandas as pd
 from patsy import dmatrix
 from inmoose.limma import lmFit, eBayes, topTable
 from langchain_core.tools import tool
 
 from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
+from tools.analysis_policy import (
+    PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
+    select_valid_two_group_design,
+)
 
 
 @tool
@@ -45,17 +48,15 @@ def run_limma_analysis(
         # annotation columns that some GEO files mix in). Match the same behaviour
         # stats_tools uses, so LLM-B's alignment denominator isn't inflated by columns
         # that could never plausibly be samples.
-        coerced = expr_df.apply(pd.to_numeric, errors="coerce")
-        non_numeric = coerced.columns[coerced.isna().all(axis=0)].tolist()
-        if non_numeric:
-            print(f"   Dropping {len(non_numeric)} non-numeric columns (likely annotations): {non_numeric}")
-            expr_df = expr_df.drop(columns=non_numeric)
+        expr_df = numeric_matrix(expr_df, label="limma expression matrix")
         expr_df = collapse_duplicate_genes(expr_df, "limma")
 
         expr_cols = expr_df.columns.tolist()
         meta_index = metadata_df.index.tolist()
 
-        if len(set(expr_cols).intersection(set(meta_index))) == 0:
+        exact_n = len(set(expr_cols).intersection(set(meta_index)))
+        exact_required = max(1, (min(len(expr_cols), len(meta_index)) + 1) // 2)
+        if exact_n < exact_required:
             print("Sample names do not match between expression matrix and metadata. Attempting smart alignment...")
             from tools.llm_helpers import align_samples_with_llm_fallback
             mapping, method = align_samples_with_llm_fallback(expr_cols, metadata_df)
@@ -67,20 +68,11 @@ def run_limma_analysis(
             metadata_df = metadata_df[~metadata_df.index.duplicated(keep="first")]
             print(f"Aligned via {method}.")
 
-        all_available_groups = metadata_df[design_column].dropna().unique().tolist()
-        mask = metadata_df[design_column].isin([control_group, treatment_group])
-        metadata_df = metadata_df[mask]
-
-        group_stats = metadata_df[design_column].value_counts()
+        metadata_df, group_stats = select_valid_two_group_design(
+            metadata_df, design_column=design_column, control_group=control_group,
+            treatment_group=treatment_group, available_samples=expr_df.columns,
+        )
         print(f"Sample distribution after filtering:\n{group_stats}")
-
-        if len(group_stats) < 2:
-            return (f"FATAL ERROR: cannot run differential analysis. File {os.path.basename(normalized_csv)} "
-                    f"does not contain both '{control_group}' and '{treatment_group}'.\n"
-                    f"Currently available groups: {group_stats.index.tolist()}\n"
-                    f"All groups in metadata column '{design_column}': {all_available_groups}\n"
-                    f"Suggestion: check that the correct expression file was selected and that the metadata "
-                    f"column name matches.")
 
         common = [s for s in metadata_df.index if s in expr_df.columns]
         if len(common) < 4:
@@ -89,16 +81,7 @@ def run_limma_analysis(
 
         metadata_df = metadata_df.loc[common]
         expr_mat = expr_df[common]
-
-        # Defensive log-scale check: log2(CPM+1) tops out around 20-25 for highly expressed genes.
-        # Raw counts can hit 1e6+. If we see counts-like magnitudes, warn loudly.
-        finite = expr_mat.values[np.isfinite(expr_mat.values)]
-        if finite.size:
-            max_val = float(finite.max())
-            if max_val > 100:
-                print(f"WARNING: max expression value is {max_val:.1f}, which looks like raw counts rather "
-                      f"than log-scale. limma assumes log-scale input — results may be biologically meaningless. "
-                      f"Consider run_deseq2_analysis for raw counts, or log2-transform the matrix first.")
+        enforce_method_matrix_compatibility(expr_mat, method="limma")
 
         # Drop features that are mostly NA or have zero variance (limma can't moderate a constant row).
         nonna = expr_mat.notna().sum(axis=1)
@@ -145,6 +128,8 @@ def run_limma_analysis(
                 f"- Up-regulated features: {len(up)}\n"
                 f"- Down-regulated features: {len(down)}")
 
+    except PolicyViolation as e:
+        return f"POLICY BLOCKED: {e}"
     except Exception as e:
         print(f"Tool Error: {str(e)}")
         return f"limma analysis failed. Error: {str(e)}"
