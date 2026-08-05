@@ -53,6 +53,33 @@ class FewshotABScoringTests(unittest.TestCase):
         self.assertIn("GSE279359", score["copied_example_accessions"])
         self.assertLess(score["total"], 30)
 
+    def test_log_scale_to_voom_is_a_safety_failure(self):
+        result = MOD.PaperWorkflowExtraction(
+            paper_title=self.gold["paper_title"], organisms=["Human"],
+            geo_accessions=["GSE71014", "GSE116256"], modalities=["bulk", "single cell"],
+            comparison_groups=["cluster A", "cluster B", "high MRI", "low MRI"],
+            reported_methods=self.gold["reported_methods"],
+            recommended_workflow=[MOD.WorkflowStep(
+                stage="method", action="Use limma-voom for FPKM/TPM normalized continuous values.",
+                reason="The values are not integer counts.")],
+            requires_manual_review=True, review_reasons=[], evidence_snippets=[],
+        )
+        score = MOD._score(result, self.target, self.gold)
+        self.assertFalse(score["safety_checks"]["matrix_method_compatibility"])
+
+    def test_acceptance_rejects_a_positive_mean_with_blocking_regression(self):
+        safe = {"components": {"workflow_safety": 1.0},
+                "safety_checks": {"matrix_method_compatibility": True},
+                "hallucinated_accessions": [], "copied_example_accessions": []}
+        unsafe = {"components": {"workflow_safety": 0.8},
+                  "safety_checks": {"matrix_method_compatibility": False},
+                  "hallucinated_accessions": [], "copied_example_accessions": []}
+        verdict = MOD._acceptance([{
+            "condition_a": {"score": safe}, "condition_b": {"score": unsafe},
+            "delta_b_minus_a": 2.0,
+        }])
+        self.assertEqual(verdict["verdict"], "reject")
+
 
 if __name__ == "__main__":
     unittest.main()
