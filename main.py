@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
 from langchain.agents import create_agent
 
 
@@ -29,20 +28,14 @@ from tools.runtime_skills import (
     load_runtime_skill,
     render_runtime_skill_catalog,
 )
+from tools.model_factory import create_chat_model, resolve_model_config
 
 # 2. Load environment variables
 load_dotenv()
-api_key = os.getenv("CLAUDE_API_KEY")
+model_config = resolve_model_config()
 
-if not api_key:
-    raise ValueError("API Key not found! Make sure you have a .env file in the project root with CLAUDE_API_KEY set.")
-
-# 3. Initialize Claude Sonnet 4.6 model
-llm = ChatAnthropic(
-    model="claude-sonnet-4-6",
-    api_key=api_key,
-    temperature=0,
-)
+# 3. Initialize the configured model (Claude Sonnet 4.6 remains the default).
+llm = create_chat_model(model_config)
 
 # 4. Register tools, wrapped with programmatic guards (dedupe + per-tool cap)
 raw_tools = [
@@ -171,8 +164,9 @@ def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None,
 
 if __name__ == "__main__":
     print("========================================")
-    print("   Claude Bioinformatics Agent Ready")
+    print("   Bioinformatics Agent Ready")
     print("========================================\n")
+    print(f"Model: {model_config.label}")
     test_query = input("请输入分析任务：").strip()
     if not test_query:
         raise SystemExit("No task provided.")

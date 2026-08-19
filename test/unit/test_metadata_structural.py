@@ -15,6 +15,7 @@ Run:  PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe test/unit/test_metadata_st
 import os
 import sys
 import json
+import tempfile
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
@@ -23,7 +24,9 @@ sys.path.insert(0, _ROOT)
 
 import pandas as pd
 
-from tools.metadata_structural import build_structural_tables, META_SOURCE_PREFIX, _load_metadata
+from tools.metadata_structural import (
+    build_structural_tables, META_SOURCE_PREFIX, _load_metadata, summarize_geo_scope,
+)
 from tools.sea_cdm_schema import csv_columns
 
 STUDY = "GSE208615"
@@ -84,6 +87,24 @@ def main():
     total = sum(int(g["group_size"]) for g in groups)
     assert total == len(sample), f"group sizes sum {total} != sample count {len(sample)}"
     print(f"[5] group sizes sum to {total} == sample count")
+
+    # Sorted GEO rows often put the treated arm last. Compact scope sampling must preserve it.
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "metadata.csv")
+        titles = ([f"control{i}" for i in range(1, 7)]
+                  + [f"high-fat diet{i}" for i in range(1, 7)]
+                  + [f"high-fat diet with MICT intervention{i}" for i in range(1, 7)])
+        pd.DataFrame({"geo_accession": [f"GSM{i}" for i in range(18)],
+                      "title": titles}).set_index("geo_accession").to_csv(path)
+        scope = summarize_geo_scope(path, max_values=6)
+        assert "control" in scope and "MICT intervention" in scope, scope
+        title_tables = build_structural_tables("GSETEST", "GSETEST_exp1", path)
+        assert [row["subject_group"] for row in title_tables["groups"]] == [
+            "control", "high-fat diet", "high-fat diet with MICT intervention",
+        ]
+        assert all(row["group_id"] for row in title_tables["sample"])
+    print("[6] compact GEO scope samples across sorted arms (control -> MICT)")
+    print("[7] replicate-suffixed titles recover three balanced design groups")
 
     print("\nALL PASS — metadata-derived subject/sample/groups/assay are deterministic + consistent.")
 

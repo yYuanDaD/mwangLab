@@ -14,7 +14,7 @@
 | 项 | 选择 | 备注 |
 |---|---|---|
 | Agent 框架 | LangChain `create_agent`（ReAct loop） | 简单够用，比 LangGraph 轻 |
-| LLM | **Claude Sonnet 4.6**（`langchain_anthropic.ChatAnthropic`） | DeepSeek-chat 用过但不可用，详见困难 §九.1 |
+| LLM | 主 agent/DA 默认 **DeepSeek V4 Pro**；SEA-CDM 生产长文抽取仍用 **Claude Sonnet 4.6**（`tools/model_factory.py`, `seacdm_tools._get_llm`） | staged 候选加入 GEO accession 范围约束后，GSE208615、GSE270703、GSE250122 均 3/3；GSE250122 是同案修复验证，仍需未见 multi-cohort 论文后再考虑切生产 |
 | 结构化输出 | `with_structured_output(PydanticSchema)` | 关键工具的输出全部走这条路 |
 | 计算依赖 | pydeseq2 / gseapy / mygene / sklearn / pandas | 都在 `.venv` 里 |
 
@@ -274,7 +274,10 @@ True, False,
 ### 1. LLM 选型困难
 - **初版用 DeepSeek-chat**：multi-tool ReAct loop 中会反复调同一个工具，每次参数仅有 cosmetic 差异（多个空格、换大小写），直到撞 recursion limit。表现极不稳定
 - **解决**：换 Claude Sonnet 4.6，本身就不循环；但同时构建 `guard_tools` 做程序化兜底，把最坏情况封死在 ~30 次调用以内
-- `.env` 里 DeepSeek key 还留着但代码路径已删
+- **2026-08-18 更新**：统一模型工厂接入 DeepSeek **V4 Pro**；主 agent 使用 `effort=max`，结构化子调用因 DeepSeek 的 `tool_choice` 限制自动关闭 thinking。V4 Pro 在 7-case × 3-repeat 科学路由 pilot 与 3-case × 3-repeat 缓存 GEO DA A/B 中均为 100% 通过、零循环、零阻断；正式端到端运行成本/成功运行约为 Sonnet 的 2.06%，三例跨模型 DEG 的 log2FC 相关性、方向一致率及 Top-50 Jaccard 均为 1.000。原 100k 字符 GSE208615 SEA-CDM 单次大 schema 路径仍不可靠；新增按 study、documentation、experiment/intervention、materials、findings 分阶段的小 schema 路径，带 16K 输出预算、完成门、定向重试、形状归一化、确定性标题复用和 `decision_trace`。最终 A/B 中旧路径 0/3，新路径 3/3、平均 100 分、零阻断、99.0% provenance、material/finding 参考召回 89.2%/100%、约 $0.0317/pass；staged-only 独立审计 100/100（适用覆盖 65.2%）。该路径目前仍是候选，生产保持主 agent/DA 用 DeepSeek、SEA-CDM 用 Sonnet，直到额外常规和对抗论文通过。
+- **2026-08-18 泛化门**：staged 路径在常规 GSE270703 为 3/3（98.1% provenance、100% material 参考召回、结构完全稳定、约 $0.0325/run），但多因素 GSE250122 为 0/3。失败不是格式或 FK：三轮均稳定输出一个 experiment 和两个 intervention，而论文/Sonnet 参考明确区分两个实验——ET/SED 急性运动 microarray 与独立 SED-T 8 周训练 qPCR。常规案例独立审计 100/100（适用覆盖 65.2%），多因素案例 86.7/100 且有 `study_completion` 阻断。生产 SEA-CDM 继续使用 Sonnet。
+- **2026-08-18 GEO 范围修正与复测**：确认当前 CDM 路径本来就是“一条 GEO accession 对应一个 experiment”，旧 prompt 却让模型抽整篇论文，旧 evaluator 又把 Sonnet 论文级参考的 `experiment_count >= 2` 当硬门，二者口径冲突。现由 GEO metadata 生成确定性 `[TARGET GEO SCOPE]`，prompt 只允许 target accession 的 cohort/intervention，评测改为检查 experiment/intervention/assay 是否混入 paper-only 队列，不再用固定实验数。GSE250122 三次都只保留 60 min 急性骑行 + baseline/+30min/+3h + microarray，未混入 8 周训练/qPCR；GSE270703 同时保持 3/3。零调用重评分六次均为 scope pass、target intervention recall 100%；完整运行审计 100/100（适用覆盖 65.2%），平均成本约 $0.0267/$0.0329 per run。另修复了 GEO 无 `library_strategy` 时 Affymetrix/CEL 被误标为 high-throughput sequencing 的问题。因为 GSE250122 是同案修复，生产 SEA-CDM 暂仍保持 Sonnet，下一门槛是未见 multi-cohort 论文。
+- **2026-08-18 未见 multi-accession 盲测**：在首次调用前冻结 GSE197045/PMC9233305 与全部门槛；目标是老年小鼠 soleus myonuclei RRBS（6 samples，PoWeR vs sedentary），同文另有 RNA-seq accession GSE198652。DeepSeek staged 3/3 通过，三轮均准确保留 8 周 PoWeR、2/3/4/5 g 递增负重、22–24 月龄雌性 C57BL/6N、Bisulfite-Seq/HiSeq 2000 和 3 vs 3 分组，且 design tables 无 GSE198652/RNA-seq 污染。平均 provenance 97.9%，成本 $0.0321/run，中位延迟 103.5 s，结构完全一致；独立审计 100/100、适用覆盖 65.2%、零阻断。旧 exact-set intervention Jaccard 为 0 是整行轻微措辞/标点差异造成，逐字段科学事实一致。结论：DeepSeek 已满足 staged + GEO metadata 的 accession-scope 候选门槛；生产默认仍保持 Sonnet，若切换应只路由该模式，并保留 paper-wide/no-metadata 的 Sonnet fallback。
 
 ### 2. TSV 静默 NaN 灾难
 - 原先 `pd.read_csv(path, index_col=0)` 没指定 `sep`，遇 `.tsv.gz` 直接把整行当一列读入；`pd.to_numeric` 把所有值 coerce 成 NaN；"drop all-NaN columns" 清理一步把所有样本删光；preprocess 报"N genes × 0 samples"但**没有任何错误**

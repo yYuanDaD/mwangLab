@@ -150,6 +150,13 @@ def _resolve_roles(df: pd.DataFrame) -> dict:
         "library_strategy": find_std("library_strategy"),
         "library_source": find_std("library_source"),
         "library_selection": find_std("library_selection"),
+        "platform_id": find_std("platform_id"),
+        "sample_type": find_std("type"),
+        "label_protocol": find_std("label_protocol_ch1", "label_protocol"),
+        "hyb_protocol": find_std("hyb_protocol"),
+        "scan_protocol": find_std("scan_protocol"),
+        "data_processing": find_std("data_processing"),
+        "description": find_std("description"),
         "title": find_std("title"),
         "sex": find_contains("sex", "gender"),
         "age": find_contains("age", "developmental stage", "dev stage", "stage"),
@@ -157,6 +164,78 @@ def _resolve_roles(df: pd.DataFrame) -> dict:
         "race": find_contains("race", "ethnicity", "ancestry", "breed", "population"),
         "tissue": find_contains("tissue", "cell type", "organ"),
     }
+
+
+def summarize_geo_scope(metadata_csv: str, max_values: int = 6) -> str:
+    """Return a compact deterministic description of the target GEO accession's samples.
+
+    This is prompt context, not a scientific inference. It intentionally contains only GEO
+    metadata so a paper-wide extractor can exclude independent validation cohorts.
+    """
+    df = _load_metadata(metadata_csv)
+    if df.empty:
+        raise ValueError(f"metadata CSV has no rows: {metadata_csv}")
+    roles = _resolve_roles(df)
+    selected = []
+    preferred = (
+        roles.get("title"), roles.get("source_name"), roles.get("species"),
+        roles.get("molecule"), roles.get("sample_type"), roles.get("platform_id"),
+        roles.get("instrument"), roles.get("library_strategy"), roles.get("description"),
+    )
+    for col in preferred:
+        if col and col not in selected:
+            selected.append(col)
+    for col in df.columns:
+        if _char_label(col) and col not in selected:
+            selected.append(col)
+
+    lines = [f"GEO sample count: {len(df)}"]
+    for col in selected:
+        values = []
+        for raw in df[col].tolist():
+            value = _norm(raw)
+            if not value:
+                continue
+            value = re.sub(r"\s+", " ", value)[:320]
+            if value not in values:
+                values.append(value)
+        if values:
+            # Do not keep only the first N values: GEO rows are commonly sorted by arm, so the
+            # first six titles can all be controls and hide the exercise arm at the end. Sample
+            # evenly across the ordered unique values while keeping the prompt compact.
+            if len(values) > max_values:
+                indices = [round(i * (len(values) - 1) / (max_values - 1))
+                           for i in range(max_values)] if max_values > 1 else [0]
+                values = [values[index] for index in dict.fromkeys(indices)]
+            lines.append(f"{col}: " + " | ".join(values))
+    return "\n".join(lines)
+
+
+def _infer_assay_name(rec: dict, roles: dict) -> tuple[str, str]:
+    """Infer an assay label when GEO omits ``library_strategy``.
+
+    Microarray series often have no instrument/library-strategy columns. Calling them
+    high-throughput sequencing is wrong; hybridization/CEL/Affymetrix metadata provides a
+    deterministic basis for a conservative microarray label.
+    """
+    strategy_col = roles.get("library_strategy")
+    strategy = _norm(rec.get(strategy_col)) if strategy_col else None
+    if strategy:
+        return strategy, strategy_col
+
+    evidence_cols = [
+        roles.get("platform_id"), roles.get("sample_type"), roles.get("label_protocol"),
+        roles.get("hyb_protocol"), roles.get("scan_protocol"), roles.get("data_processing"),
+        roles.get("description"),
+    ]
+    text = " ".join(str(rec.get(col) or "") for col in evidence_cols if col).lower()
+    if any(term in text for term in (
+        "affymetrix", "microarray", "hybridization", "hybridisation", ".cel", " cel ",
+        "genechip", "beadchip", "agilent array",
+    )):
+        source = ";".join(col for col in evidence_cols if col and _nonblank(rec.get(col)))
+        return "microarray gene expression profiling", source
+    return "high-throughput sequencing", ""
 
 
 def _pick_design_column(df: pd.DataFrame, exclude: set) -> Optional[str]:
@@ -203,6 +282,25 @@ def _pick_design_column(df: pd.DataFrame, exclude: set) -> Optional[str]:
         if best is None or cand > best:
             best = cand
     return best[3] if best and best[0] >= 1 else None
+
+
+def _title_design_series(df: pd.DataFrame, title_col: Optional[str]) -> Optional[pd.Series]:
+    """Recover balanced arms from titles that differ only by a replicate-number suffix."""
+    if not title_col:
+        return None
+    values = df[title_col].astype(str).map(
+        lambda value: re.sub(
+            r"(?i)[\s_-]*(?:rep(?:licate)?[\s_-]*)?\d+$", "", value.strip()
+        ).strip(" _-")
+    )
+    values = values[values.map(_nonblank)]
+    k = values.nunique()
+    if k < 2 or k >= len(df) or k > max(12, int(len(df) * 0.5)):
+        return None
+    sizes = values.value_counts()
+    if int(sizes.min()) < 2 or (sizes.max() / sizes.min()) > 4:
+        return None
+    return values
 
 
 # --- row helpers -----------------------------------------------------------------------
@@ -266,18 +364,26 @@ def build_structural_tables(
 
     # ---- groups: distinct values of the single best design column ----
     design_col = _pick_design_column(df, exclude=set(filter(None, [roles["title"]])))
+    design_series = df[design_col].astype(str) if design_col is not None else None
+    design_source = design_col
+    if design_col is None:
+        title_series = _title_design_series(df, roles["title"])
+        if title_series is not None:
+            design_col = roles["title"]
+            design_series = title_series
+            design_source = f"{design_col} (replicate suffix normalized)"
     groups_rows, val_to_gid = [], {}
     if design_col is not None:
-        series = df[design_col].astype(str)
+        series = design_series
         series = series[series.map(_nonblank)]
         sizes = series.value_counts()
         for i, v in enumerate(sorted(series.unique().tolist()), 1):
             gid = f"{study_id}_grp{i}"
             val_to_gid[v] = gid
             grow = {"group_id": gid, "study_id": study_id}
-            _srow(grow, "subject_group", v, design_col)
-            _srow(grow, "sample_group", v, design_col)
-            _srow(grow, "group_size", str(int(sizes[v])), design_col)
+            _srow(grow, "subject_group", v, design_source)
+            _srow(grow, "sample_group", v, design_source)
+            _srow(grow, "group_size", str(int(sizes[v])), design_source)
             for f in ("min_group_age", "min_age_unit", "max_group_age", "max_age_unit", "comments"):
                 _srow(grow, f, None, None)
             groups_rows.append(_order_row("groups", grow))
@@ -327,7 +433,7 @@ def build_structural_tables(
             org = subj_key_to_id.get(_subject_key(_subject_descriptors(rec, roles)), "0")
         gfk = single_gid
         if design_col is not None:
-            dv = str(rec.get(design_col))
+            dv = str(design_series.loc[gsm])
             gfk = val_to_gid.get(dv) if _nonblank(dv) else None
         samprow = {"sample_id": f"{experiment_id}_samp{i}", "organism_id": org, "group_id": gfk}
         _srow(samprow, "biosample_collection", rec.get(roles["extract_protocol"]) if roles["extract_protocol"] else None,
@@ -354,7 +460,8 @@ def build_structural_tables(
         rec0 = records[combos[key][0]]
         arow = {"assay_id": f"{experiment_id}_assay{i}", "experiment_id": experiment_id,
                 "documentation_id": None, "organism_input": "true"}
-        _srow(arow, "assay_name", strat or "high-throughput sequencing", strat_col or "")
+        assay_name, assay_source = _infer_assay_name(rec0, roles)
+        _srow(arow, "assay_name", assay_name, assay_source)
         _srow(arow, "assay_type", "Experimental Assay", "")        # SEA-CDM convention -> no source
         reagents = []
         for rc in (roles["molecule"], roles["library_selection"], roles["library_source"]):
@@ -371,7 +478,7 @@ def build_structural_tables(
         report.update({
             "metadata_csv": metadata_csv,
             "n_samples": n,
-            "design_column": design_col,
+            "design_column": design_source,
             "n_subject": len(subject_rows), "n_sample": len(sample_rows),
             "n_groups": len(groups_rows), "n_assay": len(assay_rows),
         })

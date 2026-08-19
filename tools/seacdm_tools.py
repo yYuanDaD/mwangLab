@@ -9,7 +9,11 @@ from pydantic import BaseModel, Field, model_validator
 from langchain_core.tools import tool
 
 from tools.sea_cdm_schema import Sourced, SEA_TABLES, csv_columns
-from tools.metadata_structural import build_structural_tables, META_SOURCE_PREFIX
+from tools.metadata_structural import (
+    build_structural_tables,
+    META_SOURCE_PREFIX,
+    summarize_geo_scope,
+)
 
 
 # LEGACY: flat v0 compatibility API. Do not use for new workflows.
@@ -71,6 +75,19 @@ class DocumentationExtract(BaseModel):
     reference_source: Optional[str] = Field(default=None, description="e.g. 'PubMed', 'GEO', 'DOI'")
     reference_source_id: Optional[str] = Field(default=None, description="the PMCID / PMID / DOI value")
 
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_plain_reference_fields(cls, data):
+        """Some providers apply the global {value, source} convention to plain ID fields too."""
+        if not isinstance(data, dict):
+            return data
+        out = dict(data)
+        for field in ("documentation_file_access", "reference_source", "reference_source_id"):
+            value = out.get(field)
+            if isinstance(value, dict) and "value" in value:
+                out[field] = value.get("value")
+        return out
+
 
 class MaterialExtract(BaseModel):
     material_name: Sourced = Field(default_factory=Sourced, description="a reagent / kit / instrument / antibody used")
@@ -84,6 +101,18 @@ class ExperimentLite(BaseModel):
     experiment_subject: Sourced = Field(default_factory=Sourced, description="who/what is studied in this experiment, e.g. 'mouse gastrocnemius'")
     experiment_control: Optional[str] = Field(default=None, description="'true' if this whole experiment IS the control arm; else null")
     comments: Sourced = Field(default_factory=Sourced)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_sourced_plain_control(cls, data):
+        """Claude 5 may apply the global Sourced convention to this legacy plain field."""
+        if not isinstance(data, dict):
+            return data
+        out = dict(data)
+        value = out.get("experiment_control")
+        if isinstance(value, dict) and "value" in value:
+            out["experiment_control"] = value.get("value")
+        return out
 
 
 class SubjectExtract(BaseModel):
@@ -192,6 +221,33 @@ class MethodsExtraction(_CoerceJSONContainer):
     assays: List[AssayExtract] = Field(default_factory=list)
 
 
+class StudyDocumentationExtraction(_CoerceJSONContainer):
+    """Small staged schema for study identity and publication provenance."""
+    study: StudyExtract = Field(default_factory=StudyExtract)
+    documentation: List[DocumentationExtract] = Field(default_factory=list)
+
+
+class StudyOnlyExtraction(_CoerceJSONContainer):
+    """One-table staged schema; avoids providers silently omitting later schema fields."""
+    study: StudyExtract = Field(default_factory=StudyExtract)
+
+
+class DocumentationOnlyExtraction(_CoerceJSONContainer):
+    """One-table staged schema for the source publication."""
+    documentation: List[DocumentationExtract] = Field(default_factory=list)
+
+
+class ExperimentInterventionExtraction(_CoerceJSONContainer):
+    """Small staged schema for designs and the treatments applied to them."""
+    experiments: List[ExperimentLite] = Field(default_factory=list)
+    interventions: List[InterventionExtract] = Field(default_factory=list)
+
+
+class MaterialExtraction(_CoerceJSONContainer):
+    """Small staged schema for named reagents, instruments, kits, and software."""
+    material: List[MaterialExtract] = Field(default_factory=list)
+
+
 class LeanExtraction(_CoerceJSONContainer):
     """Single-call extraction used when GEO metadata supplies structural tables."""
     study: StudyExtract = Field(default_factory=StudyExtract)
@@ -227,21 +283,24 @@ LeanExtraction.model_rebuild()
 # --- LLM plumbing ----------------------------------------------------------------------
 
 def _get_llm():
-    """Sonnet 4.6 @ temp 0, or None if no API key (caller handles gracefully)."""
-    from dotenv import load_dotenv
-    from langchain_anthropic import ChatAnthropic
-    load_dotenv()
-    api_key = os.getenv("CLAUDE_API_KEY")
-    if not api_key:
-        return None
-    return ChatAnthropic(model="claude-sonnet-4-6", api_key=api_key, temperature=0)
+    """SEA-CDM provider, pinned to Sonnet unless explicitly overridden.
+
+    DeepSeek V4 Pro is suitable for the main agent and DA routing, but the
+    paired 100k-character paper benchmark returned silently incomplete
+    ``LeanExtraction`` objects in 3/3 trials. Keep this high-recall extraction
+    path on Sonnet until a dedicated prompt/schema change passes the same gate.
+    """
+    from tools.model_factory import create_structured_chat_model, resolve_model_config
+    provider = os.environ.get("BIOAGENT_SEACDM_LLM_PROVIDER", "anthropic")
+    config = resolve_model_config(provider=provider)
+    return create_structured_chat_model(config, required=False)
 
 
 class _UsageCapturingStructured:
     """Wraps a with_structured_output(..., include_raw=True) runnable so each extraction call
-    records its real (input_tokens, output_tokens) into a shared `usage` list — used by the #4
-    cost profiler. Returns the parsed model exactly like the plain runnable (falls back to an
-    empty model on a parse error, matching the non-profiled behavior)."""
+    records token use and termination metadata into a shared ``usage`` list. A parse failure is
+    raised instead of being converted into an all-empty default object; otherwise an incomplete
+    response is indistinguishable from a paper that genuinely contains no records."""
 
     def __init__(self, llm, schema, usage):
         self._runnable = llm.with_structured_output(schema, include_raw=True)
@@ -252,13 +311,22 @@ class _UsageCapturingStructured:
         res = self._runnable.invoke(prompt)
         raw = res.get("raw") if isinstance(res, dict) else None
         um = getattr(raw, "usage_metadata", None) or {}
+        response_meta = getattr(raw, "response_metadata", None) or {}
+        parsed = res.get("parsed") if isinstance(res, dict) else res
+        parsing_error = res.get("parsing_error") if isinstance(res, dict) else None
         self._usage.append({
             "call": self._schema.__name__,
             "input_tokens": um.get("input_tokens"),
             "output_tokens": um.get("output_tokens"),
+            "stop_reason": response_meta.get("stop_reason") or response_meta.get("finish_reason"),
+            "model": response_meta.get("model") or response_meta.get("model_name"),
+            "parsed": parsed is not None,
+            "parsing_error": str(parsing_error) if parsing_error else None,
         })
-        parsed = res.get("parsed") if isinstance(res, dict) else res
-        return parsed if parsed is not None else self._schema()
+        if parsed is None:
+            detail = f": {parsing_error}" if parsing_error else ""
+            raise ValueError(f"Structured output did not parse for {self._schema.__name__}{detail}")
+        return parsed
 
 
 def _structured_runnable(llm, schema, usage=None):
@@ -416,6 +484,137 @@ Target GEO study: {study_id}{f' (organism: {organism})' if organism else ''}
 ------- PAPER TEXT START -------
 {paper_text}
 ------- PAPER TEXT END -------
+"""
+    return structured.invoke(prompt)
+
+
+def _extract_study_documentation(paper_text: str, study_id: str, organism: str,
+                                 usage=None) -> StudyDocumentationExtraction:
+    llm = _get_llm()
+    if llm is None:
+        return StudyDocumentationExtraction()
+    structured = _structured_runnable(llm, StudyDocumentationExtraction, usage)
+    prompt = f"""Extract only study identity and publication metadata for SEA-CDM from the supplied
+paper excerpt. Target GEO study: {study_id}{f' (organism: {organism})' if organism else ''}.
+
+Return JSON matching the schema with exactly these parts:
+1. `study`: title, one-paragraph objective, study type, biological focus, and keywords.
+2. `documentation`: at least the paper itself (`documentation_type='paper'`). Include DOI/PMCID/
+   PMID only when literally present. Do not extract experiments, materials, or findings in this step.
+
+Completion rule: do not return until the title and paper documentation record have been populated.
+{_PROVENANCE_RULES}
+
+------- RELEVANT PAPER TEXT START -------
+{paper_text}
+------- RELEVANT PAPER TEXT END -------
+"""
+    return structured.invoke(prompt)
+
+
+def _extract_study_only(paper_text: str, study_id: str, organism: str,
+                        usage=None) -> StudyOnlyExtraction:
+    llm = _get_llm()
+    if llm is None:
+        return StudyOnlyExtraction()
+    structured = _structured_runnable(llm, StudyOnlyExtraction, usage)
+    prompt = f"""Extract exactly ONE SEA-CDM `study` record from this paper header/abstract.
+Target GEO study: {study_id}{f' (organism: {organism})' if organism else ''}.
+Populate title, objective, study type, biological focus, keywords, and comments when stated.
+Do not return documentation, experiments, materials, interventions, or findings.
+Completion rule: `study_name.value` must contain the paper title.
+{_PROVENANCE_RULES}
+
+------- PAPER HEADER/ABSTRACT START -------
+{paper_text}
+------- PAPER HEADER/ABSTRACT END -------
+"""
+    return structured.invoke(prompt)
+
+
+def _extract_documentation_only(paper_text: str, study_id: str, organism: str,
+                                usage=None) -> DocumentationOnlyExtraction:
+    llm = _get_llm()
+    if llm is None:
+        return DocumentationOnlyExtraction()
+    structured = _structured_runnable(llm, DocumentationOnlyExtraction, usage)
+    prompt = f"""Extract exactly the source publication as ONE SEA-CDM `documentation` record.
+Target GEO study: {study_id}{f' (organism: {organism})' if organism else ''}.
+
+Required:
+- `document_name`: the paper title copied from the text.
+- `documentation_type`: `paper`.
+- `citation` and creator role when stated.
+- DOI/PMCID/PMID in reference_source/reference_source_id only when literally present.
+- documentation_file_access may contain the literal DOI or URL.
+Do not return study, experiments, materials, interventions, or findings.
+Completion rule: return exactly one documentation row; never return an empty list when a paper
+header is supplied.
+{_PROVENANCE_RULES}
+
+------- PAPER HEADER/IDENTIFIERS START -------
+{paper_text}
+------- PAPER HEADER/IDENTIFIERS END -------
+"""
+    return structured.invoke(prompt)
+
+
+def _extract_experiment_interventions(paper_text: str, study_id: str, organism: str,
+                                      usage=None) -> ExperimentInterventionExtraction:
+    llm = _get_llm()
+    if llm is None:
+        return ExperimentInterventionExtraction()
+    structured = _structured_runnable(llm, ExperimentInterventionExtraction, usage)
+    prompt = f"""Extract only the target GEO accession's experimental design and interventions for
+SEA-CDM from the supplied scope block and paper excerpts. Target GEO study: {study_id}{f' (organism: {organism})' if organism else ''}.
+
+HARD SCOPE RULES:
+- The extraction unit is the target GEO accession, not every experiment reported in the paper.
+- Return exactly one experiment representing the samples described in `[TARGET GEO SCOPE]`.
+- Extract only interventions actually applied to those GEO samples.
+- Exclude independent validation cohorts, follow-up training cohorts, and assays that appear only
+  in the paper but are not represented in `[TARGET GEO SCOPE]`.
+- A pre-existing subject attribute such as "trained" or "untrained" is a cohort characteristic,
+  not a longitudinal training intervention, unless the GEO scope explicitly contains samples
+  collected during that training intervention.
+- Several timepoints from the same subjects and protocol remain one experiment.
+- Cover every experimental axis represented by the target GEO samples. If GEO sample titles or
+  characteristics contain an exercise/training arm (including MICT or HIIT), return a distinct
+  exercise intervention for that arm; never return only its control diet or sedentary arm.
+
+Return JSON matching the schema:
+1. `experiments`: exactly one row describing the GEO-linked design.
+2. `interventions`: what was done to each treated arm, including exercise/drug/viral manipulation,
+   dosage, route, timing, and t0 when stated. Link each row with 1-based `experiment_index`.
+
+Completion rule: if the text describes an exercise or treatment protocol, `interventions` must not
+be empty. Do not return subjects, samples, groups, assays, materials, or reported findings.
+{_PROVENANCE_RULES}
+
+------- RELEVANT PAPER TEXT START -------
+{paper_text}
+------- RELEVANT PAPER TEXT END -------
+"""
+    return structured.invoke(prompt)
+
+
+def _extract_materials(paper_text: str, study_id: str, organism: str,
+                       usage=None) -> MaterialExtraction:
+    llm = _get_llm()
+    if llm is None:
+        return MaterialExtraction()
+    structured = _structured_runnable(llm, MaterialExtraction, usage)
+    prompt = f"""Extract only named materials for SEA-CDM from this Methods excerpt. Target GEO
+study: {study_id}{f' (organism: {organism})' if organism else ''}.
+
+Return one `material` row per explicitly named reagent, kit, instrument, antibody, sequencer, or
+software package. Put vendor/manufacturer in `organization`. Skip generic unnamed supplies and do
+not extract experiments, interventions, or scientific findings. Deduplicate within this excerpt.
+{_PROVENANCE_RULES}
+
+------- METHODS EXCERPT START -------
+{paper_text}
+------- METHODS EXCERPT END -------
 """
     return structured.invoke(prompt)
 
@@ -699,11 +898,15 @@ _EXERCISE_TERMS = (
     "sprint exercise",
     "sprint training",
     "hiit",
+    "mict",
 )
 
 
 def _is_exercise_like_intervention(row: dict) -> bool:
-    hay = " ".join(str(row.get(c) or "") for c in ("material", "intervention_type", "comments")).lower()
+    # Only the intervention's semantic identity may create an Exercise node. Comments often
+    # contain contrast text such as "control group, no exercise intervention"; treating that as
+    # positive evidence silently turns a diet/control row into exercise.
+    hay = " ".join(str(row.get(c) or "") for c in ("material", "intervention_type")).lower()
     return any(t in hay for t in _EXERCISE_TERMS)
 
 
@@ -1195,6 +1398,219 @@ def verify_provenance(tables: dict, paper_text: str) -> dict:
     }
 
 
+def _paper_regions(paper_text: str) -> dict[str, str]:
+    """Return coarse article regions without depending on line breaks in PMC plain text."""
+    references = paper_text.find(" References ")
+    body = paper_text[:references] if references > 0 else paper_text
+    discussion = body.find(" Discussion ")
+    methods = body.find(" Methods ", max(0, discussion))
+    data_availability = body.find(" Data availability ", max(0, methods))
+    results = body.find(" Results ")
+    return {
+        "body": body,
+        "results_discussion": body[max(0, results):methods if methods > 0 else len(body)],
+        "methods": body[methods:data_availability if data_availability > methods else len(body)]
+        if methods > 0 else body,
+        "data_availability": body[data_availability:data_availability + 5000]
+        if data_availability > 0 else "",
+    }
+
+
+def _ranked_chunks(text: str, terms: tuple[str, ...], *, chunk_size: int = 14000,
+                   overlap: int = 1400, max_chunks: int = 3) -> list[str]:
+    if not text:
+        return []
+    ranked = []
+    step = max(1, chunk_size - overlap)
+    for start in range(0, len(text), step):
+        chunk = text[start:start + chunk_size]
+        low = chunk.lower()
+        score = sum(low.count(term.lower()) for term in terms)
+        ranked.append((score, start, chunk))
+        if start + chunk_size >= len(text):
+            break
+    ranked.sort(key=lambda item: (-item[0], item[1]))
+    selected = [chunk for score, _, chunk in ranked[:max_chunks] if score > 0]
+    return selected or [text[:chunk_size]]
+
+
+def _sourced_value(item, field: str) -> str:
+    value = getattr(item, field, None)
+    if hasattr(value, "value"):
+        value = value.value
+    return re.sub(r"\W+", " ", str(value or "").lower()).strip()
+
+
+def _dedupe_models(items: list, key_fields: tuple[str, ...]) -> list:
+    kept = []
+    seen = set()
+    for item in items:
+        key = tuple(_sourced_value(item, field) for field in key_fields)
+        if not any(key) or key in seen:
+            continue
+        seen.add(key)
+        kept.append(item)
+    return kept
+
+
+def _extract_staged_lean(study_id: str, paper_text: str, organism: str, *, usage=None,
+                         report: Optional[dict] = None, max_retries: int = 1,
+                         metadata_csv: Optional[str] = None):
+    """DeepSeek-oriented map/reduce extraction with deterministic completion gates.
+
+    Each call owns a small schema and a focused paper region. Required empty outputs are retried;
+    every attempt is recorded in ``decision_trace`` so a syntactically valid but incomplete object
+    can no longer pass silently.
+    """
+    regions = _paper_regions(paper_text)
+    body = regions["body"]
+    trace: list[dict] = []
+    errors: dict[str, str] = {}
+
+    def run_stage(name, contexts, fn, complete, count):
+        last = None
+        attempts = min(len(contexts), max_retries + 1)
+        for index, context in enumerate(contexts[:attempts], start=1):
+            before = len(usage) if usage is not None else 0
+            event = {"stage": name, "attempt": index, "input_chars": len(context)}
+            try:
+                last = fn(context, study_id, organism, usage=usage)
+                event["record_count"] = count(last)
+                event["status"] = "complete" if complete(last) else "incomplete"
+            except Exception as exc:
+                event["status"] = "error"
+                event["error"] = f"{type(exc).__name__}: {exc}"
+            if usage is not None and len(usage) > before:
+                event["llm"] = usage[-1]
+            trace.append(event)
+            if last is not None and complete(last):
+                return last
+        errors[name] = trace[-1].get("error") or "completion gate failed"
+        return last
+
+    study_primary = body[:18000].strip()
+    study_retry = body[:30000].strip()
+    study_only = run_stage(
+        "study", [study_primary, study_retry], _extract_study_only,
+        lambda x: bool(_sourced_value(x.study, "study_name")), lambda x: 1,
+    ) or StudyOnlyExtraction()
+    documentation_primary = (body[:7000] + "\n" + regions["data_availability"]).strip()
+    documentation_retry = (body[:14000] + "\n" + regions["data_availability"]).strip()
+    documentation_only = run_stage(
+        "documentation", [documentation_primary, documentation_retry],
+        _extract_documentation_only, lambda x: len(x.documentation) == 1,
+        lambda x: len(x.documentation),
+    ) or DocumentationOnlyExtraction()
+    if (not _sourced_value(study_only.study, "study_name") and
+            documentation_only.documentation and
+            _sourced_value(documentation_only.documentation[0], "document_name")):
+        # Title is the same fact in both SEA-CDM tables. DeepSeek occasionally fills the
+        # documentation title but omits study_name; reuse the independently grounded value instead
+        # of spending another nondeterministic call or accepting an empty required field.
+        study_only.study.study_name = documentation_only.documentation[0].document_name.model_copy(
+            deep=True
+        )
+        errors.pop("study", None)
+        trace.append({
+            "stage": "repair_study_name",
+            "attempt": 0,
+            "status": "complete",
+            "record_count": 1,
+            "method": "copied grounded documentation.document_name",
+        })
+
+    design_terms = (
+        "exercise protocol", "wheel-running", "running wheel", "experimental design",
+        "viral", "injection", "treatment", "sedentary", "mice were", "days of exercise",
+    )
+    design_chunks = _ranked_chunks(body, design_terms, max_chunks=4)
+    scope_context = ""
+    if metadata_csv:
+        try:
+            scope_context = summarize_geo_scope(metadata_csv)
+        except Exception as exc:
+            trace.append({
+                "stage": "geo_scope_context", "attempt": 0, "status": "error",
+                "error": f"{type(exc).__name__}: {exc}",
+            })
+    scope_prefix = (
+        f"[TARGET GEO SCOPE]\n{scope_context}\n[END TARGET GEO SCOPE]\n\n"
+        if scope_context else ""
+    )
+    design_primary = scope_prefix + "\n\n[EXCERPT]\n".join(design_chunks[:3])
+    design_retry = scope_prefix + "\n\n[EXCERPT]\n".join(design_chunks)
+    scope_requires_exercise = _has_exercise_terms(scope_context)
+
+    def design_complete(extraction):
+        basic = bool(
+            len(extraction.experiments) == 1
+            and extraction.interventions
+            and all(iv.experiment_index == 1 for iv in extraction.interventions)
+        )
+        if not basic or not scope_requires_exercise:
+            return basic
+        return any(_has_exercise_terms(
+            _sourced_value(iv, "material"), _sourced_value(iv, "intervention_type")
+        ) for iv in extraction.interventions)
+
+    design = run_stage(
+        "experiment_interventions", [design_primary, design_retry],
+        _extract_experiment_interventions,
+        design_complete,
+        lambda x: len(x.experiments) + len(x.interventions),
+    ) or ExperimentInterventionExtraction()
+
+    material_terms = (
+        "antibody", "kit", "software", "microscope", "sequenc", "instrument",
+        "manufacturer", "purchased", "catalog", "rrid", "version", "aav",
+    )
+    material_chunks = _ranked_chunks(regions["methods"], material_terms, max_chunks=4)
+    materials = []
+    for chunk_index, chunk in enumerate(material_chunks, start=1):
+        ext = run_stage(
+            f"materials_chunk_{chunk_index}", [chunk, chunk], _extract_materials,
+            lambda x: bool(x.material), lambda x: len(x.material),
+        )
+        if ext is not None:
+            materials.extend(ext.material)
+    materials = _dedupe_models(materials, ("material_name", "organization"))
+    if materials:
+        for key in list(errors):
+            if key.startswith("materials_chunk_"):
+                errors.pop(key, None)
+
+    finding_chunks = _finding_chunks(regions["results_discussion"], max_chunks=4)
+    findings = []
+    for chunk_index, chunk in enumerate(finding_chunks, start=1):
+        ext = run_stage(
+            f"findings_chunk_{chunk_index}", [chunk, chunk], _extract_reported_findings,
+            lambda x: bool(x.findings), lambda x: len(x.findings),
+        )
+        if ext is not None:
+            findings.extend(ext.findings)
+    findings = _dedupe_models(findings, ("entity", "direction", "comparison"))
+    if findings:
+        for key in list(errors):
+            if key.startswith("findings_chunk_"):
+                errors.pop(key, None)
+
+    if report is not None:
+        report["decision_trace"] = trace
+        report["stage_errors"] = errors
+        report["staged_regions"] = {name: len(text) for name, text in regions.items()}
+        report["geo_scope_policy"] = "target_accession" if scope_context else "paper_only"
+        report["geo_scope_context"] = scope_context
+    return (
+        StudyLevelExtraction(study=study_only.study,
+                             documentation=documentation_only.documentation,
+                             material=materials),
+        DesignExtraction(experiments=design.experiments, subjects=[], groups=[]),
+        MethodsExtraction(samples=[], interventions=design.interventions, assays=[]),
+        [finding.model_dump() for finding in findings],
+        errors,
+    )
+
+
 def extract_tables_from_text(
     study_id: str,
     paper_text: str,
@@ -1204,12 +1620,15 @@ def extract_tables_from_text(
     metadata_csv: Optional[str] = None,
     lean: Optional[bool] = None,
     usage: Optional[list] = None,
+    strategy: str = "single",
+    max_stage_retries: int = 1,
 ) -> dict:
     """Extract SEA-CDM tables without writing files.
 
-    The current LEAN path uses one structured LLM call and derives structural tables from GEO
-    metadata. The three-call FULL fallback is Legacy and runs only when metadata is unavailable
-    or explicitly requested with ``lean=False``. Source quotes are verified by default.
+    ``strategy='single'`` preserves the original one-call LEAN extraction. ``strategy='staged'``
+    uses focused small-schema calls with deterministic completion gates and targeted retries.
+    The three-call FULL fallback is Legacy and runs only when metadata is unavailable or explicitly
+    requested with ``lean=False``. Source quotes are verified by default.
     """
     if metadata_csv is None:
         _cand = os.path.join("data", study_id, f"{study_id}_metadata.csv")
@@ -1230,7 +1649,22 @@ def extract_tables_from_text(
             print(f"      [extract] group '{name}' failed, using empty container: {msg.splitlines()[0][:200]}")
             return empty
 
-    if use_lean:
+    if strategy not in {"single", "staged"}:
+        raise ValueError("strategy must be 'single' or 'staged'")
+
+    if use_lean and strategy == "staged":
+        study_level, design, methods, lean_findings, staged_errors = _extract_staged_lean(
+            study_id, paper_text, organism, usage=usage, report=report,
+            max_retries=max_stage_retries, metadata_csv=metadata_csv,
+        )
+        group_errors.update(staged_errors)
+        if verify and lean_findings:
+            frep = verify_findings_provenance(lean_findings, paper_text)
+            if report is not None:
+                report["findings_verify"] = frep
+        if report is not None:
+            report["reported_findings"] = lean_findings
+    elif use_lean:
         lean_ext = _safe(_extract_lean, LeanExtraction(), "lean")
         study_level = StudyLevelExtraction(study=lean_ext.study,
                                            documentation=lean_ext.documentation,
@@ -1253,7 +1687,10 @@ def extract_tables_from_text(
     tables = flatten_extraction(study_id, study_level, design, methods, metadata_csv=metadata_csv)
     if report is not None:
         report["metadata_structural"] = have_meta
-        report["extraction_mode"] = "lean(1-call)" if use_lean else "full(3-call)"
+        report["extraction_mode"] = (
+            "lean(staged)" if use_lean and strategy == "staged" else
+            "lean(1-call)" if use_lean else "full(3-call)"
+        )
         report["legacy_mode"] = not use_lean
         if metadata_csv:
             report["metadata_csv"] = metadata_csv
@@ -1595,7 +2032,7 @@ def extract_sea_cdm_tables(
         paper_text = paper_text[:max_chars]
 
     if _get_llm() is None:
-        return "ERROR: CLAUDE_API_KEY not set — cannot run extraction."
+        return "ERROR: configured LLM API key not set — cannot run extraction."
 
     prov: dict = {}
     try:

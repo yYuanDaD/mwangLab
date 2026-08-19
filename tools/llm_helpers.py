@@ -18,15 +18,12 @@ Two fallback hooks:
 
 import json
 import math
-import os
 from typing import Optional
 
 import pandas as pd
-from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
 from pydantic import BaseModel, Field
 
-load_dotenv()
+from tools.model_factory import create_structured_chat_model
 
 
 class ContrastValidationResult(BaseModel):
@@ -57,11 +54,9 @@ class ContrastValidationResult(BaseModel):
     )
 
 
-def _get_validation_llm() -> Optional[ChatAnthropic]:
-    api_key = os.getenv("CLAUDE_API_KEY")
-    if not api_key:
-        return None
-    return ChatAnthropic(model="claude-sonnet-4-6", api_key=api_key, temperature=0)
+def _get_validation_llm():
+    """Configured provider, or None when its API key is unavailable."""
+    return create_structured_chat_model(required=False)
 
 
 class RawDAMethodChoice(BaseModel):
