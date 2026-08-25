@@ -16,14 +16,159 @@ Two fallback hooks:
    validated against the input lists before being accepted.
 """
 
+import hashlib
 import json
 import math
+from threading import RLock
 from typing import Optional
 
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from tools.model_factory import create_structured_chat_model
+from tools.model_factory import create_structured_chat_model, resolve_model_config
+
+
+# Process-local usage ledger for the optional structured LLM hooks. The batch
+# pipeline is intentionally fail-soft, but successful and failed API attempts
+# still need to be visible in run_status.json and experiment budget reports.
+_LLM_USAGE_LOCK = RLock()
+_LLM_USAGE: list[dict] = []
+_ALIGNMENT_CACHE: dict[str, dict[str, str]] = {}
+
+# USD per token. DeepSeek V4 prices are the regular (non-peak) public API rates;
+# Anthropic preserves the existing Sonnet 4.6 estimate used by cost_timing.py.
+_MODEL_RATES = {
+    ("deepseek", "deepseek-v4-pro"): {
+        "input": 0.435 / 1_000_000,
+        "cache_read": 0.003625 / 1_000_000,
+        "output": 0.87 / 1_000_000,
+    },
+    ("deepseek", "deepseek-v4-flash"): {
+        "input": 0.14 / 1_000_000,
+        "cache_read": 0.0028 / 1_000_000,
+        "output": 0.28 / 1_000_000,
+    },
+    ("anthropic", "claude-sonnet-4-6"): {
+        "input": 3.0 / 1_000_000,
+        "cache_read": 0.3 / 1_000_000,
+        "output": 15.0 / 1_000_000,
+    },
+}
+
+
+def estimate_llm_cost_usd(provider: str, model: str, input_tokens: int,
+                          output_tokens: int, cache_read_input_tokens: int = 0) -> float | None:
+    """Estimate one structured call at the configured model's public token rates."""
+    rates = _MODEL_RATES.get((str(provider).lower(), str(model).lower()))
+    if rates is None:
+        return None
+    cached = max(0, min(int(cache_read_input_tokens or 0), int(input_tokens or 0)))
+    uncached = max(0, int(input_tokens or 0) - cached)
+    return round(
+        uncached * rates["input"] + cached * rates["cache_read"]
+        + max(0, int(output_tokens or 0)) * rates["output"],
+        8,
+    )
+
+
+def llm_usage_checkpoint() -> int:
+    """Return a stable cursor for summarizing subsequent structured calls."""
+    with _LLM_USAGE_LOCK:
+        return len(_LLM_USAGE)
+
+
+def llm_usage_summary(since: int = 0) -> dict:
+    """Return call/token/cost totals and immutable per-call records after ``since``."""
+    with _LLM_USAGE_LOCK:
+        records = [dict(item) for item in _LLM_USAGE[max(0, int(since)):]]
+    measured = [item for item in records if item.get("usage_measured")]
+    estimated = [item.get("estimated_cost_usd") for item in records
+                 if item.get("estimated_cost_usd") is not None]
+    return {
+        "llm_calls": len(records),
+        "usage_measured_calls": len(measured),
+        "input_tokens": sum(int(item.get("input_tokens") or 0) for item in records),
+        "cache_read_input_tokens": sum(
+            int(item.get("cache_read_input_tokens") or 0) for item in records
+        ),
+        "output_tokens": sum(int(item.get("output_tokens") or 0) for item in records),
+        "estimated_cost_usd": round(sum(float(value) for value in estimated), 8),
+        "unpriced_calls": sum(item.get("estimated_cost_usd") is None for item in records),
+        "calls": records,
+    }
+
+
+def reset_llm_usage() -> None:
+    """Clear the process-local ledger (primarily for isolated experiments/tests)."""
+    with _LLM_USAGE_LOCK:
+        _LLM_USAGE.clear()
+
+
+def reset_llm_alignment_cache() -> None:
+    """Clear within-run semantic-alignment reuse; call once per independent run."""
+    with _LLM_USAGE_LOCK:
+        _ALIGNMENT_CACHE.clear()
+
+
+def _usage_value(usage: dict, *keys: str) -> int:
+    for key in keys:
+        value = usage.get(key)
+        if value is not None:
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                pass
+    return 0
+
+
+def _record_structured_usage(stage: str, raw, *, status: str = "ok") -> None:
+    config = resolve_model_config()
+    usage = getattr(raw, "usage_metadata", None) or {}
+    response_meta = getattr(raw, "response_metadata", None) or {}
+    provider_usage = response_meta.get("usage") or response_meta.get("usage_metadata") or {}
+    merged = {**provider_usage, **usage}
+    input_details = merged.get("input_token_details") or merged.get("input_tokens_details") or {}
+    input_tokens = _usage_value(merged, "input_tokens", "input_token_count")
+    output_tokens = _usage_value(merged, "output_tokens", "output_token_count")
+    cached = _usage_value(
+        merged, "cache_read_input_tokens", "cached_input_tokens", "cache_read"
+    ) or _usage_value(input_details, "cache_read", "cached_tokens")
+    cost = estimate_llm_cost_usd(
+        config.provider, config.model, input_tokens, output_tokens, cached
+    )
+    record = {
+        "stage": stage,
+        "provider": config.provider,
+        "model": config.model,
+        "status": status,
+        "input_tokens": input_tokens,
+        "cache_read_input_tokens": cached,
+        "output_tokens": output_tokens,
+        "usage_measured": bool(input_tokens or output_tokens),
+        "estimated_cost_usd": cost,
+    }
+    with _LLM_USAGE_LOCK:
+        _LLM_USAGE.append(record)
+
+
+def _invoke_structured(llm, schema, prompt: str, stage: str):
+    """Invoke a schema model while retaining the raw response's token usage."""
+    try:
+        runnable = llm.with_structured_output(schema, include_raw=True)
+    except TypeError:  # Compatibility with older/mocked LangChain runnables.
+        runnable = llm.with_structured_output(schema)
+    try:
+        response = runnable.invoke(prompt)
+    except Exception:
+        _record_structured_usage(stage, None, status="error")
+        raise
+    if isinstance(response, dict) and "parsed" in response:
+        _record_structured_usage(stage, response.get("raw"))
+        if response.get("parsing_error") is not None:
+            raise response["parsing_error"]
+        return response.get("parsed")
+    _record_structured_usage(stage, None, status="usage_unavailable")
+    return response
 
 
 class ContrastValidationResult(BaseModel):
@@ -84,7 +229,6 @@ def choose_raw_da_method_with_llm(
     llm = _get_validation_llm()
     if llm is None:
         return None
-    structured_llm = llm.with_structured_output(RawDAMethodChoice)
     prompt = f"""Pick ONE differential-expression method for a RAW-count RNA-seq study.
 
 Study: {accession} | organism: {organism or 'unknown'} | total samples: {n_samples if n_samples is not None else 'unknown'}
@@ -106,7 +250,7 @@ and over limma-voom because n is too small for stable voom weights."
 Return exactly one of 'deseq2' / 'edger' / 'limma-voom'.
 """
     try:
-        res = structured_llm.invoke(prompt)
+        res = _invoke_structured(llm, RawDAMethodChoice, prompt, "da_method_select")
         res.method = (res.method or "").lower().strip()
         return res
     except Exception as e:
@@ -179,7 +323,6 @@ def classify_matrix_with_llm(
     llm = _get_validation_llm()
     if llm is None:
         return None
-    structured_llm = llm.with_structured_output(MatrixTypeClassification)
     prompt = f"""Classify the DATA TYPE of one expression matrix so the right differential-analysis
 method can be picked. This is a {organism or 'unknown-organism'} omics study.
 
@@ -208,7 +351,7 @@ numeric profile alone can resemble (β looks like a small-max log matrix). If yo
 return 'ambiguous' with low confidence. Report your decision via the structured schema.
 """
     try:
-        res = structured_llm.invoke(prompt)
+        res = _invoke_structured(llm, MatrixTypeClassification, prompt, "matrix_type")
         res.matrix_type = (res.matrix_type or "").lower().strip()
         res.confidence = (res.confidence or "").lower().strip()
         return res
@@ -269,7 +412,6 @@ def validate_contrast_with_llm(
     if llm is None:
         return None
 
-    structured_llm = llm.with_structured_output(ContrastValidationResult)
 
     if proposed is not None:
         proposed_str = (
@@ -314,7 +456,7 @@ Your job:
 Return your decision via the structured schema.
 """
     try:
-        return structured_llm.invoke(prompt)
+        return _invoke_structured(llm, ContrastValidationResult, prompt, "contrast_validation")
     except Exception as e:
         print(f"  [llm-validation] call failed: {type(e).__name__}: {e}")
         return None
@@ -360,7 +502,6 @@ def judge_evaluation_with_llm(summary: dict) -> Optional[EvaluationJudgeResult]:
     llm = _get_validation_llm()
     if llm is None:
         return None
-    structured_llm = llm.with_structured_output(EvaluationJudgeResult)
     prompt = f"""You are an independent evaluation judge for a bioinformatics AI pipeline.
 
 The same study/contrast was run multiple times, typically on sample subsets or repeated
@@ -381,7 +522,7 @@ Metrics:
 Return the structured verdict.
 """
     try:
-        res = structured_llm.invoke(prompt)
+        res = _invoke_structured(llm, EvaluationJudgeResult, prompt, "evaluation_judge")
         res.verdict = (res.verdict or "").lower().strip()
         res.confidence = (res.confidence or "").lower().strip()
         if res.verdict not in {"stable", "mixed", "unstable"}:
@@ -420,8 +561,18 @@ def _llm_align_samples(counts_cols: list[str], metadata_df: pd.DataFrame) -> dic
     meta_compact = _summarize_metadata_for_alignment(metadata_df)
     if not meta_compact:
         return {}
+    cache_payload = json.dumps(
+        {"counts_cols": list(counts_cols), "metadata": meta_compact},
+        sort_keys=True,
+        ensure_ascii=False,
+    )
+    cache_key = hashlib.sha256(cache_payload.encode("utf-8")).hexdigest()
+    with _LLM_USAGE_LOCK:
+        cached = _ALIGNMENT_CACHE.get(cache_key)
+    if cached is not None:
+        print(f"  [llm-align] cache hit: {len(cached)} pairs")
+        return dict(cached)
 
-    structured_llm = llm.with_structured_output(SampleAlignmentResult)
     prompt = f"""You are aligning RNA-seq counts matrix columns to GEO metadata sample IDs.
 
 String-based alignment (exact / substring / token-overlap) already failed. The likely cause is that
@@ -448,8 +599,10 @@ Rules:
 - Provide a short reasoning describing the abbreviation pattern you used
 """
     try:
-        result = structured_llm.invoke(prompt)
+        result = _invoke_structured(llm, SampleAlignmentResult, prompt, "sample_alignment")
         print(f"  [llm-align] proposed {len(result.mapping)} pairs | {result.reasoning}")
+        with _LLM_USAGE_LOCK:
+            _ALIGNMENT_CACHE[cache_key] = dict(result.mapping)
         return result.mapping
     except Exception as e:
         print(f"  [llm-align] call failed: {type(e).__name__}: {e}")

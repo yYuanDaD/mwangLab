@@ -80,6 +80,7 @@ from tools.evaluation_tools import evaluate_repeated_results_core
 from tools.llm_helpers import (
     summarize_metadata_for_llm, validate_contrast_with_llm, choose_raw_da_method_with_llm,
     choose_raw_da_method_rule, classify_matrix_with_llm,
+    llm_usage_checkpoint, llm_usage_summary, reset_llm_alignment_cache,
 )
 from tools.evidence import EvidenceRecorder, SCHEMA_VERSION
 from tools.run_status import ConsoleStatusRenderer, RunStatusTracker
@@ -148,8 +149,19 @@ class _DecisionLog:
             evidence_ids=[source_id], details=details,
         )
         for role, path in self._artifact_candidates(details):
+            # Decision details historically stored inputs relative to data/
+            # (for example GSE123/matrix.csv). Evidence bundles live under
+            # output/, so auditors could not resolve or hash those strings.
+            candidates = [path]
+            if not os.path.isabs(path):
+                candidates.append(os.path.join("data", path))
+            resolved = next(
+                (os.path.abspath(candidate) for candidate in candidates
+                 if os.path.isfile(candidate)),
+                path,
+            )
             self.evidence.add_artifact(
-                path, role=role, produced_by=decision_id, evidence_ids=[source_id],
+                resolved, role=role, produced_by=decision_id, evidence_ids=[source_id],
             )
 
     def save(self, path, status=None, error=None):
@@ -1316,6 +1328,8 @@ def run_batch_geo_pipeline(
         study_total=len(accessions), renderer=ConsoleStatusRenderer(sys.stdout),
     )
     status_tracker.start("batch initialized")
+    reset_llm_alignment_cache()
+    llm_usage_start = llm_usage_checkpoint()
     fail_log = os.path.join(run_dir, "failures.log")
     log_path = os.path.join(run_dir, "workflow.log")
     auto_deg = bool(treatment_keywords and control_keywords)
@@ -1818,6 +1832,15 @@ def run_batch_geo_pipeline(
         partial_statuses = {"exception", "deg_failed", "deg_ok_gsea_failed"}
         is_partial = any(str(x).startswith("skipped_") or x in partial_statuses
                          for x in summary_df["status"].tolist())
+        usage = llm_usage_summary(llm_usage_start)
+        status_tracker.set_usage(
+            llm_calls=usage["llm_calls"],
+            estimated_cost_usd=usage["estimated_cost_usd"],
+        )
+        print(
+            f"LLM usage: calls={usage['llm_calls']} input={usage['input_tokens']} "
+            f"output={usage['output_tokens']} cost_usd={usage['estimated_cost_usd']:.6f}"
+        )
         status_tracker.finish("partial" if is_partial else "completed",
                               "batch completed with issues" if is_partial else "batch completed")
         print()
