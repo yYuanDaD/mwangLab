@@ -209,7 +209,7 @@ def _json_safe_row(row: dict) -> dict:
     return safe
 
 
-def _run_case(case: dict, out: Path) -> dict:
+def _run_case(case: dict, out: Path, *, llm_datatype: bool = False) -> dict:
     run_label = case["id"]
     batch_root = out / "runs"
     fn = getattr(bt.run_batch_geo_pipeline, "func", bt.run_batch_geo_pipeline)
@@ -221,7 +221,7 @@ def _run_case(case: dict, out: Path) -> dict:
         output_base=str(batch_root),
         run_label=run_label,
         raw_da_method="deseq2",
-        llm_datatype=False,
+        llm_datatype=llm_datatype,
         evaluate_subsets=False,
     )
     cohort = batch_root / f"cohort_{run_label}"

@@ -375,7 +375,7 @@ _ANALYZABLE_TYPES = ("raw_counts", "log_transformed", "fpkm_or_tpm")
 # `*_phenotype_viallabel_data-v5.txt.gz` as log_transformed instead of reaching the real
 # expression in its _RAW.tar.
 _NONEXPRESSION_NAME_HINTS = (
-    "metadata", "phenotype", "viallabel", "clinical", "data_dictionary",
+    "metadata", "meta_", "phenotype", "viallabel", "clinical", "data_dictionary",
     "datadict", "dictionary", "sample_sheet", "samplesheet", "sdrf", "readme",
 )
 

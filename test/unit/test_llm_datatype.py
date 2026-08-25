@@ -168,6 +168,16 @@ def test_candidate_excludes_mvalue():
     print("  [ok] _gather_matrix_candidates excludes *_mvalue.csv artifact")
 
 
+def test_candidate_excludes_meta_prefix():
+    d = tempfile.mkdtemp(prefix="cand_meta_")
+    pd.DataFrame(np.ones((3, 3))).to_csv(os.path.join(d, "meta_wt.csv"))
+    pd.DataFrame(np.ones((3, 3))).to_csv(os.path.join(d, "GSE_log2fpkm.csv"))
+    names = [os.path.basename(c) for c in _gather_matrix_candidates(d)]
+    assert "meta_wt.csv" not in names, "meta_ design helpers must not compete as expression"
+    assert "GSE_log2fpkm.csv" in names
+    print("  [ok] _gather_matrix_candidates excludes meta_* design helpers")
+
+
 def test_live_classify():
     if not os.getenv("CLAUDE_API_KEY"):
         print("  [skip] live classify — CLAUDE_API_KEY not set")
@@ -198,5 +208,6 @@ if __name__ == "__main__":
     test_apply_mapping()
     test_cost_gate()
     test_candidate_excludes_mvalue()
+    test_candidate_excludes_meta_prefix()
     test_live_classify()
     print("\nALL TESTS PASSED.")
