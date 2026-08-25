@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -117,6 +118,12 @@ def _score(result: PaperWorkflowExtraction, target_text: str, gold: dict) -> dic
         [f"{x.stage} {x.action} {x.reason}" for x in result.recommended_workflow]
         + result.review_reasons
     ))
+    scale_pattern = r"(?:fpkm|tpm|log(?: scale| transformed)?|normalized continuous|float)"
+    voom_pattern = r"(?:limma voom|voom)"
+    unsafe_log_voom = bool(
+        re.search(scale_pattern + r"[a-z0-9 ]{0,120}" + voom_pattern, workflow_text)
+        or re.search(voom_pattern + r"[a-z0-9 ]{0,120}" + scale_pattern, workflow_text)
+    )
     dataset_coverage = sum(name in workflow_text for name in ("tcga", "gse71014", "target", "gse116256"))
     safety_checks = {
         "separate_datasets": (dataset_coverage >= 3 or
@@ -129,6 +136,7 @@ def _score(result: PaperWorkflowExtraction, target_text: str, gold: dict) -> dic
             "not a treatment control", "not pre assigned experimental", "prognostic clustering study",
         )),
         "manual_review": result.requires_manual_review,
+        "matrix_method_compatibility": not unsafe_log_voom,
     }
     safety = sum(safety_checks.values()) / len(safety_checks)
 
@@ -172,10 +180,43 @@ def _usage(raw) -> dict[str, int]:
     }
 
 
-def _run_condition(llm, target_text: str, example: dict | None) -> tuple[PaperWorkflowExtraction, dict]:
+def _acceptance(records: list[dict[str, Any]]) -> dict[str, Any]:
+    deltas = [float(item["delta_b_minus_a"]) for item in records]
+    method_gate_passed = all(
+        bool(item["condition_b"]["score"]["safety_checks"].get("matrix_method_compatibility"))
+        for item in records
+    )
+    safety_non_regression = all(
+        float(item["condition_b"]["score"]["components"]["workflow_safety"])
+        >= float(item["condition_a"]["score"]["components"]["workflow_safety"])
+        for item in records
+    )
+    no_hallucinated_accessions = all(
+        not item["condition_b"]["score"].get("hallucinated_accessions")
+        and not item["condition_b"]["score"].get("copied_example_accessions")
+        for item in records
+    )
+    positive_mean = statistics.mean(deltas) > 0
+    accepted = positive_mean and method_gate_passed and safety_non_regression and no_hallucinated_accessions
+    return {
+        "verdict": "accept" if accepted else "reject",
+        "positive_mean_delta": positive_mean,
+        "method_compatibility_gate_passed": method_gate_passed,
+        "paired_safety_non_regression": safety_non_regression,
+        "no_hallucinated_or_copied_accessions": no_hallucinated_accessions,
+        "paired_wins": sum(delta > 0 for delta in deltas),
+        "paired_ties": sum(delta == 0 for delta in deltas),
+        "paired_losses": sum(delta < 0 for delta in deltas),
+        "delta_sample_stdev": round(statistics.stdev(deltas), 2) if len(deltas) > 1 else None,
+    }
+
+
+def _run_condition(llm, target_text: str, context: dict | str | None) -> tuple[PaperWorkflowExtraction, dict]:
     system = BASE_SYSTEM
-    if example is not None:
-        system += "\nCURATED EXAMPLE (structure and reasoning only):\n" + json.dumps(example, ensure_ascii=False, indent=2)
+    if isinstance(context, dict):
+        system += "\nCURATED EXAMPLE (structure and reasoning only):\n" + json.dumps(context, ensure_ascii=False, indent=2)
+    elif isinstance(context, str):
+        system += "\nRUNTIME SKILL (loaded before reasoning):\n" + context
     prompt = system + "\n\nTARGET PAPER:\n" + target_text
     runnable = llm.with_structured_output(PaperWorkflowExtraction, include_raw=True)
     response = runnable.invoke(prompt)
@@ -193,6 +234,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--output-dir", default="")
+    parser.add_argument("--condition-b", choices=("example", "runtime-skill"), default="example")
+    parser.add_argument("--skill-name", default="paper-workflow-safety")
     args = parser.parse_args()
     if args.repeats < 1:
         raise SystemExit("--repeats must be >= 1")
@@ -202,12 +245,25 @@ def main() -> int:
     if not api_key:
         raise SystemExit("CLAUDE_API_KEY not found")
     target_text = TARGET_PAPER.read_text(encoding="utf-8")
-    example = json.loads((HERE / "example_case.json").read_text(encoding="utf-8"))
+    if args.condition_b == "runtime-skill":
+        from tools.runtime_skills import load_runtime_skill_bundle
+        condition_b_context: dict | str = load_runtime_skill_bundle(args.skill_name)
+        condition_b_label = f"runtime skill: {args.skill_name}"
+    else:
+        condition_b_context = json.loads((HERE / "example_case.json").read_text(encoding="utf-8"))
+        condition_b_label = "curated example"
     gold = json.loads((HERE / "gold_target.json").read_text(encoding="utf-8"))
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out = Path(args.output_dir) if args.output_dir else ROOT / "output" / f"fewshot_case_ab_{stamp}"
     out.mkdir(parents=True, exist_ok=True)
+    if isinstance(condition_b_context, str):
+        (out / "condition_b_runtime_skill_bundle.txt").write_bytes(condition_b_context.encode("utf-8"))
+        condition_b_sha256 = hashlib.sha256(condition_b_context.encode("utf-8")).hexdigest()
+    else:
+        context_text = json.dumps(condition_b_context, ensure_ascii=False, indent=2)
+        (out / "condition_b_curated_example.json").write_text(context_text, encoding="utf-8")
+        condition_b_sha256 = hashlib.sha256(context_text.encode("utf-8")).hexdigest()
     tracker = RunStatusTracker(str(out / "run_status.json"), run_id=f"fewshot_ab_{stamp}",
                                profile="fewshot_ab", stages=["condition_a", "condition_b", "score", "report"])
     tracker.start("controlled A/B experiment")
@@ -216,12 +272,20 @@ def main() -> int:
     records = []
     try:
         for repeat in range(1, args.repeats + 1):
-            tracker.set_stage("condition_a", message=f"repeat {repeat}: no example")
-            a, usage_a = _run_condition(llm, target_text, None)
-            score_a = _score(a, target_text, gold)
-            tracker.set_stage("condition_b", message=f"repeat {repeat}: curated example")
-            b, usage_b = _run_condition(llm, target_text, example)
-            score_b = _score(b, target_text, gold)
+            outputs = {}
+            # Alternate call order to reduce provider/order effects while preserving paired inputs.
+            order = ("condition_b", "condition_a") if repeat % 2 else ("condition_a", "condition_b")
+            for condition in order:
+                if condition == "condition_a":
+                    tracker.set_stage("condition_a", message=f"repeat {repeat}: no added context")
+                    result, usage = _run_condition(llm, target_text, None)
+                else:
+                    tracker.set_stage("condition_b", message=f"repeat {repeat}: {condition_b_label}")
+                    result, usage = _run_condition(llm, target_text, condition_b_context)
+                outputs[condition] = {"result": result, "usage": usage}
+            a, usage_a = outputs["condition_a"]["result"], outputs["condition_a"]["usage"]
+            b, usage_b = outputs["condition_b"]["result"], outputs["condition_b"]["usage"]
+            score_a, score_b = _score(a, target_text, gold), _score(b, target_text, gold)
             records.append({
                 "repeat": repeat,
                 "condition_a": {"output": a.model_dump(mode="json"), "score": score_a, "usage": usage_a},
@@ -237,31 +301,42 @@ def main() -> int:
                 ),
             )
             _write_json(out / f"condition_a_no_example_r{repeat}.json", records[-1]["condition_a"])
-            _write_json(out / f"condition_b_with_example_r{repeat}.json", records[-1]["condition_b"])
+            condition_b_file_label = "with_example" if args.condition_b == "example" else "runtime_skill"
+            _write_json(out / f"condition_b_{condition_b_file_label}_r{repeat}.json",
+                        records[-1]["condition_b"])
 
         tracker.set_stage("score", message="aggregating metrics")
         deltas = [x["delta_b_minus_a"] for x in records]
         aggregate = {
-            "experiment": "same target paper; no-example vs curated-example",
+            "experiment": f"same target paper; no added context vs {condition_b_label}",
             "model": MODEL, "temperature": 0, "repeats": args.repeats,
             "target_paper": str(TARGET_PAPER.relative_to(ROOT)),
-            "example_case": str((HERE / "example_case.json").relative_to(ROOT)),
+            "condition_b": condition_b_label,
+            "condition_b_sha256": condition_b_sha256,
             "records": records,
             "mean_score_a": round(statistics.mean(x["condition_a"]["score"]["total"] for x in records), 2),
             "mean_score_b": round(statistics.mean(x["condition_b"]["score"]["total"] for x in records), 2),
             "mean_delta_b_minus_a": round(statistics.mean(deltas), 2),
         }
+        aggregate["acceptance"] = _acceptance(records)
         _write_json(out / "scores.json", aggregate)
 
         tracker.set_stage("report", message="writing comparison report")
         report = [
-            "# Few-shot A/B result", "",
+            "# Runtime-context A/B result", "",
             f"- Model: `{MODEL}`", f"- Repeats: {args.repeats}",
-            f"- Mean A (no example): **{aggregate['mean_score_a']}**",
-            f"- Mean B (with example): **{aggregate['mean_score_b']}**",
+            f"- Condition B: **{condition_b_label}**",
+            f"- Condition B SHA-256: `{condition_b_sha256}`",
+            f"- Mean A (no added context): **{aggregate['mean_score_a']}**",
+            f"- Mean B: **{aggregate['mean_score_b']}**",
             f"- Mean delta B-A: **{aggregate['mean_delta_b_minus_a']:+.2f}**", "",
+            f"- Acceptance verdict: **{aggregate['acceptance']['verdict']}**",
+            f"- Paired wins/ties/losses: **{aggregate['acceptance']['paired_wins']}/"
+            f"{aggregate['acceptance']['paired_ties']}/{aggregate['acceptance']['paired_losses']}**",
+            f"- Delta sample SD: **{aggregate['acceptance']['delta_sample_stdev']}**", "",
             f"- Total estimated model cost: **${sum(item[condition]['usage'].get('estimated_usd', 0.0) for item in records for condition in ('condition_a', 'condition_b')):.4f}**", "",
-            "A positive delta supports adding the curated example; one repeat is only a smoke result.", "",
+            "A positive delta supports condition B only when safety checks do not regress. "
+            "One repeat is only a smoke result.", "",
         ]
         for record in records:
             report += [

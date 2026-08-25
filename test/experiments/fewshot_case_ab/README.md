@@ -41,3 +41,11 @@ If scoring logic changes, rescore an existing run without another model call:
 ```powershell
 .\.venv\Scripts\python.exe test\experiments\fewshot_case_ab\rescore_existing.py output\fewshot_case_ab_<timestamp>
 ```
+
+To evaluate the repository runtime skill instead of injecting the legacy example directly:
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+.\.venv\Scripts\python.exe test\experiments\fewshot_case_ab\run_experiment.py `
+  --condition-b runtime-skill --skill-name paper-workflow-safety --repeats 3
+```

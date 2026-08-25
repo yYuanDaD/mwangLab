@@ -25,6 +25,7 @@ from tools.seacdm_tools import (
     SubjectExtract, SampleExtract, GroupExtract, InterventionExtract, AssayExtract,
     ExperimentLite, StudyLevelExtraction, DesignExtraction, MethodsExtraction,
     flatten_extraction, append_tables_to_csvs, extract_sea_cdm_tables,
+    exercise_rows_from_interventions,
 )
 
 
@@ -121,6 +122,36 @@ def test_flatten_offline():
     print(f"[offline] row counts: { {t: len(r) for t, r in tables.items() if r} }")
 
 
+def test_exercise_projection_uses_intervention_identity_not_negative_comment():
+    tables = {"interventions": [{
+        "intervention_id": "GSE1_exp1_int1",
+        "experiment_id": "GSE1_exp1",
+        "material": "standard chow diet",
+        "intervention_type": "diet",
+        "comments": "control group; no exercise intervention",
+    }], "exercise": []}
+    assert exercise_rows_from_interventions("GSE1", tables) == []
+
+
+def test_exercise_projection_recognizes_mict_identity():
+    tables = {"interventions": [{
+        "intervention_id": "GSE1_exp1_int1",
+        "experiment_id": "GSE1_exp1",
+        "material": "MICT treadmill protocol",
+        "intervention_type": "training",
+    }], "exercise": []}
+    rows = exercise_rows_from_interventions("GSE1", tables)
+    assert len(rows) == 1
+    assert rows[0]["intervention_id"] == "GSE1_exp1_int1"
+
+
+def test_experiment_control_accepts_provider_sourced_wrapper():
+    row = ExperimentLite.model_validate({
+        "experiment_control": {"value": None, "source": None},
+    })
+    assert row.experiment_control is None
+
+
 def test_extract_live():
     paper = "data/papers/2267864b41e9b481bd2c3bbf6967fca3f0db8c34.txt"
     if not os.path.exists(paper):
@@ -148,6 +179,9 @@ def test_extract_live():
 
 if __name__ == "__main__":
     test_flatten_offline()
+    test_exercise_projection_uses_intervention_identity_not_negative_comment()
+    test_exercise_projection_recognizes_mict_identity()
+    test_experiment_control_accepts_provider_sourced_wrapper()
     if "--live" in sys.argv:
         test_extract_live()
     else:

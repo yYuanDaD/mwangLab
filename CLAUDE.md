@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A bioinformatics AI agent built with LangChain/LangGraph that uses **Claude Sonnet 4.6** to automate RNA-seq workflows: GEO data download → metadata inspection → preprocessing → QC/PCA/correlation → DESeq2 differential expression → GO/KEGG (ORA) + MSigDB Hallmark (GSEA) enrichment → SEA CDM (Standardized Expression Anatomy Common Data Model) extraction. Also supports **keyword-driven cohort analysis**: search GEO for studies matching a keyword (e.g. "Exercise"), then batch-process the top hits with one tool call. The agent communicates in Chinese.
+A bioinformatics AI agent built with LangChain/LangGraph that uses **DeepSeek V4 Pro** in the evaluated deployment to automate RNA-seq workflows: GEO data download → metadata inspection → preprocessing → QC/PCA/correlation → DESeq2 differential expression → GO/KEGG (ORA) + MSigDB Hallmark (GSEA) enrichment → SEA CDM (Standardized Expression Anatomy Common Data Model) extraction. **Claude Sonnet 4.6** remains the tested fallback. Also supports **keyword-driven cohort analysis**: search GEO for studies matching a keyword (e.g. "Exercise"), then batch-process the top hits with one tool call. The agent communicates in Chinese.
 
 ## Commands
 
@@ -17,6 +17,13 @@ python test/unit/test.py
 python test/unit/test_seacdm.py
 python test/smoke/smoke_test_new_tools.py        # preprocess + stats + GSEA on GSE266241
 python test/scripts/probe_search_quality.py        # download + classify a few search hits
+python test/scripts/probe_model_compatibility.py --provider deepseek  # live provider/tool/schema gate
+python test/experiments/model_agent_ab/run_experiment.py --repeats 3  # paired Sonnet vs V4 routing A/B
+python test/experiments/deepseek_seacdm_staged_ab/run_experiment.py    # DeepSeek single vs staged SEA-CDM A/B
+python test/experiments/deepseek_seacdm_generalization/run_experiment.py  # routine + multifactor staged gate
+python test/experiments/deepseek_seacdm_generalization/rescore_existing.py <run_dir>  # zero-call scope rescore
+python test/experiments/deepseek_seacdm_blind_multicohort/run_experiment.py  # frozen unseen GSE197045/GSE198652 scope test
+python test/experiments/model_e2e_ab/run_experiment.py --repeats 3    # paired cached-GEO DA A/B
 
 # Reset workspace (wipes data/ and output/)
 python clean.py
@@ -28,7 +35,7 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
 
 ## Architecture
 
-**Agent pattern:** LangChain `create_agent` (ReAct loop) with **Claude Sonnet 4.6** as the backing LLM via `langchain_anthropic.ChatAnthropic`. DeepSeek-chat was used initially but proved unreliable for multi-tool agent loops (would loop on the same tool with cosmetically different args until hitting recursion limits) — kept the API key in `.env` for reference but the code path is gone.
+**Agent pattern:** LangChain `create_agent` (ReAct loop) with **DeepSeek V4 Pro** selected in `.env` through its Anthropic-compatible endpoint; **Claude Sonnet 4.6** remains the fallback. `tools/model_factory.py` centralizes both paths, and its no-environment library fallback remains Anthropic. DeepSeek structured-output hooks automatically disable thinking because its thinking mode rejects the forced `tool_choice` used by `with_structured_output`, while the main ReAct agent keeps `effort=max`. The old `deepseek-chat` model previously looped on cosmetically different tool arguments; V4 Pro passed the provider gate, 7-case × 3-repeat routing A/B, and 3-case × 3-repeat cached-GEO DA A/B with zero loops or blockers. **Exception:** `seacdm_tools._get_llm()` still defaults to Sonnet via `BIOAGENT_SEACDM_LLM_PROVIDER=anthropic`. The original one-call 100k-character SEA-CDM benchmark left DeepSeek incomplete in 3/3 runs. The focused staged strategy now receives a deterministic `[TARGET GEO SCOPE]` summary and treats one GEO accession—not every cohort in the paper—as its extraction unit. The evaluator checks cross-cohort relation contamination rather than a gold experiment count. GSE208615, GSE270703, and corrected-scope GSE250122 each passed 3/3. A subsequently frozen unseen multi-accession case, GSE197045 (RRBS) in a paper that also deposits GSE198652 (RNA-seq), also passed 3/3 with no cross-accession contamination, 97.9% provenance, and an independent 100/100 audit at 65.2% applicable coverage. DeepSeek is therefore supported for staged GEO-metadata-backed accession extraction; Sonnet remains the production default and fallback for paper-wide/no-metadata extraction until routing is deliberately changed.
 
 **Entry point:** `main.py` — initializes the LLM, registers tools (wrapped with programmatic guards), defines the English system prompt, and streams the agent's tool calls / responses. `recursion_limit=25`.
 
@@ -65,7 +72,7 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
 
 *Cohort:* User keyword → `search_geo_studies` → list of accessions → `run_batch_geo_pipeline(accessions, treatment_keywords, control_keywords, source_search_csv)` → per-study outputs + cohort-level `summary.csv` + `workflow.log`.
 
-**Key design choice — programmatic guardrails:** System prompts asking the LLM "do not loop" are insufficient on their own. `guard_tools` enforces dedupe + cap in Python so loops are structurally impossible. With Claude Sonnet 4.6 this is belt-and-suspenders — Claude does not in practice loop — but it caps the worst-case bill at ~30 tool calls per run.
+**Key design choice — programmatic guardrails:** System prompts asking the LLM "do not loop" are insufficient on their own. `guard_tools` enforces dedupe + cap in Python so loops are structurally impossible. Both Sonnet 4.6 and DeepSeek V4 Pro completed the paired evaluations without loops, while the guards still cap the worst-case bill at ~30 tool calls per run.
 
 **Key design choice — structured tool outputs via Pydantic:** Current extraction uses validated Pydantic output; Python assigns IDs/FKs and writes relational tables.
 
@@ -135,7 +142,7 @@ Cohort directory naming: `output/cohort_{run_label}/`. Each batch run is isolate
 ## Environment
 
 - Python 3.12+ with virtual environment in `.venv`
-- API key loaded from `.env` via `python-dotenv` (`CLAUDE_API_KEY`)
+- API keys loaded from `.env` via `python-dotenv`: the evaluated deployment uses `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL`; set `BIOAGENT_LLM_PROVIDER=anthropic` to use the `CLAUDE_API_KEY` fallback
 - No `requirements.txt` or `pyproject.toml` — dependencies are only tracked in the venv. Key packages: `langchain`, `langchain-anthropic`, `langgraph`, `pandas`, `geoparse`, `pydeseq2`, `inmoose` (limma/edgeR pure-Python port), `patsy`, `scikit-learn`, `matplotlib`, `seaborn`, `gseapy`, `mygene`, `lxml`.
 - **`lxml` is required for `gseapy.Msigdb`** (used by `run_gsea_analysis`) — without it, MSigDB Hallmark library fetching fails with `ImportError: Missing optional dependency 'lxml'`.
 - External APIs used at runtime (require network): NCBI E-utilities (`search_geo_studies`), GEO FTP (`download_supplementary_files`), Enrichr (`run_enrichment_analysis`), MSigDB (`run_gsea_analysis` via `gp.Msigdb`), MyGene.info (Ensembl→symbol conversion in both enrichment tools).

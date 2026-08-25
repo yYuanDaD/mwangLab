@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -26,10 +27,20 @@ def main() -> int:
     gold = json.loads((HERE / "gold_target.json").read_text(encoding="utf-8"))
     target = MOD.TARGET_PAPER.read_text(encoding="utf-8")
     records = []
+    previous = json.loads((out / "scores.json").read_text(encoding="utf-8")) if (out / "scores.json").exists() else {}
+    bundle_path = out / "condition_b_runtime_skill_bundle.txt"
+    condition_b_sha256 = (
+        hashlib.sha256(bundle_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
+        if bundle_path.exists()
+        else previous.get("condition_b_sha256")
+    )
     a_files = sorted(out.glob("condition_a_no_example_r*.json"))
     for a_path in a_files:
         repeat = int(a_path.stem.rsplit("r", 1)[1])
-        b_path = out / f"condition_b_with_example_r{repeat}.json"
+        b_candidates = sorted(out.glob(f"condition_b_*_r{repeat}.json"))
+        if len(b_candidates) != 1:
+            raise SystemExit(f"Expected one condition B file for repeat {repeat}, found {len(b_candidates)}")
+        b_path = b_candidates[0]
         a = json.loads(a_path.read_text(encoding="utf-8"))
         b = json.loads(b_path.read_text(encoding="utf-8"))
         a["score"] = MOD._score(MOD.PaperWorkflowExtraction.model_validate(a["output"]), target, gold)
@@ -49,15 +60,17 @@ def main() -> int:
     if not records:
         raise SystemExit(f"No saved condition files in {out}")
     aggregate = {
-        "experiment": "same target paper; no-example vs curated-example",
+        "experiment": previous.get("experiment", "same target paper; condition A vs condition B"),
         "model": MOD.MODEL, "temperature": 0, "repeats": len(records),
         "target_paper": str(MOD.TARGET_PAPER.relative_to(MOD.ROOT)),
-        "example_case": str((HERE / "example_case.json").relative_to(MOD.ROOT)),
+        "condition_b": previous.get("condition_b", "curated example"),
+        "condition_b_sha256": condition_b_sha256,
         "records": records,
         "mean_score_a": round(statistics.mean(x["condition_a"]["score"]["total"] for x in records), 2),
         "mean_score_b": round(statistics.mean(x["condition_b"]["score"]["total"] for x in records), 2),
         "mean_delta_b_minus_a": round(statistics.mean(x["delta_b_minus_a"] for x in records), 2),
     }
+    aggregate["acceptance"] = MOD._acceptance(records)
     MOD._write_json(out / "scores.json", aggregate)
     total_cost = sum(
         item[condition]["usage"].get("estimated_usd", 0.0)
@@ -65,12 +78,18 @@ def main() -> int:
         for condition in ("condition_a", "condition_b")
     )
     report = [
-        "# Few-shot A/B result (rescored)", "", f"- Model: `{MOD.MODEL}`",
-        f"- Repeats: {len(records)}", f"- Mean A (no example): **{aggregate['mean_score_a']}**",
-        f"- Mean B (with example): **{aggregate['mean_score_b']}**",
+        "# Runtime-context A/B result (rescored)", "", f"- Model: `{MOD.MODEL}`",
+        f"- Repeats: {len(records)}", f"- Condition B: **{aggregate['condition_b']}**",
+        f"- Condition B SHA-256: `{condition_b_sha256}`" if condition_b_sha256 else "- Condition B SHA-256: unavailable",
+        f"- Mean A (no added context): **{aggregate['mean_score_a']}**",
+        f"- Mean B: **{aggregate['mean_score_b']}**",
         f"- Mean delta B-A: **{aggregate['mean_delta_b_minus_a']:+.2f}**", "",
+        f"- Acceptance verdict: **{aggregate['acceptance']['verdict']}**",
+        f"- Paired wins/ties/losses: **{aggregate['acceptance']['paired_wins']}/"
+        f"{aggregate['acceptance']['paired_ties']}/{aggregate['acceptance']['paired_losses']}**",
+        f"- Delta sample SD: **{aggregate['acceptance']['delta_sample_stdev']}**", "",
         f"- Total estimated model cost: **${total_cost:.4f}**", "",
-        "A positive delta supports adding the curated example; one repeat is only a smoke result.",
+        "A positive delta supports condition B only when blocking safety checks do not regress.",
     ]
     (out / "comparison.md").write_text("\n".join(report), encoding="utf-8")
     status_path = out / "run_status.json"

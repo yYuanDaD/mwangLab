@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
 from langchain.agents import create_agent
 
 
@@ -24,20 +23,19 @@ from tools.guards import guard_tools
 from tools.tool_router import select_tools
 from tools.run_status import ConsoleStatusRenderer, RunStatusTracker
 from tools.agent_state import BioinformaticsAgentState, RuntimeStateMiddleware
+from tools.runtime_skills import (
+    discover_runtime_skills,
+    load_runtime_skill,
+    render_runtime_skill_catalog,
+)
+from tools.model_factory import create_chat_model, resolve_model_config
 
 # 2. Load environment variables
 load_dotenv()
-api_key = os.getenv("CLAUDE_API_KEY")
+model_config = resolve_model_config()
 
-if not api_key:
-    raise ValueError("API Key not found! Make sure you have a .env file in the project root with CLAUDE_API_KEY set.")
-
-# 3. Initialize Claude Sonnet 4.6 model
-llm = ChatAnthropic(
-    model="claude-sonnet-4-6",
-    api_key=api_key,
-    temperature=0,
-)
+# 3. Initialize the configured model (Claude Sonnet 4.6 remains the default).
+llm = create_chat_model(model_config)
 
 # 4. Register tools, wrapped with programmatic guards (dedupe + per-tool cap)
 raw_tools = [
@@ -125,7 +123,15 @@ SEA-CDM v1 — PREFERRED for structured output:
   for one study. The flat single-JSON extractor is Legacy and is not exposed to the agent.
 """
 
-def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None):
+def _runtime_skills_enabled(override: bool | None = None) -> bool:
+    if override is not None:
+        return override
+    value = os.getenv("BIOAGENT_RUNTIME_SKILLS", "1").strip().lower()
+    return value not in {"0", "false", "no", "off"}
+
+
+def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None,
+                enable_runtime_skills: bool | None = None):
     """Build a per-request agent with only the relevant tool profile exposed.
 
     Rebuilding the guarded wrappers also scopes dedupe/call counters to this
@@ -134,7 +140,11 @@ def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None)
     selected_raw_tools, routing = select_tools(user_query, raw_tools)
     if status_tracker is not None:
         status_tracker.set_profile("+".join(routing.profiles))
-    request_tools = guard_tools(selected_raw_tools, max_calls_per_tool=3)
+    skill_catalog = discover_runtime_skills() if _runtime_skills_enabled(enable_runtime_skills) else ()
+    request_raw_tools = list(selected_raw_tools)
+    if skill_catalog:
+        request_raw_tools.append(load_runtime_skill)
+    request_tools = guard_tools(request_raw_tools, max_calls_per_tool=3)
     routed_prompt = (
         system_prompt
         + "\n\nACTIVE TOOL SCOPE:\n"
@@ -142,6 +152,9 @@ def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None)
           "Use only the tools currently exposed. If the request is outside this scope, "
           "state that clearly instead of inventing a tool."
     )
+    skill_prompt = render_runtime_skill_catalog(skill_catalog)
+    if skill_prompt:
+        routed_prompt += "\n\n" + skill_prompt
     executor = create_agent(
         model=llm, tools=request_tools, system_prompt=routed_prompt,
         state_schema=BioinformaticsAgentState,
@@ -151,8 +164,9 @@ def build_agent(user_query: str, status_tracker: RunStatusTracker | None = None)
 
 if __name__ == "__main__":
     print("========================================")
-    print("   Claude Bioinformatics Agent Ready")
+    print("   Bioinformatics Agent Ready")
     print("========================================\n")
+    print(f"Model: {model_config.label}")
     test_query = input("请输入分析任务：").strip()
     if not test_query:
         raise SystemExit("No task provided.")
@@ -166,8 +180,10 @@ if __name__ == "__main__":
     status_tracker.start("agent initialized")
     agent_executor, routing = build_agent(test_query, status_tracker=status_tracker)
     status_tracker.set_stage("routing", message=routing.reason)
+    active_runtime_skills = discover_runtime_skills() if _runtime_skills_enabled() else ()
+    skill_note = f" + runtime skill loader ({len(active_runtime_skills)} skills)" if active_runtime_skills else ""
     print(f"Tool routing: {', '.join(routing.profiles)} "
-          f"({len(routing.tool_names)}/{len(raw_tools)} tools exposed)")
+          f"({len(routing.tool_names)}/{len(raw_tools)} scientific tools exposed){skill_note}")
     print("Agent is working...\n")
     safety_config = {"recursion_limit": 50}
 
@@ -180,6 +196,7 @@ if __name__ == "__main__":
                 "raw_query": test_query,
                 "profiles": list(routing.profiles),
                 "tool_names": list(routing.tool_names),
+                "runtime_skills": [skill.name for skill in active_runtime_skills],
             },
             "run_status": status_tracker.snapshot(),
             "artifacts": [],
