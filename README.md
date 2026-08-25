@@ -22,6 +22,7 @@
 - **论文优先的数据发现**：支持论文搜索、全文抓取、数据 accession 提取、论文自有数据与引用数据辨别，以及论文级交付记录组装。
 - **可追溯与可复现**：记录数据来源、自动决策、LLM 判断、统计方法、contrast 和输出文件路径，并支持重复子集分析的一致性评估。
 - **统一证据模型**：每个 batch study 生成 `evidence.json`，统一记录 source、claim、decision、artifact、决策方法、置信度、文件哈希和证据引用关系。
+- **文章结论—分析证据对齐**：`tools/claim_evidence.py` 将论文主结论、目标 accession/contrast、可信 DEG/GSEA、作者报告结果和描述性结果统一成成果卡；区分直接支持、部分支持、次级发现、矛盾与不可检验，并禁止不可信分析被包装成结论证据。
 - **实时运行状态**：CLI 显示当前 profile、工具、研究和阶段；Agent 与 batch 持续原子写入 `run_status.json`，记录阶段进度、耗时、warning/failure、成本字段和证据指针。
 - **消息与运行状态分离**：自定义 LangGraph `BioinformaticsAgentState` 保存 request、status、artifacts、evidence 和预算；middleware 只在模型调用时临时投影决策相关摘要，不向 ReAct `messages` 追加状态栏消息。
 
