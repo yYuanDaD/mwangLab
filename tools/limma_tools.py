@@ -19,6 +19,7 @@ def run_limma_analysis(
     control_group: str,
     treatment_group: str,
     output_dir: str = "./output",
+    design_formula: str = "",
 ) -> str:
     """
     Run Differential Expression Analysis using limma (moderated t + empirical Bayes).
@@ -36,6 +37,9 @@ def run_limma_analysis(
         control_group: Value in design_column for the control / baseline samples.
         treatment_group: Value in design_column for the treatment samples.
         output_dir: Directory to save the DEG CSV.
+        design_formula: Optional patsy formula for multifactor designs, e.g.
+            ``~ genotype + exercise + genotype:exercise``. The treatment indicator
+            remains the default when omitted.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -94,16 +98,23 @@ def run_limma_analysis(
 
         # patsy dmatrix (DesignMatrix, NOT return_type='dataframe') — inmoose preserves
         # coefficient names only from a true DesignMatrix; DataFrames lose names on conversion.
-        design_meta = pd.DataFrame(
-            {"Treatment": (metadata_df[design_column] == treatment_group).astype(int).values},
-            index=metadata_df.index,
-        )
-        design = dmatrix("~ Treatment", design_meta)
+        if design_formula:
+            design_meta = metadata_df.copy()
+            # Patsy formulas cannot safely reference arbitrary GEO column names;
+            # callers should pass sanitized names or use Q('original name').
+            design = dmatrix(design_formula, design_meta)
+        else:
+            design_meta = pd.DataFrame(
+                {"Treatment": (metadata_df[design_column] == treatment_group).astype(int).values},
+                index=metadata_df.index,
+            )
+            design = dmatrix("~ Treatment", design_meta)
 
         fit = lmFit(expr_mat, design=design)
         fit = eBayes(fit)
 
-        top = topTable(fit, coef="Treatment", number=n_features, sort_by="P", adjust_method="fdr_bh")
+        coef = "Treatment" if "Treatment" in list(design.design_info.column_names) else list(design.design_info.column_names)[-1]
+        top = topTable(fit, coef=coef, number=n_features, sort_by="P", adjust_method="fdr_bh")
 
         # inmoose's topTable already returns DESeq2-style column names (baseMean / log2FoldChange /
         # pvalue / lfcSE / stat) — only adj_pvalue needs renaming to padj for downstream consistency.
