@@ -42,6 +42,7 @@ def preprocess_counts(
     output_dir: str = "./output",
     min_count: int = 10,
     min_samples: int = 3,
+    transcript_to_gene_csv: str = "",
 ) -> str:
     """
     Filter low-expression genes and produce a log2(CPM+1) normalized expression matrix.
@@ -51,6 +52,8 @@ def preprocess_counts(
         output_dir: Directory to save the filtered and normalized matrices.
         min_count: Minimum count a gene must reach in at least `min_samples` samples.
         min_samples: Number of samples that must satisfy the count threshold.
+        transcript_to_gene_csv: Optional two-column transcript-to-gene mapping. When
+            supplied, transcript rows are aggregated to gene rows before filtering.
 
     Returns:
         A summary of how many genes were kept and the paths to the output files.
@@ -84,6 +87,16 @@ def preprocess_counts(
                     print(f"   Saved id->symbol map ({len(id2sym)} genes, from '{sym_col}') to {map_path}")
             counts_df = counts_df.drop(columns=non_numeric)
         counts_df = counts_df.fillna(0)
+
+        if transcript_to_gene_csv:
+            from tools.omics_semantics import aggregate_transcripts_to_genes
+            mapping = pd.read_csv(transcript_to_gene_csv, sep=None, engine="python")
+            if mapping.shape[1] < 2:
+                raise ValueError("transcript_to_gene_csv must contain at least two columns")
+            transcript_col, gene_col = mapping.columns[:2]
+            tx_to_gene = dict(zip(mapping[transcript_col].astype(str), mapping[gene_col].astype(str)))
+            counts_df = aggregate_transcripts_to_genes(counts_df, tx_to_gene, method="sum")
+            print(f"   Aggregated transcript rows to {counts_df.shape[0]} gene rows")
 
         n_genes_in = counts_df.shape[0]
         n_samples = counts_df.shape[1]

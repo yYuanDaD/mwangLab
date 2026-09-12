@@ -289,8 +289,8 @@ def _unpack_and_merge_geo_tar(data_dir):
     extract and merge into a single counts matrix (gene_id as index, sample
     filenames as columns). Returns the merged CSV path or None on failure.
 
-    Per-sample file convention: first column is gene_id, the rightmost numeric
-    column is the count. Works for plain `gene_id\\tcount` files and for
+    Per-sample file convention: first column is gene_id, with a uniquely
+    identifiable count-like column. Works for plain `gene_id\\tcount` files and for
     featureCounts output (auto-skips `#`-prefixed metadata lines)."""
     tar_path = None
     for n in os.listdir(data_dir):
@@ -330,11 +330,12 @@ def _unpack_and_merge_geo_tar(data_dir):
             skipped.append((m.name, f"too_few_cols({df.shape[1]})"))
             continue
         gene_col = df.columns[0]
-        numeric_cols = df.select_dtypes(include="number").columns.tolist()
-        if not numeric_cols:
-            skipped.append((m.name, "no_numeric_col"))
+        from tools.omics_semantics import choose_count_column
+        decision = choose_count_column(df)
+        if not decision.column:
+            skipped.append((m.name, f"count_column_{decision.confidence}:{decision.reason}"))
             continue
-        count_col = numeric_cols[-1]
+        count_col = decision.column
         # Sample id = leading part of filename, drops extensions
         base = os.path.basename(m.name)
         for suf in (".gz", ".txt", ".tsv", ".csv"):
