@@ -664,7 +664,7 @@ def _apply_llm_matrix_type(llm_res, counts_path, provenance=""):
     return counts_path, None, f"LLM: {t} (unroutable / ambiguous — kept heuristic)"
 
 
-def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism, provenance=""):
+def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism, provenance="", force=False):
     """Run the req#1 LLM data-type classifier when warranted, else return None.
 
     Gate: integer raw_counts are reliable → SKIP the call (cost ≈ 0). Fire only on the decimal /
@@ -678,7 +678,7 @@ def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism, 
     uncertain = heuristic_cls in ("ambiguous_decimal", "fpkm_or_tpm", "log_transformed")
     suspect_semantics = any(k in name or k in hint for k in (
         "fpkm", "tpm", "cpm", "normaliz", "normalis", "kallisto", "salmon", "rsem", "tximport"))
-    if not (uncertain or suspect_special or suspect_semantics):
+    if not force and not (uncertain or suspect_special or suspect_semantics):
         return None
     stats, preview = _matrix_stats_preview(counts_path)
     if stats is None:
@@ -1339,6 +1339,7 @@ def run_batch_geo_pipeline(
     source_search_csv: str = "",
     raw_da_method: str = "deseq2",
     llm_datatype: bool = True,
+    llm_datatype_strict: bool = False,
     matrix_provenance: str = "",
     evaluate_subsets: bool = False,
     evaluation_runs: int = 3,
@@ -1383,6 +1384,9 @@ def run_batch_geo_pipeline(
             counts are detected by the heuristic and SKIP the LLM call (cost ≈ 0). The decision
             drives the DA route: raw→DESeq2/edgeR/voom, fpkm/log→limma, proteomics→limma,
             methylation β→M-values→limma. Set False to force the heuristic-only path.
+        llm_datatype_strict: When True, run the semantic classifier even for integer-looking matrices.
+            Use this for gold-standard benchmarks where every input must receive an independent
+            semantic confirmation. The normal cost gate remains active when False.
         matrix_provenance: Optional source/processing notes tied to the selected matrix, with original
             filenames and source locations. Treated as evidence, never executed. Estimated counts
             require a validated count workflow and are not silently treated as FPKM/TPM.
@@ -1530,7 +1534,9 @@ def run_batch_geo_pipeline(
                 # promote proteomics, or detect methylation β and trigger the β→M pre-transform.
                 # Estimated counts enter DESeq2 only when provenance documents the same rounding recipe.
                 if llm_datatype and matrix_type_source == "heuristic":
-                    llm_res = _llm_datatype_decision(counts_path, matrix_type, platform_hint, organism, provenance_hint)
+                    llm_res = _llm_datatype_decision(
+                        counts_path, matrix_type, platform_hint, organism, provenance_hint,
+                        force=llm_datatype_strict)
                     if llm_res is not None:
                         row["matrix_type_llm"] = llm_res.matrix_type
                         row["matrix_type_llm_confidence"] = llm_res.confidence
@@ -1563,6 +1569,7 @@ def run_batch_geo_pipeline(
                             dlog.record("matrix_type_llm", "confirm", heuristic=matrix_type,
                                         llm_type=llm_res.matrix_type, confidence=llm_res.confidence,
                                         reason=llm_res.reasoning)
+                            matrix_type_source = "llm-confirmed"
 
                 row["counts_file"] = os.path.relpath(counts_path, "data")
                 row["matrix_type"] = matrix_type

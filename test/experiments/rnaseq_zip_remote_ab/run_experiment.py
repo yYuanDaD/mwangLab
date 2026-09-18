@@ -95,6 +95,7 @@ def _run_case(case, workspace: Path, output_root: Path, local: bool) -> dict:
             "run_label": label,
             "raw_da_method": "deseq2",
             "llm_datatype": True,
+            "llm_datatype_strict": True,
         })
     finally:
         os.chdir(old_cwd)

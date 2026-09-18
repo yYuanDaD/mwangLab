@@ -6,7 +6,7 @@ The deterministic parts run with NO network:
   - _mvalue_transform_matrix  (methylation β→M pre-transform that normalizes methylation onto the
                                existing log/limma route)
   - _apply_llm_matrix_type  (vocab → pipeline route mapping)
-  - _llm_datatype_decision  (the cost gate: raw counts SKIP the LLM; decimals/special-hints fire)
+  - _llm_datatype_decision  (the cost gate: raw counts skip by default; strict mode forces semantic review)
   - _gather_matrix_candidates  (excludes the *_mvalue.csv artifact)
 
 A final LIVE test calls the real LLM only if CLAUDE_API_KEY is set (skipped otherwise).
@@ -174,6 +174,8 @@ def test_cost_gate(monkeypatch_calls=None):
         assert calls["n"] == 2, "methylation hint must call the LLM"
         _llm_datatype_decision(raw, "raw_counts", platform_hint="normalized TPM", organism="Mouse")
         assert calls["n"] == 3, "integer appearance must not override normalization provenance"
+        _llm_datatype_decision(raw, "raw_counts", platform_hint="", organism="Mouse", force=True)
+        assert calls["n"] == 4, "strict benchmark mode must review integer-looking matrices"
     finally:
         batch_tools.classify_matrix_with_llm = orig
     print("  [ok] cost gate: raw counts skip LLM; decimals & methyl hints fire it")

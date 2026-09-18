@@ -24,7 +24,7 @@ ZIP 中共覆盖 6 个 pairwise contrast：
 | GSE195482 WMF vs WCF | 6 | raw counts | DESeq2 | 1,379 | 42 | pass |
 | GSE195482 WMM vs WCM | 6 | raw counts | DESeq2 | 128 | 37 | pass |
 
-All six cases completed with intact artifacts and provenance. GSE194151 FC vs MC and FH vs MH triggered the existing DEG sanity gate because approximately 51% and 53% of tested features were significant. Those are scientific review items, not execution or provenance failures.
+All six cases completed with intact artifacts and provenance. This rerun used strict semantic confirmation: the four GSE194151 cases were classified as estimated counts, and both GSE195482 integer matrices were independently confirmed as raw counts. GSE194151 FC vs MC and FH vs MH triggered the existing DEG sanity gate because approximately 51% and 53% of tested features were significant. Those are scientific review items, not execution or provenance failures.
 
 ## 数据类型判断修复
 
