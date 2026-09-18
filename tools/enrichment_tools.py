@@ -6,10 +6,12 @@ gene IDs are converted to gene symbols via mygene before submission.
 
 import os
 import re
+import time
 
 import pandas as pd
 import gseapy as gp
 import mygene
+import httpx
 
 
 _ORGANISM_GENE_SETS = {
@@ -96,6 +98,13 @@ def _get_hallmark_gmt(category: str, dbver: str) -> dict:
 
 _SYMBOL_CACHE: dict = {}               # (ensembl_no_version, species_lower) -> symbol or None
 
+# mygene.py intentionally disables HTTP timeouts by default.  That is unsafe for a
+# long-running cohort: one stalled annotation request can prevent GSEA from ever
+# starting.  Keep these configurable for slow networks, but bounded by default.
+_MYGENE_BATCH_SIZE = 1000
+_MYGENE_REQUEST_TIMEOUT_S = float(os.getenv("BIOAGENT_MYGENE_REQUEST_TIMEOUT_S", "20"))
+_MYGENE_TOTAL_TIMEOUT_S = float(os.getenv("BIOAGENT_MYGENE_TOTAL_TIMEOUT_S", "120"))
+
 
 def _query_symbols(cleaned: list[str], species: str) -> dict:
     """{version-stripped Ensembl id -> symbol} via MyGene, cached per (id, species). Only the
@@ -104,14 +113,49 @@ def _query_symbols(cleaned: list[str], species: str) -> dict:
     sp = species.lower()
     miss = [c for c in dict.fromkeys(cleaned) if (c, sp) not in _SYMBOL_CACHE]
     if miss:
-        res = mygene.MyGeneInfo().querymany(
-            miss, scopes="ensembl.gene", fields="symbol", species=sp,
-            as_dataframe=False, verbose=False)
+        client = mygene.MyGeneInfo()
+        # mygene.py creates an httpx client lazily. Replace it before the first
+        # query so its default Timeout(None) cannot hang the benchmark forever.
+        # The hasattr checks keep the test doubles and older mygene versions working.
+        configured_client = False
+        if hasattr(client, "http_client_setup"):
+            client.http_client = httpx.Client(timeout=httpx.Timeout(_MYGENE_REQUEST_TIMEOUT_S))
+            client.http_client_setup = True
+            if hasattr(client, "http_cache_client_setup"):
+                client.http_cache_client_setup = False
+            configured_client = True
+
         got = {}
-        for r in res:
-            q, sym = r.get("query"), r.get("symbol")
-            if q is not None and sym:
-                got[q] = sym               # last-wins on duplicate hits (matches prior behavior)
+        started = time.monotonic()
+        try:
+            for offset in range(0, len(miss), _MYGENE_BATCH_SIZE):
+                if time.monotonic() - started >= _MYGENE_TOTAL_TIMEOUT_S:
+                    print(
+                        f"[mygene] total timeout after {_MYGENE_TOTAL_TIMEOUT_S:.0f}s; "
+                        f"keeping {len(got)} partial mappings"
+                    )
+                    break
+                batch = miss[offset:offset + _MYGENE_BATCH_SIZE]
+                try:
+                    res = client.querymany(
+                        batch, scopes="ensembl.gene", fields="symbol", species=sp,
+                        as_dataframe=False, verbose=False)
+                except Exception as exc:
+                    print(
+                        f"[mygene] batch {offset // _MYGENE_BATCH_SIZE + 1} failed "
+                        f"({type(exc).__name__}: {exc}); continuing with available mappings"
+                    )
+                    continue
+                for r in res:
+                    q, sym = r.get("query"), r.get("symbol")
+                    if q is not None and sym:
+                        got[q] = sym  # last-wins on duplicate hits (prior behavior)
+        finally:
+            if configured_client:
+                try:
+                    client.http_client.close()
+                except Exception:
+                    pass
         for c in miss:
             _SYMBOL_CACHE[(c, sp)] = got.get(c)
     return {c: _SYMBOL_CACHE[(c, sp)] for c in cleaned if _SYMBOL_CACHE.get((c, sp))}
