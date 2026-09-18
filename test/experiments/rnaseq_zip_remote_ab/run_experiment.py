@@ -61,6 +61,10 @@ def _stage_local(case, workspace: Path) -> dict:
     metadata_dst = data_dir / f"{accession}_metadata.csv"
     shutil.copy2(matrix_src, matrix_dst)
     pd.read_csv(metadata_src, sep=None, engine="python").to_csv(metadata_dst, index=False)
+    # Preserve the small, human-readable processing recipes shipped with the BO ZIP.
+    # The pipeline reads these as bounded provenance evidence; it never executes them.
+    for helper in sorted(source_dir.glob("*.r")) + sorted(source_dir.glob("*.py")):
+        shutil.copy2(helper, data_dir / helper.name)
     return {
         "matrix": str(matrix_dst),
         "metadata": str(metadata_dst),
@@ -90,7 +94,7 @@ def _run_case(case, workspace: Path, output_root: Path, local: bool) -> dict:
             "output_base": str(output_root),
             "run_label": label,
             "raw_da_method": "deseq2",
-            "llm_datatype": False,
+            "llm_datatype": True,
         })
     finally:
         os.chdir(old_cwd)

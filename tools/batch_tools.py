@@ -567,16 +567,89 @@ def _platform_hint_from_metadata(meta_df):
     return "; ".join(bits)[:600]
 
 
+def _matrix_provenance_hint(path, max_chars=6000):
+    """Read nearby source notes/scripts as bounded evidence for semantic classification.
+
+    Files are never executed. Only names and short text from likely processing notes are sent
+    to the classifier; the expression matrix itself and large result tables are excluded.
+    """
+    directory = os.path.dirname(os.path.abspath(path))
+    basename = os.path.basename(path).lower()
+    candidates = []
+    for name in sorted(os.listdir(directory)) if os.path.isdir(directory) else []:
+        lower = name.lower()
+        if lower == basename or not lower.endswith((".r", ".py", ".md", ".markdown", ".txt")):
+            continue
+        if not any(k in lower for k in ("de", "count", "cpm", "tpm", "fpkm", "prep", "quant", "salmon", "kallisto", "rsem")):
+            continue
+        candidates.append(os.path.join(directory, name))
+    chunks = []
+    remaining = max_chars
+    for candidate in candidates:
+        if remaining <= 0:
+            break
+        try:
+            text = open(candidate, "r", encoding="utf-8", errors="replace").read(1800)
+        except Exception:
+            continue
+        piece = f"SOURCE_FILE={os.path.basename(candidate)}\n{text}\n"
+        chunks.append(piece[:remaining])
+        remaining -= len(chunks[-1])
+    return "\n".join(chunks)
+
+
 # req#1 LLM data-type → pipeline route. The classifier's vocabulary is normalized onto the three
 # existing dispatch branches (raw / fpkm / log) by doing any type-specific pre-transform up front,
 # so nothing downstream of matrix_type needs a new branch.
-def _apply_llm_matrix_type(llm_res, counts_path):
+def _round_estimated_counts_matrix(path):
+    """Create an explicit rounded-count artifact only when provenance authorizes that route."""
+    base, ext = os.path.splitext(path)
+    if ext.lower() == ".gz":
+        base, _ = os.path.splitext(base)
+    out_path = f"{base}_rounded_counts.csv"
+    if os.path.exists(out_path):
+        return out_path
+    df = pd.read_csv(path, sep=None, engine="python", index_col=0)
+    numeric_cols = df.select_dtypes(include="number").columns
+    if len(numeric_cols) < 2:
+        raise ValueError("estimated_counts_rounding_failed: fewer than two numeric sample columns")
+    if (df[numeric_cols] < 0).any().any():
+        raise ValueError("estimated_counts_rounding_failed: negative values present")
+    df[numeric_cols] = df[numeric_cols].round().astype("int64")
+    df.to_csv(out_path)
+    print(f"  rounded estimated counts -> {out_path}")
+    return out_path
+
+
+def _provenance_authorizes_rounding(provenance):
+    """Require an explicit count-matrix round step tied to a DESeq2 recipe."""
+    text = re.sub(r"\s+", " ", (provenance or "").lower())
+    has_round_count = bool(re.search(r"round\s*\([^)]*(count|matrix)", text))
+    has_deseq = "deseq" in text and ("rawcount" in text or "count_matrix" in text)
+    return has_round_count and has_deseq
+
+
+def _apply_llm_matrix_type(llm_res, counts_path, provenance=""):
     """Map a MatrixTypeClassification onto (counts_path, pipeline_matrix_type, note), performing
     a pre-transform when the type needs one. Returns pipeline_matrix_type=None for ambiguous/
     unroutable so the caller keeps the heuristic answer."""
     t = (llm_res.matrix_type or "").lower().strip()
     if t == "raw_counts":
         return counts_path, "raw_counts", "LLM: integer read counts → DESeq2/edgeR/voom"
+    if t == "estimated_counts":
+        route = (getattr(llm_res, "recommended_route", "") or "").lower().strip()
+        prov = (provenance or "").lower()
+        if route == "deseq2_after_rounding" and _provenance_authorizes_rounding(prov):
+            rounded = _round_estimated_counts_matrix(counts_path)
+            return rounded, "raw_counts", (
+                "LLM: estimated counts + explicit provenance recipe rounds before DESeq2; "
+                "used the reproduced rounded-count route"
+            )
+        raise ValueError(
+            "estimated_counts_requires_count_workflow: fractional estimated counts are not FPKM/TPM. "
+            "Provide transcript-level import/offsets or an explicit validated rounding recipe; "
+            "automatic log2 + limma and blind rounding are refused."
+        )
     if t == "fpkm_or_tpm":
         return counts_path, "fpkm_or_tpm", "LLM: linear normalized expression (FPKM/TPM) → log2 then limma"
     if t == "log_transformed":
@@ -591,19 +664,21 @@ def _apply_llm_matrix_type(llm_res, counts_path):
     return counts_path, None, f"LLM: {t} (unroutable / ambiguous — kept heuristic)"
 
 
-def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism):
+def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism, provenance=""):
     """Run the req#1 LLM data-type classifier when warranted, else return None.
 
     Gate: integer raw_counts are reliable → SKIP the call (cost ≈ 0). Fire only on the decimal /
     ambiguous zone (fpkm/log/ambiguous_decimal) or when the filename/platform hints a non-RNA assay
     (proteomics / methylation). Returns a MatrixTypeClassification or None (LLM off / unavailable)."""
     name = os.path.basename(counts_path).lower()
-    hint = (platform_hint or "").lower()
+    hint = ((platform_hint or "") + " " + provenance).lower()
     suspect_special = any(k in name or k in hint for k in (
         "methyl", "rrbs", "wgbs", "bisulf", "450k", "850k", "epic", "beta_",
         "proteom", "protein", "intensity", "lfq", "tmt", "olink", "maxquant", "_dia"))
     uncertain = heuristic_cls in ("ambiguous_decimal", "fpkm_or_tpm", "log_transformed")
-    if not (uncertain or suspect_special):
+    suspect_semantics = any(k in name or k in hint for k in (
+        "fpkm", "tpm", "cpm", "normaliz", "normalis", "kallisto", "salmon", "rsem", "tximport"))
+    if not (uncertain or suspect_special or suspect_semantics):
         return None
     stats, preview = _matrix_stats_preview(counts_path)
     if stats is None:
@@ -611,7 +686,7 @@ def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism):
     return classify_matrix_with_llm(
         filename=os.path.basename(counts_path), platform=platform_hint,
         value_stats=stats, preview_text=preview or "", heuristic_label=heuristic_cls,
-        organism=organism)
+        organism=organism, provenance=provenance)
 
 
 def _da_model_params(method, matrix_type):
@@ -1264,6 +1339,7 @@ def run_batch_geo_pipeline(
     source_search_csv: str = "",
     raw_da_method: str = "deseq2",
     llm_datatype: bool = True,
+    matrix_provenance: str = "",
     evaluate_subsets: bool = False,
     evaluation_runs: int = 3,
     evaluation_subset_fraction: float = 0.8,
@@ -1307,6 +1383,9 @@ def run_batch_geo_pipeline(
             counts are detected by the heuristic and SKIP the LLM call (cost ≈ 0). The decision
             drives the DA route: raw→DESeq2/edgeR/voom, fpkm/log→limma, proteomics→limma,
             methylation β→M-values→limma. Set False to force the heuristic-only path.
+        matrix_provenance: Optional source/processing notes tied to the selected matrix, with original
+            filenames and source locations. Treated as evidence, never executed. Estimated counts
+            require a validated count workflow and are not silently treated as FPKM/TPM.
         evaluate_subsets: If True, after each successful DA contrast, run repeated stratified
             subset analyses and compare the resulting DEG/GSEA files for stability. This is opt-in
             because it multiplies runtime and, if evaluation_include_gsea=True, may add network calls.
@@ -1368,6 +1447,8 @@ def run_batch_geo_pipeline(
                 "design_col": None, "control": None, "treatment": None,
                 "n_deg": None, "n_gsea_sig": None, "counts_file": None, "error": None,
                 "llm_validated": None, "llm_overrode": None, "llm_reasoning": None,
+                "matrix_type_llm": None, "matrix_type_llm_confidence": None,
+                "matrix_type_llm_reasoning": None,
                 "sex_mismatch": None, "matrix_type": None, "matrix_type_source": None, "da_method": None,
                 "da_method_reason": None,
                 # req #8: a study may split into several control-vs-treatment-level contrasts
@@ -1406,6 +1487,8 @@ def run_batch_geo_pipeline(
                 status_tracker.set_stage("classify", message="selecting and classifying expression matrix")
                 counts_path, matrix_type = _find_expression_file(data_dir)
                 matrix_type_source = "heuristic"
+                provenance_hint = ((matrix_provenance or "") + "\n" +
+                                   _matrix_provenance_hint(counts_path or ""))[:8000]
 
                 # req #1: LLM data-type RESCUE. The heuristic dropped every candidate as
                 # non-analyzable (its 'ambiguous' bucket). Ask Claude on the top candidate — it can
@@ -1417,9 +1500,12 @@ def run_batch_geo_pipeline(
                     if rescue_cands:
                         top = rescue_cands[0]
                         h_cls, _ = _classify_matrix(top)
-                        llm_res = _llm_datatype_decision(top, h_cls, platform_hint, organism)
+                        llm_res = _llm_datatype_decision(top, h_cls, platform_hint, organism, provenance_hint)
                         if llm_res and llm_res.confidence in ("high", "medium"):
-                            new_path, mapped, note = _apply_llm_matrix_type(llm_res, top)
+                            row["matrix_type_llm"] = llm_res.matrix_type
+                            row["matrix_type_llm_confidence"] = llm_res.confidence
+                            row["matrix_type_llm_reasoning"] = llm_res.reasoning
+                            new_path, mapped, note = _apply_llm_matrix_type(llm_res, top, provenance_hint)
                             if mapped in _ANALYZABLE_TYPES:
                                 counts_path, matrix_type, matrix_type_source = new_path, mapped, "llm-rescue"
                                 dlog.record("matrix_type_llm", "rescue", heuristic=h_cls,
@@ -1440,14 +1526,32 @@ def run_batch_geo_pipeline(
 
                 # req #1: LLM data-type CROSS-CHECK on a confident heuristic pick. Fires only on the
                 # decimal/ambiguous zone or proteomics/methyl hints (raw counts skip → cost ≈ 0). The
-                # LLM may re-route within the limma family (fpkm<->log), promote proteomics, or detect
-                # methylation β and trigger the β→M pre-transform. Never demotes to raw_counts (the
-                # heuristic owns integer detection); ambiguous LLM answers keep the heuristic pick.
+                # LLM may re-route within the limma family (fpkm<->log), identify estimated counts,
+                # promote proteomics, or detect methylation β and trigger the β→M pre-transform.
+                # Estimated counts enter DESeq2 only when provenance documents the same rounding recipe.
                 if llm_datatype and matrix_type_source == "heuristic":
-                    llm_res = _llm_datatype_decision(counts_path, matrix_type, platform_hint, organism)
+                    llm_res = _llm_datatype_decision(counts_path, matrix_type, platform_hint, organism, provenance_hint)
+                    if llm_res is not None:
+                        row["matrix_type_llm"] = llm_res.matrix_type
+                        row["matrix_type_llm_confidence"] = llm_res.confidence
+                        row["matrix_type_llm_reasoning"] = llm_res.reasoning
+                        dlog.record("matrix_type_llm", "assessment", heuristic=matrix_type,
+                                    llm_type=llm_res.matrix_type, confidence=llm_res.confidence,
+                                    reason=llm_res.reasoning, provenance=provenance_hint,
+                                    recommended_route=getattr(llm_res, "recommended_route", ""))
+                        if llm_res.confidence not in ("high", "medium") or llm_res.matrix_type == "ambiguous":
+                            raise ValueError("matrix_semantics_unresolved: " + llm_res.reasoning)
+                    elif matrix_type in ("fpkm_or_tpm", "log_transformed", "ambiguous_decimal"):
+                        raise ValueError("matrix_semantics_unresolved: semantic classifier unavailable; "
+                                         "refusing a decimal-only method decision")
                     if llm_res and llm_res.confidence in ("high", "medium"):
-                        new_path, mapped, note = _apply_llm_matrix_type(llm_res, counts_path)
-                        if mapped in ("fpkm_or_tpm", "log_transformed") and (
+                        row["matrix_type_llm"] = llm_res.matrix_type
+                        row["matrix_type_llm_confidence"] = llm_res.confidence
+                        row["matrix_type_llm_reasoning"] = llm_res.reasoning
+                        new_path, mapped, note = _apply_llm_matrix_type(llm_res, counts_path, provenance_hint)
+                        if mapped is None:
+                            raise ValueError("matrix_semantics_unresolved: unsupported classification " + llm_res.matrix_type)
+                        if mapped in _ANALYZABLE_TYPES and (
                                 mapped != matrix_type or new_path != counts_path):
                             print(f"  [datatype-llm] {matrix_type} → {mapped} "
                                   f"({llm_res.confidence}) — {llm_res.reasoning}")

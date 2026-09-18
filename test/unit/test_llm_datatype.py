@@ -26,6 +26,7 @@ import pandas as pd
 
 from tools.batch_tools import (
     _matrix_stats_preview, _mvalue_transform_matrix, _apply_llm_matrix_type,
+    _round_estimated_counts_matrix, _provenance_authorizes_rounding,
     _llm_datatype_decision, _gather_matrix_candidates, _classify_matrix,
 )
 from tools import batch_tools
@@ -109,6 +110,25 @@ def test_apply_mapping():
 
     _, mt, _ = _apply_llm_matrix_type(cls("raw_counts"), raw)
     assert mt == "raw_counts"
+    try:
+        _apply_llm_matrix_type(cls("estimated_counts"), raw)
+    except ValueError as exc:
+        assert "estimated_counts_requires_count_workflow" in str(exc)
+    else:
+        raise AssertionError("estimated counts must never be silently treated as FPKM/TPM")
+    # The BO recipe is an explicit reproduction exception: only a documented round→DESeq2 route
+    # may convert estimated counts into the integer-count branch.
+    rounded_cls = MatrixTypeClassification(
+        matrix_type="estimated_counts", already_log_scale=False, confidence="high",
+        reasoning="explicit recipe", recommended_route="deseq2_after_rounding")
+    rounded_path, rounded_type, rounded_note = _apply_llm_matrix_type(
+        rounded_cls, raw, provenance="DESeq2 reads this matrix and round(count_matrix) before DESeq2")
+    assert rounded_type == "raw_counts" and rounded_path.endswith("_rounded_counts.csv")
+    assert "rounded-count route" in rounded_note
+    rounded = pd.read_csv(rounded_path, index_col=0)
+    assert np.issubdtype(rounded.to_numpy().dtype, np.integer)
+    assert _provenance_authorizes_rounding("DESeq2 reads rawcount and round(count_matrix)")
+    assert not _provenance_authorizes_rounding("round(cpm_matrix) for a limma-only report")
     _, mt, _ = _apply_llm_matrix_type(cls("fpkm_or_tpm"), raw)
     assert mt == "fpkm_or_tpm"
     _, mt, _ = _apply_llm_matrix_type(cls("log_transformed"), raw)
@@ -124,7 +144,7 @@ def test_apply_mapping():
     new_path, mt, note = _apply_llm_matrix_type(cls("methylation_beta"), beta)
     assert mt == "log_transformed" and new_path.endswith("_mvalue.csv"), (mt, new_path)
     assert "M-value" in note or "M-values" in note
-    print("  [ok] _apply_llm_matrix_type: all 6 vocab → correct route; methylation pre-transforms")
+    print("  [ok] _apply_llm_matrix_type: estimated counts + all other vocab routes; methylation pre-transforms")
 
 
 def test_cost_gate(monkeypatch_calls=None):
@@ -152,6 +172,8 @@ def test_cost_gate(monkeypatch_calls=None):
                                platform_hint="platform_id=GPL21145 Illumina EPIC methylation",
                                organism="Human")
         assert calls["n"] == 2, "methylation hint must call the LLM"
+        _llm_datatype_decision(raw, "raw_counts", platform_hint="normalized TPM", organism="Mouse")
+        assert calls["n"] == 3, "integer appearance must not override normalization provenance"
     finally:
         batch_tools.classify_matrix_with_llm = orig
     print("  [ok] cost gate: raw counts skip LLM; decimals & methyl hints fire it")
