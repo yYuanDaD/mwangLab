@@ -205,6 +205,7 @@ def run_scrna_pseudobulk_da(
     min_samples_per_group: int = 2,
     run_gsea: bool = True,
     output_dir: str = "./output/scrna",
+    paired: bool = False,
 ) -> str:
     """Run pseudobulk differential expression on a single-cell RNA-seq dataset, ONE contrast PER CELL TYPE.
 
@@ -222,6 +223,11 @@ def run_scrna_pseudobulk_da(
         cell_metadata_path: CSV (cell-barcode indexed) for MTX/dense input; ignored for .h5ad with obs.
         organism: 'Mouse' or 'Human' (for GSEA Hallmark species).
         da_method: 'deseq2' (default) | 'edger' | 'limma-voom' | 'all' (run all three + consensus).
+        paired: when True, use donor-blocked limma on complete donor pairs
+            (``~ C(sample) + Treatment``). This is the recommended route when
+            each donor contributes both control and treatment cells; it overrides
+            other da_method choices because DESeq2's single-factor interface
+            cannot represent the blocking term.
         min_cells: drop a (sample x cell-type) group with fewer cells (unreliable pseudobulk profile).
         min_samples_per_group: a cell type needs at least this many pseudobulk samples in BOTH the
             control and treatment groups, else it is skipped for DE (can't form a 2-group contrast).
@@ -244,6 +250,9 @@ def run_scrna_pseudobulk_da(
                     f"< {min_cells} cells, or the metadata columns were empty). "
                     f"dropped={len(prep.get('dropped', []))}.")
 
+        if paired and da_method != "limma":
+            print(f"paired=True: using donor-blocked limma instead of da_method={da_method!r}")
+            da_method = "limma"
         methods = list(_ALL_RAW_METHODS) if da_method == "all" else [da_method]
         multi = len(methods) > 1
         fail_log = os.path.join(output_dir, "failures.log")
@@ -275,6 +284,70 @@ def run_scrna_pseudobulk_da(
             meta_path = info["metadata_csv"]
             n_de_run += 1
             try:
+                if paired:
+                    # Keep only donors represented in both conditions.  The
+                    # aggregation unit is already (sample x condition), so a
+                    # complete pair can be modeled as a donor blocking factor.
+                    pair_counts = meta.groupby("sample")["condition"].nunique()
+                    eligible = set(pair_counts[pair_counts >= 2].index)
+                    paired_meta = meta[meta["sample"].isin(eligible)].copy()
+                    if len(eligible) < min_samples_per_group:
+                        base_row["status"] = "skipped_too_few_complete_pairs"
+                        base_row["n_deg"] = None
+                        rows.append(base_row)
+                        dlog.record("contrast", "skipped", reason="too few complete donor pairs",
+                                    celltype=ct, n_complete_pairs=len(eligible))
+                        continue
+                    paired_counts_path = os.path.join(ct_out, f"{info['celltype_safe']}_paired_counts.csv")
+                    paired_meta_path = os.path.join(ct_out, f"{info['celltype_safe']}_paired_metadata.csv")
+                    pd.read_csv(counts_path, index_col=0).loc[:, paired_meta.index].to_csv(paired_counts_path)
+                    paired_meta.to_csv(paired_meta_path)
+                    norm_dir = os.path.join(ct_out, "paired_preprocess")
+                    from tools.preprocess_tools import preprocess_counts
+                    preprocess_counts.invoke({
+                        "counts_csv": paired_counts_path,
+                        "output_dir": norm_dir,
+                        "min_count": 1,
+                        "min_samples": 1,
+                    })
+                    norm_candidates = sorted(glob.glob(os.path.join(norm_dir, "*_normalized.csv")))
+                    if not norm_candidates:
+                        base_row["status"] = "paired_preprocess_failed"
+                        base_row["n_deg"] = None
+                        rows.append(base_row)
+                        continue
+                    from tools.limma_tools import run_limma_analysis
+                    canon = os.path.join(ct_out, deg_filename(treatment_group, control_group))
+                    if os.path.exists(canon):
+                        os.remove(canon)
+                    print(run_limma_analysis.invoke({
+                        "normalized_csv": norm_candidates[0],
+                        "metadata_csv": paired_meta_path,
+                        "design_column": "condition",
+                        "control_group": control_group,
+                        "treatment_group": treatment_group,
+                        "output_dir": ct_out,
+                        "design_formula": "~ C(sample) + Treatment",
+                        "coefficient": "Treatment",
+                    })[:200])
+                    if not os.path.exists(canon):
+                        base_row["status"] = "deg_failed"
+                        base_row["n_deg"] = None
+                        rows.append(base_row)
+                        continue
+                    deg = pd.read_csv(canon, index_col=0)
+                    base_row["n_complete_pairs"] = len(eligible)
+                    base_row["n_control"] = int((paired_meta["condition"] == control_group).sum())
+                    base_row["n_treatment"] = int((paired_meta["condition"] == treatment_group).sum())
+                    base_row["n_deg"] = int((deg["padj"] < 0.05).sum()) if "padj" in deg.columns else None
+                    base_row["status"] = "deg_ok_paired"
+                    if run_gsea:
+                        nsig, gstatus = _gsea_for_deg(canon, organism, ct_out, dlog, fail_log,
+                                                      info["celltype_safe"], f"{ct} {treatment_group} vs {control_group}")
+                        base_row["n_gsea_sig"] = nsig
+                        base_row["status"] = gstatus
+                    rows.append(base_row)
+                    continue
                 if multi:
                     res = _run_contrast_multi(methods, counts_path, counts_path, meta_path,
                                               "condition", control_group, treatment_group, ct_out,

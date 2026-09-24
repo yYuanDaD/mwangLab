@@ -20,6 +20,7 @@ def run_limma_analysis(
     treatment_group: str,
     output_dir: str = "./output",
     design_formula: str = "",
+    coefficient: str = "",
 ) -> str:
     """
     Run Differential Expression Analysis using limma (moderated t + empirical Bayes).
@@ -40,6 +41,9 @@ def run_limma_analysis(
         design_formula: Optional patsy formula for multifactor designs, e.g.
             ``~ genotype + exercise + genotype:exercise``. The treatment indicator
             remains the default when omitted.
+        coefficient: Optional design-matrix coefficient to test when using a
+            multifactor formula. For paired donor designs this is typically
+            ``Treatment`` in ``~ C(donor) + Treatment``.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -100,6 +104,14 @@ def run_limma_analysis(
         # coefficient names only from a true DesignMatrix; DataFrames lose names on conversion.
         if design_formula:
             design_meta = metadata_df.copy()
+            # Make the requested two-group contrast available to formulas that
+            # include blocking terms (for example ``~ C(sample) + Treatment``).
+            # Callers may provide their own Treatment column; otherwise derive
+            # it from the validated design factor and group labels.
+            if "Treatment" not in design_meta.columns:
+                design_meta["Treatment"] = (
+                    metadata_df[design_column] == treatment_group
+                ).astype(int).values
             # Patsy formulas cannot safely reference arbitrary GEO column names;
             # callers should pass sanitized names or use Q('original name').
             design = dmatrix(design_formula, design_meta)
@@ -113,7 +125,11 @@ def run_limma_analysis(
         fit = lmFit(expr_mat, design=design)
         fit = eBayes(fit)
 
-        coef = "Treatment" if "Treatment" in list(design.design_info.column_names) else list(design.design_info.column_names)[-1]
+        design_names = list(design.design_info.column_names)
+        coef = coefficient.strip() if coefficient else ("Treatment" if "Treatment" in design_names else design_names[-1])
+        if coef not in design_names:
+            return (f"FATAL ERROR: requested coefficient {coef!r} is not present in the design matrix. "
+                    f"Available coefficients: {design_names}")
         top = topTable(fit, coef=coef, number=n_features, sort_by="P", adjust_method="fdr_bh")
 
         # inmoose's topTable already returns DESeq2-style column names (baseMean / log2FoldChange /

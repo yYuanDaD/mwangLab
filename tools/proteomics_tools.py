@@ -79,6 +79,25 @@ _PROTEIN_ID_PATTERNS = [
     re.compile(r"^entry$", re.I),                   # UniProt direct export
 ]
 
+# Peptide-level exports use several vendor-specific names for the sequence and
+# protein mapping columns.  These are deliberately separate from the
+# protein-level ID patterns above: choosing a sample column as a mapping column
+# would create a plausible-looking but biologically invalid roll-up.
+_PEPTIDE_ID_PATTERNS = [
+    re.compile(r"^(?:stripped[._\s-]?)?sequence$", re.I),
+    re.compile(r"peptide[._\s-]?(?:sequence|id)?$", re.I),
+    re.compile(r"modified[._\s-]?sequence", re.I),
+    re.compile(r"precursor[._\s-]?(?:id|charge)?", re.I),
+]
+_PEPTIDE_PROTEIN_MAP_PATTERNS = [
+    re.compile(r"^protein[._\s-]?ids?$", re.I),
+    re.compile(r"leading[._\s-]?(?:razor[._\s-]?)?protein", re.I),
+    re.compile(r"protein[._\s-]?accessions?$", re.I),
+    re.compile(r"protein[._\s-]?groups?$", re.I),
+    re.compile(r"^proteins?$", re.I),
+    re.compile(r"^accessions?$", re.I),
+]
+
 # Per-protein score / stat / structural-property column patterns. These look
 # numeric (so pass the "is numeric" sample-column heuristic) but are NOT per-
 # sample measurements. Excluding them prevents fake "samples" in the output.
@@ -110,6 +129,15 @@ def _find_protein_id_column(columns) -> Optional[str]:
     for pat in _PROTEIN_ID_PATTERNS:
         for c in columns:
             if pat.search(str(c)):
+                return c
+    return None
+
+
+def _find_named_column(columns, patterns) -> Optional[str]:
+    """Return the first column matching one of the supplied regex patterns."""
+    for pat in patterns:
+        for c in columns:
+            if pat.search(str(c).strip()):
                 return c
     return None
 
@@ -634,6 +662,208 @@ def _load_quant_matrix(quant_path: str) -> tuple[pd.DataFrame, list[str]]:
     numeric_cols = [c for c in df.columns if not coerced[c].isna().all()]
     sample_cols = [c for c in numeric_cols if not _is_score_or_stat_column(c)]
     return df, sample_cols
+
+
+def _load_peptide_matrix(quant_path: str) -> pd.DataFrame:
+    """Load a peptide export without guessing an index column."""
+    low = quant_path.lower()
+    inner = low[:-3] if low.endswith(".gz") else low
+    if inner.endswith((".csv", ".tsv", ".txt")):
+        return pd.read_csv(quant_path, sep=None, engine="python")
+    if inner.endswith((".xlsx", ".xls")):
+        return pd.read_excel(quant_path)
+    raise ValueError(
+        f"Unsupported peptide matrix format: {os.path.basename(quant_path)}. "
+        "Supported: .csv, .tsv, .txt, .xlsx, .xls"
+    )
+
+
+def _split_protein_mappings(value) -> list[str]:
+    """Normalize common MaxQuant/Spectronaut protein-group delimiters."""
+    if pd.isna(value):
+        return []
+    text = str(value).strip()
+    if not text or text.lower() in {"nan", "null", "none", "-"}:
+        return []
+    # A semicolon is the standard group separator.  Some exports use a pipe;
+    # avoid splitting UniProt-style IDs unless the pipe is clearly present as a
+    # group delimiter.  Empty/duplicate IDs are removed deterministically.
+    parts = re.split(r"\s*;\s*|\s*\|\s*", text)
+    return list(dict.fromkeys(p for p in (x.strip() for x in parts) if p))
+
+
+def aggregate_peptides_to_proteins(
+    quant_path: str,
+    output_dir: str = "./output",
+    peptide_id_column: str = "",
+    protein_column: str = "",
+    aggregation_method: str = "sum",
+    input_scale: str = "linear",
+    shared_peptides: str = "exclude",
+    min_peptides: int = 1,
+    top_n: int = 3,
+) -> dict:
+    """Roll a peptide abundance table up to protein-level abundance.
+
+    The input must contain one peptide per row, a protein mapping column, and
+    numeric sample abundance columns.  Linear intensities are summed by
+    default; log2 input must use ``mean``, ``median`` or ``top_n_mean`` so the
+    function never silently sums values on the wrong scale.  Shared peptides
+    are excluded by default because assigning them to every mapped protein
+    inflates abundance and can create artificial group differences.
+
+    Returns a manifest with the output paths and filtering counts.  The helper
+    is intentionally independent of PRIDE so it also works with MaxQuant,
+    Spectronaut and user-supplied CSV/TSV/XLSX exports.
+    """
+    if aggregation_method not in {"sum", "mean", "median", "top_n_mean"}:
+        raise ValueError("aggregation_method must be sum, mean, median, or top_n_mean")
+    if input_scale not in {"linear", "log2"}:
+        raise ValueError("input_scale must be linear or log2")
+    if input_scale == "log2" and aggregation_method == "sum":
+        raise ValueError("sum aggregation is only valid for linear abundance; use mean/median/top_n_mean for log2 input")
+    if shared_peptides not in {"exclude", "all"}:
+        raise ValueError("shared_peptides must be exclude or all")
+    if min_peptides < 1:
+        raise ValueError("min_peptides must be >= 1")
+    if top_n < 1:
+        raise ValueError("top_n must be >= 1")
+
+    df = _load_peptide_matrix(quant_path)
+    if df.empty:
+        raise ValueError("peptide matrix is empty")
+    peptide_id_column = peptide_id_column.strip() or _find_named_column(df.columns, _PEPTIDE_ID_PATTERNS)
+    protein_column = protein_column.strip() or _find_named_column(df.columns, _PEPTIDE_PROTEIN_MAP_PATTERNS)
+    if not peptide_id_column or peptide_id_column not in df.columns:
+        raise ValueError(f"could not identify peptide sequence column; available columns: {list(df.columns)[:30]}")
+    if not protein_column or protein_column not in df.columns:
+        raise ValueError(f"could not identify protein mapping column; available columns: {list(df.columns)[:30]}")
+
+    protected = {peptide_id_column, protein_column}
+    numeric = df.apply(pd.to_numeric, errors="coerce")
+    numeric_cols = [c for c in df.columns if c not in protected and not numeric[c].isna().all()]
+    sample_cols = [c for c in numeric_cols if not _is_score_or_stat_column(c)]
+    if not sample_cols:
+        raise ValueError("no numeric sample abundance columns detected after score/stat filtering")
+
+    work = df[[peptide_id_column, protein_column] + sample_cols].copy()
+    work[peptide_id_column] = work[peptide_id_column].astype(str).str.strip()
+    work = work[work[peptide_id_column].ne("") & work[peptide_id_column].ne("nan")]
+    work["_proteins"] = work[protein_column].map(_split_protein_mappings)
+    n_input = len(work)
+    work = work[work["_proteins"].map(bool)]
+
+    # Decoy/contaminant rows are not biological proteins.  Filtering them here
+    # keeps them from contributing to min-peptide counts or output abundance.
+    def _is_decoy(pid: str) -> bool:
+        p = str(pid).upper()
+        return p.startswith(("DECOY", "REV__", "CON__", "CONTAM"))
+
+    work["_proteins"] = work["_proteins"].map(lambda xs: [x for x in xs if not _is_decoy(x)])
+    work = work[work["_proteins"].map(bool)]
+    n_unmapped = n_input - len(work)
+    n_shared = int(work["_proteins"].map(lambda xs: len(xs) > 1).sum())
+    if shared_peptides == "exclude":
+        work = work[work["_proteins"].map(lambda xs: len(xs) == 1)]
+        work["_proteins"] = work["_proteins"].map(lambda xs: xs[0])
+    else:
+        work = work.explode("_proteins", ignore_index=True)
+
+    work[sample_cols] = work[sample_cols].apply(pd.to_numeric, errors="coerce")
+    work = work.dropna(subset=sample_cols, how="all")
+    if work.empty:
+        raise ValueError("no mapped peptides with numeric abundance values remain")
+
+    # Keep one row per peptide/protein pair before grouping; duplicated exports
+    # otherwise make the same peptide count multiple times.
+    work = work.drop_duplicates(subset=[peptide_id_column, "_proteins"], keep="first")
+    grouped = []
+    for protein, rows in work.groupby("_proteins", sort=True):
+        unique_peptides = rows[peptide_id_column].nunique()
+        if unique_peptides < min_peptides:
+            continue
+        values = rows[sample_cols]
+        if aggregation_method == "sum":
+            agg = values.sum(axis=0, skipna=True)
+        elif aggregation_method == "mean":
+            agg = values.mean(axis=0, skipna=True)
+        elif aggregation_method == "median":
+            agg = values.median(axis=0, skipna=True)
+        else:
+            agg = values.apply(lambda col: col.dropna().nlargest(top_n).mean(), axis=0)
+        grouped.append((protein, unique_peptides, agg))
+    if not grouped:
+        raise ValueError(f"no proteins met min_peptides={min_peptides}")
+
+    result = pd.DataFrame({protein: agg for protein, _, agg in grouped}).T
+    result.index.name = "protein_id"
+    result = result[sample_cols]
+    os.makedirs(output_dir, exist_ok=True)
+    base = os.path.basename(quant_path)
+    for suffix in (".gz",):
+        if base.lower().endswith(suffix):
+            base = base[:-len(suffix)]
+    for suffix in (".csv", ".tsv", ".txt", ".xlsx", ".xls"):
+        if base.lower().endswith(suffix):
+            base = base[:-len(suffix)]
+    out_path = os.path.join(output_dir, f"{base}_protein_abundance.csv")
+    result.to_csv(out_path)
+    manifest = {
+        "input": quant_path,
+        "output": out_path,
+        "protein_column": protein_column,
+        "peptide_id_column": peptide_id_column,
+        "sample_columns": sample_cols,
+        "aggregation_method": aggregation_method,
+        "input_scale": input_scale,
+        "shared_peptides": shared_peptides,
+        "min_peptides": min_peptides,
+        "n_input_peptides": int(n_input),
+        "n_unmapped_or_decoy": int(n_unmapped),
+        "n_shared_peptides": n_shared,
+        "n_output_proteins": int(len(result)),
+    }
+    with open(os.path.join(output_dir, f"{base}_protein_abundance.json"), "w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, indent=2, ensure_ascii=False)
+    return manifest
+
+
+@tool
+def aggregate_peptide_to_protein(
+    quant_path: str,
+    output_dir: str = "./output",
+    peptide_id_column: str = "",
+    protein_column: str = "",
+    aggregation_method: str = "sum",
+    input_scale: str = "linear",
+    shared_peptides: str = "exclude",
+    min_peptides: int = 1,
+    top_n: int = 3,
+) -> str:
+    """Convert peptide-level abundance to a protein-level matrix for limma.
+
+    Call this after downloading a peptide quantification export and before
+    ``preprocess_proteomics_matrix``.  The default excludes shared peptides and
+    sums linear intensities.  For log2 intensities use ``aggregation_method``
+    ``mean``, ``median`` or ``top_n_mean``.
+    """
+    try:
+        manifest = aggregate_peptides_to_proteins(
+            quant_path=quant_path, output_dir=output_dir,
+            peptide_id_column=peptide_id_column, protein_column=protein_column,
+            aggregation_method=aggregation_method, input_scale=input_scale,
+            shared_peptides=shared_peptides, min_peptides=min_peptides, top_n=top_n,
+        )
+    except Exception as e:
+        return f"ERROR: peptide-to-protein aggregation failed: {type(e).__name__}: {e}"
+    return (
+        "peptide-to-protein aggregation complete\n"
+        f"Input peptides: {manifest['n_input_peptides']} | output proteins: {manifest['n_output_proteins']}\n"
+        f"Shared peptides: {manifest['n_shared_peptides']} ({manifest['shared_peptides']}) | "
+        f"unmapped/decoy: {manifest['n_unmapped_or_decoy']}\n"
+        f"Output matrix: {manifest['output']}\n"
+        "Next step: run preprocess_proteomics_matrix on the protein-level matrix."
+    )
 
 
 @tool

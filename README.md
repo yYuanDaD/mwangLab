@@ -11,6 +11,7 @@ An agent-assisted bioinformatics workflow for GEO studies and related omics data
 - Extracts paper and experiment metadata into SEA-CDM-style tables with source and artifact provenance.
 - Provides paper-first cohort analysis, contrast validation, sample-alignment fallback, and repeat/subset stability checks.
 - Records run status, failures, decisions, evidence, and output paths for later review.
+- See [docs/MENG_OMICS_FOLLOWUP.md](docs/MENG_OMICS_FOLLOWUP.md) for the single-cell statistical references and the protein/peptide/methylation feasibility contract.
 
 The agent can use Claude Sonnet or DeepSeek V4 through the Anthropic-compatible client. Tool routing and per-tool call limits are enforced in Python.
 

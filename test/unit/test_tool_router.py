@@ -12,7 +12,7 @@ ALL_NAMES = [
     "infer_sex_from_expression", "run_deseq2_analysis", "run_limma_analysis",
     "run_enrichment_analysis", "run_gsea_analysis", "run_batch_geo_pipeline",
     "run_scrna_pseudobulk_da", "run_methylation_da", "identify_proteomics_labeling",
-    "download_pride_project", "preprocess_proteomics_matrix",
+    "download_pride_project", "aggregate_peptide_to_protein", "preprocess_proteomics_matrix",
     "evaluate_repeated_subset_results", "export_kg_style_results",
 ]
 

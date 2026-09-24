@@ -41,7 +41,8 @@ PROFILE_TO_TOOL_NAMES: dict[str, tuple[str, ...]] = {
     ),
     "proteomics": (
         "identify_proteomics_labeling", "download_pride_project",
-        "preprocess_proteomics_matrix", "inspect_metadata", "run_limma_analysis",
+        "aggregate_peptide_to_protein", "preprocess_proteomics_matrix",
+        "inspect_metadata", "run_limma_analysis",
         "run_enrichment_analysis", "run_gsea_analysis", "evaluate_repeated_subset_results",
     ),
     "evaluation": ("evaluate_repeated_subset_results",),

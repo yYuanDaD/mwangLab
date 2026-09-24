@@ -8,7 +8,10 @@ from tools.seacdm_tools import extract_sea_cdm_tables
 from tools.geo_tools import download_geo_data, download_supplementary_files, fetch_geo_description, search_geo_studies
 from tools.deseq2_tools import run_deseq2_analysis, inspect_metadata
 from tools.limma_tools import run_limma_analysis
-from tools.proteomics_tools import identify_proteomics_labeling, download_pride_project, preprocess_proteomics_matrix
+from tools.proteomics_tools import (
+    identify_proteomics_labeling, download_pride_project,
+    aggregate_peptide_to_protein, preprocess_proteomics_matrix,
+)
 from tools.preprocess_tools import preprocess_counts
 from tools.stats_tools import run_pca, sample_correlation_heatmap, sample_qc_summary, infer_sex_from_expression
 from tools.enrichment_tools import run_enrichment_analysis, run_gsea_analysis
@@ -52,6 +55,7 @@ raw_tools = [
     run_limma_analysis,
     identify_proteomics_labeling,
     download_pride_project,
+    aggregate_peptide_to_protein,
     preprocess_proteomics_matrix,
     inspect_metadata,
     preprocess_counts,
@@ -87,7 +91,7 @@ FILE TYPE CONVENTIONS (very important — confusing these is a common failure):
 DIFFERENTIAL EXPRESSION TOOL CHOICE:
 - run_deseq2_analysis: ONLY for raw integer count matrices (e.g. *_raw_counts.csv, featureCounts output). Required by DESeq2's negative-binomial model. Float / fractional values are rounded but this is statistically wrong if the file is already normalized.
 - run_limma_analysis: for log-scale expression — log2(CPM+1) (preprocess_counts output *_normalized.csv), log-transformed FPKM/TPM, or proteomics intensities. Uses moderated-t + empirical Bayes. Output CSV has the same columns as DESeq2 (log2FoldChange, padj, pvalue, ...) so downstream enrichment/GSEA tools work unchanged.
-- run_scrna_pseudobulk_da: for SINGLE-CELL RNA-seq (a genes x CELLS matrix — .h5ad, a 10x MTX directory, or a dense genes x cells CSV — with per-cell sample + cell-type annotation). Do NOT feed a single-cell matrix to run_deseq2_analysis directly: per-cell tests inflate significance via pseudoreplication. This tool SUMS counts within each (sample x cell-type) group into pseudobulk profiles (true biological replicates), then runs DESeq2/edgeR/limma-voom (or da_method='all' for the consensus) + GSEA once PER CELL TYPE. Needs sample_col, celltype_col, condition_col, control_group, treatment_group. Scope is DA only — it assumes the deposited per-cell cell-type labels (no clustering/annotation).
+- run_scrna_pseudobulk_da: for SINGLE-CELL RNA-seq (a genes x CELLS matrix — .h5ad, a 10x MTX directory, or a dense genes x cells CSV — with per-cell sample + cell-type annotation). Do NOT feed a single-cell matrix to run_deseq2_analysis directly: per-cell tests inflate significance via pseudoreplication. This tool SUMS counts within each (sample x cell-type) group into pseudobulk profiles (true biological replicates), then runs DESeq2/edgeR/limma-voom (or da_method='all' for the consensus) + GSEA once PER CELL TYPE. Needs sample_col, celltype_col, condition_col, control_group, treatment_group. Set `paired=true` when each donor/sample has both conditions; it keeps complete donor pairs and runs limma with `~ C(sample) + Treatment`. Scope is DA only — it assumes the deposited per-cell cell-type labels (no clustering/annotation).
 - run_methylation_da: for DNA METHYLATION (RRBS / WGBS / methylation array) — a β-value matrix (CpG sites x samples, values in [0,1] or 0-100%). Do NOT use run_deseq2_analysis (β is not counts) or run_limma_analysis directly (β is bounded/heteroscedastic). This tool converts β to M-values (M = log2(β/(1-β)), the limma-recommended methylation transform), drops invariant sites, and runs limma — output is the same DEG column shape (log2FoldChange = ΔM, padj) so enrichment/GSEA consume it unchanged. Output rows are differentially-methylated SITES. Needs design_column, control_group, treatment_group.
 
 EVALUATION:
@@ -98,7 +102,8 @@ EVALUATION:
 PROTEOMICS DISPATCH (call in this order):
 - identify_proteomics_labeling(pxd_accession): FIRST step. Hits the PRIDE REST API and classifies the project as labeled (TMT / iTRAQ / SILAC) vs label-free, plus reports whether the project ships a processed quantification matrix. If has_quant_matrix=false the project is RAW-only — STOP with an honest "out of scope" message, do not proceed.
 - download_pride_project(pxd_accession): SECOND step. Downloads only the processed quant-matrix files (.mztab / .csv / .tsv / .xlsx / proteinGroups.txt) plus the project JSON metadata to data/{PXD}/. Skips RAW / .mzML / .mzid (GBs each, out of matrix-in DA scope). Skip-if-exists. Returns 'NO QUANT MATRIX' if the project ships only raw spectra.
-- preprocess_proteomics_matrix(quant_path, labeling): THIRD step. Reads the downloaded matrix (mzTab parser handles PRH/PRT sections + decoy filtering; CSV/TSV/XLSX via pandas), log2-transforms if linear, then branches on labeling: labeled → sample-level median centering (v0 — no IRS); label_free → missingness filter + MinProb imputation + median centering. Writes <base>_preprocessed.csv ready for run_limma_analysis. Pass `labeling` from the identify_proteomics_labeling result.
+- aggregate_peptide_to_protein(quant_path): if the downloaded file is peptide-level (peptides.txt / peptide abundance), call this before preprocessing. It requires a peptide-to-protein mapping, excludes shared peptides by default, removes decoys/contaminants, and sums linear intensities (or uses mean/median/top_n_mean for log2 input). It writes a protein-level matrix plus a JSON manifest; never sum log2 values.
+- preprocess_proteomics_matrix(quant_path, labeling): THIRD step for protein-level input, or the next step after peptide aggregation. Reads the downloaded matrix (mzTab parser handles PRH/PRT sections + decoy filtering; CSV/TSV/XLSX via pandas), log2-transforms if linear, then branches on labeling: labeled → sample-level median centering (v0 — no IRS); label_free → missingness filter + MinProb imputation + median centering. Writes <base>_preprocessed.csv ready for run_limma_analysis. Pass `labeling` from the identify_proteomics_labeling result.
 - After preprocessing: hand the _preprocessed.csv to run_limma_analysis (same tool used for log-scale RNA-seq) with a metadata CSV that the user supplies — sample IDs in metadata must match the column names of the preprocessed matrix.
 
 PAPER-FIRST CURATION (Agent A):
