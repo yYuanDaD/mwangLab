@@ -75,6 +75,7 @@ from tools.deseq2_tools import run_deseq2_analysis, deg_filename
 from tools.limma_tools import run_limma_analysis
 from tools.edger_tools import run_edger_analysis
 from tools.limma_voom_tools import run_limma_voom_analysis
+from tools.multigroup_tools import run_multigroup_analysis
 from tools.enrichment_tools import run_gsea_analysis
 from tools.evaluation_tools import evaluate_repeated_results_core
 from tools.llm_helpers import (
@@ -82,6 +83,8 @@ from tools.llm_helpers import (
     choose_raw_da_method_rule, classify_matrix_with_llm,
     llm_usage_checkpoint, llm_usage_summary, reset_llm_alignment_cache,
 )
+from tools.multifactor_design import build_multifactor_plan
+from tools.model_factory import resolve_model_config
 from tools.evidence import EvidenceRecorder, SCHEMA_VERSION
 from tools.run_status import ConsoleStatusRenderer, RunStatusTracker
 
@@ -115,8 +118,17 @@ class _DecisionLog:
     @staticmethod
     def _method(step, decision):
         text = f"{step} {decision}".lower()
+        if step == "llm_contrast_validation" and decision == "skipped_explicit_plan":
+            return "user", "user", "explicit design plan; LLM review skipped"
+        if "llm" in text and (decision.startswith("skipped_") or decision == "unavailable_blocked"):
+            return "rule", "rule", "semantic review gate; no completed LLM decision"
         if "llm" in text:
-            return "llm", "llm", "Claude structured decision"
+            try:
+                config = resolve_model_config()
+                label = f"{config.provider}:{config.model} structured decision"
+            except Exception:
+                label = "configured structured-model decision"
+            return "llm", "llm", label
         if decision == "param":
             return "user", "user", "user-supplied pipeline parameter"
         if step in {"gsea", "deseq2", "edger", "limma", "limma-voom",
@@ -136,18 +148,27 @@ class _DecisionLog:
                     yield key, item
 
     def record(self, step, decision, reason="", **details):
+        raw_confidence = details.get("confidence")
+        confidence = None
+        if isinstance(raw_confidence, (int, float)):
+            confidence = max(0.0, min(1.0, float(raw_confidence)))
+        elif isinstance(raw_confidence, str):
+            confidence = {"high": 0.9, "medium": 0.7, "low": 0.4}.get(raw_confidence.lower())
         self.entries.append({
             "step": step,
             "decision": decision,
             "reason": reason,
+            "confidence": raw_confidence,
+            "confidence_numeric": confidence,
             "details": details,
         })
         method, origin, label = self._method(step, decision)
         source_id = self.evidence.add_source(origin, label, locator=self.accession)
         decision_id = self.evidence.add_decision(
             step, decision, reason=reason, method=method,
-            evidence_ids=[source_id], details=details,
+            evidence_ids=[source_id], confidence=confidence, details=details,
         )
+        self.entries[-1]["decision_id"] = decision_id
         for role, path in self._artifact_candidates(details):
             # Decision details historically stored inputs relative to data/
             # (for example GSE123/matrix.csv). Evidence bundles live under
@@ -240,6 +261,8 @@ def _classify_matrix(path):
             sep = ","
         elif "\t" in head:
             sep = "\t"
+        elif " " in head.splitlines()[0]:
+            sep = r"\s+"
         else:
             sep = ","
         with _open_maybe_gz(path) as fh:
@@ -476,6 +499,19 @@ def _log2_transform_matrix(path):
     return out_path
 
 
+def _normalized_sidecar_path(counts_path, output_dir):
+    """Return the deterministic log2(CPM+1) sidecar produced by preprocess_counts."""
+    base = os.path.basename(counts_path)
+    # preprocess_tools uses os.path.splitext once.  For gzip inputs it first
+    # strips the outer suffix, so ``foo.csv.gz`` becomes ``foo.csv_normalized``
+    # and ``foo.txt.gz`` becomes ``foo.txt_normalized``.
+    if base.lower().endswith(".gz"):
+        stem = base[:-3]
+    else:
+        stem = os.path.splitext(base)[0]
+    return os.path.join(output_dir, f"{stem}_normalized.csv")
+
+
 def _mvalue_transform_matrix(path):
     """Write an M-value sibling of a methylation β matrix (β in [0,1] or 0-100%):
     M = log2((β+ε)/(1-β+ε)). Returns the new path; idempotent. This routes a methylation matrix
@@ -505,9 +541,15 @@ def _matrix_stats_preview(path, max_rows=80):
     try:
         with _open_maybe_gz(path) as fh:
             head = fh.read(8192)
-        sep = "," if path.endswith((".csv", ".csv.gz")) else ("\t" if "\t" in head else ",")
+        sep = ("," if path.endswith((".csv", ".csv.gz")) else
+               "\t" if "\t" in head else
+               r"\s+" if " " in head.splitlines()[0] else ",")
         with _open_maybe_gz(path) as fh:
-            df = pd.read_csv(fh, sep=sep, nrows=max_rows, low_memory=False)
+            # The first rows of GEO matrices often contain unexpressed or
+            # unannotated features. Read a bounded window, then retain rows
+            # with signal for the semantic preview; otherwise a perfectly
+            # valid count matrix can look all-zero to the LLM.
+            df = pd.read_csv(fh, sep=sep, nrows=max_rows * 20, low_memory=False)
     except Exception:
         return None, None
     if df.shape[1] < 2:
@@ -519,6 +561,17 @@ def _matrix_stats_preview(path, max_rows=80):
         numeric = numeric[sample_cols]
     if numeric.shape[1] == 0:
         return None, None
+    row_signal = numeric.fillna(0).abs().sum(axis=1)
+    signal_rows = df.loc[row_signal > 0]
+    if len(signal_rows) >= max_rows:
+        df = signal_rows.head(max_rows)
+        numeric = df[sample_cols]
+    elif len(signal_rows) > 0:
+        df = signal_rows
+        numeric = df[sample_cols]
+    else:
+        df = df.head(max_rows)
+        numeric = df[sample_cols]
     vals = numeric.to_numpy(dtype=float, na_value=np.nan).ravel()
     finite = vals[np.isfinite(vals)]
     nz = finite[finite != 0]
@@ -689,13 +742,12 @@ def _llm_datatype_decision(counts_path, heuristic_cls, platform_hint, organism, 
         organism=organism, provenance=provenance)
 
 
-def _da_model_params(method, matrix_type):
+def _da_model_params(method, matrix_type, design_plan=None, design_column=None):
     """Full model spec + parameters used for the DA step, recorded into decisions.json
     for transparency. Pure record-keeping — does NOT affect the analysis.
 
-    IMPORTANT (honest disclosure): every backend here fits a SINGLE-FACTOR model
-    (`~ condition`, one 2-group contrast). NO covariate adjustment (no sex / batch /
-    age / tissue). Covariate + per-sex / interaction modelling is roadmap E1/E5.
+    A single-factor model remains the default. When an explicit design plan is
+    supplied, the selected backend's formula and covariates are recorded here.
     """
     normalization = {
         "deseq2": "DESeq2 internal median-of-ratios size factors (fit on raw integer counts)",
@@ -705,9 +757,29 @@ def _da_model_params(method, matrix_type):
                   if matrix_type == "fpkm_or_tpm"
                   else "none — matrix is already log-scale"),
     }.get(method, "unknown")
+    plan = design_plan or {}
+    covariates = [str(x) for x in (plan.get("covariates") or [])]
+    interactions = plan.get("interactions") or []
+    formula = plan.get("formula")
+    if not formula:
+        primary = str(design_column or "condition")
+        formula = "~ " + " + ".join([primary] + [f"C({x})" for x in covariates])
+        if interactions:
+            interaction_terms = []
+            for item in interactions:
+                if isinstance(item, (list, tuple)) and len(item) == 2:
+                    interaction_terms.append(f"{item[0]}:{item[1]}")
+                else:
+                    interaction_terms.append(str(item))
+            formula += " + " + " + ".join(interaction_terms)
     return {
-        "design_formula": "~ condition  (single 2-group factor)",
-        "covariates": [],  # none — no sex/batch/age adjustment (roadmap E1/E5)
+        "design_formula": formula,
+        "covariates": covariates,
+        "interactions": interactions,
+        "design_validation": {
+            key: plan[key] for key in ("matrix_rank", "residual_df", "n_samples")
+            if key in plan
+        },
         "da_method": method,
         "normalization": normalization,
         "deg_significance_cutoff": "padj < 0.05",
@@ -717,15 +789,29 @@ def _da_model_params(method, matrix_type):
 
 
 def _invoke_da_method(method, counts_path, da_input_path, metadata_for_design,
-                      col, ctrl, treat, study_out):
+                      col, ctrl, treat, study_out, design_plan=None):
     """Dispatch to one DA backend. Each writes the canonical DEG_results_<treat>_vs_<ctrl>.csv
     into study_out (same filename regardless of method — the caller renames it if needed).
     Returns the backend's text report."""
+    plan = design_plan or {}
+    covariates = ",".join(str(x) for x in (plan.get("covariates") or []))
+    interactions = []
+    for item in (plan.get("interactions") or []):
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            interactions.append(f"{item[0]}:{item[1]}")
+        else:
+            interactions.append(str(item))
+    interaction_text = ",".join(interactions)
+    if plan and method in {"edger", "limma-voom"} and (covariates or interaction_text):
+        return (f"POLICY BLOCKED: {method} multifactor dispatch is not enabled yet; "
+                "use DESeq2 for additive raw-count adjustment or limma for log-scale/interaction models.")
     if method == "deseq2":
         return run_deseq2_analysis.invoke({
             "counts_csv": counts_path, "metadata_csv": metadata_for_design,
             "design_column": col, "control_group": ctrl, "treatment_group": treat,
             "output_dir": study_out,
+            "covariate_columns": covariates,
+            "interaction_terms": interaction_text,
         })
     elif method == "edger":
         return run_edger_analysis.invoke({
@@ -744,7 +830,56 @@ def _invoke_da_method(method, counts_path, da_input_path, metadata_for_design,
             "normalized_csv": da_input_path, "metadata_csv": metadata_for_design,
             "design_column": col, "control_group": ctrl, "treatment_group": treat,
             "output_dir": study_out,
+            "covariate_columns": covariates,
+            "interaction_terms": interaction_text,
         })
+
+
+def _call_da_method(method, counts_path, da_input_path, metadata_for_design,
+                    col, ctrl, treat, study_out, design_plan=None):
+    """Call the DA dispatcher while preserving compatibility with legacy test doubles.
+
+    Simple designs do not need a plan. Omitting the optional keyword in that case lets
+    older monkeypatched executors keep their original seven-argument interface, while
+    explicit multifactor plans still receive the plan and all covariates/interactions.
+    """
+    args = (method, counts_path, da_input_path, metadata_for_design,
+            col, ctrl, treat, study_out)
+    if design_plan is None:
+        return _invoke_da_method(*args)
+    return _invoke_da_method(*args, design_plan=design_plan)
+
+
+def _materialize_design_plan(metadata_csv, design_plan, col, ctrl, treat):
+    """Attach the validated semantic formula and rank to a caller-supplied plan.
+
+    The DA tools repeat the validation immediately before fitting. This helper
+    is for provenance: decision logs should show the actual safe formula
+    (`Treatment`, `Covariate0`, ...) rather than an informal placeholder.
+    """
+    if not design_plan:
+        return design_plan
+    plan = dict(design_plan)
+    try:
+        metadata = pd.read_csv(metadata_csv, index_col=0)
+        checked = build_multifactor_plan(
+            metadata,
+            primary_factor=col,
+            control=str(ctrl),
+            treatment=str(treat),
+            covariates=plan.get("covariates") or [],
+            interactions=[tuple(x) for x in (plan.get("interactions") or [])
+                          if isinstance(x, (list, tuple)) and len(x) == 2],
+        )
+        plan["formula"] = checked.formula
+        plan["matrix_rank"] = checked.matrix_rank
+        plan["residual_df"] = checked.residual_df
+        plan["n_samples"] = checked.n_samples
+    except Exception:
+        # The backend remains the final gate; do not turn a provenance helper
+        # into a second, divergent source of scientific decisions.
+        pass
+    return plan
 
 
 def _gsea_for_deg(deg_csv, organism, study_out, dlog, fail_log, acc, label):
@@ -824,7 +959,7 @@ def _record_deg_sanity(res, sanity, label, method, dlog, fail_log, acc):
 
 def _run_contrast_multi(methods, counts_path, da_input_path, metadata_for_design,
                         col, ctrl, treat, study_out, organism, matrix_type,
-                        dlog, fail_log, acc, gsea_method="deseq2"):
+                        dlog, fail_log, acc, gsea_method="deseq2", design_plan=None):
     """raw_da_method='all': run EVERY method in `methods` on the SAME contrast, then compare.
 
     Why run several: DESeq2, edgeR and limma-voom make different statistical assumptions
@@ -845,8 +980,8 @@ def _run_contrast_multi(methods, counts_path, da_input_path, metadata_for_design
         if os.path.exists(canon):
             os.remove(canon)  # ensure we only pick up THIS method's fresh output
         try:
-            print(_invoke_da_method(m, counts_path, da_input_path, metadata_for_design,
-                                    col, ctrl, treat, study_out)[:200])
+            print(_call_da_method(m, counts_path, da_input_path, metadata_for_design,
+                                  col, ctrl, treat, study_out, design_plan=design_plan)[:200])
         except Exception as e:
             dlog.record(m, "failed", reason=f"{type(e).__name__}: {e}", contrast=label,
                         design_column=col, control=ctrl, treatment=treat)
@@ -868,7 +1003,8 @@ def _run_contrast_multi(methods, counts_path, da_input_path, metadata_for_design
                     reason=(f"{m} differential expression on contrast '{label}' (design column '{col}', "
                             f"{ctrl} vs {treat}); {n_deg if n_deg is not None else 'NA'} genes at padj<0.05"),
                     n_deg=n_deg, contrast=label, design_column=col,
-                    control=ctrl, treatment=treat, model_params=_da_model_params(m, matrix_type))
+                    control=ctrl, treatment=treat,
+                    model_params=_da_model_params(m, matrix_type, design_plan, col))
         print(f"  [{m}] {label}: {n_deg} DEG (padj<.05)")
 
     res = {"control": ctrl, "treatment": treat, "design_col": col,
@@ -944,15 +1080,15 @@ def _run_contrast_multi(methods, counts_path, da_input_path, metadata_for_design
 
 def _run_contrast_da(method, counts_path, da_input_path, metadata_for_design,
                      col, ctrl, treat, study_out, organism, matrix_type,
-                     dlog, fail_log, acc):
+                     dlog, fail_log, acc, design_plan=None):
     """Run ONE control-vs-treatment contrast end to end: DA -> DEG -> GSEA (req #8).
 
     Each contrast writes its own DEG_results_<treat>_vs_<ctrl>.csv (so sibling contrasts of the
     same study don't collide) and its own GSEA. Per-step decisions are tagged with the contrast
     label. Returns {control, treatment, design_col, deg_csv, n_deg, n_gsea_sig, status}."""
     label = f"{treat} vs {ctrl}"
-    print(_invoke_da_method(method, counts_path, da_input_path, metadata_for_design,
-                            col, ctrl, treat, study_out)[:300])
+    print(_call_da_method(method, counts_path, da_input_path, metadata_for_design,
+                          col, ctrl, treat, study_out, design_plan=design_plan)[:300])
 
     deg_csv = os.path.join(study_out, deg_filename(treat, ctrl))
     res = {"control": ctrl, "treatment": treat, "design_col": col,
@@ -973,7 +1109,7 @@ def _run_contrast_da(method, counts_path, da_input_path, metadata_for_design,
                         f"{ctrl} vs {treat}); {res['n_deg']} genes at padj<0.05 of {n_tested} tested"),
                 n_deg=res["n_deg"], contrast=label,
                 design_column=col, control=ctrl, treatment=treat,
-                model_params=_da_model_params(method, matrix_type))
+                model_params=_da_model_params(method, matrix_type, design_plan, col))
 
     sanity = _deg_sanity_flags(res["n_deg"], n_tested, metadata_for_design, col, ctrl, treat)
     _record_deg_sanity(res, sanity, label, method, dlog, fail_log, acc)
@@ -991,7 +1127,7 @@ def _run_subset_evaluation(method, counts_path, da_input_path, metadata_for_desi
                            col, ctrl, treat, study_out, organism, matrix_type,
                            dlog, fail_log, acc, n_runs=3, subset_fraction=0.8,
                            min_group_n=2, include_gsea=False, use_llm_judge=False,
-                           seed=42):
+                           seed=42, design_plan=None):
     """Run repeated stratified subset DA for one contrast, then compare outputs.
 
     This is an opt-in stability check: it keeps the main analysis untouched, writes all subset
@@ -1032,8 +1168,8 @@ def _run_subset_evaluation(method, counts_path, da_input_path, metadata_for_desi
             subset_meta = os.path.join(run_dir, f"metadata_subset_run_{run_idx}.csv")
             sampled.to_csv(subset_meta)
             print(f"  [eval] subset run {run_idx}/{n_runs}: {len(sampled)} samples -> {run_dir}")
-            msg = _invoke_da_method(method, counts_path, da_input_path, subset_meta,
-                                    col, ctrl, treat, run_dir)
+            msg = _call_da_method(method, counts_path, da_input_path, subset_meta,
+                                  col, ctrl, treat, run_dir, design_plan=design_plan)
             print(str(msg)[:200])
             deg_csv = os.path.join(run_dir, deg_filename(treat, ctrl))
             if os.path.exists(deg_csv):
@@ -1340,7 +1476,9 @@ def run_batch_geo_pipeline(
     raw_da_method: str = "deseq2",
     llm_datatype: bool = True,
     llm_datatype_strict: bool = False,
+    llm_contrast_strict: bool = False,
     matrix_provenance: str = "",
+    design_plans_json: str = "",
     evaluate_subsets: bool = False,
     evaluation_runs: int = 3,
     evaluation_subset_fraction: float = 0.8,
@@ -1387,9 +1525,21 @@ def run_batch_geo_pipeline(
         llm_datatype_strict: When True, run the semantic classifier even for integer-looking matrices.
             Use this for gold-standard benchmarks where every input must receive an independent
             semantic confirmation. The normal cost gate remains active when False.
+        llm_contrast_strict: When True, run the structured LLM contrast validator for every
+            non-explicit design, including Python picks that pass the cheap confidence gate.
+            Python still validates the returned column/levels and replication before fitting. Use
+            this when semantic accuracy is more important than reducing provider calls. Only the
+            reviewed triple is executed; unreviewed sibling treatment levels are not auto-added.
         matrix_provenance: Optional source/processing notes tied to the selected matrix, with original
             filenames and source locations. Treated as evidence, never executed. Estimated counts
             require a validated count workflow and are not silently treated as FPKM/TPM.
+        design_plans_json: Optional JSON mapping accession to an explicit design plan. Legacy
+            two-arm plans may contain design_column/control/treatment, covariates, and interaction
+            pairs. Multi-group plans use analysis_type=multigroup|multilevel|factorial or
+            paired_change, a patsy formula, and named coefficient vectors in contrasts; optional
+            derived_columns make source metadata fields safe for formulas. Plans are validated for
+            exact sample coverage, duplicate feature IDs, design rank, and residual degrees of
+            freedom. They never auto-add metadata columns or collapse a multi-level design.
         evaluate_subsets: If True, after each successful DA contrast, run repeated stratified
             subset analyses and compare the resulting DEG/GSEA files for stability. This is opt-in
             because it multiplies runtime and, if evaluation_include_gsea=True, may add network calls.
@@ -1404,6 +1554,12 @@ def run_batch_geo_pipeline(
     safe_label = "".join(c if c.isalnum() or c in ("_", "-") else "_" for c in label)
     run_dir = os.path.join(output_base, f"cohort_{safe_label}")
     os.makedirs(run_dir, exist_ok=True)
+    try:
+        design_plans = json.loads(design_plans_json) if design_plans_json.strip() else {}
+    except Exception as exc:
+        return f"Invalid design_plans_json: {type(exc).__name__}: {exc}"
+    if not isinstance(design_plans, dict):
+        return "Invalid design_plans_json: expected a JSON object keyed by GEO accession."
     status_path = os.path.join(run_dir, "run_status.json")
     status_tracker = RunStatusTracker(
         status_path, run_id=f"cohort_{safe_label}", profile="geo_batch",
@@ -1427,6 +1583,8 @@ def run_batch_geo_pipeline(
         print(f"# organism={organism}")
         print(f"# treatment_keywords={treatment_keywords}")
         print(f"# control_keywords={control_keywords}")
+        print(f"# llm_contrast_strict={llm_contrast_strict}")
+        print(f"# explicit_multifactor_plans={list(design_plans)}")
         print(f"# output_dir={run_dir}")
         if source_search_csv and os.path.exists(source_search_csv):
             print(f"# source_search_csv={source_search_csv}")
@@ -1450,7 +1608,9 @@ def run_batch_geo_pipeline(
                 "accession": acc, "status": "started", "n_samples": None,
                 "design_col": None, "control": None, "treatment": None,
                 "n_deg": None, "n_gsea_sig": None, "counts_file": None, "error": None,
-                "llm_validated": None, "llm_overrode": None, "llm_reasoning": None,
+                "llm_validated": None, "llm_overrode": None, "llm_confidence": None,
+                "llm_intent_match": None,
+                "llm_reasoning": None,
                 "matrix_type_llm": None, "matrix_type_llm_confidence": None,
                 "matrix_type_llm_reasoning": None,
                 "sex_mismatch": None, "matrix_type": None, "matrix_type_source": None, "da_method": None,
@@ -1469,7 +1629,33 @@ def run_batch_geo_pipeline(
                 "eval_verdict": None, "eval_deg_log2fc_r": None,
                 "eval_sig_deg_jaccard": None, "eval_gsea_nes_r": None,
                 "eval_sig_pathway_jaccard": None, "eval_summary_json": None,
+                "design_plan": None,
             }
+            plan_for_study = design_plans.get(acc)
+            if plan_for_study is not None and isinstance(plan_for_study, dict):
+                row["design_plan"] = json.dumps(plan_for_study, ensure_ascii=False, sort_keys=True)
+            explicit_multigroup_plan = bool(
+                isinstance(plan_for_study, dict)
+                and str(plan_for_study.get("analysis_type", "")).lower()
+                in {"multigroup", "multilevel", "factorial", "paired_change"}
+            )
+            study_treatment_keywords = treatment_keywords
+            study_control_keywords = control_keywords
+            explicit_plan_design = None
+            if plan_for_study:
+                required = ("design_column", "control", "treatment")
+                if all(plan_for_study.get(k) not in (None, "") for k in required):
+                    explicit_plan_design = (
+                        str(plan_for_study["design_column"]),
+                        str(plan_for_study["control"]),
+                        str(plan_for_study["treatment"]),
+                    )
+                    # The explicit plan is authoritative for this accession; the
+                    # keyword detector is only used when a plan omits the triple.
+                    study_treatment_keywords = [explicit_plan_design[2]]
+                    study_control_keywords = [explicit_plan_design[1]]
+            study_auto_deg = bool((study_treatment_keywords and study_control_keywords)
+                                  or explicit_plan_design or explicit_multigroup_plan)
             data_dir = os.path.join("data", acc)
             study_out = os.path.join(run_dir, acc)
             os.makedirs(study_out, exist_ok=True)
@@ -1493,6 +1679,8 @@ def run_batch_geo_pipeline(
                 matrix_type_source = "heuristic"
                 provenance_hint = ((matrix_provenance or "") + "\n" +
                                    _matrix_provenance_hint(counts_path or ""))[:8000]
+                datatype_stats = None
+                datatype_preview = None
 
                 # req #1: LLM data-type RESCUE. The heuristic dropped every candidate as
                 # non-analyzable (its 'ambiguous' bucket). Ask Claude on the top candidate — it can
@@ -1504,6 +1692,7 @@ def run_batch_geo_pipeline(
                     if rescue_cands:
                         top = rescue_cands[0]
                         h_cls, _ = _classify_matrix(top)
+                        datatype_stats, datatype_preview = _matrix_stats_preview(top)
                         llm_res = _llm_datatype_decision(top, h_cls, platform_hint, organism, provenance_hint)
                         if llm_res and llm_res.confidence in ("high", "medium"):
                             row["matrix_type_llm"] = llm_res.matrix_type
@@ -1514,7 +1703,8 @@ def run_batch_geo_pipeline(
                                 counts_path, matrix_type, matrix_type_source = new_path, mapped, "llm-rescue"
                                 dlog.record("matrix_type_llm", "rescue", heuristic=h_cls,
                                             llm_type=llm_res.matrix_type, mapped=mapped,
-                                            confidence=llm_res.confidence, reason=llm_res.reasoning, note=note)
+                                            confidence=llm_res.confidence, reason=llm_res.reasoning, note=note,
+                                            input_stats=datatype_stats, input_preview=datatype_preview)
                                 print(f"  [datatype-llm] RESCUE {os.path.basename(top)}: "
                                       f"{h_cls} → {mapped} ({llm_res.confidence}) — {llm_res.reasoning}")
 
@@ -1528,12 +1718,15 @@ def run_batch_geo_pipeline(
                     print(f"[SKIP] {acc}: {matrix_type}")
                     continue
 
-                # req #1: LLM data-type CROSS-CHECK on a confident heuristic pick. Fires only on the
-                # decimal/ambiguous zone or proteomics/methyl hints (raw counts skip → cost ≈ 0). The
+                # req #1: LLM data-type CROSS-CHECK on a heuristic pick. By default it fires only on
+                # the decimal/ambiguous zone or proteomics/methyl hints. In strict mode it also reviews
+                # integer-looking matrices, so the LLM is the semantic decision-maker and the heuristic
+                # is only a candidate. The
                 # LLM may re-route within the limma family (fpkm<->log), identify estimated counts,
                 # promote proteomics, or detect methylation β and trigger the β→M pre-transform.
                 # Estimated counts enter DESeq2 only when provenance documents the same rounding recipe.
                 if llm_datatype and matrix_type_source == "heuristic":
+                    datatype_stats, datatype_preview = _matrix_stats_preview(counts_path)
                     llm_res = _llm_datatype_decision(
                         counts_path, matrix_type, platform_hint, organism, provenance_hint,
                         force=llm_datatype_strict)
@@ -1544,12 +1737,17 @@ def run_batch_geo_pipeline(
                         dlog.record("matrix_type_llm", "assessment", heuristic=matrix_type,
                                     llm_type=llm_res.matrix_type, confidence=llm_res.confidence,
                                     reason=llm_res.reasoning, provenance=provenance_hint,
-                                    recommended_route=getattr(llm_res, "recommended_route", ""))
+                                    recommended_route=getattr(llm_res, "recommended_route", ""),
+                                    input_stats=datatype_stats, input_preview=datatype_preview)
                         if llm_res.confidence not in ("high", "medium") or llm_res.matrix_type == "ambiguous":
                             raise ValueError("matrix_semantics_unresolved: " + llm_res.reasoning)
-                    elif matrix_type in ("fpkm_or_tpm", "log_transformed", "ambiguous_decimal"):
+                    elif llm_datatype_strict or matrix_type in ("fpkm_or_tpm", "log_transformed", "ambiguous_decimal"):
+                        dlog.record("matrix_type_llm", "unavailable_blocked",
+                                    heuristic=matrix_type, reason=(
+                                        "semantic classifier unavailable; refusing an unverified method decision"),
+                                    input_stats=datatype_stats, input_preview=datatype_preview)
                         raise ValueError("matrix_semantics_unresolved: semantic classifier unavailable; "
-                                         "refusing a decimal-only method decision")
+                                         "refusing an unverified method decision")
                     if llm_res and llm_res.confidence in ("high", "medium"):
                         row["matrix_type_llm"] = llm_res.matrix_type
                         row["matrix_type_llm_confidence"] = llm_res.confidence
@@ -1563,12 +1761,14 @@ def run_batch_geo_pipeline(
                                   f"({llm_res.confidence}) — {llm_res.reasoning}")
                             dlog.record("matrix_type_llm", "override", heuristic=matrix_type,
                                         llm_type=llm_res.matrix_type, mapped=mapped,
-                                        confidence=llm_res.confidence, reason=llm_res.reasoning, note=note)
+                                        confidence=llm_res.confidence, reason=llm_res.reasoning, note=note,
+                                        input_stats=datatype_stats, input_preview=datatype_preview)
                             counts_path, matrix_type, matrix_type_source = new_path, mapped, "llm"
                         else:
                             dlog.record("matrix_type_llm", "confirm", heuristic=matrix_type,
                                         llm_type=llm_res.matrix_type, confidence=llm_res.confidence,
-                                        reason=llm_res.reasoning)
+                                        reason=llm_res.reasoning, input_stats=datatype_stats,
+                                        input_preview=datatype_preview)
                             matrix_type_source = "llm-confirmed"
 
                 row["counts_file"] = os.path.relpath(counts_path, "data")
@@ -1606,6 +1806,19 @@ def run_batch_geo_pipeline(
                         dlog.record("da_method_select", "all", methods=da_methods,
                                     reason=row["da_method_reason"])
                         print(f"  [da-method] ALL: {da_methods} (consensus reporting)")
+                        if plan_for_study and (plan_for_study.get("covariates") or
+                                               plan_for_study.get("interactions")):
+                            # Do not run a misleading pseudo-consensus where
+                            # unsupported backends silently omit the requested
+                            # adjustment. DESeq2 is the validated raw-count
+                            # additive backend for this plan.
+                            da_methods = ["deseq2"]
+                            row["da_method"] = "deseq2 (multifactor plan)"
+                            row["da_method_reason"] += (
+                                " | multifactor plan supplied: restricted to DESeq2 because "
+                                "edgeR/limma-voom dispatch is fail-closed for explicit plans.")
+                            dlog.record("da_method_select", "multifactor_restrict",
+                                        methods=da_methods, reason=row["da_method_reason"])
                     elif chosen == "auto":
                         # req #1: deterministic, zero-cost pick (no per-study LLM call).
                         method, reason = choose_raw_da_method_rule(row["n_samples"])
@@ -1682,7 +1895,86 @@ def run_batch_geo_pipeline(
                 else:
                     print(f"  [sex-check] {sex['verdict']} ({sex['summary']})")
 
-                if auto_deg:
+                # Explicit multi-level/factorial/paired-change plans bypass the
+                # legacy single two-arm contrast detector.  The plan is still
+                # aligned to the actual expression columns and validated by the
+                # dedicated executor before any coefficient is fitted.
+                if explicit_multigroup_plan:
+                    status_tracker.set_stage("align", message="aligning explicit multi-group design")
+                    mg_expr_path = da_input_path
+                    if is_raw:
+                        mg_expr_path = _normalized_sidecar_path(counts_path, study_out)
+                        if not os.path.exists(mg_expr_path):
+                            raise RuntimeError(f"normalized sidecar missing for explicit multi-group plan: {mg_expr_path}")
+                    metadata_for_design, align_info = _align_metadata_to_expression(
+                        metadata_csv, mg_expr_path, study_out, acc)
+                    dlog.record("metadata_alignment",
+                                align_info.get("verdict", "unknown"),
+                                **{k: v for k, v in align_info.items() if k != "verdict"})
+                    plan_copy = dict(plan_for_study)
+                    status_tracker.set_stage("design", message="validating explicit multi-group plan")
+                    mg_out = os.path.join(study_out, "multigroup")
+                    mg_result = run_multigroup_analysis(
+                        mg_expr_path, metadata_for_design, plan_copy, mg_out)
+                    dlog.record("multigroup_plan", "validated",
+                                analysis_type=mg_result.get("analysis_type"),
+                                formula=mg_result.get("formula", plan_copy.get("formula")),
+                                n_samples=mg_result.get("n_samples"),
+                                design_rank=mg_result.get("design_rank"),
+                                residual_df=mg_result.get("residual_df"),
+                                n_contrasts=mg_result.get("n_contrasts"),
+                                plan=plan_copy)
+                    row["da_method"] = "limma (explicit multi-group plan)"
+                    row["da_method_reason"] = (
+                        "explicit multi-group/longitudinal plan; log-scale matrix fitted with "
+                        "validated formula and named coefficient contrasts")
+                    row["n_contrasts"] = int(mg_result.get("n_contrasts", 0))
+                    row["contrasts"] = "; ".join(str(x.get("name")) for x in mg_result.get("results", []))
+                    row["design_col"] = "(explicit formula)"
+                    row["control"] = None
+                    row["treatment"] = None
+                    dlog.record("execution_plan", "dispatch",
+                                reason="explicit multi-group plan dispatched to limma executor",
+                                counts_csv=counts_path, da_input_csv=mg_expr_path,
+                                metadata_csv=metadata_for_design, matrix_type=matrix_type,
+                                methods=["limma"], plan=plan_copy)
+                    cres = []
+                    for result in mg_result.get("results", []):
+                        label = str(result.get("name"))
+                        deg_path = result.get("path")
+                        gsea_n = None
+                        gsea_status = "deg_ok_gsea_skipped"
+                        if bool(plan_copy.get("run_gsea", True)):
+                            gsea_n, gsea_status = _gsea_for_deg(
+                                deg_path, organism, os.path.dirname(deg_path),
+                                dlog, fail_log, acc, label)
+                        cres.append({
+                            "status": gsea_status,
+                            "n_deg": int(result.get("n_deg", 0)),
+                            "n_gsea_sig": gsea_n,
+                            "treatment": label,
+                            "control": "(explicit contrast)",
+                            "deg_sanity": "ok",
+                        })
+                    dlog.record("differential_expression", "completed",
+                                n_contrasts=len(cres),
+                                contrasts=[x.get("name") for x in mg_result.get("results", [])])
+                    if cres:
+                        row["n_deg"] = int(sum(x["n_deg"] for x in cres))
+                        row["n_deg_detail"] = "; ".join(
+                            f"{x['treatment']}: {x['n_deg']}" for x in cres)
+                        gsea_values = [x["n_gsea_sig"] for x in cres if x["n_gsea_sig"] is not None]
+                        row["n_gsea_sig"] = int(sum(gsea_values)) if gsea_values else None
+                        row["deg_sanity"] = "ok"
+                        statuses = [x["status"] for x in cres]
+                        row["status"] = ("deg_gsea_ok" if all(s == "deg_gsea_ok" for s in statuses)
+                                          else "deg_gsea_ok_partial" if "deg_gsea_ok" in statuses
+                                          else "deg_ok_gsea_failed" if "deg_ok_gsea_failed" in statuses
+                                          else "deg_ok_gsea_skipped")
+                    else:
+                        row["status"] = "multigroup_no_contrasts"
+
+                if study_auto_deg and not explicit_multigroup_plan:
                     status_tracker.set_stage("align", message="aligning metadata to expression samples")
                     # Pre-align metadata to actual expression-file samples BEFORE LLM-A
                     # reads it. Prevents the GSE317978-class bug where LLM-A picks a
@@ -1703,8 +1995,14 @@ def run_batch_geo_pipeline(
 
                     status_tracker.set_stage("design", message="detecting control-treatment contrasts")
                     contrasts = _auto_detect_contrasts(
-                        metadata_for_design, treatment_keywords, control_keywords)
+                        metadata_for_design, study_treatment_keywords, study_control_keywords)
                     design = contrasts[0] if contrasts else None  # representative for LLM validation
+                    if explicit_plan_design is not None:
+                        # A caller-supplied plan may target a value that the
+                        # heuristic would otherwise not select. It is still
+                        # validated by the DA backend before fitting.
+                        design = explicit_plan_design
+                        contrasts = [explicit_plan_design]
                     if design is not None:
                         print(f"auto-design (python): {design[0]} | {len(contrasts)} contrast(s): "
                               + "; ".join(f"{t} vs {c}" for _, c, t in contrasts))
@@ -1720,27 +2018,45 @@ def run_batch_geo_pipeline(
                     # UNAMBIGUOUS (both arms keyword-grounded & n>=3, and no competing design column)
                     # — the LLM would only confirm it. Ambiguous / no-design studies still go to the
                     # LLM (the safety net for keyword gaps like PBS/Vehicle and multi-axis designs).
-                    skipped_confident = _python_pick_is_confident(
-                        metadata_for_design, design, treatment_keywords, control_keywords)
-                    if skipped_confident:
+                    skipped_confident = (explicit_plan_design is not None or
+                                         (not llm_contrast_strict and
+                                          _python_pick_is_confident(
+                                              metadata_for_design, design,
+                                              study_treatment_keywords,
+                                              study_control_keywords)))
+                    llm_input_summary = None
+                    if explicit_plan_design is not None:
+                        llm_result = None
+                        row["llm_validated"] = "skipped(explicit_design_plan)"
+                        dlog.record("llm_contrast_validation", "skipped_explicit_plan",
+                                    reason="user-supplied explicit design plan",
+                                    design_column=design[0], control=design[1], treatment=design[2],
+                                    validation_mode="explicit_plan", plan=plan_for_study)
+                    elif skipped_confident:
                         llm_result = None
                         print(f"  [llm-validation] SKIPPED (cost) — python pick unambiguous: "
                               f"{design[2]} vs {design[1]} on '{design[0]}'")
                         dlog.record("llm_contrast_validation", "skipped_python_confident",
-                                    design_column=design[0], control=design[1], treatment=design[2])
+                                    reason=("Python pick passed the confidence gate: keyword-grounded "
+                                            "arms, adequate replication, and no competing design column"),
+                                    design_column=design[0], control=design[1], treatment=design[2],
+                                    validation_mode="python_confident")
                         row["llm_validated"] = "skipped(confident)"
                     else:
                         md_summary = summarize_metadata_for_llm(metadata_for_design)
+                        llm_input_summary = md_summary
                         llm_result = validate_contrast_with_llm(
                             accession=acc,
                             metadata_columns_summary=md_summary,
-                            treatment_keywords=treatment_keywords,
-                            control_keywords=control_keywords,
+                            treatment_keywords=study_treatment_keywords,
+                            control_keywords=study_control_keywords,
                             proposed=design,
                         )
                     final_design = design
                     if llm_result is not None:
                         row["llm_validated"] = bool(llm_result.is_valid)
+                        row["llm_confidence"] = getattr(llm_result, "confidence", None)
+                        row["llm_intent_match"] = getattr(llm_result, "intent_match", None)
                         row["llm_reasoning"] = llm_result.reasoning
                         print(f"  [llm-validation] is_valid={llm_result.is_valid} | {llm_result.reasoning}")
                         # Trust the LLM's structured triple whenever it is fully populated — this is
@@ -1752,27 +2068,74 @@ def run_batch_geo_pipeline(
                             llm_triple = (llm_result.design_column,
                                           llm_result.control_value,
                                           llm_result.treatment_value)
-                        if llm_result.is_valid and design is not None:
-                            # Confirm the Python pick.
-                            final_design = design
-                            dlog.record("llm_contrast_validation", "confirm", reason=llm_result.reasoning)
-                        elif llm_triple is not None:
-                            # LLM proposed a contrast where Python found none, or overrode a wrong pick.
+                        llm_intent_match = getattr(llm_result, "intent_match", None)
+                        confident_semantics = getattr(llm_result, "confidence", None) in {"high", "medium"}
+                        if (llm_triple is not None and llm_intent_match is True and confident_semantics
+                                and llm_result.is_valid and llm_triple == design):
+                            # Confirm only when the structured triple itself
+                            # matches the Python candidate. The boolean alone
+                            # is not trusted as a semantic decision.
+                            final_design = llm_triple
+                            dlog.record("llm_contrast_validation", "confirm", reason=llm_result.reasoning,
+                                        design_column=llm_triple[0], control=llm_triple[1],
+                                        treatment=llm_triple[2], proposed=design,
+                                        llm_triple=llm_triple, metadata_summary=llm_input_summary,
+                                        confidence=getattr(llm_result, "confidence", None),
+                                        intent_match=llm_intent_match,
+                                        treatment_keywords=study_treatment_keywords,
+                                        control_keywords=study_control_keywords,
+                                        validator_available=True, validation_mode="llm")
+                        elif llm_triple is not None and llm_intent_match is True and confident_semantics:
+                            # LLM proposed a contrast where Python found none,
+                            # or overrode a wrong pick. The downstream policy
+                            # validates the returned column, levels, coverage,
+                            # and replication before fitting.
                             final_design = llm_triple
                             verb = "proposed" if design is None else "override"
                             print(f"  [llm-validation] {verb} -> "
                                   f"{llm_triple[0]} | {llm_triple[1]} vs {llm_triple[2]}")
                             dlog.record("llm_contrast_validation", verb, reason=llm_result.reasoning,
-                                        design_column=llm_triple[0], control=llm_triple[1], treatment=llm_triple[2])
+                                        design_column=llm_triple[0], control=llm_triple[1], treatment=llm_triple[2],
+                                        proposed=design, llm_triple=llm_triple,
+                                        metadata_summary=llm_input_summary,
+                                        confidence=getattr(llm_result, "confidence", None),
+                                        intent_match=llm_intent_match,
+                                        treatment_keywords=study_treatment_keywords,
+                                        control_keywords=study_control_keywords,
+                                        validator_available=True, validation_mode="llm")
                         else:
-                            # No usable contrast (LLM refused, or claimed valid but gave nothing usable).
+                            # No usable contrast: the LLM refused, omitted the required semantic
+                            # intent confirmation, or explicitly found that the study does not match
+                            # the requested intervention. Never execute a genotype/diet/disease/drug
+                            # contrast as a substitute for an exercise contrast.
                             final_design = None
                             print("  [llm-validation] no clean contrast; skipping DEG")
-                            dlog.record("llm_contrast_validation", "refuse", reason=llm_result.reasoning)
+                            refuse_decision = ("refuse_intent_mismatch"
+                                               if llm_intent_match is False
+                                               else "refuse_missing_intent_evidence")
+                            dlog.record("llm_contrast_validation", refuse_decision, reason=llm_result.reasoning,
+                                        proposed=design, llm_triple=llm_triple,
+                                        metadata_summary=llm_input_summary,
+                                        confidence=getattr(llm_result, "confidence", None),
+                                        intent_match=llm_intent_match,
+                                        treatment_keywords=study_treatment_keywords,
+                                        control_keywords=study_control_keywords,
+                                        validator_available=True, validation_mode="llm")
                         row["llm_overrode"] = (final_design != design)
                     elif not skipped_confident:
-                        print("  [llm-validation] unavailable; using python result")
-                        dlog.record("llm_contrast_validation", "unavailable")
+                        # Ambiguous/no-design cases must fail closed when the
+                        # semantic validator is unavailable. Reusing the
+                        # heuristic pick here could send the wrong baseline to
+                        # DESeq2/limma while still producing plausible p-values.
+                        final_design = None
+                        row["llm_validated"] = "unavailable(blocked)"
+                        print("  [llm-validation] unavailable; blocking unverified contrast")
+                        dlog.record("llm_contrast_validation", "unavailable_blocked",
+                                    reason="ambiguous or non-confident Python contrast was not reused",
+                                    proposed=design, metadata_summary=llm_input_summary,
+                                    treatment_keywords=study_treatment_keywords,
+                                    control_keywords=study_control_keywords,
+                                    validator_available=False, validation_mode="llm_required")
 
                     # req #8: build the FULL contrast set to run. Multi-contrast only when the
                     # keyword detector drove it AND the LLM didn't override to a different pick:
@@ -1781,7 +2144,7 @@ def run_batch_geo_pipeline(
                     #   - LLM overrode or proposed a single triple -> run just that one contrast.
                     if final_design is None:
                         final_contrasts = []
-                    elif final_design == design and contrasts:
+                    elif final_design == design and contrasts and not llm_contrast_strict:
                         final_contrasts = contrasts
                     else:
                         final_contrasts = [final_design]
@@ -1807,16 +2170,28 @@ def run_batch_geo_pipeline(
                                                  message=f"running {len(final_contrasts)} contrast(s)")
                         for (col, ctrl, treat) in final_contrasts:
                             print(f"  --- contrast: {col} | {ctrl} vs {treat} ---")
+                            effective_plan = _materialize_design_plan(
+                                metadata_for_design, plan_for_study, col, ctrl, treat)
+                            upstream_ids = [d.decision_id for d in dlog.evidence.bundle.decisions
+                                            if d.step in {"matrix_type_llm", "counts_detection",
+                                                          "llm_contrast_validation", "da_method_select"}]
+                            dlog.record("execution_plan", "dispatch",
+                                        reason="actual parameters dispatched to calculation tools",
+                                        upstream_decision_ids=upstream_ids,
+                                        counts_csv=counts_path, da_input_csv=da_input_path,
+                                        metadata_csv=metadata_for_design, matrix_type=matrix_type,
+                                        methods=da_methods, design_column=col,
+                                        control=ctrl, treatment=treat, design_plan=effective_plan)
                             if multi:
                                 r = _run_contrast_multi(
                                     da_methods, counts_path, da_input_path, metadata_for_design,
                                     col, ctrl, treat, study_out, organism, matrix_type,
-                                    dlog, fail_log, acc)
+                                    dlog, fail_log, acc, design_plan=effective_plan)
                             else:
                                 r = _run_contrast_da(
                                     da_methods[0], counts_path, da_input_path, metadata_for_design,
                                     col, ctrl, treat, study_out, organism, matrix_type,
-                                    dlog, fail_log, acc)
+                                    dlog, fail_log, acc, design_plan=effective_plan)
                             cres.append(r)
                             if evaluate_subsets and r.get("n_deg") is not None:
                                 status_tracker.set_stage("evaluate", message="evaluating subset stability")
@@ -1832,6 +2207,7 @@ def run_batch_geo_pipeline(
                                     subset_fraction=evaluation_subset_fraction,
                                     include_gsea=evaluation_include_gsea,
                                     use_llm_judge=evaluation_use_llm_judge,
+                                    design_plan=effective_plan,
                                 ))
                         # Aggregate the per-contrast results into the one-row-per-study summary.
                         # design_col/control/treatment hold the first contrast (back-compat); n_deg

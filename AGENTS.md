@@ -72,6 +72,11 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
   - **`validate_contrast_with_llm`** (Priority A) — called from `batch_tools` once per study after `_auto_detect_design`. Returns a `ContrastValidationResult` Pydantic model with `is_valid`, optional override `(col, ctrl, treat)`, and reasoning.
   - **`align_samples_with_llm_fallback`** (Priority B) — drop-in wrapper for `tools.sample_align.align_samples`. When the 3 string strategies (exact / substring / token-overlap) all fail, asks Codex to decode the abbreviation pattern and returns a `{metadata_id → counts_col}` mapping. Used by `deseq2_tools` and `stats_tools`. Returned method string is `llm (k/n)` on success, `no_match` / `no_match_llm_too_few (k/n)` on failure.
   - Both use `ChatAnthropic.with_structured_output()` for deterministic JSON. Per-call cost ≈ $0.001-0.005. If the call fails (no API key, network, schema), the caller falls back to the Python heuristic's original answer — never blocks.
+- `multigroup_tools.py` — explicit multi-level/factorial/paired-change executor used by
+  `run_batch_geo_pipeline` when a plan declares `analysis_type` as `multigroup`, `multilevel`,
+  `factorial`, or `paired_change`. Validates exact metadata coverage, duplicate feature IDs,
+  full-rank patsy formulas, residual degrees of freedom, and named limma contrasts. Paired-change
+  plans compute within-subject follow-up minus baseline deltas before fitting group contrasts.
 
 **Data flow:**
 
@@ -143,7 +148,10 @@ Cohort directory naming: `output/cohort_{run_label}/`. Each batch run is isolate
 1. ~~**Semantic abbreviation mismatch**~~ — **mitigated by LLM sample-alignment fallback** (see Architecture). When string-based alignment returns `no_match`, Codex decodes the abbreviation pattern and emits a validated mapping. Remaining gap: if the metadata itself doesn't contain enough descriptive context (e.g. only GSM IDs and `data_processing` columns are present), the LLM has nothing to pattern-match against and will still fail.
 2. ~~**Keyword coverage gap**~~ — **partially mitigated by LLM contrast validation** (see Architecture). Biological synonyms like `PBS`/`Vehicle`/`AEX` that don't appear in the user's keyword list can still derail `_auto_detect_design`, but the LLM fallback now catches and overrides these picks based on the user's stated intent. Remaining issue: the LLM call only sees keyword lists, not full free-text intent — for studies with truly novel terminology a more descriptive intent string would help.
 3. **FPKM/TPM-only studies** — when authors upload only normalized expression matrices (no raw counts in supplementary or in SRA-accessible form), DESeq2 cannot be run. The pipeline correctly skips these but the underlying data problem is unfixable at this layer.
-4. **Multi-factor designs** — studies with genotype × stimulus × time × tissue 3-4 axis designs don't expose a single clean 2-group split. Requires LLM judgment per study.
+4. **Multi-factor designs** — studies with genotype × stimulus × time × tissue 3-4 axis designs
+   require either an LLM-produced or user-supplied explicit formula/contrast plan. The main batch
+   path now executes validated `multigroup`/`factorial`/`paired_change` plans; it still refuses to
+   invent a design when no plan is available.
 5. ~~**`download_supplementary_files` always re-downloads**~~ — **FIXED 2026-06-22 (mechanical cost pass)**. Skip-if-exists added in two places: `download_supplementary_files` skips any file whose target (or converted `.csv` sibling) already exists, and `download_geo_data` short-circuits when `{accession}_metadata.csv` is present (skipping the SOFT download + parse + rewrite). Companion deterministic cost cuts shipped the same pass: process-level **MSigDB GMT cache** (`enrichment_tools._get_hallmark_gmt`, N same-species GSEA runs → 1 fetch), **MyGene Ensembl→symbol cache** (`enrichment_tools._query_symbols`, per `(id, species)`), and a **confidence gate on the per-study LLM contrast validation** (`batch_tools._python_pick_is_confident` — skips the LLM call only when the Python pick is unambiguous: both arms keyword-grounded with ≥3 samples AND exactly one viable design column; ambiguous/no-design studies still go to the LLM). Tests: `test/unit/test_cost_caches.py`, `test/unit/test_cost_gate_45.py`.
 
 ## Environment

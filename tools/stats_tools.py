@@ -56,6 +56,14 @@ def _reject_if_metadata(path: str) -> str:
 def _align_metadata(expr_df: pd.DataFrame, metadata_df: pd.DataFrame) -> tuple:
     """Intersect samples between expression columns and metadata index, with
     smart alignment fallback (substring + token-overlap + LLM) when names diverge."""
+    # pandas infers all-numeric sample labels as integers on one side and
+    # strings on the other (common for Salmon/Kallisto exports).  Sample IDs
+    # are identifiers, so compare them in a single representation before
+    # invoking the semantic fallback.
+    expr_df = expr_df.copy()
+    expr_df.columns = expr_df.columns.astype(str)
+    metadata_df = metadata_df.copy()
+    metadata_df.index = metadata_df.index.astype(str)
     common = expr_df.columns.intersection(metadata_df.index)
     if len(common) == 0:
         from tools.llm_helpers import align_samples_with_llm_fallback

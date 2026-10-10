@@ -9,6 +9,7 @@ from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
 )
+from tools.multifactor_design import build_multifactor_plan
 
 
 _FNAME_BAD = re.compile(r'[<>:"/\\|?*\s]+')
@@ -54,7 +55,9 @@ def run_deseq2_analysis(
     design_column: str,
     control_group: str,
     treatment_group: str,
-    output_dir: str = "./output"
+    output_dir: str = "./output",
+    covariate_columns: str = "",
+    interaction_terms: str = "",
 ) -> str:
     """
     Run Differential Expression Analysis using PyDESeq2.
@@ -66,6 +69,12 @@ def run_deseq2_analysis(
         control_group: The specific value in the design_column representing the control/sham group.
         treatment_group: The specific value in the design_column representing the treatment/disease group.
         output_dir: Directory to save the final DEG results.
+        covariate_columns: Optional comma-separated metadata columns for an
+            additive multifactor model. Covariates are explicit; they are not
+            guessed from metadata names.
+        interaction_terms: Optional comma-separated ``factor:factor`` terms.
+            DESeq2 currently refuses interaction terms because a main-effect
+            pairwise contrast is not a sufficient estimand for an interaction.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -116,6 +125,23 @@ def run_deseq2_analysis(
         counts_df = counts_df.loc[metadata_df.index]
         enforce_method_matrix_compatibility(counts_df, method="deseq2")
 
+        multifactor_plan = None
+        if interaction_terms.strip():
+            return ("POLICY BLOCKED: DESeq2 interaction terms require an explicit interaction contrast; "
+                    "use limma with coefficient='Treatment:...' or provide a precomputed contrast vector.")
+        if covariate_columns.strip():
+            covs = [x.strip() for x in covariate_columns.split(",") if x.strip()]
+            try:
+                multifactor_plan = build_multifactor_plan(
+                    metadata_df,
+                    primary_factor=design_column,
+                    control=str(control_group),
+                    treatment=str(treatment_group),
+                    covariates=covs,
+                )
+            except PolicyViolation as exc:
+                return f"POLICY BLOCKED: multifactor design validation failed: {exc}"
+
         # Drop genes with zero counts across all samples; PyDESeq2 needs integer counts.
         counts_df = counts_df.loc[:, (counts_df != 0).any(axis=0)]
         counts_df = counts_df.astype(int)
@@ -125,14 +151,25 @@ def run_deseq2_analysis(
         # -> "Missing operator"). Rename the design column to a safe identifier for the model; the
         # factor VALUES (control/treatment) are unaffected and stay as-is in the contrast.
         safe_col = "design_factor"
-        metadata_df = metadata_df.rename(columns={design_column: safe_col})
+        rename_map = {design_column: safe_col}
+        if multifactor_plan is not None:
+            for original, safe in multifactor_plan.safe_columns.items():
+                if original != design_column:
+                    rename_map[original] = safe
+        metadata_df = metadata_df.rename(columns=rename_map)
 
         print(f"Running DESeq2 on {len(counts_df.index)} samples and {len(counts_df.columns)} genes...")
 
+        design_factors = [safe_col]
+        if multifactor_plan is not None:
+            design_factors.extend(
+                multifactor_plan.safe_columns[col]
+                for col in multifactor_plan.covariates
+            )
         dds = DeseqDataSet(
             counts=counts_df,
             metadata=metadata_df,
-            design_factors=safe_col,
+            design_factors=design_factors,
             refit_cooks=True,
             n_cpus=8,
         )

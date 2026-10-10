@@ -19,6 +19,7 @@ Two fallback hooks:
 import hashlib
 import json
 import math
+import re
 from threading import RLock
 from typing import Optional
 
@@ -180,19 +181,30 @@ class ContrastValidationResult(BaseModel):
     )
     design_column: Optional[str] = Field(
         default=None,
-        description="The metadata column of your RECOMMENDED contrast. ALWAYS fill this whenever a clean "
-                    "2-group split exists — whether confirming, replacing, or proposing one where none was "
-                    "given. Null ONLY when no clean contrast exists.",
+        description="The metadata column of your RECOMMENDED contrast. Fill this when a clean 2-group split "
+                    "matches the user's intent. Null when no matching intent contrast exists.",
     )
     control_value: Optional[str] = Field(
         default=None,
         description="Control group value of the recommended contrast (must appear verbatim in that column's "
-                    "unique values). ALWAYS fill when a clean contrast exists; null only when none exists.",
+                    "unique values). Null when no matching intent contrast exists.",
     )
     treatment_value: Optional[str] = Field(
         default=None,
         description="Treatment group value of the recommended contrast (must appear verbatim in that column's "
-                    "unique values). ALWAYS fill when a clean contrast exists; null only when none exists.",
+                    "unique values). Null when no matching intent contrast exists.",
+    )
+    confidence: str = Field(
+        default="low",
+        description="Exactly one of: high, medium, low. Confidence in the recommended semantic contrast, "
+                    "separate from is_valid (which only says whether the Python proposal was confirmed).",
+    )
+    intent_match: Optional[bool] = Field(
+        default=None,
+        description="True ONLY when the recommended contrast directly answers the user's stated "
+                    "control/treatment intent. False when the study has no matching intervention axis, "
+                    "even if another two-group split (genotype, diet, disease, drug) is available. "
+                    "A false value must be treated as a refusal, not as an executable alternative.",
     )
     reasoning: str = Field(
         description="One or two sentences explaining the decision."
@@ -416,6 +428,38 @@ def summarize_metadata_for_llm(metadata_csv: str, max_cols: int = 15) -> dict:
         }
         if len(summary) >= max_cols:
             break
+    # GEO often encodes the arm only in sample titles with a trailing
+    # replicate number, e.g. ``Muscle.30mins.Control.1`` or ``Fatigue, 1``.
+    # Preserve a bounded grouped view so those studies do not appear to have
+    # empty design metadata merely because the raw title column is high-cardinality.
+    if len(summary) < max_cols:
+        for col in df.columns:
+            col_low = str(col).lower()
+            if not any(h in col_low for h in ("title", "sample", "source", "characteristics")):
+                continue
+            vals = df[col].dropna().astype(str)
+            if vals.nunique() <= 12:
+                continue
+            def _group_title(value: str) -> str:
+                grouped_value = re.sub(r"[\s._,-]+\d+\s*$", "", value)
+                # Some GEO submitters use ``control1`` without a separator.
+                if grouped_value == value and str(col_low).startswith("title"):
+                    grouped_value = re.sub(r"\d+\s*$", "", value)
+                return grouped_value.strip(" ._,-")
+
+            grouped = vals.map(_group_title)
+            unique = grouped.unique().tolist()
+            if not (2 <= len(unique) <= 12):
+                continue
+            counts = grouped.value_counts().to_dict()
+            summary[f"{col}__replicate_grouped"] = {
+                "unique_values": unique,
+                "counts": {str(k): int(v) for k, v in counts.items()},
+                "source_column": str(col),
+                "grouping": "removed trailing replicate number",
+            }
+            if len(summary) >= max_cols:
+                break
     return summary
 
 
@@ -469,19 +513,28 @@ Your job:
    - Multi-factor / time-course design: pick the single 2-group pair that best answers the user's
      intent (e.g. baseline/pre vs the primary treated/post group). Do NOT give up just because a
      column has more than two values — choose the most meaningful pair from it.
-3. ALWAYS report your recommended contrast in design_column / control_value / treatment_value whenever
-   a clean 2-group split exists — whether you are confirming the proposed pick, replacing it, or
-   proposing one where none was given. The values MUST appear verbatim in that column's unique_values.
+3. Report your recommended contrast in design_column / control_value / treatment_value when a clean
+   2-group split exists that matches the user's intent. The values MUST appear verbatim in that
+   column's unique_values. Leave all three fields null when the study has no matching intent axis.
 4. Set is_valid=true ONLY when you are confirming the proposed pick unchanged. Set is_valid=false when
    you are replacing it, or when no pick was proposed and you are proposing a new one.
 5. If no column has a clean 2-group split that matches the user's intent, set is_valid=false and leave
    all three fields null.
 6. Prefer columns where both groups have at least 3 samples (DESeq2 needs replicates).
+7. Set intent_match=true only when the recommended contrast directly tests the user's stated
+   treatment/control intent. When the user requests exercise, do not substitute a disease, genotype,
+   diet or drug contrast. When the user explicitly requests genotype, disease, diet or drug effects,
+   those axes are valid. If no contrast matches the requested axis, set intent_match=false and leave
+   the three fields null even if an unrelated alternative contrast exists.
 
 Return your decision via the structured schema.
 """
     try:
-        return _invoke_structured(llm, ContrastValidationResult, prompt, "contrast_validation")
+        result = _invoke_structured(llm, ContrastValidationResult, prompt, "contrast_validation")
+        result.confidence = (result.confidence or "low").lower().strip()
+        if result.confidence not in {"high", "medium", "low"}:
+            result.confidence = "low"
+        return result
     except Exception as e:
         print(f"  [llm-validation] call failed: {type(e).__name__}: {e}")
         return None

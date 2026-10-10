@@ -9,6 +9,7 @@ from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
 )
+from tools.multifactor_design import build_multifactor_plan
 
 
 @tool
@@ -21,6 +22,8 @@ def run_limma_analysis(
     output_dir: str = "./output",
     design_formula: str = "",
     coefficient: str = "",
+    covariate_columns: str = "",
+    interaction_terms: str = "",
 ) -> str:
     """
     Run Differential Expression Analysis using limma (moderated t + empirical Bayes).
@@ -44,6 +47,11 @@ def run_limma_analysis(
         coefficient: Optional design-matrix coefficient to test when using a
             multifactor formula. For paired donor designs this is typically
             ``Treatment`` in ``~ C(donor) + Treatment``.
+        covariate_columns: Optional comma-separated metadata columns. When
+            supplied without ``design_formula``, a validated formula is built
+            as ``~ Treatment + C(covariate)``.
+        interaction_terms: Optional comma-separated ``factor:factor`` pairs
+            used with ``covariate_columns``; factors are validated before fit.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -102,6 +110,28 @@ def run_limma_analysis(
 
         # patsy dmatrix (DesignMatrix, NOT return_type='dataframe') — inmoose preserves
         # coefficient names only from a true DesignMatrix; DataFrames lose names on conversion.
+        multifactor_plan = None
+        if not design_formula and covariate_columns.strip():
+            covs = [x.strip() for x in covariate_columns.split(",") if x.strip()]
+            interactions = []
+            for item in interaction_terms.split(",") if interaction_terms.strip() else []:
+                parts = [x.strip() for x in item.split(":")]
+                if len(parts) != 2:
+                    return f"POLICY BLOCKED: invalid interaction specification {item!r}; use factor:factor."
+                interactions.append((parts[0], parts[1]))
+            try:
+                multifactor_plan = build_multifactor_plan(
+                    metadata_df,
+                    primary_factor=design_column,
+                    control=str(control_group),
+                    treatment=str(treatment_group),
+                    covariates=covs,
+                    interactions=interactions,
+                )
+            except Exception as exc:
+                return f"POLICY BLOCKED: multifactor design validation failed: {exc}"
+            design_formula = multifactor_plan.formula
+
         if design_formula:
             design_meta = metadata_df.copy()
             # Make the requested two-group contrast available to formulas that
@@ -112,6 +142,11 @@ def run_limma_analysis(
                 design_meta["Treatment"] = (
                     metadata_df[design_column] == treatment_group
                 ).astype(int).values
+            if multifactor_plan is not None:
+                for original, safe in multifactor_plan.safe_columns.items():
+                    if original == design_column:
+                        continue
+                    design_meta[safe] = metadata_df[original].astype(str).values
             # Patsy formulas cannot safely reference arbitrary GEO column names;
             # callers should pass sanitized names or use Q('original name').
             design = dmatrix(design_formula, design_meta)
