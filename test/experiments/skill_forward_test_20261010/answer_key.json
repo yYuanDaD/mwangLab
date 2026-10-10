@@ -1,0 +1,56 @@
+{
+  "note": "Scorer-side only. Never copy this file into a tested workspace.",
+  "cases": {
+    "case_01": {
+      "accession": "GSE990101",
+      "trap": "within-subject pre/post; matrix columns are sample titles in shuffled order",
+      "expect_stop": false,
+      "matrix": "raw",
+      "method_any": ["deseq2", "edger", "limma-voom", "voom"],
+      "covariance_status": "required",
+      "blocking_contains": "subject",
+      "control_contains": "pre",
+      "treatment_contains": "post",
+      "n_aligned": 16,
+      "effect_cutoff": null,
+      "n_contrasts": 1
+    },
+    "case_02": {
+      "accession": "GSE990102",
+      "trap": "sequencing run completely aliased with the exercise arm; paper is silent",
+      "expect_stop": true,
+      "stop_stage_any": ["covariance", "design"],
+      "covariance_status_not": "not_required"
+    },
+    "case_03": {
+      "accession": "GSE990103",
+      "trap": "only FPKM deposited; paper used DESeq2 on counts",
+      "expect_stop": false,
+      "matrix": "fpkm",
+      "method_any": ["limma"],
+      "method_none": ["deseq2", "edger", "voom"],
+      "deviation_recorded": true,
+      "covariance_status": "not_required",
+      "control_contains": "sed",
+      "treatment_contains": "swim",
+      "effect_cutoff": null,
+      "n_contrasts": 1
+    },
+    "case_04": {
+      "accession": "GSE990104",
+      "trap": "one control plus three time points from different animals; fold change 1.5",
+      "expect_stop": false,
+      "matrix": "log",
+      "method_any": ["limma"],
+      "covariance_status": "not_required",
+      "n_contrasts": 3,
+      "effect_cutoff_any": [1.5, 0.585, 0.58496, 0.584963]
+    },
+    "case_05": {
+      "accession": "GSE990105",
+      "trap": "genotype-only transcriptomics; no exercised samples",
+      "expect_stop": true,
+      "stop_stage_any": ["design", "paper_reconstruction"]
+    }
+  }
+}
