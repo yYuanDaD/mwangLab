@@ -7,6 +7,8 @@ import argparse
 import csv
 import hashlib
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +19,11 @@ FAILURE_TOKENS = ("exception", "failed", "error")
 BLOCKING_CHECKS = {
     "run_terminal", "study_completion", "matrix_method_compatibility",
     "contrast_definition", "deg_sanity", "evidence_references", "artifact_integrity",
+    "decision_contract",
 }
+# A native skill run marks a case that a decision gate stopped as "stopped:<stage>".
+# That is a finished, accounted outcome, not a failure.
+STOPPED_PREFIX = "stopped"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -191,7 +197,8 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
 
     statuses = [str(row.get("status", "")).lower() for row in rows]
     failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses)
-    successful = sum(any(token in status for token in SUCCESS_TOKENS) for status in statuses)
+    successful = sum(any(token in status for token in SUCCESS_TOKENS) or status.startswith(STOPPED_PREFIX)
+                     for status in statuses)
     completion_status = "fail" if failed else "pass" if successful == len(rows) else "warn"
     checks = [_check("study_completion", "execution", completion_status,
                      8 * successful / len(rows), 8,
@@ -246,6 +253,35 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                              "flags: " + "; ".join(flagged) if flagged else "All DA rows passed sanity checks.",
                              "Review sample size, normalization, model fit, and DEG fraction."))
     return checks
+
+
+def _find_repo(run_dir: Path) -> Path | None:
+    env = os.environ.get("MWANGLAB_ROOT")
+    candidates = [Path(env)] if env else []
+    for start in (run_dir, Path.cwd().resolve(), Path(__file__).resolve().parent):
+        candidates += [start, *start.parents]
+    return next((p for p in candidates if (p / "tools" / "decision_contract.py").is_file()), None)
+
+
+def _audit_decision_contract(run_dir: Path) -> list[dict[str, Any]]:
+    files = sorted(run_dir.rglob("decisions.json"))
+    if not files:
+        return [_check("decision_contract", "scientific_validity", "not_measured", 0, 10,
+                       "No decisions.json found.", "Record every gate with the decision contract.")]
+    repo = _find_repo(run_dir)
+    if repo is None:
+        return [_check("decision_contract", "scientific_validity", "not_measured", 0, 10,
+                       "Repository with tools/decision_contract.py not found; set MWANGLAB_ROOT.")]
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+    from tools.decision_contract import validate
+
+    count, errors = validate(files)
+    detail = (f"{count} records in {len(files)} case file(s); {len(errors)} violation(s)"
+              + (": " + "; ".join(errors[:5]) if errors else ""))
+    return [_check("decision_contract", "scientific_validity", "fail" if errors else "pass",
+                   0 if errors else 10, 10, detail,
+                   "Fix records so every gate, method, covariance term, and threshold is consistent.")]
 
 
 def _audit_stability(run_dir: Path) -> list[dict[str, Any]]:
@@ -317,6 +353,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     summary_path = root / "summary.csv" if (root / "summary.csv").is_file() else None
     checks.extend(_audit_summary(summary_path))
     checks.extend(_audit_evidence(root, list(root.rglob("evidence.json"))))
+    checks.extend(_audit_decision_contract(root))
     checks.extend(_audit_stability(root))
 
     core_files = [root / "workflow.log", root / "summary.csv", root / "run_status.json"]

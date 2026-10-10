@@ -1,0 +1,310 @@
+"""Deterministic checks for bioinformatics decision-contract records.
+
+A record captures one decision gate for one case (study). Two levels of checks:
+
+- ``check_record``: structure and stage-specific required fields.
+- ``check_case``: invariants across all records of a case, for example that no
+  analysis ran after a gate was blocked, that a required blocking term reached
+  the fitted formula, and that the method suits the matrix type.
+
+These checks catch internally inconsistent records. They cannot tell whether a
+decision matches the paper; that still needs evidence review or a gold set.
+Standard library only, so the validator runs on any machine.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Iterable
+
+CONTRACT_VERSION = "2"
+STAGES = (
+    "paper_reconstruction", "ownership", "alignment", "matrix", "design",
+    "covariance", "method", "threshold", "execution", "study",
+)
+DECISIONS = {"valid", "unresolved", "manual_review", "refused"}
+BLOCKED = {"unresolved", "manual_review", "refused"}
+EXECUTIONS = {"not_started", "completed", "failed", "not_run"}
+CONFIDENCE = {"high", "medium", "low"}
+COVARIANCE_STATUS = {"required", "not_required", "unresolved"}
+THRESHOLD_SOURCES = {"paper", "paper_on_deviation_route", "workflow_default", "audit"}
+STUDY_ROUTES = {"paper_aligned", "declared_deviation", "exploratory", "stopped"}
+PRE_EXECUTION_STAGES = ("alignment", "matrix", "design", "covariance", "method", "threshold")
+REQUIRED_KEYS = (
+    "case_id", "stage", "evidence", "candidates", "final", "confidence",
+    "reasoning", "decision_status", "execution_status", "stop_reason",
+)
+# Fields a *valid* decision must carry in `final`, per stage. Blocked
+# decisions only need a stop_reason.
+STAGE_FIELDS = {
+    "paper_reconstruction": ("accessions", "primary_estimand", "planned_contrasts", "paper_threshold"),
+    "ownership": ("accession", "matrix_file", "metadata_file", "owned"),
+    "alignment": ("method", "n_aligned", "n_metadata", "coverage"),
+    "matrix": ("matrix_type", "recommended_method"),
+    "design": ("analysis_type",),
+    "covariance": ("status", "blocking_terms", "covariates"),
+    "method": ("method", "matrix_type"),
+    "threshold": ("paper_threshold", "threshold_source", "applied_threshold"),
+    "execution": ("method",),
+    "study": ("route",),
+}
+PAIRED_PATTERN = re.compile(r"paired|repeated|within[- ]subject|longitudinal|paired_change", re.I)
+COUNT_METHODS = ("deseq2", "edger", "limma-voom", "voom")
+
+
+def matrix_family(value: Any) -> str:
+    """Map a free-text matrix_type to a coarse family used by the invariants."""
+    text = str(value or "").lower()
+    if not text or "ambiguous" in text or "unknown" in text:
+        return "ambiguous"
+    if "estimated" in text:
+        return "estimated_counts"
+    if "beta" in text and "m-value" not in text and "m_value" not in text:
+        return "methylation_beta"
+    if "log" in text or "rma" in text or "m-value" in text or "m_value" in text:
+        return "log_scale"
+    if any(k in text for k in ("fpkm", "tpm", "rpkm", "linear", "intensity")):
+        return "linear_normalized"
+    if "count" in text or "raw" in text:
+        return "raw_counts"
+    return "other"
+
+
+def method_family(value: Any) -> str:
+    """Leading method name only: 'limma (alternative to DESeq2)' is limma."""
+    head = str(value or "").lower().split("(")[0]
+    if "voom" in head:
+        return "count"
+    if any(m in head for m in ("deseq2", "edger")):
+        return "count"
+    if "limma" in head:
+        return "log_linear"
+    if not head.strip() or head.strip() in {"none", "null", "not_run"}:
+        return "none"
+    return "other"
+
+
+def _evidence_errors(evidence: Any, source: str) -> list[str]:
+    if not isinstance(evidence, list) or not evidence:
+        return [f"{source}: evidence must be a non-empty list"]
+    errors = []
+    for index, item in enumerate(evidence):
+        if not isinstance(item, dict) or not item.get("id") or not item.get("kind"):
+            errors.append(f"{source}: evidence[{index}] must be an object with id and kind")
+    return errors
+
+
+def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool = False) -> list[str]:
+    """Structural and stage-field checks for one record."""
+    if not isinstance(record, dict):
+        return [f"{source}: record must be an object"]
+    missing = [key for key in REQUIRED_KEYS if key not in record]
+    if missing:
+        return [f"{source}: missing {', '.join(missing)}"]
+    errors: list[str] = []
+    stage = record["stage"]
+    status = record["decision_status"]
+    final = record["final"]
+    if not isinstance(record["case_id"], str) or not record["case_id"].strip():
+        errors.append(f"{source}: case_id must be a non-empty string")
+    if stage not in STAGES:
+        errors.append(f"{source}: invalid stage {stage!r}")
+    if status not in DECISIONS:
+        errors.append(f"{source}: invalid decision_status {status!r}")
+    if record["execution_status"] not in EXECUTIONS:
+        errors.append(f"{source}: invalid execution_status {record['execution_status']!r}")
+    if record["confidence"] not in CONFIDENCE:
+        errors.append(f"{source}: confidence must be high, medium, or low")
+    if not isinstance(record["candidates"], list):
+        errors.append(f"{source}: candidates must be a list")
+    if not isinstance(final, dict):
+        errors.append(f"{source}: final must be an object")
+        return errors
+    if status in BLOCKED:
+        if not record.get("stop_reason"):
+            errors.append(f"{source}: unresolved/review/refused decision needs stop_reason")
+        if record["execution_status"] == "completed":
+            errors.append(f"{source}: blocked decision cannot have completed execution")
+    if status == "valid" and record.get("stop_reason"):
+        errors.append(f"{source}: valid decision cannot have stop_reason; use final.execution_error "
+                      "for an execution failure")
+    if legacy:
+        if not isinstance(record["evidence"], list) or not record["evidence"]:
+            errors.append(f"{source}: evidence must be a non-empty list")
+        return errors
+
+    errors.extend(_evidence_errors(record["evidence"], source))
+    if stage not in STAGES:
+        return errors
+    if status == "valid":
+        absent = [key for key in STAGE_FIELDS[stage] if key not in final]
+        if absent:
+            errors.append(f"{source}: valid {stage} decision missing final.{', final.'.join(absent)}")
+    if stage == "paper_reconstruction" and "paper_threshold" in final \
+            and not isinstance(final["paper_threshold"], dict):
+        errors.append(f"{source}: paper_threshold must be an object")
+    if stage == "design" and status == "valid":
+        if not (final.get("formula") or final.get("design_column")):
+            errors.append(f"{source}: valid design needs final.formula or final.design_column")
+        if not (final.get("contrasts") or (final.get("control") and final.get("treatment"))):
+            errors.append(f"{source}: valid design needs final.contrasts or final.control and final.treatment")
+    if stage == "alignment" and status == "valid":
+        coverage = final.get("coverage")
+        if not isinstance(coverage, (int, float)) or not 0 <= coverage <= 1:
+            errors.append(f"{source}: alignment coverage must be a fraction between 0 and 1")
+    if stage == "covariance" and "status" in final:
+        cov_status = final.get("status")
+        if cov_status not in COVARIANCE_STATUS:
+            errors.append(f"{source}: covariance status must be one of {sorted(COVARIANCE_STATUS)}")
+        if cov_status == "unresolved" and status == "valid":
+            errors.append(f"{source}: unresolved covariance cannot be a valid decision")
+        if cov_status == "required" and status == "valid" and not (
+                final.get("blocking_terms") or final.get("covariates")):
+            errors.append(f"{source}: required covariance needs blocking_terms or covariates")
+    if stage == "threshold" and status == "valid":
+        if final.get("threshold_source") not in THRESHOLD_SOURCES:
+            errors.append(f"{source}: threshold_source must be one of {sorted(THRESHOLD_SOURCES)}")
+        if not isinstance(final.get("paper_threshold"), dict):
+            errors.append(f"{source}: paper_threshold must be an object")
+        if not isinstance(final.get("applied_threshold"), dict):
+            errors.append(f"{source}: applied_threshold must be an object")
+    if stage == "execution" and record["execution_status"] == "completed" and not final.get("outputs"):
+        errors.append(f"{source}: completed execution must list final.outputs")
+    if stage == "execution" and record["execution_status"] == "failed" and not final.get("execution_error"):
+        errors.append(f"{source}: failed execution must record final.execution_error")
+    if stage == "study" and status == "valid" and final.get("route") not in STUDY_ROUTES:
+        errors.append(f"{source}: study route must be one of {sorted(STUDY_ROUTES)}")
+    return errors
+
+
+def _formula_text(records: Iterable[dict]) -> str:
+    parts = []
+    for record in records:
+        final = record.get("final") or {}
+        for key in ("formula", "design_formula", "fitted_formula"):
+            if final.get(key):
+                parts.append(str(final[key]))
+    return " ".join(parts).lower()
+
+
+def _term_name(term: Any) -> str:
+    text = str(term).strip()
+    match = re.match(r"C\((.+?)\)", text)
+    return (match.group(1) if match else text).strip().lower()
+
+
+def _same_threshold(applied: dict, paper: dict) -> bool:
+    keys = ("metric", "cutoff", "effect_metric", "effect_cutoff")
+    return all(applied.get(key) == paper.get(key) for key in keys if key in paper or key in applied)
+
+
+def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str]:
+    """Invariants across every record of one case."""
+    errors: list[str] = []
+    by_stage: dict[str, list[dict]] = defaultdict(list)
+    for record in records:
+        if isinstance(record, dict):
+            by_stage[record.get("stage")].append(record)
+    blocked = [r for r in records if r.get("decision_status") in BLOCKED]
+    completed = [r for r in records if r.get("execution_status") == "completed"]
+
+    if blocked and completed:
+        stages = sorted({r.get("stage") for r in blocked})
+        errors.append(f"{case_id}: analysis marked completed although gate(s) {stages} are blocked")
+
+    if completed:
+        missing = [s for s in PRE_EXECUTION_STAGES
+                   if not any(r.get("decision_status") == "valid" for r in by_stage.get(s, []))]
+        if missing:
+            errors.append(f"{case_id}: completed analysis lacks valid decisions for {missing}")
+
+    valid = lambda stage: [r for r in by_stage.get(stage, []) if r.get("decision_status") == "valid"]  # noqa: E731
+
+    # Matrix and method must agree.
+    matrix_types = {matrix_family((r.get("final") or {}).get("matrix_type")) for r in valid("matrix")}
+    # A transform declared in the method decision applies to the executed analysis too.
+    case_transform = next((str((r.get("final") or {}).get("transform")) for r in valid("method")
+                           if (r.get("final") or {}).get("transform")), "")
+    for record in valid("method") + [r for r in by_stage.get("execution", [])
+                                     if r.get("execution_status") == "completed"]:
+        final = record.get("final") or {}
+        family = method_family(final.get("method"))
+        types = matrix_types | ({matrix_family(final["matrix_type"])} if final.get("matrix_type") else set())
+        transform = str(final.get("transform") or case_transform).lower()
+        if family == "count" and types & {"linear_normalized", "log_scale", "methylation_beta"}:
+            errors.append(f"{case_id}: count-based method {final.get('method')!r} on {sorted(types)} matrix")
+        if family == "count" and "estimated_counts" in types and not final.get("rounding_documented"):
+            errors.append(f"{case_id}: count method on estimated counts needs final.rounding_documented")
+        if family == "log_linear" and types & {"raw_counts", "linear_normalized", "methylation_beta",
+                                               "estimated_counts"} and not transform:
+            errors.append(f"{case_id}: limma on {sorted(types)} matrix needs final.transform "
+                          "(for example log2(x+1), log2(CPM+1), or beta-to-M)")
+        if "ambiguous" in types and family != "none":
+            errors.append(f"{case_id}: method chosen although matrix type is ambiguous")
+
+    # Repeated measures must be handled as covariance.
+    design_text = " ".join(str((r.get("final") or {}).get("analysis_type", "")) for r in valid("design"))
+    covariance = valid("covariance")
+    if PAIRED_PATTERN.search(design_text):
+        if not any((r.get("final") or {}).get("status") == "required" for r in covariance):
+            errors.append(f"{case_id}: design is paired/repeated but covariance is not 'required'")
+
+    # Required blocking terms must reach the fitted model, unless the design
+    # removes the subject effect by differencing (paired_change).
+    formulas = _formula_text(valid("design") + valid("method") + by_stage.get("execution", []))
+    if formulas and "paired_change" not in design_text.lower():
+        for record in covariance:
+            final = record.get("final") or {}
+            if final.get("status") != "required":
+                continue
+            terms = list(final.get("blocking_terms") or [])
+            for covariate in final.get("covariates") or []:
+                if isinstance(covariate, str):
+                    terms.append(covariate)
+                elif isinstance(covariate, dict) and str(covariate.get("disposition", "")).lower().startswith("included"):
+                    terms.append(covariate.get("name", ""))
+            for term in terms:
+                name = _term_name(term if not isinstance(term, dict) else term.get("name", ""))
+                if name and name not in formulas:
+                    errors.append(f"{case_id}: required model term {name!r} is not in the fitted formula")
+
+    # The paper's threshold cannot be silently changed.
+    for record in valid("threshold"):
+        final = record.get("final") or {}
+        paper = final.get("paper_threshold") or {}
+        applied = final.get("applied_threshold") or {}
+        source = final.get("threshold_source")
+        if source in {"paper", "paper_on_deviation_route"} and paper and applied \
+                and not _same_threshold(applied, paper):
+            errors.append(f"{case_id}: applied threshold differs from paper_threshold "
+                          f"but threshold_source is {source!r}")
+    return errors
+
+
+def load_records(paths: Iterable[Path]) -> list[tuple[str, dict]]:
+    out = []
+    for path in paths:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        if isinstance(payload, dict) and isinstance(payload.get("records"), list):
+            payload = payload["records"]
+        items = payload if isinstance(payload, list) else [payload]
+        for index, record in enumerate(items):
+            out.append((f"{path}[{index}]", record))
+    return out
+
+
+def validate(paths: Iterable[Path], *, legacy: bool = False) -> tuple[int, list[str]]:
+    """Validate record files; returns (record count, errors)."""
+    loaded = load_records(paths)
+    errors: list[str] = []
+    cases: dict[str, list[dict]] = defaultdict(list)
+    for source, record in loaded:
+        errors.extend(check_record(record, source, legacy=legacy))
+        if isinstance(record, dict) and isinstance(record.get("case_id"), str):
+            cases[record["case_id"]].append(record)
+    for case_id, records in cases.items():
+        errors.extend(check_case(records, case_id))
+    return len(loaded), errors

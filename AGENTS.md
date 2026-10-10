@@ -1,6 +1,10 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to Codex and other coding agents working with code in this repository.
+
+## Workflow skill (native agent sessions)
+
+For paper-first differential-expression analysis, load the `bioinformatics-workflow` skill (`.agents/skills/` for Codex, `.claude/skills/` for Claude Code; source of truth `agent_skills/bioinformatics-workflow/`). In that mode the agent session makes the scientific decisions and uses `tools/native.py` (external LLM calls blocked, exact alignment, design checks, run layout) and `tools/decision_contract.py`. Start with `python .agents/skills/bioinformatics-workflow/scripts/preflight.py`. After editing the skill source, run `python scripts/sync_skills.py`; `python scripts/sync_skills.py --check` must pass.
 
 ## Project Overview
 
@@ -37,7 +41,7 @@ On Windows, set `PYTHONIOENCODING=utf-8` before running anything that prints emo
 
 **Agent pattern:** LangChain `create_agent` (ReAct loop) with **DeepSeek V4 Pro** selected in `.env` through its Anthropic-compatible endpoint; **Claude Sonnet 4.6** remains the fallback. `tools/model_factory.py` centralizes both paths, and its no-environment library fallback remains Anthropic. DeepSeek structured-output hooks automatically disable thinking because its thinking mode rejects the forced `tool_choice` used by `with_structured_output`, while the main ReAct agent keeps `effort=max`. The old `deepseek-chat` model previously looped on cosmetically different tool arguments; V4 Pro passed the provider gate, 7-case × 3-repeat routing A/B, and 3-case × 3-repeat cached-GEO DA A/B with zero loops or blockers. **Exception:** `seacdm_tools._get_llm()` still defaults to Sonnet via `BIOAGENT_SEACDM_LLM_PROVIDER=anthropic`. The original one-call 100k-character SEA-CDM benchmark left DeepSeek incomplete in 3/3 runs. The focused staged strategy now receives a deterministic `[TARGET GEO SCOPE]` summary and treats one GEO accession—not every cohort in the paper—as its extraction unit. The evaluator checks cross-cohort relation contamination rather than a gold experiment count. GSE208615, GSE270703, and corrected-scope GSE250122 each passed 3/3. A subsequently frozen unseen multi-accession case, GSE197045 (RRBS) in a paper that also deposits GSE198652 (RNA-seq), also passed 3/3 with no cross-accession contamination, 97.9% provenance, and an independent 100/100 audit at 65.2% applicable coverage. DeepSeek is therefore supported for staged GEO-metadata-backed accession extraction; Sonnet remains the production default and fallback for paper-wide/no-metadata extraction until routing is deliberately changed.
 
-**Entry point:** `main.py` — initializes the LLM, registers tools (wrapped with programmatic guards), defines the English system prompt, and streams the agent's tool calls / responses. `recursion_limit=25`.
+**Entry point:** `main.py` — initializes the LLM, registers tools (wrapped with programmatic guards), defines the English system prompt, and streams the agent's tool calls / responses. `recursion_limit=50`.
 
 **Tools** (in `tools/`):
 
@@ -158,6 +162,6 @@ Cohort directory naming: `output/cohort_{run_label}/`. Each batch run is isolate
 
 - Python 3.12+ with virtual environment in `.venv`
 - API keys loaded from `.env` via `python-dotenv`: the evaluated deployment uses `DEEPSEEK_API_KEY` + `DEEPSEEK_BASE_URL`; set `BIOAGENT_LLM_PROVIDER=anthropic` to use the `CLAUDE_API_KEY` fallback
-- No `requirements.txt` or `pyproject.toml` — dependencies are only tracked in the venv. Key packages: `langchain`, `langchain-anthropic`, `langgraph`, `pandas`, `geoparse`, `pydeseq2`, `inmoose` (limma/edgeR pure-Python port), `patsy`, `scikit-learn`, `matplotlib`, `seaborn`, `gseapy`, `mygene`, `lxml`.
+- Dependencies are listed in `requirements.txt` (`python -m pip install -r requirements.txt`). Key packages: `langchain`, `langchain-anthropic`, `langgraph`, `pandas`, `geoparse`, `pydeseq2`, `inmoose` (limma/edgeR pure-Python port), `patsy`, `scikit-learn`, `matplotlib`, `seaborn`, `gseapy`, `mygene`, `lxml`.
 - **`lxml` is required for `gseapy.Msigdb`** (used by `run_gsea_analysis`) — without it, MSigDB Hallmark library fetching fails with `ImportError: Missing optional dependency 'lxml'`.
 - External APIs used at runtime (require network): NCBI E-utilities (`search_geo_studies`), GEO FTP (`download_supplementary_files`), Enrichr (`run_enrichment_analysis`), MSigDB (`run_gsea_analysis` via `gp.Msigdb`), MyGene.info (Ensembl→symbol conversion in both enrichment tools).

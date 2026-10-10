@@ -1,23 +1,48 @@
 # Multigroup and longitudinal designs
 
-Use this reference when a paper contains more than one treatment level, more than one biological factor, or repeated samples from the same subject.
+Use this reference when a paper has more than one treatment level, more than one biological factor, or repeated samples from the same subject.
 
 ## Decide which design is present
 
-1. **One factor, several levels.** Keep the factor as a (k)-level categorical variable. Require a replication check for every observed level. Use an omnibus model when available and run only planned contrasts, with one FDR procedure covering the declared family.
-2. **Factorial design.** Keep each factor separate. Enumerate observed cells, identify missing cells, and state whether the target is a main effect, a simple effect, or an interaction. Do not call a single cell-to-cell comparison an interaction.
-3. **Longitudinal/repeated measures.** Identify the subject/donor/animal key and verify that each sample maps uniquely. Model time explicitly and use the subject key as a blocking or covariance term. A pooled timepoint comparison is not a longitudinal analysis.
+1. **One factor, several levels.**
+   - Keep the factor as a k-level categorical variable.
+   - Check replication at every level.
+   - Run only the planned contrasts.
+   - If different animals were used at each level, there is no repeated measure: a unique animal ID per sample is an identifier, not a blocking term.
+2. **Factorial design.**
+   - Keep each factor separate.
+   - Enumerate observed and missing cells (`native.design_check`).
+   - State whether the target is a main effect, a simple effect, or an interaction.
+   - A single cell-to-cell comparison is not an interaction.
+3. **Longitudinal or repeated measures.**
+   - Identify the subject key and verify a unique mapping (`native.pairing_report`).
+   - Model time explicitly, with the subject as a blocking term, or difference within subjects (`paired_change`).
+   - A pooled timepoint comparison is not a longitudinal analysis.
+
+## Executors
+
+`tools/multigroup_tools.run_multigroup_analysis` handles each design:
+
+| Design | Plan |
+|---|---|
+| Multi-level | `"analysis_type": "multilevel"`, `"formula": "~ 0 + C(group)"`, one coefficient vector per planned contrast |
+| Factorial | `"analysis_type": "factorial"`, a formula with the interaction, contrasts on the named coefficients |
+| Paired change | `"analysis_type": "paired_change"` with `subject_column`, `time_column`, `baseline_level`, `followup_levels`, `group_column`, and a formula on the within-subject differences. Subjects without exactly one baseline and one follow-up sample are excluded and listed in `paired_change_pairs.json` |
+
+Input requirements:
+- The executor fits limma, so the input must be log-scale.
+- For raw counts, use the `log2(CPM+1)` output of `preprocess_counts` and record the transform.
+- For FPKM/TPM, use `native.log_transform`.
+- The executor rejects raw-count-like or linear-scale input.
 
 ## GSE128078-style plan
 
-For disease-by-time data, the question is usually whether trajectories differ between disease groups. The plan should contain disease, time, subject blocking, and a disease-by-time interaction. Useful planned contrasts may include within-group time changes, between-group differences at selected timepoints, and a difference-in-differences. The exact contrasts must follow the paper's Methods and stated hypothesis.
+For disease-by-time data, the usual question is whether trajectories differ between disease groups. The plan needs disease, time, subject blocking, and a disease-by-time interaction, parameterized to full rank (see multifactor-design.md). Useful contrasts include within-group time changes, between-group differences at selected timepoints, and a difference-in-differences. The exact contrasts must follow the paper's Methods.
 
 ## Safety checks
 
-- Every observed cell must have enough biological replication for the chosen model.
+- Every observed cell needs enough biological replication for the chosen model.
 - A missing cell can make an interaction non-estimable even when several pairwise contrasts are valid.
-- Pairing uncertainty is a stop condition; adding more groups does not repair incorrect subject mapping.
-- Multi-level pairwise results must not be interpreted as proof that the factor, interaction, or trajectory effect was valid.
-- Record the formula, coefficient/contrast vector, covariance or blocking term, multiplicity family, and rejected simplifications.
-
-The current batch path supports sibling contrasts from one design column and explicit two-arm additive plans. It does not yet provide a universal executor for arbitrary crossed factors and repeated-measure covariance. Preserve such a plan and stop or route to a validated backend rather than reducing it silently.
+- Pairing uncertainty is a stop condition (`manual_review`). Adding more groups does not repair a wrong subject mapping.
+- Multi-level pairwise results do not prove that the factor, the interaction, or the trajectory effect is valid.
+- Record the formula, the coefficient or contrast vector, the blocking term, the multiplicity rule, and every rejected simplification.

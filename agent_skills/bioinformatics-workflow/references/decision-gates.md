@@ -2,55 +2,76 @@
 
 ## Contrast gate
 
-Use the aligned metadata, not the full GEO metadata, to identify the design. The Python detector may use keyword-grounded columns and values, but a direct keyword match is only a candidate decision. Check that:
+Identify the design from the aligned metadata, not the full GEO table. A keyword match such as `exercise`/`control` is a candidate, not a decision. Check that:
 
 - the design column exists;
-- control and treatment values are different and present in the expression matrix;
-- each arm has adequate biological replication;
+- control and treatment values are different and present in the aligned samples;
+- each arm has biological replication;
 - alignment coverage is adequate in both arms;
-- the selected column answers the user's biological intent rather than merely containing a familiar word.
+- the selected column answers the requested biological question rather than merely containing a familiar word. For example, a genotype contrast does not answer an exercise question.
 
-The structured contrast validator may confirm, replace, or refuse a proposed triple `(design_column, control_value, treatment_value)`. Validate any returned triple against the metadata before execution. If no defensible contrast remains, stop differential analysis and record `preprocess_ok_no_design` or an equivalent review status.
+Record rejected alternatives in `candidates`. If no defensible contrast remains, the design gate is `refused`.
+
+In the external-agent backend (`run_batch_geo_pipeline`), the structured validator in `tools/llm_helpers.py` may confirm, replace, or refuse a proposed triple. Native runs do not use it. The agent session makes this decision.
 
 ## Multiple treatment levels
 
-With one baseline and several treatment levels in the same design column, fit the factor with all observed levels, then run only the scientifically planned baseline-vs-level contrasts. Keep each DEG/GSEA artifact and decision record separate, apply a documented multiplicity correction, and do not pool biologically distinct levels into one treatment group. An omnibus test can be reported when the backend supports it; pairwise results do not replace that omnibus question.
+With one baseline and several levels of the same factor, fit one model with all observed levels and run only the planned baseline-vs-level contrasts (`run_multigroup_analysis`). Rules:
 
-With multiple plausible design columns or a factorial design, do not select one arbitrary two-arm contrast as a substitute for the design. Use an explicit multifactor plan naming factors, reference levels, the estimand, planned contrasts, and any interaction. A factor-by-factor pairwise expansion is acceptable only when it answers the stated question; an interaction requires a difference-in-differences or an explicit interaction coefficient.
+- Keep each contrast's results and records separate.
+- Apply BH within each contrast unless the paper states a family-wide rule.
+- Never pool biologically distinct levels into one treatment group.
+- No executor currently provides an omnibus F-test; do not claim one.
+
+With several plausible design columns or a factorial design, do not choose one arbitrary two-arm contrast as a substitute. Write a plan naming the factors, reference levels, estimand, planned contrasts, and any interaction. An interaction requires an explicit interaction coefficient or a difference-in-differences.
 
 ## Longitudinal and covariance gate
 
-For repeated samples from the same donor, subject, animal, or patient, identify the repeated-measure key and verify that the sample-to-key mapping is complete and unique. Do not treat repeated samples as independent biological replicates. Timepoint is a factor; it is not automatically a covariate to be ignored or pooled.
+For repeated samples from the same donor, subject, animal, or patient:
 
-Use the design that matches the estimand:
+- Identify the repeated-measure key.
+- Check that the mapping is complete and unique (`native.pairing_report`).
+- Never treat repeated samples as independent biological replicates.
+- Timepoint is a factor, not a covariate to ignore or pool.
 
-- one factor with (k>2) levels: all levels in one model plus planned contrasts;
-- factorial design: main effects plus the interaction required by the scientific question;
-- repeated-measure time course: subject/donor blocking plus time and, when relevant, factor-by-time interaction;
-- missing factorial cells: report the estimable effects and refuse non-estimable interactions.
+Match the model to the estimand:
 
-Before fitting, check replication in every observed cell, missing levels, complete confounding, design-matrix rank, and residual degrees of freedom. If the current backend accepts only a two-arm interface or cannot represent the required covariance, preserve the plan and mark the study for review. Never infer that a successful pairwise p-value validates the original longitudinal or factorial question.
+| Design | Model |
+|---|---|
+| One factor with k > 2 levels | All levels in one model, plus planned contrasts |
+| Factorial | Main effects plus the interaction the question needs |
+| Two-timepoint paired | Subject blocking (`covariate_columns=subject`) or `paired_change` |
+| Repeated-measure time course | Subject blocking plus time and, when relevant, factor-by-time interaction |
+| Missing factorial cells | Report estimable effects; refuse non-estimable interactions |
+
+Before fitting, check replication in every cell, missing levels, complete confounding, rank, and residual df (`native.design_check`). If no executor can represent the required covariance, preserve the plan and mark the design `manual_review`. A successful pairwise p-value never validates a longitudinal or factorial question.
 
 ## Covariate gate
 
-Inspect metadata for batch, donor, sex, age, tissue, time, genotype, library preparation, and pairing. Record each relevant candidate and whether it is:
+Inspect metadata for batch, donor, sex, age, tissue, time, genotype, library preparation, and pairing (`native.confounding_report`). Record each relevant candidate and whether it is:
 
 - included in the model;
-- excluded with a reason;
-- aliased with the treatment;
+- excluded, with a reason (for example, a single level);
+- aliased with the treatment (complete confounding);
+- nested in the treatment (for example, animals in between-animal arms; they cannot be blocked);
 - unresolved and requiring review.
 
-`tools/multifactor_design.py` validates an explicit plan before fitting: selected-arm replication, missing covariate values, complete confounding, full design-matrix rank, and residual degrees of freedom. DESeq2 accepts additive categorical covariates; limma accepts additive covariates and interactions. edgeR/limma-voom batch dispatch currently fails closed for explicit multifactor plans. Do not describe a result as batch-, donor-, sex-, or time-adjusted unless the fitted tool received that covariate.
+The executors handle adjustment as follows:
+- DESeq2 accepts additive categorical covariates.
+- limma accepts additive covariates, interactions, and explicit formulas.
+- edgeR and limma-voom have no covariate interface, so use DESeq2 or limma when adjustment is required.
+
+Do not describe a result as batch-, donor-, sex-, or time-adjusted unless the fitted tool received that term.
 
 ## Stop conditions
 
-Stop or mark for review when any of these holds:
+Stop (record a blocked status) when:
 
-- no reliable two-arm contrast;
-- sample alignment is unresolved or below coverage threshold;
-- a matrix type is ambiguous;
-- the requested method is incompatible with the numeric matrix;
+- no defensible contrast answers the request;
+- sample alignment is unresolved or below coverage;
+- the matrix type is ambiguous;
+- the method is incompatible with the numeric matrix;
 - the treatment is completely confounded with a known batch or other covariate;
-- the study is observational, prognostic, clustering, or validation-only and no causal contrast is defensible.
+- the study is observational, prognostic, clustering, or validation-only.
 
-Low confidence by itself is not a stop condition. Stop when the unresolved fact changes the matrix route, estimand, sample independence, or method compatibility. For a small but otherwise valid study, keep the planned contrast, mark the result exploratory, and record the replication limitation instead of escalating automatically to `manual_review`.
+Low confidence alone is not a stop condition. Stop when the unresolved fact changes the matrix route, estimand, sample independence, or method compatibility. For a small but otherwise valid study, keep the planned contrast and label it exploratory (rule in the decision contract).

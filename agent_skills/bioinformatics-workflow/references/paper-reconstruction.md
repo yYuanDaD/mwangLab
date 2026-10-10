@@ -66,7 +66,7 @@ Preserve the paper's exact threshold semantics:
 - an article that reports only an adjusted-p-value cutoff has no implied effect-size cutoff;
 - if the paper reports different thresholds for different contrasts, keep them contrast-specific.
 
-For a paper-aligned result, use `paper_threshold`. For cross-study comparison or sensitivity analysis, optionally calculate a separate `audit_threshold` and report both. If the paper threshold is absent, use the workflow default only with `threshold_source=workflow_default` and mark the result as a fallback. Threshold choice cannot override a failed design, covariance, matrix, or sample-alignment gate.
+For a paper-aligned result, apply `paper_threshold` (`threshold_source=paper`). For a declared deviation route (for example limma on log2 FPKM when the paper used DESeq2 on counts that were not deposited), apply the paper rule with `threshold_source=paper_on_deviation_route`. For cross-study comparison or sensitivity analysis, optionally calculate a separate `audit_threshold` (`threshold_source=audit`) and report both. If the paper threshold is absent, use the workflow default (BH-adjusted p < 0.05, no effect-size cutoff) with `threshold_source=workflow_default` and mark the result as a fallback. A paper that says "adjusted P" without naming the method: record `adjustment: not_reported` and note that the executor applies BH. Threshold choice cannot override a failed design, covariance, matrix, or sample-alignment gate.
 
 ## Minimum output
 

@@ -1,44 +1,38 @@
-# Explicit multifactor plans
+# Explicit multifactor designs
 
-Use a plan only after inspecting the aligned metadata and deciding what the biological estimand is. A plan is per accession and may be passed to `run_batch_geo_pipeline` through `design_plans_json`:
+Write a design plan only after reading the paper and the aligned metadata and deciding the estimand. Name the factors and reference levels, the repeated-measure key, the blocking and covariance terms, the planned contrasts, and any interaction. Covariates and interactions are never inferred from column names.
+
+## Choosing the executor
+
+| Estimand | Executor | How |
+|---|---|---|
+| Two arms with additive covariates or subject blocking, raw counts | `run_deseq2_analysis` | `covariate_columns="subject"` (comma-separated). Interactions are refused because a main-effect contrast does not define one |
+| Two arms with additive covariates or blocking, log-scale | `run_limma_analysis` | `covariate_columns=...`, or `design_formula` + `coefficient` for a custom model |
+| Interaction on log-scale data | `run_limma_analysis` | `covariate_columns` + `interaction_terms="factor:factor"`, or `design_formula` with an explicit `coefficient` |
+| Several levels, factorial cells, named contrasts | `run_multigroup_analysis` | patsy `formula` + `contrasts` with coefficient vectors (plan schema in native-execution.md) |
+| Within-subject change, optionally compared between arms | `run_multigroup_analysis` | `analysis_type: paired_change` |
+| Anything else (for example, random effects or crossed repeated measures across arms) | none | Keep the plan and mark the design `manual_review` |
+
+For two-arm plans, `tools/multifactor_design.build_multifactor_plan` validates the plan before fitting: arm replication, missing covariate values, complete confounding, full rank, and residual df. `run_multigroup_analysis` validates rank and residual df for its formula. Use `native.design_check` before either call to record cells, rank, and df in the covariance or method decision.
+
+A covariate must have complete values in the selected samples. A covariate with one level is dropped and recorded. Complete treatment-covariate confounding, rank deficiency, or zero residual df is a hard stop.
+
+## Example semantic plan (disease by time with repeated subjects)
 
 ```json
 {
-  "GSE123": {
-    "design_column": "condition",
-    "control": "vehicle",
-    "treatment": "drug",
-    "covariates": ["batch", "sex"],
-    "interactions": [["condition", "sex"]]
-  }
+  "factors": {"disease": ["ME/CFS", "Control"], "time": ["day1", "day2", "day3", "day7"]},
+  "repeated_measure": "individual_id",
+  "blocking": ["individual_id"],
+  "interactions": [["disease", "time"]],
+  "planned_contrasts": ["ME/CFS day2 vs day1", "Control day2 vs day1", "difference_in_differences"]
 }
 ```
 
-For a multi-level or longitudinal study, extend the plan conceptually before choosing any pairwise contrast. Record the factors and levels, the repeated-measure key, the covariance/blocking term, the primary estimand, and the planned contrasts. For example:
+With subject blocking plus `disease × time`, the subject term absorbs the disease main effect. Parameterize so that the design is full rank: keep the subject term, the time effects, and the disease-by-time interaction, and drop the separate disease main effect. Check this with `design_check` before fitting.
 
-```json
-{
-  "GSE_TIMECOURSE": {
-    "factors": {
-      "disease": ["ME/CFS", "Control"],
-      "time": ["day1", "day2", "day3", "day7"]
-    },
-    "repeated_measure": "individual_identifier",
-    "blocking": ["individual_identifier"],
-    "interactions": [["disease", "time"]],
-    "planned_contrasts": [
-      "ME/CFS day2 vs day1",
-      "Control day2 vs day1",
-      "difference_in_differences"
-    ]
-  }
-}
-```
+## Recording
 
-This is a semantic design record. The current two-arm `build_multifactor_plan` helper and batch dispatcher cannot yet execute every such plan. When the backend cannot represent the factors or repeated-measure covariance, fail closed and retain the plan for an implementation or manual-review path; do not silently convert it to one control-vs-treatment comparison.
+Record the plan in the `design` decision. Record the fitted formula in metadata column names, together with the coefficient or contrast vector, in the `method` decision. Record rank and residual df in `covariance` or `method`. A successful p-value never overrides a failed design gate.
 
-`design_column`, `control`, and `treatment` are optional when keyword-based contrast detection is already reliable. `covariates` and `interactions` are never inferred from column names. A covariate must have complete values in the selected contrast; a one-level covariate is omitted from the fitted design and recorded. Complete treatment-covariate confounding, rank deficiency, or no residual degrees of freedom is a hard stop.
-
-DESeq2 fits additive categorical covariates and tests the primary treatment contrast. It refuses interaction terms because a main-effect pairwise contrast does not define an interaction estimand. limma can fit additive covariates and interaction terms; pass an explicit `coefficient` when the interaction, rather than the primary treatment effect, is the target. For repeated measures, a donor/subject blocking term is part of the estimand and must be validated as such. The batch dispatcher fails closed for explicit plans sent to edgeR or limma-voom until those backends expose the same validated design interface.
-
-Record the plan, the fitted formula, the backend, and the coefficient in the decision log. A successful p-value does not override a failed design gate.
+The external-agent backend accepts the same kind of plan through `run_batch_geo_pipeline(design_plans_json=...)`. Native runs call the executors directly.
