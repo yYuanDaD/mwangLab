@@ -2,11 +2,11 @@
 
 Goal: the `bioinformatics-workflow` skill runs on any machine (Windows, macOS, Linux) under Codex or Claude Code, from a repository clone plus `requirements-skill.txt`. The plan is split into stages that each fit in one usage window.
 
-Branch: `claude/exergenedb-gold-eval`. Rename it to `<name>/skill-portability` before pushing if you prefer.
+Branch: `zoutongfei/skill-portability` on GitHub (pushed 2026-10-11).
 
 ## How to resume in a new session
 
-1. Make the code reachable. Push the branch, or apply `mwanglab-skill-portability.patch` with `git am`.
+1. Check out `zoutongfei/skill-portability`.
 2. Start the session with: "Continue the skill portability plan at stage <X>. Read `docs/status/SKILL_PORTABILITY_PLAN.md` first."
 3. When a stage finishes, update its status line here and commit.
 
