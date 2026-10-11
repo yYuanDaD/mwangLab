@@ -40,6 +40,7 @@ CAPABILITIES = {
                           ["tools.preprocess_tools", "tools.stats_tools"]),
     "methylation": (["patsy", "inmoose"], ["tools.methylation_tools"]),
     "proteomics_preprocess": (["requests", "pydantic"], ["tools.proteomics_tools"]),
+    "proteomics_pride": (["requests", "pydantic"], ["tools.proteomics_tools"]),
     "single_cell_aggregation": (["scipy"], ["tools.scrna_tools"]),
     "single_cell_de_tool": (["scipy", "pydeseq2", "patsy", "inmoose", "gseapy", "GEOparse"],
                             ["tools.batch_tools", "tools.scrna_tools"]),
@@ -54,7 +55,7 @@ NETWORK = {
     "geo_download": ["https://eutils.ncbi.nlm.nih.gov", "https://ftp.ncbi.nlm.nih.gov"],
     "gsea_and_ora": ["https://maayanlab.cloud", "https://data.broadinstitute.org", "https://mygene.info"],
     "paper_fetch": ["https://www.ebi.ac.uk"],
-    "proteomics_preprocess": ["https://www.ebi.ac.uk"],
+    "proteomics_pride": ["https://www.ebi.ac.uk"],
 }
 INSTALL_NAMES = {"dotenv": "python-dotenv", "sklearn": "scikit-learn", "bs4": "beautifulsoup4",
                  "langchain_core": "langchain-core"}
@@ -170,7 +171,8 @@ def main() -> int:
         report["network_note"] = ("Run with --network to check the hosts used by GEO download, paper fetch, "
                                   "PRIDE, and enrichment. Codex sandboxes often disable network by default.")
     report["install_hint"] = (
-        "python -m pip install -r requirements.txt" if missing_all else None)
+        "python -m pip install -r requirements-skill.txt  (native skill sessions; requirements.txt "
+        "adds the LangChain backend)" if missing_all else None)
     report["missing_packages"] = sorted(INSTALL_NAMES.get(p, p) for p in missing_all)
     if platform.system() == "Windows":
         report["windows_note"] = ("native.enable_native_mode() switches the console to UTF-8; set "

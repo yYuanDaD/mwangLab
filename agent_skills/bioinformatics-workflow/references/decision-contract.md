@@ -31,19 +31,20 @@ Write one record per gate per case, in gate order. A record is an audit object, 
 | Stage | Required fields | Notes |
 |---|---|---|
 | `paper_reconstruction` | `accessions`, `primary_estimand`, `planned_contrasts`, `paper_threshold` (object) | Write `not_reported` for absent facts; never fill them from a workflow default |
-| `ownership` | `accession`, `matrix_file`, `metadata_file`, `owned` | `owned` is true only when the files belong to the paper's samples |
+| `ownership` | `accession`, `matrix_file`, `metadata_file`, `owned` | `owned` is true only when the files belong to the paper's samples. Evidence: the accession or series ID in the metadata or file name, and sample counts, groups, and labels that match the paper's description. When the metadata carries no accession, record the checks that were possible and use `medium` confidence |
 | `alignment` | `method`, `n_aligned`, `n_metadata`, `coverage` (0–1) | List unmatched IDs when coverage < 1 |
 | `matrix` | `matrix_type`, `recommended_method` | Use the type words from the matrix policy (`raw counts`, `estimated counts`, `FPKM`, `TPM`, `log2 ...`, `RMA log2`, `beta`) |
-| `design` | `analysis_type`, `formula` or `design_column`, `contrasts` or `control` + `treatment` | Use `paired`, `repeated`, or `paired_change` in `analysis_type` for within-subject designs |
+| `design` | `analysis_type`, `formula` or `design_column`, `contrasts` or `control` + `treatment` | Use `paired`, `repeated`, or `paired_change` in `analysis_type` for within-subject designs. Add `estimand_type: associational` for cross-sectional group comparisons |
 | `covariance` | `status`, `blocking_terms`, `covariates` | `status` is `required`, `not_required`, or `unresolved`. `covariates` lists each candidate with a disposition (`included`, `excluded: reason`, `aliased`, `nested`). Use the formula-safe names from `derive_columns` |
 | `method` | `method`, `matrix_type`, plus `formula` when the model has more than one term | Start `method` with the method name (`DESeq2`, `edgeR`, `limma-voom`, `limma`). Add `transform` (for example `log2(x+1)`, `log2(CPM+1)`, `beta-to-M`) whenever limma runs on data that were not already log-scale. When the paper's own route cannot run, add `paper_route: {"method": ..., "status": "blocked", "reason": ...}`; the record itself stays `valid` for the alternative |
-| `threshold` | `paper_threshold`, `threshold_source`, `applied_threshold` | `threshold_source`: `paper`, `paper_on_deviation_route`, `workflow_default`, `audit` |
-| `execution` | `method`; `outputs` when completed; `execution_error` when failed | One record per analysis unit; add `subset` (for example a cell type) when a case runs several |
+| `threshold` | `paper_threshold`, `threshold_source`, `applied_threshold` | `threshold_source`: `paper`, `paper_on_deviation_route`, `workflow_default`, `audit`. `metric` names: `FDR`, `padj`, and `qvalue` are all adjusted p-values; `pvalue` is raw. When the adjustment method changes (for example permutation FDR to BH), use `paper_on_deviation_route` and add `deviation_note` |
+| `execution` | `method`; `outputs` when completed; `execution_error` when failed; `reason_not_run` when planned but not attempted | One record per analysis unit; add `subset` (for example a cell type) when a case runs several |
 | `enrichment` (optional) | `method`, `gene_sets`, `organism`, `feature_id_type`; `outputs` or `execution_error` | ORA also needs `input_threshold` and `input_threshold_source` (`applied` or `audit`). IDs other than gene symbols or Ensembl gene IDs need `id_mapping`; species other than Mouse or Human need `ortholog_mapping`. See [Modalities](modalities.md) |
 | `study` | `route` | `paper_aligned`, `declared_deviation`, or `exploratory`: the planned route, also when execution failed. Not written for stopped cases |
 
 Other rules for these fields:
-- A blocked decision (`unresolved`, `manual_review`, `refused`) needs only `stop_reason`. For a refused covariance gate, list the aliased covariate in `covariates` with disposition `aliased`.
+- A blocked decision (`unresolved`, `manual_review`, `refused`) needs only `stop_reason`. For a refused covariance gate, use `status: unresolved` and list the aliased covariate in `covariates` with disposition `aliased`.
+- A requested `enrichment` that cannot run (no completed DE table, missing packages, no network) is recorded as `valid` + `not_run` with `final.reason_not_run`, so the plan is not lost.
 - A valid decision never has a `stop_reason`. When a valid plan fails to run, the execution record is `valid` + `failed` with `final.execution_error`.
 - Decision gates keep `execution_status: not_started` (or `not_run` when blocked). Only `execution` and `enrichment` records carry `completed` or `failed`.
 - A refused or failed `enrichment` does not stop the case or change its DE result.
@@ -55,7 +56,7 @@ Other rules for these fields:
 - **`refused`**: the available data cannot identify the requested estimand, and no review would change that. Examples:
   - no exercise contrast in the sequenced samples;
   - treatment completely confounded with batch;
-  - an observational design with no causal contrast.
+  - a prognostic, clustering, or validation-only design with no comparison that answers the request. A cross-sectional comparison defined by the paper stays `valid` with `estimand_type: associational`.
 - **`manual_review`**: a specific fact or executor could unblock the gate. Examples:
   - unknown subject mapping;
   - ambiguous matrix scale;
@@ -87,9 +88,9 @@ Do not invent other status strings. Put the wording in `stop_reason`.
    - no method at all when the matrix type is ambiguous.
 4. A design described as paired, repeated, or longitudinal has covariance `required`.
 5. Every required blocking term and included covariate appears in a recorded formula. Paired-change designs are exempt, because differencing removes the subject effect.
-6. With `threshold_source` `paper` or `paper_on_deviation_route`, the applied rule equals the paper rule.
+6. With `threshold_source` `paper` or `paper_on_deviation_route`, the applied rule equals the paper rule (metric names compared by kind). A changed adjustment method needs `paper_on_deviation_route` and `deviation_note`.
 7. An enrichment is `completed` only after a completed execution. An ORA list marked `applied` uses the applied threshold. IDs and species need the mappings listed above.
-8. Decision gates never carry `completed` or `failed`.
+8. Decision gates never carry `completed` or `failed` (the `study` record may mirror the execution outcome). A valid run stage marked `not_run` needs `reason_not_run`.
 
 The validator cannot check whether a decision matches the paper; for example, it cannot detect a wrong effect cutoff that was copied into both fields. Use the evaluation protocol with a scorer-side answer key for that.
 

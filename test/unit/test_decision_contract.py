@@ -198,6 +198,36 @@ class EnrichmentTests(unittest.TestCase):
                                 "treatment": "b"}, execution="completed")
         self.assertTrue(any("keeps execution_status not_started" in e for e in check_record(record, "d")))
 
+    def test_planned_enrichment_not_run_needs_reason(self):
+        records = paired_case()
+        planned = enrichment({}, execution="not_run")
+        planned["final"].pop("outputs")
+        self.assertTrue(any("reason_not_run" in e for e in check_record(planned, "e")))
+        planned["final"]["reason_not_run"] = "differential analysis did not complete; gseapy missing"
+        self.assertEqual(check_record(planned, "e"), [])
+        records.insert(-1, planned)
+        self.assertEqual(check_case(records, "c1"), [])
+
+
+class ThresholdNameTests(unittest.TestCase):
+    def test_fdr_and_padj_are_the_same_metric(self):
+        records = set_final(paired_case(), "threshold",
+                            paper_threshold={"metric": "FDR", "cutoff": 0.05, "effect_cutoff": None},
+                            applied_threshold={"metric": "padj", "cutoff": 0.05, "effect_cutoff": None})
+        self.assertEqual(check_case(records, "c1"), [])
+
+    def test_adjustment_change_needs_deviation_route_and_note(self):
+        paper = {"metric": "FDR", "adjustment": "permutation-based FDR", "cutoff": 0.05, "effect_cutoff": None}
+        applied = {"metric": "padj", "adjustment": "Benjamini-Hochberg", "cutoff": 0.05, "effect_cutoff": None}
+        records = set_final(paired_case(), "threshold", paper_threshold=paper, applied_threshold=applied)
+        self.assertTrue(any("adjustment changes" in e for e in check_case(records, "c1")))
+        set_final(records, "threshold", threshold_source="paper_on_deviation_route",
+                  deviation_note="no permutation FDR executor; BH within the contrast")
+        self.assertEqual(check_case(records, "c1"), [])
+        same = set_final(paired_case(), "threshold",
+                         paper_threshold={**paper, "adjustment": "BH"}, applied_threshold=applied)
+        self.assertEqual(check_case(same, "c1"), [])
+
 
 if __name__ == "__main__":
     unittest.main()

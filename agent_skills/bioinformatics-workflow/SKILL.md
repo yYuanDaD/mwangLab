@@ -32,6 +32,12 @@ case = run.case("<case_id>", accession="<GSE...>")
 
 The recorder saves its state after every call. To continue the run from a later command, use `run = native.RunRecorder.open("output/<run_name>")` and `case = run.case("<case_id>")`.
 
+Save driver scripts in `output/<run_name>/scripts/`, so they stay with the run, and start each one with:
+
+```python
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # repository root
+```
+
 Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_helpers.py` for decisions unless the user asks for that external-agent backend.
 
 ## Core rules
@@ -54,13 +60,16 @@ Complete them in this order for every case:
 
 1. `paper_reconstruction`: build the study map — accessions, assay, sample inclusion and exclusion, factors and levels, primary estimand, planned contrasts, repeated-measure unit, normalization, method, and paper threshold, each with a locator in the paper.
 2. `ownership`: identify the matrix and metadata files and confirm they belong to the paper's accession and samples.
-3. `alignment`: map matrix columns to metadata samples with `native.align_to_metadata` (exact match on the index or on one named column, such as `title`). Never align by position. Record coverage and unmatched IDs. Then create short, formula-safe columns with `native.derive_columns` (for example `subject`, `time`, `grp`). Pass the aligned files to every later tool, so that no tool falls back to LLM alignment, and use the derived names in every formula and record.
+3. `alignment`: map the deposited matrix's columns to metadata samples with `native.align_to_metadata` (exact match on the index or on one named column, such as `title`). Never align by position. Record coverage and unmatched IDs. Then create short, formula-safe columns with `native.derive_columns` (for example `subject`, `time`, `grp`). Pass the aligned files to every later tool, so that no tool falls back to LLM alignment, and use the derived names in every formula and record.
+   - Steps that change values (filters, imputation, transforms) are method decisions, run at execution.
+   - A deterministic summary that a later gate needs, such as cells per donor and cell type from pseudobulk aggregation, may be computed earlier and registered as evidence.
 4. `matrix`: decide the matrix type from `native.profile_matrix` values plus file name, platform, and processing notes. Compare it with the paper's stated input. An ambiguous type stops the case.
 5. `design`: decide the estimand structure.
    - One control with several levels: one model with planned contrasts, never pooled levels.
    - Factorial: keep every factor and the interaction the question needs.
    - Repeated measures: time as a factor plus the subject key.
-   - Observational, clustering, prognostic, or validation-only studies get no manufactured contrast.
+   - Clustering, prognostic, or validation-only studies get no manufactured contrast.
+   - A cross-sectional comparison defined by the paper (for example trained versus untrained people) stays valid with `estimand_type: associational`; do not describe it as an effect of the intervention.
    - When several columns could define the contrast, decide from the paper and record the rejected alternatives.
 6. `covariance`: use `native.pairing_report`, `native.confounding_report`, and `native.design_check`.
    - Treat donor, subject, and animal keys as blocking decisions, not annotations.
@@ -69,7 +78,11 @@ Complete them in this order for every case:
 7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it. Otherwise the method decision stays `valid`, carries `paper_route: {"method": ..., "status": "blocked", "reason": ...}`, and names the validated alternative that runs as a declared deviation.
 8. `threshold`: record `paper_threshold`, `threshold_source`, and the `applied_threshold`.
 9. `execution`: run the approved route with `native.call_tool("tools.<module>:<function>", ...)`, which turns an import failure into a recordable `NativeToolError`. Apply the threshold with `native.apply_threshold` and register outputs with `case.add_output`. A failure is recorded as `valid` + `failed` with `final.execution_error`.
-10. `enrichment` (optional): only after a completed execution, and only when the request or paper calls for pathway results. Check IDs with `native.feature_id_report`. GSEA uses the full ranking; an ORA gene list uses the applied threshold. A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).
+10. `enrichment` (optional): only when the request or paper calls for pathway results.
+    - Check IDs with `native.feature_id_report`. Map probes or proteins to genes with `native.collapse_to_genes`.
+    - GSEA uses the full ranking; an ORA gene list uses the applied threshold.
+    - It runs only after a completed execution. Without one, record the plan as `valid` + `not_run` with `reason_not_run`.
+    - A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).
 11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed. Then call `case.finish(n_deg=..., deg_sanity=...)`.
 
 After all cases:
@@ -82,7 +95,7 @@ After all cases:
 
 Use `refused` when the available data cannot identify the estimand, such as no exercise contrast or treatment aliased with batch. Use `manual_review` when a specific fact or executor could unblock it, such as unknown pairing, an ambiguous matrix scale, or a missing file.
 
-Stop at the gate where the problem is established, after recording the earlier gates that establish it. For example, a sequenced sample set with no exercise arm is refused at `design`, after `ownership` and `alignment` confirm which samples exist. Do not record later gates or a `study` record for a stopped case; `case.finish()` marks its route `stopped`.
+Record every gate in order up to and including the one that stops the case. For example, a sequenced sample set with no exercise arm is refused at `design`, after `paper_reconstruction`, `ownership`, `alignment`, and `matrix` are recorded. Do not record later gates or a `study` record for a stopped case; `case.finish()` marks its route `stopped`.
 
 Small n alone is not a reason to stop: run the planned contrast and label it exploratory under the rule in the decision contract.
 

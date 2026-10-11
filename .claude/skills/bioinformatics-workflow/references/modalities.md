@@ -29,10 +29,12 @@ manifest = native.call_tool("tools.scrna_tools:aggregate_pseudobulk",
 # Pseudobulk metadata columns: sample, celltype, condition, n_cells
 ```
 
+Run the aggregation after the `matrix` gate. Its manifest (cells and pseudobulk samples per donor, time point, and cell type) is evidence for the `design` and `covariance` gates; register the files with `case.add_output`.
+
 Then, for each cell type:
 - Unpaired: run DESeq2 on `counts_csv` and `metadata_csv` with `design_column="condition"`.
 - Paired:
-  1. Restrict both files to complete donors.
+  1. Restrict both files to complete donors with `native.complete_pairs_subset(counts_csv, metadata_csv, out_dir, subject_column="sample", condition_column="condition", levels=[...])`, and record the excluded donors.
   2. Run `preprocess_counts`.
   3. Run limma with `design_formula="~ C(sample) + Treatment"` and `coefficient="Treatment"`.
   4. Record `transform: log2(CPM+1)` and `formula: ~ sample + condition`, with `blocking_terms: ["sample"]`.
@@ -64,7 +66,8 @@ native.call_tool("tools.proteomics_tools:preprocess_proteomics_matrix", quant_pa
 It writes `<base>_preprocessed.csv`. The steps are log2, a missingness filter, MinProb imputation (label-free only), and median centering. Imputation and the missingness filter are decisions: record them in the `method` decision as `transform` and `missing_values`.
 
 **Gate notes:**
-- `alignment`: align the preprocessed matrix to metadata with `native.align_to_metadata`, then run limma (two-arm or multigroup). Record `matrix_type` as the original scale (for example `linear LFQ intensity`), with the transform.
+- `alignment`: align the deposited matrix to metadata with `native.align_to_metadata`. Run the preprocessing at execution, because filtering and imputation are method decisions, then run limma (two-arm or multigroup) on the preprocessed file. Record `matrix_type` as the original scale (for example `linear LFQ intensity`), with the transform.
+- `method`: the tool's missingness filter is one fraction over all samples. A per-group rule in the paper (for example "valid in at least 70% of one group") is a declared deviation. Count how many proteins differ between the two rules and record the count.
 - `covariance`: with TMT data spread over several plexes, plex is a batch. Include it as a covariate when it crosses the groups. Stop when it is aliased with the groups. No IRS correction is implemented, so cross-plex data without a reference channel needs `manual_review`.
 
 **Feature IDs:** UniProt accessions need a recorded mapping to gene symbols before enrichment.
@@ -90,13 +93,15 @@ Run it only after a completed `execution` and only when the request or paper cal
 
 1. Run `native.feature_id_report(deg_csv)`.
    - Gene symbols, or Ensembl gene IDs (converted through MyGene.info), are ready.
-   - Probe, transcript, protein, CpG, region, Entrez, and RefSeq IDs need a recorded `id_mapping`; otherwise refuse the gate.
+   - Probe, transcript, protein, Entrez, and RefSeq IDs need a mapping. When the deposited files carry one (for example a `Symbol` column in a series matrix, or `Gene names` in a proteinGroups file), collapse with `native.collapse_to_genes(deg_csv, out_csv, mapping_csv=..., mapping_column="Symbol", rule="max_mean")`. Use the paper's collapse rule when it states one (`max_mean` or `max_abs_score`). Pass the collapsed table to the enrichment tool, and record the returned `mapping_record` as `id_mapping`.
+   - Without a mapping, refuse the gate. CpG and region IDs also need a region-to-gene rule.
    - Repository gene sets are Mouse and Human only. Another species needs a recorded `ortholog_mapping`.
 2. **GSEA** (`run_gsea_analysis(deg_csv, organism, ranking_metric="stat", output_dir=...)`, MSigDB Hallmark): no gene-list threshold. Record `ranking_metric`.
 3. **ORA** (`run_enrichment_analysis(deg_csv, organism, padj_cutoff, log2fc_cutoff, direction, output_dir=...)`, Enrichr GO and KEGG): the gene list must follow the case's `applied_threshold`.
    - Pass both cutoffs explicitly. The tool's default `log2fc_cutoff=1.0` adds an effect cutoff the paper may not have, so use `log2fc_cutoff=0` when there is none.
    - Record `input_threshold` and `input_threshold_source: applied`, or `audit` for any other rule.
 4. Network access is needed (Enrichr, MSigDB, MyGene). Without it, record `valid` + `failed` with the error.
+5. When the DE execution did not complete, record the planned enrichment as `valid` + `not_run` with `reason_not_run`. Include the gene-set library, ranking, and ID mapping you would use.
 
 Record the gate as stage `enrichment`. The required fields are `method`, `gene_sets` (library and version), `organism`, and `feature_id_type`; it carries `outputs` when completed and `execution_error` when failed. Like `execution`, it uses `execution_status` `completed` or `failed`. A refused enrichment does not stop the case.
 

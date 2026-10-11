@@ -10,7 +10,8 @@ uses this module for deterministic checks, tool execution, and record keeping:
 - ``call_tool`` runs a repository tool as a plain function and raises on failure.
 - ``apply_threshold`` applies a stated threshold to a full results table.
 - ``log_transform``, ``beta_to_m`` write recorded transforms; ``feature_id_report``
-  checks whether IDs are ready for gene-set analysis.
+  checks whether IDs are ready for gene-set analysis; ``collapse_to_genes`` maps
+  probes or proteins to genes; ``complete_pairs_subset`` keeps complete pairs.
 - ``RunRecorder`` writes the standard run layout that ``audit_run.py`` and the
   decision-contract validator read.
 
@@ -52,7 +53,7 @@ SUMMARY_COLUMNS = (
     "case_id", "accession", "status", "decision_status", "execution_status", "stop_stage",
     "stop_reason", "route", "matrix_type", "da_method", "design_col", "formula", "control",
     "treatment", "n_contrasts", "covariance_status", "blocking_terms", "threshold_source",
-    "applied_threshold", "n_deg", "deg_sanity", "enrichment", "transform",
+    "applied_threshold", "n_deg", "deg_sanity", "enrichment", "transform", "execution_error",
 )
 # Execution errors that mean "this machine lacks a package or R", not an agent error.
 ENVIRONMENT_ERROR = re.compile(r"ModuleNotFoundError|ImportError|No module named|cannot import|"
@@ -569,11 +570,110 @@ def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
     }
 
 
+def collapse_to_genes(table_csv: str | Path, out_csv: str | Path, *,
+                      mapping_csv: str | Path | None = None, mapping_column: str | None = None,
+                      mapping: dict[str, str] | None = None, rule: str = "max_mean",
+                      mean_column: str | None = None, score_column: str = "stat") -> dict:
+    """Collapse a feature-level table (probes, transcripts, proteins) to one row per gene.
+
+    The mapping comes from ``mapping`` (feature -> gene), or from ``mapping_column``
+    of ``mapping_csv`` (indexed by feature ID), for example the ``Symbol`` column
+    of a series matrix. Rules:
+
+    - ``max_mean``: keep the feature with the highest mean expression
+      (``mean_column``; default ``baseMean``, ``AveExpr``, or the row mean of an
+      expression matrix);
+    - ``max_abs_score``: keep the feature with the largest absolute ``score_column``.
+
+    Features without a gene are dropped and counted. Use the output for GSEA or
+    ORA, and record ``id_mapping`` as the returned ``mapping_record``.
+    """
+    table = pd.read_csv(table_csv, index_col=0)
+    table.index = table.index.astype(str)
+    if mapping is None:
+        if mapping_csv is None or mapping_column is None:
+            raise NativeToolError("give mapping, or mapping_csv with mapping_column")
+        source = pd.read_csv(mapping_csv, index_col=0, sep=None, engine="python")
+        if mapping_column not in source.columns:
+            raise NativeToolError(f"mapping column {mapping_column!r} not in {mapping_csv}")
+        source.index = source.index.astype(str)
+        mapping = source[mapping_column].dropna().astype(str).str.strip().to_dict()
+    genes = pd.Series({f: mapping.get(f, "") for f in table.index}, dtype="object")
+    genes = genes.where(~genes.isin(["", "nan", "NA", "---"]), None)
+    mapped = table.loc[genes.notna()].copy()
+    mapped["gene"] = genes.dropna()
+    if mapped.empty:
+        raise NativeToolError("no feature in the table has a gene in the mapping")
+    if rule == "max_mean":
+        column = mean_column or next((c for c in ("baseMean", "AveExpr", "mean") if c in mapped.columns), None)
+        if column is None:
+            numeric = mapped.drop(columns=["gene"]).apply(pd.to_numeric, errors="coerce")
+            key = numeric.mean(axis=1)
+            column = "row mean"
+        else:
+            key = pd.to_numeric(mapped[column], errors="coerce")
+    elif rule == "max_abs_score":
+        if score_column not in mapped.columns:
+            raise NativeToolError(f"score column {score_column!r} not in the table")
+        key = pd.to_numeric(mapped[score_column], errors="coerce").abs()
+        column = f"|{score_column}|"
+    else:
+        raise NativeToolError("rule must be 'max_mean' or 'max_abs_score'")
+    mapped["_key"] = key.fillna(-np.inf)
+    mapped["source_feature"] = mapped.index
+    best = mapped.sort_values("_key", ascending=False).drop_duplicates("gene").drop(columns=["_key"])
+    best = best.set_index("gene")
+    out = Path(out_csv)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    best.to_csv(out)
+    return {
+        "output": str(out), "sha256": sha256(out),
+        "n_features": int(len(table)), "n_unmapped": int(genes.isna().sum()),
+        "n_genes": int(len(best)), "n_features_collapsed": int(len(mapped) - len(best)),
+        "mapping_record": {"source": str(mapping_csv) + (f":{mapping_column}" if mapping_column else "")
+                           if mapping_csv else "mapping given in code",
+                           "rule": f"{rule} ({column})"},
+    }
+
+
+def complete_pairs_subset(matrix_csv: str | Path, metadata_csv: str | Path, out_dir: str | Path, *,
+                          subject_column: str, condition_column: str, levels: Sequence[str]) -> dict:
+    """Keep only subjects with exactly one sample at every level; write both files.
+
+    Use before a paired or blocked model (for example paired pseudobulk). The
+    excluded subjects and the reason are returned for the covariance record.
+    """
+    report = pairing_report(metadata_csv, subject_column, condition_column, levels)
+    meta = _frame(metadata_csv)
+    keep = meta[meta[subject_column].astype(str).isin(report["complete_subjects"])
+                & meta[condition_column].astype(str).isin([str(x) for x in levels])]
+    if keep.empty:
+        raise NativeToolError("no subject has exactly one sample at every level")
+    matrix = read_table(matrix_csv)
+    missing = [s for s in keep.index if s not in set(map(str, matrix.columns))]
+    if missing:
+        raise NativeToolError(f"metadata samples missing from the matrix: {missing[:10]}")
+    matrix.columns = matrix.columns.astype(str)
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    matrix_out, meta_out = out / "paired_matrix.csv", out / "paired_metadata.csv"
+    matrix.loc[:, list(keep.index)].to_csv(matrix_out)
+    keep.to_csv(meta_out)
+    return {"matrix": str(matrix_out), "metadata": str(meta_out), "n_samples": int(len(keep)),
+            "n_complete_pairs": report["n_complete"],
+            "excluded_subjects": {"incomplete": report["incomplete_subjects"],
+                                  "duplicated": report["duplicated_subjects"]}}
+
+
+def find_outputs(output_dir: str | Path, pattern: str) -> list[str]:
+    """Files matching ``pattern`` (for example ``*_normalized.csv``) below output_dir, newest first."""
+    paths = sorted(Path(output_dir).rglob(pattern), key=lambda p: p.stat().st_mtime, reverse=True)
+    return [str(p) for p in paths]
+
+
 def deg_outputs(output_dir: str | Path) -> list[str]:
     """Result tables written by the repository DE tools in output_dir, newest first."""
-    paths = sorted(Path(output_dir).rglob("DEG_results_*.csv"), key=lambda p: p.stat().st_mtime,
-                   reverse=True)
-    return [str(p) for p in paths]
+    return find_outputs(output_dir, "DEG_results_*.csv")
 
 
 def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float = 0.05,
@@ -750,7 +850,7 @@ class RunRecorder:
             for row in rows:
                 writer.writerow(row)
         failed = [r for r in rows if r["status"].startswith("failed")]
-        environment = [r for r in failed if ENVIRONMENT_ERROR.search(str(r.get("stop_reason", "")))]
+        environment = [r for r in failed if ENVIRONMENT_ERROR.search(str(r.get("execution_error", "")))]
         other = [r for r in failed if r not in environment]
         # A run whose only failures are missing packages finished every decision: partial, not failed.
         status = ("failed" if other and len(other) == len(rows) else
@@ -758,7 +858,7 @@ class RunRecorder:
         attempts = self._attempts()
         self.tracker.set_usage(llm_calls=0, estimated_cost_usd=0.0)
         for row in failed:
-            self.tracker.add_failure(f"{row['case_id']}: {row.get('stop_reason') or 'execution failed'}")
+            self.tracker.add_failure(f"{row['case_id']}: {row.get('execution_error') or 'execution failed'}")
         self.tracker.finish(status, f"{len(rows)} case(s); {len(failed)} execution failure(s), "
                                     f"{len(environment)} from a missing package or R")
         self.manifest.update(finished_at=_now(), status=status, n_cases=len(rows),
@@ -923,7 +1023,8 @@ class CaseRecorder:
             "decision_status": blocked["decision_status"] if blocked else "valid",
             "execution_status": executions[-1] if executions else "not_run",
             "stop_stage": blocked["stage"] if blocked else "",
-            "stop_reason": blocked["stop_reason"] if blocked else execution_error,
+            "stop_reason": blocked["stop_reason"] if blocked else "",
+            "execution_error": execution_error,
             "route": "stopped" if blocked else self._final("study").get("route", ""),
             "matrix_type": self._final("matrix").get("matrix_type", ""),
             "da_method": method.get("method", ""),

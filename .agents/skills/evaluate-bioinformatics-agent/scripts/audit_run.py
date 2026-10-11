@@ -204,7 +204,7 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
     # does not block the verdict on its own.
     environment = [row for row, status in zip(rows, statuses)
                    if status.startswith("failed_execution")
-                   and ENVIRONMENT_ERROR.search(str(row.get("stop_reason", "")))]
+                   and ENVIRONMENT_ERROR.search(str(row.get("execution_error") or row.get("stop_reason", "")))]
     failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses) - len(environment)
     successful = sum(any(token in status for token in SUCCESS_TOKENS) or status.startswith(STOPPED_PREFIX)
                      for status in statuses)

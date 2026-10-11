@@ -184,7 +184,12 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
         errors.append(f"{source}: completed {stage} must list final.outputs")
     if stage in RUN_STAGES and record["execution_status"] == "failed" and not final.get("execution_error"):
         errors.append(f"{source}: failed {stage} must record final.execution_error")
-    if stage not in RUN_STAGES and stage in STAGES and record["execution_status"] in {"completed", "failed"}:
+    if stage in RUN_STAGES and status == "valid" and record["execution_status"] == "not_run" \
+            and not final.get("reason_not_run"):
+        errors.append(f"{source}: a planned {stage} that was not run must record final.reason_not_run")
+    # The study record summarizes the case and may mirror the execution outcome.
+    if stage not in RUN_STAGES and stage in STAGES and stage != "study" \
+            and record["execution_status"] in {"completed", "failed"}:
         errors.append(f"{source}: decision gate {stage} keeps execution_status not_started; "
                       "only execution and enrichment records run something")
     if stage == "enrichment" and status == "valid":
@@ -229,9 +234,40 @@ def _term_name(term: Any) -> str:
     return (match.group(1) if match else text).strip().lower()
 
 
+_ADJUSTED_METRICS = {"padj", "fdr", "adj_p", "adjp", "adjusted_p", "adj.p.val", "q", "qvalue", "q_value"}
+_RAW_METRICS = {"pvalue", "p", "p_value", "raw_p", "p.value"}
+
+
+def _metric(value: Any) -> Any:
+    """'FDR', 'padj', and 'q-value' name the same kind of cutoff; 'p' and 'pvalue' another."""
+    text = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if text in _ADJUSTED_METRICS or text.startswith(("fdr", "padj", "adjusted")):
+        return "adjusted_p"
+    if text in _RAW_METRICS:
+        return "pvalue"
+    return value
+
+
+def _adjustment(value: Any) -> str | None:
+    text = str(value or "").strip().lower()
+    if not text or "not_reported" in text or "not reported" in text:
+        return None
+    if "permut" in text:
+        return "permutation"
+    if "bonferroni" in text:
+        return "bonferroni"
+    if "storey" in text or "qvalue" in text.replace(" ", ""):
+        return "storey"
+    if "bh" in text or "benjamini" in text or "fdr" in text:
+        return "bh"
+    return text
+
+
 def _same_threshold(applied: dict, paper: dict) -> bool:
     keys = ("metric", "cutoff", "effect_metric", "effect_cutoff")
-    return all(applied.get(key) == paper.get(key) for key in keys if key in paper or key in applied)
+    norm = lambda key, value: _metric(value) if key == "metric" else value  # noqa: E731
+    return all(norm(key, applied.get(key)) == norm(key, paper.get(key))
+               for key in keys if key in paper or key in applied)
 
 
 def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str]:
@@ -329,6 +365,11 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
                 and not _same_threshold(applied, paper):
             errors.append(f"{case_id}: applied threshold differs from paper_threshold "
                           f"but threshold_source is {source!r}")
+        paper_adj, applied_adj = _adjustment(paper.get("adjustment")), _adjustment(applied.get("adjustment"))
+        if paper_adj and applied_adj and paper_adj != applied_adj:
+            if source != "paper_on_deviation_route" or not final.get("deviation_note"):
+                errors.append(f"{case_id}: adjustment changes from {paper_adj!r} to {applied_adj!r}; "
+                              "use threshold_source 'paper_on_deviation_route' with final.deviation_note")
     return errors
 
 

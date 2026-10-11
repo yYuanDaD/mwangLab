@@ -30,4 +30,4 @@ Blocking failures include incompatible matrix/method, invalid contrast, unresolv
 
 Report paired per-case outcomes and aggregate confidence intervals or exact paired tests. Treat DEG/p-value counts as descriptive outputs under a named threshold, not as correctness scores. Do not rank systems by DEG count, p-value count, or fluent narrative quality.
 
-A reusable frozen case set, answer key, and layout-independent scorer are in `test/experiments/skill_forward_test_20261010/`. Run it on each platform you support; the scorer reads any run that writes decision-contract records under `<runs>/<case_id>/`.
+Frozen case sets and scorers live under `test/experiments/` in the repository. Before a blind run, give the tested agent a checkout without the scorer-side files (answer keys, earlier results, review documents), because an agent that can read them is no longer blind. The scorers read any run that writes decision-contract records under `<runs>/<case_id>/`.

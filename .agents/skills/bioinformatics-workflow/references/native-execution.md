@@ -59,6 +59,17 @@ derived = native.derive_columns(
 
 Record `derived` (sources, regexes, mappings, levels) as evidence in the alignment or design decision. Then write formulas, `blocking_terms`, and executor arguments with the short names, for example `~ subject + time` with `blocking_terms: ["subject"]`.
 
+## Driver scripts
+
+Keep driver scripts in `output/<run_name>/scripts/` so they stay with the run, and start each with:
+
+```python
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # repository root
+from tools import native
+```
+
+Repository tools return text. Find the files they wrote with `native.deg_outputs(dir)` or `native.find_outputs(dir, "*_normalized.csv")` instead of parsing the text.
+
 ## Continuing a run
 
 `RunRecorder` and `CaseRecorder` write their state to disk after every call: `decisions.json`, `evidence.json`, and `case_state.json`. An agent that runs one command per gate continues with:
@@ -84,6 +95,9 @@ These summarize evidence; none of them decides.
 | `beta_to_m(beta_csv, out_csv)` | methylation M-values for limma with covariates, blocking, or several levels |
 | `feature_id_report(path)` | ID type (symbol, Ensembl gene or transcript, probe, UniProt, CpG, ...) and whether gene-set analysis can use it |
 | `package_versions()` | installed versions of the numerical packages (also written to `run_manifest.json`) |
+| `collapse_to_genes(table, out_csv, mapping_csv, mapping_column, rule)` | probe, transcript, or protein table to one row per gene (`max_mean` or `max_abs_score`), with a mapping record |
+| `complete_pairs_subset(matrix, metadata, out_dir, subject_column, condition_column, levels)` | keep subjects with one sample at every level; reports excluded subjects |
+| `find_outputs(dir, pattern)` | files a tool wrote, for example `*_normalized.csv` from `preprocess_counts` |
 | `pairing_report(meta, subject_col, condition_col, levels)` | complete, incomplete, and duplicated subjects across levels |
 | `confounding_report(meta, primary)` | each column's relation to the primary factor: `complete_confounding`, `nested_in_primary`, `crossed`, ... |
 | `design_check(meta, terms, interactions)` | rank, residual df, cells, and missing values of a categorical design (same column space as `~ C(a) + C(b)`) |
@@ -150,7 +164,8 @@ Plan rules:
 <run_dir>/
   run_manifest.json    request, platform, decision maker, repo commit, Python/OS, package versions, external-LLM attempts
   run_status.json      tracker: status, stages, timing, failures
-  summary.csv          one row per case: status, matrix_type, da_method, contrast, covariance, threshold, enrichment
+  summary.csv          one row per case: status, matrix_type, da_method, transform, contrast, covariance,
+                       threshold, enrichment, stop_reason (blocked gates), execution_error (failed runs)
   workflow.log         one line per decision and case outcome
   preflight.json       output of scripts/preflight.py (write it here)
   <case_id>/

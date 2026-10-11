@@ -56,7 +56,9 @@ def profile_matrix(df: pd.DataFrame) -> MatrixProfile:
     finite = values[np.isfinite(values)]
     if finite.size == 0:
         raise PolicyViolation("Expression matrix contains no finite numeric values.")
-    integer_fraction = float(np.isclose(finite, np.rint(finite), atol=1e-8).mean())
+    # Absolute tolerance only: np.isclose's default relative tolerance (1e-5) would call every
+    # value above about 1e5 an integer, so large linear intensities looked like raw counts.
+    integer_fraction = float((np.abs(finite - np.rint(finite)) <= 1e-8).mean())
     return MatrixProfile(
         n_features=int(df.shape[0]),
         n_samples=int(df.shape[1]),

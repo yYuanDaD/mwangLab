@@ -48,7 +48,7 @@ Before fitting, check replication in every cell, missing levels, complete confou
 
 ## Covariate gate
 
-Inspect metadata for batch, donor, sex, age, tissue, time, genotype, library preparation, and pairing (`native.confounding_report`). Record each relevant candidate and whether it is:
+Inspect metadata for batch, donor, sex, age, tissue, time, genotype, library preparation, and pairing (`native.confounding_report`). When a covariate is aliased with the treatment, record the covariance gate as `refused` with `final.status: unresolved` and the covariate's disposition `aliased`. Record each relevant candidate and whether it is:
 
 - included in the model;
 - excluded, with a reason (for example, a single level);
@@ -72,6 +72,8 @@ Stop (record a blocked status) when:
 - the matrix type is ambiguous;
 - the method is incompatible with the numeric matrix;
 - the treatment is completely confounded with a known batch or other covariate;
-- the study is observational, prognostic, clustering, or validation-only.
+- the study is prognostic, clustering, or validation-only, so no comparison answers the request.
+
+A cross-sectional comparison that the paper defines (for example trained versus untrained people) is not a stop: keep it `valid`, set `design.final.estimand_type: associational`, and do not describe the result as an effect of the intervention. Refuse only when no group comparison answers the request.
 
 Low confidence alone is not a stop condition. Stop when the unresolved fact changes the matrix route, estimand, sample independence, or method compatibility. For a small but otherwise valid study, keep the planned contrast and label it exploratory (rule in the decision contract).

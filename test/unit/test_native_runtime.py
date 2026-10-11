@@ -317,5 +317,49 @@ class ModalityHelperTests(unittest.TestCase):
             self.assertEqual(status["status"], "partial")
 
 
+class RoundThreeFixTests(unittest.TestCase):
+    def test_large_linear_values_are_not_integers(self):
+        rng = np.random.default_rng(5)
+        lfq = pd.DataFrame(2 ** rng.normal(25, 2, (300, 4)), columns=list("abcd"))
+        self.assertLess(native._profile(lfq).integer_fraction, 0.01)
+        with self.assertRaises(PolicyViolation):
+            enforce_method_matrix_compatibility(lfq, method="deseq2")
+
+    def test_collapse_to_genes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            deg = pd.DataFrame({"baseMean": [5.0, 9.0, 7.0, 3.0], "stat": [4.0, 1.0, -6.0, 2.0],
+                                "padj": [0.01, 0.5, 0.001, 0.2]},
+                               index=pd.Index(["ILMN_1", "ILMN_2", "ILMN_3", "ILMN_4"], name="ID_REF"))
+            deg.to_csv(Path(tmp) / "deg.csv")
+            annotation = pd.DataFrame({"Symbol": ["GENEA", "GENEA", "GENEB", None]},
+                                      index=pd.Index(["ILMN_1", "ILMN_2", "ILMN_3", "ILMN_4"], name="ID_REF"))
+            annotation.to_csv(Path(tmp) / "matrix.csv")
+            info = native.collapse_to_genes(Path(tmp) / "deg.csv", Path(tmp) / "genes.csv",
+                                            mapping_csv=Path(tmp) / "matrix.csv", mapping_column="Symbol")
+            genes = pd.read_csv(info["output"], index_col=0)
+            self.assertEqual(info["n_genes"], 2)
+            self.assertEqual(info["n_unmapped"], 1)
+            self.assertEqual(genes.loc["GENEA", "source_feature"], "ILMN_2")  # highest baseMean
+            info = native.collapse_to_genes(Path(tmp) / "deg.csv", Path(tmp) / "genes2.csv",
+                                            mapping_csv=Path(tmp) / "matrix.csv", mapping_column="Symbol",
+                                            rule="max_abs_score")
+            self.assertEqual(pd.read_csv(info["output"], index_col=0).loc["GENEA", "source_feature"], "ILMN_1")
+            self.assertIn("max_abs_score", info["mapping_record"]["rule"])
+
+    def test_complete_pairs_subset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            meta = pd.DataFrame({"donor": ["d1", "d1", "d2", "d3", "d3"],
+                                 "time": ["pre", "post", "pre", "pre", "post"]},
+                                index=["s1", "s2", "s3", "s4", "s5"])
+            meta.to_csv(Path(tmp) / "meta.csv")
+            pd.DataFrame(np.ones((3, 5)), columns=meta.index, index=["g1", "g2", "g3"]).to_csv(Path(tmp) / "m.csv")
+            info = native.complete_pairs_subset(Path(tmp) / "m.csv", Path(tmp) / "meta.csv", Path(tmp) / "out",
+                                                subject_column="donor", condition_column="time",
+                                                levels=["pre", "post"])
+            self.assertEqual(info["n_complete_pairs"], 2)
+            self.assertEqual(info["excluded_subjects"]["incomplete"], ["d2"])
+            self.assertEqual(list(pd.read_csv(info["matrix"], index_col=0).columns), ["s1", "s2", "s4", "s5"])
+
+
 if __name__ == "__main__":
     unittest.main()
