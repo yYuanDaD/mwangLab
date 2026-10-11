@@ -11,16 +11,18 @@ Use the smallest tool surface that answers the request. This is an inventory, no
 | Raw-count preprocessing and QC | `tools/preprocess_tools.py`, `tools/stats_tools.py` |
 | Two-arm differential analysis | `tools/deseq2_tools.py`, `tools/edger_tools.py`, `tools/limma_voom_tools.py`, `tools/limma_tools.py` |
 | Multi-level, factorial, paired-change limma | `tools/multigroup_tools.py` |
-| Enrichment | `tools/enrichment_tools.py` |
+| Enrichment (GSEA, ORA) | `tools/enrichment_tools.py`; check IDs first with `native.feature_id_report` |
+| Paper text | `tools/paper_tools.py` (Europe PMC) |
+| Shared DE helpers (no pydeseq2 needed) | `tools/de_common.py` |
 | Evidence and run status | `tools/evidence.py`, `tools/run_status.py` |
 
-Load modality-specific modules only when needed:
+Load modality-specific modules only when needed ([Modalities](modalities.md)):
 
 | Modality | Modules |
 |---|---|
-| Single cell | `scrna_tools.py` (donor-level pseudobulk, `paired=True` for donor blocking) |
-| Proteomics | `proteomics_tools.py` (PRIDE download, peptide-to-protein roll-up, preprocessing) |
-| Methylation | `methylation_tools.py` |
+| Single cell | `scrna_tools.py`: `aggregate_pseudobulk` (native route) or `run_scrna_pseudobulk_da` (one call, `paired=True` for donor blocking) |
+| Proteomics | `proteomics_tools.py`: PRIDE labeling and download, peptide-to-protein roll-up, preprocessing |
+| Methylation | `methylation_tools.py`, or `native.beta_to_m` plus limma |
 | SEA-CDM extraction | `seacdm_tools.py`, `sea_cdm_schema.py`, `metadata_structural.py` |
 
 These modules belong to the external-agent backend; use them only when the user asks for that backend: `main.py`, `tools/batch_tools.run_batch_geo_pipeline`, `tools/llm_helpers.py`, `tools/model_factory.py`, `tools/guards.py`, `tools/tool_router.py`, `tools/agent_state.py`, `tools/runtime_skills.py`.

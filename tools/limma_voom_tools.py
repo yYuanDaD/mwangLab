@@ -22,7 +22,7 @@ import tempfile
 import pandas as pd
 from tools.tooling import tool
 
-from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
+from tools.de_common import deg_filename, collapse_duplicate_genes
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
@@ -32,11 +32,23 @@ _R_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "limma_voom
 
 
 def _find_rscript() -> str:
-    """Locate Rscript: PATH first, then the standard Windows install dir."""
+    """Locate Rscript: BIOAGENT_RSCRIPT, then PATH, then standard install folders.
+
+    Checked on every platform: Windows Program Files, macOS R.framework and
+    Homebrew, and /usr/local or /opt on Linux.
+    """
+    configured = os.environ.get("BIOAGENT_RSCRIPT", "").strip()
+    if configured and os.path.isfile(configured):
+        return configured
     exe = shutil.which("Rscript") or shutil.which("Rscript.exe")
     if exe:
         return exe
-    for base in (r"C:\Program Files\R", r"C:\Program Files\R\R-4.6.0\bin\x64"):
+    fixed = ("/Library/Frameworks/R.framework/Resources/bin/Rscript", "/opt/homebrew/bin/Rscript",
+             "/usr/local/bin/Rscript", "/usr/bin/Rscript", "/opt/R/bin/Rscript")
+    for path in fixed:
+        if os.path.isfile(path):
+            return path
+    for base in (r"C:\Program Files\R", r"C:\Program Files (x86)\R"):
         if os.path.isdir(base):
             for root, _, files in os.walk(base):
                 if "Rscript.exe" in files:

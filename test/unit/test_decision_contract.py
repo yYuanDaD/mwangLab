@@ -51,6 +51,13 @@ def set_final(records, stage, **updates):
     return records
 
 
+def enrichment(final, execution="completed", status="valid", stop=None):
+    base = {"method": "GSEA", "gene_sets": "MSigDB Hallmark 2024.1", "organism": "Human",
+            "feature_id_type": "gene_symbol", "outputs": ["gsea.csv"]}
+    base.update(final)
+    return rec("enrichment", base, status=status, execution=execution, stop=stop)
+
+
 class RecordTests(unittest.TestCase):
     def test_correct_case_passes(self):
         records = paired_case()
@@ -141,6 +148,55 @@ class ValidateFilesTests(unittest.TestCase):
             self.assertEqual((count, errors), (10, []))
             _, errors = validate([good, bad])
             self.assertTrue(errors and all(e.startswith("c2") for e in errors))
+
+
+
+class EnrichmentTests(unittest.TestCase):
+    def test_gsea_after_completed_execution_passes(self):
+        records = paired_case()
+        records.insert(-1, enrichment({}))
+        self.assertEqual(check_case(records, "c1"), [])
+        self.assertEqual(check_record(records[-2], "e"), [])
+
+    def test_enrichment_without_completed_execution_fails(self):
+        records = paired_case()
+        for record in records:
+            if record["stage"] == "execution":
+                record.update(execution_status="failed")
+                record["final"] = {"method": "DESeq2", "execution_error": "No module named 'pydeseq2'"}
+        records.insert(-1, enrichment({}))
+        self.assertTrue(any("enrichment completed without" in e for e in check_case(records, "c1")))
+
+    def test_probe_ids_and_rat_need_mappings(self):
+        errors = check_record(enrichment({"feature_id_type": "affy_probe", "organism": "Rat"}), "e")
+        self.assertTrue(any("id_mapping" in e for e in errors))
+        self.assertTrue(any("ortholog_mapping" in e for e in errors))
+        ok = enrichment({"feature_id_type": "affy_probe", "organism": "Rat",
+                         "id_mapping": "GPL1355 annotation", "ortholog_mapping": "HCOP rat-human"})
+        self.assertEqual(check_record(ok, "e"), [])
+
+    def test_ora_list_must_use_applied_threshold(self):
+        records = paired_case()
+        ora = enrichment({"method": "ORA (Enrichr GO/KEGG)",
+                          "input_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": 1.0},
+                          "input_threshold_source": "applied"})
+        records.insert(-1, ora)
+        self.assertTrue(any("ORA input_threshold differs" in e for e in check_case(records, "c1")))
+        ora["final"]["input_threshold_source"] = "audit"
+        self.assertEqual(check_case(records, "c1"), [])
+        missing = enrichment({"method": "ORA"})
+        self.assertTrue(any("input_threshold" in e for e in check_record(missing, "e")))
+
+    def test_refused_enrichment_does_not_block_completed_de(self):
+        records = paired_case()
+        records.insert(-1, enrichment({}, execution="not_run", status="refused",
+                                      stop="transcript IDs without a gene mapping"))
+        self.assertEqual(check_case(records, "c1"), [])
+
+    def test_decision_gate_cannot_carry_execution_status(self):
+        record = rec("design", {"analysis_type": "two-arm", "design_column": "g", "control": "a",
+                                "treatment": "b"}, execution="completed")
+        self.assertTrue(any("keeps execution_status not_started" in e for e in check_record(record, "d")))
 
 
 if __name__ == "__main__":

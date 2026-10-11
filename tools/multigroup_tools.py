@@ -21,7 +21,7 @@ from tools.analysis_policy import enforce_method_matrix_compatibility, numeric_m
 
 def collapse_duplicate_genes(df: pd.DataFrame, label: str = "counts") -> pd.DataFrame:
     # Imported lazily: deseq2_tools pulls in pydeseq2 at module import.
-    from tools.deseq2_tools import collapse_duplicate_genes as _collapse
+    from tools.de_common import collapse_duplicate_genes as _collapse
     return _collapse(df, label)
 
 

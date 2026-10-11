@@ -15,7 +15,7 @@ from statistics import mean
 from typing import Any
 
 import pandas as pd
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 def _as_list(value) -> list[str]:

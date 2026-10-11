@@ -12,6 +12,8 @@ Several repository paths call an external model (DeepSeek or Claude) when they r
 
 `native.enable_native_mode()` sets `BIOAGENT_DISABLE_EXTERNAL_LLM=1`. From then on, every client request is blocked and logged. `native.call_tool` raises if a tool made such an attempt, and `RunRecorder` writes the attempt count to `run_manifest.json`. Zero attempts is the expected result.
 
+It also switches the console to UTF-8, so Windows needs no `PYTHONIOENCODING` setting inside a native run.
+
 ## Calling convention
 
 ```python
@@ -79,6 +81,9 @@ These summarize evidence; none of them decides.
 | `align_to_metadata(matrix, metadata, out_dir, key_column=None)` | exact alignment on the metadata index or one column; writes `aligned_matrix.csv` (columns renamed to sample IDs), `aligned_metadata.csv`, `alignment_map.csv` |
 | `derive_columns(meta, out_csv, aliases, patterns, recode)` | formula-safe metadata columns with a recorded mapping (see below) |
 | `log_transform(matrix, out_csv)` | `log2(x+1)` for linear FPKM/TPM/intensity; refuses data that already look log-scale |
+| `beta_to_m(beta_csv, out_csv)` | methylation M-values for limma with covariates, blocking, or several levels |
+| `feature_id_report(path)` | ID type (symbol, Ensembl gene or transcript, probe, UniProt, CpG, ...) and whether gene-set analysis can use it |
+| `package_versions()` | installed versions of the numerical packages (also written to `run_manifest.json`) |
 | `pairing_report(meta, subject_col, condition_col, levels)` | complete, incomplete, and duplicated subjects across levels |
 | `confounding_report(meta, primary)` | each column's relation to the primary factor: `complete_confounding`, `nested_in_primary`, `crossed`, ... |
 | `design_check(meta, terms, interactions)` | rank, residual df, cells, and missing values of a categorical design (same column space as `~ C(a) + C(b)`) |
@@ -97,10 +102,15 @@ All executors read the aligned files. Raw-count executors require integer counts
 | limma-voom (needs R + limma) | `run_limma_voom_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | one model, several levels / factorial / paired change | `tools.multigroup_tools:run_multigroup_analysis(expression_csv, metadata_csv, plan, output_dir)` (plain function; through `call_tool` a `PolicyViolation` becomes a `NativeToolError`) |
 | log2(CPM+1) for raw counts before limma | `preprocess_counts(counts_csv, output_dir)` → `*_normalized.csv` |
-| single-cell pseudobulk | `run_scrna_pseudobulk_da(matrix_path, sample_col, celltype_col, condition_col, control_group, treatment_group, ..., paired=False)` |
-| methylation beta values | `run_methylation_da(beta_matrix_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
+| single-cell pseudobulk, native | `tools.scrna_tools:aggregate_pseudobulk(matrix_path, sample_col, celltype_col, condition_col, cell_metadata_path, min_cells, output_dir, report)` (plain function, returns a per-cell-type manifest), then a DE executor per cell type |
+| single-cell pseudobulk, one call | `run_scrna_pseudobulk_da(matrix_path, sample_col, celltype_col, condition_col, control_group, treatment_group, ..., paired=False)` |
+| proteomics | `aggregate_peptide_to_protein(quant_path, ...)` for peptide input, `preprocess_proteomics_matrix(quant_path, labeling, output_dir)`, then limma |
+| methylation beta values | `run_methylation_da(beta_matrix_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)`; with covariates use `native.beta_to_m` and limma |
 | GSEA (Hallmark) | `run_gsea_analysis(deg_csv, organism, ranking_metric="stat", output_dir=...)` |
-| ORA | `run_enrichment_analysis(deg_csv, organism, padj_cutoff, log2fc_cutoff, ...)`; pass the paper's cutoffs explicitly (default `log2fc_cutoff=1.0`) |
+| ORA | `run_enrichment_analysis(deg_csv, organism, padj_cutoff, log2fc_cutoff, ...)`; pass the applied cutoffs explicitly (the default `log2fc_cutoff=1.0` adds an effect cutoff) |
+| paper text | `tools.paper_tools:fetch_paper_text(pmcid=...)` (Europe PMC, needs network); otherwise read the paper file the user gave |
+
+Module paths for `call_tool`: `tools.deseq2_tools`, `tools.limma_tools`, `tools.edger_tools`, `tools.limma_voom_tools`, `tools.preprocess_tools`, `tools.multigroup_tools`, `tools.scrna_tools`, `tools.proteomics_tools`, `tools.methylation_tools`, `tools.enrichment_tools`, `tools.paper_tools`. Modality-specific details are in [Modalities](modalities.md).
 
 Blocking with DESeq2 or limma: pass the derived subject column in `covariate_columns`. The tool validates the design and fits `Treatment` plus the covariate; internally it renames covariates to safe names such as `Covariate0`. In the records, write the model with the derived names (for example `~ subject + time`) in `method.final.formula`, and the same subject name in `covariance.final.blocking_terms`. The validator checks that every required blocking term appears in the recorded formula.
 
@@ -138,9 +148,9 @@ Plan rules:
 
 ```text
 <run_dir>/
-  run_manifest.json    request, platform, decision maker, repo commit, Python/OS, external-LLM attempts
+  run_manifest.json    request, platform, decision maker, repo commit, Python/OS, package versions, external-LLM attempts
   run_status.json      tracker: status, stages, timing, failures
-  summary.csv          one row per case: status, matrix_type, da_method, contrast, covariance, threshold
+  summary.csv          one row per case: status, matrix_type, da_method, contrast, covariance, threshold, enrichment
   workflow.log         one line per decision and case outcome
   preflight.json       output of scripts/preflight.py (write it here)
   <case_id>/
@@ -164,7 +174,7 @@ aligned = case.add_output(aln["outputs"]["aligned_matrix"]["path"], "aligned_mat
 case.decide("alignment", final={"method": aln["method"], "n_aligned": aln["n_aligned"],
             "n_metadata": aln["n_metadata"], "coverage": aln["coverage"]},
             evidence=[mat, meta, aligned], reasoning="...", confidence="high")
-# ... matrix, design, covariance, method, threshold, execution, study
+# ... matrix, design, covariance, method, threshold, execution, (enrichment), study
 case.finish(n_deg=counts["n_significant"], deg_sanity=counts["deg_sanity"])
 run.finish()
 ```

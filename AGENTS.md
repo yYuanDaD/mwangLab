@@ -4,7 +4,7 @@ This file provides guidance to Codex and other coding agents working with code i
 
 ## Workflow skill (native agent sessions)
 
-For paper-first differential-expression analysis, load the `bioinformatics-workflow` skill (`.agents/skills/` for Codex, `.claude/skills/` for Claude Code; source of truth `agent_skills/bioinformatics-workflow/`). In that mode the agent session makes the scientific decisions and uses `tools/native.py` (external LLM calls blocked, exact alignment, design checks, run layout) and `tools/decision_contract.py`. Start with `python .agents/skills/bioinformatics-workflow/scripts/preflight.py`. After editing the skill source, run `python scripts/sync_skills.py`; `python scripts/sync_skills.py --check` must pass.
+For paper-first differential-expression analysis, load the `bioinformatics-workflow` skill (`.agents/skills/` for Codex, `.claude/skills/` for Claude Code; source of truth `agent_skills/bioinformatics-workflow/`). In that mode the agent session makes the scientific decisions and uses `tools/native.py` (external LLM calls blocked, exact alignment, design checks, run layout) and `tools/decision_contract.py`. Native sessions need only `requirements-skill.txt` (no LangChain). Start with `python .agents/skills/bioinformatics-workflow/scripts/preflight.py`; `python scripts/skill_selftest.py` checks every route on a new machine with synthetic data. Shared DE helpers live in `tools/de_common.py` (no pydeseq2 import); tool modules use the LangChain-optional `@tool` from `tools/tooling.py`. After editing the skill source, run `python scripts/sync_skills.py`; `python scripts/sync_skills.py --check` must pass.
 
 ## Project Overview
 

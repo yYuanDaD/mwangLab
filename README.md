@@ -53,7 +53,13 @@ agent_skills/           skill sources (LangChain runtime skills, workflow skill)
 
 ## Agent skill
 
-Codex, Claude Code, and other skills-capable agents can run the paper-first workflow natively with the `bioinformatics-workflow` skill: the agent makes the scientific decisions, and `tools/native.py` blocks hidden external LLM calls, checks designs, and writes an auditable run layout. Setup on a new machine: [setup.md](agent_skills/bioinformatics-workflow/references/setup.md).
+Codex, Claude Code, and other skills-capable agents can run the paper-first workflow natively with the `bioinformatics-workflow` skill: the agent makes the scientific decisions, and `tools/native.py` blocks hidden external LLM calls, checks designs, and writes an auditable run layout. It covers bulk RNA-seq, microarray, single-cell pseudobulk, proteomics, methylation, and GSEA/ORA. Setup on a new machine: [setup.md](agent_skills/bioinformatics-workflow/references/setup.md).
+
+```bash
+python -m pip install -r requirements-skill.txt      # native skill sessions
+python .agents/skills/bioinformatics-workflow/scripts/preflight.py --network
+python scripts/skill_selftest.py                      # synthetic end-to-end check of every route
+```
 
 See [AGENTS.md](AGENTS.md) for the detailed architecture and development notes.
 

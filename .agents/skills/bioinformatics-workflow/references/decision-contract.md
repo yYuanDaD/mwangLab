@@ -38,13 +38,15 @@ Write one record per gate per case, in gate order. A record is an audit object, 
 | `covariance` | `status`, `blocking_terms`, `covariates` | `status` is `required`, `not_required`, or `unresolved`. `covariates` lists each candidate with a disposition (`included`, `excluded: reason`, `aliased`, `nested`). Use the formula-safe names from `derive_columns` |
 | `method` | `method`, `matrix_type`, plus `formula` when the model has more than one term | Start `method` with the method name (`DESeq2`, `edgeR`, `limma-voom`, `limma`). Add `transform` (for example `log2(x+1)`, `log2(CPM+1)`, `beta-to-M`) whenever limma runs on data that were not already log-scale. When the paper's own route cannot run, add `paper_route: {"method": ..., "status": "blocked", "reason": ...}`; the record itself stays `valid` for the alternative |
 | `threshold` | `paper_threshold`, `threshold_source`, `applied_threshold` | `threshold_source`: `paper`, `paper_on_deviation_route`, `workflow_default`, `audit` |
-| `execution` | `method`; `outputs` when completed; `execution_error` when failed | |
+| `execution` | `method`; `outputs` when completed; `execution_error` when failed | One record per analysis unit; add `subset` (for example a cell type) when a case runs several |
+| `enrichment` (optional) | `method`, `gene_sets`, `organism`, `feature_id_type`; `outputs` or `execution_error` | ORA also needs `input_threshold` and `input_threshold_source` (`applied` or `audit`). IDs other than gene symbols or Ensembl gene IDs need `id_mapping`; species other than Mouse or Human need `ortholog_mapping`. See [Modalities](modalities.md) |
 | `study` | `route` | `paper_aligned`, `declared_deviation`, or `exploratory`: the planned route, also when execution failed. Not written for stopped cases |
 
 Other rules for these fields:
 - A blocked decision (`unresolved`, `manual_review`, `refused`) needs only `stop_reason`. For a refused covariance gate, list the aliased covariate in `covariates` with disposition `aliased`.
 - A valid decision never has a `stop_reason`. When a valid plan fails to run, the execution record is `valid` + `failed` with `final.execution_error`.
-- Decision gates keep `execution_status: not_started`. Only the `execution` record carries `completed` or `failed`.
+- Decision gates keep `execution_status: not_started` (or `not_run` when blocked). Only `execution` and `enrichment` records carry `completed` or `failed`.
+- A refused or failed `enrichment` does not stop the case or change its DE result.
 - A stopped case has no gates after the stop and no `study` record. `case.finish()` reports its route as `stopped`.
 
 ## Status rules
@@ -86,6 +88,8 @@ Do not invent other status strings. Put the wording in `stop_reason`.
 4. A design described as paired, repeated, or longitudinal has covariance `required`.
 5. Every required blocking term and included covariate appears in a recorded formula. Paired-change designs are exempt, because differencing removes the subject effect.
 6. With `threshold_source` `paper` or `paper_on_deviation_route`, the applied rule equals the paper rule.
+7. An enrichment is `completed` only after a completed execution. An ORA list marked `applied` uses the applied threshold. IDs and species need the mappings listed above.
+8. Decision gates never carry `completed` or `failed`.
 
 The validator cannot check whether a decision matches the paper; for example, it cannot detect a wrong effect cutoff that was copied into both fields. Use the evaluation protocol with a scorer-side answer key for that.
 

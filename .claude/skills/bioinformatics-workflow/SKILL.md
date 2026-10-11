@@ -1,6 +1,6 @@
 ---
 name: bioinformatics-workflow
-description: "Paper-first, auditable differential-expression workflow for GEO and omics studies (bulk RNA-seq, microarray, single-cell pseudobulk, proteomics, methylation). Use when analyzing one study or a cohort from papers or GEO accessions, reproducing a paper's DE result, or reviewing whether a DE analysis used a valid contrast, covariance, matrix-method route, and threshold. Requires the mwangLab repository and its Python environment. Not for literature search alone or SEA-CDM extraction."
+description: "Paper-first, auditable differential-expression and pathway-enrichment workflow for GEO and omics studies (bulk RNA-seq, microarray, single-cell pseudobulk, proteomics, methylation). Use when analyzing one study or a cohort from papers or GEO accessions, reproducing a paper's DE or pathway result, or reviewing whether an analysis used a valid contrast, covariance, matrix-method route, and threshold. Requires the mwangLab repository and its Python environment. Not for literature search alone or SEA-CDM extraction."
 ---
 
 # Bioinformatics workflow
@@ -14,10 +14,11 @@ The agent session running this skill is the scientific decision-maker. It reads 
 ## Before the first study
 
 1. Work from the repository root. Choose a new run directory, `output/<run_name>`.
-2. Run `python <skill_dir>/scripts/preflight.py --out output/<run_name>/preflight.json`.
+2. Run `python <skill_dir>/scripts/preflight.py --out output/<run_name>/preflight.json`. Add `--network` when the run needs GEO download, paper fetch, PRIDE, or enrichment.
    - If the repository is not found or packages are missing, follow [Setup](references/setup.md).
+   - Each capability (`deseq2`, `limma_two_group`, `limma_multigroup`, `methylation`, `proteomics_preprocess`, `single_cell_aggregation`, `gsea_and_ora`, ...) says whether its route can run here.
    - If no differential-analysis capability is available (`de_capable: false`), tell the user the run will be decision-only. Each valid plan is then recorded with its `execution_error`. Never replace a missing executor with a hand-written statistical model.
-3. Read [Native execution](references/native-execution.md) for the calling convention, the external-LLM block, formula-safe column names, and the run layout.
+3. Read [Native execution](references/native-execution.md) for the calling convention, the external-LLM block, formula-safe column names, and the run layout. For single-cell, proteomics, methylation, or enrichment, also read [Modalities](references/modalities.md).
 4. Start the run:
 
 ```python
@@ -68,7 +69,8 @@ Complete them in this order for every case:
 7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it. Otherwise the method decision stays `valid`, carries `paper_route: {"method": ..., "status": "blocked", "reason": ...}`, and names the validated alternative that runs as a declared deviation.
 8. `threshold`: record `paper_threshold`, `threshold_source`, and the `applied_threshold`.
 9. `execution`: run the approved route with `native.call_tool("tools.<module>:<function>", ...)`, which turns an import failure into a recordable `NativeToolError`. Apply the threshold with `native.apply_threshold` and register outputs with `case.add_output`. A failure is recorded as `valid` + `failed` with `final.execution_error`.
-10. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed. Then call `case.finish(n_deg=..., deg_sanity=...)`.
+10. `enrichment` (optional): only after a completed execution, and only when the request or paper calls for pathway results. Check IDs with `native.feature_id_report`. GSEA uses the full ranking; an ORA gene list uses the applied threshold. A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).
+11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed. Then call `case.finish(n_deg=..., deg_sanity=...)`.
 
 After all cases:
 
@@ -92,13 +94,15 @@ Reply in the user's language. For each case, report:
 - what ran as a declared deviation or exploratory analysis;
 - what was stopped, and why;
 - what failed to execute, and what to install;
-- the threshold used and its source.
+- the threshold used and its source;
+- enrichment results, if run, kept separate from the DE result.
 
 Do not summarize success by DEG or p-value counts.
 
 ## References
 
-- [Setup](references/setup.md): installing the repository and environment on a new machine; installing the skill for Codex and Claude Code.
+- [Setup](references/setup.md): installing the repository and environment on a new machine; installing the skill for Codex and Claude Code; self-test.
+- [Modalities](references/modalities.md): single-cell pseudobulk, proteomics, methylation, and the enrichment gate.
 - [Native execution](references/native-execution.md): calling convention, executor signatures, multigroup plan schema, run layout.
 - [Decision contract](references/decision-contract.md): record fields per stage, status rules, invariants the validator enforces.
 - [Decision gates](references/decision-gates.md): contrast, multi-group, covariance, and stop conditions.

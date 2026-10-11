@@ -9,6 +9,8 @@ uses this module for deterministic checks, tool execution, and record keeping:
   ``confounding_report``, ``pairing_report`` summarize evidence; they never decide.
 - ``call_tool`` runs a repository tool as a plain function and raises on failure.
 - ``apply_threshold`` applies a stated threshold to a full results table.
+- ``log_transform``, ``beta_to_m`` write recorded transforms; ``feature_id_report``
+  checks whether IDs are ready for gene-set analysis.
 - ``RunRecorder`` writes the standard run layout that ``audit_run.py`` and the
   decision-contract validator read.
 
@@ -45,14 +47,19 @@ _FAILURE_PATTERNS = (
     re.compile(r"\b(failed|aborted|unavailable)\b", re.I),
     re.compile(r"^\s*(only \d+ |no pseudobulk|this file looks like|no obvious grouping)", re.I),
 )
-GATES = ("paper_reconstruction", "ownership", "alignment", "matrix", "design",
-         "covariance", "method", "threshold", "execution", "study")
+GATES = decision_contract.STAGES
 SUMMARY_COLUMNS = (
     "case_id", "accession", "status", "decision_status", "execution_status", "stop_stage",
     "stop_reason", "route", "matrix_type", "da_method", "design_col", "formula", "control",
     "treatment", "n_contrasts", "covariance_status", "blocking_terms", "threshold_source",
-    "applied_threshold", "n_deg", "deg_sanity",
+    "applied_threshold", "n_deg", "deg_sanity", "enrichment", "transform",
 )
+# Execution errors that mean "this machine lacks a package or R", not an agent error.
+ENVIRONMENT_ERROR = re.compile(r"ModuleNotFoundError|ImportError|No module named|cannot import|"
+                               r"not installed|Rscript not found", re.I)
+# Packages whose versions decide numerical results; recorded in run_manifest.json.
+VERSIONED_PACKAGES = ("numpy", "pandas", "scipy", "patsy", "inmoose", "pydeseq2", "gseapy",
+                      "anndata", "GEOparse", "mygene")
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -75,9 +82,33 @@ def sha256(path: str | Path) -> str:
 # ---------------------------------------------------------------- native mode
 
 def enable_native_mode() -> dict:
-    """Block every external LLM client created by repository tools in this process."""
+    """Block every external LLM client created by repository tools in this process.
+
+    Also switches stdout/stderr to UTF-8 with replacement, so tools that print
+    non-ASCII status text cannot crash a Windows console (no PYTHONIOENCODING needed).
+    """
     os.environ[NATIVE_ENV] = "1"
+    for stream in (sys.stdout, sys.stderr):
+        encoding = (getattr(stream, "encoding", "") or "").lower().replace("-", "")
+        if encoding != "utf8" and hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):
+                pass
     return external_llm_status()
+
+
+def package_versions(names: Sequence[str] = VERSIONED_PACKAGES) -> dict:
+    """Installed versions of the packages that determine numerical results (None = not installed)."""
+    from importlib import metadata
+
+    versions = {}
+    for name in names:
+        try:
+            versions[name] = metadata.version(name)
+        except metadata.PackageNotFoundError:
+            versions[name] = None
+    return versions
 
 
 def external_llm_status() -> dict:
@@ -127,6 +158,10 @@ def call_tool(tool: Any, **kwargs) -> Any:
         result = function(**kwargs)
     except PolicyViolation as exc:
         raise NativeToolError(f"POLICY BLOCKED: {exc}") from exc
+    except ImportError as exc:  # a package imported lazily inside the tool
+        raise NativeToolError(f"cannot import inside {getattr(function, '__name__', 'tool')}: "
+                              f"{type(exc).__name__}: {exc}. Install the missing package "
+                              "(see the preflight report) and rerun.") from exc
     attempts = external_llm_status()["blocked_attempts"][before:]
     if attempts:
         raise NativeToolError(
@@ -138,13 +173,27 @@ def call_tool(tool: Any, **kwargs) -> Any:
     return result
 
 
+# A wrapper tool can report success on its first line and embed a nested
+# tool's failure later (for example run_methylation_da around limma).
+_NESTED_FAILURE = re.compile(r"^\s*(fatal error|policy blocked|error)\b", re.I | re.M)
+
+
 def tool_failed(message: str) -> bool:
     """True when a repository tool's return text reports a failure or refusal."""
     first_line = message.strip().splitlines()[0] if message.strip() else ""
-    return any(pattern.search(first_line) for pattern in _FAILURE_PATTERNS)
+    return any(pattern.search(first_line) for pattern in _FAILURE_PATTERNS) \
+        or bool(_NESTED_FAILURE.search(message))
 
 
 # ---------------------------------------------------------------- evidence summaries
+
+def _numeric(frame: pd.DataFrame, label: str) -> pd.DataFrame:
+    """numeric_matrix that raises NativeToolError, the one error type native helpers use."""
+    try:
+        return numeric_matrix(frame, label=label)
+    except PolicyViolation as exc:
+        raise NativeToolError(str(exc)) from exc
+
 
 def read_table(path: str | Path) -> pd.DataFrame:
     """Read a CSV/TSV (optionally gzipped) with the first column as index."""
@@ -163,7 +212,7 @@ def _frame(metadata: pd.DataFrame | str | Path) -> pd.DataFrame:
 def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None) -> dict:
     """Describe the numeric profile of a matrix and list type candidates, without choosing."""
     raw = read_table(path)
-    numeric = numeric_matrix(raw, label=str(path))
+    numeric = _numeric(raw, str(path))
     if sample_columns is not None:
         numeric = numeric.loc[:, [c for c in numeric.columns if str(c) in set(map(str, sample_columns))]]
     profile = _profile(numeric)
@@ -219,7 +268,7 @@ def align_to_metadata(matrix_path: str | Path, metadata_path: str | Path, out_di
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     raw = read_table(matrix_path)
-    numeric = numeric_matrix(raw, label=str(matrix_path))
+    numeric = _numeric(raw, str(matrix_path))
     meta = _frame(metadata_path)
     if key_column is None:
         lookup = {sample: sample for sample in meta.index}
@@ -431,7 +480,7 @@ def pairing_report(metadata: pd.DataFrame | str | Path, subject_column: str, con
 
 def log_transform(matrix_csv: str | Path, out_csv: str | Path, *, pseudocount: float = 1.0) -> dict:
     """Write log2(x + pseudocount) of a linear, non-negative matrix (for example FPKM/TPM)."""
-    matrix = numeric_matrix(read_table(matrix_csv), label=str(matrix_csv))
+    matrix = _numeric(read_table(matrix_csv), str(matrix_csv))
     values = matrix.to_numpy(dtype=float)
     if np.nanmin(values) < 0:
         raise NativeToolError("log_transform needs a non-negative linear matrix; negative values found")
@@ -443,6 +492,81 @@ def log_transform(matrix_csv: str | Path, out_csv: str | Path, *, pseudocount: f
     np.log2(matrix + pseudocount).to_csv(out)
     return {"input": str(matrix_csv), "output": str(out), "sha256": sha256(out),
             "transform": f"log2(x+{pseudocount:g})"}
+
+
+def beta_to_m(matrix_csv: str | Path, out_csv: str | Path, *, offset: float = 1e-3) -> dict:
+    """Write M-values, log2((beta + offset) / (1 - beta + offset)), from a methylation beta matrix.
+
+    Same transform as ``run_methylation_da``. Use it when the methylation design
+    needs covariates, blocking, or several levels: pass the M-value file to
+    ``run_limma_analysis`` or ``run_multigroup_analysis`` and record
+    ``transform: beta-to-M``. Values in 0-100 are treated as percentages.
+    """
+    beta = _numeric(read_table(matrix_csv), str(matrix_csv))
+    values = beta.to_numpy(dtype=float)
+    finite = values[np.isfinite(values)]
+    if finite.size == 0 or finite.min() < 0 or finite.max() > 100:
+        raise NativeToolError("beta_to_m needs beta values in [0, 1] or percentages in [0, 100]")
+    scale = "percent" if finite.max() > 1.5 else "fraction"
+    if scale == "percent":
+        beta = beta / 100.0
+    clipped = beta.clip(lower=offset, upper=1 - offset)
+    m_values = np.log2((clipped + offset) / (1 - clipped + offset))
+    out = Path(out_csv)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    m_values.to_csv(out)
+    return {"input": str(matrix_csv), "output": str(out), "sha256": sha256(out),
+            "transform": f"beta-to-M (offset {offset:g}, input scale {scale})"}
+
+
+_ID_PATTERNS = (
+    ("ensembl_gene", re.compile(r"^ENS[A-Z]*G\d{11}(\.\d+)?$")),
+    ("ensembl_transcript", re.compile(r"^ENS[A-Z]*T\d{11}(\.\d+)?$")),
+    ("ensembl_protein", re.compile(r"^ENS[A-Z]*P\d{11}(\.\d+)?$")),
+    ("refseq", re.compile(r"^[NX][MRP]_\d+(\.\d+)?$")),
+    ("affy_probe", re.compile(r"^[\w.-]*_(s_|x_|a_|i_|f_|r_|g_)?at$|^\d+_st$", re.I)),
+    ("illumina_probe", re.compile(r"^ILMN_\d+$")),
+    ("agilent_probe", re.compile(r"^A_\d+_P\d+$")),
+    ("cpg_probe", re.compile(r"^(cg|ch\.)\d+", re.I)),
+    ("genomic_region", re.compile(r"^(chr)?[\dXYMT]{1,2}[:_-]\d+", re.I)),
+    ("uniprot", re.compile(r"^([OPQ]\d[A-Z\d]{3}\d|[A-NR-Z]\d([A-Z][A-Z\d]{2}\d){1,2})(-\d+)?([;|].*)?$")),
+    ("entrez", re.compile(r"^\d+$")),
+    ("gene_symbol", re.compile(r"^[A-Za-z][A-Za-z0-9.\-]{0,19}$")),
+)
+
+
+def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
+    """Classify the feature IDs of a matrix or result table before gene-set analysis.
+
+    Gene-set tools in this repository accept gene symbols, and Ensembl gene IDs
+    (converted through MyGene.info, which needs network). Transcript, probe,
+    protein, CpG, region, Entrez, and RefSeq IDs need a recorded mapping first.
+    """
+    index = pd.read_csv(path, index_col=0, usecols=[0]).index.astype(str)
+    ids = list(index[:sample])
+    counts: dict[str, int] = {}
+    for value in ids:
+        kind = next((name for name, pattern in _ID_PATTERNS if pattern.match(value)), "other")
+        counts[kind] = counts.get(kind, 0) + 1
+    dominant, n = max(counts.items(), key=lambda item: item[1]) if counts else ("other", 0)
+    fraction = round(n / len(ids), 4) if ids else 0.0
+    ready = dominant in decision_contract.GENE_SET_READY_IDS and fraction >= 0.8
+    return {
+        "path": str(path),
+        "n_features": int(len(index)),
+        "n_checked": len(ids),
+        "type_counts": dict(sorted(counts.items(), key=lambda item: -item[1])),
+        "dominant_type": dominant,
+        "dominant_fraction": fraction,
+        "duplicated_ids": int(index.duplicated().sum()),
+        "gene_set_ready": ready,
+        "note": ("Ensembl gene IDs are mapped to symbols through MyGene.info (network)."
+                 if dominant == "ensembl_gene" else
+                 "Gene symbols can be used directly." if ready else
+                 "Record an ID mapping (platform annotation, biomart table, or ortholog table) "
+                 "before gene-set analysis, or refuse the enrichment gate."),
+        "examples": ids[:5],
+    }
 
 
 def deg_outputs(output_dir: str | Path) -> list[str]:
@@ -542,8 +666,10 @@ class RunRecorder:
         self._case_order = list(case_ids)
         status_path = self.run_dir / "run_status.json"
         previous_status = json.loads(status_path.read_text(encoding="utf-8")) if _resume and status_path.exists() else None
+        # enrichment is optional, so it is not counted as an expected stage
         self.tracker = RunStatusTracker(str(status_path), run_id=self.run_id, profile="native-skill",
-                                        stages=GATES, study_total=len(self._case_order))
+                                        stages=tuple(g for g in GATES if g != "enrichment"),
+                                        study_total=len(self._case_order))
         if previous_status:
             self.tracker.state = RunStatus.model_validate(previous_status)
             self.tracker._started_monotonic -= float(previous_status.get("elapsed_seconds") or 0)
@@ -565,6 +691,7 @@ class RunRecorder:
             "repo_commit": _git_commit(),
             "python": sys.version.split()[0],
             "os": platform.platform(),
+            "packages": package_versions(),
             "started_at": _now(),
             "external_llm": external_llm_status(),
         }
@@ -623,12 +750,17 @@ class RunRecorder:
             for row in rows:
                 writer.writerow(row)
         failed = [r for r in rows if r["status"].startswith("failed")]
-        status = "completed" if not failed else "partial" if len(failed) < len(rows) else "failed"
+        environment = [r for r in failed if ENVIRONMENT_ERROR.search(str(r.get("stop_reason", "")))]
+        other = [r for r in failed if r not in environment]
+        # A run whose only failures are missing packages finished every decision: partial, not failed.
+        status = ("failed" if other and len(other) == len(rows) else
+                  "partial" if failed else "completed")
         attempts = self._attempts()
         self.tracker.set_usage(llm_calls=0, estimated_cost_usd=0.0)
         for row in failed:
             self.tracker.add_failure(f"{row['case_id']}: {row.get('stop_reason') or 'execution failed'}")
-        self.tracker.finish(status, f"{len(rows)} case(s); {len(failed)} execution failure(s)")
+        self.tracker.finish(status, f"{len(rows)} case(s); {len(failed)} execution failure(s), "
+                                    f"{len(environment)} from a missing package or R")
         self.manifest.update(finished_at=_now(), status=status, n_cases=len(rows),
                              external_llm={"disabled": external_llm_status()["disabled"],
                                            "blocked_attempts": attempts})
@@ -745,7 +877,7 @@ class CaseRecorder:
                                             "execution_status": execution_status,
                                             "stop_reason": stop_reason})
         self._save_state()
-        if stage in GATES:
+        if stage in self.run.tracker.stages:
             self.run.tracker.set_stage(stage, message=f"{self.case_id}: {decision_status}")
         self.run.log(f"{self.case_id} {stage}: {decision_status}/{execution_status}"
                      + (f" ({stop_reason})" if stop_reason else ""))
@@ -759,8 +891,13 @@ class CaseRecorder:
         errors = decision_contract.check_case(self.records, self.case_id)
         if errors:
             raise NativeToolError("case records are inconsistent:\n" + "\n".join(errors))
-        blocked = next((r for r in self.records if r["decision_status"] in decision_contract.BLOCKED), None)
+        blocked = next((r for r in self.records if r["decision_status"] in decision_contract.BLOCKED
+                        and r["stage"] != "enrichment"), None)
         executions = [r["execution_status"] for r in self.records if r["stage"] == "execution"]
+        enrichment = "; ".join(
+            f"{r['final'].get('method') or 'enrichment'}:"
+            f"{r['decision_status'] if r['decision_status'] != 'valid' else r['execution_status']}"
+            for r in self.records if r["stage"] == "enrichment")
         if blocked:
             status = f"stopped:{blocked['stage']}"
         elif "completed" in executions:
@@ -802,6 +939,8 @@ class CaseRecorder:
             if threshold else "",
             "n_deg": "" if n_deg is None else n_deg,
             "deg_sanity": deg_sanity or ("" if n_deg is None else "ok"),
+            "enrichment": enrichment,
+            "transform": method.get("transform", ""),
         }
         self.evidence.finish(status=status)
         self.finished = True

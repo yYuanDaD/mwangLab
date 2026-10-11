@@ -11,9 +11,11 @@ Decide the matrix type from the numeric profile (`native.profile_matrix`) togeth
 | Raw non-negative integer counts | DESeq2, edgeR, or limma-voom; or limma on `log2(CPM+1)` from `preprocess_counts` (record the transform) |
 | FPKM/TPM or other linear normalized expression | `log2(x+1)` (`native.log_transform`), then limma |
 | Already log-transformed expression (RMA, log2 CPM, log2 FPKM) | limma as-is |
-| Linear proteomics intensity | log2 transform, then limma |
+| Linear proteomics intensity | `preprocess_proteomics_matrix` (log2, missingness filter, imputation for label-free, median centering) or `native.log_transform`, then limma |
 | Already-log proteomics intensity | limma as-is |
-| Methylation beta | beta-to-M (`run_methylation_da`), then limma |
+| Methylation beta | beta-to-M (`run_methylation_da`, or `native.beta_to_m` when covariates are needed), then limma |
+| Single-cell raw UMI counts | sum to pseudobulk per sample and cell type, then a raw-count route; paired donors use limma on `log2(CPM+1)` with the donor block |
+| Single-cell normalized or scaled values | cannot be summed into pseudobulk; `manual_review` unless a raw-count layer exists |
 | Estimated counts | Refuse integer-only methods unless the rounding recipe is documented (`rounding_documented`) |
 | Ambiguous | Stop with `manual_review` |
 

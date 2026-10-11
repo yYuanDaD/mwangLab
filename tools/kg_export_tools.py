@@ -15,7 +15,7 @@ import re
 from collections import defaultdict
 
 import pandas as pd
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 KG_COLUMNS = [

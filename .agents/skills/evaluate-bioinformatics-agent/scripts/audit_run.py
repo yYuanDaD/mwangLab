@@ -231,6 +231,11 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                 continue
             raw_ok = any(x in method for x in ("deseq2", "edger", "voom"))
             log_ok = "limma" in method and "voom" not in method
+            transform = str(row.get("transform", "")).lower()
+            # limma on log2(CPM+1) of raw counts (limma-trend, paired pseudobulk) is a valid route
+            # when the summary records that transform.
+            if log_ok and ("cpm" in transform or "log" in transform):
+                raw_ok = True
             if "raw" in matrix and not raw_ok:
                 incompatible.append(f"row {idx}: {matrix}->{method}")
             if any(x in matrix for x in ("fpkm", "tpm", "log", "proteom", "methyl")) and not log_ok:
@@ -247,8 +252,12 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
         checks.append(_check("contrast_definition", "scientific_validity", "not_measured", 0, 6,
                              "No successful DA rows were present."))
     else:
-        missing = [row for row in da_rows if not all(str(row.get(key, "")).strip()
-                                                     for key in ("design_col", "control", "treatment"))]
+        # A two-arm row names control and treatment; a named-contrast design
+        # (multilevel, factorial) names its contrasts and records the formula instead.
+        def _defined(row):
+            has = lambda key: bool(str(row.get(key, "")).strip())  # noqa: E731
+            return has("design_col") and has("treatment") and (has("control") or has("formula"))
+        missing = [row for row in da_rows if not _defined(row)]
         checks.append(_check("contrast_definition", "scientific_validity",
                              "fail" if missing else "pass", 0 if missing else 6, 6,
                              f"DA rows={len(da_rows)}, missing contrast fields={len(missing)}",

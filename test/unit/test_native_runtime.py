@@ -251,5 +251,71 @@ class RunRecorderTests(unittest.TestCase):
                 os.environ[native.NATIVE_ENV] = previous
 
 
+class ModalityHelperTests(unittest.TestCase):
+    def test_feature_id_report(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cases = {
+                "ensembl_gene": [f"ENSMUSG{i:011d}.2" for i in range(50)],
+                "ensembl_transcript": [f"ENST{i:011d}" for i in range(50)],
+                "affy_probe": [f"{1370000 + i}_at" for i in range(48)] + ["AFFX-BioB-5_at", "1367452_s_at"],
+                "gene_symbol": ["Gapdh", "Actb", "ISG15", "MX1", "HLA-A", "H2-K1"] * 8,
+                "cpg_probe": [f"cg{i:08d}" for i in range(50)],
+                "uniprot": ["P04637", "Q9Y6K9", "O14786", "P68871-2"] * 12,
+            }
+            for expected, ids in cases.items():
+                path = Path(tmp) / f"{expected}.csv"
+                pd.DataFrame({"x": range(len(ids))}, index=pd.Index(ids, name="id")).to_csv(path)
+                report = native.feature_id_report(path)
+                self.assertEqual(report["dominant_type"], expected, report)
+                self.assertEqual(report["gene_set_ready"], expected in {"ensembl_gene", "gene_symbol"})
+
+    def test_beta_to_m(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            beta = pd.DataFrame({"a": [0.5, 0.0, 1.0], "b": [0.2, 0.8, 0.9]}, index=["cg1", "cg2", "cg3"])
+            beta.to_csv(Path(tmp) / "beta.csv")
+            info = native.beta_to_m(Path(tmp) / "beta.csv", Path(tmp) / "m.csv")
+            m = pd.read_csv(info["output"], index_col=0)
+            self.assertAlmostEqual(m.loc["cg1", "a"], 0.0, places=6)
+            self.assertTrue(np.isfinite(m.to_numpy()).all())
+            (beta * 100).to_csv(Path(tmp) / "pct.csv")
+            m_pct = pd.read_csv(native.beta_to_m(Path(tmp) / "pct.csv", Path(tmp) / "m2.csv")["output"], index_col=0)
+            self.assertTrue(np.allclose(m.to_numpy(), m_pct.to_numpy()))
+            pd.DataFrame({"a": [5.0, 300.0], "b": [1.0, 2.0]}).to_csv(Path(tmp) / "bad.csv")
+            with self.assertRaises(native.NativeToolError):
+                native.beta_to_m(Path(tmp) / "bad.csv", Path(tmp) / "m3.csv")
+
+    def test_nested_failure_and_lazy_import_errors(self):
+        native.enable_native_mode()
+        self.assertTrue(native.tool_failed("Differential methylation on 900 sites.\n--- limma result ---\n"
+                                           "FATAL ERROR: only 2 samples remain"))
+        self.assertFalse(native.tool_failed("limma complete\nSummary (padj < 0.05): 12 genes"))
+
+        def lazy():
+            import a_package_that_is_not_installed  # noqa: F401
+        with self.assertRaises(native.NativeToolError) as raised:
+            native.call_tool(lazy)
+        self.assertIn("No module named", str(raised.exception))
+
+    def test_environment_failures_make_a_partial_run(self):
+        native.enable_native_mode()
+        with tempfile.TemporaryDirectory() as tmp:
+            run = native.RunRecorder(Path(tmp) / "run", request="r", platform_name="test",
+                                     decision_maker="test", case_ids=["c1"])
+            self.assertNotIn("enrichment", run.tracker.stages)
+            self.assertIn("numpy", run.manifest["packages"])
+            case = run.case("c1", "GSE1")
+            spec = Path(tmp) / "spec.txt"
+            spec.write_text("x", encoding="utf-8")
+            item = case.add_input(spec, "user")
+            case.decide("execution", final={"method": "DESeq2",
+                                            "execution_error": "cannot import tools.deseq2_tools: No module named 'pydeseq2'"},
+                        evidence=[item], reasoning="r", confidence="high", execution_status="failed")
+            case.finish()
+            result = run.finish()
+            self.assertEqual(result["status"], "partial")
+            status = json.loads((Path(tmp) / "run" / "run_status.json").read_text(encoding="utf-8"))
+            self.assertEqual(status["status"], "partial")
+
+
 if __name__ == "__main__":
     unittest.main()

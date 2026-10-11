@@ -237,7 +237,7 @@ def run_scrna_pseudobulk_da(
     try:
         from tools.batch_tools import (_DecisionLog, _ALL_RAW_METHODS, _invoke_da_method,
                                         _gsea_for_deg, _run_contrast_multi)
-        from tools.deseq2_tools import deg_filename
+        from tools.de_common import deg_filename
 
         os.makedirs(output_dir, exist_ok=True)
         agg_dir = os.path.join(output_dir, "pseudobulk")

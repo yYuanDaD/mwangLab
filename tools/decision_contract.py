@@ -23,8 +23,10 @@ from typing import Any, Iterable
 CONTRACT_VERSION = "2"
 STAGES = (
     "paper_reconstruction", "ownership", "alignment", "matrix", "design",
-    "covariance", "method", "threshold", "execution", "study",
+    "covariance", "method", "threshold", "execution", "enrichment", "study",
 )
+# Stages that run something and therefore may carry completed/failed.
+RUN_STAGES = ("execution", "enrichment")
 DECISIONS = {"valid", "unresolved", "manual_review", "refused"}
 BLOCKED = {"unresolved", "manual_review", "refused"}
 EXECUTIONS = {"not_started", "completed", "failed", "not_run"}
@@ -49,8 +51,14 @@ STAGE_FIELDS = {
     "method": ("method", "matrix_type"),
     "threshold": ("paper_threshold", "threshold_source", "applied_threshold"),
     "execution": ("method",),
+    "enrichment": ("method", "gene_sets", "organism", "feature_id_type"),
     "study": ("route",),
 }
+# Feature identifiers the repository gene-set tools accept directly
+# (Ensembl gene IDs are converted to symbols through MyGene.info).
+GENE_SET_READY_IDS = {"gene_symbol", "ensembl_gene"}
+ENRICHMENT_ORGANISMS = {"mouse", "human"}
+ORA_PATTERN = re.compile(r"\bora\b|over-?representation|enrichr|\bgo\b|kegg", re.I)
 PAIRED_PATTERN = re.compile(r"(?<![a-z])(?<!un)(?<!non-)(paired|repeated|within[- ]subject|longitudinal)", re.I)
 _METHOD_HEAD = re.compile(r"\s*(limma[- ]?voom|voom|deseq2|edger|limma|none|null|not_run)\b", re.I)
 COUNT_METHODS = ("deseq2", "edger", "limma-voom", "voom")
@@ -172,12 +180,36 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
             errors.append(f"{source}: paper_threshold must be an object")
         if not isinstance(final.get("applied_threshold"), dict):
             errors.append(f"{source}: applied_threshold must be an object")
-    if stage == "execution" and record["execution_status"] == "completed" and not final.get("outputs"):
-        errors.append(f"{source}: completed execution must list final.outputs")
-    if stage == "execution" and record["execution_status"] == "failed" and not final.get("execution_error"):
-        errors.append(f"{source}: failed execution must record final.execution_error")
+    if stage in RUN_STAGES and record["execution_status"] == "completed" and not final.get("outputs"):
+        errors.append(f"{source}: completed {stage} must list final.outputs")
+    if stage in RUN_STAGES and record["execution_status"] == "failed" and not final.get("execution_error"):
+        errors.append(f"{source}: failed {stage} must record final.execution_error")
+    if stage not in RUN_STAGES and stage in STAGES and record["execution_status"] in {"completed", "failed"}:
+        errors.append(f"{source}: decision gate {stage} keeps execution_status not_started; "
+                      "only execution and enrichment records run something")
+    if stage == "enrichment" and status == "valid":
+        errors.extend(_enrichment_errors(final, source))
     if stage == "study" and status == "valid" and final.get("route") not in STUDY_ROUTES:
         errors.append(f"{source}: study route must be one of {sorted(STUDY_ROUTES)}")
+    return errors
+
+
+def _enrichment_errors(final: dict, source: str) -> list[str]:
+    errors = []
+    id_type = str(final.get("feature_id_type", "")).lower()
+    if id_type and id_type not in GENE_SET_READY_IDS and not final.get("id_mapping"):
+        errors.append(f"{source}: feature_id_type {id_type!r} needs final.id_mapping (for example a "
+                      "platform annotation or ID-to-symbol table) before gene-set analysis")
+    organism = str(final.get("organism", "")).lower()
+    if organism and organism not in ENRICHMENT_ORGANISMS and not final.get("ortholog_mapping"):
+        errors.append(f"{source}: repository gene sets cover Mouse and Human only; {organism!r} needs "
+                      "final.ortholog_mapping")
+    if ORA_PATTERN.search(str(final.get("method", ""))):
+        if not isinstance(final.get("input_threshold"), dict):
+            errors.append(f"{source}: over-representation analysis needs final.input_threshold (the gene-list rule)")
+        if final.get("input_threshold_source") not in {"applied", "audit"}:
+            errors.append(f"{source}: final.input_threshold_source must be 'applied' (the case's applied "
+                          "threshold) or 'audit'")
     return errors
 
 
@@ -209,7 +241,8 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
     for record in records:
         if isinstance(record, dict):
             by_stage[record.get("stage")].append(record)
-    blocked = [r for r in records if r.get("decision_status") in BLOCKED]
+    # A blocked enrichment gate does not undo a completed differential analysis.
+    blocked = [r for r in records if r.get("decision_status") in BLOCKED and r.get("stage") != "enrichment"]
     completed = [r for r in records if r.get("execution_status") == "completed"]
 
     if blocked and completed:
@@ -271,6 +304,20 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
                 name = _term_name(term if not isinstance(term, dict) else term.get("name", ""))
                 if name and name not in formulas:
                     errors.append(f"{case_id}: required model term {name!r} is not in the fitted formula")
+
+    # Enrichment runs on a completed differential analysis, and an ORA gene list
+    # uses the case's applied threshold unless it is labelled as an audit rule.
+    de_completed = any(r.get("execution_status") == "completed" for r in by_stage.get("execution", []))
+    applied_rules = [(r.get("final") or {}).get("applied_threshold") or {} for r in valid("threshold")]
+    for record in by_stage.get("enrichment", []):
+        final = record.get("final") or {}
+        if record.get("execution_status") == "completed" and not de_completed:
+            errors.append(f"{case_id}: enrichment completed without a completed differential analysis")
+        if record.get("decision_status") == "valid" and final.get("input_threshold_source") == "applied" \
+                and applied_rules and isinstance(final.get("input_threshold"), dict) \
+                and not any(_same_threshold(final["input_threshold"], rule) for rule in applied_rules):
+            errors.append(f"{case_id}: ORA input_threshold differs from the applied threshold; "
+                          "label it input_threshold_source 'audit' or use the applied rule")
 
     # The paper's threshold cannot be silently changed.
     for record in valid("threshold"):
