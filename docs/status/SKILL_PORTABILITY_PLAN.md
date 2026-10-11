@@ -40,6 +40,8 @@ Result: cases 01 and 06 (first attempt) and 07, 08, 09 (second session, `.claude
 
 ### F. Real execution on a full environment
 
+First run (2026-10-11, Windows 11, Python 3.12.4, commit `165bea5`): preflight fully available (`de_capable: true`, every network host reachable, R limma found). Five of seven self-test routes passed (DESeq2 with blocking, limma on FPKM, methylation, paired single-cell, GSEA and ORA). Multilevel limma and label-free proteomics failed with `KeyError: -2`, an inmoose 0.9.1 eBayes bug: when residual variances are near-homogeneous, squeezeVar returns `df_prior = inf` as a Python float and `~True == -2` is used as a column key. Fixed by `tools/limma_compat.ebayes`, used by `limma_tools` and `multigroup_tools`; regression test `test/unit/test_limma_compat.py`. With inmoose loaded in the cloud workspace, all limma routes then pass. Remaining: rerun the self-test on Windows after pulling.
+
 This is the stage that proves the skill runs on another device. It cannot run in the cloud sandbox, where PyPI, GEO, and enrichment services are blocked. Run it on your computer, or on any machine with network:
 
 ```bash

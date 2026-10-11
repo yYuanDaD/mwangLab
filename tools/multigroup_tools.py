@@ -99,7 +99,8 @@ def _validate_design(meta: pd.DataFrame, formula: str):
 
 def _fit_contrasts(expr: pd.DataFrame, meta: pd.DataFrame, formula: str,
                    contrasts: list[dict[str, Any]], output_dir: str):
-    from inmoose.limma import contrasts_fit, eBayes, lmFit, topTable
+    from inmoose.limma import contrasts_fit, lmFit, topTable
+    from tools.limma_compat import ebayes as eBayes
 
     design, rank, residual_df = _validate_design(meta, formula)
     names = list(design.design_info.column_names)
