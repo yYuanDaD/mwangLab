@@ -88,7 +88,7 @@ These summarize evidence; none of them decides.
 
 | Helper | Use |
 |---|---|
-| `profile_matrix(path)` | integer fraction, range, negatives, missing values, annotation columns, type candidates |
+| `profile_matrix(path, sample_columns=None)` | integer fraction, range, negatives, missing values, annotation columns, type candidates. Numeric non-sample columns (for example `Score` in a MaxQuant export) count as samples unless you pass `sample_columns`, such as the aligned sample IDs |
 | `align_to_metadata(matrix, metadata, out_dir, key_column=None)` | exact alignment on the metadata index or one column; writes `aligned_matrix.csv` (columns renamed to sample IDs), `aligned_metadata.csv`, `alignment_map.csv` |
 | `derive_columns(meta, out_csv, aliases, patterns, recode)` | formula-safe metadata columns with a recorded mapping (see below) |
 | `log_transform(matrix, out_csv)` | `log2(x+1)` for linear FPKM/TPM/intensity; refuses data that already look log-scale |
@@ -99,7 +99,7 @@ These summarize evidence; none of them decides.
 | `complete_pairs_subset(matrix, metadata, out_dir, subject_column, condition_column, levels)` | keep subjects with one sample at every level; reports excluded subjects |
 | `find_outputs(dir, pattern)` | files a tool wrote, for example `*_normalized.csv` from `preprocess_counts` |
 | `pairing_report(meta, subject_col, condition_col, levels)` | complete, incomplete, and duplicated subjects across levels |
-| `confounding_report(meta, primary)` | each column's relation to the primary factor: `complete_confounding`, `nested_in_primary`, `crossed`, ... |
+| `confounding_report(meta, primary, candidates)` | each column's relation to the primary factor: `complete_confounding`, `nested_in_primary`, `crossed`, ... Pass `candidates` without the primary factor's own source column (a derived `grp` copied from `group` is trivially one-to-one with it) |
 | `design_check(meta, terms, interactions)` | rank, residual df, cells, and missing values of a categorical design (same column space as `~ C(a) + C(b)`) |
 | `apply_threshold(deg_csv, metric, cutoff, effect_cutoff)` | counts under a stated rule, plus `deg_sanity` flags |
 | `deg_outputs(output_dir)` | result tables written by the DE tools |

@@ -26,9 +26,9 @@ Budget notes:
 
 ## Remaining stages
 
-### E. Verify the round-3 fixes (partly done)
+### E. Verify the round-3 fixes (done 2026-10-11)
 
-The window ran out during this stage. One session finished case_01 and case_06; both pass, and the session used the new `valid` + `not_run` enrichment record.
+Result: cases 01 and 06 (first attempt) and 07, 08, 09 (second session, `.claude/skills`) all pass the scorer; the contract check is `VALID`; the audit reports `incomplete_environment` with no blocking findings. Helper code written by the session fell from about 1,300 lines to 245. Its four documentation notes were fixed. The `.agents/skills` copy is byte-identical (checked by `sync_skills.py --check`), so a separate Codex-location rerun is deferred to stage G.
 
 - Scope: cases 07, 08, and 09, in one session for the `.claude/skills` location. In the next window, run the same cases for the `.agents/skills` location.
 - Setup: create a checkout at commit `029fb50` or later and remove the scorer-side files. Then run `python test/experiments/skill_forward_test_20261011/make_cases.py <checkout>/cases` and trim the manifest to the three cases.

@@ -63,7 +63,7 @@ native.call_tool("tools.proteomics_tools:preprocess_proteomics_matrix", quant_pa
                  labeling="label_free", output_dir=..., missing_threshold=0.5)
 ```
 
-It writes `<base>_preprocessed.csv`. The steps are log2, a missingness filter, MinProb imputation (label-free only), and median centering. Imputation and the missingness filter are decisions: record them in the `method` decision as `transform` and `missing_values`.
+It writes `<base>_preprocessed.csv`. The steps are log2(x+1), a missingness filter, MinProb imputation (label-free only), and median centering. Imputation and the missingness filter are decisions: record them in the `method` decision as `transform` and `missing_values`.
 
 **Gate notes:**
 - `alignment`: align the deposited matrix to metadata with `native.align_to_metadata`. Run the preprocessing at execution, because filtering and imputation are method decisions, then run limma (two-arm or multigroup) on the preprocessed file. Record `matrix_type` as the original scale (for example `linear LFQ intensity`), with the transform.
@@ -89,7 +89,7 @@ It writes `<base>_preprocessed.csv`. The steps are log2, a missingness filter, M
 
 ## Enrichment gate (optional)
 
-Run it only after a completed `execution` and only when the request or paper calls for pathway results. It never repairs or validates a DE decision.
+Run it only after a completed `execution` and only when the request or paper calls for pathway results. A paper reports pathway results when it names a gene-set method (GSEA, ORA, GO or KEGG enrichment); a sentence such as "mitochondrial proteins increased" is a finding to compare, not a request for enrichment. It never repairs or validates a DE decision.
 
 1. Run `native.feature_id_report(deg_csv)`.
    - Gene symbols, or Ensembl gene IDs (converted through MyGene.info), are ready.
