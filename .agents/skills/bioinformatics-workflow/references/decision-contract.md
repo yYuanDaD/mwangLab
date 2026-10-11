@@ -35,13 +35,17 @@ Write one record per gate per case, in gate order. A record is an audit object, 
 | `alignment` | `method`, `n_aligned`, `n_metadata`, `coverage` (0–1) | List unmatched IDs when coverage < 1 |
 | `matrix` | `matrix_type`, `recommended_method` | Use the type words from the matrix policy (`raw counts`, `estimated counts`, `FPKM`, `TPM`, `log2 ...`, `RMA log2`, `beta`) |
 | `design` | `analysis_type`, `formula` or `design_column`, `contrasts` or `control` + `treatment` | Use `paired`, `repeated`, or `paired_change` in `analysis_type` for within-subject designs |
-| `covariance` | `status`, `blocking_terms`, `covariates` | `status` is `required`, `not_required`, or `unresolved`. `covariates` lists each candidate with a disposition (`included`, `excluded: reason`, `aliased`) |
-| `method` | `method`, `matrix_type`, plus `formula` when the model has more than one term | Add `transform` (for example `log2(x+1)`, `log2(CPM+1)`, `beta-to-M`) whenever limma runs on data that were not already log-scale |
+| `covariance` | `status`, `blocking_terms`, `covariates` | `status` is `required`, `not_required`, or `unresolved`. `covariates` lists each candidate with a disposition (`included`, `excluded: reason`, `aliased`, `nested`). Use the formula-safe names from `derive_columns` |
+| `method` | `method`, `matrix_type`, plus `formula` when the model has more than one term | Start `method` with the method name (`DESeq2`, `edgeR`, `limma-voom`, `limma`). Add `transform` (for example `log2(x+1)`, `log2(CPM+1)`, `beta-to-M`) whenever limma runs on data that were not already log-scale. When the paper's own route cannot run, add `paper_route: {"method": ..., "status": "blocked", "reason": ...}`; the record itself stays `valid` for the alternative |
 | `threshold` | `paper_threshold`, `threshold_source`, `applied_threshold` | `threshold_source`: `paper`, `paper_on_deviation_route`, `workflow_default`, `audit` |
 | `execution` | `method`; `outputs` when completed; `execution_error` when failed | |
-| `study` | `route` | `paper_aligned`, `declared_deviation`, `exploratory`, or `stopped` |
+| `study` | `route` | `paper_aligned`, `declared_deviation`, or `exploratory`: the planned route, also when execution failed. Not written for stopped cases |
 
-A blocked decision (`unresolved`, `manual_review`, `refused`) needs only `stop_reason`. A valid decision never has a `stop_reason`; when a valid plan fails to run, the execution record is `valid` + `failed` with `final.execution_error`.
+Other rules for these fields:
+- A blocked decision (`unresolved`, `manual_review`, `refused`) needs only `stop_reason`. For a refused covariance gate, list the aliased covariate in `covariates` with disposition `aliased`.
+- A valid decision never has a `stop_reason`. When a valid plan fails to run, the execution record is `valid` + `failed` with `final.execution_error`.
+- Decision gates keep `execution_status: not_started`. Only the `execution` record carries `completed` or `failed`.
+- A stopped case has no gates after the stop and no `study` record. `case.finish()` reports its route as `stopped`.
 
 ## Status rules
 
@@ -61,7 +65,7 @@ Do not invent other status strings. Put the wording in `stop_reason`.
 
 ## Thresholds, small studies, and multiplicity
 
-- `paper_threshold` copies the article's metric, cutoff, and effect rule exactly (`metric`, `adjustment`, `cutoff`, `effect_metric`, `effect_cutoff`, `inclusive`, `source_locator`). A fold change of 1.5 is `effect_cutoff: 0.585` on log2FC; keep the original in `effect_cutoff_original`.
+- `paper_threshold` copies the article's metric, cutoff, and effect rule exactly (`metric`, `adjustment`, `cutoff`, `effect_metric`, `effect_cutoff`, `inclusive`, `source_locator`). A fold change of 1.5 is `effect_cutoff: 0.5849625` (`log2(1.5)`, not rounded) on log2FC; keep the original in `effect_cutoff_original`.
 - `threshold_source` and `applied_threshold`:
   - `paper`: the applied rule equals the paper rule.
   - `paper_on_deviation_route`: the paper rule applied to a declared alternative method.

@@ -20,7 +20,7 @@ import subprocess
 import tempfile
 
 import pandas as pd
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
 from tools.analysis_policy import (

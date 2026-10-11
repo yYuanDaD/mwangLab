@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pydeseq2.dds import DeseqDataSet
 from pydeseq2.ds import DeseqStats
-from langchain_core.tools import tool
+from tools.tooling import tool
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,

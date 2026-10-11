@@ -13,9 +13,12 @@ The agent session running this skill is the scientific decision-maker. It reads 
 
 ## Before the first study
 
-1. Run `python <skill_dir>/scripts/preflight.py --out <run_dir>/preflight.json`. If the repository is not found or packages are missing, follow [Setup](references/setup.md). An unavailable capability makes that execution step fail with a recorded `execution_error`; never replace it with a hand-written statistical model.
-2. Work from the repository root. Read [Native execution](references/native-execution.md) for the calling convention, the external-LLM block, and the run layout.
-3. Start every run with:
+1. Work from the repository root. Choose a new run directory, `output/<run_name>`.
+2. Run `python <skill_dir>/scripts/preflight.py --out output/<run_name>/preflight.json`.
+   - If the repository is not found or packages are missing, follow [Setup](references/setup.md).
+   - If no differential-analysis capability is available (`de_capable: false`), tell the user the run will be decision-only. Each valid plan is then recorded with its `execution_error`. Never replace a missing executor with a hand-written statistical model.
+3. Read [Native execution](references/native-execution.md) for the calling convention, the external-LLM block, formula-safe column names, and the run layout.
+4. Start the run:
 
 ```python
 from tools import native
@@ -26,13 +29,15 @@ run = native.RunRecorder("output/<run_name>", request="<user request>",
 case = run.case("<case_id>", accession="<GSE...>")
 ```
 
+The recorder saves its state after every call. To continue the run from a later command, use `run = native.RunRecorder.open("output/<run_name>")` and `case = run.case("<case_id>")`.
+
 Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_helpers.py` for decisions unless the user asks for that external-agent backend.
 
 ## Core rules
 
 - **Paper first.** When an article is available, it defines the estimand, sample inclusion, contrast, design and blocking unit, method, and threshold. GEO metadata and the matrix test whether that plan can be carried out. Keyword matches are only supporting evidence. If paper and data disagree, record both and stop when the disagreement changes the estimand, sample set, covariance, or method. Details: [Paper reconstruction](references/paper-reconstruction.md).
 - **Thresholds keep their meaning.**
-  - `paper_threshold` is the article's exact rule. Do not turn FDR into raw p, do not add `|log2FC| > 1` when the paper has none, and convert a fold change of 1.5 to `|log2FC| > 0.585`.
+  - `paper_threshold` is the article's exact rule. Do not turn FDR into raw p, and do not add `|log2FC| > 1` when the paper has none. Convert a fold change with its exact value: FC 1.5 becomes `|log2FC| > log2(1.5)` = 0.5849625, not a rounded number.
   - `audit_threshold` is a separate, labelled comparison rule.
   - When the paper states nothing, use `workflow_default` (BH-adjusted p < 0.05, no effect-size cutoff) and say so.
   - Repository tools print their own `n_deg` summaries. Count with `native.apply_threshold` instead.
@@ -40,7 +45,7 @@ Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_
   - `decision_status` says whether the route is scientifically valid; `execution_status` says whether the tool ran.
   - A valid plan whose tool failed is acceptable.
   - A completed run on an invalid plan is a blocking failure.
-- **Record before acting.** Write each gate with `case.decide(...)` before moving to the next one. `RunRecorder` rejects records that break the [Decision contract](references/decision-contract.md).
+- **Record before acting.** Write each gate with `case.decide(...)` before moving to the next one. `RunRecorder` rejects records that break the [Decision contract](references/decision-contract.md). Decision gates keep `execution_status="not_started"`; only the `execution` record carries `completed` or `failed`.
 
 ## Gates
 
@@ -48,7 +53,7 @@ Complete them in this order for every case:
 
 1. `paper_reconstruction`: build the study map — accessions, assay, sample inclusion and exclusion, factors and levels, primary estimand, planned contrasts, repeated-measure unit, normalization, method, and paper threshold, each with a locator in the paper.
 2. `ownership`: identify the matrix and metadata files and confirm they belong to the paper's accession and samples.
-3. `alignment`: map matrix columns to metadata samples with `native.align_to_metadata` (exact match on the index or on one named column, such as `title`). Never align by position. Record coverage and unmatched IDs. Pass the aligned files to every later tool so that no tool falls back to LLM alignment.
+3. `alignment`: map matrix columns to metadata samples with `native.align_to_metadata` (exact match on the index or on one named column, such as `title`). Never align by position. Record coverage and unmatched IDs. Then create short, formula-safe columns with `native.derive_columns` (for example `subject`, `time`, `grp`). Pass the aligned files to every later tool, so that no tool falls back to LLM alignment, and use the derived names in every formula and record.
 4. `matrix`: decide the matrix type from `native.profile_matrix` values plus file name, platform, and processing notes. Compare it with the paper's stated input. An ambiguous type stops the case.
 5. `design`: decide the estimand structure.
    - One control with several levels: one model with planned contrasts, never pooled levels.
@@ -60,10 +65,10 @@ Complete them in this order for every case:
    - Treat donor, subject, and animal keys as blocking decisions, not annotations.
    - Do not add covariates because of their column names.
    - A covariate completely confounded with the treatment stops the case. A design that is not full rank, or that has no residual degrees of freedom, also stops it.
-7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it; otherwise record the paper route as blocked and run a validated alternative as a declared deviation.
+7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it. Otherwise the method decision stays `valid`, carries `paper_route: {"method": ..., "status": "blocked", "reason": ...}`, and names the validated alternative that runs as a declared deviation.
 8. `threshold`: record `paper_threshold`, `threshold_source`, and the `applied_threshold`.
-9. `execution`: run the approved route with `native.call_tool(...)` or the multigroup executor, apply the threshold with `native.apply_threshold`, and register outputs with `case.add_output`.
-10. `study`: record the route (`paper_aligned`, `declared_deviation`, `exploratory`, or `stopped`), then call `case.finish(n_deg=..., deg_sanity=...)`.
+9. `execution`: run the approved route with `native.call_tool("tools.<module>:<function>", ...)`, which turns an import failure into a recordable `NativeToolError`. Apply the threshold with `native.apply_threshold` and register outputs with `case.add_output`. A failure is recorded as `valid` + `failed` with `final.execution_error`.
+10. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed. Then call `case.finish(n_deg=..., deg_sanity=...)`.
 
 After all cases:
 
@@ -73,15 +78,20 @@ After all cases:
 
 ## When to stop
 
-Use `refused` when the available data cannot identify the estimand, such as no exercise contrast or treatment aliased with batch. Use `manual_review` when a specific fact or executor could unblock it, such as unknown pairing, an ambiguous matrix scale, or a missing file. Small n alone is not a reason to stop: run the planned contrast and label it exploratory under the rule in the decision contract. Later gates of a stopped case are not recorded.
+Use `refused` when the available data cannot identify the estimand, such as no exercise contrast or treatment aliased with batch. Use `manual_review` when a specific fact or executor could unblock it, such as unknown pairing, an ambiguous matrix scale, or a missing file.
+
+Stop at the gate where the problem is established, after recording the earlier gates that establish it. For example, a sequenced sample set with no exercise arm is refused at `design`, after `ownership` and `alignment` confirm which samples exist. Do not record later gates or a `study` record for a stopped case; `case.finish()` marks its route `stopped`.
+
+Small n alone is not a reason to stop: run the planned contrast and label it exploratory under the rule in the decision contract.
 
 ## Final response
 
-For each case, report:
+Reply in the user's language. For each case, report:
 
 - what was reproduced exactly;
 - what ran as a declared deviation or exploratory analysis;
 - what was stopped, and why;
+- what failed to execute, and what to install;
 - the threshold used and its source.
 
 Do not summarize success by DEG or p-value counts.

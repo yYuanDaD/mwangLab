@@ -51,7 +51,8 @@ STAGE_FIELDS = {
     "execution": ("method",),
     "study": ("route",),
 }
-PAIRED_PATTERN = re.compile(r"paired|repeated|within[- ]subject|longitudinal|paired_change", re.I)
+PAIRED_PATTERN = re.compile(r"(?<![a-z])(?<!un)(?<!non-)(paired|repeated|within[- ]subject|longitudinal)", re.I)
+_METHOD_HEAD = re.compile(r"\s*(limma[- ]?voom|voom|deseq2|edger|limma|none|null|not_run)\b", re.I)
 COUNT_METHODS = ("deseq2", "edger", "limma-voom", "voom")
 
 
@@ -74,17 +75,17 @@ def matrix_family(value: Any) -> str:
 
 
 def method_family(value: Any) -> str:
-    """Leading method name only: 'limma (alternative to DESeq2)' is limma."""
-    head = str(value or "").lower().split("(")[0]
-    if "voom" in head:
+    """Family of the method named first: 'limma, deviation from DESeq2' is limma."""
+    text = str(value or "")
+    match = _METHOD_HEAD.match(text)
+    if not match:
+        return "none" if not text.strip() else "other"
+    name = match.group(1).lower()
+    if "voom" in name or name in {"deseq2", "edger"}:
         return "count"
-    if any(m in head for m in ("deseq2", "edger")):
-        return "count"
-    if "limma" in head:
+    if name == "limma":
         return "log_linear"
-    if not head.strip() or head.strip() in {"none", "null", "not_run"}:
-        return "none"
-    return "other"
+    return "none"
 
 
 def _evidence_errors(evidence: Any, source: str) -> list[str]:

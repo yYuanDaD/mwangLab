@@ -105,6 +105,13 @@ def main() -> int:
     if not rscript or capabilities["limma_voom"].get("r_limma") is not True:
         capabilities["limma_voom"]["available"] = False
     report["capabilities"] = capabilities
+    de_routes = ("deseq2", "limma_two_group", "limma_multigroup", "edger", "limma_voom")
+    report["de_capable"] = any(capabilities[name]["available"] for name in de_routes)
+    if not report["de_capable"]:
+        report["decision_only_note"] = (
+            "No differential-analysis executor is available. Decisions can still be made and "
+            "recorded; every valid plan will be recorded as execution failed with its error. "
+            "Tell the user and install the missing packages to execute.")
 
     native_ok = capabilities["native_runtime"]["available"]
     if native_ok:

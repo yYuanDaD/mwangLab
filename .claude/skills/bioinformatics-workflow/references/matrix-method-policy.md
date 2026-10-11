@@ -19,7 +19,7 @@ Decide the matrix type from the numeric profile (`native.profile_matrix`) togeth
 
 The default raw-count method is DESeq2. edgeR, limma-voom, or a comparison of several raw-count methods must be requested or justified. Proving that the matrix really holds raw integer counts comes before choosing among valid raw-count methods.
 
-When the paper's method needs an input that was not deposited (for example, DESeq2 when only FPKM is in GEO), the paper route is blocked. Record it as blocked in the `method` decision, run the valid alternative as a declared deviation, and label the study route `declared_deviation`. Never round FPKM or TPM into integers to satisfy a count method.
+When the paper's method needs an input that was not deposited (for example, DESeq2 when only FPKM is in GEO), the paper route is blocked. Keep the `method` decision `valid` for the alternative you will run, and add `paper_route: {"method": "DESeq2 on counts", "status": "blocked", "reason": ...}` to it. Run the alternative as a declared deviation, with `threshold_source: paper_on_deviation_route`, and label the study route `declared_deviation`. Never round FPKM or TPM into integers to satisfy a count method.
 
 ## Enforced checks
 

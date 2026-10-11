@@ -187,7 +187,7 @@ def aggregate_pseudobulk(matrix_path: str, sample_col: str, celltype_col: str,
     return manifest
 
 
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 @tool

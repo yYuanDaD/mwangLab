@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from patsy import dmatrix
 from inmoose.limma import lmFit, eBayes, topTable
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
 from tools.analysis_policy import (

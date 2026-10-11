@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 _METADATA_SIGNATURE_COLUMNS = {

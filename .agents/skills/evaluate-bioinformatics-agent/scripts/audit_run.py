@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,8 @@ BLOCKING_CHECKS = {
 # A native skill run marks a case that a decision gate stopped as "stopped:<stage>".
 # That is a finished, accounted outcome, not a failure.
 STOPPED_PREFIX = "stopped"
+ENVIRONMENT_ERROR = re.compile(r"ModuleNotFoundError|ImportError|No module named|cannot import|"
+                               r"unavailable|not installed|Rscript not found", re.I)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -196,14 +199,23 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                        "summary.csv has no rows.", "Write one row per requested study.")]
 
     statuses = [str(row.get("status", "")).lower() for row in rows]
-    failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses)
+    # A valid plan whose executor could not even be imported is an environment
+    # gap, not an agent error: it is reported, scored as not completed, and
+    # does not block the verdict on its own.
+    environment = [row for row, status in zip(rows, statuses)
+                   if status.startswith("failed_execution")
+                   and ENVIRONMENT_ERROR.search(str(row.get("stop_reason", "")))]
+    failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses) - len(environment)
     successful = sum(any(token in status for token in SUCCESS_TOKENS) or status.startswith(STOPPED_PREFIX)
                      for status in statuses)
     completion_status = "fail" if failed else "pass" if successful == len(rows) else "warn"
     checks = [_check("study_completion", "execution", completion_status,
                      8 * successful / len(rows), 8,
-                     f"successful={successful}/{len(rows)}, failed={failed}",
-                     "Inspect failed or partial rows and failures.log.")]
+                     f"successful={successful}/{len(rows)}, failed={failed}, "
+                     f"environment_blocked={len(environment)}",
+                     "Install the packages reported by preflight and rerun environment-blocked cases; "
+                     "inspect other failed rows.")]
+    checks[0]["environment_blocked"] = len(environment)
 
     has_route = all("matrix_type" in row and ("da_method" in row or "da_methods_run" in row)
                     for row in rows)
@@ -370,10 +382,13 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     score = round(100 * earned / available, 1) if available else 0.0
     coverage = round(100 * available / total, 1) if total else 0.0
     blockers = [item for item in checks if item["blocking"]]
+    environment_blocked = sum(int(item.get("environment_blocked", 0)) for item in checks)
     if blockers:
         verdict = "fail"
     elif coverage < 60:
         verdict = "insufficient_evidence"
+    elif environment_blocked:
+        verdict = "incomplete_environment"
     elif score >= 85:
         verdict = "pass"
     elif score >= 70:
@@ -397,6 +412,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
         "schema_version": "1.0", "run_dir": str(root), "verdict": verdict,
         "score": score, "coverage": coverage,
         "blocking_findings": [item["id"] for item in blockers],
+        "environment_blocked": environment_blocked,
         "dimensions": dimensions, "checks": checks,
     }
 
@@ -407,6 +423,7 @@ def _markdown(report: dict[str, Any]) -> str:
         f"- Observed score: **{report['score']}/100**",
         f"- Evidence coverage: **{report['coverage']}%**",
         f"- Blocking findings: {', '.join(report['blocking_findings']) or 'none'}",
+        f"- Environment-blocked executions: {report.get('environment_blocked', 0)}",
         "", "## Dimensions", "", "| Dimension | Score | Coverage |", "|---|---:|---:|",
     ]
     for name, values in report["dimensions"].items():
@@ -434,7 +451,7 @@ def main() -> int:
             json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         (output / "agent_evaluation.md").write_text(_markdown(report), encoding="utf-8")
     print(json.dumps({key: report[key] for key in
-                      ("verdict", "score", "coverage", "blocking_findings")},
+                      ("verdict", "score", "coverage", "blocking_findings", "environment_blocked")},
                      ensure_ascii=False))
     return 0
 

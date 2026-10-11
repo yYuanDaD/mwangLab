@@ -20,6 +20,7 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timezone
 import hashlib
+import importlib
 import json
 import os
 import platform
@@ -33,7 +34,7 @@ import numpy as np
 import pandas as pd
 
 from tools import decision_contract
-from tools.analysis_policy import LOG_SCALE_MAX, RAW_INTEGER_FRACTION, numeric_matrix
+from tools.analysis_policy import LOG_SCALE_MAX, RAW_INTEGER_FRACTION, PolicyViolation, numeric_matrix
 from tools.analysis_policy import profile_matrix as _profile
 
 NATIVE_ENV = "BIOAGENT_DISABLE_EXTERNAL_LLM"
@@ -88,17 +89,44 @@ def external_llm_status() -> dict:
     return {"disabled": disabled, "blocked_attempts": blocked_external_llm_attempts()}
 
 
-def call_tool(tool: Any, **kwargs) -> Any:
-    """Run a repository tool (LangChain ``@tool`` or plain function) and fail loudly.
+def load_tool(spec: str) -> Any:
+    """Import ``"module:function"`` (for example ``"tools.deseq2_tools:run_deseq2_analysis"``).
 
+    A missing package becomes a NativeToolError whose text can be recorded as
+    the execution_error, so a decision-only environment fails cleanly.
+    """
+    module_name, _, attribute = spec.partition(":")
+    if not attribute:
+        raise NativeToolError(f"tool spec must look like 'module:function', got {spec!r}")
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError as exc:
+        raise NativeToolError(f"cannot import {module_name}: {type(exc).__name__}: {exc}. "
+                              "Install the missing package (see the preflight report) and rerun.") from exc
+    try:
+        return getattr(module, attribute)
+    except AttributeError as exc:
+        raise NativeToolError(f"{module_name} has no {attribute!r}") from exc
+
+
+def call_tool(tool: Any, **kwargs) -> Any:
+    """Run a repository tool and fail loudly.
+
+    ``tool`` is a LangChain ``@tool``, a plain function, or a ``"module:function"``
+    string (preferred: an import failure then raises NativeToolError too).
     Raises NativeToolError when native mode is off, when the tool returns an
     error string, or when the tool tried to reach an external LLM.
     """
     if os.environ.get(NATIVE_ENV) != "1":
         raise NativeToolError("call enable_native_mode() before running repository tools")
+    if isinstance(tool, str):
+        tool = load_tool(tool)
     function = getattr(tool, "func", None) or tool
     before = len(external_llm_status()["blocked_attempts"])
-    result = function(**kwargs)
+    try:
+        result = function(**kwargs)
+    except PolicyViolation as exc:
+        raise NativeToolError(f"POLICY BLOCKED: {exc}") from exc
     attempts = external_llm_status()["blocked_attempts"][before:]
     if attempts:
         raise NativeToolError(
@@ -150,9 +178,14 @@ def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None
     if profile.integer_fraction < RAW_INTEGER_FRACTION and profile.min_value >= 0 \
             and profile.max_value > LOG_SCALE_MAX:
         candidates.append("linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts")
+    negative_fraction = float((finite < 0).mean()) if finite.size else 0.0
+    median = float(np.median(finite)) if finite.size else 0.0
     if profile.max_value <= LOG_SCALE_MAX:
-        candidates.append("log_scale" if profile.min_value >= 0 else
-                          "signed_log_scale (log ratios, M-values, or centered data)")
+        if profile.min_value >= 0 or (negative_fraction < 0.01 and median > 1):
+            candidates.append("log_scale" + ("" if profile.min_value >= 0 else
+                              " (a few small negative values, as in RMA or background-corrected arrays)"))
+        else:
+            candidates.append("signed_log_scale (log ratios, M-values, or centered data)")
     return {
         "path": str(path),
         "sha256": sha256(path),
@@ -163,9 +196,10 @@ def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None
         "duplicated_feature_ids": int(numeric.index.duplicated().sum()),
         "missing_values": int(values.size - finite.size),
         "negative_values": int((finite < 0).sum()),
+        "negative_fraction": round(negative_fraction, 6),
         "min": profile.min_value,
         "max": profile.max_value,
-        "median": float(np.median(finite)) if finite.size else None,
+        "median": median if finite.size else None,
         "integer_fraction": round(profile.integer_fraction, 4),
         "candidates": candidates,
         "note": "Candidates only. Decide the matrix type from these values together with the file "
@@ -228,6 +262,58 @@ def align_to_metadata(matrix_path: str | Path, metadata_path: str | Path, out_di
         "annotation_columns_dropped": [str(c) for c in raw.columns if c not in numeric.columns],
         "outputs": {name: {"path": str(p), "sha256": sha256(p)} for name, p in paths.items()},
     }
+
+
+def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
+                   aliases: dict[str, str] | None = None,
+                   patterns: dict[str, tuple[str, str]] | None = None,
+                   recode: dict[str, dict[str, str]] | None = None) -> dict:
+    """Write a metadata copy with short, formula-safe columns, and return the mapping.
+
+    GEO columns such as ``characteristics_ch1.1.time point`` cannot be used in a
+    patsy formula. Use this before any formula-based step:
+
+    - ``aliases``: ``{"subject": "characteristics_ch1.0.subject"}`` copies a column.
+    - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group.
+    - ``recode``: ``{"grp": {"sedentary_control": "sed", ...}}`` maps values of a new
+      column to safe labels; every value must be mapped.
+
+    Raises when a source column is missing, a pattern does not match every row,
+    or a recode leaves a value unmapped. Never guesses a label.
+    """
+    meta = _frame(metadata_csv)
+    record: dict[str, Any] = {"source": str(metadata_csv), "columns": {}}
+    for new, source in (aliases or {}).items():
+        if source not in meta.columns:
+            raise NativeToolError(f"alias source column {source!r} not in metadata")
+        meta[new] = meta[source]
+        record["columns"][new] = {"alias_of": source}
+    for new, (source, pattern) in (patterns or {}).items():
+        if source not in meta.columns:
+            raise NativeToolError(f"pattern source column {source!r} not in metadata")
+        extracted = meta[source].astype(str).str.extract(pattern, expand=False)
+        if extracted.isna().any():
+            missing = meta.index[extracted.isna()].tolist()[:5]
+            raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")
+        meta[new] = extracted
+        record["columns"][new] = {"source": source, "regex": pattern}
+    for column, mapping in (recode or {}).items():
+        if column not in meta.columns:
+            raise NativeToolError(f"recode column {column!r} not in metadata")
+        unmapped = sorted(set(meta[column].astype(str)) - set(mapping))
+        if unmapped:
+            raise NativeToolError(f"recode for {column!r} leaves values unmapped: {unmapped}")
+        meta[column] = meta[column].astype(str).map(mapping)
+        record["columns"].setdefault(column, {})["recode"] = mapping
+    for new in record["columns"]:
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", new):
+            raise NativeToolError(f"derived column name {new!r} is not formula-safe")
+    out = Path(out_csv)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    meta.to_csv(out)
+    record.update(output=str(out), sha256=sha256(out),
+                  levels={c: meta[c].astype(str).value_counts().to_dict() for c in record["columns"]})
+    return record
 
 
 def design_check(metadata: pd.DataFrame | str | Path, terms: Sequence[str],
@@ -432,33 +518,50 @@ class RunRecorder:
     """Write the standard native run layout.
 
     <run_dir>/run_manifest.json, run_status.json, summary.csv, workflow.log
-    <run_dir>/<case_id>/decisions.json, evidence.json, and any case files
+    <run_dir>/<case_id>/decisions.json, evidence.json, case_summary.json, case files
 
     Every decision record is checked against the decision contract when it is
     written, and every case is checked for cross-record invariants when it is
-    finished, so an inconsistent record is rejected instead of saved.
+    finished, so an inconsistent record is rejected instead of saved. State is
+    written to disk after every call, so a run can be continued from a later
+    process with ``RunRecorder.open(run_dir)``.
     """
 
     def __init__(self, run_dir: str | Path, *, request: str, platform_name: str,
-                 decision_maker: str, case_ids: Sequence[str] = ()):
-        from tools.run_status import RunStatusTracker
+                 decision_maker: str, case_ids: Sequence[str] = (), _resume: bool = False):
+        from tools.run_status import RunStatus, RunStatusTracker
 
         self.run_dir = Path(run_dir)
+        manifest_path = self.run_dir / "run_manifest.json"
+        if manifest_path.exists() and not _resume:
+            raise NativeToolError(f"{self.run_dir} already holds a run; continue it with "
+                                  "RunRecorder.open(run_dir) or choose a new directory")
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.run_id = self.run_dir.name
         self.cases: dict[str, CaseRecorder] = {}
-        self.rows: list[dict] = []
         self._case_order = list(case_ids)
-        self.tracker = RunStatusTracker(str(self.run_dir / "run_status.json"), run_id=self.run_id,
-                                        profile="native-skill", stages=GATES,
-                                        study_total=len(self._case_order))
-        self.tracker.start("native skill run started")
+        status_path = self.run_dir / "run_status.json"
+        previous_status = json.loads(status_path.read_text(encoding="utf-8")) if _resume and status_path.exists() else None
+        self.tracker = RunStatusTracker(str(status_path), run_id=self.run_id, profile="native-skill",
+                                        stages=GATES, study_total=len(self._case_order))
+        if previous_status:
+            self.tracker.state = RunStatus.model_validate(previous_status)
+            self.tracker._started_monotonic -= float(previous_status.get("elapsed_seconds") or 0)
+            self.tracker.state.finished_at = None
+        self.tracker.start("native skill run resumed" if _resume else "native skill run started")
+        if _resume:
+            self.manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self._llm_baseline = len(external_llm_status()["blocked_attempts"])
+            self._previous_attempts = list(self.manifest.get("external_llm", {}).get("blocked_attempts", []))
+            self.log("run resumed")
+            return
         self.manifest = {
             "run_id": self.run_id,
             "request": request,
             "platform": platform_name,
             "decision_maker": decision_maker,
             "contract_version": decision_contract.CONTRACT_VERSION,
+            "case_ids": list(case_ids),
             "repo_commit": _git_commit(),
             "python": sys.version.split()[0],
             "os": platform.platform(),
@@ -467,9 +570,30 @@ class RunRecorder:
         }
         # The blocked-attempt ledger is process-wide; count only this run's attempts.
         self._llm_baseline = len(self.manifest["external_llm"]["blocked_attempts"])
+        self._previous_attempts = []
         self.manifest["external_llm"]["blocked_attempts"] = []
         self._write_manifest()
         self.log(f"run started: {request}")
+
+    @classmethod
+    def open(cls, run_dir: str | Path) -> "RunRecorder":
+        """Continue a run written by an earlier process (for example one shell call per gate)."""
+        run_dir = Path(run_dir)
+        manifest_path = run_dir / "run_manifest.json"
+        if not manifest_path.exists():
+            raise NativeToolError(f"no run to continue in {run_dir}")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        run = cls(run_dir, request=manifest.get("request", ""), platform_name=manifest.get("platform", ""),
+                  decision_maker=manifest.get("decision_maker", ""), case_ids=manifest.get("case_ids", []),
+                  _resume=True)
+        for case_dir in sorted(p for p in run_dir.iterdir() if (p / "decisions.json").exists()):
+            run.cases[case_dir.name] = CaseRecorder._load(run, case_dir)
+            if case_dir.name not in run._case_order:
+                run._case_order.append(case_dir.name)
+        return run
+
+    def _attempts(self) -> list[dict]:
+        return self._previous_attempts + external_llm_status()["blocked_attempts"][self._llm_baseline:]
 
     def _write_manifest(self) -> None:
         (self.run_dir / "run_manifest.json").write_text(
@@ -492,25 +616,26 @@ class RunRecorder:
         for case in self.cases.values():
             if not case.finished:
                 case.finish()
+        rows = [self.cases[c].row for c in self._case_order if c in self.cases]
         with open(self.run_dir / "summary.csv", "w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=SUMMARY_COLUMNS, extrasaction="ignore")
             writer.writeheader()
-            for row in self.rows:
+            for row in rows:
                 writer.writerow(row)
-        failed = [r for r in self.rows if r["status"].startswith("failed")]
-        status = "completed" if not failed else "partial" if len(failed) < len(self.rows) else "failed"
-        llm = external_llm_status()
-        llm["blocked_attempts"] = llm["blocked_attempts"][self._llm_baseline:]
+        failed = [r for r in rows if r["status"].startswith("failed")]
+        status = "completed" if not failed else "partial" if len(failed) < len(rows) else "failed"
+        attempts = self._attempts()
         self.tracker.set_usage(llm_calls=0, estimated_cost_usd=0.0)
         for row in failed:
             self.tracker.add_failure(f"{row['case_id']}: {row.get('stop_reason') or 'execution failed'}")
-        self.tracker.finish(status, f"{len(self.rows)} case(s); {len(failed)} execution failure(s)")
-        self.manifest.update(finished_at=_now(), status=status, external_llm=llm,
-                             n_cases=len(self.rows))
+        self.tracker.finish(status, f"{len(rows)} case(s); {len(failed)} execution failure(s)")
+        self.manifest.update(finished_at=_now(), status=status, n_cases=len(rows),
+                             external_llm={"disabled": external_llm_status()["disabled"],
+                                           "blocked_attempts": attempts})
         self._write_manifest()
         self.log(f"run finished: {status}")
         return {"status": status, "summary_csv": str(self.run_dir / "summary.csv"),
-                "external_llm_blocked_attempts": len(llm["blocked_attempts"])}
+                "external_llm_blocked_attempts": len(attempts)}
 
 
 class CaseRecorder:
@@ -526,10 +651,46 @@ class CaseRecorder:
         self.evidence = EvidenceRecorder(run.run_id, subject_id=case_id)
         self._source_ids: dict[str, str] = {}
         self.finished = False
+        self.row: dict = {}
+
+    @classmethod
+    def _load(cls, run: RunRecorder, case_dir: Path) -> "CaseRecorder":
+        from tools.evidence import EvidenceBundle
+
+        state_path = case_dir / "case_state.json"
+        state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+        case = cls(run, case_dir.name, state.get("accession"))
+        case.records = json.loads((case_dir / "decisions.json").read_text(encoding="utf-8"))
+        evidence_path = case_dir / "evidence.json"
+        if evidence_path.exists():
+            case.evidence.bundle = EvidenceBundle.model_validate(
+                json.loads(evidence_path.read_text(encoding="utf-8")))
+            for source in case.evidence.bundle.sources:
+                case.evidence._source_keys[(source.origin, source.label, source.uri, source.locator)] = source.source_id
+            for artifact in case.evidence.bundle.artifacts:
+                case.evidence._artifact_paths[os.path.normpath(artifact.path)] = artifact.artifact_id
+        case._source_ids = state.get("source_ids", {})
+        case.finished = bool(state.get("finished"))
+        case.row = state.get("row", {})
+        return case
+
+    def _save_state(self) -> None:
+        self.evidence.save(str(self.dir / "evidence.json"))
+        (self.dir / "case_state.json").write_text(json.dumps({
+            "accession": self.accession, "source_ids": self._source_ids,
+            "finished": self.finished, "row": self.row}, indent=2, default=str), encoding="utf-8")
 
     def _evidence_item(self, path: Path, kind: str, source_id: str) -> dict:
         self._source_ids[f"{kind}:{path.name}"] = source_id
+        self._save_state()
         return {"id": f"{kind}:{path.name}", "kind": kind, "path": str(path), "sha256": sha256(path)}
+
+    def evidence_item(self, item_id: str) -> dict:
+        """Rebuild the evidence item for an input or output registered earlier (also after open())."""
+        if item_id not in self._source_ids:
+            raise NativeToolError(f"unknown evidence id {item_id!r}; known: {sorted(self._source_ids)}")
+        kind = item_id.split(":", 1)[0]
+        return {"id": item_id, "kind": kind}
 
     def add_input(self, path: str | Path, kind: str, label: str | None = None) -> dict:
         """Register an input (kind: paper, metadata, matrix, user, ...) and return its evidence item."""
@@ -554,6 +715,8 @@ class CaseRecorder:
                confidence: str, decision_status: str = "valid", execution_status: str = "not_started",
                candidates: Sequence[dict] = (), stop_reason: str | None = None,
                paper: dict | None = None) -> dict:
+        if self.finished:
+            raise NativeToolError(f"case {self.case_id} is already finished")
         record = {
             "contract_version": decision_contract.CONTRACT_VERSION,
             "case_id": self.case_id,
@@ -581,6 +744,7 @@ class CaseRecorder:
                                    details={"decision_status": decision_status,
                                             "execution_status": execution_status,
                                             "stop_reason": stop_reason})
+        self._save_state()
         if stage in GATES:
             self.run.tracker.set_stage(stage, message=f"{self.case_id}: {decision_status}")
         self.run.log(f"{self.case_id} {stage}: {decision_status}/{execution_status}"
@@ -607,21 +771,23 @@ class CaseRecorder:
             status = "decided_not_executed"
         design, method = self._final("design"), self._final("method")
         covariance, threshold = self._final("covariance"), self._final("threshold")
+        if blocked:  # a stopped case reports no contrast
+            design, method, threshold = {}, {}, {}
         contrasts = design.get("contrasts") or []
         treatment = design.get("treatment")
         if not treatment and contrasts:
             treatment = "; ".join(str(c.get("name", c)) if isinstance(c, dict) else str(c) for c in contrasts)
-        row = {
+        execution_error = next((r["final"].get("execution_error") for r in self.records
+                                if r["stage"] == "execution" and r["final"].get("execution_error")), "")
+        self.row = {
             "case_id": self.case_id,
             "accession": self.accession or "",
             "status": status,
             "decision_status": blocked["decision_status"] if blocked else "valid",
             "execution_status": executions[-1] if executions else "not_run",
             "stop_stage": blocked["stage"] if blocked else "",
-            "stop_reason": blocked["stop_reason"] if blocked else
-            next((r["final"].get("execution_error") for r in self.records
-                  if r["stage"] == "execution" and r["final"].get("execution_error")), ""),
-            "route": self._final("study").get("route", "stopped" if blocked else ""),
+            "stop_reason": blocked["stop_reason"] if blocked else execution_error,
+            "route": "stopped" if blocked else self._final("study").get("route", ""),
             "matrix_type": self._final("matrix").get("matrix_type", ""),
             "da_method": method.get("method", ""),
             "design_col": design.get("design_column") or design.get("formula", ""),
@@ -638,8 +804,7 @@ class CaseRecorder:
             "deg_sanity": deg_sanity or ("" if n_deg is None else "ok"),
         }
         self.evidence.finish(status=status)
-        self.evidence.save(str(self.dir / "evidence.json"))
-        self.run.rows.append(row)
         self.finished = True
+        self._save_state()
         self.run.log(f"{self.case_id} finished: {status}")
-        return row
+        return self.row

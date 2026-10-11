@@ -15,22 +15,59 @@ Several repository paths call an external model (DeepSeek or Claude) when they r
 ## Calling convention
 
 ```python
+import math
 from tools import native
-from tools.deseq2_tools import run_deseq2_analysis
 
 native.enable_native_mode()
-message = native.call_tool(run_deseq2_analysis, counts_csv=..., metadata_csv=..., design_column=...,
-                           control_group=..., treatment_group=..., output_dir=...,
-                           covariate_columns="subject")
+try:
+    message = native.call_tool("tools.deseq2_tools:run_deseq2_analysis",
+                               counts_csv=..., metadata_csv=..., design_column="time",
+                               control_group="pre", treatment_group="post", output_dir=...,
+                               covariate_columns="subject")
+except native.NativeToolError as error:
+    ...  # record execution: decision_status="valid", execution_status="failed",
+         # final={"method": ..., "execution_error": str(error)}
 deg = native.deg_outputs(output_dir)[0]
 counts = native.apply_threshold(deg, metric="padj", cutoff=0.05, effect_cutoff=None)
+# FC 1.5 in the paper: effect_cutoff=math.log2(1.5)
 ```
 
 How `call_tool` behaves:
-- It unwraps LangChain `@tool` objects, so the tool runs as a plain function.
+- It accepts a `"module:function"` string (preferred), a LangChain `@tool`, or a plain function. A string turns a missing package into a `NativeToolError` whose text is the `execution_error` to record.
+- It runs the tool as a plain function. LangChain is optional: the analysis modules fall back to a plain decorator (`tools/tooling.py`), so preprocessing, QC, and executors need only their own scientific packages.
 - It raises `NativeToolError` when the tool's return text reports a failure or refusal (`FATAL ERROR`, `POLICY BLOCKED`, `... failed`, `unavailable`, and similar).
 
-When an import fails because a package is missing, record the execution as failed with the error text. Do not write a substitute model.
+Never write a substitute model for a missing executor.
+
+## Formula-safe column names
+
+GEO metadata columns such as `characteristics_ch1.1.time point` cannot appear in a patsy formula, and the validator checks blocking terms by name. After alignment, write a metadata copy with short columns and use only those names afterwards:
+
+```python
+derived = native.derive_columns(
+    aligned_metadata, case.dir / "aligned" / "design_metadata.csv",
+    aliases={"subject": "characteristics_ch1.0.subject", "time": "characteristics_ch1.1.time point"},
+    patterns={"grp": ("title", r"soleus_(.+)_rep\d+")},
+    recode={"grp": {"sedentary_control": "sed", "exercise_0_h_post": "ex0h"}})
+```
+
+- `aliases` copies a column under a new name.
+- `patterns` extracts a regex group and fails unless every row matches.
+- `recode` must map every value.
+
+Record `derived` (sources, regexes, mappings, levels) as evidence in the alignment or design decision. Then write formulas, `blocking_terms`, and executor arguments with the short names, for example `~ subject + time` with `blocking_terms: ["subject"]`.
+
+## Continuing a run
+
+`RunRecorder` and `CaseRecorder` write their state to disk after every call: `decisions.json`, `evidence.json`, and `case_state.json`. An agent that runs one command per gate continues with:
+
+```python
+run = native.RunRecorder.open("output/<run_name>")
+case = run.case("case_01")
+meta = case.evidence_item("metadata:GSE1_metadata.csv")  # reuse an evidence item registered earlier
+```
+
+Creating a new `RunRecorder` on an existing run directory raises, so nothing is overwritten.
 
 ## Evidence helpers
 
@@ -40,6 +77,7 @@ These summarize evidence; none of them decides.
 |---|---|
 | `profile_matrix(path)` | integer fraction, range, negatives, missing values, annotation columns, type candidates |
 | `align_to_metadata(matrix, metadata, out_dir, key_column=None)` | exact alignment on the metadata index or one column; writes `aligned_matrix.csv` (columns renamed to sample IDs), `aligned_metadata.csv`, `alignment_map.csv` |
+| `derive_columns(meta, out_csv, aliases, patterns, recode)` | formula-safe metadata columns with a recorded mapping (see below) |
 | `log_transform(matrix, out_csv)` | `log2(x+1)` for linear FPKM/TPM/intensity; refuses data that already look log-scale |
 | `pairing_report(meta, subject_col, condition_col, levels)` | complete, incomplete, and duplicated subjects across levels |
 | `confounding_report(meta, primary)` | each column's relation to the primary factor: `complete_confounding`, `nested_in_primary`, `crossed`, ... |
@@ -57,14 +95,14 @@ All executors read the aligned files. Raw-count executors require integer counts
 | limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="")` |
 | edgeR, two arms, no covariates | `run_edger_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | limma-voom (needs R + limma) | `run_limma_voom_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
-| one model, several levels / factorial / paired change | `tools.multigroup_tools.run_multigroup_analysis(expression_csv, metadata_csv, plan, output_dir)` (plain function; raises `PolicyViolation`) |
+| one model, several levels / factorial / paired change | `tools.multigroup_tools:run_multigroup_analysis(expression_csv, metadata_csv, plan, output_dir)` (plain function; through `call_tool` a `PolicyViolation` becomes a `NativeToolError`) |
 | log2(CPM+1) for raw counts before limma | `preprocess_counts(counts_csv, output_dir)` → `*_normalized.csv` |
 | single-cell pseudobulk | `run_scrna_pseudobulk_da(matrix_path, sample_col, celltype_col, condition_col, control_group, treatment_group, ..., paired=False)` |
 | methylation beta values | `run_methylation_da(beta_matrix_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | GSEA (Hallmark) | `run_gsea_analysis(deg_csv, organism, ranking_metric="stat", output_dir=...)` |
 | ORA | `run_enrichment_analysis(deg_csv, organism, padj_cutoff, log2fc_cutoff, ...)`; pass the paper's cutoffs explicitly (default `log2fc_cutoff=1.0`) |
 
-Blocking with DESeq2 or limma: pass the subject column in `covariate_columns`. The tool validates the design and fits `Treatment` plus the covariate; internally it renames covariates to safe names such as `Covariate0`. In the records, write the model in metadata column names (for example `~ subject + time`) in `method.final.formula`, and the subject column in `covariance.final.blocking_terms`. The validator checks that every required blocking term appears in the recorded formula.
+Blocking with DESeq2 or limma: pass the derived subject column in `covariate_columns`. The tool validates the design and fits `Treatment` plus the covariate; internally it renames covariates to safe names such as `Covariate0`. In the records, write the model with the derived names (for example `~ subject + time`) in `method.final.formula`, and the same subject name in `covariance.final.blocking_terms`. The validator checks that every required blocking term appears in the recorded formula.
 
 ### Multigroup plan
 
@@ -88,8 +126,9 @@ Paired change (follow-up minus baseline within each subject, then a group model 
 ```
 
 Plan rules:
-- Coefficient names are patsy column names. Create short, safe level labels first (for example `sed`, `ex6h`) when the original values contain spaces or punctuation, and record the mapping.
-- `derived_columns` (`{"name": {"source_column": ..., "regex": ...}}`) extracts labels from titles deterministically.
+- Coefficient names are patsy column names: `C(<column>)[<level>]` for `~ 0 + C(column)`, and `C(<column>)[T.<level>]` for treatment-coded terms. Create short, safe column names and level labels first with `native.derive_columns` (for example `grp` with levels `sed`, `ex6h`), and record the mapping.
+- Check the plan with `native.design_check(design_metadata, ["grp"])` before calling the executor. Use the same derived file for both.
+- The executor's own `derived_columns` (`{"name": {"source_column": ..., "regex": ...}}`) still works, but deriving beforehand lets every check see the same columns.
 - Paired change writes `paired_change_pairs.json` with complete pairs and excluded subjects. Report the exclusions.
 - Each contrast is BH-adjusted within itself, and the executor's `n_deg` uses `padj < 0.05`. Apply the paper threshold with `apply_threshold`.
 
@@ -107,6 +146,7 @@ Plan rules:
   <case_id>/
     decisions.json     decision-contract records, in gate order
     evidence.json      sources, decisions, artifacts with SHA-256
+    case_state.json    recorder state (evidence ids, summary row) for RunRecorder.open
     paper_reconstruction.json, paper_data_discrepancies.json,
     reproduction_plan.json, reproduction_summary.json
     aligned/ results/  files produced for this case

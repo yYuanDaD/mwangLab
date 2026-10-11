@@ -173,7 +173,7 @@ def _ensembl_to_symbol(ensembl_ids: list[str], species: str) -> list[str]:
     return symbols
 
 
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 @tool

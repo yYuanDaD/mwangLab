@@ -2,7 +2,7 @@ import os
 import re
 import pandas as pd
 import numpy as np
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 # Column names that commonly hold a gene SYMBOL in GEO/TALON supplementary matrices.
