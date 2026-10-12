@@ -62,6 +62,8 @@ Send back `output/preflight.json` and `output/skill_selftest_*/selftest_report.j
 
 ### G. Live Codex run
 
+Status (2026-10-11): verified by the user on Codex; not scored here. A blind checkout is at `output/stage_g/repo` (9 cases) if a scored run is wanted later.
+
 Run the Codex CLI in a clean checkout with network enabled:
 
 ```bash
@@ -79,6 +81,8 @@ Exit: every case passes, the record is `VALID`, and the audit verdict is `pass`,
 Run one GEO study with a trusted reference (a BO benchmark contrast, or GSE132520) through the skill with execution. Compare logFC, direction, and DEG overlap with the reference.
 
 Exit: the agreement metrics are reported, and any difference is explained by a recorded decision.
+
+Setup (2026-10-11): study GSE195482 (HFpEF diet vs chow in WT cardiomyocytes, female `WMF_vs_WCF` and male `WMM_vs_WCM`, 3 vs 3 raw counts). Reference: Bo's R DESeq2 tables in `F:\RNAseqData4Testing\GSE195482`. Blind workspace: `output/stage_h/repo` with `cases/GSE195482/` (two matrices, metadata, `paper.md` from the published article); Bo's results and scripts withheld, and the 2026-10-09 handoff note (which lists earlier DEG counts) removed. Scoring: `test/experiments/stage_h_bo_reference/compare_to_reference.py` against `*.allgene.DEseq2.txt`.
 
 ### I. Wrap-up
 
