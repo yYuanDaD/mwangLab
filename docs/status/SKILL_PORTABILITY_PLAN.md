@@ -88,8 +88,7 @@ Result (2026-10-13, Codex on Windows): **done**, details in `test/experiments/st
 
 ### I. Wrap-up
 
-- Add the stage D–H results to `docs/reviews/SKILL_REVIEW_20261010.md`, or a follow-up review.
-- Open a PR to `main`, and keep `sync_skills.py --check` in the test run.
+Status (2026-10-13): review written ([SKILL_REVIEW_20261013.md](../reviews/SKILL_REVIEW_20261013.md)); unit tests compared with `main` (no regressions); pull request to `main` opened from `zoutongfei/skill-portability`. Open items are listed at the end of the review.
 
 ## Known limits
 
