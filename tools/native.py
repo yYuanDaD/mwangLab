@@ -730,6 +730,120 @@ def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float 
 
 # ---------------------------------------------------------------- run layout
 
+# ---------------------------------------------------------------- decision trace
+#
+# While a RunRecorder is active, every helper call, repository tool call, and
+# decision is appended to <run_dir>/trace.jsonl. Agents need not do anything:
+# the trace is a by-product of the normal API. scripts/analyze_traces.py turns
+# traces from many runs into stop, revision, confidence, and tool-failure
+# statistics and a review sheet.
+
+_ACTIVE_RUN: "RunRecorder | None" = None
+_TRACE_DEPTH = 0
+_RESULT_KEYS = ("method", "n_aligned", "n_metadata", "coverage", "verdict", "aliased", "status",
+                "n_complete", "n_significant", "deg_sanity", "dominant_type", "gene_set_ready",
+                "rank", "residual_df", "candidates", "n_features", "n_samples")
+
+
+def _short(value: Any) -> Any:
+    """A compact, JSON-safe summary of an argument: file names, not full paths or data."""
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, Path) or (isinstance(value, str) and ("/" in value or "\\" in value)):
+        return Path(str(value)).name
+    if isinstance(value, str):
+        return value if len(value) <= 80 else value[:77] + "..."
+    if isinstance(value, pd.DataFrame):
+        return f"<DataFrame {value.shape[0]}x{value.shape[1]}>"
+    if isinstance(value, (list, tuple, set)):
+        items = list(value)
+        return [_short(v) for v in items] if len(items) <= 6 else f"<{len(items)} items>"
+    if isinstance(value, dict):
+        return {str(k): _short(v) for k, v in list(value.items())[:8]}
+    return f"<{type(value).__name__}>"
+
+
+def _result_summary(result: Any) -> Any:
+    if isinstance(result, dict):
+        return {k: _short(result[k]) for k in _RESULT_KEYS if k in result}
+    if isinstance(result, str):
+        first = result.strip().splitlines()[0] if result.strip() else ""
+        return first[:160]
+    if isinstance(result, (list, tuple)):
+        return f"<{len(result)} items>"
+    return _short(result)
+
+
+def _tool_label(tool: Any) -> str:
+    if isinstance(tool, str):
+        return tool.rpartition(":")[2] or tool
+    function = getattr(tool, "func", None) or tool
+    return getattr(function, "__name__", type(tool).__name__)
+
+
+def trace_event(kind: str, **fields) -> None:
+    """Append an event to the active run's trace (a no-op without an active run)."""
+    if _ACTIVE_RUN is not None:
+        _ACTIVE_RUN._trace(kind, **fields)
+
+
+def note(message: str, **fields) -> None:
+    """Record a free-text note in the trace, for example why a gate needed a second look."""
+    trace_event("note", message=str(message)[:500], **{k: _short(v) for k, v in fields.items()})
+
+
+def _traced(function):
+    import functools
+    import time
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        global _TRACE_DEPTH
+        if _ACTIVE_RUN is None or _TRACE_DEPTH:
+            return function(*args, **kwargs)
+        if function.__name__ == "call_tool":
+            label = "tool:" + _tool_label(args[0] if args else kwargs.get("tool"))
+            shown = {k: _short(v) for k, v in kwargs.items()}
+        else:
+            label = function.__name__
+            names = function.__code__.co_varnames[:function.__code__.co_argcount]
+            shown = {**{n: _short(a) for n, a in zip(names, args)},
+                     **{k: _short(v) for k, v in kwargs.items()}}
+        started = time.monotonic()
+        _TRACE_DEPTH += 1
+        try:
+            result = function(*args, **kwargs)
+        except Exception as exc:
+            text = str(exc).strip().splitlines()[0] if str(exc).strip() else ""
+            trace_event("call", name=label, args=shown, ok=False,
+                        duration_s=round(time.monotonic() - started, 3),
+                        error=f"{type(exc).__name__}: {text}"[:300])
+            raise
+        finally:
+            _TRACE_DEPTH -= 1
+        trace_event("call", name=label, args=shown, ok=True,
+                    duration_s=round(time.monotonic() - started, 3), result=_result_summary(result))
+        return result
+
+    return wrapper
+
+
+TRACED_FUNCTIONS = (
+    "call_tool", "profile_matrix", "align_to_metadata", "derive_columns", "design_check",
+    "confounding_report", "pairing_report", "log_transform", "beta_to_m", "feature_id_report",
+    "collapse_to_genes", "complete_pairs_subset", "apply_threshold",
+)
+for _name in TRACED_FUNCTIONS:
+    globals()[_name] = _traced(globals()[_name])
+del _name
+
+
+def _changed_keys(before: dict, after: dict) -> list[str]:
+    keys = set(before) | set(after)
+    return sorted(k for k in keys if json.dumps(before.get(k), sort_keys=True, default=str)
+                  != json.dumps(after.get(k), sort_keys=True, default=str))
+
+
 def _git_commit() -> str | None:
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True,
@@ -764,6 +878,12 @@ class RunRecorder:
         self.run_id = self.run_dir.name
         self.cases: dict[str, CaseRecorder] = {}
         self._case_order = list(case_ids)
+        self.active_case: str | None = None
+        trace_path = self.run_dir / "trace.jsonl"
+        self._trace_seq = (sum(1 for _ in open(trace_path, encoding="utf-8"))
+                           if _resume and trace_path.exists() else 0)
+        global _ACTIVE_RUN
+        _ACTIVE_RUN = self
         status_path = self.run_dir / "run_status.json"
         previous_status = json.loads(status_path.read_text(encoding="utf-8")) if _resume and status_path.exists() else None
         # enrichment is optional, so it is not counted as an expected stage
@@ -780,6 +900,7 @@ class RunRecorder:
             self._llm_baseline = len(external_llm_status()["blocked_attempts"])
             self._previous_attempts = list(self.manifest.get("external_llm", {}).get("blocked_attempts", []))
             self.log("run resumed")
+            self._trace("run_resume")
             return
         self.manifest = {
             "run_id": self.run_id,
@@ -801,6 +922,8 @@ class RunRecorder:
         self.manifest["external_llm"]["blocked_attempts"] = []
         self._write_manifest()
         self.log(f"run started: {request}")
+        self._trace("run_start", platform=platform_name, decision_maker=decision_maker,
+                    n_cases=len(self._case_order))
 
     @classmethod
     def open(cls, run_dir: str | Path) -> "RunRecorder":
@@ -830,13 +953,31 @@ class RunRecorder:
         with open(self.run_dir / "workflow.log", "a", encoding="utf-8") as handle:
             handle.write(f"{_now()} {message}\n")
 
+    def _trace(self, kind: str, **fields) -> None:
+        """Append one trace event. Tracing never interrupts an analysis: a write
+        failure (for example a deleted run directory) detaches this run instead."""
+        global _ACTIVE_RUN
+        self._trace_seq += 1
+        event = {"seq": self._trace_seq, "t": _now(), "kind": kind,
+                 "case": fields.pop("case", self.active_case), **fields}
+        try:
+            with open(self.run_dir / "trace.jsonl", "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(event, ensure_ascii=False, default=str) + "\n")
+        except OSError:
+            if _ACTIVE_RUN is self:
+                _ACTIVE_RUN = None
+
     def case(self, case_id: str, accession: str | None = None) -> "CaseRecorder":
+        global _ACTIVE_RUN
+        _ACTIVE_RUN = self
+        self.active_case = case_id
         if case_id not in self.cases:
             if case_id not in self._case_order:
                 self._case_order.append(case_id)
             index = self._case_order.index(case_id) + 1
             self.tracker.begin_study(accession or case_id, index, len(self._case_order))
             self.cases[case_id] = CaseRecorder(self, case_id, accession)
+            self._trace("case_start", accession=accession)
         return self.cases[case_id]
 
     def finish(self) -> dict:
@@ -866,6 +1007,10 @@ class RunRecorder:
                                            "blocked_attempts": attempts})
         self._write_manifest()
         self.log(f"run finished: {status}")
+        self._trace("run_finish", case=None, status=status, n_cases=len(rows), n_failed=len(failed))
+        global _ACTIVE_RUN
+        if _ACTIVE_RUN is self:
+            _ACTIVE_RUN = None
         return {"status": status, "summary_csv": str(self.run_dir / "summary.csv"),
                 "external_llm_blocked_attempts": len(attempts)}
 
@@ -964,10 +1109,20 @@ class CaseRecorder:
             "stop_reason": stop_reason,
             "recorded_at": _now(),
         }
+        self.run.active_case = self.case_id
+        previous = [r for r in self.records if r["stage"] == stage]
         errors = decision_contract.check_record(record, f"{self.case_id}/{stage}")
         if errors:
+            self.run._trace("decision_rejected", case=self.case_id, stage=stage,
+                            decision_status=decision_status, errors=[e[:200] for e in errors[:5]])
             raise NativeToolError("decision record rejected:\n" + "\n".join(errors))
         self.records.append(record)
+        self.run._trace("decision", case=self.case_id, stage=stage, decision_status=decision_status,
+                        execution_status=execution_status, confidence=confidence,
+                        revision=len(previous),
+                        changed=_changed_keys(previous[-1]["final"], final) if previous else [],
+                        stop_reason=stop_reason, n_candidates=len(record["candidates"]),
+                        n_evidence=len(record["evidence"]), reasoning_chars=len(reasoning or ""))
         (self.dir / "decisions.json").write_text(
             json.dumps(self.records, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
         source_ids = [self._source_ids[e["id"]] for e in evidence if e.get("id") in self._source_ids]
@@ -990,6 +1145,7 @@ class CaseRecorder:
     def finish(self, *, n_deg: int | None = None, deg_sanity: str | None = None) -> dict:
         errors = decision_contract.check_case(self.records, self.case_id)
         if errors:
+            self.run._trace("case_rejected", case=self.case_id, errors=[e[:200] for e in errors[:5]])
             raise NativeToolError("case records are inconsistent:\n" + "\n".join(errors))
         blocked = next((r for r in self.records if r["decision_status"] in decision_contract.BLOCKED
                         and r["stage"] != "enrichment"), None)
@@ -1047,4 +1203,7 @@ class CaseRecorder:
         self.finished = True
         self._save_state()
         self.run.log(f"{self.case_id} finished: {status}")
+        self.run._trace("case_finish", case=self.case_id, status=status,
+                        stop_stage=self.row["stop_stage"], n_records=len(self.records),
+                        n_deg=self.row["n_deg"])
         return self.row

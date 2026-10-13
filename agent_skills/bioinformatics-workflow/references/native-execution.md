@@ -167,6 +167,9 @@ Plan rules:
   summary.csv          one row per case: status, matrix_type, da_method, transform, contrast, covariance,
                        threshold, enrichment, stop_reason (blocked gates), execution_error (failed runs)
   workflow.log         one line per decision and case outcome
+  trace.jsonl          decision trace: every helper and tool call (arguments as file names, duration,
+                       success or error), every decision with its revision number and changed fields,
+                       records the contract rejected, case and run outcomes
   preflight.json       output of scripts/preflight.py (write it here)
   <case_id>/
     decisions.json     decision-contract records, in gate order
@@ -195,3 +198,12 @@ run.finish()
 ```
 
 `case.decide` raises `NativeToolError` when a record misses a required field. `case.finish` raises when the case breaks an invariant, for example a completed execution after a blocked gate. Fix the record; do not bypass the recorder.
+
+## Decision trace
+
+`trace.jsonl` is written automatically while a `RunRecorder` is active; nothing extra is needed. Keep the trace honest:
+- Revise a gate by calling `case.decide` again for the same stage. Do not edit `decisions.json`; the revision and its changed fields are the record of the second look.
+- Use `confidence` as you mean it. `medium` or `low` marks the gate for review.
+- When a gate needed a second look for a reason the records do not show, add one line with `native.note("why", stage="design")`.
+
+After a run, or across many runs, `python scripts/analyze_traces.py <runs...> --out <dir>` reports where cases stopped, which gates were revised or not high-confidence, which tools failed, and writes `review_sheet.csv` for expert review.
