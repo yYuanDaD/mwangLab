@@ -838,6 +838,17 @@ for _name in TRACED_FUNCTIONS:
 del _name
 
 
+def decision_slot(stage: str, final: dict) -> tuple:
+    """The thing a decision record is about. Two records in the same slot are a
+    revision; enrichment methods and per-subset executions are separate slots."""
+    final = final or {}
+    if stage == "enrichment":
+        return (stage, str(final.get("method") or "").split("(")[0].strip().lower())
+    if stage == "execution":
+        return (stage, str(final.get("subset") or ""))
+    return (stage,)
+
+
 def _changed_keys(before: dict, after: dict) -> list[str]:
     keys = set(before) | set(after)
     return sorted(k for k in keys if json.dumps(before.get(k), sort_keys=True, default=str)
@@ -1110,7 +1121,8 @@ class CaseRecorder:
             "recorded_at": _now(),
         }
         self.run.active_case = self.case_id
-        previous = [r for r in self.records if r["stage"] == stage]
+        slot = decision_slot(stage, final)
+        previous = [r for r in self.records if decision_slot(r["stage"], r["final"]) == slot]
         errors = decision_contract.check_record(record, f"{self.case_id}/{stage}")
         if errors:
             self.run._trace("decision_rejected", case=self.case_id, stage=stage,

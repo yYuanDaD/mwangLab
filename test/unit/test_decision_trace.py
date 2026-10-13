@@ -154,6 +154,35 @@ class DecisionTraceTests(unittest.TestCase):
             self.assertEqual(summary["stops"][0]["reason"], "no exercise contrast")
             self.assertEqual(len(rows), 1)
 
+    def test_separate_methods_and_subsets_are_not_revisions(self):
+        self.assertNotEqual(native.decision_slot("enrichment", {"method": "ORA (Enrichr GO/KEGG)"}),
+                            native.decision_slot("enrichment", {"method": "GSEA preranked Hallmark"}))
+        self.assertNotEqual(native.decision_slot("execution", {"subset": "CD14 monocyte"}),
+                            native.decision_slot("execution", {"subset": "CD4 T cell"}))
+        self.assertEqual(native.decision_slot("design", {"control": "a"}),
+                         native.decision_slot("design", {"control": "b"}))
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "run"
+            (run / "c1").mkdir(parents=True)
+            (run / "run_manifest.json").write_text("{}", encoding="utf-8")
+            base = {"decision_status": "valid", "execution_status": "completed", "confidence": "high",
+                    "reasoning": "r", "evidence": []}
+            records = [
+                {**base, "stage": "execution", "final": {"method": "limma", "subset": "A"}},
+                {**base, "stage": "execution", "final": {"method": "limma", "subset": "B"}},
+                {**base, "stage": "enrichment", "final": {"method": "ORA (Enrichr GO/KEGG)"}},
+                {**base, "stage": "enrichment", "final": {"method": "GSEA preranked Hallmark"}},
+                {**base, "stage": "enrichment", "final": {"method": "GSEA preranked Hallmark",
+                                                          "ranking_metric": "stat"}},
+            ]
+            (run / "c1" / "decisions.json").write_text(json.dumps(records), encoding="utf-8")
+            summary, _ = analyze_traces.analyze([run])
+            stages = {s["stage"]: s for s in summary["stages"]}
+            self.assertEqual(stages["execution"]["revised_cases"], 0)
+            self.assertEqual(stages["execution"]["cases"], 1)
+            self.assertEqual(stages["enrichment"]["revised_cases"], 1)  # only the GSEA re-record
+            self.assertEqual(stages["enrichment"]["changed_fields"], {"ranking_metric": 1})
+
     def test_tracing_never_breaks_analysis(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)

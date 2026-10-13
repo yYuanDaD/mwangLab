@@ -84,6 +84,8 @@ Exit: the agreement metrics are reported, and any difference is explained by a r
 
 Setup (2026-10-11): study GSE195482 (HFpEF diet vs chow in WT cardiomyocytes, female `WMF_vs_WCF` and male `WMM_vs_WCM`, 3 vs 3 raw counts). Reference: Bo's R DESeq2 tables in `F:\RNAseqData4Testing\GSE195482`. Blind workspace: `output/stage_h/repo` with `cases/GSE195482/` (two matrices, metadata, `paper.md` from the published article); Bo's results and scripts withheld, and the 2026-10-09 handoff note (which lists earlier DEG counts) removed. Scoring: `test/experiments/stage_h_bo_reference/compare_to_reference.py` against `*.allgene.DEseq2.txt`.
 
+Result (2026-10-13, Codex on Windows): **done**, details in `test/experiments/stage_h_bo_reference/RESULTS.md`. All 24 decision records `VALID` and scientifically correct (sex-stratified pairwise contrasts, raw counts with DESeq2, no blocking, paper threshold, PyDESeq2 deviation declared). Agreement with Bo: log2FC Pearson 1.000 over about 17,000 genes, direction 100%, DEG Jaccard 0.910 (female) and 0.904 (male), recovery 96% and 94%. The gene-set differences sit at padj 0.04 to 0.06 and come from PyDESeq2 against R DESeq2, mainly the low-count pre-filter, which is now an explicit `min_total_count` option recorded as `prefilter`. Caveat: Codex ran from the main repository, so the run was not strictly blind and has no trace.
+
 ### I. Wrap-up
 
 - Add the stage D–H results to `docs/reviews/SKILL_REVIEW_20261010.md`, or a follow-up review.

@@ -33,6 +33,16 @@ sys.path.insert(0, str(ROOT))
 
 from tools.decision_contract import BLOCKED, STAGES  # noqa: E402
 
+
+def decision_slot(stage: str, final: dict) -> tuple:
+    """Same rule as tools.native.decision_slot, without importing pandas."""
+    final = final or {}
+    if stage == "enrichment":
+        return (stage, str(final.get("method") or "").split("(")[0].strip().lower())
+    if stage == "execution":
+        return (stage, str(final.get("subset") or ""))
+    return (stage,)
+
 REVIEW_COLUMNS = [
     "run_id", "case_id", "accession", "stage", "record_index", "decision_status", "execution_status",
     "confidence", "revisions", "stop_reason", "final", "reasoning", "evidence_ids",
@@ -153,18 +163,21 @@ def analyze(runs: list[Path]) -> tuple[dict, list[dict]]:
         for case_id, case in cases.items():
             n_cases += 1
             records = case["records"]
-            by_stage = defaultdict(list)
+            by_slot = defaultdict(list)
             for index, record in enumerate(records):
-                by_stage[record.get("stage")].append((index, record))
+                by_slot[decision_slot(record.get("stage"), record.get("final"))].append((index, record))
             clean = not rejected_by_case.get(case_id)
-            for stage, items in by_stage.items():
+            revised_stages = set()
+            for slot, items in by_slot.items():
+                stage = slot[0]
                 stats = stage_stats.setdefault(stage, {"records": 0, "cases": 0, "status": Counter(),
                                                        "confidence": Counter(), "revised_cases": 0,
                                                        "rejected": 0})
                 stats["records"] += len(items)
-                stats["cases"] += 1
                 if len(items) > 1:
-                    stats["revised_cases"] += 1
+                    if stage not in revised_stages:
+                        stats["revised_cases"] += 1
+                        revised_stages.add(stage)
                     clean = False
                     for (_, before), (_, after) in zip(items, items[1:]):
                         keys = sorted(k for k in set(before.get("final", {})) | set(after.get("final", {}))
@@ -194,6 +207,8 @@ def analyze(runs: list[Path]) -> tuple[dict, list[dict]]:
                         "evidence_ids": "; ".join(str(e.get("id", "")) for e in record.get("evidence", [])),
                         "reviewer_correct": "", "reviewer_issue_type": "", "reviewer_note": "",
                     })
+            for stage in {r.get("stage") for r in records}:
+                stage_stats[stage]["cases"] += 1
             blocked = next((r for r in records if r.get("decision_status") in BLOCKED
                             and r.get("stage") != "enrichment"), None)
             if blocked:
