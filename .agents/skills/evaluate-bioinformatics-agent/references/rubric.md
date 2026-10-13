@@ -17,7 +17,8 @@
 2. Mark a run `insufficient_evidence` when weighted coverage is below 60%, regardless of its observed score.
 3. Treat the following as blocking: non-terminal run, failed studies, incompatible matrix/method, invalid contrast/alignment, implausible DEG result, invalid evidence references, or artifact hash mismatch.
 4. Do not infer biological correctness solely from a successful process exit or a plausible narrative.
-5. Prefer multiple complementary metrics. Thresholded Jaccard is unstable near cutoffs; pair it with full-ranking correlation and direction agreement.
+5. For native skill runs, every `decisions.json` must pass the decision contract (`tools/decision_contract.py`); a violation is blocking because it means an analysis ran on an inconsistent or blocked plan.
+6. Prefer multiple complementary metrics. Thresholded Jaccard is unstable near cutoffs; pair it with full-ranking correlation and direction agreement.
 
 ## A/B protocol for skills and prompts
 

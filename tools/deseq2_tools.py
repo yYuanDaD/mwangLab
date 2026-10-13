@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pydeseq2.dds import DeseqDataSet
 from pydeseq2.ds import DeseqStats
-from langchain_core.tools import tool
+from tools.tooling import tool
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
@@ -12,40 +12,9 @@ from tools.analysis_policy import (
 from tools.multifactor_design import build_multifactor_plan
 
 
-_FNAME_BAD = re.compile(r'[<>:"/\\|?*\s]+')
-
-
-def collapse_duplicate_genes(df: pd.DataFrame, label: str = "counts") -> pd.DataFrame:
-    """Return df with a UNIQUE gene index. Real GEO matrices often index by gene symbol where
-    several source IDs (Ensembl/probes) collapse to the same symbol -> duplicate rownames, which
-    break DESeq2 (reindex error), limma (R read.csv), and silently confuse edgeR. We keep the
-    highest-mean row per duplicated gene (MaxMean collapse — the most-expressed representative).
-    No-op when the index is already unique."""
-    if not df.index.has_duplicates:
-        return df
-    n_before = len(df)
-    means = df.apply(pd.to_numeric, errors="coerce").mean(axis=1).fillna(-np.inf).to_numpy()
-    order = np.argsort(-means, kind="stable")
-    df2 = df.iloc[order]
-    df2 = df2[~df2.index.duplicated(keep="first")]
-    print(f"   Collapsed {n_before - len(df2)} duplicate gene IDs ({label}, kept highest-mean row).")
-    return df2
-
-
-def safe_for_filename(s: str) -> str:
-    """Sanitize a metadata value (e.g. 'db/db (leptin receptor mutant)') for use
-    in a filename. Replaces illegal Windows chars and whitespace with '_', then
-    collapses repeats and strips leading/trailing '_'. Keeps parens/brackets/etc
-    intact since they're legal on Windows."""
-    cleaned = _FNAME_BAD.sub("_", str(s))
-    cleaned = re.sub(r"_+", "_", cleaned).strip("_")
-    return cleaned or "value"
-
-
-def deg_filename(treatment: str, control: str) -> str:
-    """Canonical DEG filename used by run_deseq2_analysis (writer) and
-    batch_tools (reader). Both sides must use this helper to stay in sync."""
-    return f"DEG_results_{safe_for_filename(treatment)}_vs_{safe_for_filename(control)}.csv"
+from tools.de_common import (  # noqa: F401 - re-exported for existing callers
+    _FNAME_BAD, collapse_duplicate_genes, deg_filename, safe_for_filename,
+)
 
 
 @tool
@@ -58,6 +27,7 @@ def run_deseq2_analysis(
     output_dir: str = "./output",
     covariate_columns: str = "",
     interaction_terms: str = "",
+    min_total_count: int = 0,
 ) -> str:
     """
     Run Differential Expression Analysis using PyDESeq2.
@@ -75,6 +45,11 @@ def run_deseq2_analysis(
         interaction_terms: Optional comma-separated ``factor:factor`` terms.
             DESeq2 currently refuses interaction terms because a main-effect
             pairwise contrast is not a sufficient estimand for an interaction.
+        min_total_count: Pre-filter: keep genes whose counts summed over the
+            analysed samples are at least this value (the common R idiom
+            ``rowSums(counts) >= 10``). 0 keeps every gene that is not zero in
+            all samples. The filter changes which genes are tested and so the
+            BH adjustment; record it in the method decision.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -144,6 +119,10 @@ def run_deseq2_analysis(
 
         # Drop genes with zero counts across all samples; PyDESeq2 needs integer counts.
         counts_df = counts_df.loc[:, (counts_df != 0).any(axis=0)]
+        if min_total_count and int(min_total_count) > 0:
+            before = counts_df.shape[1]
+            counts_df = counts_df.loc[:, counts_df.sum(axis=0) >= int(min_total_count)]
+            print(f"Pre-filter: kept {counts_df.shape[1]} of {before} genes with total count >= {int(min_total_count)}")
         counts_df = counts_df.astype(int)
 
         # pydeseq2 builds a patsy formula `~ <design_factor>` from the column NAME, which breaks

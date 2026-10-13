@@ -1,6 +1,6 @@
 import os
 import GEOparse
-from langchain_core.tools import tool
+from tools.tooling import tool
 import requests
 from bs4 import BeautifulSoup
 import urllib.request

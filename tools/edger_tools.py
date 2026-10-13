@@ -24,9 +24,9 @@ import os
 import pandas as pd
 from patsy import dmatrix
 from inmoose.edgepy import DGEList, glmQLFTest, topTags
-from langchain_core.tools import tool
+from tools.tooling import tool
 
-from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
+from tools.de_common import deg_filename, collapse_duplicate_genes
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,

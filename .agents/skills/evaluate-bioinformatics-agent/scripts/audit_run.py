@@ -7,6 +7,9 @@ import argparse
 import csv
 import hashlib
 import json
+import os
+import re
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +20,13 @@ FAILURE_TOKENS = ("exception", "failed", "error")
 BLOCKING_CHECKS = {
     "run_terminal", "study_completion", "matrix_method_compatibility",
     "contrast_definition", "deg_sanity", "evidence_references", "artifact_integrity",
+    "decision_contract",
 }
+# A native skill run marks a case that a decision gate stopped as "stopped:<stage>".
+# That is a finished, accounted outcome, not a failure.
+STOPPED_PREFIX = "stopped"
+ENVIRONMENT_ERROR = re.compile(r"ModuleNotFoundError|ImportError|No module named|cannot import|"
+                               r"unavailable|not installed|Rscript not found", re.I)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -190,13 +199,23 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                        "summary.csv has no rows.", "Write one row per requested study.")]
 
     statuses = [str(row.get("status", "")).lower() for row in rows]
-    failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses)
-    successful = sum(any(token in status for token in SUCCESS_TOKENS) for status in statuses)
+    # A valid plan whose executor could not even be imported is an environment
+    # gap, not an agent error: it is reported, scored as not completed, and
+    # does not block the verdict on its own.
+    environment = [row for row, status in zip(rows, statuses)
+                   if status.startswith("failed_execution")
+                   and ENVIRONMENT_ERROR.search(str(row.get("execution_error") or row.get("stop_reason", "")))]
+    failed = sum(any(token in status for token in FAILURE_TOKENS) for status in statuses) - len(environment)
+    successful = sum(any(token in status for token in SUCCESS_TOKENS) or status.startswith(STOPPED_PREFIX)
+                     for status in statuses)
     completion_status = "fail" if failed else "pass" if successful == len(rows) else "warn"
     checks = [_check("study_completion", "execution", completion_status,
                      8 * successful / len(rows), 8,
-                     f"successful={successful}/{len(rows)}, failed={failed}",
-                     "Inspect failed or partial rows and failures.log.")]
+                     f"successful={successful}/{len(rows)}, failed={failed}, "
+                     f"environment_blocked={len(environment)}",
+                     "Install the packages reported by preflight and rerun environment-blocked cases; "
+                     "inspect other failed rows.")]
+    checks[0]["environment_blocked"] = len(environment)
 
     has_route = all("matrix_type" in row and ("da_method" in row or "da_methods_run" in row)
                     for row in rows)
@@ -212,6 +231,11 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                 continue
             raw_ok = any(x in method for x in ("deseq2", "edger", "voom"))
             log_ok = "limma" in method and "voom" not in method
+            transform = str(row.get("transform", "")).lower()
+            # limma on log2(CPM+1) of raw counts (limma-trend, paired pseudobulk) is a valid route
+            # when the summary records that transform.
+            if log_ok and ("cpm" in transform or "log" in transform):
+                raw_ok = True
             if "raw" in matrix and not raw_ok:
                 incompatible.append(f"row {idx}: {matrix}->{method}")
             if any(x in matrix for x in ("fpkm", "tpm", "log", "proteom", "methyl")) and not log_ok:
@@ -228,8 +252,12 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
         checks.append(_check("contrast_definition", "scientific_validity", "not_measured", 0, 6,
                              "No successful DA rows were present."))
     else:
-        missing = [row for row in da_rows if not all(str(row.get(key, "")).strip()
-                                                     for key in ("design_col", "control", "treatment"))]
+        # A two-arm row names control and treatment; a named-contrast design
+        # (multilevel, factorial) names its contrasts and records the formula instead.
+        def _defined(row):
+            has = lambda key: bool(str(row.get(key, "")).strip())  # noqa: E731
+            return has("design_col") and has("treatment") and (has("control") or has("formula"))
+        missing = [row for row in da_rows if not _defined(row)]
         checks.append(_check("contrast_definition", "scientific_validity",
                              "fail" if missing else "pass", 0 if missing else 6, 6,
                              f"DA rows={len(da_rows)}, missing contrast fields={len(missing)}",
@@ -246,6 +274,35 @@ def _audit_summary(summary_path: Path | None) -> list[dict[str, Any]]:
                              "flags: " + "; ".join(flagged) if flagged else "All DA rows passed sanity checks.",
                              "Review sample size, normalization, model fit, and DEG fraction."))
     return checks
+
+
+def _find_repo(run_dir: Path) -> Path | None:
+    env = os.environ.get("MWANGLAB_ROOT")
+    candidates = [Path(env)] if env else []
+    for start in (run_dir, Path.cwd().resolve(), Path(__file__).resolve().parent):
+        candidates += [start, *start.parents]
+    return next((p for p in candidates if (p / "tools" / "decision_contract.py").is_file()), None)
+
+
+def _audit_decision_contract(run_dir: Path) -> list[dict[str, Any]]:
+    files = sorted(run_dir.rglob("decisions.json"))
+    if not files:
+        return [_check("decision_contract", "scientific_validity", "not_measured", 0, 10,
+                       "No decisions.json found.", "Record every gate with the decision contract.")]
+    repo = _find_repo(run_dir)
+    if repo is None:
+        return [_check("decision_contract", "scientific_validity", "not_measured", 0, 10,
+                       "Repository with tools/decision_contract.py not found; set MWANGLAB_ROOT.")]
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+    from tools.decision_contract import validate
+
+    count, errors = validate(files)
+    detail = (f"{count} records in {len(files)} case file(s); {len(errors)} violation(s)"
+              + (": " + "; ".join(errors[:5]) if errors else ""))
+    return [_check("decision_contract", "scientific_validity", "fail" if errors else "pass",
+                   0 if errors else 10, 10, detail,
+                   "Fix records so every gate, method, covariance term, and threshold is consistent.")]
 
 
 def _audit_stability(run_dir: Path) -> list[dict[str, Any]]:
@@ -317,6 +374,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     summary_path = root / "summary.csv" if (root / "summary.csv").is_file() else None
     checks.extend(_audit_summary(summary_path))
     checks.extend(_audit_evidence(root, list(root.rglob("evidence.json"))))
+    checks.extend(_audit_decision_contract(root))
     checks.extend(_audit_stability(root))
 
     core_files = [root / "workflow.log", root / "summary.csv", root / "run_status.json"]
@@ -333,10 +391,13 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
     score = round(100 * earned / available, 1) if available else 0.0
     coverage = round(100 * available / total, 1) if total else 0.0
     blockers = [item for item in checks if item["blocking"]]
+    environment_blocked = sum(int(item.get("environment_blocked", 0)) for item in checks)
     if blockers:
         verdict = "fail"
     elif coverage < 60:
         verdict = "insufficient_evidence"
+    elif environment_blocked:
+        verdict = "incomplete_environment"
     elif score >= 85:
         verdict = "pass"
     elif score >= 70:
@@ -360,6 +421,7 @@ def audit_run(run_dir: str | Path) -> dict[str, Any]:
         "schema_version": "1.0", "run_dir": str(root), "verdict": verdict,
         "score": score, "coverage": coverage,
         "blocking_findings": [item["id"] for item in blockers],
+        "environment_blocked": environment_blocked,
         "dimensions": dimensions, "checks": checks,
     }
 
@@ -370,6 +432,7 @@ def _markdown(report: dict[str, Any]) -> str:
         f"- Observed score: **{report['score']}/100**",
         f"- Evidence coverage: **{report['coverage']}%**",
         f"- Blocking findings: {', '.join(report['blocking_findings']) or 'none'}",
+        f"- Environment-blocked executions: {report.get('environment_blocked', 0)}",
         "", "## Dimensions", "", "| Dimension | Score | Coverage |", "|---|---:|---:|",
     ]
     for name, values in report["dimensions"].items():
@@ -397,7 +460,7 @@ def main() -> int:
             json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
         (output / "agent_evaluation.md").write_text(_markdown(report), encoding="utf-8")
     print(json.dumps({key: report[key] for key in
-                      ("verdict", "score", "coverage", "blocking_findings")},
+                      ("verdict", "score", "coverage", "blocking_findings", "environment_blocked")},
                      ensure_ascii=False))
     return 0
 

@@ -13,7 +13,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 # Derived-stat column name patterns. Surfaced 2026-05-28 on GSE317978's

@@ -6,9 +6,9 @@ Use a frozen case manifest and identical source data for every system under comp
 
 Stratify cases across clean two-arm RNA-seq, multiple treatment levels, FPKM/TPM, log-scale data, abbreviated sample IDs, incomplete metadata, batch/donor confounding, multi-factor designs, observational studies, and papers with multiple accessions.
 
-Compare the current agent and native Codex+skill on the same cases. In the Codex arm, the current conversation must make the scientific decisions; launching the existing external-LLM harness from a Codex window is only orchestration validation. Use the native execution reference to prevent hidden external LLM calls. Keep expected answers and prior results out of the tested conversation; input manifests must omit expected fields. Mark any already-exposed conversation as non-blind.
+Compare the external-model agent and a native agent session with this skill (Codex, Claude Code, or another skills-capable agent) on the same cases. In a native arm the session itself must make the scientific decisions; launching the external-LLM harness from an agent window only validates orchestration. Run native arms with `native.enable_native_mode()` and report the blocked-attempt count from `run_manifest.json`. Keep expected answers and prior results out of the tested conversation; input manifests must omit expected fields. Mark any already-exposed conversation as non-blind.
 
-Run at least three independently decided repeats per condition; rerunning one saved plan only tests computational reproducibility. Use five or more when model variance is material. If isolating the skill effect matters, add current-agent+skill and Codex-without-skill arms. Hold inputs, tools, scoring and biological requests fixed; document each arm's actual model and configuration. Hold model/settings fixed only when evaluating the skill effect within the same model, not when comparing Codex with the external-model agent.
+Run at least three independently decided repeats per condition; rerunning one saved plan only tests computational reproducibility. Use five or more when model variance is material. If isolating the skill effect matters, add an external-agent+skill arm and a native-agent-without-skill arm. Hold inputs, tools, scoring and biological requests fixed; document each arm's actual model and configuration. Hold model/settings fixed only when evaluating the skill effect within the same model, not when comparing different agents.
 
 Primary metrics:
 
@@ -29,3 +29,14 @@ Record `decision_status` and `execution_status` separately. A valid scientific p
 Blocking failures include incompatible matrix/method, invalid contrast, unresolved alignment presented as complete, an unhandled treatment-batch confound, or a p-value-producing run that violates a required method gate. Report completion, latency, tool/LLM calls, and estimated cost as secondary metrics. Score deterministic checks first; use an independent semantic judge only for questions that cannot be encoded reliably.
 
 Report paired per-case outcomes and aggregate confidence intervals or exact paired tests. Treat DEG/p-value counts as descriptive outputs under a named threshold, not as correctness scores. Do not rank systems by DEG count, p-value count, or fluent narrative quality.
+
+Frozen case sets and scorers live under `test/experiments/` in the repository. Before a blind run, give the tested agent a checkout without the scorer-side files (answer keys, earlier results, review documents), because an agent that can read them is no longer blind. The scorers read any run that writes decision-contract records under `<runs>/<case_id>/`.
+
+## Decision traces and expert review
+
+Every native run writes `trace.jsonl`. Aggregate runs with `python scripts/analyze_traces.py <runs...> --out <dir>`:
+- `trace_summary.md`: stops by gate and reason; per gate, the share of decisions that were not high-confidence, revised cases and the fields that changed, and records the contract rejected; tool calls, errors, and durations; the most common transitions between actions.
+- `review_sheet.csv`: one row per case and gate with the final decision and reasoning, plus empty `reviewer_correct` (1, 0, NA), `reviewer_issue_type` (agent_error, data_limitation, none), and `reviewer_note` columns. Two independent reviewers on a random sample of cases give an agreement-checked correctness rate per gate. Score a correct stop on unusable data as correct, not as a data limitation.
+
+Revisions and non-high confidence are hesitation signals, not errors. Report them next to correctness, so that a gate that is often revised but ends correct is distinguished from one that is confidently wrong.
+

@@ -2,25 +2,32 @@
 
 ## Classification evidence
 
-Use numeric profile, row identifiers, filename, GEO platform/assay hints, and nearby processing notes. Numeric appearance alone is insufficient when estimated counts, normalized integer matrices, proteomics, or methylation are plausible.
+Decide the matrix type from the numeric profile (`native.profile_matrix`) together with row identifiers, file name, GEO platform or assay hints, and processing notes. Numbers alone are not enough when any of these is plausible: estimated counts, normalized integer matrices, proteomics, or methylation.
 
 ## Valid routes
 
 | Matrix type | Route |
 |---|---|
-| Raw non-negative integer counts | DESeq2, edgeR, or limma-voom |
-| FPKM/TPM or other linear normalized expression | log2(x+1), then limma |
-| Already log-transformed expression | limma as-is |
-| Linear proteomics intensity | log2 transform, then limma |
+| Raw non-negative integer counts | DESeq2, edgeR, or limma-voom; or limma on `log2(CPM+1)` from `preprocess_counts` (record the transform) |
+| FPKM/TPM or other linear normalized expression | `log2(x+1)` (`native.log_transform`), then limma |
+| Already log-transformed expression (RMA, log2 CPM, log2 FPKM) | limma as-is |
+| Linear proteomics intensity | `preprocess_proteomics_matrix` (log2, missingness filter, imputation for label-free, median centering) or `native.log_transform`, then limma |
 | Already-log proteomics intensity | limma as-is |
-| Methylation beta | beta-to-M transformation, then limma |
-| Estimated counts | Refuse integer-only methods unless the exact rounding/count recipe is documented and validated |
-| Ambiguous | Stop and request evidence or manual review |
+| Methylation beta | beta-to-M (`run_methylation_da`, or `native.beta_to_m` when covariates are needed), then limma |
+| Single-cell raw UMI counts | sum to pseudobulk per sample and cell type, then a raw-count route; paired donors use limma on `log2(CPM+1)` with the donor block |
+| Single-cell normalized or scaled values | cannot be summed into pseudobulk; `manual_review` unless a raw-count layer exists |
+| Estimated counts | Refuse integer-only methods unless the rounding recipe is documented (`rounding_documented`) |
+| Ambiguous | Stop with `manual_review` |
 
-The default raw-count method is DESeq2. `edgeR`, `limma-voom`, or a multi-method raw-count comparison must be explicitly requested or selected by the configured method policy. Method choice among valid raw-count backends is secondary to proving that the matrix is raw integer counts.
+The default raw-count method is DESeq2. edgeR, limma-voom, or a comparison of several raw-count methods must be requested or justified. Proving that the matrix really holds raw integer counts comes before choosing among valid raw-count methods.
 
-## Required checks
+When the paper's method needs an input that was not deposited (for example, DESeq2 when only FPKM is in GEO), the paper route is blocked. Keep the `method` decision `valid` for the alternative you will run, and add `paper_route: {"method": "DESeq2 on counts", "status": "blocked", "reason": ...}` to it. Run the alternative as a declared deviation, with `threshold_source: paper_on_deviation_route`, and label the study route `declared_deviation`. Never round FPKM or TPM into integers to satisfy a count method.
 
-Before fitting, apply the shared analysis policy. Raw-count backends must reject missing/non-finite values, negative values, and non-integer-like values. Plain limma must reject clearly raw-count-like matrices. Record both the original matrix type and any generated transform artifact.
+## Enforced checks
 
-If an LLM classification is used, record its confidence, reasoning, provenance snippet, and whether it changed the heuristic route. Low-confidence or ambiguous semantic classifications must not be silently routed to a method.
+`tools/analysis_policy.enforce_method_matrix_compatibility` runs inside every executor:
+
+- DESeq2, edgeR, and limma-voom reject missing values, negative values, and non-integer data.
+- limma rejects raw-count-like matrices and any matrix with a maximum above 50, which is still on a linear scale.
+
+These checks are a safety net, not the decision. Record the original matrix type and any transform in the `matrix` and `method` decisions; the validator checks that they agree.

@@ -1,10 +1,11 @@
 import os
 import pandas as pd
 from patsy import dmatrix
-from inmoose.limma import lmFit, eBayes, topTable
-from langchain_core.tools import tool
+from inmoose.limma import lmFit, topTable
+from tools.limma_compat import ebayes as eBayes
+from tools.tooling import tool
 
-from tools.deseq2_tools import deg_filename, collapse_duplicate_genes
+from tools.de_common import deg_filename, collapse_duplicate_genes
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
@@ -193,5 +194,5 @@ def run_limma_analysis(
     except PolicyViolation as e:
         return f"POLICY BLOCKED: {e}"
     except Exception as e:
-        print(f"Tool Error: {str(e)}")
-        return f"limma analysis failed. Error: {str(e)}"
+        print(f"Tool Error: {type(e).__name__}: {e}")
+        return f"limma analysis failed. Error: {type(e).__name__}: {e}"

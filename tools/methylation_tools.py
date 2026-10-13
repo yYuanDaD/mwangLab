@@ -16,7 +16,7 @@ enrichment is a separate annotation step (out of scope here).
 import os
 import numpy as np
 import pandas as pd
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 from tools.limma_tools import run_limma_analysis
 

@@ -955,6 +955,6 @@ def _count_csv_rows(csv_dir: str) -> dict:
 
 
 # LangChain wrapper; scripts continue to call the plain function.
-from langchain_core.tools import tool as _tool  # noqa: E402
+from tools.tooling import tool as _tool  # noqa: E402
 
 run_agent_a_cohort_tool = _tool(run_agent_a_cohort)

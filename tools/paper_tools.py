@@ -23,7 +23,7 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 _S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"

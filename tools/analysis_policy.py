@@ -17,6 +17,9 @@ MIN_REPLICATES_PER_GROUP = 2
 MIN_ALIGNED_FRACTION_PER_GROUP = 0.5
 RAW_INTEGER_FRACTION = 0.99
 LOG_SCALE_RAW_LIKE_MAX = 100.0
+# log2/log10/ln expression, log-CPM, log intensities, and M-values stay far below
+# this; a larger value means the matrix is still on a linear scale.
+LOG_SCALE_MAX = 50.0
 
 
 class PolicyViolation(ValueError):
@@ -53,7 +56,9 @@ def profile_matrix(df: pd.DataFrame) -> MatrixProfile:
     finite = values[np.isfinite(values)]
     if finite.size == 0:
         raise PolicyViolation("Expression matrix contains no finite numeric values.")
-    integer_fraction = float(np.isclose(finite, np.rint(finite), atol=1e-8).mean())
+    # Absolute tolerance only: np.isclose's default relative tolerance (1e-5) would call every
+    # value above about 1e5 an integer, so large linear intensities looked like raw counts.
+    integer_fraction = float((np.abs(finite - np.rint(finite)) <= 1e-8).mean())
     return MatrixProfile(
         n_features=int(df.shape[0]),
         n_samples=int(df.shape[1]),
@@ -93,6 +98,12 @@ def enforce_method_matrix_compatibility(df: pd.DataFrame, *, method: str) -> Mat
                 f"limma requires transformed/log-scale expression, but this matrix is raw-count-like "
                 f"({p.integer_fraction:.1%} integer-like; max={p.max_value:g}). "
                 "Use DESeq2/edgeR/limma-voom for raw counts."
+            )
+        if p.max_value > LOG_SCALE_MAX:
+            raise PolicyViolation(
+                f"limma requires log-scale expression, but this matrix appears to be on a linear "
+                f"scale (max={p.max_value:g} > {LOG_SCALE_MAX:g}). Apply log2(x+1) to FPKM/TPM or "
+                "linear intensities before limma."
             )
     else:
         raise PolicyViolation(f"Unknown differential-analysis method: {method!r}.")

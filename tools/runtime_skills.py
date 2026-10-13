@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
