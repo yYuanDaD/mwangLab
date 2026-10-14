@@ -17,6 +17,15 @@ resume from the log.
     python test/experiments/paper_evidence_ablation/run_arms.py --repeats 1 --limit 4   # pilot
     python test/experiments/paper_evidence_ablation/run_arms.py --repeats 3              # full
     python test/experiments/paper_evidence_ablation/run_arms.py --score-only
+
+`--backend codex-cli` sends the identical prompt to the local Codex CLI (`codex exec`, signed
+in with a ChatGPT plan, so it uses plan quota rather than API billing). Each call runs in a
+fresh, empty, read-only working directory outside the repository, so the model sees only the
+prompt, never the gold or annotations; any shell command it runs is counted in the log.
+Results go to calls_codex.jsonl, scored_calls_codex.csv and summary_codex.json.
+
+    python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --series GSE51216 --repeats 1
+    python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --arms metadata
 """
 from __future__ import annotations
 
@@ -24,7 +33,10 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 import sys
+import tempfile
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -198,9 +210,82 @@ def call_once(llm, prompt: str) -> tuple[Optional[dict], dict]:
                  "output_tokens": int(usage.get("output_tokens", 0) or 0)}
 
 
+CODEX_PREAMBLE = ("Answer from the text below only. Do not run commands, read files or browse. "
+                  "Return one JSON object that matches the output schema.\n\n")
+
+
+def _nullable(kind: str) -> dict:
+    return {"type": [kind, "null"]}
+
+
+def codex_schema() -> dict:
+    """AblationDecision as a strict JSON schema (every field required, nullable where optional)."""
+    props = {
+        "is_valid": {"type": "boolean"},
+        "design_column": _nullable("string"), "control_value": _nullable("string"),
+        "treatment_value": _nullable("string"),
+        "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+        "intent_match": _nullable("boolean"), "reasoning": {"type": "string"},
+        "pairing": {"type": "string", "enum": ["required", "not_required", "unknown"]},
+        "pairing_column": _nullable("string"),
+        "paper_locators": {"type": "array", "items": {"type": "string"}},
+    }
+    return {"type": "object", "properties": props, "required": list(props), "additionalProperties": False}
+
+
+def codex_model_info(effort: str) -> dict:
+    model = None
+    cfg = Path.home() / ".codex" / "config.toml"
+    if cfg.exists():
+        for line in cfg.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith("model ") or line.strip().startswith("model="):
+                model = line.split("=", 1)[1].strip().strip('"')
+                break
+    return {"provider": "codex-cli", "model": model, "reasoning_effort": effort}
+
+
+def call_once_codex(prompt: str, effort: str, schema_path: Path, codex_bin: str) -> tuple[Optional[dict], dict]:
+    t0 = time.time()
+    usage, n_commands = {}, 0
+    workdir = Path(tempfile.mkdtemp(prefix="codex_ablation_"))
+    try:
+        out_file = workdir / "last_message.json"
+        cmd = [codex_bin, "exec", "--skip-git-repo-check", "--ephemeral",
+               "--ignore-rules", "-s", "read-only", "--json", "--color", "never",
+               "--output-schema", str(schema_path), "-o", str(out_file), "-C", str(workdir),
+               "-c", f'model_reasoning_effort="{effort}"', "-"]
+        proc = subprocess.run(cmd, input=CODEX_PREAMBLE + prompt, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=600)
+        for line in proc.stdout.splitlines():
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if ev.get("type") == "turn.completed":
+                usage = ev.get("usage") or {}
+            item = ev.get("item") or {}
+            if ev.get("type") == "item.started" and item.get("type") == "command_execution":
+                n_commands += 1
+        if proc.returncode != 0 or not out_file.exists():
+            raise RuntimeError(f"codex exit {proc.returncode}: {(proc.stderr or proc.stdout)[-300:]}")
+        out = AblationDecision.model_validate_json(out_file.read_text(encoding="utf-8")).model_dump()
+        status = "ok"
+    except Exception as e:  # CLI, quota and parse errors are logged, not fatal
+        out, status = None, f"error: {type(e).__name__}: {str(e)[:300]}"
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+    return out, {"status": status, "seconds": round(time.time() - t0, 2),
+                 "input_tokens": int(usage.get("input_tokens", 0) or 0),
+                 "cached_input_tokens": int(usage.get("cached_input_tokens", 0) or 0),
+                 "output_tokens": int(usage.get("output_tokens", 0) or 0),
+                 "n_commands": n_commands}
+
+
 def run(args) -> None:
     manifest = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))
     series = manifest["series"][: args.limit] if args.limit else manifest["series"]
+    if args.series:
+        series = [r for r in series if r["accession"] in set(args.series)]
     log_path = HERE / args.log
     done = set()
     if log_path.exists():
@@ -208,9 +293,18 @@ def run(args) -> None:
             r = json.loads(line)
             if r["call"]["status"] == "ok":
                 done.add((r["accession"], r["arm"], r["repeat"]))
-    cfg = resolve_model_config()
-    llm = create_structured_chat_model()
-    model_info = {"provider": cfg.provider, "model": cfg.model}
+    if args.backend == "codex-cli":
+        schema_path = HERE / "codex_output_schema.json"
+        schema_path.write_text(json.dumps(codex_schema(), indent=1) + "\n", encoding="utf-8")
+        model_info = codex_model_info(args.codex_effort)
+        model_info["cli_version"] = subprocess.run([args.codex_bin, "--version"], capture_output=True,
+                                                   text=True).stdout.strip()
+        call = lambda prompt: call_once_codex(prompt, args.codex_effort, schema_path, args.codex_bin)  # noqa: E731
+    else:
+        cfg = resolve_model_config()
+        llm = create_structured_chat_model()
+        model_info = {"provider": cfg.provider, "model": cfg.model}
+        call = lambda prompt: call_once(llm, prompt)  # noqa: E731
     print(f"model: {model_info}; series: {len(series)}; arms: {args.arms}; repeats: {args.repeats}; "
           f"already done: {len(done)}", flush=True)
 
@@ -228,15 +322,15 @@ def run(args) -> None:
 
     def work(job):
         rec, arm, rep, prompt, info, inputs = job
-        out, call = call_once(llm, prompt)
+        out, result = call(prompt)
         entry = {"accession": rec["accession"], "arm": arm, "repeat": rep,
                  "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                  "model": model_info, "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
                  "evidence": info, "proposed": list(inputs["proposed"]) if inputs["proposed"] else None,
-                 "python_confident": inputs["python_confident"], "output": out, "call": call}
+                 "python_confident": inputs["python_confident"], "output": out, "call": result}
         with lock, log_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-        return rec["accession"], arm, rep, call["status"]
+        return rec["accession"], arm, rep, result["status"]
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = [pool.submit(work, j) for j in jobs]
@@ -302,7 +396,7 @@ def score(args) -> None:
         s_raw = score_contrast_set(meta, sg["role"], raw, sg)
         s_acc = score_contrast_set(meta, sg["role"], accepted, sg)
         locs = (out or {}).get("paper_locators") or []
-        resolved = [l for l in locs if ps.resolve_locator(docs[acc], l)]
+        resolved = [l for l in locs if ps.resolve_locator(docs[acc], str(l).strip("[] "))]
         ann = annotations.get(acc)
         est = (score_estimand_decision(meta, sg["role"], ann, raw, (out or {}).get("pairing"),
                                        (out or {}).get("pairing_column")) if ann else {})
@@ -326,10 +420,11 @@ def score(args) -> None:
             "n_locators": len(locs), "n_locators_resolved": len(resolved),
             "input_tokens": e["call"]["input_tokens"], "output_tokens": e["call"]["output_tokens"],
             "cost_usd": cost, "seconds": e["call"]["seconds"],
+            "n_commands": e["call"].get("n_commands", 0),
             "python_confident": e["python_confident"], "reasoning": (out or {}).get("reasoning"),
         })
     df = pd.DataFrame(rows)
-    df.to_csv(HERE / "scored_calls.csv", index=False)
+    df.to_csv(HERE / f"scored_calls{args.suffix}.csv", index=False)
 
     def arm_summary(g: pd.DataFrame) -> dict:
         n = len(g)
@@ -366,7 +461,7 @@ def score(args) -> None:
     maj = (df[df["call_status"] == "ok"].groupby(["accession", "arm"])["raw_verdict"]
            .agg(lambda s: s.value_counts().index[0]).unstack())
     summary["disagreements"] = maj[maj.nunique(axis=1) > 1].reset_index().to_dict("records")
-    (HERE / "summary.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False), encoding="utf-8")
+    (HERE / f"summary{args.suffix}.json").write_text(json.dumps(summary, indent=1, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(summary["arms"], indent=1))
     print("stability:", stab)
     print(f"series with arm disagreement: {len(summary['disagreements'])}")
@@ -378,9 +473,17 @@ def main(argv=None) -> int:
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=4)
-    ap.add_argument("--log", default="calls.jsonl")
+    ap.add_argument("--log", default=None, help="default calls.jsonl, or calls_codex.jsonl for codex-cli")
+    ap.add_argument("--series", nargs="*", default=None, help="only these accessions")
+    ap.add_argument("--backend", choices=["provider", "codex-cli"], default="provider",
+                    help="provider = the model configured in .env; codex-cli = local `codex exec`")
+    ap.add_argument("--codex-effort", default="low", help="model_reasoning_effort for codex-cli")
+    ap.add_argument("--codex-bin", default=os.environ.get("CODEX_BIN") or shutil.which("codex") or "codex",
+                    help="codex executable; the desktop app bundles a newer one than the PATH install")
     ap.add_argument("--score-only", action="store_true")
     args = ap.parse_args(argv)
+    args.suffix = "_codex" if args.backend == "codex-cli" else ""
+    args.log = args.log or f"calls{args.suffix}.jsonl"
     if not args.score_only:
         run(args)
     score(args)
