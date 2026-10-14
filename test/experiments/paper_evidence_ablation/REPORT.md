@@ -83,7 +83,7 @@ Findings over 38 series:
 
 What this means for production (not changed yet): pass title + abstract by default; add Methods (structured, with block IDs) when the design or pairing decision needs it, since it is what fixes GSE27536; and change the metadata summary to keep subject-like columns (name, number of subjects, whether IDs recur across groups) and to expose arm tokens embedded in per-sample titles. Those two summary changes target the remaining pairing-column and refusal errors, which paper text does not fix.
 
-## Codex as the decision model (in progress)
+## Codex as the decision model (ultra paused)
 
 The same prompts, unchanged, sent to the local Codex CLI with `run_arms.py --backend codex-cli`. The CLI is signed in with a ChatGPT plan, so these calls use plan quota, not API billing. The model is `gpt-6.1-sol`, run with the Codex app's bundled CLI 0.162, because the PATH install (0.154) rejects that model on a ChatGPT account. Each call runs in a fresh, empty, read-only directory outside the repository with a strict output schema, so the model sees only the prompt. No call ran a shell command. Codex adds about 16k tokens of its own context to every call, so its token counts are not comparable with DeepSeek's. Two reasoning efforts were run: `low` (complete, 456 calls) and `ultra` (the user's Codex default; metadata arm complete, the three paper arms partial at the time of writing). Files: `calls_codex_<effort>.jsonl`, `scored_calls_codex_<effort>.csv`, `summary_codex_<effort>.json`.
 
@@ -96,14 +96,14 @@ All 38 series, 114 calls per arm (Codex ultra paper arms not yet run on all seri
 | structured | 84.2% | 89.5% | partial | 15.8% | 10.5% | 100% | 100% | 0% |
 | flat | 85.1% | 89.5% | partial | 14.9% | 10.5% | 100% | 100% | 0% |
 
-Same 12 series that the partial ultra run has finished in every arm (36 calls per arm, 35 for ultra structured and flat), estimand-correct:
+The 13 series that the paused ultra run finished in every arm (39 calls per arm), estimand-correct:
 
 | arm | DeepSeek | Codex low | Codex ultra |
 |---|---|---|---|
-| metadata | 72.2% | 91.7% | 91.7% |
-| abstract | 88.9% | 91.7% | 91.7% |
-| structured | 83.3% | 91.7% | 91.4% |
-| flat | 86.1% | 91.7% | 88.6% |
+| metadata | 74.4% | 92.3% | 92.3% |
+| abstract | 89.7% | 92.3% | 92.3% |
+| structured | 84.6% | 92.3% | 92.3% |
+| flat | 87.2% | 92.3% | 89.7% |
 
 Cost and time per call: Codex low averages 18k–35k input tokens and 11–14 s; Codex ultra averages 47k input tokens and 31 s on metadata and 130k–184k input tokens and 76–101 s on the paper arms, against 1.7k–18k tokens and 2–3 s for DeepSeek.
 
@@ -115,7 +115,11 @@ Findings so far:
 4. Codex names the subject column a little more often than DeepSeek (metadata 76.9% against 50.0%), but it hits the same wall: high-cardinality subject columns are missing from the summary.
 5. Ultra so far gives no accuracy gain over low on the matched series. It costs about 3–5 times the input tokens and 3–7 times the wall time.
 
-The ultra paper arms will be added when the run finishes.
+**Resume mark (2026-10-14, paused at the user's request).** Ultra stopped at 239 of 456 calls, with none failed. Metadata is complete (114). The paper arms have abstract 42, structured 42 and flat 41 calls, covering the first 14 manifest series. The log resumes from completed calls; run this to finish it:
+
+    python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --codex-effort ultra --codex-bin "%LOCALAPPDATA%/OpenAI/Codex/bin/2e5e00daee91c61d/codex.exe" --arms abstract structured flat --workers 4
+
+The remaining 217 calls take about 1 h 15 min at about 21 s per call with 4 workers. After they finish, refresh the ultra columns above.
 
 ## Next
 

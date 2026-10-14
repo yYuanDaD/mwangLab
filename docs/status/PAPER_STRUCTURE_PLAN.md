@@ -47,6 +47,11 @@ Conclusions: at this size, full text does not clearly improve the contrast choic
 
 Conclusions: labels on the chosen axis are always right (one confounded metadata call aside); the earlier "wrong" calls were paper-supported axes or gold errors. Abstract is best for the contrast; Methods text is what makes pairing fully right. The remaining errors are in the metadata summary, not the evidence: subject-ID columns with many subjects are dropped, and arms embedded in per-sample titles are never exposed (four series refused in every arm). Details in `paper_evidence_ablation/REPORT.md`.
 
+### B2b. Codex decision-model comparison (paused)
+
+- `run_arms.py --backend codex-cli` sends the same prompts to the local Codex CLI (ChatGPT plan quota, `gpt-6.1-sol`). Low effort is complete (456 calls). Over 38 series it is 86.0% estimand-correct on metadata and 89.5% with any paper text, against DeepSeek 75.4% and 84–89%.
+- Ultra effort is paused at 239/456 calls (metadata complete; the paper arms cover 14 series). Resume mark and command are in `paper_evidence_ablation/REPORT.md` ("Codex as the decision model"). On the 13 matched series, ultra so far gives no gain over low at 3–7 times the time.
+
 ### B3. Metadata summary fixes (next)
 
 - `summarize_metadata_for_llm`: keep subject-like columns (name, subject count, whether IDs recur across groups) and expose arm tokens embedded in per-sample titles or descriptions (GSE1832, GSE53598, GSE92719, GSE115645).
