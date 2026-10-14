@@ -70,7 +70,9 @@ except ImportError:
 
 from tools import paper_structure as ps  # noqa: E402
 from tools.batch_tools import _auto_detect_contrasts, _python_pick_is_confident  # noqa: E402
-from tools.contrast_gold import llm_accepts, llm_triple, load_gold, score_contrast_set  # noqa: E402
+from tools.contrast_gold import (  # noqa: E402
+    llm_accepts, llm_triple, load_gold, score_contrast_set, score_estimand_decision,
+)
 from tools.llm_helpers import (  # noqa: E402
     ContrastValidationResult, _invoke_structured, estimate_llm_cost_usd, summarize_metadata_for_llm,
 )
@@ -79,6 +81,7 @@ from tools.paper_tools import _flatten_jats  # noqa: E402
 
 HERE = Path(__file__).parent
 GOLD = ROOT / "test" / "validation" / "exergenedb_gold" / "exergenedb_samples.csv"
+ESTIMANDS = GOLD.with_name("estimand_annotations.json")
 ARMS = ("metadata", "abstract", "structured", "flat")
 CHAR_CAP = 100_000  # same cap for structured and flat, about 25k tokens
 
@@ -242,10 +245,39 @@ def run(args) -> None:
             print(f"[{i}/{len(jobs)}] {acc} {arm} r{rep}: {status}", flush=True)
 
 
+def _rate(mask: pd.Series, base: pd.Series) -> Optional[float]:
+    n = int(base.sum())
+    return round(float((mask & base).sum()) / n, 3) if n else None
+
+
+def estimand_summary(ok: pd.DataFrame) -> dict:
+    """Axis and label scored separately; pairing scored against the gold of the chosen axis."""
+    if "axis" not in ok or ok["axis"].isna().all():
+        return {}
+    every = pd.Series(True, index=ok.index)
+    chose = ok["label_verdict"].isin(["correct", "reversed", "mixed"])
+    pv = ok["pairing_verdict"]
+    scorable = pv.isin(["correct", "over_called", "missed", "abstained"])
+    return {
+        "estimand_correct": _rate(ok["estimand_correct"] == True, every),  # noqa: E712
+        "axis_gold": _rate(ok["axis_admissible"].notna() & (ok["axis"] == ok["gold_axis"]), every),
+        "axis_admissible_other": _rate((ok["axis_admissible"] == True) & (ok["axis"] != ok["gold_axis"]), every),  # noqa: E712
+        "off_axis": _rate(ok["axis"] == "off_axis", every),
+        "labels_correct_given_axis": _rate(ok["label_verdict"] == "correct", chose & (ok["axis"] != "off_axis")),
+        "pairing_scorable_calls": int(scorable.sum()),
+        "pairing_correct": _rate(pv == "correct", scorable),
+        "pairing_over_called": _rate(pv == "over_called", scorable),
+        "pairing_missed": _rate(pv == "missed", scorable),
+        "pairing_abstained": _rate(pv == "abstained", scorable),
+        "pairing_column_ok": _rate(ok["pairing_column_ok"] == True, ok["pairing_column_ok"].notna()),  # noqa: E712
+    }
+
+
 def score(args) -> None:
     manifest = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))
     recs = {r["accession"]: r for r in manifest["series"]}
     gold = load_gold(str(GOLD))
+    annotations = json.loads(ESTIMANDS.read_text(encoding="utf-8"))["series"]
     entries = [json.loads(l) for l in (HERE / args.log).read_text(encoding="utf-8").splitlines()]
     latest: dict = {}
     for e in entries:  # keep the last ok entry per key; otherwise the last attempt
@@ -270,10 +302,14 @@ def score(args) -> None:
         s_acc = score_contrast_set(meta, sg["role"], accepted, sg)
         locs = (out or {}).get("paper_locators") or []
         resolved = [l for l in locs if ps.resolve_locator(docs[acc], l)]
+        ann = annotations.get(acc)
+        est = (score_estimand_decision(meta, sg["role"], ann, raw, (out or {}).get("pairing"),
+                                       (out or {}).get("pairing_column")) if ann else {})
         cost = estimate_llm_cost_usd(e["model"]["provider"], e["model"]["model"],
                                      e["call"]["input_tokens"], e["call"]["output_tokens"])
         rows.append({
             "accession": acc, "design_class": rec["design_class"], "arm": arm, "repeat": rep,
+            "gold_axis": (ann or {}).get("gold_estimand"),
             "call_status": e["call"]["status"], "evidence_chars": e["evidence"].get("chars", 0),
             "evidence_truncated": e["evidence"].get("truncated", False),
             "triple": " | ".join(raw[0]) if raw else "", "confidence": (out or {}).get("confidence"),
@@ -282,6 +318,10 @@ def score(args) -> None:
             "accepted_verdict": s_acc["verdict"], "pairing": (out or {}).get("pairing"),
             "pairing_column": (out or {}).get("pairing_column"),
             "pairing_signal": ";".join(s_raw["pairing_signal"]),
+            "axis": est.get("axis"), "axis_admissible": est.get("axis_admissible"),
+            "label_verdict": est.get("label_verdict"), "estimand_correct": est.get("estimand_correct"),
+            "gold_verdict_corrected": est.get("gold_verdict"),
+            "pairing_verdict": est.get("pairing_verdict"), "pairing_column_ok": est.get("pairing_column_ok"),
             "n_locators": len(locs), "n_locators_resolved": len(resolved),
             "input_tokens": e["call"]["input_tokens"], "output_tokens": e["call"]["output_tokens"],
             "cost_usd": cost, "seconds": e["call"]["seconds"],
@@ -304,6 +344,7 @@ def score(args) -> None:
             "accepted_wrong": round(av.isin(["reversed", "mixed"]).mean(), 3) if len(ok) else None,
             "manual_review_rate": round(1 - ok["accepted"].mean(), 3) if len(ok) else None,
             "pairing_required": round((ok["pairing"] == "required").mean(), 3) if len(ok) else None,
+            **estimand_summary(ok),
             "locator_resolve_rate": (round(ok["n_locators_resolved"].sum() / ok["n_locators"].sum(), 3)
                                      if ok["n_locators"].sum() else None),
             "mean_input_tokens": int(ok["input_tokens"].mean()) if len(ok) else None,

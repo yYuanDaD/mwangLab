@@ -1,0 +1,186 @@
+{
+ "description": "Manual estimand and pairing annotations on top of the ExerGeneDB sample-level gold (exergenedb_samples.csv). ExerGeneDB labels every sample control or treatment along one axis per series. These annotations name that axis, list the other exercise axes the paper itself analyses, give pairing gold per axis, and correct sample labels that contradict the GEO record. Scored by test/experiments/paper_evidence_ablation/estimand_scoring.py.",
+ "annotator": "Claude, from GEO metadata and the article abstract/methods",
+ "annotated_on": "2026-10-14",
+ "estimands": {
+  "acute_bout": "Before versus after one exercise session in the same subjects, or an exercised versus non-exercised limb after one session.",
+  "training": "Effect of a training programme assigned by the investigators: before versus after training in the same subjects, or trained versus sedentary animals after a training or wheel-running period.",
+  "habitual": "Cross-sectional comparison of pre-existing groups, such as athletes versus untrained people or trained versus sedentary volunteers."
+ },
+ "fields": {
+  "gold_estimand": "The axis the ExerGeneDB control/treatment labels encode.",
+  "paper_estimands": "Exercise axes the article reports as its own comparisons. A contrast on any of these, or on gold_estimand, is admissible.",
+  "pairing": "Gold pairing for the gold axis: required (the same subjects contribute to both arms, so the analysis must block on subject), not_required, or unknown (excluded from pairing scores).",
+  "subject": "Where subject identity lives: a metadata column and, when the ID is embedded in a longer string, a regex whose first group is the subject. pairing_column is the column a model should name.",
+  "alternate_axes": "Other admissible axes. roles lists rules (column, control values, treatment values) that assign sample roles for that axis; columns may be the __replicate_grouped pseudo-columns used by the validator.",
+  "label_corrections": "Samples whose ExerGeneDB role contradicts the GEO record, with the corrected role."
+ },
+ "series": {
+  "GSE117161": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "Separate mice per running protocol and time of day (titles Basal_Early_A, High_Late_B ...).",
+   "notes": "Moderate and High are both treatment arms; either against Basal is correct. Moderate versus High is an intensity contrast, not exercise versus control."
+  },
+  "GSE140089": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.4.subject_id", "regex": "^(PD-\\d+)"}, "pairing_column": "characteristics_ch1.4.subject_id",
+   "evidence": "ABS.p1: 5 participants with PD before and after 16-week resistance training; subject_id PD-02-0 / PD-02-16.",
+   "notes": "Gold covers only the PD subset (9 of 41 samples); older and young adult baseline groups are an age/disease contrast."
+  },
+  "GSE144133": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.1.participant"}, "pairing_column": "characteristics_ch1.1.participant",
+   "evidence": "ABS.p2: biopsies from young sedentary men before and after 6 weeks of endurance training; GEO 'Untrained'/'Trained' are the pre/post timepoints of P1-P8."
+  },
+  "GSE144627": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["habitual", "acute_bout"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.4.subject id"}, "pairing_column": "characteristics_ch1.4.subject id",
+   "evidence": "ABS.p1: trained and sedentary older men at Pre, Post and 3hPost; regular exercise assessed as trained versus sedentary at baseline, acute exercise as baseline versus post within each group.",
+   "alternate_axes": [
+    {"estimand": "habitual", "roles": [{"column": "characteristics_ch1.3.subject group", "control": ["Sedentary"], "treatment": ["Trained"]}],
+     "pairing": "not_required", "pairing_column": null,
+     "notes": "The paper restricts this comparison to Pre samples; a whole-column contrast also mixes post-exercise samples."}
+   ]
+  },
+  "GSE163356": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["training"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.2.subject"}, "pairing_column": "characteristics_ch1.2.subject",
+   "evidence": "ABS.p1: 7 weeks of combined training, biopsies before and after training; GEO has Pre/Post of the first and the ninth/last session for subjects A-K.",
+   "alternate_axes": [
+    {"estimand": "training", "roles": [{"column": "characteristics_ch1.3.time", "control": ["First session"], "treatment": ["Ninth/Last session"]}],
+     "pairing": "required", "pairing_column": "characteristics_ch1.2.subject",
+     "notes": "Training effect proper is First-session Pre versus Last-session Pre; the whole-column contrast also carries post-bout samples."}
+   ]
+  },
+  "GSE167046": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p2: sedentary versus treadmill-trained mice on control or high-energy diet; separate animals.",
+   "notes": "Diet is a stratum, not an exercise axis."
+  },
+  "GSE1832": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^Pa\\w+ (\\d+)"}, "pairing_column": null,
+   "evidence": "ABS.p2: one-leg acute resistance exercise; exercised and non-exercised legs biopsied at 6 h and 18 h in the same patients.",
+   "notes": "Subject and arm exist only in free-text titles with typos; no metadata column separates the arms."
+  },
+  "GSE195585": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "_ID(\\d+)_"}, "pairing_column": null,
+   "evidence": "ABS.p1: biopsies at baseline and 1, 4 and 24 h after high-load resistance exercise in each participant.",
+   "notes": "Gold covers the placebo arm only; the verum (collagen peptide) arm is unlabelled."
+  },
+  "GSE202295": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^((?:NGT|T2D)_\\d+)_"}, "pairing_column": null,
+   "evidence": "ABS.p1: acute exercise in NGT and T2D; titles NGT_003_basal / _post / _rec.",
+   "label_corrections": [
+    {"sample_id": "GSM6107915", "role": "treatment", "evidence": "title NGT_010_post, timepoint Post"},
+    {"sample_id": "GSM6107919", "role": "treatment", "evidence": "title T2D_006_rec, timepoint Recovery"},
+    {"sample_id": "GSM6107921", "role": "treatment", "evidence": "title T2D_007_post, timepoint Post"},
+    {"sample_id": "GSM6107924", "role": "treatment", "evidence": "title NGT_016_post, timepoint Post"},
+    {"sample_id": "GSM6107976", "role": "treatment", "evidence": "title T2D_031_rec, timepoint Recovery"},
+    {"sample_id": "GSM6107978", "role": "treatment", "evidence": "title NGT_050_post, timepoint Post"},
+    {"sample_id": "GSM6107987", "role": "treatment", "evidence": "title T2D_101_post, timepoint Post"},
+    {"sample_id": "GSM6108002", "role": "treatment", "evidence": "title T2D_108_rec, timepoint Recovery"}
+   ],
+   "notes": "Diagnosis (NGT/T2D) is a disease stratum."
+  },
+  "GSE218103": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "unknown", "subject": null,
+   "evidence": "S2.6.p1: pre- and post-exercise samples were pooled to N = 3 per timepoint per group; GEO CON = pre-exercise pool, EX = post-exercise pool.",
+   "notes": "Pooled samples, so whether pools are matched across timepoints is not stated."
+  },
+  "GSE224310": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout", "training"],
+   "pairing": "required", "subject": {"column": "source_name_ch1", "regex": "subject (\\d+)"}, "pairing_column": null,
+   "evidence": "ABS.p3: biopsies before, 60 min after the first and last bout, and 5 days after an 8-week intervention; source names end 'derived from subject N'.",
+   "alternate_axes": [
+    {"estimand": "training", "roles": [
+      {"column": "source_name_ch1__replicate_grouped", "control": ["Muscle biopsy before training derived from subject", "Subcutaneous adipose tissue biopsies untrained before exercise derived from subject"],
+       "treatment": ["Muscle biopsy post training derived from subject", "Subcutaneous adipose tissue biopsies post training before exercise derived from subject"]}],
+     "pairing": "required", "pairing_column": null,
+     "notes": "Rested samples before versus after the 8-week intervention."}
+   ],
+   "notes": "Muscle and adipose tissue are strata."
+  },
+  "GSE229755": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p2: mice running for 6 weeks versus sedentary mice."
+  },
+  "GSE24235": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "_(\\d+)U?T$"}, "pairing_column": null,
+   "evidence": "ABS.p1: unilateral acute resistance exercise after 12 weeks of training; bilateral biopsies compare the exercised (T) and non-exercised (UT) arm of the same person.",
+   "notes": "Sex is a stratum the paper analyses separately."
+  },
+  "GSE29075": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p1: adult and aged mice housed with or without running wheels for 8 weeks.",
+   "notes": "Age is a stratum."
+  },
+  "GSE43219": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^(\\w+?)_"}, "pairing_column": null,
+   "evidence": "ABS.p2: biopsies at rest and 30 min after one acute bout in 14 participants; titles MM29_rest / MM29_exercise."
+  },
+  "GSE45041": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.0.participant id"}, "pairing_column": "characteristics_ch1.0.participant id",
+   "evidence": "ABS.p1: blood before and after 30 min treadmill running in the same participants."
+  },
+  "GSE46075": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^(Athlete\\d+)-"}, "pairing_column": null,
+   "evidence": "ABS.p2: whole blood of eight athletes before and after exercise and during recovery.",
+   "notes": "Two exercise tests (MT and RTE), each with its own baseline."
+  },
+  "GSE47881": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "required", "subject": {"column": "characteristics_ch1.0.patientid"}, "pairing_column": "characteristics_ch1.0.patientid",
+   "evidence": "ABS.p1: profiles before and after 20 weeks of supervised resistance training in the same individuals.",
+   "notes": "ExerGeneDB records the post samples as '2.5h post exercise', but the GEO axis is pre- versus post-training."
+  },
+  "GSE48405": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^subject (\\w)"}, "pairing_column": null,
+   "evidence": "ABS.p1: blood before and 60 min, 1 day and 3 days after one resistance exercise session."
+  },
+  "GSE51216": {
+   "gold_estimand": "acute_bout", "paper_estimands": ["habitual", "acute_bout"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^Blood_(\\w+?_\\d+)_"}, "pairing_column": null,
+   "evidence": "ABS.p1: masters athletes versus untrained controls, each sampled before and after an acute bout.",
+   "alternate_axes": [
+    {"estimand": "habitual", "roles": [{"column": "characteristics_ch1.3.subject", "control": ["control"], "treatment": ["athlete"]}],
+     "pairing": "not_required", "pairing_column": null,
+     "notes": "Whole-column contrast mixes timepoints."}
+   ]
+  },
+  "GSE53598": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "required", "subject": {"column": "title", "regex": "^(\\w+?)_"}, "pairing_column": null,
+   "evidence": "ABS.p2: vastus lateralis before and after a 12-week training intervention; titles GL23_before / GL23_after.",
+   "notes": "Arms exist only in titles; no metadata column separates them."
+  },
+  "GSE64607": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p1: mice running or given AICAR for 3, 7 or 14 days; separate animals.",
+   "notes": "AICAR arm is unlabelled; vehicle-injected sedentary mice are the control."
+  },
+  "GSE68161": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p1: scWAT from mice after 11 days of wheel running versus sedentary mice."
+  },
+  "GSE7640": {
+   "gold_estimand": "training", "paper_estimands": ["training"],
+   "pairing": "not_required", "subject": null,
+   "evidence": "ABS.p1: trained (n = 10) versus control (n = 10) rats after 10 weeks of treadmill training."
+  }
+ }
+}

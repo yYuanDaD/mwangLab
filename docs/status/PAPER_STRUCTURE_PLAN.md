@@ -33,11 +33,10 @@ Conclusions: at this size, full text does not clearly improve the contrast choic
 
 ## Remaining stages
 
-### B2. Estimand-aware scoring and pairing gold (next)
+### B2. Estimand-aware scoring and pairing gold (in progress)
 
-- Add an estimand axis (acute bout, training, cross-sectional) to the gold and score the axis separately from sample labels.
-- Fill `covariance_annotations.csv` for the 24 frozen series and score the pairing calls.
-- Rerun on all 39 eligible series before changing what evidence production passes to the validator.
+- Done: `test/validation/exergenedb_gold/estimand_annotations.json` names each series' gold axis (`acute_bout`, `training`, `habitual`), the axes its paper analyses, pairing gold per axis, and gold label corrections; `sync_covariance_annotations.py` copies the pairing gold into `covariance_annotations.csv`. `tools.contrast_gold.score_estimand_decision` scores the chosen axis separately from the labels on that axis. Rescoring the 24-series run (no new calls): every wrong call was an axis choice the paper supports or a gold error; labels on the chosen axis are 100% correct in every arm; estimand-correct is metadata 77.8%, abstract 90.3%, structured 83.3%, flat 84.7%; paper text fixes the two pairing misses of the metadata arm. See `paper_evidence_ablation/REPORT.md`.
+- Next: annotate the other 15 eligible series, extend the manifest to all 39, run the four arms on the new 15 (the 24 frozen prompts are unchanged, so their calls are reused), and rescore before changing what evidence production passes to the validator.
 
 ### C. Supplementary tables
 

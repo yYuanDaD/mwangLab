@@ -206,3 +206,139 @@ def production_route(python_contrasts: list[Contrast], python_confident: bool, l
     if _field(llm, "intent_match") is False:
         return [], "llm_refuse_intent_mismatch"
     return [], "llm_refuse"
+
+
+# --- Estimand-aware scoring -------------------------------------------------
+#
+# The sample gold encodes one comparison axis per series. A paper can analyse
+# other exercise axes too (athletes versus controls next to pre/post), so the
+# axis a decision chose is scored separately from whether its sample labels are
+# right on that axis. Annotations live in
+# test/validation/exergenedb_gold/estimand_annotations.json.
+
+PURE = {"correct", "reversed"}
+
+
+def corrected_roles(roles: pd.Series, annotation: Optional[dict]) -> tuple[pd.Series, int]:
+    """Apply an annotation's label_corrections to the gold roles."""
+    fixes = (annotation or {}).get("label_corrections") or []
+    if not fixes:
+        return roles, 0
+    roles = roles.copy()
+    for fix in fixes:
+        roles[fix["sample_id"]] = fix["role"]
+    return roles, len(fixes)
+
+
+def roles_from_rules(meta: pd.DataFrame, rules: list[dict]) -> pd.Series:
+    """Sample roles for an alternate axis from (column, control values, treatment values) rules."""
+    roles: dict[str, str] = {}
+    for rule in rules:
+        for role, key in ((CONTROL, "control"), (TREATMENT, "treatment")):
+            for value in rule.get(key, []):
+                ids, how = samples_for_value(meta, rule["column"], value)
+                if how == "missing_column" or not ids:
+                    raise ValueError(f"axis rule selects nothing: {rule['column']!r} = {value!r}")
+                for s in ids:
+                    if roles.get(s, role) != role:
+                        raise ValueError(f"axis rules give {s} both roles")
+                    roles[s] = role
+    return pd.Series(roles, dtype=str)
+
+
+def subject_ids(meta: pd.DataFrame, subject: Optional[dict]) -> Optional[pd.Series]:
+    """Subject ID per sample from an annotation's subject spec, or None."""
+    if not subject or subject.get("column") not in meta.columns:
+        return None
+    values = meta[subject["column"]].astype(str)
+    if subject.get("regex"):
+        values = values.str.extract(subject["regex"], expand=False)
+    return values
+
+
+def score_pairing(gold: Optional[str], gold_column: Optional[str], call: Optional[str],
+                  call_column: Optional[str]) -> dict[str, Any]:
+    """Compare a pairing call (required / not_required / unknown) with the gold for its axis."""
+    call = (call or "unknown").lower()
+    if gold not in ("required", "not_required"):
+        verdict = "no_gold"
+    elif call not in ("required", "not_required"):
+        verdict = "abstained"
+    else:
+        verdict = "correct" if call == gold else ("over_called" if call == "required" else "missed")
+    column_ok = None
+    if verdict == "correct" and gold == "required" and gold_column:
+        # The validator shows subject IDs embedded in longer values as a grouped pseudo-column.
+        column_ok = call_column in (gold_column, gold_column + REPLICATE_SUFFIX)
+    return {"pairing_verdict": verdict, "pairing_column_ok": column_ok}
+
+
+def score_estimand_decision(meta: pd.DataFrame, roles: pd.Series, annotation: dict,
+                            contrasts: list[Contrast], pairing: Optional[str] = None,
+                            pairing_column: Optional[str] = None) -> dict[str, Any]:
+    """Score which axis a decision chose and, separately, its labels on that axis.
+
+    axis              gold estimand, an alternate estimand, `off_axis` (mixed on every
+                      annotated axis), or the set verdict when nothing was selected
+                      (`refused`, `unresolvable`, `unscorable`)
+    axis_admissible   the axis is the gold estimand or one the paper analyses
+    label_verdict     the contrast-set verdict on the chosen axis (correct / reversed),
+                      `mixed` when off axis
+    estimand_correct  admissible axis and correct labels
+    """
+    roles, n_fixed = corrected_roles(roles, annotation)
+    gold_axis = annotation["gold_estimand"]
+    admissible = {gold_axis, *annotation.get("paper_estimands", [])}
+    on_gold = score_contrast_set(meta, roles, contrasts)
+    axis, label, pairing_gold, pairing_gold_col = None, None, None, None
+    if on_gold["verdict"] in PURE:
+        axis, label = gold_axis, on_gold["verdict"]
+        pairing_gold, pairing_gold_col = annotation.get("pairing"), annotation.get("pairing_column")
+    elif on_gold["verdict"] == "mixed":
+        for alt in annotation.get("alternate_axes", []):
+            s = score_contrast_set(meta, roles_from_rules(meta, alt["roles"]), contrasts)
+            if s["verdict"] in PURE:
+                axis, label = alt["estimand"], s["verdict"]
+                pairing_gold, pairing_gold_col = alt.get("pairing"), alt.get("pairing_column")
+                break
+        if axis is None:
+            axis, label = "off_axis", "mixed"
+    else:
+        axis = on_gold["verdict"]
+    result = {
+        "gold_verdict": on_gold["verdict"], "gold_purity": on_gold["purity"],
+        "n_label_corrections": n_fixed, "axis": axis,
+        "axis_is_gold": axis == gold_axis,
+        "axis_admissible": (axis in admissible) if label is not None else None,
+        "label_verdict": label,
+        "estimand_correct": bool(axis in admissible and label == "correct"),
+    }
+    if label in PURE:
+        result.update(score_pairing(pairing_gold, pairing_gold_col, pairing, pairing_column))
+    else:
+        result.update({"pairing_verdict": "n/a", "pairing_column_ok": None})
+    return result
+
+
+def check_estimand_annotation(meta: pd.DataFrame, roles: pd.Series, annotation: dict) -> list[str]:
+    """Consistency problems in one series annotation (empty list when it checks out)."""
+    problems = []
+    roles, _ = corrected_roles(roles, annotation)
+    labelled = roles[roles.index.isin(meta.index.astype(str))]
+    subjects = subject_ids(meta, annotation.get("subject"))
+    if annotation.get("subject") and subjects is None:
+        problems.append(f"subject column missing: {annotation['subject'].get('column')!r}")
+    if annotation.get("pairing") == "required" and subjects is not None:
+        ctrl = set(subjects.reindex(labelled.index[labelled == CONTROL]).dropna())
+        treat = set(subjects.reindex(labelled.index[labelled == TREATMENT]).dropna())
+        if len(ctrl & treat) < 2:
+            problems.append(f"pairing required but only {len(ctrl & treat)} subjects span both arms")
+    col = annotation.get("pairing_column")
+    if col and col not in meta.columns:
+        problems.append(f"pairing_column missing: {col!r}")
+    for alt in annotation.get("alternate_axes", []):
+        try:
+            roles_from_rules(meta, alt["roles"])
+        except ValueError as e:
+            problems.append(f"{alt['estimand']}: {e}")
+    return problems

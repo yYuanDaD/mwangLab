@@ -13,7 +13,8 @@ os.chdir(ROOT)
 sys.path.insert(0, str(ROOT))
 
 from tools.contrast_gold import (  # noqa: E402
-    pairing_signal, production_route, samples_for_value, score_contrast_set,
+    check_estimand_annotation, pairing_signal, production_route, samples_for_value,
+    score_contrast_set, score_estimand_decision,
 )
 
 
@@ -133,6 +134,72 @@ class ProductionRouteTests(unittest.TestCase):
         self.assertEqual(production_route(self.py, False, self.llm(intent=False))[1],
                          "llm_refuse_intent_mismatch")
         self.assertEqual(production_route(self.py, True, override, strict=True)[1], "llm_override")
+
+
+class EstimandScoringTests(unittest.TestCase):
+    """Athletes and controls, each sampled before and after one bout (GSE51216-like)."""
+
+    def setUp(self):
+        ids = [f"GSM{i}" for i in range(1, 9)]
+        self.meta = pd.DataFrame({
+            "group": ["athlete"] * 4 + ["control"] * 4,
+            "time": ["pre", "post"] * 4,
+            "subject id": ["A1", "A1", "A2", "A2", "C1", "C1", "C2", "C2"],
+        }, index=ids)
+        self.roles = pd.Series(["control", "treatment"] * 4, index=ids)
+        self.ann = {
+            "gold_estimand": "acute_bout", "paper_estimands": ["acute_bout", "habitual"],
+            "pairing": "required", "subject": {"column": "subject id"}, "pairing_column": "subject id",
+            "alternate_axes": [{"estimand": "habitual", "pairing": "not_required",
+                                "roles": [{"column": "group", "control": ["control"], "treatment": ["athlete"]}]}],
+        }
+
+    def score(self, contrasts, pairing=None, column=None, ann=None):
+        return score_estimand_decision(self.meta, self.roles, ann or self.ann, contrasts, pairing, column)
+
+    def test_gold_axis_with_paired_call(self):
+        r = self.score([("time", "pre", "post")], "required", "subject id")
+        self.assertEqual((r["axis"], r["label_verdict"], r["estimand_correct"]), ("acute_bout", "correct", True))
+        self.assertEqual((r["pairing_verdict"], r["pairing_column_ok"]), ("correct", True))
+        self.assertEqual(self.score([("time", "pre", "post")], "not_required")["pairing_verdict"], "missed")
+
+    def test_paper_axis_is_scored_on_its_own_roles(self):
+        r = self.score([("group", "control", "athlete")], "required")
+        self.assertEqual(r["gold_verdict"], "mixed")
+        self.assertEqual((r["axis"], r["axis_admissible"], r["label_verdict"]), ("habitual", True, "correct"))
+        self.assertEqual(r["pairing_verdict"], "over_called")
+        reversed_ = self.score([("group", "athlete", "control")])
+        self.assertEqual((reversed_["axis"], reversed_["label_verdict"], reversed_["estimand_correct"]),
+                         ("habitual", "reversed", False))
+        self.assertEqual(reversed_["pairing_verdict"], "abstained")  # reversed arms keep the same design
+
+    def test_axis_outside_the_paper_is_not_admissible(self):
+        ann = dict(self.ann, paper_estimands=["acute_bout"])
+        r = self.score([("group", "control", "athlete")], ann=ann)
+        self.assertEqual((r["axis"], r["axis_admissible"], r["estimand_correct"]), ("habitual", False, False))
+
+    def test_off_axis_and_refusal(self):
+        meta = self.meta.assign(batch=["b1", "b2", "b2", "b1"] * 2)
+        r = score_estimand_decision(meta, self.roles, self.ann, [("batch", "b1", "b2")])
+        self.assertEqual((r["axis"], r["label_verdict"], r["axis_admissible"]), ("off_axis", "mixed", False))
+        r = self.score([])
+        self.assertEqual((r["axis"], r["axis_admissible"], r["estimand_correct"]), ("refused", None, False))
+
+    def test_label_corrections_apply_before_scoring(self):
+        roles = self.roles.copy()
+        roles["GSM2"] = "control"  # gold error: a post sample labelled control
+        self.assertEqual(score_estimand_decision(self.meta, roles, self.ann, [("time", "pre", "post")])["gold_verdict"],
+                         "mixed")
+        ann = dict(self.ann, label_corrections=[{"sample_id": "GSM2", "role": "treatment"}])
+        r = score_estimand_decision(self.meta, roles, ann, [("time", "pre", "post")])
+        self.assertEqual((r["gold_verdict"], r["n_label_corrections"]), ("correct", 1))
+
+    def test_annotation_check(self):
+        self.assertEqual(check_estimand_annotation(self.meta, self.roles, self.ann), [])
+        bad = dict(self.ann, subject={"column": "time"},
+                   alternate_axes=[{"estimand": "habitual", "roles": [{"column": "group", "control": ["nope"]}]}])
+        problems = check_estimand_annotation(self.meta, self.roles, bad)
+        self.assertEqual(len(problems), 2, problems)
 
 
 if __name__ == "__main__":
