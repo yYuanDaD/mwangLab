@@ -61,10 +61,33 @@ Findings:
 
 Scope: 24 series; the per-call table now also carries `axis`, `axis_admissible`, `label_verdict`, `estimand_correct`, `pairing_verdict`, `pairing_column_ok` (`scored_calls.csv`), and the arm summaries carry the matching rates (`summary.json`).
 
+## All eligible series (stage B2)
+
+The draw was extended to every eligible series with the same seed and order (`manifest.json`; `stage_b_series` lists the original 24). Of the 15 new series, GSE158984 (single-cell) has no metadata sample in the gold, so 38 of 39 eligible series are scored. The 14 new series were annotated the same way (11 training, 3 acute bout; 5 with pairing required) and run in all four arms x 3 repeats: 168 new calls, all succeeded, about $0.64. The 288 earlier calls were reused because their prompts are unchanged. Totals below are over 38 series, 114 calls per arm.
+
+One scorer gap surfaced: the sample-gold verdict calls a contrast correct when one arm has no labelled sample. In GSE217155 a metadata-arm call compared normal-diet controls (not in the gold) with exercise on the atherogenic diet, which confounds diet with exercise. The estimand scorer now marks such contrasts `one_arm_unlabelled` and does not count them as correct; the sample-gold column is left as it was for comparability.
+
+| arm | correct (sample gold) | estimand-correct | refused | gold axis | other admissible axis | one arm unlabelled | pairing correct | pairing missed | pairing column right | mean input tokens | cost (114 calls) | identical triple across repeats |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| metadata | 71.1% | 75.4% | 22.8% | 71.1% | 6.1% | 1.8% | 88.2% (n = 85) | 10.6% | 50.0% | 1,711 | $0.11 | 92.1% |
+| abstract | 80.7% | 88.6% | 11.4% | 83.3% | 5.3% | 0% | 95.9% (n = 98) | 3.1% | 70.0% | 2,151 | $0.14 | 84.2% |
+| structured | 76.3% | 84.2% | 15.8% | 78.9% | 5.3% | 0% | 100% (n = 93) | 0% | 62.5% | 7,770 | $0.42 | 97.4% |
+| flat | 74.6% | 85.1% | 14.9% | 77.2% | 7.9% | 0% | 100% (n = 94) | 0% | 57.1% | 18,214 | $0.93 | 94.7% |
+
+Findings over 38 series:
+
+1. The 24-series conclusions hold. Labels on the chosen axis are always correct except the one confounded metadata call; every remaining non-correct call is a refusal. Abstract is the most accurate arm (+13.2 points estimand-correct over metadata), structured and flat are close to each other (+8.8 and +9.7), and structured is the most stable across repeats.
+2. Pairing: structured and flat text are 100% correct on 93–94 scorable calls. The metadata arm misses GSE144133, GSE24235 and GSE27536 (pre/post timepoints labelled 'Untrained'/'Trained' or 'Sedentary'/'Trained', and an exercised versus non-exercised limb). The abstract arm still misses GSE27536, where the pre/post design is stated only in Methods (S2.4.p1). Only one call over-calls pairing.
+3. Pairing columns are often unnameable. The validator's metadata summary drops high-cardinality columns, so subject-ID columns with many subjects (GSE47881 `patientid`, GSE27536 `individual`, GSE156247 `subject id`) never reach the model, which then guesses a column. The model names the right column whenever the summary shows it.
+4. Four series are refused in every arm: GSE1832, GSE53598, GSE92719 and GSE115645. Their arms exist only in per-sample titles or descriptions that the summary cannot group. GSE53598 and GSE156247 are the same article and subjects; GSE156247 exposes time point and subject as columns, and every arm gets it right. Paper text cannot fix this, because the contrast must name a metadata column and values.
+
+What this means for production (not changed yet): pass title + abstract by default; add Methods (structured, with block IDs) when the design or pairing decision needs it, since it is what fixes GSE27536; and change the metadata summary to keep subject-like columns (name, number of subjects, whether IDs recur across groups) and to expose arm tokens embedded in per-sample titles. Those two summary changes target the remaining pairing-column and refusal errors, which paper text does not fix.
+
 ## Next
 
 - ~~Score the axis separately from the sample labels~~ and ~~fill the pairing gold~~: done in stage B2 above.
-- Use title + abstract as the default paper evidence for contrast validation, and the structured sections for design, covariance, and threshold gates where locators are needed. Re-test with a larger set (all 39 eligible series) before changing production.
+- Use title + abstract as the default paper evidence for contrast validation, and the structured sections for design, covariance, and threshold gates where locators are needed. ~~Re-test with all 39 eligible series~~: done above; the recommendation stands.
+- Keep subject-like columns and per-sample arm tokens in `summarize_metadata_for_llm` (see the 38-series findings 3 and 4), then rerun this ablation.
 - 31 of 70 series with a PMCID have no Europe PMC full text; a PDF route (stage D) would cover them.
 
 Files: `manifest.json` (frozen inputs and hashes), `calls.jsonl` (every call with prompt hash, evidence size, output, usage), `scored_calls.csv`, `summary.json`, `pilot_calls.jsonl` (4-series pilot, not part of the results).

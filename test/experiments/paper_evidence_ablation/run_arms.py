@@ -255,7 +255,7 @@ def estimand_summary(ok: pd.DataFrame) -> dict:
     if "axis" not in ok or ok["axis"].isna().all():
         return {}
     every = pd.Series(True, index=ok.index)
-    chose = ok["label_verdict"].isin(["correct", "reversed", "mixed"])
+    chose = ok["label_verdict"].isin(["correct", "reversed", "mixed", "one_arm_unlabelled"])
     pv = ok["pairing_verdict"]
     scorable = pv.isin(["correct", "over_called", "missed", "abstained"])
     return {
@@ -263,6 +263,7 @@ def estimand_summary(ok: pd.DataFrame) -> dict:
         "axis_gold": _rate(ok["axis_admissible"].notna() & (ok["axis"] == ok["gold_axis"]), every),
         "axis_admissible_other": _rate((ok["axis_admissible"] == True) & (ok["axis"] != ok["gold_axis"]), every),  # noqa: E712
         "off_axis": _rate(ok["axis"] == "off_axis", every),
+        "one_arm_unlabelled": _rate(ok["label_verdict"] == "one_arm_unlabelled", every),
         "labels_correct_given_axis": _rate(ok["label_verdict"] == "correct", chose & (ok["axis"] != "off_axis")),
         "pairing_scorable_calls": int(scorable.sum()),
         "pairing_correct": _rate(pv == "correct", scorable),

@@ -185,6 +185,13 @@ class EstimandScoringTests(unittest.TestCase):
         r = self.score([])
         self.assertEqual((r["axis"], r["axis_admissible"], r["estimand_correct"]), ("refused", None, False))
 
+    def test_contrast_with_an_unlabelled_arm_is_not_correct(self):
+        meta = pd.concat([self.meta, pd.DataFrame({"group": ["other"], "time": ["x"], "subject id": ["O1"]},
+                                                  index=["GSM9"])])
+        r = score_estimand_decision(meta, self.roles, self.ann, [("time", "x", "post")])
+        self.assertEqual(r["gold_verdict"], "correct")  # the sample-gold scorer only sees one arm
+        self.assertEqual((r["label_verdict"], r["estimand_correct"]), ("one_arm_unlabelled", False))
+
     def test_label_corrections_apply_before_scoring(self):
         roles = self.roles.copy()
         roles["GSM2"] = "control"  # gold error: a post sample labelled control

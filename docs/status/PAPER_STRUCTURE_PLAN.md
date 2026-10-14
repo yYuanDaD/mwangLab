@@ -33,10 +33,24 @@ Conclusions: at this size, full text does not clearly improve the contrast choic
 
 ## Remaining stages
 
-### B2. Estimand-aware scoring and pairing gold (in progress)
+### B2. Estimand-aware scoring and pairing gold (2026-10-14)
 
-- Done: `test/validation/exergenedb_gold/estimand_annotations.json` names each series' gold axis (`acute_bout`, `training`, `habitual`), the axes its paper analyses, pairing gold per axis, and gold label corrections; `sync_covariance_annotations.py` copies the pairing gold into `covariance_annotations.csv`. `tools.contrast_gold.score_estimand_decision` scores the chosen axis separately from the labels on that axis. Rescoring the 24-series run (no new calls): every wrong call was an axis choice the paper supports or a gold error; labels on the chosen axis are 100% correct in every arm; estimand-correct is metadata 77.8%, abstract 90.3%, structured 83.3%, flat 84.7%; paper text fixes the two pairing misses of the metadata arm. See `paper_evidence_ablation/REPORT.md`.
-- Next: annotate the other 15 eligible series, extend the manifest to all 39, run the four arms on the new 15 (the 24 frozen prompts are unchanged, so their calls are reused), and rescore before changing what evidence production passes to the validator.
+- `test/validation/exergenedb_gold/estimand_annotations.json` names each series' gold axis (`acute_bout`, `training`, `habitual`), the axes its paper analyses, pairing gold per axis, and gold label corrections (8 GSE202295 samples). `sync_covariance_annotations.py` copies the pairing gold into `covariance_annotations.csv`. `tools.contrast_gold.score_estimand_decision` scores the chosen axis separately from the labels on it, flags contrasts with an unlabelled arm, and scores pairing against the chosen axis.
+- The ablation now covers all 38 scorable eligible series (39 eligible; GSE158984 has no gold overlap): 456 calls, about $1.60 in total.
+
+| arm | estimand-correct | refused | pairing correct | mean input tokens |
+|---|---|---|---|---|
+| metadata | 75.4% | 22.8% | 88.2% | 1,711 |
+| abstract | 88.6% | 11.4% | 95.9% | 2,151 |
+| structured | 84.2% | 15.8% | 100% | 7,770 |
+| flat | 85.1% | 14.9% | 100% | 18,214 |
+
+Conclusions: labels on the chosen axis are always right (one confounded metadata call aside); the earlier "wrong" calls were paper-supported axes or gold errors. Abstract is best for the contrast; Methods text is what makes pairing fully right. The remaining errors are in the metadata summary, not the evidence: subject-ID columns with many subjects are dropped, and arms embedded in per-sample titles are never exposed (four series refused in every arm). Details in `paper_evidence_ablation/REPORT.md`.
+
+### B3. Metadata summary fixes (next)
+
+- `summarize_metadata_for_llm`: keep subject-like columns (name, subject count, whether IDs recur across groups) and expose arm tokens embedded in per-sample titles or descriptions (GSE1832, GSE53598, GSE92719, GSE115645).
+- Then pass title + abstract by default and Methods for design/pairing in production, and rerun the 38-series ablation as the regression check.
 
 ### C. Supplementary tables
 

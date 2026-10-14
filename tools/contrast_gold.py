@@ -283,7 +283,9 @@ def score_estimand_decision(meta: pd.DataFrame, roles: pd.Series, annotation: di
                       (`refused`, `unresolvable`, `unscorable`)
     axis_admissible   the axis is the gold estimand or one the paper analyses
     label_verdict     the contrast-set verdict on the chosen axis (correct / reversed),
-                      `mixed` when off axis
+                      `mixed` when off axis, `one_arm_unlabelled` when an arm has no
+                      labelled sample (for example normal diet against exercise on a
+                      high-fat diet, where only the exercise arm is in the gold)
     estimand_correct  admissible axis and correct labels
     """
     roles, n_fixed = corrected_roles(roles, annotation)
@@ -291,20 +293,25 @@ def score_estimand_decision(meta: pd.DataFrame, roles: pd.Series, annotation: di
     admissible = {gold_axis, *annotation.get("paper_estimands", [])}
     on_gold = score_contrast_set(meta, roles, contrasts)
     axis, label, pairing_gold, pairing_gold_col = None, None, None, None
+    chosen = None
     if on_gold["verdict"] in PURE:
-        axis, label = gold_axis, on_gold["verdict"]
+        axis, label, chosen = gold_axis, on_gold["verdict"], on_gold
         pairing_gold, pairing_gold_col = annotation.get("pairing"), annotation.get("pairing_column")
     elif on_gold["verdict"] == "mixed":
         for alt in annotation.get("alternate_axes", []):
             s = score_contrast_set(meta, roles_from_rules(meta, alt["roles"]), contrasts)
             if s["verdict"] in PURE:
-                axis, label = alt["estimand"], s["verdict"]
+                axis, label, chosen = alt["estimand"], s["verdict"], s
                 pairing_gold, pairing_gold_col = alt.get("pairing"), alt.get("pairing_column")
                 break
         if axis is None:
             axis, label = "off_axis", "mixed"
     else:
         axis = on_gold["verdict"]
+    if chosen is not None and any(
+            c[arm][CONTROL] + c[arm][TREATMENT] == 0
+            for c in chosen["contrasts"] for arm in ("control_arm_gold", "treatment_arm_gold")):
+        label = "one_arm_unlabelled"
     result = {
         "gold_verdict": on_gold["verdict"], "gold_purity": on_gold["purity"],
         "n_label_corrections": n_fixed, "axis": axis,
@@ -313,7 +320,7 @@ def score_estimand_decision(meta: pd.DataFrame, roles: pd.Series, annotation: di
         "label_verdict": label,
         "estimand_correct": bool(axis in admissible and label == "correct"),
     }
-    if label in PURE:
+    if label in PURE or label == "one_arm_unlabelled":
         result.update(score_pairing(pairing_gold, pairing_gold_col, pairing, pairing_column))
     else:
         result.update({"pairing_verdict": "n/a", "pairing_column_ok": None})
