@@ -12,7 +12,7 @@ Write one record per gate per case, in gate order. A record is an audit object, 
   "evidence": [{"id": "metadata:GSE1_metadata.csv", "kind": "metadata", "sha256": "..."}],
   "candidates": [{"value": "~ time", "reason_rejected": "ignores within-subject pairing"}],
   "final": {"status": "required", "blocking_terms": ["subject"], "covariates": []},
-  "paper": {"locator": "Methods, paragraph 2"},
+  "paper": {"locator": "S2.4.p1"},
   "confidence": "high",
   "reasoning": "8 subjects each sampled pre and post; paper models ~ subject + time.",
   "decision_status": "valid",
@@ -22,6 +22,7 @@ Write one record per gate per case, in gate order. A record is an audit object, 
 ```
 
 - `evidence`: a non-empty list. Every item is an object with `id` and `kind` (`paper`, `metadata`, `matrix`, `tool_output`, or `user`); add `sha256` and `path` when a file is involved.
+- `paper.locator`: a block ID from the structured paper (`S2.4.p1`, `TAB1`, `FIG2`, `DA.p1`; see [Paper reconstruction](paper-reconstruction.md#reading-the-paper)). Use a free-text locator such as "Methods, paragraph 2" only when no structured copy exists.
 - `confidence`: `high`, `medium`, or `low`.
 - `decision_status`: `valid`, `unresolved`, `manual_review`, or `refused`.
 - `execution_status`: `not_started`, `completed`, `failed`, or `not_run`.

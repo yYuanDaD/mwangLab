@@ -2,6 +2,22 @@
 
 Use this reference whenever a paper, DOI, PDF, paper-derived GEO case, or article-specific validation question is available. The goal is to reproduce the paper's stated analysis and then test whether the available data and implementation support that reproduction.
 
+## Reading the paper
+
+`fetch_paper_text` saves `<id>.paper.md` and `<id>.paper.json` next to the flat `.txt`. For a PMCID alone, run `python -m tools.paper_structure fetch <PMCID> --out data/papers`. Read the structured copy by section, not the flat text:
+
+```bash
+python -m tools.paper_structure outline data/papers/<id>.paper.json
+python -m tools.paper_structure section data/papers/<id>.paper.json methods,data_availability,tables
+python -m tools.paper_structure find    data/papers/<id>.paper.json sedentary sham baseline paired
+python -m tools.paper_structure block   data/papers/<id>.paper.json S2.4.p1 TAB1
+```
+
+- Read whole sections. Sample groups, pairing, and thresholds are often split between a Methods paragraph, a table, and a figure legend; read all three before deciding the contrast or covariance.
+- Every paragraph, table, figure legend, and supplementary file has a block ID (`S2.4.p1`, `TAB1`, `FIG2`, `SUP1`, `DA.p1`). Use it as `paper.locator` and `source_locator`. A reviewer resolves it with `tools.paper_structure.resolve_locator`.
+- The outline lists where each accession is mentioned. A GSE in Methods or the data-availability statement is usually the paper's own deposit; one that appears only in the Introduction or Discussion is usually a citation.
+- `structure_quality: pdf_heuristic` means the copy came from PDF text. Its headings are approximate and its tables are not recovered, so check table values and group sizes against the PDF.
+
 ## Study map
 
 Before inspecting candidate contrasts, extract an evidence-backed study map:
