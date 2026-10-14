@@ -25,7 +25,7 @@ from typing import Optional, Literal
 import numpy as np
 import pandas as pd
 import requests
-from langchain_core.tools import tool
+from tools.tooling import tool
 from pydantic import BaseModel, Field
 
 PRIDE_BASE = "https://www.ebi.ac.uk/pride/ws/archive/v3"

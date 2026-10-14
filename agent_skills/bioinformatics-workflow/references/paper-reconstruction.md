@@ -2,6 +2,22 @@
 
 Use this reference whenever a paper, DOI, PDF, paper-derived GEO case, or article-specific validation question is available. The goal is to reproduce the paper's stated analysis and then test whether the available data and implementation support that reproduction.
 
+## Reading the paper
+
+`fetch_paper_text` saves `<id>.paper.md` and `<id>.paper.json` next to the flat `.txt`. For a PMCID alone, run `python -m tools.paper_structure fetch <PMCID> --out data/papers`. Read the structured copy by section, not the flat text:
+
+```bash
+python -m tools.paper_structure outline data/papers/<id>.paper.json
+python -m tools.paper_structure section data/papers/<id>.paper.json methods,data_availability,tables
+python -m tools.paper_structure find    data/papers/<id>.paper.json sedentary sham baseline paired
+python -m tools.paper_structure block   data/papers/<id>.paper.json S2.4.p1 TAB1
+```
+
+- Read whole sections. Sample groups, pairing, and thresholds are often split between a Methods paragraph, a table, and a figure legend; read all three before deciding the contrast or covariance.
+- Every paragraph, table, figure legend, and supplementary file has a block ID (`S2.4.p1`, `TAB1`, `FIG2`, `SUP1`, `DA.p1`). Use it as `paper.locator` and `source_locator`. A reviewer resolves it with `tools.paper_structure.resolve_locator`.
+- The outline lists where each accession is mentioned. A GSE in Methods or the data-availability statement is usually the paper's own deposit; one that appears only in the Introduction or Discussion is usually a citation.
+- `structure_quality: pdf_heuristic` means the copy came from PDF text. Its headings are approximate and its tables are not recovered, so check table values and group sizes against the PDF.
+
 ## Study map
 
 Before inspecting candidate contrasts, extract an evidence-backed study map:
@@ -66,7 +82,7 @@ Preserve the paper's exact threshold semantics:
 - an article that reports only an adjusted-p-value cutoff has no implied effect-size cutoff;
 - if the paper reports different thresholds for different contrasts, keep them contrast-specific.
 
-For a paper-aligned result, use `paper_threshold`. For cross-study comparison or sensitivity analysis, optionally calculate a separate `audit_threshold` and report both. If the paper threshold is absent, use the workflow default only with `threshold_source=workflow_default` and mark the result as a fallback. Threshold choice cannot override a failed design, covariance, matrix, or sample-alignment gate.
+For a paper-aligned result, apply `paper_threshold` (`threshold_source=paper`). For a declared deviation route (for example limma on log2 FPKM when the paper used DESeq2 on counts that were not deposited), apply the paper rule with `threshold_source=paper_on_deviation_route`. For cross-study comparison or sensitivity analysis, optionally calculate a separate `audit_threshold` (`threshold_source=audit`) and report both. If the paper threshold is absent, use the workflow default (BH-adjusted p < 0.05, no effect-size cutoff) with `threshold_source=workflow_default` and mark the result as a fallback. A paper that says "adjusted P" without naming the method: record `adjustment: not_reported` and note that the executor applies BH. Threshold choice cannot override a failed design, covariance, matrix, or sample-alignment gate.
 
 ## Minimum output
 

@@ -6,7 +6,7 @@ import json
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, model_validator
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 from tools.sea_cdm_schema import Sourced, SEA_TABLES, csv_columns
 from tools.metadata_structural import (

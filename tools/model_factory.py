@@ -8,12 +8,52 @@ environment without a DeepSeek key fails neither implicitly nor ambiguously.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
+import inspect
 import os
+from threading import RLock
 from typing import Mapping
 from urllib.parse import urlsplit, urlunsplit
 
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
+
+try:
+    from langchain_anthropic import ChatAnthropic
+except ImportError:  # optional: native skill sessions never create an external client
+    ChatAnthropic = None
+
+
+# Native skill sessions make every scientific decision themselves. Setting this
+# variable blocks every external LLM client created through this module, and
+# records the attempt so a run can prove that no hidden call was made.
+EXTERNAL_LLM_DISABLE_ENV = "BIOAGENT_DISABLE_EXTERNAL_LLM"
+_BLOCKED_ATTEMPTS: list[dict] = []
+_BLOCKED_LOCK = RLock()
+
+
+class ExternalLLMDisabledError(RuntimeError):
+    """Raised when a required external LLM client is requested in native mode."""
+
+
+def external_llm_disabled(environment: Mapping[str, str] | None = None) -> bool:
+    env = environment if environment is not None else os.environ
+    return str(env.get(EXTERNAL_LLM_DISABLE_ENV, "")).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def blocked_external_llm_attempts() -> list[dict]:
+    """Return a copy of every external LLM request blocked in this process."""
+    with _BLOCKED_LOCK:
+        return [dict(item) for item in _BLOCKED_ATTEMPTS]
+
+
+def _record_blocked_attempt(required: bool) -> None:
+    callers = [frame.function for frame in inspect.stack()[2:6]]
+    with _BLOCKED_LOCK:
+        _BLOCKED_ATTEMPTS.append({
+            "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "required": required,
+            "callers": callers,
+        })
 
 
 DEFAULT_PROVIDER = "anthropic"
@@ -123,6 +163,14 @@ def create_chat_model(
     """
     load_dotenv()
     env = environment if environment is not None else os.environ
+    if external_llm_disabled(env):
+        _record_blocked_attempt(required)
+        if required:
+            raise ExternalLLMDisabledError(
+                f"External LLM calls are disabled ({EXTERNAL_LLM_DISABLE_ENV}=1); "
+                "the calling step needs a decision from the agent session instead."
+            )
+        return None
     resolved = config or resolve_model_config(environment=env)
     api_key = env.get(resolved.api_key_env)
     if not api_key:
@@ -154,6 +202,8 @@ def create_chat_model(
         thinking_enabled = thinking
     if resolved.effort and thinking_enabled is not False:
         kwargs["effort"] = resolved.effort
+    if ChatAnthropic is None:
+        raise ImportError("langchain-anthropic is required to create an external LLM client")
     return ChatAnthropic(**kwargs)
 
 

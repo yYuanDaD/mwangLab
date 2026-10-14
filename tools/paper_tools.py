@@ -23,7 +23,7 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from langchain_core.tools import tool
+from tools.tooling import tool
 
 
 _S2_SEARCH = "https://api.semanticscholar.org/graph/v1/paper/search"
@@ -84,6 +84,35 @@ def _normalize_pmcid(value) -> str:
     return f"PMC{s}" if s.isdigit() else ""
 
 
+def _fetch_europepmc_xml(pmcid: str):
+    """Fetch an open-access article's JATS XML from Europe PMC.
+
+    Returns (xml_bytes, url). xml_bytes is b'' when the article isn't in Europe PMC's OA
+    full-text set (404) or the request fails.
+    """
+    norm = _normalize_pmcid(pmcid)
+    url = _EPMC_FULLTEXT.format(pmcid=norm) if norm else ""
+    if not norm:
+        return b"", url
+    try:
+        r = requests.get(url, headers=_HTTP_HEADERS, timeout=60)
+        if r.status_code != 200 or not r.content.strip():
+            return b"", url
+        return r.content, url
+    except Exception:
+        return b"", url
+
+
+def _flatten_jats(xml_bytes: bytes) -> str:
+    """The historical flat-text form of JATS XML ('' if it won't parse)."""
+    try:
+        root = ET.fromstring(xml_bytes)
+    except Exception:
+        return ""
+    text = " ".join(t for t in root.itertext() if t and t.strip())
+    return text if text.strip() else ""
+
+
 def _fetch_europepmc_text(pmcid: str):
     """Fetch an open-access article's full text as plain text from Europe PMC.
 
@@ -91,19 +120,42 @@ def _fetch_europepmc_text(pmcid: str):
     set (404) or the XML won't parse. The JATS XML includes the Data Availability section
     where GEO/SRA accessions are stated, so GSE hit-rate is far higher than scraping PDFs.
     """
-    norm = _normalize_pmcid(pmcid)
-    url = _EPMC_FULLTEXT.format(pmcid=norm) if norm else ""
-    if not norm:
-        return "", url
+    xml_bytes, url = _fetch_europepmc_xml(pmcid)
+    return (_flatten_jats(xml_bytes) if xml_bytes else ""), url
+
+
+def _save_structured(stem: str, output_dir: str, source: str, url: str,
+                     xml_bytes: bytes = b"", pdf_pages: list | None = None) -> str:
+    """Write <stem>.paper.json/.paper.md beside the .txt and return a report line.
+
+    Additive only: a parse failure never affects the .txt that callers already rely on.
+    """
     try:
-        r = requests.get(url, headers=_HTTP_HEADERS, timeout=60)
-        if r.status_code != 200 or not r.content.strip():
-            return "", url
-        root = ET.fromstring(r.content)
-        text = " ".join(t for t in root.itertext() if t and t.strip())
-        return (text if text.strip() else ""), url
-    except Exception:
-        return "", url
+        from tools import paper_structure as ps
+        if xml_bytes:
+            doc = ps.parse_jats(xml_bytes, source=source, fetched_url=url)
+        else:
+            doc = ps.parse_pdf_pages(pdf_pages or [], source=source, fetched_url=url)
+        paths = ps.save(doc, output_dir, stem, raw_xml=xml_bytes or None)
+        kinds = [b["kind"] for b in doc["blocks"]]
+        classes = sorted({s["class"] for s in doc["sections"]} - {"other"})
+        quality = ("" if doc["structure_quality"] == "jats"
+                   else " — PDF heuristic: headings approximate, tables not recovered")
+        line = (f"- Structured full text: {paths['md']} ({len(doc['sections'])} sections "
+                f"[{', '.join(classes)}], {kinds.count('table')} tables, {kinds.count('figure')} figure "
+                f"legends{quality}). Read by section with read_paper_section(paper='{paths['json']}', "
+                f"section='methods'); cite block IDs such as S2.1.p1 or TAB1 as locators.")
+        # Where each GSE is mentioned: a Methods/Data-availability mention suggests the
+        # paper's own deposit; an Introduction/Discussion-only mention suggests a citation.
+        by_id = {b["id"]: b for b in doc["blocks"]}
+        gse = [(a, w) for a, w in doc.get("accession_mentions", {}).items() if a.startswith("GSE")]
+        if gse:
+            line += "\n    GSE locations: " + "; ".join(
+                f"{a} → " + ", ".join(f"{i} [{by_id[i]['section_class']}]" for i in w[:4])
+                for a, w in gse[:6])
+        return line
+    except Exception as e:  # defensive: structure is optional
+        return f"- Structured full text not produced ({type(e).__name__}: {e}); use the .txt."
 
 
 @tool
@@ -345,8 +397,10 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
         notes = []
 
         # Strategy 1: Europe PMC full-text XML (preferred — reliable, has Data Availability).
+        xml_bytes, fetched_url, pages = b"", "", []
         if pmcid:
-            xml_text, _epmc_url = _fetch_europepmc_text(pmcid)
+            xml_bytes, fetched_url = _fetch_europepmc_xml(pmcid)
+            xml_text = _flatten_jats(xml_bytes) if xml_bytes else ""
             if xml_text:
                 text, source = xml_text, f"Europe PMC full-text XML ({_normalize_pmcid(pmcid)})"
             else:
@@ -382,6 +436,8 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
                 return (f"Downloaded the PDF ({len(content)} bytes, {len(reader.pages)} pages) but extracted no "
                         f"text — likely a scanned/image PDF with no text layer (OCR not supported). Saved to {pdf_path}.")
             source = f"PDF download ({len(reader.pages)} pages)"
+            fetched_url = pdf_url
+            xml_bytes = b""
             notes.append(f"PDF saved to: {pdf_path}")
 
         txt_path = os.path.join(output_dir, f"{safe_pid}.txt")
@@ -392,6 +448,8 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
         lines = [
             f"Fetched paper text via {source}: {len(text)} chars.",
             f"- Text saved to: {txt_path}",
+            _save_structured(safe_pid, output_dir, source, fetched_url,
+                             xml_bytes=xml_bytes, pdf_pages=pages),
         ]
         for n in notes:
             lines.append(f"- {n}")
@@ -411,6 +469,49 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
         return "\n".join(lines)
     except Exception as e:
         return f"Failed to fetch paper text. Error: {type(e).__name__}: {e}"
+
+
+@tool
+def read_paper_section(paper: str, section: str = "", block_ids: str = "", find: str = "",
+                       max_chars: int = 15000) -> str:
+    """
+    Read a fetched paper by section instead of as one flat text. Use it to find the
+    evidence for sample groups, design, method, and threshold decisions, and cite the
+    returned block IDs (e.g. S2.3.p1, TAB1, DA.p1) as locators.
+
+    Ask for several sections in ONE call (comma-separated) — the per-tool call cap is low.
+
+    Args:
+        paper: Path printed by fetch_paper_text (the .paper.json, or its .txt/.paper.md sibling).
+        section: Comma-separated section classes, section IDs, or title words. Classes:
+            abstract, introduction, methods, results, discussion, conclusion,
+            data_availability, supplementary, figures (all legends), tables (all tables).
+            Example: "methods,data_availability,tables". Leave empty for the outline.
+        block_ids: Comma-separated block IDs or labels to print verbatim (e.g. "S2.3.p1,TAB1").
+        find: Space-separated terms; returns the blocks that mention any of them
+            (e.g. "sedentary control paired DESeq2").
+        max_chars: Truncate the section text after this many characters (0 = no limit).
+    """
+    try:
+        from tools import paper_structure as ps
+        doc = ps.load(paper)
+    except FileNotFoundError:
+        return (f"No structured version of {paper!r}. Re-run fetch_paper_text for this paper "
+                f"(it now writes <id>.paper.json beside the .txt).")
+    except Exception as e:
+        return f"Could not load structured paper: {type(e).__name__}: {e}"
+    out = []
+    if block_ids.strip():
+        out.append(ps.get_blocks(doc, [b.strip() for b in block_ids.split(",") if b.strip()]))
+    if find.strip():
+        hits = ps.find(doc, find.split(), limit=25)
+        out.append("\n".join(f"[{h['id']}] ({h['kind']}; {h['section']}) {h['snippet']}" for h in hits)
+                   or f"No block mentions any of: {find}")
+    if section.strip():
+        out.append(ps.read_section(doc, section, max_chars))
+    if not out:
+        out.append(ps.outline(doc))
+    return "\n\n".join(out)
 
 
 @tool

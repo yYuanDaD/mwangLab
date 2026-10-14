@@ -11,12 +11,13 @@ Use evidence in generated artifacts before judging prose quality. Keep result qu
 
 1. Identify the evaluation unit: one run, one study/contrast, or an A/B change.
 2. Read [references/rubric.md](references/rubric.md) and choose applicable checks.
-3. For a completed run directory, execute:
+3. For a completed run directory, run with the repository's Python environment (`<skill_dir>` is the folder containing this file; on Windows set `PYTHONIOENCODING=utf-8` first):
 
-   ```powershell
-   $env:PYTHONIOENCODING = 'utf-8'
-   .\.venv\Scripts\python.exe .agents\skills\evaluate-bioinformatics-agent\scripts\audit_run.py --run-dir <path>
+   ```bash
+   python <skill_dir>/scripts/audit_run.py --run-dir <path>
    ```
+
+   The audit reads batch-pipeline runs and native skill runs (`RunRecorder` layout). For native runs it also validates every `decisions.json` against the decision contract; a violation is blocking. A case whose valid plan failed only because a package or R was missing counts as `environment_blocked`: it lowers the score but does not block, and the verdict becomes `incomplete_environment` so a decision-only run is never reported as a pass.
 
 4. Inspect `agent_evaluation.json` and `agent_evaluation.md`. Report both `score` and `coverage`; never present a high score with low coverage as strong evidence.
 5. If repeated DEG/GSEA files exist, also use the project's `evaluate_repeated_subset_results` tool or `tools.evaluation_tools.evaluate_repeated_results_core`.

@@ -9,16 +9,20 @@ freedom, and contrast names before fitting limma on a log-scale matrix.
 
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
 import numpy as np
 import pandas as pd
-from patsy import dmatrix
-from inmoose.limma import contrasts_fit, eBayes, lmFit, topTable
 
-from tools.analysis_policy import numeric_matrix, PolicyViolation
-from tools.deseq2_tools import collapse_duplicate_genes
+from tools.analysis_policy import enforce_method_matrix_compatibility, numeric_matrix, PolicyViolation
+
+
+def collapse_duplicate_genes(df: pd.DataFrame, label: str = "counts") -> pd.DataFrame:
+    # Imported lazily: deseq2_tools pulls in pydeseq2 at module import.
+    from tools.de_common import collapse_duplicate_genes as _collapse
+    return _collapse(df, label)
 
 
 def _prepare_metadata(meta: pd.DataFrame, plan: dict[str, Any]) -> pd.DataFrame:
@@ -65,7 +69,8 @@ def _prepare_metadata(meta: pd.DataFrame, plan: dict[str, Any]) -> pd.DataFrame:
 def _read_matrix(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, index_col=0, sep=None, engine="python")
     df = numeric_matrix(df, label="explicit multi-group expression matrix")
-    df = collapse_duplicate_genes(df, "explicit multi-group")
+    if df.index.has_duplicates:
+        df = collapse_duplicate_genes(df, "explicit multi-group")
     df = df.loc[df.notna().sum(axis=1) >= max(3, int(df.shape[1] * 0.5))]
     df = df.loc[df.var(axis=1, skipna=True) > 0]
     if df.empty or df.shape[1] < 4:
@@ -74,6 +79,8 @@ def _read_matrix(path: str) -> pd.DataFrame:
 
 
 def _validate_design(meta: pd.DataFrame, formula: str):
+    from patsy import dmatrix
+
     if not formula or not isinstance(formula, str):
         raise PolicyViolation("an explicit patsy formula is required for a multi-group plan")
     try:
@@ -92,6 +99,9 @@ def _validate_design(meta: pd.DataFrame, formula: str):
 
 def _fit_contrasts(expr: pd.DataFrame, meta: pd.DataFrame, formula: str,
                    contrasts: list[dict[str, Any]], output_dir: str):
+    from inmoose.limma import contrasts_fit, lmFit, topTable
+    from tools.limma_compat import ebayes as eBayes
+
     design, rank, residual_df = _validate_design(meta, formula)
     names = list(design.design_info.column_names)
     # Fit once, then apply each contrast and empirical-Bayes moderation.  The
@@ -139,14 +149,7 @@ def _paired_change(expr: pd.DataFrame, meta: pd.DataFrame, plan: dict[str, Any])
         raise PolicyViolation(f"paired_change plan missing columns/levels: {missing}")
     outputs = []
     for followup in followups:
-        pairs = []
-        for subject, rows in meta.groupby(subject_col, dropna=False):
-            b = rows[rows[time_col].astype(str) == baseline]
-            f = rows[rows[time_col].astype(str) == followup]
-            if len(b) != 1 or len(f) != 1:
-                continue
-            pairs.append({"subject": str(subject), "baseline": b.index[0], "followup": f.index[0],
-                          "group": str(f.iloc[0][group_col])})
+        pairs, excluded = complete_subject_pairs(meta, subject_col, time_col, baseline, followup, group_col)
         if len(pairs) < 4:
             raise PolicyViolation(f"follow-up {followup!r} has too few complete subject pairs: {len(pairs)}")
         delta = pd.DataFrame({p["subject"]: expr[p["followup"]] - expr[p["baseline"]] for p in pairs})
@@ -156,11 +159,43 @@ def _paired_change(expr: pd.DataFrame, meta: pd.DataFrame, plan: dict[str, Any])
         contrasts = plan.get("contrasts") or []
         follow_dir = os.path.join(out_dir, f"followup_{followup}")
         os.makedirs(follow_dir, exist_ok=True)
+        exclusion_path = os.path.join(follow_dir, "paired_change_pairs.json")
+        with open(exclusion_path, "w", encoding="utf-8") as fh:
+            json.dump({"baseline": baseline, "followup": followup, "n_complete_pairs": len(pairs),
+                       "pairs": pairs, "excluded_subjects": excluded}, fh, indent=2, default=str)
         results = _fit_contrasts(delta, delta_meta.rename(columns={"group": group_col}), formula, contrasts, follow_dir)
         for result in results:
             result["followup_level"] = followup
+            result["n_complete_pairs"] = len(pairs)
+            result["excluded_subjects"] = excluded
+            result["pairs_file"] = exclusion_path
         outputs.extend(results)
     return outputs
+
+
+def complete_subject_pairs(meta: pd.DataFrame, subject_col: str, time_col: str, baseline: str,
+                           followup: str, group_col: str) -> tuple[list[dict], list[dict]]:
+    """Return complete baseline/follow-up pairs and every subject left out, with a reason.
+
+    A subject is paired only when it has exactly one baseline and exactly one
+    follow-up sample. Missing or duplicated samples are reported, never guessed.
+    """
+    pairs, excluded = [], []
+    for subject, rows in meta.groupby(subject_col, dropna=False):
+        b = rows[rows[time_col].astype(str) == baseline]
+        f = rows[rows[time_col].astype(str) == followup]
+        if len(b) == 1 and len(f) == 1:
+            pairs.append({"subject": str(subject), "baseline": b.index[0], "followup": f.index[0],
+                          "group": str(f.iloc[0][group_col])})
+            continue
+        if len(b) == 0 or len(f) == 0:
+            reason = "missing_" + ("baseline" if len(b) == 0 else "followup")
+        else:
+            reason = "duplicate_samples"
+        excluded.append({"subject": str(subject), "reason": reason,
+                         "n_baseline": int(len(b)), "n_followup": int(len(f)),
+                         "samples": [str(x) for x in rows.index]})
+    return pairs, excluded
 
 
 def run_multigroup_analysis(expression_csv: str, metadata_csv: str,
@@ -182,6 +217,10 @@ def run_multigroup_analysis(expression_csv: str, metadata_csv: str,
     meta.index = meta.index.astype(str)
     expr.columns = expr.columns.astype(str)
     expr = expr.loc[:, common]
+    # This executor fits limma, so the sample columns must already be on a log
+    # scale: raw counts need log-CPM (or voom), FPKM/TPM need log2(x+1) first.
+    # Checked after numeric annotation columns (length, exon count) are dropped.
+    enforce_method_matrix_compatibility(expr, method="limma")
     meta = meta.loc[common]
     meta = _prepare_metadata(meta, plan)
     if plan.get("analysis_type") == "paired_change":
