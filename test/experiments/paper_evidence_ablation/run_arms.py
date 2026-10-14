@@ -22,7 +22,7 @@ resume from the log.
 in with a ChatGPT plan, so it uses plan quota rather than API billing). Each call runs in a
 fresh, empty, read-only working directory outside the repository, so the model sees only the
 prompt, never the gold or annotations; any shell command it runs is counted in the log.
-Results go to calls_codex.jsonl, scored_calls_codex.csv and summary_codex.json.
+Results go to calls_codex_<effort>.jsonl, scored_calls_codex_<effort>.csv and summary_codex_<effort>.json.
 
     python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --series GSE51216 --repeats 1
     python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --arms metadata
@@ -473,7 +473,7 @@ def main(argv=None) -> int:
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=4)
-    ap.add_argument("--log", default=None, help="default calls.jsonl, or calls_codex.jsonl for codex-cli")
+    ap.add_argument("--log", default=None, help="default calls.jsonl, or calls_codex_<effort>.jsonl for codex-cli")
     ap.add_argument("--series", nargs="*", default=None, help="only these accessions")
     ap.add_argument("--backend", choices=["provider", "codex-cli"], default="provider",
                     help="provider = the model configured in .env; codex-cli = local `codex exec`")
@@ -482,7 +482,7 @@ def main(argv=None) -> int:
                     help="codex executable; the desktop app bundles a newer one than the PATH install")
     ap.add_argument("--score-only", action="store_true")
     args = ap.parse_args(argv)
-    args.suffix = "_codex" if args.backend == "codex-cli" else ""
+    args.suffix = f"_codex_{args.codex_effort}" if args.backend == "codex-cli" else ""
     args.log = args.log or f"calls{args.suffix}.jsonl"
     if not args.score_only:
         run(args)
