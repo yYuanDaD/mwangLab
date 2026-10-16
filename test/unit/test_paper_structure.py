@@ -148,6 +148,135 @@ def test_pdf_heuristic_fallback():
     assert doc["accession_mentions"]["GSE123456"][0].startswith("S")
 
 
+# Shaped like Docling output: every heading at "##", unnumbered subsections, image
+# placeholders, a caption line before a pipe table, a running header on each page.
+_DOCLING_MD = """## Treadmill training remodels muscle
+
+Journal of Synthetic Exercise Biology
+
+A. Author, B. Author
+
+## Abstract
+
+We trained mice for six weeks.
+
+## Introduction
+
+Earlier work (GSE12345) used microarrays.
+
+Journal of Synthetic Exercise Biology
+
+## Materials and methods
+
+## Animals
+
+Male mice (n = 6 per group) were sedentary or trained. The training
+
+continued for six weeks.
+
+Table 1 Sample groups used for RNA-seq.
+
+| Group     |   n | Sex   |
+|-----------|-----|-------|
+| Sedentary |   6 | M     |
+| Trained   |   6 | M     |
+
+## Statistical analysis
+
+DESeq2, padj < 0.05.
+
+Journal of Synthetic Exercise Biology
+
+## Results
+
+<!-- image -->
+
+Figure 1. Volcano plot of trained versus sedentary muscle.
+
+Table 2 Top genes (shown as an image in the PDF).
+
+## Acknowledgements
+
+We thank the animal facility.
+
+## Data Availability Statement
+
+Raw counts are in GEO (GSE209999).
+
+## References
+
+1. Smith J. GSE99999 cited only here.
+"""
+
+
+def test_markdown_docling_style():
+    doc = ps.parse_markdown(_DOCLING_MD, source="docling", quality="pdf_markdown:docling")
+    assert doc["structure_quality"] == "pdf_markdown:docling"
+    secs = {s["id"]: s for s in doc["sections"]}
+    # Unnumbered subsections nest under Methods; back matter stays top-level.
+    assert secs["S2.1"]["title"] == "Animals" and secs["S2.1"]["class"] == "methods", secs
+    assert secs["S2.2"]["class"] == "methods"
+    ack = [s for s in doc["sections"] if s["title"] == "Acknowledgements"][0]
+    assert ack["parent"] is None, ack
+    assert secs["DA"]["class"] == "data_availability" and secs["ABS"]["class"] == "abstract"
+    blocks = {b["id"]: b for b in doc["blocks"]}
+    # Running header removed; the first heading is the title.
+    assert doc["title"] == "Treadmill training remodels muscle"
+    assert "Journal of Synthetic" not in json.dumps(doc["blocks"])
+    # A paragraph split by a page break is rejoined.
+    assert blocks["S2.1.p1"]["text"].endswith("The training continued for six weeks."), blocks["S2.1.p1"]
+    # Caption attached to its table; an image-only table keeps its caption.
+    assert blocks["TAB1"]["label"] == "Table 1" and "| Sedentary | 6 | M |" in blocks["TAB1"]["text"]
+    assert blocks["TAB2"].get("image_only") and blocks["TAB2"]["section_id"] == "S3"
+    assert blocks["FIG1"]["label"] == "Figure 1" and blocks["FIG1"]["section_id"] == "S3"
+    assert "<!-- image -->" not in json.dumps(doc["blocks"])
+    # Nothing after References; accessions indexed by block.
+    assert "GSE99999" not in doc["accession_mentions"]
+    assert doc["accession_mentions"]["GSE209999"] == ["DA.p1"]
+    assert "[TAB1]" in ps.read_section(doc, "methods")
+
+
+def test_markdown_numbered_headings_and_h1_title():
+    md = ("# A study of exercise\n\n# 1 Introduction\n\nText.\n\n# 2 Methods\n\n"
+          "# 2.1 Subjects\n\nTen men.\n\n# 2.1.1 Inclusion\n\nHealthy.\n\n# 3 Results\n\nMore.\n")
+    doc = ps.parse_markdown(md)
+    assert doc["title"] == "A study of exercise"
+    ids = [(s["id"], s["class"]) for s in doc["sections"]]
+    assert ids == [("S1", "introduction"), ("S2", "methods"), ("S2.1", "methods"),
+                   ("S2.1.1", "methods"), ("S3", "results")], ids
+
+
+def test_pdf_to_structure_backends():
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    pdf = os.path.join(FIX, "synthetic_two_column.pdf")
+    # pypdf is a core dependency: the heuristic route must always work.
+    doc, md = pm.structure_pdf(pdf, backend="pypdf")
+    assert doc["structure_quality"] == "pdf_heuristic" and md == ""
+    assert "GSE209999" in doc["accession_mentions"]
+    installed = [b for b in pm.available_backends() if b != "pypdf"]
+    if not installed:
+        print("  SKIP markdown backends (install pymupdf4llm or docling)")
+        return
+    for backend in installed:
+        doc, md = pm.structure_pdf(pdf, backend=backend)
+        assert doc["structure_quality"] == f"pdf_markdown:{backend}", doc["structure_quality"]
+        cls = {s["class"] for s in doc["sections"]}
+        assert {"abstract", "introduction", "methods", "results", "discussion",
+                "data_availability"} <= cls, (backend, cls)
+        tabs = [b for b in doc["blocks"] if b["kind"] == "table"]
+        assert tabs and "Sedentary" in tabs[0]["text"] and tabs[0]["label"] == "Table 1", (backend, tabs)
+        assert doc["accession_mentions"].get("GSE209999") == ["DA.p1"], (backend, doc["accession_mentions"])
+        assert "Journal of Synthetic" not in json.dumps(doc["blocks"]), backend
+        assert "Smith J." not in json.dumps(doc["blocks"]), backend
+        with tempfile.TemporaryDirectory() as d:
+            _, paths = pm.save_pdf(pdf, d, "P1", backend=backend)
+            assert os.path.exists(paths["converted_md"]) and ps.load(paths["json"])["blocks"]
+
+
 def test_save_load_and_tool_wrapper():
     doc = _load("PMC12989000")
     with tempfile.TemporaryDirectory() as d:
