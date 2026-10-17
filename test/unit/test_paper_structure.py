@@ -315,6 +315,100 @@ def test_markdown_real_pdf_shapes():
     assert acc["GSE333333"] == ["DA.p1"] and secs["DA"]["class"] == "data_availability", acc
 
 
+# Science "REFERENCES AND NOTES", a Results subsection whose title says "participants",
+# Cell Press page banner ("Protocol") and logo glyph ("ll") as headings, and a data
+# availability title the converter left as a plain line.
+_REAL_SHAPES_MD_2 = """# Exercise and exosomes in older men
+
+## INTRODUCTION
+
+Background.
+
+## RESULTS
+
+## Anthropometric and Physiological Characteristics of Participants
+
+Trained men were leaner.
+
+## Protocol
+
+## Acute exercise changes exomiRs
+
+Many changed.
+
+##### ll
+
+Data and code availability
+
+Small RNA-seq data are in GEO (GSE144627).
+
+## REFERENCES AND NOTES
+
+1. Smith J. Cited (GSE99999).
+"""
+
+
+def test_markdown_real_pdf_shapes_2():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD_2)
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert "Protocol" not in by_title and "ll" not in by_title, list(by_title)
+    part = by_title["Anthropometric and Physiological Characteristics of Participants"]
+    assert part["class"] == "results" and part["parent"] == by_title["RESULTS"]["id"], part
+    assert by_title["Acute exercise changes exomiRs"]["class"] == "results"
+    da = by_title["Data and code availability"]
+    assert da["class"] == "data_availability", da
+    assert doc["accession_mentions"] == {"GSE144627": [f"{da['id']}.p1"]}, doc["accession_mentions"]
+
+
+# NIH author manuscript: PMC banner merged into the first heading, a Cell "Highlights"
+# block before the title, a title that contains a section keyword ("Patients"), escaped
+# entities, a stray NUL, and tables printed after the reference list.
+_REAL_SHAPES_MD_3 = """# **HHS Public Access** Author manuscript Br J Haematol. Author manuscript.
+
+## HIGHLIGHTS
+
+Exercise changed blood genes.
+
+## **Whole-Blood Transcriptome Analysis in Pediatric Patients Before and After Exercise**
+
+### **Abstract**
+
+We sequenced blood.
+
+### 2. METHODS
+
+RNA-seq (GSE244401).
+
+### 5. SUMMARY &amp; CONCLUSIONS
+
+Done.\x00
+
+### REFERENCES
+
+1. Smith J. Cited.
+
+## Table 2.
+
+Differentially expressed genes after exercise.
+
+| Gene | log2FC |
+|---|---|
+| IL6 | 1.2 |
+"""
+
+
+def test_markdown_real_pdf_shapes_3():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD_3)
+    assert doc["title"] == ("Whole-Blood Transcriptome Analysis in Pediatric Patients Before and "
+                            "After Exercise"), doc["title"]
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert by_title["5. SUMMARY & CONCLUSIONS"]["class"] == "conclusion", list(by_title)
+    assert "\x00" not in json.dumps(doc["blocks"]) and "Smith J." not in json.dumps(doc["blocks"])
+    tabs = [b for b in doc["blocks"] if b["kind"] == "table"]
+    assert len(tabs) == 1 and tabs[0]["label"] == "Table 2" and "| IL6 | 1.2 |" in tabs[0]["text"], tabs
+    assert tabs[0]["section_id"] == "FLT", tabs[0]
+
+
 def test_pdf_to_structure_backends():
     try:
         from tools import pdf_markdown as pm

@@ -37,6 +37,7 @@ CLI (run from the repository root):
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import re
@@ -58,7 +59,7 @@ SECTION_CLASSES = (
 _TITLE_RULES: tuple[tuple[str, re.Pattern], ...] = (
     ("data_availability", re.compile(
         r"data\b.{0,30}\b(availab|access|deposit|sharing)|availability of (data|materials)|"
-        r"accession (number|code)|code availab|data and code|data access", re.I)),
+        r"accession (number|code)|code availab|data and code|data access|^data statement", re.I)),
     ("supplementary", re.compile(r"supplement|supporting information|additional (file|information)", re.I)),
     ("methods", re.compile(
         r"method|materials?\b|experimental (design|procedure|section|model)|study design|"
@@ -656,7 +657,8 @@ _MD_HEADING = re.compile(r"^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$")
 _MD_NUMBERED = re.compile(r"^\s*((?:\d{1,2}\.)*\d{1,2})\.?\s+(\S.*)$")
 _MD_TABLE_CAPTION = re.compile(r"^(?:\*\*|_)*\s*(table\s*S?\d+[a-z]?)\b[.:|]?\s*(.*)$", re.I | re.S)
 _MD_FIG_CAPTION = re.compile(r"^(?:\*\*|_)*\s*((?:figure|fig\.?)\s*S?\d+[a-z]?)\b[.:|]?\s*(.*)$", re.I | re.S)
-_MD_STOP = re.compile(r"^(references?|bibliography|literature cited|works cited)$", re.I)
+_MD_STOP = re.compile(r"^(references?( and notes)?|notes and references|references cited|bibliography|"
+                      r"literature cited|cited literature|works cited)$", re.I)
 _MD_IMAGE = re.compile(r"^(<!--\s*image\s*-->|!\[[^\]]*\]\([^)]*\)|\*{0,2}==>\s*picture.*<==\*{0,2})$", re.I)
 _MD_BACK_MATTER = re.compile(
     r"^(acknowledge?ments?|funding|author contributions?|conflicts? of interest|competing interests?|"
@@ -668,8 +670,10 @@ _MD_FRONT_LABEL = re.compile(
     r"^(open( access)?|edited by|reviewed by|correspondence|specialty section|citation|copyright|"
     r"received|accepted|published( online)?|article|articles|research( article| paper)?|"
     r"original (research|article|investigation|contribution)|brief (report|communication)|report|"
-    r"letter|cell reports|check for updates|(article )?information|full length article|"
+    r"letter|cell reports|check for updates|protocol|author manuscript|hhs public access|resource|short article|technical report|(article )?information|full length article|"
     r"originalarticle|researcharticle|reviewarticle|originalresearch|researchpaper)$", re.I)
+# PubMed Central author-manuscript banner, often merged with the journal line.
+_MD_BANNER_PREFIX = re.compile(r"^(hhs public access|author manuscript|europe pmc funders group)\b", re.I)
 # Sections that journals print after the reference list (Nature "Methods", Cell "STAR
 # Methods", data/code availability); parsing resumes at one of these after References.
 _MD_AFTER_REFS = re.compile(
@@ -691,8 +695,9 @@ def _md_plain(s: str) -> str:
     s = re.sub(r"</?[A-Za-z][^>]*>", "", s)
     s = re.sub(r"(\*\*|__|\*|_|`)", "", s)
     s = re.sub(r"\s+", " ", s).strip().rstrip(":").strip()
-    if re.fullmatch(r"(?:[A-Za-z] ){3,}[A-Za-z]", s):
-        s = s.replace(" ", "")
+    toks = s.split()
+    if len(toks) >= 4 and s.isupper() and sum(map(len, toks)) / len(toks) <= 2:
+        s = "".join(toks)     # "K E YWO R D S" (Docling) / "K E Y W O R D S"
     return re.sub(r"^(\d{1,2}(?:\.\d{1,2})*)\.?\s*\|\s*", r"\1 ", s)
 
 
@@ -752,7 +757,9 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
     paragraphs become ``FIG`` blocks, and everything after References is dropped.
     Running headers/footers that repeat on most pages are removed.
     """
-    raw_lines = md.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    # Docling escapes &, < and > in text ("SUMMARY &amp; CONCLUSIONS").
+    md = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", md)   # stray control chars from PDF fonts
+    raw_lines = html.unescape(md).replace("\r\n", "\n").replace("\r", "\n").split("\n")
     repeated = _md_repeated_lines(raw_lines)
     b = _Builder()
     front = b.add_section("S0", "", "other", 1, None, ["(front matter)"])
@@ -781,7 +788,10 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
         top = stack[0] if stack else None
         if (num is None and top is not None and top["class"] != "other"
                 and not _MD_BACK_MATTER.match(rest) and not _PDF_HEADING.match(rest)
-                and cls_own in ("other", top["class"])):
+                and (cls_own in ("other", top["class"])
+                     # "Characteristics of participants" in Results is a subsection:
+                     # only a heading that names methods opens a Methods section.
+                     or (cls_own == "methods" and not re.search(r"method|material", rest, re.I)))):
             depth = 2
         while len(stack) >= depth:
             stack.pop()
@@ -819,6 +829,10 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
         m = _MD_TABLE_CAPTION.match(text)
         if m and len(text) < 1200:
             pending_caption = (_md_plain(m.group(1)), m.group(2).strip())
+            return
+        # A bare "Table 2." label (Docling makes it a heading) is followed by its caption.
+        if pending_caption and not pending_caption[1] and len(text) < 1200:
+            pending_caption = (pending_caption[0], text)
             return
         flush_caption()
         # Rejoin a paragraph that a page or column break split mid-sentence.
@@ -875,14 +889,29 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
             continue
         hm = _MD_HEADING.match(line)
         heading = hm.group(2) if hm else _md_bold_heading(line)
+        # A standard section name standing alone on a line ("Data and code availability")
+        # that the converter did not mark as a heading.
+        if heading is None and not para and len(stripped) <= 60 and _PDF_HEADING.match(_md_plain(stripped)):
+            heading = stripped
         if in_refs:
             # Nature puts Methods, Cell puts STAR Methods, and many journals put data
             # availability after the reference list: resume there, skip the references.
             unnumbered = re.sub(r"^\d+(\.\d+)*\.?\s+", "", _md_plain(heading)) if heading else ""
-            if not (unnumbered and _MD_AFTER_REFS.match(unnumbered)):
+            caption = _md_plain(heading if heading is not None else stripped)[:300]
+            if unnumbered and _MD_AFTER_REFS.match(unnumbered):
+                in_refs = False
+                stack.clear()
+            elif re.match(r"(table|fig)", caption, re.I) and (
+                    _MD_TABLE_CAPTION.match(caption) or _MD_FIG_CAPTION.match(caption)):
+                # Author manuscripts and some journals print figures and tables last.
+                in_refs = False
+                stack.clear()
+                if not any(s_["id"] == "FLT" for s_ in b.sections):
+                    sec = b.add_section("FLT", "Figures and tables", "other", 1, None,
+                                        ["Figures and tables"])
+                    stack.append(sec)
+            else:
                 continue
-            in_refs = False
-            stack.clear()
         if stripped.startswith("|"):
             flush_para()
             table.append(stripped)
@@ -895,17 +924,23 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
                 flush_caption()
                 in_refs = True
                 continue
-            if _MD_FRONT_LABEL.match(plain):
+            # Journal banners and logo glyphs (Cell Press "ll") are not sections.
+            if (_MD_FRONT_LABEL.match(plain) or _MD_BANNER_PREFIX.match(plain)
+                    or len(re.findall(r"[A-Za-z]", plain)) < 3):
                 continue
             # Headings before the first section heading are front matter (journal
             # banners, subject labels, the title). The title is the biggest of them:
             # Docling emits every heading as "##", pymupdf4llm sizes them by font.
-            if pre_body and hm and classify_title(plain) == "other" and not _MD_NUMBERED.match(plain) \
+            # A long heading is the title even when it names a section keyword
+            # ("... in Pediatric Patients" would otherwise classify as methods).
+            if pre_body and hm and (classify_title(plain) == "other" or len(plain) > 60) \
+                    and not _MD_NUMBERED.match(plain) and not _PDF_HEADING.match(plain) \
                     and not _MD_BACK_MATTER.match(plain) and not (
                         _MD_TABLE_CAPTION.match(plain) or _MD_FIG_CAPTION.match(plain)):
                 title_candidates.append((len(hm.group(1)), -len(plain), plain))
                 continue
-            if pre_body:
+            # Cell "Highlights" / "Graphical abstract" and keywords come before the title.
+            if pre_body and not _MD_BACK_MATTER.match(plain):
                 pick_title()
             # A "Table 1 ..." or "Figure 1 ..." heading is a caption, not a section.
             if _MD_TABLE_CAPTION.match(plain) or _MD_FIG_CAPTION.match(plain):
