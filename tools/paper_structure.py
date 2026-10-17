@@ -662,12 +662,38 @@ _MD_BACK_MATTER = re.compile(
     r"^(acknowledge?ments?|funding|author contributions?|conflicts? of interest|competing interests?|"
     r"declaration|ethics|abbreviations|keywords?|highlights|graphical abstract|footnotes?)", re.I)
 _MD_SEPARATOR = re.compile(r"^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$")
+# Publisher labels that converters emit as headings (Frontiers side panel, Nature/Science
+# article-type banners): never the paper title, never a section.
+_MD_FRONT_LABEL = re.compile(
+    r"^(open( access)?|edited by|reviewed by|correspondence|specialty section|citation|copyright|"
+    r"received|accepted|published( online)?|article|articles|research( article| paper)?|"
+    r"original (research|article|investigation|contribution)|brief (report|communication)|report|"
+    r"letter|cell reports|check for updates|(article )?information|full length article|"
+    r"originalarticle|researcharticle|reviewarticle|originalresearch|researchpaper)$", re.I)
+# Sections that journals print after the reference list (Nature "Methods", Cell "STAR
+# Methods", data/code availability); parsing resumes at one of these after References.
+_MD_AFTER_REFS = re.compile(
+    r"^((online |star\s*\+?\s*)?(materials? and )?methods?( and materials?)?( details)?|"
+    r"experimental (model|procedures).*|resource availability|lead contact|materials availability|"
+    r"key resources table|quantification and statistical analysis|statistical analysis|"
+    r"(data|code|data and code|data and software)( and materials)? availability( statement)?|"
+    r"accession (numbers?|codes?)|supplementary (information|materials?)|"
+    r"supplemental information)$", re.I)
 
 
 def _md_plain(s: str) -> str:
-    """Heading text without emphasis markers or trailing colon."""
+    """Heading text without emphasis markers, link targets, HTML tags, or trailing colon.
+
+    Also undoes two Wiley typesetting habits: letter-spaced banners ("K E Y W O R D S")
+    and a bar between the number and the title ("2 | METHODS").
+    """
+    s = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", s)
+    s = re.sub(r"</?[A-Za-z][^>]*>", "", s)
     s = re.sub(r"(\*\*|__|\*|_|`)", "", s)
-    return re.sub(r"\s+", " ", s).strip().rstrip(":").strip()
+    s = re.sub(r"\s+", " ", s).strip().rstrip(":").strip()
+    if re.fullmatch(r"(?:[A-Za-z] ){3,}[A-Za-z]", s):
+        s = s.replace(" ", "")
+    return re.sub(r"^(\d{1,2}(?:\.\d{1,2})*)\.?\s*\|\s*", r"\1 ", s)
 
 
 def _md_bold_heading(line: str) -> str | None:
@@ -814,7 +840,6 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
 
     para: list[str] = []
     table: list[str] = []
-    stopped = False
 
     def flush_para() -> None:
         if para:
@@ -834,28 +859,54 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
         head = f"**{label}** {cap}".strip() if label else ""
         b.add_block(sec, "table", "\n\n".join(x for x in (head, md_tab) if x), label=label)
 
+    in_refs = False                 # inside the reference list; skip until a known section
+    pre_body = True                 # before the first recognisable section heading
+    title_candidates: list[tuple[int, int, str]] = []   # (heading level, -length, text)
+
+    def pick_title() -> None:
+        nonlocal title, pre_body
+        pre_body = False
+        if title_candidates and not title:
+            title = min(title_candidates)[2]
+
     for line in raw_lines:
         stripped = line.strip()
         if stripped in repeated or re.fullmatch(r"(page\s*)?\d{1,4}(\s*(of|/)\s*\d{1,4})?", stripped, re.I):
             continue
+        hm = _MD_HEADING.match(line)
+        heading = hm.group(2) if hm else _md_bold_heading(line)
+        if in_refs:
+            # Nature puts Methods, Cell puts STAR Methods, and many journals put data
+            # availability after the reference list: resume there, skip the references.
+            unnumbered = re.sub(r"^\d+(\.\d+)*\.?\s+", "", _md_plain(heading)) if heading else ""
+            if not (unnumbered and _MD_AFTER_REFS.match(unnumbered)):
+                continue
+            in_refs = False
+            stack.clear()
         if stripped.startswith("|"):
             flush_para()
             table.append(stripped)
             continue
         flush_table()
-        hm = _MD_HEADING.match(line)
-        heading = hm.group(2) if hm else _md_bold_heading(line)
         if heading is not None:
             flush_para()
             plain = _md_plain(heading)
             if _MD_STOP.match(plain):
-                stopped = True
-                break
-            # The first heading, before any section, is the paper title (Docling emits it
-            # as "##", pymupdf4llm as "#").
-            if hm and not title and len(b.sections) == 1 and classify_title(plain) == "other":
-                title = plain
+                flush_caption()
+                in_refs = True
                 continue
+            if _MD_FRONT_LABEL.match(plain):
+                continue
+            # Headings before the first section heading are front matter (journal
+            # banners, subject labels, the title). The title is the biggest of them:
+            # Docling emits every heading as "##", pymupdf4llm sizes them by font.
+            if pre_body and hm and classify_title(plain) == "other" and not _MD_NUMBERED.match(plain) \
+                    and not _MD_BACK_MATTER.match(plain) and not (
+                        _MD_TABLE_CAPTION.match(plain) or _MD_FIG_CAPTION.match(plain)):
+                title_candidates.append((len(hm.group(1)), -len(plain), plain))
+                continue
+            if pre_body:
+                pick_title()
             # A "Table 1 ..." or "Figure 1 ..." heading is a caption, not a section.
             if _MD_TABLE_CAPTION.match(plain) or _MD_FIG_CAPTION.match(plain):
                 emit_paragraph(plain)
@@ -869,10 +920,12 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
         if re.match(r"^\s*([-*+]|\d+[.)])\s+", line) and para and not re.match(r"^\s*([-*+]|\d+[.)])\s+", para[-1]):
             flush_para()
         para.append(line)
-    if not stopped:
+    if not in_refs:
         flush_para()
         flush_table()
     flush_caption()
+    if pre_body:
+        pick_title()
 
     # Drop the front-matter section when nothing landed in it.
     if not front["block_ids"]:

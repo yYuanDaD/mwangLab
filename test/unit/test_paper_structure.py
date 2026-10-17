@@ -246,6 +246,75 @@ def test_markdown_numbered_headings_and_h1_title():
                    ("S2.1.1", "methods"), ("S3", "results")], ids
 
 
+# Shapes seen on real PDFs (docs/status/PDF_MARKDOWN_EVAL.md): Frontiers side-panel
+# labels and a linked title as Docling headings, a Nature-style article banner and a
+# subject label above the h1 title (pymupdf4llm), Wiley letter-spaced banners and
+# "2 | METHODS" headings, and Methods / Data availability printed after References.
+_REAL_SHAPES_MD = """## ARTICLE
+
+### **OPEN**
+
+## OPEN ACCESS
+
+## EDITED BY
+
+Katsuhiko Suzuki, Waseda University, Japan
+
+#### Adipocyte and Cell Biology
+
+# [Exercise remodels adipose tissue in humans](https://example.org/a1)
+
+#### **O R I G I N A L A R T I C L E**
+
+##### **K E Y W O R D S**
+
+exercise, adipose
+
+## **1** | **INTRODUCTION**
+
+Exercise matters.
+
+## **2** | **RESULTS**
+
+Genes changed (GSE111111).
+
+## REFERENCES
+
+1. Smith J. Methods for counting. GSE99999 cited only here.
+
+## Methods
+
+## RNA sequencing
+
+Reads were counted (GSE222222).
+
+## Data availability
+
+Counts are in GEO (GSE333333).
+"""
+
+
+def test_markdown_real_pdf_shapes():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD)
+    assert doc["title"] == "Exercise remodels adipose tissue in humans", doc["title"]
+    titles = [s["title"] for s in doc["sections"]]
+    assert not any(t.upper() in ("ARTICLE", "OPEN", "OPEN ACCESS", "EDITED BY", "ORIGINALARTICLE")
+                   for t in titles), titles
+    secs = {s["id"]: s for s in doc["sections"]}
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert by_title["1 INTRODUCTION"]["class"] == "introduction", titles
+    assert by_title["2 RESULTS"]["class"] == "results" and "KEYWORDS" in by_title, titles
+    acc = doc["accession_mentions"]
+    # The reference list is skipped, but Methods and Data availability after it are kept.
+    assert "GSE99999" not in acc and "Smith J." not in json.dumps(doc["blocks"])
+    meth = [s for s in doc["sections"] if s["title"] == "Methods"][0]
+    assert meth["class"] == "methods" and meth["parent"] is None, meth
+    rna = [s for s in doc["sections"] if s["title"] == "RNA sequencing"][0]
+    assert rna["parent"] == meth["id"] and rna["class"] == "methods", rna
+    assert acc["GSE222222"] == [f"{rna['id']}.p1"], acc
+    assert acc["GSE333333"] == ["DA.p1"] and secs["DA"]["class"] == "data_availability", acc
+
+
 def test_pdf_to_structure_backends():
     try:
         from tools import pdf_markdown as pm
