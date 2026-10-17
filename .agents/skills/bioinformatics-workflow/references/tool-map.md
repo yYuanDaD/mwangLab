@@ -12,7 +12,7 @@ Use the smallest tool surface that answers the request. This is an inventory, no
 | Two-arm differential analysis | `tools/deseq2_tools.py`, `tools/edger_tools.py`, `tools/limma_voom_tools.py`, `tools/limma_tools.py` |
 | Multi-level, factorial, paired-change limma | `tools/multigroup_tools.py` |
 | Enrichment (GSEA, ORA) | `tools/enrichment_tools.py`; check IDs first with `native.feature_id_report` |
-| Paper text | `tools/paper_tools.py` (Europe PMC fetch); `tools/paper_structure.py` (sections, tables, figure legends, citable block IDs) |
+| Paper text | `tools/paper_tools.py` (Europe PMC fetch); `tools/paper_structure.py` (sections, tables, figure legends, citable block IDs); `tools/pdf_markdown.py` (PDF to the same structure via Docling or pymupdf4llm) |
 | Shared DE helpers (no pydeseq2 needed) | `tools/de_common.py` |
 | Evidence and run status | `tools/evidence.py`, `tools/run_status.py` |
 

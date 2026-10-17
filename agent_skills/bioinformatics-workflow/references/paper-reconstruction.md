@@ -16,7 +16,8 @@ python -m tools.paper_structure block   data/papers/<id>.paper.json S2.4.p1 TAB1
 - Read whole sections. Sample groups, pairing, and thresholds are often split between a Methods paragraph, a table, and a figure legend; read all three before deciding the contrast or covariance.
 - Every paragraph, table, figure legend, and supplementary file has a block ID (`S2.4.p1`, `TAB1`, `FIG2`, `SUP1`, `DA.p1`). Use it as `paper.locator` and `source_locator`. A reviewer resolves it with `tools.paper_structure.resolve_locator`.
 - The outline lists where each accession is mentioned. A GSE in Methods or the data-availability statement is usually the paper's own deposit; one that appears only in the Introduction or Discussion is usually a citation.
-- `structure_quality: pdf_heuristic` means the copy came from PDF text. Its headings are approximate and its tables are not recovered, so check table values and group sizes against the PDF.
+- For a paper with only a PDF, run `python -m tools.pdf_markdown <file>.pdf --out data/papers --stem <id>`. It converts the PDF to Markdown with Docling or pymupdf4llm (whichever is installed) and saves the same `.paper.json`/`.paper.md`, plus the raw `<id>.converted.md`.
+- `structure_quality: pdf_markdown:<backend>` means the copy came from a PDF converter. Sections and tables are kept, but cell values can be misread, so check group sizes against the PDF before relying on them. `pdf_heuristic` means no converter was installed: headings are approximate and tables are not recovered.
 
 ## Study map
 

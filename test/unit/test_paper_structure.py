@@ -148,6 +148,379 @@ def test_pdf_heuristic_fallback():
     assert doc["accession_mentions"]["GSE123456"][0].startswith("S")
 
 
+# Shaped like Docling output: every heading at "##", unnumbered subsections, image
+# placeholders, a caption line before a pipe table, a running header on each page.
+_DOCLING_MD = """## Treadmill training remodels muscle
+
+Journal of Synthetic Exercise Biology
+
+A. Author, B. Author
+
+## Abstract
+
+We trained mice for six weeks.
+
+## Introduction
+
+Earlier work (GSE12345) used microarrays.
+
+Journal of Synthetic Exercise Biology
+
+## Materials and methods
+
+## Animals
+
+Male mice (n = 6 per group) were sedentary or trained. The training
+
+continued for six weeks.
+
+Table 1 Sample groups used for RNA-seq.
+
+| Group     |   n | Sex   |
+|-----------|-----|-------|
+| Sedentary |   6 | M     |
+| Trained   |   6 | M     |
+
+## Statistical analysis
+
+DESeq2, padj < 0.05.
+
+Journal of Synthetic Exercise Biology
+
+## Results
+
+<!-- image -->
+
+Figure 1. Volcano plot of trained versus sedentary muscle.
+
+Table 2 Top genes (shown as an image in the PDF).
+
+## Acknowledgements
+
+We thank the animal facility.
+
+## Data Availability Statement
+
+Raw counts are in GEO (GSE209999).
+
+## References
+
+1. Smith J. GSE99999 cited only here.
+"""
+
+
+def test_markdown_docling_style():
+    doc = ps.parse_markdown(_DOCLING_MD, source="docling", quality="pdf_markdown:docling")
+    assert doc["structure_quality"] == "pdf_markdown:docling"
+    secs = {s["id"]: s for s in doc["sections"]}
+    # Unnumbered subsections nest under Methods; back matter stays top-level.
+    assert secs["S2.1"]["title"] == "Animals" and secs["S2.1"]["class"] == "methods", secs
+    assert secs["S2.2"]["class"] == "methods"
+    ack = [s for s in doc["sections"] if s["title"] == "Acknowledgements"][0]
+    assert ack["parent"] is None, ack
+    assert secs["DA"]["class"] == "data_availability" and secs["ABS"]["class"] == "abstract"
+    blocks = {b["id"]: b for b in doc["blocks"]}
+    # Running header removed; the first heading is the title.
+    assert doc["title"] == "Treadmill training remodels muscle"
+    assert "Journal of Synthetic" not in json.dumps(doc["blocks"])
+    # A paragraph split by a page break is rejoined.
+    assert blocks["S2.1.p1"]["text"].endswith("The training continued for six weeks."), blocks["S2.1.p1"]
+    # Caption attached to its table; an image-only table keeps its caption.
+    assert blocks["TAB1"]["label"] == "Table 1" and "| Sedentary | 6 | M |" in blocks["TAB1"]["text"]
+    assert blocks["TAB2"].get("image_only") and blocks["TAB2"]["section_id"] == "S3"
+    assert blocks["FIG1"]["label"] == "Figure 1" and blocks["FIG1"]["section_id"] == "S3"
+    assert "<!-- image -->" not in json.dumps(doc["blocks"])
+    # Nothing after References; accessions indexed by block.
+    assert "GSE99999" not in doc["accession_mentions"]
+    assert doc["accession_mentions"]["GSE209999"] == ["DA.p1"]
+    assert "[TAB1]" in ps.read_section(doc, "methods")
+
+
+def test_markdown_numbered_headings_and_h1_title():
+    md = ("# A study of exercise\n\n# 1 Introduction\n\nText.\n\n# 2 Methods\n\n"
+          "# 2.1 Subjects\n\nTen men.\n\n# 2.1.1 Inclusion\n\nHealthy.\n\n# 3 Results\n\nMore.\n")
+    doc = ps.parse_markdown(md)
+    assert doc["title"] == "A study of exercise"
+    ids = [(s["id"], s["class"]) for s in doc["sections"]]
+    assert ids == [("S1", "introduction"), ("S2", "methods"), ("S2.1", "methods"),
+                   ("S2.1.1", "methods"), ("S3", "results")], ids
+
+
+# Shapes seen on real PDFs (docs/status/PDF_MARKDOWN_EVAL.md): Frontiers side-panel
+# labels and a linked title as Docling headings, a Nature-style article banner and a
+# subject label above the h1 title (pymupdf4llm), Wiley letter-spaced banners and
+# "2 | METHODS" headings, and Methods / Data availability printed after References.
+_REAL_SHAPES_MD = """## ARTICLE
+
+### **OPEN**
+
+## OPEN ACCESS
+
+## EDITED BY
+
+Katsuhiko Suzuki, Waseda University, Japan
+
+#### Adipocyte and Cell Biology
+
+# [Exercise remodels adipose tissue in humans](https://example.org/a1)
+
+#### **O R I G I N A L A R T I C L E**
+
+##### **K E Y W O R D S**
+
+exercise, adipose
+
+## **1** | **INTRODUCTION**
+
+Exercise matters.
+
+## **2** | **RESULTS**
+
+Genes changed (GSE111111).
+
+## REFERENCES
+
+1. Smith J. Methods for counting. GSE99999 cited only here.
+
+## Methods
+
+## RNA sequencing
+
+Reads were counted (GSE222222).
+
+## Data availability
+
+Counts are in GEO (GSE333333).
+"""
+
+
+def test_markdown_real_pdf_shapes():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD)
+    assert doc["title"] == "Exercise remodels adipose tissue in humans", doc["title"]
+    titles = [s["title"] for s in doc["sections"]]
+    assert not any(t.upper() in ("ARTICLE", "OPEN", "OPEN ACCESS", "EDITED BY", "ORIGINALARTICLE")
+                   for t in titles), titles
+    secs = {s["id"]: s for s in doc["sections"]}
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert by_title["1 INTRODUCTION"]["class"] == "introduction", titles
+    assert by_title["2 RESULTS"]["class"] == "results" and "KEYWORDS" in by_title, titles
+    acc = doc["accession_mentions"]
+    # The reference list is skipped, but Methods and Data availability after it are kept.
+    assert "GSE99999" not in acc and "Smith J." not in json.dumps(doc["blocks"])
+    meth = [s for s in doc["sections"] if s["title"] == "Methods"][0]
+    assert meth["class"] == "methods" and meth["parent"] is None, meth
+    rna = [s for s in doc["sections"] if s["title"] == "RNA sequencing"][0]
+    assert rna["parent"] == meth["id"] and rna["class"] == "methods", rna
+    assert acc["GSE222222"] == [f"{rna['id']}.p1"], acc
+    assert acc["GSE333333"] == ["DA.p1"] and secs["DA"]["class"] == "data_availability", acc
+
+
+# Science "REFERENCES AND NOTES", a Results subsection whose title says "participants",
+# Cell Press page banner ("Protocol") and logo glyph ("ll") as headings, and a data
+# availability title the converter left as a plain line.
+_REAL_SHAPES_MD_2 = """# Exercise and exosomes in older men
+
+## INTRODUCTION
+
+Background.
+
+## RESULTS
+
+## Anthropometric and Physiological Characteristics of Participants
+
+Trained men were leaner.
+
+## Protocol
+
+## Acute exercise changes exomiRs
+
+Many changed.
+
+##### ll
+
+Data and code availability
+
+Small RNA-seq data are in GEO (GSE144627).
+
+## REFERENCES AND NOTES
+
+1. Smith J. Cited (GSE99999).
+"""
+
+
+def test_markdown_real_pdf_shapes_2():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD_2)
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert "Protocol" not in by_title and "ll" not in by_title, list(by_title)
+    part = by_title["Anthropometric and Physiological Characteristics of Participants"]
+    assert part["class"] == "results" and part["parent"] == by_title["RESULTS"]["id"], part
+    assert by_title["Acute exercise changes exomiRs"]["class"] == "results"
+    da = by_title["Data and code availability"]
+    assert da["class"] == "data_availability", da
+    assert doc["accession_mentions"] == {"GSE144627": [f"{da['id']}.p1"]}, doc["accession_mentions"]
+
+
+# NIH author manuscript: PMC banner merged into the first heading, a Cell "Highlights"
+# block before the title, a title that contains a section keyword ("Patients"), escaped
+# entities, a stray NUL, and tables printed after the reference list.
+_REAL_SHAPES_MD_3 = """# **HHS Public Access** Author manuscript Br J Haematol. Author manuscript.
+
+## HIGHLIGHTS
+
+Exercise changed blood genes.
+
+## **Whole-Blood Transcriptome Analysis in Pediatric Patients Before and After Exercise**
+
+| Alen Lovric 2 |
+|---|
+
+### **Abstract**
+
+We sequenced blood.
+
+### 2. METHODS
+
+RNA-seq (GSE244401).
+
+### 5. SUMMARY &amp; CONCLUSIONS
+
+Done.\x00 Mice ran 5 km day<sup>-1</sup>.
+
+<!-- Start of picture text -->
+Page 48<br>Frodermann et al.<br><!-- End of picture text -->
+
+| BMI (kg/m<sup>2</sup>) | VO2 max<br>(ml/kg/min) |
+|---|---|
+| 26.1 | 34.4 |
+
+### REFERENCES
+
+1. Smith J. Cited.
+
+## Table 2.
+
+Differentially expressed genes after exercise.
+
+| Gene | log2FC |
+|---|---|
+| IL6 | 1.2 |
+"""
+
+
+def test_markdown_real_pdf_shapes_3():
+    doc = ps.parse_markdown(_REAL_SHAPES_MD_3)
+    assert doc["title"] == ("Whole-Blood Transcriptome Analysis in Pediatric Patients Before and "
+                            "After Exercise"), doc["title"]
+    by_title = {s["title"]: s for s in doc["sections"]}
+    assert by_title["5. SUMMARY & CONCLUSIONS"]["class"] == "conclusion", list(by_title)
+    assert "\x00" not in json.dumps(doc["blocks"]) and "Smith J." not in json.dumps(doc["blocks"])
+    tabs = [b for b in doc["blocks"] if b["kind"] == "table" and b.get("label")]
+    assert len(tabs) == 1 and tabs[0]["label"] == "Table 2" and "| IL6 | 1.2 |" in tabs[0]["text"], tabs
+    assert tabs[0]["section_id"] == "FLT", tabs[0]
+    conc = by_title["5. SUMMARY & CONCLUSIONS"]["block_ids"]
+    text = json.dumps([x for x in doc["blocks"] if x["id"] in conc])
+    assert "day^-1" in text and "Frodermann" not in text and "<br>" not in text, text
+    assert "| BMI (kg/m^2) | VO2 max (ml/kg/min) |" in text, text
+    assert not any("Lovric" in x["text"] for x in doc["blocks"] if x["kind"] == "table")
+    assert any("Alen Lovric 2" == x["text"] for x in doc["blocks"] if x["kind"] == "paragraph")
+
+
+def test_pdf_to_structure_backends():
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    pdf = os.path.join(FIX, "synthetic_two_column.pdf")
+    # pypdf is a core dependency: the heuristic route must always work.
+    doc, md = pm.structure_pdf(pdf, backend="pypdf")
+    assert doc["structure_quality"] == "pdf_heuristic" and md == ""
+    assert "GSE209999" in doc["accession_mentions"]
+    installed = [b for b in pm.available_backends() if b != "pypdf"]
+    if not installed:
+        print("  SKIP markdown backends (install pymupdf4llm or docling)")
+        return
+    for backend in installed:
+        doc, md = pm.structure_pdf(pdf, backend=backend)
+        assert doc["structure_quality"] == f"pdf_markdown:{backend}", doc["structure_quality"]
+        cls = {s["class"] for s in doc["sections"]}
+        assert {"abstract", "introduction", "methods", "results", "discussion",
+                "data_availability"} <= cls, (backend, cls)
+        tabs = [b for b in doc["blocks"] if b["kind"] == "table"]
+        assert tabs and "Sedentary" in tabs[0]["text"] and tabs[0]["label"] == "Table 1", (backend, tabs)
+        assert doc["accession_mentions"].get("GSE209999") == ["DA.p1"], (backend, doc["accession_mentions"])
+        assert "Journal of Synthetic" not in json.dumps(doc["blocks"]), backend
+        assert "Smith J." not in json.dumps(doc["blocks"]), backend
+        with tempfile.TemporaryDirectory() as d:
+            _, paths = pm.save_pdf(pdf, d, "P1", backend=backend)
+            assert os.path.exists(paths["converted_md"]) and ps.load(paths["json"])["blocks"]
+
+
+def test_pdf_backend_options_and_ocr_retry():
+    """pymupdf4llm's layout mode keeps page headers/footers and OCRs every page with a
+    picture unless told not to (3-4x slower, figure text pasted into the body). OCR
+    runs only when the text layer is empty."""
+    import types
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    assert not pm._has_text("<!-- image -->\n\n## \n\n<!-- image -->\n")
+    assert pm._has_text(_DOCLING_MD)
+    calls = []
+
+    def fake_to_markdown(path, **kw):
+        calls.append(kw)
+        return _DOCLING_MD if kw.get("use_ocr") else "<!-- image -->\n"
+
+    fake = types.ModuleType("pymupdf4llm")
+    fake.to_markdown = fake_to_markdown
+    saved = sys.modules.get("pymupdf4llm")
+    sys.modules["pymupdf4llm"] = fake
+    orig_find = pm.importlib.util.find_spec
+    pm.importlib.util.find_spec = lambda name: object() if name == "pymupdf4llm" else orig_find(name)
+    try:
+        md, used = pm.pdf_to_markdown("scanned.pdf", backend="pymupdf4llm")
+    finally:
+        pm.importlib.util.find_spec = orig_find
+        if saved is None:
+            sys.modules.pop("pymupdf4llm", None)
+        else:
+            sys.modules["pymupdf4llm"] = saved
+    assert used == "pymupdf4llm" and md == _DOCLING_MD
+    assert [c["use_ocr"] for c in calls] == [False, True], calls
+    assert all(c["header"] is False and c["footer"] is False for c in calls), calls
+
+
+def test_pdf_auto_backend_avoids_glyph_loss():
+    """Docling turned every "±" of a Frontiers sample table into U+FFFD; auto mode then
+    also runs pymupdf4llm and keeps the cleaner conversion."""
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    lossy = _DOCLING_MD + "\n| Age | 68.2 � 1.6 |\n" * 12
+    saved = (pm._docling_markdown, pm._pymupdf4llm_markdown, pm.importlib.util.find_spec)
+    pm.importlib.util.find_spec = lambda name: object()
+    try:
+        pm._docling_markdown = lambda path, ocr=False: lossy
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: _DOCLING_MD
+        assert pm.pdf_to_markdown("x.pdf") == (_DOCLING_MD, "pymupdf4llm")
+        # Only one backend asked for: its output is used as is.
+        assert pm.pdf_to_markdown("x.pdf", backend="docling") == (lossy, "docling")
+        # The fallback is no better: keep docling.
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: lossy + "�"
+        assert pm.pdf_to_markdown("x.pdf")[1] == "docling"
+        # A clean docling conversion never runs the second backend.
+        pm._docling_markdown = lambda path, ocr=False: _DOCLING_MD
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: 1 / 0
+        assert pm.pdf_to_markdown("x.pdf") == (_DOCLING_MD, "docling")
+    finally:
+        pm._docling_markdown, pm._pymupdf4llm_markdown, pm.importlib.util.find_spec = saved
+
+
 def test_save_load_and_tool_wrapper():
     doc = _load("PMC12989000")
     with tempfile.TemporaryDirectory() as d:

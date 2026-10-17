@@ -125,21 +125,33 @@ def _fetch_europepmc_text(pmcid: str):
 
 
 def _save_structured(stem: str, output_dir: str, source: str, url: str,
-                     xml_bytes: bytes = b"", pdf_pages: list | None = None) -> str:
+                     xml_bytes: bytes = b"", pdf_pages: list | None = None,
+                     pdf_path: str = "") -> str:
     """Write <stem>.paper.json/.paper.md beside the .txt and return a report line.
 
     Additive only: a parse failure never affects the .txt that callers already rely on.
     """
     try:
         from tools import paper_structure as ps
+        converted_md = ""
         if xml_bytes:
             doc = ps.parse_jats(xml_bytes, source=source, fetched_url=url)
+        elif pdf_path:
+            # Docling / pymupdf4llm when installed (tables kept), else pypdf heuristics.
+            from tools import pdf_markdown
+            doc, converted_md = pdf_markdown.structure_pdf(pdf_path, source=source, fetched_url=url)
         else:
             doc = ps.parse_pdf_pages(pdf_pages or [], source=source, fetched_url=url)
         paths = ps.save(doc, output_dir, stem, raw_xml=xml_bytes or None)
+        if converted_md:
+            with open(os.path.join(output_dir, f"{stem}.converted.md"), "w", encoding="utf-8") as f:
+                f.write(converted_md)
         kinds = [b["kind"] for b in doc["blocks"]]
         classes = sorted({s["class"] for s in doc["sections"]} - {"other"})
-        quality = ("" if doc["structure_quality"] == "jats"
+        sq = doc["structure_quality"]
+        quality = ("" if sq == "jats"
+                   else f" — converted from PDF by {sq.split(':', 1)[1]}: check table values against the PDF"
+                   if sq.startswith("pdf_markdown:")
                    else " — PDF heuristic: headings approximate, tables not recovered")
         line = (f"- Structured full text: {paths['md']} ({len(doc['sections'])} sections "
                 f"[{', '.join(classes)}], {kinds.count('table')} tables, {kinds.count('figure')} figure "
@@ -397,7 +409,7 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
         notes = []
 
         # Strategy 1: Europe PMC full-text XML (preferred — reliable, has Data Availability).
-        xml_bytes, fetched_url, pages = b"", "", []
+        xml_bytes, fetched_url, pages, pdf_path = b"", "", [], ""
         if pmcid:
             xml_bytes, fetched_url = _fetch_europepmc_xml(pmcid)
             xml_text = _flatten_jats(xml_bytes) if xml_bytes else ""
@@ -449,7 +461,7 @@ def fetch_paper_text(pdf_url: str = "", paper_id: str = "", pmcid: str = "", sea
             f"Fetched paper text via {source}: {len(text)} chars.",
             f"- Text saved to: {txt_path}",
             _save_structured(safe_pid, output_dir, source, fetched_url,
-                             xml_bytes=xml_bytes, pdf_pages=pages),
+                             xml_bytes=xml_bytes, pdf_pages=pages, pdf_path=pdf_path),
         ]
         for n in notes:
             lines.append(f"- {n}")
