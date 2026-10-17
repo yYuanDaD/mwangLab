@@ -32,30 +32,47 @@ import argparse
 import importlib.util
 import json
 import os
+import re
 import sys
 
 from tools import paper_structure as ps
 
 BACKENDS = ("docling", "pymupdf4llm", "pypdf")
 _MODULE = {"docling": "docling", "pymupdf4llm": "pymupdf4llm", "pypdf": "pypdf"}
-_docling_converter = None
 
 
 def available_backends() -> list[str]:
     return [b for b in BACKENDS if importlib.util.find_spec(_MODULE[b]) is not None]
 
 
-def _docling_markdown(path: str) -> str:
-    global _docling_converter
-    if _docling_converter is None:   # model loading is slow; reuse across papers
-        from docling.document_converter import DocumentConverter
-        _docling_converter = DocumentConverter()
-    return _docling_converter.convert(path).document.export_to_markdown()
+# OCR is off on the first pass: publisher PDFs have a text layer, and OCR only reads the
+# words inside figures (axis labels, panel letters) into the body while costing 2-4x
+# the conversion time. A PDF whose text layer comes back empty is retried with OCR.
+_docling_converters: dict[bool, object] = {}
 
 
-def _pymupdf4llm_markdown(path: str) -> str:
+def _docling_markdown(path: str, ocr: bool = False) -> str:
+    if ocr not in _docling_converters:   # model loading is slow; reuse across papers
+        from docling.datamodel.base_models import InputFormat
+        from docling.datamodel.pipeline_options import PdfPipelineOptions
+        from docling.document_converter import DocumentConverter, PdfFormatOption
+        opts = PdfPipelineOptions()
+        opts.do_ocr = ocr
+        _docling_converters[ocr] = DocumentConverter(
+            format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)})
+    return _docling_converters[ocr].convert(path).document.export_to_markdown()
+
+
+def _pymupdf4llm_markdown(path: str, ocr: bool = False) -> str:
     import pymupdf4llm
-    return pymupdf4llm.to_markdown(path, show_progress=False)
+    # With pymupdf-layout installed (a pymupdf4llm dependency since 1.27) the layout
+    # model is used, which keeps page headers/footers and OCRs every page that has a
+    # picture unless told otherwise. The legacy (non-layout) API rejects these keywords.
+    try:
+        return pymupdf4llm.to_markdown(path, show_progress=False, use_ocr=ocr,
+                                       header=False, footer=False)
+    except TypeError:
+        return pymupdf4llm.to_markdown(path, show_progress=False)
 
 
 def _pypdf_pages(path: str) -> list[str]:
@@ -67,6 +84,12 @@ def _pypdf_pages(path: str) -> list[str]:
         except Exception:
             pages.append("")
     return pages
+
+
+def _has_text(md: str) -> bool:
+    """True when Markdown holds real words, not just image placeholders and page breaks."""
+    words = re.sub(r"<!--.*?-->|!\[[^\]]*\]\([^)]*\)|[#|*_\-=\s]", " ", md or "", flags=re.S)
+    return len(re.findall(r"[A-Za-z]{3,}", words)) >= 50
 
 
 def pdf_to_markdown(path: str, backend: str = "auto") -> tuple[str, str]:
@@ -83,14 +106,17 @@ def pdf_to_markdown(path: str, backend: str = "auto") -> tuple[str, str]:
         if importlib.util.find_spec(_MODULE[b]) is None:
             errors.append(f"{b}: not installed")
             continue
+        convert = _docling_markdown if b == "docling" else _pymupdf4llm_markdown
         try:
-            md = _docling_markdown(path) if b == "docling" else _pymupdf4llm_markdown(path)
+            md = convert(path)
+            if not _has_text(md):   # scanned PDF: no text layer, so OCR it
+                md = convert(path, ocr=True)
         except Exception as e:  # a converter crash should not lose the paper
             errors.append(f"{b}: {type(e).__name__}: {e}")
             continue
-        if md and md.strip():
+        if _has_text(md):
             return md, b
-        errors.append(f"{b}: empty output (scanned PDF without a text layer?)")
+        errors.append(f"{b}: empty output even with OCR")
     raise RuntimeError("; ".join(errors))
 
 

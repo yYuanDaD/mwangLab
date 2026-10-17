@@ -277,6 +277,43 @@ def test_pdf_to_structure_backends():
             assert os.path.exists(paths["converted_md"]) and ps.load(paths["json"])["blocks"]
 
 
+def test_pdf_backend_options_and_ocr_retry():
+    """pymupdf4llm's layout mode keeps page headers/footers and OCRs every page with a
+    picture unless told not to (3-4x slower, figure text pasted into the body). OCR
+    runs only when the text layer is empty."""
+    import types
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    assert not pm._has_text("<!-- image -->\n\n## \n\n<!-- image -->\n")
+    assert pm._has_text(_DOCLING_MD)
+    calls = []
+
+    def fake_to_markdown(path, **kw):
+        calls.append(kw)
+        return _DOCLING_MD if kw.get("use_ocr") else "<!-- image -->\n"
+
+    fake = types.ModuleType("pymupdf4llm")
+    fake.to_markdown = fake_to_markdown
+    saved = sys.modules.get("pymupdf4llm")
+    sys.modules["pymupdf4llm"] = fake
+    orig_find = pm.importlib.util.find_spec
+    pm.importlib.util.find_spec = lambda name: object() if name == "pymupdf4llm" else orig_find(name)
+    try:
+        md, used = pm.pdf_to_markdown("scanned.pdf", backend="pymupdf4llm")
+    finally:
+        pm.importlib.util.find_spec = orig_find
+        if saved is None:
+            sys.modules.pop("pymupdf4llm", None)
+        else:
+            sys.modules["pymupdf4llm"] = saved
+    assert used == "pymupdf4llm" and md == _DOCLING_MD
+    assert [c["use_ocr"] for c in calls] == [False, True], calls
+    assert all(c["header"] is False and c["footer"] is False for c in calls), calls
+
+
 def test_save_load_and_tool_wrapper():
     doc = _load("PMC12989000")
     with tempfile.TemporaryDirectory() as d:
