@@ -371,6 +371,9 @@ Exercise changed blood genes.
 
 ## **Whole-Blood Transcriptome Analysis in Pediatric Patients Before and After Exercise**
 
+| Alen Lovric 2 |
+|---|
+
 ### **Abstract**
 
 We sequenced blood.
@@ -381,7 +384,14 @@ RNA-seq (GSE244401).
 
 ### 5. SUMMARY &amp; CONCLUSIONS
 
-Done.\x00
+Done.\x00 Mice ran 5 km day<sup>-1</sup>.
+
+<!-- Start of picture text -->
+Page 48<br>Frodermann et al.<br><!-- End of picture text -->
+
+| BMI (kg/m<sup>2</sup>) | VO2 max<br>(ml/kg/min) |
+|---|---|
+| 26.1 | 34.4 |
 
 ### REFERENCES
 
@@ -404,9 +414,15 @@ def test_markdown_real_pdf_shapes_3():
     by_title = {s["title"]: s for s in doc["sections"]}
     assert by_title["5. SUMMARY & CONCLUSIONS"]["class"] == "conclusion", list(by_title)
     assert "\x00" not in json.dumps(doc["blocks"]) and "Smith J." not in json.dumps(doc["blocks"])
-    tabs = [b for b in doc["blocks"] if b["kind"] == "table"]
+    tabs = [b for b in doc["blocks"] if b["kind"] == "table" and b.get("label")]
     assert len(tabs) == 1 and tabs[0]["label"] == "Table 2" and "| IL6 | 1.2 |" in tabs[0]["text"], tabs
     assert tabs[0]["section_id"] == "FLT", tabs[0]
+    conc = by_title["5. SUMMARY & CONCLUSIONS"]["block_ids"]
+    text = json.dumps([x for x in doc["blocks"] if x["id"] in conc])
+    assert "day^-1" in text and "Frodermann" not in text and "<br>" not in text, text
+    assert "| BMI (kg/m^2) | VO2 max (ml/kg/min) |" in text, text
+    assert not any("Lovric" in x["text"] for x in doc["blocks"] if x["kind"] == "table")
+    assert any("Alen Lovric 2" == x["text"] for x in doc["blocks"] if x["kind"] == "paragraph")
 
 
 def test_pdf_to_structure_backends():
@@ -475,6 +491,34 @@ def test_pdf_backend_options_and_ocr_retry():
     assert used == "pymupdf4llm" and md == _DOCLING_MD
     assert [c["use_ocr"] for c in calls] == [False, True], calls
     assert all(c["header"] is False and c["footer"] is False for c in calls), calls
+
+
+def test_pdf_auto_backend_avoids_glyph_loss():
+    """Docling turned every "±" of a Frontiers sample table into U+FFFD; auto mode then
+    also runs pymupdf4llm and keeps the cleaner conversion."""
+    try:
+        from tools import pdf_markdown as pm
+    except ImportError as e:
+        print(f"  SKIP pdf_markdown ({e})")
+        return
+    lossy = _DOCLING_MD + "\n| Age | 68.2 � 1.6 |\n" * 12
+    saved = (pm._docling_markdown, pm._pymupdf4llm_markdown, pm.importlib.util.find_spec)
+    pm.importlib.util.find_spec = lambda name: object()
+    try:
+        pm._docling_markdown = lambda path, ocr=False: lossy
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: _DOCLING_MD
+        assert pm.pdf_to_markdown("x.pdf") == (_DOCLING_MD, "pymupdf4llm")
+        # Only one backend asked for: its output is used as is.
+        assert pm.pdf_to_markdown("x.pdf", backend="docling") == (lossy, "docling")
+        # The fallback is no better: keep docling.
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: lossy + "�"
+        assert pm.pdf_to_markdown("x.pdf")[1] == "docling"
+        # A clean docling conversion never runs the second backend.
+        pm._docling_markdown = lambda path, ocr=False: _DOCLING_MD
+        pm._pymupdf4llm_markdown = lambda path, ocr=False: 1 / 0
+        assert pm.pdf_to_markdown("x.pdf") == (_DOCLING_MD, "docling")
+    finally:
+        pm._docling_markdown, pm._pymupdf4llm_markdown, pm.importlib.util.find_spec = saved
 
 
 def test_save_load_and_tool_wrapper():

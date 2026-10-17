@@ -759,6 +759,13 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
     """
     # Docling escapes &, < and > in text ("SUMMARY &amp; CONCLUSIONS").
     md = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", md)   # stray control chars from PDF fonts
+    # pymupdf4llm: words inside figures (axis labels, panel letters) are not body text,
+    # and inline HTML becomes the same ^/_ notation the JATS route uses.
+    md = re.sub(r"<!--\s*Start of picture text\s*-->.*?<!--\s*End of picture text\s*-->", "", md,
+                flags=re.S | re.I)
+    md = re.sub(r"<br\s*/?>", " ", md, flags=re.I)
+    md = re.sub(r"<sup>(.*?)</sup>", r"^\1", md, flags=re.I | re.S)
+    md = re.sub(r"<sub>(.*?)</sub>", r"_\1", md, flags=re.I | re.S)
     raw_lines = html.unescape(md).replace("\r\n", "\n").replace("\r", "\n").split("\n")
     repeated = _md_repeated_lines(raw_lines)
     b = _Builder()
@@ -863,6 +870,12 @@ def parse_markdown(md: str, source: str = "", fetched_url: str = "",
     def flush_table() -> None:
         nonlocal pending_caption
         if not table:
+            return
+        cells = [c.strip() for r in table if not _MD_SEPARATOR.match(r) for c in r.strip().strip("|").split("|")]
+        if not pending_caption and all(r.strip().strip("|").count("|") == 0 for r in table):
+            # Docling boxes stray lines (author names on Wiley title pages) as one-cell tables.
+            table.clear()
+            emit_paragraph(" ".join(c for c in cells if c))
             return
         md_tab = _md_table_to_rows(table)
         table.clear()

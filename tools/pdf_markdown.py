@@ -86,6 +86,11 @@ def _pypdf_pages(path: str) -> list[str]:
     return pages
 
 
+# Replacement characters (U+FFFD) at which a conversion counts as glyph-lossy; a few
+# come from logos and the copyright sign, dozens mean a table's symbols were lost.
+_MAX_LOST_GLYPHS = 10
+
+
 def _has_text(md: str) -> bool:
     """True when Markdown holds real words, not just image placeholders and page breaks."""
     words = re.sub(r"<!--.*?-->|!\[[^\]]*\]\([^)]*\)|[#|*_\-=\s]", " ", md or "", flags=re.S)
@@ -95,13 +100,17 @@ def _has_text(md: str) -> bool:
 def pdf_to_markdown(path: str, backend: str = "auto") -> tuple[str, str]:
     """Markdown for a PDF and the backend that produced it.
 
-    ``backend="auto"`` tries docling, then pymupdf4llm. Raises RuntimeError when no
-    Markdown backend is installed or every one fails (callers fall back to pypdf).
+    ``backend="auto"`` tries docling, then pymupdf4llm. When a conversion has lost many
+    glyphs (U+FFFD, e.g. every "±" in a sample table on some Frontiers PDFs under
+    docling), the next backend is tried too and the cleaner output is kept. Raises
+    RuntimeError when no Markdown backend is installed or every one fails (callers fall
+    back to pypdf).
     """
     order = [b for b in ("docling", "pymupdf4llm") if backend in ("auto", b)]
     if not order:
         raise ValueError(f"unknown Markdown backend {backend!r}; choose from docling, pymupdf4llm")
     errors = []
+    lossy: tuple[str, str] | None = None
     for b in order:
         if importlib.util.find_spec(_MODULE[b]) is None:
             errors.append(f"{b}: not installed")
@@ -114,9 +123,17 @@ def pdf_to_markdown(path: str, backend: str = "auto") -> tuple[str, str]:
         except Exception as e:  # a converter crash should not lose the paper
             errors.append(f"{b}: {type(e).__name__}: {e}")
             continue
-        if _has_text(md):
-            return md, b
-        errors.append(f"{b}: empty output even with OCR")
+        if not _has_text(md):
+            errors.append(f"{b}: empty output even with OCR")
+            continue
+        if lossy and lossy[0].count("�") <= md.count("�"):
+            return lossy
+        if md.count("�") >= _MAX_LOST_GLYPHS and b != order[-1]:
+            lossy = (md, b)
+            continue
+        return md, b
+    if lossy:
+        return lossy
     raise RuntimeError("; ".join(errors))
 
 
