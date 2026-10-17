@@ -119,6 +119,10 @@ class Http:
                 return None
             return data if binary else data.decode("utf-8", errors="replace")
         import requests
+        headers = dict(_UA)
+        s2 = url.startswith(S2_SEARCH)
+        if s2 and os.getenv("S2_API_KEY"):
+            headers["x-api-key"] = os.environ["S2_API_KEY"]
         data = None
         for attempt in range(4):
             wait = self.min_interval - (time.time() - self._last)
@@ -126,7 +130,7 @@ class Http:
                 time.sleep(wait)
             self._last = time.time()
             try:
-                r = requests.get(url, params=params, headers=_UA, timeout=timeout)
+                r = requests.get(url, params=params, headers=headers, timeout=timeout)
             except Exception:
                 time.sleep(2 ** attempt)
                 continue
@@ -134,7 +138,8 @@ class Http:
                 data = b"\x00404"
                 break
             if r.status_code in (429, 500, 502, 503, 504):
-                time.sleep(2 ** (attempt + 1))
+                # The shared anonymous Semantic Scholar pool throttles for tens of seconds.
+                time.sleep(20 * (attempt + 1) if s2 and r.status_code == 429 else 2 ** (attempt + 1))
                 continue
             r.raise_for_status()
             data = r.content
@@ -500,29 +505,37 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
 # ---------------------------------------------------------------------------
 
 def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int = 0) -> list[dict]:
-    """Relevance-ranked open-access papers from Semantic Scholar, merged with PubMed hits
-    that have a PMC full text. Deduplicated by DOI, then PMID, then title."""
-    rows: list[dict] = []
+    """Up to ``max_papers`` relevance-ranked papers: Semantic Scholar open-access hits and
+    PubMed free-full-text hits, taken alternately so both sources are represented.
+    Deduplicated by DOI, then PMID, then title; a duplicate fills in the kept row's
+    missing PMCID / PDF URL."""
+    s2_rows: list[dict] = []
     offset = 0
-    while len(rows) < max_papers and offset < 1000:
+    while len(s2_rows) < max_papers and offset < 1000:
         params = {"query": query, "fields": "title,abstract,year,externalIds,openAccessPdf",
-                  "limit": min(100, max_papers - len(rows)), "offset": offset,
+                  "limit": min(100, max_papers - len(s2_rows)), "offset": offset,
                   "fieldsOfStudy": "Medicine,Biology"}
         if end_year:
             params["year"] = f"-{end_year}"
         s = http.get(S2_SEARCH + "?openAccessPdf", params)
         data = (json.loads(s).get("data") or []) if s else []
+        if s is None:
+            print("Semantic Scholar search failed (rate limited?); set S2_API_KEY for a steadier quota. "
+                  "Continuing with PubMed only.", file=sys.stderr)
         if not data:
             break
         for p in data:
             ext = p.get("externalIds") or {}
-            rows.append({"paper_id": p.get("paperId", ""), "source": "semantic_scholar",
-                         "title": (p.get("title") or "").strip(), "year": p.get("year") or "",
-                         "doi": (ext.get("DOI") or "").lower(), "pmid": str(ext.get("PubMed") or ""),
-                         "pmcid": _pmcid(ext.get("PubMedCentral", "")),
-                         "pdf_url": (p.get("openAccessPdf") or {}).get("url", "")})
+            s2_rows.append({"paper_id": p.get("paperId", ""), "source": "semantic_scholar",
+                            "title": (p.get("title") or "").strip(), "year": p.get("year") or "",
+                            "doi": (ext.get("DOI") or "").lower(), "pmid": str(ext.get("PubMed") or ""),
+                            "pmcid": _pmcid(ext.get("PubMedCentral", "")),
+                            "pdf_url": (p.get("openAccessPdf") or {}).get("url", "")})
         offset += len(data)
+    pm_rows: list[dict] = []
     term = f"({query}) AND free full text[sb]"
+    if end_year:
+        term += f" AND 1800:{end_year}[dp]"
     s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "pubmed", "term": term, "retmax": max_papers,
                                                "sort": "relevance", "retmode": "json"})
     pmids = json.loads(s)["esearchresult"]["idlist"] if s else []
@@ -533,16 +546,25 @@ def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int 
         for pid in res.get("uids", []):
             r = res[pid]
             ids = {a.get("idtype"): a.get("value", "") for a in r.get("articleids", [])}
-            rows.append({"paper_id": f"PMID{pid}", "source": "pubmed", "title": r.get("title", "").strip(),
-                         "year": (r.get("pubdate") or "")[:4], "doi": ids.get("doi", "").lower(),
-                         "pmid": pid, "pmcid": _pmcid(ids.get("pmc", "")), "pdf_url": ""})
-    seen, out = set(), []
-    for r in rows:
+            pm_rows.append({"paper_id": f"PMID{pid}", "source": "pubmed", "title": r.get("title", "").strip(),
+                            "year": (r.get("pubdate") or "")[:4], "doi": ids.get("doi", "").lower(),
+                            "pmid": pid, "pmcid": _pmcid(ids.get("pmc", "")), "pdf_url": ""})
+    merged = [r for pair in zip(s2_rows, pm_rows) for r in pair]
+    merged += s2_rows[len(pm_rows):] + pm_rows[len(s2_rows):]
+    kept: dict[str, dict] = {}
+    out = []
+    for r in merged:
         keys = [k for k in (r["doi"] and "doi:" + r["doi"], r["pmid"] and "pmid:" + r["pmid"],
                             "t:" + re.sub(r"\W+", "", r["title"].lower())[:80]) if k]
-        if any(k in seen for k in keys):
+        first = next((kept[k] for k in keys if k in kept), None)
+        if first is not None:
+            for f in ("pmcid", "pdf_url", "pmid", "doi"):
+                first[f] = first[f] or r[f]
             continue
-        seen.update(keys)
+        if len(out) >= max_papers:
+            continue
+        for k in keys:
+            kept[k] = r
         out.append(r)
     return out
 

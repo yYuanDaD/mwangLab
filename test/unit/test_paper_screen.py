@@ -205,6 +205,21 @@ def test_collect_dedupes_sources():
     assert rows[0]["pmcid"] == "PMC999" and rows[1]["pmcid"] == "PMC5"
 
 
+def test_collect_caps_at_max_and_mixes_sources():
+    # --max is the total, not per source; both sources are represented; a PubMed row kept
+    # first still gets the Semantic Scholar PDF URL of its duplicate.
+    s2 = json.dumps({"data": [{"paperId": f"S{i}", "title": f"Paper {i}", "year": 2024,
+                               "externalIds": {"PubMed": str(100 + i)},
+                               "openAccessPdf": {"url": f"http://x/{i}.pdf"}} for i in range(4)]})
+    pub_search = json.dumps({"esearchresult": {"idlist": ["101", "200", "201", "202"]}})
+    pub_sum = json.dumps({"result": {"uids": ["101", "200", "201", "202"], **{
+        u: {"title": f"Paper {u}", "pubdate": "2023", "articleids": []} for u in ("101", "200", "201", "202")}}})
+    http = FakeHttp({"semanticscholar": s2, "esearch.fcgi": pub_search, "esummary.fcgi": pub_sum})
+    rows = sc.collect_papers("exercise", http, max_papers=4)
+    assert [r["paper_id"] for r in rows] == ["S0", "PMID101", "PMID200", "S2"], [r["paper_id"] for r in rows]
+    assert rows[1]["pdf_url"] == "http://x/1.pdf", rows[1]
+
+
 def main() -> int:
     tests = [v for k, v in globals().items() if k.startswith("test_") and callable(v)]
     failed = 0
