@@ -110,7 +110,7 @@ All executors read the aligned files. Raw-count executors require integer counts
 
 | Route | Call |
 |---|---|
-| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="")` |
+| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="", min_total_count=0)` |
 | limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="")` |
 | edgeR, two arms, no covariates | `run_edger_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | limma-voom (needs R + limma) | `run_limma_voom_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
@@ -125,6 +125,8 @@ All executors read the aligned files. Raw-count executors require integer counts
 | paper text | `tools.paper_tools:fetch_paper_text(pmcid=...)` (Europe PMC, needs network); otherwise read the paper file the user gave |
 
 Module paths for `call_tool`: `tools.deseq2_tools`, `tools.limma_tools`, `tools.edger_tools`, `tools.limma_voom_tools`, `tools.preprocess_tools`, `tools.multigroup_tools`, `tools.scrna_tools`, `tools.proteomics_tools`, `tools.methylation_tools`, `tools.enrichment_tools`, `tools.paper_tools`. Modality-specific details are in [Modalities](modalities.md).
+
+Low-count pre-filter: `run_deseq2_analysis` drops only genes that are zero in every sample unless `min_total_count` is set. The filter changes how many genes are tested and so the BH adjustment, which moves genes near padj 0.05. Use the paper's rule when it states one (`rowSums(counts) >= 10` is `min_total_count=10`), and record it in the method decision as `prefilter` (for example `"total count >= 10 (paper)"` or `"all-zero genes only (tool default)"`).
 
 Blocking with DESeq2 or limma: pass the derived subject column in `covariate_columns`. The tool validates the design and fits `Treatment` plus the covariate; internally it renames covariates to safe names such as `Covariate0`. In the records, write the model with the derived names (for example `~ subject + time`) in `method.final.formula`, and the same subject name in `covariance.final.blocking_terms`. The validator checks that every required blocking term appears in the recorded formula.
 
@@ -167,6 +169,9 @@ Plan rules:
   summary.csv          one row per case: status, matrix_type, da_method, transform, contrast, covariance,
                        threshold, enrichment, stop_reason (blocked gates), execution_error (failed runs)
   workflow.log         one line per decision and case outcome
+  trace.jsonl          decision trace: every helper and tool call (arguments as file names, duration,
+                       success or error), every decision with its revision number and changed fields,
+                       records the contract rejected, case and run outcomes
   preflight.json       output of scripts/preflight.py (write it here)
   <case_id>/
     decisions.json     decision-contract records, in gate order
@@ -195,3 +200,12 @@ run.finish()
 ```
 
 `case.decide` raises `NativeToolError` when a record misses a required field. `case.finish` raises when the case breaks an invariant, for example a completed execution after a blocked gate. Fix the record; do not bypass the recorder.
+
+## Decision trace
+
+`trace.jsonl` is written automatically while a `RunRecorder` is active; nothing extra is needed. Keep the trace honest:
+- Revise a gate by calling `case.decide` again for the same stage. Do not edit `decisions.json`; the revision and its changed fields are the record of the second look.
+- Use `confidence` as you mean it. `medium` or `low` marks the gate for review.
+- When a gate needed a second look for a reason the records do not show, add one line with `native.note("why", stage="design")`.
+
+After a run, or across many runs, `python scripts/analyze_traces.py <runs...> --out <dir>` reports where cases stopped, which gates were revised or not high-confidence, which tools failed, and writes `review_sheet.csv` for expert review.

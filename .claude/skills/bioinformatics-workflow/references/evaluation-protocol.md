@@ -31,3 +31,12 @@ Blocking failures include incompatible matrix/method, invalid contrast, unresolv
 Report paired per-case outcomes and aggregate confidence intervals or exact paired tests. Treat DEG/p-value counts as descriptive outputs under a named threshold, not as correctness scores. Do not rank systems by DEG count, p-value count, or fluent narrative quality.
 
 Frozen case sets and scorers live under `test/experiments/` in the repository. Before a blind run, give the tested agent a checkout without the scorer-side files (answer keys, earlier results, review documents), because an agent that can read them is no longer blind. The scorers read any run that writes decision-contract records under `<runs>/<case_id>/`.
+
+## Decision traces and expert review
+
+Every native run writes `trace.jsonl`. Aggregate runs with `python scripts/analyze_traces.py <runs...> --out <dir>`:
+- `trace_summary.md`: stops by gate and reason; per gate, the share of decisions that were not high-confidence, revised cases and the fields that changed, and records the contract rejected; tool calls, errors, and durations; the most common transitions between actions.
+- `review_sheet.csv`: one row per case and gate with the final decision and reasoning, plus empty `reviewer_correct` (1, 0, NA), `reviewer_issue_type` (agent_error, data_limitation, none), and `reviewer_note` columns. Two independent reviewers on a random sample of cases give an agreement-checked correctness rate per gate. Score a correct stop on unusable data as correct, not as a data limitation.
+
+Revisions and non-high confidence are hesitation signals, not errors. Report them next to correctness, so that a gate that is often revised but ends correct is distinguished from one that is confidently wrong.
+

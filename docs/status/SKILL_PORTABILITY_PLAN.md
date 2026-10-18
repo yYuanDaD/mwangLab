@@ -40,7 +40,9 @@ Result: cases 01 and 06 (first attempt) and 07, 08, 09 (second session, `.claude
 
 ### F. Real execution on a full environment
 
-First run (2026-10-11, Windows 11, Python 3.12.4, commit `165bea5`): preflight fully available (`de_capable: true`, every network host reachable, R limma found). Five of seven self-test routes passed (DESeq2 with blocking, limma on FPKM, methylation, paired single-cell, GSEA and ORA). Multilevel limma and label-free proteomics failed with `KeyError: -2`, an inmoose 0.9.1 eBayes bug: when residual variances are near-homogeneous, squeezeVar returns `df_prior = inf` as a Python float and `~True == -2` is used as a column key. Fixed by `tools/limma_compat.ebayes`, used by `limma_tools` and `multigroup_tools`; regression test `test/unit/test_limma_compat.py`. With inmoose loaded in the cloud workspace, all limma routes then pass. Remaining: rerun the self-test on Windows after pulling.
+First run (2026-10-11, Windows 11, Python 3.12.4, commit `165bea5`): preflight fully available (`de_capable: true`, every network host reachable, R limma found). Five of seven self-test routes passed (DESeq2 with blocking, limma on FPKM, methylation, paired single-cell, GSEA and ORA). Multilevel limma and label-free proteomics failed with `KeyError: -2`, an inmoose 0.9.1 eBayes bug: when residual variances are near-homogeneous, squeezeVar returns `df_prior = inf` as a Python float and `~True == -2` is used as a column key. Fixed by `tools/limma_compat.ebayes`, used by `limma_tools` and `multigroup_tools`; regression test `test/unit/test_limma_compat.py`. With inmoose loaded in the cloud workspace, all limma routes then pass.
+
+Second run (2026-10-11, Windows, commit `f9eb082`): **done**. All 7 routes `PASS` (sensitivity 1.0 except paired single-cell 0.9; null false-positive rate at most 0.006; sign agreement 1.0). Decision contract: 60 records, 0 errors. Audit: `pass`, score 100. External LLM attempts: 0.
 
 This is the stage that proves the skill runs on another device. It cannot run in the cloud sandbox, where PyPI, GEO, and enrichment services are blocked. Run it on your computer, or on any machine with network:
 
@@ -60,6 +62,8 @@ Send back `output/preflight.json` and `output/skill_selftest_*/selftest_report.j
 
 ### G. Live Codex run
 
+Status (2026-10-11): verified by the user on Codex; not scored here. A blind checkout is at `output/stage_g/repo` (9 cases) if a scored run is wanted later.
+
 Run the Codex CLI in a clean checkout with network enabled:
 
 ```bash
@@ -78,10 +82,13 @@ Run one GEO study with a trusted reference (a BO benchmark contrast, or GSE13252
 
 Exit: the agreement metrics are reported, and any difference is explained by a recorded decision.
 
+Setup (2026-10-11): study GSE195482 (HFpEF diet vs chow in WT cardiomyocytes, female `WMF_vs_WCF` and male `WMM_vs_WCM`, 3 vs 3 raw counts). Reference: Bo's R DESeq2 tables in `F:\RNAseqData4Testing\GSE195482`. Blind workspace: `output/stage_h/repo` with `cases/GSE195482/` (two matrices, metadata, `paper.md` from the published article); Bo's results and scripts withheld, and the 2026-10-09 handoff note (which lists earlier DEG counts) removed. Scoring: `test/experiments/stage_h_bo_reference/compare_to_reference.py` against `*.allgene.DEseq2.txt`.
+
+Result (2026-10-13, Codex on Windows): **done**, details in `test/experiments/stage_h_bo_reference/RESULTS.md`. All 24 decision records `VALID` and scientifically correct (sex-stratified pairwise contrasts, raw counts with DESeq2, no blocking, paper threshold, PyDESeq2 deviation declared). Agreement with Bo: log2FC Pearson 1.000 over about 17,000 genes, direction 100%, DEG Jaccard 0.910 (female) and 0.904 (male), recovery 96% and 94%. The gene-set differences sit at padj 0.04 to 0.06 and come from PyDESeq2 against R DESeq2, mainly the low-count pre-filter, which is now an explicit `min_total_count` option recorded as `prefilter`. Caveat: Codex ran from the main repository, so the run was not strictly blind and has no trace.
+
 ### I. Wrap-up
 
-- Add the stage D–H results to `docs/reviews/SKILL_REVIEW_20261010.md`, or a follow-up review.
-- Open a PR to `main`, and keep `sync_skills.py --check` in the test run.
+Status (2026-10-13): review written ([SKILL_REVIEW_20261013.md](../reviews/SKILL_REVIEW_20261013.md)); unit tests compared with `main` (no regressions); pull request to `main` opened from `zoutongfei/skill-portability`. Open items are listed at the end of the review.
 
 ## Known limits
 

@@ -27,6 +27,7 @@ def run_deseq2_analysis(
     output_dir: str = "./output",
     covariate_columns: str = "",
     interaction_terms: str = "",
+    min_total_count: int = 0,
 ) -> str:
     """
     Run Differential Expression Analysis using PyDESeq2.
@@ -44,6 +45,11 @@ def run_deseq2_analysis(
         interaction_terms: Optional comma-separated ``factor:factor`` terms.
             DESeq2 currently refuses interaction terms because a main-effect
             pairwise contrast is not a sufficient estimand for an interaction.
+        min_total_count: Pre-filter: keep genes whose counts summed over the
+            analysed samples are at least this value (the common R idiom
+            ``rowSums(counts) >= 10``). 0 keeps every gene that is not zero in
+            all samples. The filter changes which genes are tested and so the
+            BH adjustment; record it in the method decision.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -113,6 +119,10 @@ def run_deseq2_analysis(
 
         # Drop genes with zero counts across all samples; PyDESeq2 needs integer counts.
         counts_df = counts_df.loc[:, (counts_df != 0).any(axis=0)]
+        if min_total_count and int(min_total_count) > 0:
+            before = counts_df.shape[1]
+            counts_df = counts_df.loc[:, counts_df.sum(axis=0) >= int(min_total_count)]
+            print(f"Pre-filter: kept {counts_df.shape[1]} of {before} genes with total count >= {int(min_total_count)}")
         counts_df = counts_df.astype(int)
 
         # pydeseq2 builds a patsy formula `~ <design_factor>` from the column NAME, which breaks
