@@ -134,7 +134,9 @@ class Http:
             except Exception:
                 time.sleep(2 ** attempt)
                 continue
-            if r.status_code == 404:
+            if r.status_code in (401, 403, 404, 410):
+                # Not there, or a publisher blocking automated download: unavailable,
+                # not an error (a 403 PDF means "no full text", not "inspect by hand").
                 data = b"\x00404"
                 break
             if r.status_code in (429, 500, 502, 503, 504):
@@ -183,29 +185,54 @@ def deposits_from_doc(doc: dict) -> dict:
     cited = []
     for acc, classes in where.items():
         repo = next(r for r, p in _REPO_PATTERNS.items() if p.fullmatch(acc))
-        if classes & OWN_SECTIONS or not classes <= CITED_SECTIONS:
-            # A Results mention of a GSE is ambiguous; keep it as own only when no
-            # citation phrase surrounds it (handled by ownership_hint below).
-            if classes <= {"results"} and _cited_phrase(acc, evidence[acc], by_id):
-                cited.append(acc)
-                continue
+        # The words around each mention decide first: "deposited / generated in this
+        # study" is the paper's own; "downloaded from / publicly available / re-analysed"
+        # is reuse, even in Methods or the data-availability statement. Only when no
+        # mention carries either phrase does the section decide.
+        phrases = {_mention_phrase(acc, bid, by_id) for bid in evidence[acc]}
+        if "own" in phrases:
+            own.setdefault(repo, []).append(acc)
+        elif "cited" in phrases:
+            cited.append(acc)
+        elif classes & OWN_SECTIONS or not classes <= CITED_SECTIONS:
             own.setdefault(repo, []).append(acc)
         else:
             cited.append(acc)
     return {"own": own, "cited": cited, "evidence": evidence, "on_request": on_request}
 
 
-_CITED_NEAR = re.compile(r"(downloaded|obtained|retrieved|publicly available|previously (published|"
-                         r"reported|described)|re-?analy[sz]|from (a|the) (previous|published))", re.I)
+_CITED_NEAR = re.compile(
+    r"(downloaded|obtained|retrieved|accessed|acquired|extracted)\b|publicly (available|accessible)|"
+    r"public (data ?sets?|data|repositor)|previously (published|reported|described|deposited|generated)|"
+    r"re-?analy[sz]|re-?used?\b|from (a|the|our) (previous|prior|earlier|published)|(previous|prior|earlier) stud|"
+    r"(data ?sets?|data|profiles?) (were |was )?(from|of) (the )?(GEO|Gene Expression Omnibus)|"
+    r"available (from|in|at|on) (the )?(GEO|Gene Expression Omnibus)|published data", re.I)
+_OWN_NEAR = re.compile(
+    r"(have been|has been|were|was|are|is|been) (deposited|submitted|uploaded)|\bdeposited (in|at|to|under|with)|"
+    r"we (have )?(deposited|submitted|uploaded)|generated (in|for|during) (this|the present|the current) stud|"
+    r"(produced|reported|sequenced) (in|for) (this|the present|the current) stud|"
+    r"data (from|of|for) this (study|article|paper)|(this|the present|the current) study (are|is) available", re.I)
 
 
-def _cited_phrase(acc: str, block_ids: list, by_id: dict) -> bool:
-    for bid in block_ids:
-        text = by_id[bid]["text"]
-        i = text.find(acc)
-        if i >= 0 and _CITED_NEAR.search(text[max(0, i - 200): i + 60]):
-            return True
-    return False
+def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
+    """'own', 'cited' or '' from the words around one mention of an accession.
+
+    The window stops at the previous accession or sentence so a phrase about another
+    dataset in the same paragraph is not borrowed.
+    """
+    text = by_id[bid]["text"]
+    i = text.find(acc)
+    if i < 0:
+        return ""
+    before = text[max(0, i - 220): i]
+    cut = max(before.rfind(". "), max((m.end() for m in re.finditer(
+        r"\b(GSE|PXD|E-[A-Z]{4}-|PRJNA|SRP)\w*", before)), default=-1))
+    window = before[cut + 1:] + text[i: i + 80]
+    if _OWN_NEAR.search(window):
+        return "own"
+    if _CITED_NEAR.search(window):
+        return "cited"
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -630,10 +657,38 @@ def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: boo
             w.writerow(s.row())
             f.flush()
             print(f"[{i}/{len(papers)}] {s.verdict:16} {s.reason[:40]:40} {s.title[:60]}")
+    mark_shared_series(out_csv)
     summary = summarize(out_csv)
     with open(os.path.join(out_dir, "screen_summary.md"), "w", encoding="utf-8") as f:
         f.write(summary)
     return out_csv
+
+
+def mark_shared_series(screen_csv: str) -> None:
+    """Flag analysable GEO series that several papers in the run claim as their own.
+
+    A series is deposited by one paper; when two or more papers claim it, the others
+    almost always reuse it and the ownership call missed the reuse wording. Those rows
+    become ``needs_inspection`` with reason ``shared_gse`` (the claimants are listed).
+    """
+    with open(screen_csv, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    claim: dict[str, list] = {}
+    for r in rows:
+        for g in filter(None, r["own_gse"].split(";")):
+            claim.setdefault(g, []).append(r["paper_id"])
+    changed = False
+    for r in rows:
+        shared = [g for g in filter(None, r["analyzable_gse"].split(";")) if len(claim[g]) > 1]
+        if shared and r["verdict"] == "analyzable":
+            r["verdict"] = "needs_inspection"
+            r["reason"] = "shared_gse:" + ",".join(f"{g}({len(claim[g])} papers)" for g in shared)
+            changed = True
+    if changed:
+        with open(screen_csv, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=FIELDS)
+            w.writeheader()
+            w.writerows(rows)
 
 
 def summarize(screen_csv: str) -> str:
@@ -648,6 +703,10 @@ def summarize(screen_csv: str) -> str:
     lines += ["", "## Why papers were excluded (first failing layer)", "", "| Reason | Papers |", "|---|---:|"]
     lines += [f"| {k} | {v} |" for k in REASONS for v in [reasons.get(k, 0)] if v]
     lines += [f"| {k} | {v} |" for k, v in reasons.items() if k not in REASONS]
+    inspect = Counter(r["reason"].split(":")[0] for r in rows if r["verdict"] == "needs_inspection")
+    if inspect:
+        lines += ["", "## Why papers need inspection", "", "| Reason | Papers |", "|---|---:|"]
+        lines += [f"| {k} | {v} |" for k, v in inspect.most_common()]
     lines += ["", "## Data types of the papers' own GEO series", "", "| Data type | Papers |", "|---|---:|"]
     lines += [f"| {k} | {v} |" for k, v in types.most_common()]
     return "\n".join(lines) + "\n"

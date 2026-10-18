@@ -101,6 +101,56 @@ def test_own_vs_cited_by_section():
     assert sc.deposits_from_doc(doc)["cited"] == ["GSE33333"]
 
 
+def test_reuse_wording_beats_section():
+    """Reuse phrasing in Methods or data availability is a citation (GSE97084 case)."""
+    md = ("## Methods\n\nPublicly available RNA-seq data (GSE97084) were downloaded from GEO and "
+          "re-analysed. Our own samples were sequenced on a NovaSeq.\n\n"
+          "## Data availability\n\nThe data generated in this study have been deposited in GEO under "
+          "GSE200001. This study also analysed publicly available datasets: GSE113165.\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE200001"]}, dep
+    assert sorted(dep["cited"]) == ["GSE113165", "GSE97084"], dep
+    # A neighbouring accession's phrase is not borrowed.
+    md = "## Methods\n\nData were obtained from GSE1111. Sequencing data are in GSE2222.\n"
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE2222"]} and dep["cited"] == ["GSE1111"], dep
+
+
+def test_shared_series_flagged():
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "screen.csv")
+        import csv as _csv
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = _csv.DictWriter(f, fieldnames=sc.FIELDS)
+            w.writeheader()
+            for pid, own, ok in (("A", "GSE97084", "GSE97084"), ("B", "GSE97084;GSE5", "GSE97084;GSE5"),
+                                 ("C", "GSE7", "GSE7")):
+                w.writerow({k: "" for k in sc.FIELDS} | {"paper_id": pid, "own_gse": own,
+                                                        "analyzable_gse": ok, "verdict": "analyzable"})
+        sc.mark_shared_series(path)
+        rows = {r["paper_id"]: r for r in _csv.DictReader(open(path, encoding="utf-8"))}
+        assert rows["A"]["verdict"] == "needs_inspection" and rows["A"]["reason"] == "shared_gse:GSE97084(2 papers)"
+        assert rows["B"]["verdict"] == "needs_inspection" and rows["C"]["verdict"] == "analyzable", rows
+
+
+def test_blocked_pdf_is_no_full_text():
+    """A 403 from a publisher is "unavailable" (None), so the paper is no_full_text."""
+    import types
+    http = sc.Http(cache_dir="")
+    fake = types.SimpleNamespace(status_code=403, content=b"", raise_for_status=lambda: None)
+    import requests
+    orig = requests.get
+    requests.get = lambda *a, **k: fake
+    try:
+        assert http.get("https://example.org/x.pdf", binary=True) is None
+        doc = sc.load_full_text({"paper_id": "P", "pdf_url": "https://example.org/x.pdf"},
+                                tempfile.mkdtemp(), http)
+    finally:
+        requests.get = orig
+    assert doc is None
+    assert sc.screen_paper({"paper_id": "P"}, doc, None).reason == "no_full_text"
+
+
 def test_other_repositories_and_on_request():
     doc = _doc("## Data availability\n\nProteomics data are in PRIDE (PXD012345).\n")
     s = sc.screen_paper({"paper_id": "p"}, doc, FakeHttp({}))
