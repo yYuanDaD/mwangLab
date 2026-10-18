@@ -82,7 +82,8 @@ _SINGLE_CELL = re.compile(r"single[- ]?(cell|nucle(us|i))|scRNA|snRNA|10x genomi
 # Supplementary file names.
 _RAW_COUNT_NAME = re.compile(
     r"(raw[._ -]?counts?|read[._ -]?counts?|counts?[._ -]?(matrix|table)|featurecounts?|htseq|"
-    r"gene[._ -]?counts?|_counts?\.|\bcounts?\b|expected[._ -]?count|umi[._ -]?counts?)", re.I)
+    # "counts" as a word of its own, where "_" also separates words ("X_Full_Counts_v2.xlsx").
+    r"gene[._ -]?counts?|(?<![a-z])counts?(?![a-z])|expected[._ -]?count|umi[._ -]?counts?)", re.I)
 _NORMALISED_NAME = re.compile(r"(fpkm|rpkm|tpm|cpm|normali[sz]ed|norm[._]|vst|rlog|log2|abundance)", re.I)
 _MATRIX_EXT = re.compile(r"\.(csv|tsv|txt|xlsx?|tab)(\.gz)?$", re.I)
 
@@ -183,6 +184,7 @@ def deposits_from_doc(doc: dict) -> dict:
             on_request = True
     own: dict[str, list] = {}
     cited = []
+    said_own = set()
     for acc, classes in where.items():
         repo = next(r for r, p in _REPO_PATTERNS.items() if p.fullmatch(acc))
         # The words around each mention decide first: "deposited / generated in this
@@ -192,26 +194,42 @@ def deposits_from_doc(doc: dict) -> dict:
         phrases = {_mention_phrase(acc, bid, by_id) for bid in evidence[acc]}
         if "own" in phrases:
             own.setdefault(repo, []).append(acc)
+            said_own.add(acc)
         elif "cited" in phrases:
             cited.append(acc)
         elif classes & OWN_SECTIONS or not classes <= CITED_SECTIONS:
             own.setdefault(repo, []).append(acc)
         else:
             cited.append(acc)
+    # A meta-analysis lists dozens of series in its tables and Methods with no deposit
+    # wording (MetaMEx, PMC6981202: ~50). A paper that deposits that many series says
+    # so; past MANY_SERIES, keep only the ones with deposit wording.
+    if len(own.get("geo", [])) > MANY_SERIES:
+        cited += [a for a in own["geo"] if a not in said_own]
+        own["geo"] = [a for a in own["geo"] if a in said_own]
+        if not own["geo"]:
+            del own["geo"]
     return {"own": own, "cited": cited, "evidence": evidence, "on_request": on_request}
 
 
+MANY_SERIES = 8
+
+
 _CITED_NEAR = re.compile(
-    r"(downloaded|obtained|retrieved|accessed|acquired|extracted)\b|publicly (available|accessible)|"
+    r"(downloaded|obtained|retrieved|accessed|acquired|extracted|compiled)\b|publicly (available|accessible)|"
     r"public (data ?sets?|data|repositor)|previously (published|reported|described|deposited|generated)|"
-    r"re-?analy[sz]|re-?used?\b|from (a|the|our) (previous|prior|earlier|published)|(previous|prior|earlier) stud|"
+    r"re-?analy[sz]|meta-?analy[sz]|re-?used?\b|from (a|the|our) (previous|prior|earlier|published)|(previous|prior|earlier) stud|"
     r"(data ?sets?|data|profiles?) (were |was )?(from|of) (the )?(GEO|Gene Expression Omnibus)|"
-    r"available (from|in|at|on) (the )?(GEO|Gene Expression Omnibus)|published data", re.I)
+    r"available (from|in|at|on) (the )?(GEO|Gene Expression Omnibus)|published data|"
+    r"(data ?sets?|data|profiles?) (from|of|by|published by|reported by) (the )?[A-Z][\w'-]+ et al", re.I)
 _OWN_NEAR = re.compile(
     r"(have been|has been|were|was|are|is|been) (deposited|submitted|uploaded)|\bdeposited (in|at|to|under|with)|"
     r"we (have )?(deposited|submitted|uploaded)|generated (in|for|during) (this|the present|the current) stud|"
     r"(produced|reported|sequenced) (in|for) (this|the present|the current) stud|"
     r"data (from|of|for) this (study|article|paper)|(this|the present|the current) study (are|is) available", re.I)
+
+
+_LIST_GAP = re.compile(r"[\s,;/()\[\]]*((and|or|&)[\s,;()]*)?", re.I)
 
 
 def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
@@ -224,15 +242,25 @@ def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
     i = text.find(acc)
     if i < 0:
         return ""
-    before = text[max(0, i - 220): i]
-    cut = max(before.rfind(". "), max((m.end() for m in re.finditer(
-        r"\b(GSE|PXD|E-[A-Z]{4}-|PRJNA|SRP)\w*", before)), default=-1))
+    before = text[max(0, i - 300): i]
+    accs = list(re.finditer(r"\b(GSE|PXD|E-[A-Z]{4}-|PRJNA|SRP)\w*", before))
+    # In a list ("are accessible at GSE59088 and GSE97084") the phrase before the first
+    # item covers every item, so step back over accessions joined only by separators.
+    end = len(before)
+    while accs and _LIST_GAP.fullmatch(before[accs[-1].end():end]):
+        end = accs.pop().start()
+    cut = max(before.rfind(". ", 0, end), accs[-1].end() if accs else -1)
     window = before[cut + 1:] + text[i: i + 80]
     if _OWN_NEAR.search(window):
         return "own"
-    if _CITED_NEAR.search(window):
+    # "the GESTALT cohort^6 (GSE129643)": a reference marker right before the accession
+    # credits the dataset to another paper.
+    if _CITED_NEAR.search(window) or _REF_BEFORE.search(text[max(0, i - 40): i]):
         return "cited"
     return ""
+
+
+_REF_BEFORE = re.compile(r"(\^\d+(?:[,–-]\^?\d+)*|\[\d+(?:[,–-]\d+)*\]|\(\d+(?:[,–-]\d+)*\))\s*[(\[]?\s*$")
 
 
 # ---------------------------------------------------------------------------
@@ -490,6 +518,10 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
     if not s.own_gse:
         if s.other_repos:
             s.verdict, s.reason = "excluded", "non_geo_repository:" + ",".join(sorted(s.other_repos))
+        elif any(a.startswith("GSE") for a in s.cited_gse):
+            # Analyses of other people's GEO series (meta-analyses, re-analyses); an
+            # "upon request" line there is about derived results, not a hidden deposit.
+            s.verdict, s.reason = "excluded", "no_own_deposit:reuses_public_gse"
         elif dep["on_request"]:
             s.verdict, s.reason = "excluded", "data_on_request"
         else:

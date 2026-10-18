@@ -179,6 +179,56 @@ def test_supplementary_classification():
     assert c(["GSE1_RAW.tar", "filelist.txt"])["status"] == "raw_tar"
     assert c(["filelist.txt"])["status"] == "none"
     assert c(["GSE1_processed_data.txt.gz"])["status"] == "unlabelled_matrix"
+    # GSE71972: "Counts" between underscores, next to a _RAW.tar and DE tables.
+    real = ["GSE71972_RAW.tar", "GSE71972_Differential_Expression_Tables.xlsx",
+            "GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx"]
+    assert c(real)["raw"] == ["GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx"], c(real)
+    assert c(["GSE1_discounts.txt"])["status"] == "unlabelled_matrix"
+
+
+def test_data_from_named_authors_is_reuse():
+    """GSE214544 in PMC11624283: 'Single-cell RNA sequencing data from Lovrić et al (GSE214544)'."""
+    md = ("## Methods\n\nSingle-cell RNA sequencing data from Lovrić et al (GSE214544) were used for the "
+          "reference matrix. Raw and processed files have been deposited in the GEO database (GSE252357).\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE252357"]} and dep["cited"] == ["GSE214544"], dep
+
+
+def test_reuse_phrase_covers_accession_list():
+    """PMC10443797: 'Data from the Amar et al. meta-analysis ... are accessible at GSE59088 and
+    GSE97084' -- the phrase before the first item covers the whole list."""
+    md = ("## Data availability\n\nStrength training data associated with this study have been deposited in "
+          "Gene Expression Omnibus at GSE208639. Data from the Amar et al. (26) long-term exercise "
+          "meta-analysis used to compare previously published exercise genes are accessible at GSE59088 "
+          "and GSE97084.\n\n## Methods\n\nWe compiled human skeletal muscle RNA-seq data (GSE129643).\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE208639"]}, dep
+    assert sorted(dep["cited"]) == ["GSE129643", "GSE59088", "GSE97084"], dep
+    # PMC12355375: a reference marker right before the accession credits another paper.
+    md = "## Results\n\nUsing RNA-seq data from the GESTALT cohort^6 (GSE129643), PSI fell with age.\n"
+    assert sc.deposits_from_doc(_doc(md))["cited"] == ["GSE129643"]
+    # PMC7185955: series pooled in a meta-analysis are reused.
+    md = ("## Methods\n\nWe performed a meta-analysis including 3 studies of a single bout of exercise "
+          "(q < 0.05, GSE43219, GSE71972 and GSE28422) (37).\n")
+    assert sorted(sc.deposits_from_doc(_doc(md))["cited"]) == ["GSE28422", "GSE43219", "GSE71972"]
+    # PMC9259242: a re-analysis that also says "available upon request" reuses public data.
+    md = ("## Methods\n\nWe downloaded the GSE101931 dataset from GEO.\n\n## Data availability\n\n"
+          "The datasets analysed are available from the corresponding author upon request.\n")
+    s = sc.screen_paper({"paper_id": "p"}, _doc(md), FakeHttp({}))
+    assert (s.verdict, s.reason) == ("excluded", "no_own_deposit:reuses_public_gse"), s
+
+
+def test_meta_analysis_series_are_reuse():
+    """MetaMEx (PMC6981202) and the AD portrait (PMC9561721) list dozens of series with no
+    deposit wording; none is the paper's own."""
+    rows = "\n".join(f"| GSE{100000 + i} | Exercise | {i} |" for i in range(12))
+    md = ("## Methods\n\nRepositories were screened for human exercise studies.\n\n"
+          "## Results\n\nTable 1. Datasets.\n\n| GEO | Treatment | Score |\n|---|---|---|\n" + rows + "\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert "geo" not in dep["own"] and len(dep["cited"]) == 12, dep
+    md += "\n## Data availability\n\nOur RNA-seq data have been deposited in GEO under GSE999999.\n"
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE999999"]}, dep
 
 
 def test_end_to_end_analyzable():
