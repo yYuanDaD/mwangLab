@@ -66,7 +66,10 @@ RNA-seq data were deposited in GEO under GSE123456.
 
 
 def _geo_routes(gse="GSE123456", gdstype="Expression profiling by high throughput sequencing",
-                suppl=("GSE123456_raw_counts.txt.gz", "filelist.txt"), groups=(4, 4), title="Bulk muscle"):
+                suppl=("GSE123456_raw_counts.txt.gz", "filelist.txt"), groups=(4, 4), title="Bulk muscle",
+                sample_files=None):
+    """GEO responses for one series. ``sample_files`` maps a per-sample file name (one per
+    sample, named GSM<i>_<name>) to its content, for _RAW.tar series."""
     esearch = json.dumps({"esearchresult": {"idlist": ["200123456"]}})
     esummary = json.dumps({"result": {"200123456": {
         "title": title, "summary": "", "gdstype": gdstype, "taxon": "Mus musculus",
@@ -80,10 +83,17 @@ def _geo_routes(gse="GSE123456", gdstype="Expression profiling by high throughpu
               "!Sample_geo_accession\t" + "\t".join(f'"GSM{i}"' for i in range(n)) + "\n"
               "!Sample_characteristics_ch1\t" + "\t".join('"tissue: muscle"' for _ in range(n)) + "\n"
               "!Sample_characteristics_ch1\t" + "\t".join(f'"group: {g}"' for g in labels) + "\n"
-              "!Sample_characteristics_ch1\t" + "\t".join('"Sex: male"' for _ in range(n)) + "\n"
-              "!series_matrix_table_begin\nID_REF\tGSM0\n")
+              "!Sample_characteristics_ch1\t" + "\t".join('"Sex: male"' for _ in range(n)) + "\n")
+    files = {}
+    if sample_files:
+        name, content = next(iter(sample_files.items()))
+        urls = [f"ftp://ftp.ncbi.nlm.nih.gov/geo/samples/GSMnnn/GSM{i}/suppl/GSM{i}_{name}" for i in range(n)]
+        header += "!Sample_supplementary_file_1\t" + "\t".join(f'"{u}"' for u in urls) + "\n"
+        files = {f"GSM{i}_{name}": gzip.compress(content.encode()) for i in range(n)}
+    header += "!series_matrix_table_begin\nID_REF\tGSM0\n"
     stub = sc.geo_stub(gse)
     return {
+        **files,
         "esearch.fcgi": esearch,
         "esummary.fcgi": esummary,
         f"{stub}/{gse}/suppl/": suppl_html,
@@ -281,6 +291,89 @@ def test_screen_file_and_summary():
         assert [r["verdict"] for r in rows] == ["analyzable", "excluded"], rows
         summary = open(os.path.join(d, "out", "screen_summary.md"), encoding="utf-8").read()
         assert "| analyzable | 1 |" in summary and "| no_full_text | 1 |" in summary, summary
+
+
+HTSEQ = "".join(f"ENSMUSG{i:011d}\t{(i * 7) % 300}\n" for i in range(200)) + "__no_feature\t1234\n"
+FEATURECOUNTS = ("# Program:featureCounts v2.0.1\nGeneid\tChr\tStart\tEnd\tStrand\tLength\tsample.bam\n"
+                 + "".join(f"G{i}\tchr1;chr1\t1;50\t40;90\t+;+\t{900 + i}\t{i % 17}\n" for i in range(200)))
+RSEM = ("gene_id\ttranscript_id(s)\tlength\teffective_length\texpected_count\tTPM\tFPKM\n"
+        + "".join(f"G{i}\tT{i}\t1000.00\t850.5\t{i * 1.37:.2f}\t{i * 0.11:.2f}\t{i * 0.07:.2f}\n" for i in range(200)))
+FPKM = "gene\tFPKM\n" + "".join(f"G{i}\t{i * 0.731:.3f}\n" for i in range(200))
+UNLABELLED_FLOATS = "".join(f"G{i}\t{i * 0.731 + 0.1:.3f}\n" for i in range(200))
+
+
+def test_sniff_count_file():
+    assert sc.sniff_count_file(HTSEQ) == "raw_counts"
+    assert sc.sniff_count_file(FEATURECOUNTS) == "raw_counts"
+    assert sc.sniff_count_file(RSEM) == "raw_counts"      # expected_count, not the FPKM column
+    assert sc.sniff_count_file(FPKM) == "normalized"
+    assert sc.sniff_count_file(UNLABELLED_FLOATS) == "normalized"
+    assert sc.sniff_count_file("G1\t3\nG2\t4\n") == "unknown"   # too few rows to judge
+
+
+def test_raw_tar_judged_from_sample_files():
+    tar = ("GSE123456_RAW.tar", "filelist.txt")
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
+                        FakeHttp(_geo_routes(suppl=tar, sample_files={"counts.txt.gz": HTSEQ})))
+    assert (s.verdict, s.analyzable_gse) == ("analyzable", ["GSE123456"]), s.series
+    f = s.series[0]["files"]
+    assert f["status"] == "raw_counts_in_tar" and f["tar_inspection"]["n_tables"] == 8, f
+    assert "sample_files" not in s.series[0]["design"]
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
+                        FakeHttp(_geo_routes(suppl=tar, sample_files={"genes.txt.gz": FPKM})))
+    assert (s.verdict, s.reason) == ("excluded", "normalized_only"), (s.verdict, s.reason)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
+                        FakeHttp(_geo_routes(suppl=tar, sample_files={"signal.bw": "x"})))
+    assert (s.verdict, s.reason) == ("excluded", "no_processed_matrix"), (s.verdict, s.reason)
+    # A file that cannot be fetched leaves the series for a person to look at.
+    routes = _geo_routes(suppl=tar, sample_files={"counts.txt.gz": HTSEQ})
+    for k in [k for k in routes if k.startswith("GSM")]:
+        routes[k] = None
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
+    assert (s.verdict, s.reason) == ("needs_inspection", "matrix_raw_tar"), (s.verdict, s.reason)
+
+
+JATS_BODY = ("<pmc-articleset><article><front><article-meta><title-group><article-title>T</article-title>"
+             "</title-group><abstract><p>Abstract.</p></abstract></article-meta></front><body>"
+             + "".join(f"<sec><title>S{i}</title><p>Paragraph {i}. Data are in GSE123456.</p></sec>" for i in range(6))
+             + "</body></article></pmc-articleset>")
+JATS_FRONT = ("<pmc-articleset><article><front><article-meta><title-group><article-title>T</article-title>"
+              "</title-group><abstract><p>Abstract.</p></abstract></article-meta></front></article></pmc-articleset>")
+
+
+def test_full_text_falls_back_to_ncbi_pmc():
+    with tempfile.TemporaryDirectory() as d:
+        http = FakeHttp({"europepmc": None, "efetch.fcgi": JATS_BODY})
+        doc = sc.load_full_text({"pmcid": "PMC42"}, d, http)
+        assert doc and sc.has_body(doc) and "NCBI PMC" in doc["source"], doc and doc.get("source")
+        assert http.calls[1][1]["id"] == "42", http.calls
+    with tempfile.TemporaryDirectory() as d:
+        # Front matter only (publisher withholds the body) is not full text.
+        http = FakeHttp({"europepmc": JATS_FRONT, "efetch.fcgi": JATS_FRONT})
+        assert sc.load_full_text({"pmcid": "PMC42"}, d, http) is None
+
+
+def test_collect_multiple_queries_and_geo_source():
+    def esearch(params):
+        if params["db"] == "gds":
+            assert "gse[Entry Type]" in params["term"] and "high throughput sequencing" in params["term"]
+            return json.dumps({"esearchresult": {"idlist": ["200001", "200002"]}})
+        ids = {"(exercise) AND free full text[sb]": ["11"], "(training) AND free full text[sb]": ["11", "22"]}
+        return json.dumps({"esearchresult": {"idlist": ids[params["term"]]}})
+
+    def esummary(params):
+        if params["db"] == "gds":
+            return json.dumps({"result": {"uids": ["200001", "200002"],
+                                          "200001": {"accession": "GSE1", "pubmedids": ["33"]},
+                                          "200002": {"accession": "GSE2", "pubmedids": []}}})
+        return json.dumps({"result": {"uids": params["id"].split(","), **{
+            u: {"title": f"Paper {u}", "pubdate": "2024", "articleids": []} for u in params["id"].split(",")}}})
+
+    http = FakeHttp({"esearch.fcgi": esearch, "esummary.fcgi": esummary})
+    rows = sc.collect_papers(["exercise", "training"], http, max_papers=10, sources=("pubmed", "geo"))
+    assert [r["paper_id"] for r in rows] == ["PMID11", "PMID33", "PMID22"], [r["paper_id"] for r in rows]
+    assert rows[1]["linked_gse"] == "GSE1" and rows[1]["source"] == "geo"
+    assert [r["query"] for r in rows] == ["exercise", "exercise", "training"]
 
 
 def test_collect_dedupes_sources():

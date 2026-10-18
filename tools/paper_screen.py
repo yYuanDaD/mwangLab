@@ -14,7 +14,8 @@ Layers (each cheap enough to run on a few hundred papers; nothing here calls an 
                  count, platform; non-GEO repositories (PRIDE, ArrayExpress, SRA-only,
                  GSA) are recorded and routed, not analysed
     3. files     GEO supplementary listing: raw counts vs. normalised-only vs. per-sample
-                 tar vs. nothing (bulk RNA-seq only)
+                 tar vs. nothing (bulk RNA-seq only); a _RAW.tar is judged from its
+                 per-sample files (listed in the series matrix), sniffing one or two
     4. design    GEO sample characteristics (series matrix): groups, smallest group, sex
                  column; uses metadata_structural's deterministic design-column picker
 
@@ -26,7 +27,8 @@ free and tests inject canned responses.
 
 CLI (repository root):
 
-    python -m tools.paper_screen collect "exercise skeletal muscle" --out output/screen_run --max 200
+    python -m tools.paper_screen collect "exercise skeletal muscle" "endurance training" \
+        --sources s2,pubmed,geo --out output/screen_run --max 1000
     python -m tools.paper_screen screen output/screen_run/papers.csv --out output/screen_run
     python -m tools.paper_screen summary output/screen_run/screen.csv
 """
@@ -138,6 +140,11 @@ class Http:
             if r.status_code in (401, 403, 404, 410):
                 # Not there, or a publisher blocking automated download: unavailable,
                 # not an error (a 403 PDF means "no full text", not "inspect by hand").
+                data = b"\x00404"
+                break
+            if r.status_code == 500 and "europepmc" in url and attempt >= 1:
+                # Europe PMC answers 500 (not 404) for full text it may not serve; cache
+                # it so a rerun does not spend the full retry backoff on every such paper.
                 data = b"\x00404"
                 break
             if r.status_code in (429, 500, 502, 503, 504):
@@ -425,9 +432,103 @@ def geo_design(gse: str, http: Http) -> dict:
             if line.startswith("!series_matrix_table_begin"):
                 break
             head.append(line)
-    out = design_from_samples(parse_series_matrix_samples("".join(head)))
+    samples = parse_series_matrix_samples("".join(head))
+    out = design_from_samples(samples)
     out["matrix_files"] = len(files)
+    # Per-sample supplementary files (the members of a _RAW.tar), first file per sample.
+    cols = [c for c in samples.columns if c.startswith("supplementary_file")]
+    out["sample_files"] = [u for u in (samples[c].iloc[i] for i in range(len(samples)) for c in cols[:1])
+                           if u and u.upper() != "NONE"]
     return out
+
+
+# ---------------------------------------------------------------------------
+# Layer 3b: what is inside a _RAW.tar, from the per-sample files
+# ---------------------------------------------------------------------------
+
+_NON_MATRIX_EXT = re.compile(
+    r"\.(bw|bigwig|bed|bedgraph|bdg|wig|bam|sam|cram|h5|hdf5|mtx|narrowpeak|broadpeak|cel|idat|"
+    r"gtf|gff3?|fa|fasta|fastq|fq|vcf|tdf|png|pdf|cov|rds|rda)(\.gz)?$", re.I)
+
+
+def _numeric_columns(text: str, max_rows: int = 3000) -> tuple[list[str], list[list[float]]]:
+    """(header, numeric columns) of a delimited per-sample file; '#' lines are skipped."""
+    lines = [ln for ln in text.splitlines() if ln.strip() and not ln.startswith("#")][:max_rows + 1]
+    if not lines:
+        return [], []
+    sep = "\t" if "\t" in lines[0] else ("," if "," in lines[0] else None)
+    rows = [ln.split(sep) for ln in lines]
+    header = []
+    if not any(_is_number(v) for v in rows[0][1:]):
+        header, rows = [h.strip().strip('"') for h in rows[0]], rows[1:]
+    width = max((len(r) for r in rows), default=0)
+    cols = []
+    for j in range(1, width):
+        vals = [r[j] for r in rows if len(r) > j]
+        nums = [float(v) for v in vals if _is_number(v)]
+        cols.append(nums if vals and len(nums) >= 0.9 * len(vals) else [])
+    return header, cols
+
+
+def _is_number(v: str) -> bool:
+    try:
+        float(v.strip().strip('"'))
+        return True
+    except ValueError:
+        return False
+
+
+def sniff_count_file(text: str) -> str:
+    """'raw_counts', 'normalized' or 'unknown' for one per-sample expression file."""
+    header, cols = _numeric_columns(text)
+    low = [h.lower() for h in header]
+    # RSEM *.genes.results: expected_count (rounded for DESeq2) sits left of TPM/FPKM.
+    if "expected_count" in low:
+        return "raw_counts"
+    numeric = [(j, c) for j, c in enumerate(cols) if c]
+    if not numeric:
+        return "unknown"
+    j, col = numeric[-1]   # featureCounts/HTSeq/STAR: the count is the rightmost number
+    name = header[j + 1].lower() if len(header) > j + 1 else ""
+    if _NORMALISED_NAME.search(name):
+        return "normalized"
+    if len(col) < 50:
+        return "unknown"
+    integer = sum(1 for v in col if v >= 0 and v == int(v)) / len(col)
+    return "raw_counts" if integer >= 0.99 else "normalized"
+
+
+def inspect_sample_files(urls: list[str], http: Http, n_sniff: int = 2) -> dict:
+    """What a series' per-sample files (the members of its _RAW.tar) hold.
+
+    status: ``raw_counts`` (per-sample count tables), ``normalized_only`` (FPKM/TPM or
+    non-integer values), ``no_count_files`` (only tracks, peaks, BAMs, 10x matrices...),
+    or ``unknown`` (could not tell; stays needs_inspection).
+    """
+    names = [u.rsplit("/", 1)[-1] for u in urls]
+    if not names:
+        return {"status": "unknown", "why": "no per-sample files listed"}
+    tables = [(u, n) for u, n in zip(urls, names) if _MATRIX_EXT.search(n) and not _NON_MATRIX_EXT.search(n)]
+    if not tables:
+        return {"status": "no_count_files", "examples": names[:3]}
+    if all(_NORMALISED_NAME.search(n) and not _RAW_COUNT_NAME.search(n) for _, n in tables):
+        return {"status": "normalized_only", "examples": [n for _, n in tables[:3]], "why": "file names"}
+    kinds = []
+    for u, n in tables[:n_sniff]:
+        raw = http.get(u.replace("ftp://", "https://", 1), binary=True, timeout=120)
+        if not raw:
+            continue
+        try:
+            text = (gzip.decompress(raw) if raw[:2] == b"\x1f\x8b" else raw).decode("utf-8", errors="replace")
+        except (OSError, EOFError):
+            continue
+        kinds.append(sniff_count_file(text))
+    examples = [n for _, n in tables[:3]]
+    if kinds and all(k == "raw_counts" for k in kinds):
+        return {"status": "raw_counts", "examples": examples, "n_tables": len(tables)}
+    if kinds and all(k == "normalized" for k in kinds):
+        return {"status": "normalized_only", "examples": examples, "why": "values"}
+    return {"status": "unknown", "examples": examples, "sniffed": kinds}
 
 
 # ---------------------------------------------------------------------------
@@ -453,10 +554,14 @@ class Screen:
     verdict: str = ""
     reason: str = ""
     analyzable_gse: list = field(default_factory=list)
+    source: str = ""
+    query: str = ""
+    linked_gse: str = ""
 
     def row(self) -> dict:
         return {
             "paper_id": self.paper_id, "title": self.title, "pmcid": self.pmcid, "doi": self.doi,
+            "source": self.source, "query": self.query, "linked_gse": self.linked_gse,
             "verdict": self.verdict, "reason": self.reason,
             "analyzable_gse": ";".join(self.analyzable_gse), "data_types": self.data_types,
             "own_gse": ";".join(self.own_gse), "cited_gse": ";".join(self.cited_gse),
@@ -505,7 +610,8 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
                  check_design: bool = True, routes: set = SUPPORTED_ROUTES) -> Screen:
     """Screen one paper. ``doc`` is its structured full text (None when unavailable)."""
     s = Screen(paper_id=row.get("paper_id") or row.get("paperId") or row.get("pmcid") or row.get("doi", ""),
-               title=row.get("title", ""), pmcid=row.get("pmcid", ""), doi=row.get("doi", ""))
+               title=row.get("title", ""), pmcid=row.get("pmcid", ""), doi=row.get("doi", ""),
+               source=row.get("source", ""), query=row.get("query", ""), linked_gse=row.get("linked_gse", ""))
     if not doc or not doc.get("blocks"):
         s.verdict, s.reason = "excluded", "no_full_text"
         return s
@@ -537,6 +643,11 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
                 files = classify_supplementary(list_geo_dir(GEO_SUPPL.format(stub=geo_stub(gse), gse=gse), http))
             if check_design:
                 design = geo_design(gse, http)
+                if files and files["status"] == "raw_tar":
+                    files["tar_inspection"] = inside = inspect_sample_files(design.get("sample_files", []), http)
+                    files["status"] = {"raw_counts": "raw_counts_in_tar", "normalized_only": "normalized_only",
+                                       "no_count_files": "none"}.get(inside["status"], "raw_tar")
+                design.pop("sample_files", None)
         verdict, reason = judge_series(info, files, design, routes)
         types.append(info["data_type"] if info else "not_public")
         results.append({"gse": gse, "verdict": verdict, "reason": reason,
@@ -563,16 +674,16 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
 # Paper collection (Semantic Scholar + PubMed) and full-text loading
 # ---------------------------------------------------------------------------
 
-def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int = 0) -> list[dict]:
-    """Up to ``max_papers`` relevance-ranked papers: Semantic Scholar open-access hits and
-    PubMed free-full-text hits, taken alternately so both sources are represented.
-    Deduplicated by DOI, then PMID, then title; a duplicate fills in the kept row's
-    missing PMCID / PDF URL."""
-    s2_rows: list[dict] = []
+SOURCES = ("s2", "pubmed", "geo")
+_GEO_RNASEQ = '"expression profiling by high throughput sequencing"[DataSet Type]'
+
+
+def _s2_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+    rows: list[dict] = []
     offset = 0
-    while len(s2_rows) < max_papers and offset < 1000:
+    while len(rows) < n and offset < 1000:
         params = {"query": query, "fields": "title,abstract,year,externalIds,openAccessPdf",
-                  "limit": min(100, max_papers - len(s2_rows)), "offset": offset,
+                  "limit": min(100, n - len(rows)), "offset": offset,
                   "fieldsOfStudy": "Medicine,Biology"}
         if end_year:
             params["year"] = f"-{end_year}"
@@ -580,24 +691,22 @@ def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int 
         data = (json.loads(s).get("data") or []) if s else []
         if s is None:
             print("Semantic Scholar search failed (rate limited?); set S2_API_KEY for a steadier quota. "
-                  "Continuing with PubMed only.", file=sys.stderr)
+                  "Continuing without it.", file=sys.stderr)
         if not data:
             break
         for p in data:
             ext = p.get("externalIds") or {}
-            s2_rows.append({"paper_id": p.get("paperId", ""), "source": "semantic_scholar",
-                            "title": (p.get("title") or "").strip(), "year": p.get("year") or "",
-                            "doi": (ext.get("DOI") or "").lower(), "pmid": str(ext.get("PubMed") or ""),
-                            "pmcid": _pmcid(ext.get("PubMedCentral", "")),
-                            "pdf_url": (p.get("openAccessPdf") or {}).get("url", "")})
+            rows.append({"paper_id": p.get("paperId", ""), "source": "semantic_scholar",
+                         "title": (p.get("title") or "").strip(), "year": p.get("year") or "",
+                         "doi": (ext.get("DOI") or "").lower(), "pmid": str(ext.get("PubMed") or ""),
+                         "pmcid": _pmcid(ext.get("PubMedCentral", "")),
+                         "pdf_url": (p.get("openAccessPdf") or {}).get("url", "")})
         offset += len(data)
-    pm_rows: list[dict] = []
-    term = f"({query}) AND free full text[sb]"
-    if end_year:
-        term += f" AND 1800:{end_year}[dp]"
-    s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "pubmed", "term": term, "retmax": max_papers,
-                                               "sort": "relevance", "retmode": "json"})
-    pmids = json.loads(s)["esearchresult"]["idlist"] if s else []
+    return rows
+
+
+def _pubmed_summaries(pmids: list[str], http: Http, source: str) -> list[dict]:
+    rows = []
     for i in range(0, len(pmids), 200):
         s = http.get(f"{EUTILS}/esummary.fcgi", {"db": "pubmed", "id": ",".join(pmids[i:i + 200]),
                                                     "retmode": "json"})
@@ -605,11 +714,75 @@ def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int 
         for pid in res.get("uids", []):
             r = res[pid]
             ids = {a.get("idtype"): a.get("value", "") for a in r.get("articleids", [])}
-            pm_rows.append({"paper_id": f"PMID{pid}", "source": "pubmed", "title": r.get("title", "").strip(),
-                            "year": (r.get("pubdate") or "")[:4], "doi": ids.get("doi", "").lower(),
-                            "pmid": pid, "pmcid": _pmcid(ids.get("pmc", "")), "pdf_url": ""})
-    merged = [r for pair in zip(s2_rows, pm_rows) for r in pair]
-    merged += s2_rows[len(pm_rows):] + pm_rows[len(s2_rows):]
+            rows.append({"paper_id": f"PMID{pid}", "source": source, "title": r.get("title", "").strip(),
+                         "year": (r.get("pubdate") or "")[:4], "doi": ids.get("doi", "").lower(),
+                         "pmid": pid, "pmcid": _pmcid(ids.get("pmc", "")), "pdf_url": ""})
+    return rows
+
+
+def _pubmed_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+    term = f"({query}) AND free full text[sb]"
+    if end_year:
+        term += f" AND 1800:{end_year}[dp]"
+    s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "pubmed", "term": term, "retmax": n,
+                                               "sort": "relevance", "retmode": "json"})
+    pmids = json.loads(s)["esearchresult"]["idlist"] if s else []
+    return _pubmed_summaries(pmids, http, "pubmed")
+
+
+def _geo_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+    """Papers linked from GEO bulk RNA-seq series that match the query.
+
+    Starting from the deposit finds papers that have their own data, which a literature
+    search mostly does not (88 of 200 papers in the first run deposited nothing). GEO's
+    PubMed link is usually the submitter's own paper; the ownership check still runs on
+    the text. ``linked_gse`` records the series that led to the paper.
+    """
+    term = f"({query}) AND gse[Entry Type] AND {_GEO_RNASEQ}"
+    if end_year:
+        term += f" AND 1800:{end_year}[PDAT]"
+    s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "gds", "term": term, "retmax": max(n * 3, 100),
+                                               "retmode": "json"})
+    uids = json.loads(s)["esearchresult"]["idlist"] if s else []
+    linked: dict[str, list] = {}
+    for i in range(0, len(uids), 200):
+        s = http.get(f"{EUTILS}/esummary.fcgi", {"db": "gds", "id": ",".join(uids[i:i + 200]),
+                                                    "retmode": "json"})
+        res = json.loads(s).get("result", {}) if s else {}
+        for uid in res.get("uids", []):
+            r = res[uid]
+            for pid in r.get("pubmedids", []) or []:
+                linked.setdefault(str(pid), []).append(r.get("accession", ""))
+        if len(linked) >= n:
+            break
+    pmids = list(linked)[:n]
+    rows = _pubmed_summaries(pmids, http, "geo")
+    for r in rows:
+        r["linked_gse"] = ";".join(dict.fromkeys(linked.get(r["pmid"], [])))
+    return rows
+
+
+def collect_papers(query, http: Http, max_papers: int = 200, end_year: int = 0,
+                   sources=("s2", "pubmed")) -> list[dict]:
+    """Up to ``max_papers`` papers for one query or a list of queries.
+
+    Each (query, source) list is relevance-ranked; the lists are taken in turn so every
+    query and source is represented. Sources: ``s2`` (Semantic Scholar open-access hits),
+    ``pubmed`` (PubMed free-full-text hits), ``geo`` (papers linked from matching GEO
+    bulk RNA-seq series). Deduplicated by DOI, then PMID, then title; a duplicate fills in
+    the kept row's missing PMCID / PDF URL / linked series.
+    """
+    queries = [query] if isinstance(query, str) else list(query)
+    fetch = {"s2": _s2_rows, "pubmed": _pubmed_rows, "geo": _geo_rows}
+    lists = []
+    for q in queries:
+        for src in sources:
+            rows = fetch[src](q, http, max_papers, end_year)
+            for r in rows:
+                r["query"] = q
+                r.setdefault("linked_gse", "")
+            lists.append(rows)
+    merged = [x[i] for i in range(max((len(x) for x in lists), default=0)) for x in lists if i < len(x)]
     kept: dict[str, dict] = {}
     out = []
     for r in merged:
@@ -617,7 +790,7 @@ def collect_papers(query: str, http: Http, max_papers: int = 200, end_year: int 
                             "t:" + re.sub(r"\W+", "", r["title"].lower())[:80]) if k]
         first = next((kept[k] for k in keys if k in kept), None)
         if first is not None:
-            for f in ("pmcid", "pdf_url", "pmid", "doi"):
+            for f in ("pmcid", "pdf_url", "pmid", "doi", "linked_gse"):
                 first[f] = first[f] or r[f]
             continue
         if len(out) >= max_papers:
@@ -633,6 +806,13 @@ def _pmcid(v) -> str:
     return v if v.startswith("PMC") else (f"PMC{v}" if v.isdigit() else "")
 
 
+def has_body(doc: dict, min_paragraphs: int = 5) -> bool:
+    """True when a structured paper has text beyond its abstract and front matter."""
+    n = sum(1 for b in doc.get("blocks", [])
+            if b.get("kind") == "paragraph" and b.get("section_class") != "abstract")
+    return n >= min_paragraphs
+
+
 def load_full_text(row: dict, papers_dir: str, http: Http) -> dict | None:
     """Structured full text: cached .paper.json, else Europe PMC JATS, else the PDF."""
     from tools import paper_structure as ps
@@ -641,11 +821,23 @@ def load_full_text(row: dict, papers_dir: str, http: Http) -> dict | None:
     if os.path.exists(cached):
         return ps.load(cached)
     if row.get("pmcid"):
-        xml = http.get(ps.EPMC_FULLTEXT.format(pmcid=row["pmcid"]), binary=True)
-        if xml and b"<article" in xml[:5000]:
-            doc = ps.parse_jats(xml, source=f"Europe PMC full-text XML ({row['pmcid']})")
-            ps.save(doc, papers_dir, stem, raw_xml=xml)
-            return doc
+        # Europe PMC first; NCBI PMC (efetch) serves some OA and author-manuscript texts
+        # Europe PMC answers with a 500. Both can return front matter only, so a text
+        # counts only when it has a body.
+        for url, params, label in (
+                (ps.EPMC_FULLTEXT.format(pmcid=row["pmcid"]), None, "Europe PMC full-text XML"),
+                (f"{EUTILS}/efetch.fcgi", {"db": "pmc", "id": row["pmcid"][3:], "retmode": "xml"},
+                 "NCBI PMC efetch XML")):
+            xml = http.get(url, params, binary=True)
+            if not xml or b"<article" not in xml[:5000]:
+                continue
+            try:
+                doc = ps.parse_jats(xml, source=f"{label} ({row['pmcid']})")
+            except Exception:
+                continue
+            if has_body(doc):
+                ps.save(doc, papers_dir, stem, raw_xml=xml)
+                return doc
     if row.get("pdf_url"):
         pdf = http.get(row["pdf_url"], binary=True, timeout=120)
         if pdf and pdf[:5] == b"%PDF-":
@@ -663,7 +855,7 @@ def load_full_text(row: dict, papers_dir: str, http: Http) -> dict | None:
 # Batch + summary
 # ---------------------------------------------------------------------------
 
-FIELDS = ["paper_id", "title", "pmcid", "doi", "verdict", "reason", "analyzable_gse", "data_types",
+FIELDS = ["paper_id", "title", "pmcid", "doi", "source", "query", "linked_gse", "verdict", "reason", "analyzable_gse", "data_types",
           "own_gse", "cited_gse", "other_repos", "text_source", "series_json", "evidence_json"]
 
 
@@ -685,6 +877,7 @@ def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: boo
                 s = screen_paper(row, doc, http, check_design=check_design, routes=routes)
             except Exception as e:  # one bad paper never stops the batch
                 s = Screen(paper_id=row.get("paper_id", ""), title=row.get("title", ""),
+                           source=row.get("source", ""), query=row.get("query", ""),
                            verdict="needs_inspection", reason=f"error:{type(e).__name__}: {e}"[:200])
             w.writerow(s.row())
             f.flush()
@@ -739,6 +932,19 @@ def summarize(screen_csv: str) -> str:
     if inspect:
         lines += ["", "## Why papers need inspection", "", "| Reason | Papers |", "|---|---:|"]
         lines += [f"| {k} | {v} |" for k, v in inspect.most_common()]
+    in_tar = sum(1 for r in rows if r["verdict"] == "analyzable"
+                 and any((x.get("files") or {}).get("status") == "raw_counts_in_tar"
+                         for x in json.loads(r.get("series_json") or "[]") if x["gse"] in r["analyzable_gse"]))
+    if in_tar:
+        lines += ["", f"{in_tar} analyzable papers have their raw counts only inside a _RAW.tar."]
+    sources = sorted({r.get("source", "") for r in rows} - {""})
+    if len(sources) > 1:
+        lines += ["", "## Verdicts by source", "", "| Source | Papers | analyzable | needs_inspection |",
+                  "|---|---:|---:|---:|"]
+        for src in sources:
+            sub = [r for r in rows if r.get("source") == src]
+            lines.append(f"| {src} | {len(sub)} | {sum(r['verdict'] == 'analyzable' for r in sub)} | "
+                         f"{sum(r['verdict'] == 'needs_inspection' for r in sub)} |")
     lines += ["", "## Data types of the papers' own GEO series", "", "| Data type | Papers |", "|---|---:|"]
     lines += [f"| {k} | {v} |" for k, v in types.most_common()]
     return "\n".join(lines) + "\n"
@@ -748,10 +954,12 @@ def _main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m tools.paper_screen", description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("collect", help="search Semantic Scholar + PubMed, write papers.csv")
-    p.add_argument("query")
+    p.add_argument("query", nargs="+", help="one or more queries; results are merged and deduplicated")
     p.add_argument("--out", required=True)
-    p.add_argument("--max", type=int, default=200)
+    p.add_argument("--max", type=int, default=200, help="total papers across all queries and sources")
     p.add_argument("--end-year", type=int, default=0)
+    p.add_argument("--sources", default="s2,pubmed",
+                   help="comma-separated: s2, pubmed, geo (papers linked from GEO bulk RNA-seq series)")
     p = sub.add_parser("screen", help="screen a papers.csv, write screen.csv + screen_summary.md")
     p.add_argument("papers_csv")
     p.add_argument("--out", required=True)
@@ -763,7 +971,12 @@ def _main(argv=None) -> int:
     a = ap.parse_args(argv)
     if a.cmd == "collect":
         os.makedirs(a.out, exist_ok=True)
-        rows = collect_papers(a.query, Http(cache_dir=os.path.join(a.out, "_http_cache")), a.max, a.end_year)
+        sources = [x for x in a.sources.split(",") if x]
+        bad = set(sources) - set(SOURCES)
+        if bad:
+            ap.error(f"unknown source(s) {sorted(bad)}; choose from {', '.join(SOURCES)}")
+        rows = collect_papers(a.query, Http(cache_dir=os.path.join(a.out, "_http_cache")), a.max,
+                              a.end_year, sources)
         path = os.path.join(a.out, "papers.csv")
         with open(path, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) if rows else ["paper_id"])
