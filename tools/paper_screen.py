@@ -224,7 +224,8 @@ def deposits_from_doc(doc: dict) -> dict:
         own["geo"] = [a for a in own["geo"] if a in said_own]
         if not own["geo"]:
             del own["geo"]
-    return {"own": own, "cited": cited, "evidence": evidence, "on_request": on_request}
+    return {"own": own, "cited": cited, "evidence": evidence, "on_request": on_request,
+            "said_own": sorted(said_own)}
 
 
 MANY_SERIES = 8
@@ -327,6 +328,7 @@ def geo_summary(gse: str, http: Http) -> dict | None:
         "platforms": rec.get("gpl", ""),
         "suppfile": rec.get("suppfile", ""),
         "sample_titles": [x.get("title", "") for x in rec.get("samples", []) or []],
+        "pubmedids": [str(x) for x in rec.get("pubmedids", []) or []],
     }
 
 
@@ -603,7 +605,9 @@ def organism_ok(taxon: str, organisms: set | None) -> bool:
     """True when one of the series' organisms is supported (``organisms=None``: any)."""
     if not organisms:
         return True
-    return any(t.strip().lower() in organisms for t in re.split(r"[;,]", taxon or ""))
+    # By genus: GEO labels some laboratory rats "Rattus rattus" instead of R. norvegicus.
+    genera = {o.split()[0] for o in organisms}
+    return any(t.strip().lower().split(" ")[0] in genera for t in re.split(r"[;,]", taxon or "") if t.strip())
 
 
 def judge_series(info: dict | None, files: dict | None, design: dict | None,
@@ -685,9 +689,21 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
         return s
     results = []
     types = []
+    pmid = str(row.get("pmid") or "").strip()
     for gse in s.own_gse:
         info = geo_summary(gse, http) if http else None
         files = design = None
+        if (info and pmid and info.get("pubmedids") and pmid not in info["pubmedids"]
+                and gse not in dep["said_own"]):
+            # GEO links the series to other papers only, and this one never says it
+            # deposited it: a public dataset listed in Methods (GSE91061 in a radiomics
+            # paper). A paper GEO has not linked yet has an empty list and passes.
+            results.append({"gse": gse, "verdict": "excluded", "reason": "no_own_deposit:linked_to_other_paper",
+                            "data_type": info["data_type"], "taxon": info["taxon"],
+                            "n_samples": info["n_samples"], "files": None, "design": None,
+                            "linked_pmids": info["pubmedids"]})
+            types.append(info["data_type"])
+            continue
         if info and set(info["data_type"].split("+")) & routes and organism_ok(info["taxon"], organisms):
             if check_files:
                 files = classify_supplementary(list_geo_dir(GEO_SUPPL.format(stub=geo_stub(gse), gse=gse), http))
@@ -911,7 +927,11 @@ FIELDS = ["paper_id", "title", "pmcid", "doi", "source", "query", "linked_gse", 
 
 DEFAULT_ORGANISMS = {"homo sapiens", "mus musculus", "rattus norvegicus"}
 # The exercise topic; --topic replaces it for another theme, --topic "" turns it off.
-DEFAULT_TOPIC = (r"exercis|physical(ly)? (activ|train|fit|inactiv)|\btrain(ing|ed)\b|endurance|resistance train|"
+DEFAULT_TOPIC = (r"exercis|physical(ly)? (activ|train|fit|inactiv)|endurance|"
+                 r"(exercise|endurance|resistance|strength|interval|aerobic|treadmill|swim(ming)?|physical|sprint|"
+                 r"running|athletic|weight|muscle|sports?)[- ]train|\b(un)?trained (mice|rats?|animals|subjects|"
+                 r"individuals|men|women|adults|athletes|participants|group|state|muscle|leg)|\btraining (program|"
+                 r"protocol|intervention|regimen|sessions?|adaptation|status|load|volume|intensity)|resistance train|"
                  r"strength train|aerobic|treadmill|wheel[- ]running|voluntary running|\brunning\b|swim|cycling|"
                  r"sedentar|athlet|fitness|\bHIIT\b|interval train|detrain|muscle contraction|contractile activity|"
                  r"overload|unloading|disuse|bed rest|inactivity|sprint|\bsports?\b|post-?run|runners?\b|"

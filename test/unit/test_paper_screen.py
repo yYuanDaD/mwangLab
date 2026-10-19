@@ -68,12 +68,12 @@ RNA-seq data were deposited in GEO under GSE123456.
 
 def _geo_routes(gse="GSE123456", gdstype="Expression profiling by high throughput sequencing",
                 suppl=("GSE123456_raw_counts.txt.gz", "filelist.txt"), groups=(4, 4), title="Bulk muscle",
-                sample_files=None, taxon="Mus musculus"):
+                sample_files=None, taxon="Mus musculus", pubmedids=()):
     """GEO responses for one series. ``sample_files`` maps a per-sample file name (one per
     sample, named GSM<i>_<name>) to its content, for _RAW.tar series."""
     esearch = json.dumps({"esearchresult": {"idlist": ["200123456"]}})
     esummary = json.dumps({"result": {"200123456": {
-        "title": title, "summary": "", "gdstype": gdstype, "taxon": taxon,
+        "title": title, "summary": "", "gdstype": gdstype, "taxon": taxon, "pubmedids": list(pubmedids),
         "n_samples": sum(groups), "gpl": "24247", "suppfile": "TXT",
         "samples": [{"accession": f"GSM{i}", "title": f"s{i}"} for i in range(sum(groups))]}}})
     suppl_html = "".join(f'<a href="{n}">{n}</a>' for n in suppl)
@@ -340,6 +340,24 @@ def test_topic_and_organism_filters():
     assert sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
                            FakeHttp(_geo_routes(taxon="Escherichia coli"))).verdict == "analyzable"
     assert sc.organism_ok("Homo sapiens; Escherichia coli", sc.DEFAULT_ORGANISMS)
+    # GEO labels some laboratory rats Rattus rattus; the genus decides.
+    assert sc.organism_ok("Rattus rattus", sc.DEFAULT_ORGANISMS)
+    # "training" in the machine-learning sense is not the topic.
+    assert not topic.search("Radiomics of melanoma: a training cohort and a validation set")
+    for t in ("Endurance training remodels muscle", "Trained mice ran more", "Resistance-training intervention",
+              "Effects of exercise on liver"):
+        assert topic.search(t), t
+
+
+def test_series_linked_to_other_paper_is_reuse():
+    # Listed in Methods with no deposit wording, and GEO links it to another paper only.
+    md = "# Exercise\n\n## Methods\n\nCohorts: GSE123456 and our clinical data.\n"
+    s = sc.screen_paper({"paper_id": "p", "pmid": "999"}, _doc(md), FakeHttp(_geo_routes(pubmedids=["111"])))
+    assert (s.verdict, s.reason) == ("excluded", "no_own_deposit:linked_to_other_paper"), (s.verdict, s.reason)
+    # Linked to this paper, not linked yet, or with deposit wording: own.
+    for pubmedids, doc in ((["999", "111"], _doc(md)), ([], _doc(md)), (["111"], _doc(PAPER_MD))):
+        s = sc.screen_paper({"paper_id": "p", "pmid": "999"}, doc, FakeHttp(_geo_routes(pubmedids=pubmedids)))
+        assert s.verdict == "analyzable", (pubmedids, s.verdict, s.reason)
 
 
 def test_sniff_count_file():
