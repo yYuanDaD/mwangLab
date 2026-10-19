@@ -8,7 +8,6 @@ import json
 import os
 import re
 import sys
-import tarfile
 from datetime import datetime
 
 import numpy as np
@@ -69,6 +68,7 @@ class _Tee:
         return False
 
 from tools.geo_tools import download_geo_data, download_supplementary_files
+from tools.geo_tar import unpack_and_merge_geo_tar as _unpack_and_merge_geo_tar
 from tools.preprocess_tools import preprocess_counts
 from tools.stats_tools import sample_qc_summary
 from tools.deseq2_tools import run_deseq2_analysis, deg_filename
@@ -305,88 +305,6 @@ def _classify_matrix(path):
             return "log_transformed", df
         return "fpkm_or_tpm", df
     return "ambiguous_decimal", df
-
-
-def _unpack_and_merge_geo_tar(data_dir):
-    """If data_dir contains a *_RAW.tar with per-sample count files inside,
-    extract and merge into a single counts matrix (gene_id as index, sample
-    filenames as columns). Returns the merged CSV path or None on failure.
-
-    Per-sample file convention: first column is gene_id, with a uniquely
-    identifiable count-like column. Works for plain `gene_id\\tcount` files and for
-    featureCounts output (auto-skips `#`-prefixed metadata lines)."""
-    tar_path = None
-    for n in os.listdir(data_dir):
-        if n.lower().endswith("_raw.tar") or n.lower().endswith(".tar"):
-            tar_path = os.path.join(data_dir, n)
-            break
-    if tar_path is None:
-        return None
-
-    acc = os.path.basename(data_dir.rstrip("/\\"))
-    extract_dir = os.path.join(data_dir, "_unpacked")
-    os.makedirs(extract_dir, exist_ok=True)
-
-    try:
-        with tarfile.open(tar_path) as t:
-            members = [m for m in t.getmembers() if m.isfile() and
-                       m.name.lower().endswith((".txt", ".tsv", ".csv",
-                                                ".txt.gz", ".tsv.gz", ".csv.gz"))]
-            if not members:
-                return None
-            t.extractall(extract_dir)
-    except Exception as e:
-        print(f"  tar extract failed: {e}")
-        return None
-
-    print(f"  unpacked {len(members)} per-sample files from {os.path.basename(tar_path)}")
-    series = []
-    skipped = []   # (filename, reason) — a skipped SAMPLE file is a dropped sample (fail loud)
-    for m in members:
-        p = os.path.join(extract_dir, m.name)
-        try:
-            df = pd.read_csv(p, sep=None, engine="python", comment="#")
-        except Exception as e:
-            skipped.append((m.name, f"parse_error:{type(e).__name__}"))
-            continue
-        if df.shape[1] < 2:
-            skipped.append((m.name, f"too_few_cols({df.shape[1]})"))
-            continue
-        gene_col = df.columns[0]
-        from tools.omics_semantics import choose_count_column
-        decision = choose_count_column(df)
-        if not decision.column:
-            skipped.append((m.name, f"count_column_{decision.confidence}:{decision.reason}"))
-            continue
-        count_col = decision.column
-        # Sample id = leading part of filename, drops extensions
-        base = os.path.basename(m.name)
-        for suf in (".gz", ".txt", ".tsv", ".csv"):
-            if base.lower().endswith(suf):
-                base = base[: -len(suf)]
-        s = df.set_index(gene_col)[count_col]
-        s.name = base
-        s = s[~s.index.duplicated(keep="first")]
-        series.append(s)
-
-    # Fail loud: an unparseable per-sample file is a DROPPED SAMPLE. GSE291636 silently lost
-    # samples this way. Some tar members are legitimately non-sample (README/filelist), so we
-    # REPORT rather than abort — a merged-sample-count mismatch is now visible, not silent.
-    if skipped:
-        shown = "; ".join(f"{n} [{r}]" for n, r in skipped[:8])
-        print(f"  WARNING: skipped {len(skipped)}/{len(members)} tar members "
-              f"(possible dropped samples): {shown}" + (" ..." if len(skipped) > 8 else ""))
-
-    if not series:
-        return None
-
-    merged = pd.concat(series, axis=1, join="outer").fillna(0)
-    merged.index.name = "gene_id"
-    out_path = os.path.join(data_dir, f"{acc}_merged_from_tar.csv")
-    merged.to_csv(out_path)
-    print(f"  merged matrix: {merged.shape[0]} genes x {merged.shape[1]} samples "
-          f"({len(series)}/{len(members)} members merged) -> {out_path}")
-    return out_path
 
 
 _ANALYZABLE_TYPES = ("raw_counts", "log_transformed", "fpkm_or_tpm")

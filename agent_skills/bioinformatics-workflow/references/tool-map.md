@@ -5,7 +5,7 @@ Use the smallest tool surface that answers the request. This is an inventory, no
 | Workflow stage | Modules |
 |---|---|
 | Native runtime: native mode, evidence helpers, run layout | `tools/native.py`, `tools/decision_contract.py` |
-| GEO search and download | `tools/geo_tools.py` |
+| GEO search and download | `tools/geo_tools.py` (every sheet of a supplementary `.xlsx` becomes a CSV); per-sample `_RAW.tar` (plain, featureCounts or STAR `ReadsPerGene` tables) → `native.merge_raw_tar` |
 | Sample alignment | `tools.native.align_to_metadata` (exact only); `tools/sample_align.py` is used inside executors |
 | Design and method gates | `tools/analysis_policy.py`, `tools/multifactor_design.py` |
 | Raw-count preprocessing and QC | `tools/preprocess_tools.py`, `tools/stats_tools.py` |
