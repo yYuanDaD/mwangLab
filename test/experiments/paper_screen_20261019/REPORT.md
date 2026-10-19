@@ -244,3 +244,67 @@ needs_inspection with an unlabelled matrix fell from 28 to 12.
   GSE78220 and GSE115821 in the melanoma paper are well-known public cohorts. Possible fixes:
   a reverse check that the GEO series' PubMed links include the paper's PMID, which also
   catches the PMID40259517 case; or using the GEO submission date versus the publication date.
+
+## Rescreen 2 (69b59bb)
+
+This run used the cache only: 2913 HTTP cache entries before and after. Its changes:
+- organisms match by genus;
+- "training" counts only in an exercise sense;
+- a series is reuse (`no_own_deposit:linked_to_other_paper`) when GEO links it only to other
+  PMIDs and the paper has no deposit wording.
+
+The previous screen is saved as `screen_second.csv`. Tests pass 22/22.
+
+| Verdict | first | second | **rescreen 2** |
+|---|---:|---:|---:|
+| analyzable | 66 | 50 | **46** |
+| needs_inspection | 35 | 18 | 15 |
+| excluded | 899 | 932 | 939 |
+
+### Changes to analyzable
+
+| Change | Paper | Series | Correct? |
+|---|---|---|---|
+| left → off_topic | 8de7ad50, melanoma ultrasound radiomics | GSE91061 | yes (the ML "training" case) |
+| left → off_topic | 551fbd6b, NetActivity gene-set method | GSE183019, GSE201284 | yes (methods paper) |
+| left → linked_to_other_paper | PMID41853865, exercise and aortic dissection | GSE153434 (+GSE207784) | yes. The series are published human datasets (GEO links PMID 33066131 / 36172868). The paper's own RNA-seq is in GSA (CRA097761) |
+| left → linked_to_other_paper | PMID36533424, exercise signature with ageing / partial reprogramming | GSE198652, GSE148911 | yes. Methods: "published previously (Dungan et al., 2022a) (GSE198652)" and "from Wang et al. (2021) (GSE148911)" |
+| left → linked_to_other_paper | **53b3c290, skeletal-muscle BMAL1 and exercise training (bioRxiv, PMID 37905004)** | GSE255280, GSE240653, GSE253735 | **no.** GEO links these series to PMID 38950777, the *Mol Metab* version of the same paper (same title, same authors), so this is the authors' own deposit |
+| joined | PMID39000297, exercise in the female hypothalamic arcuate nucleus | GSE232510 (*Rattus rattus* label) | yes (bug A fixed) |
+
+### Checking every linked_to_other_paper call
+
+I compared the title of each linked PMID with the paper's title. 23 series in 19 papers are
+marked linked_to_other_paper. Two papers have a same-title preprint/journal pair:
+- the BMAL1 paper above, the only one this costs an analyzable paper;
+- PMID40156268, an Alzheimer's exercise multi-omics paper, whose series GEO links to its own
+  bioRxiv preprint (PMID 38746443). It stays excluded for another reason (chromatin/scRNA
+  series), so only its reason is wrong.
+
+The others are genuine reuse: meta-analyses, a database paper, and public datasets cited in
+Methods.
+
+### The 10 spot-check papers
+
+All 10 are unchanged from the second screen and still correct (10/10).
+
+### analyzable.csv
+
+`analyzable.csv` has one row per analyzable paper (46 rows): paper_id, pmid, title, year,
+analyzable_gse, taxon, n_samples, groups, file_kind and source.
+
+| Breakdown | Counts |
+|---|---|
+| Counts file kind | 33 raw-count file, 10 from a `_RAW.tar`, 3 mixed |
+| Organism | 19 mouse, 13 human, 10 rat, 2 human+mouse |
+| Source | 31 GEO-linked, 9 Semantic Scholar, 6 PubMed |
+
+The BMAL1 paper is **not** in `analyzable.csv` because the screen excludes it. Add it by hand
+if the large run should include it.
+
+### New bug (not fixed in this pass)
+
+- **D. A preprint and its journal version count as different papers.**
+  `linked_to_other_paper` should treat a linked PMID with the same normalised title (or a DOI
+  relation between preprint and journal article) as the same paper. Two papers in this run
+  are affected: 53b3c290 and PMID40156268.
