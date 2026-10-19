@@ -1,0 +1,58 @@
+[
+  {
+    "item": "matrix column names vs GEO sample IDs",
+    "paper": "n/a",
+    "data": "matrix columns are library names (e.g. SAT_AM_Cont_a); GEO GSM rows carry them only inside 'description' ('Library name: ...')",
+    "disposition": "executable_without_change",
+    "resolution": "derived library_name from description by regex, exact match"
+  },
+  {
+    "item": "phase labels",
+    "paper": "EA = ZT13, LA = ZT23",
+    "data": "library names use AM/PM; GEO titles map AM -> 'early active', PM -> 'late active'. ZT13/ZT23 in clock time depends on lights-on time, so AM/PM alone is ambiguous",
+    "disposition": "executable_without_change",
+    "resolution": "GEO title mapping used; independently confirmed: the 4 libraries with the most expressed genes are SAT_PM_Exp x2 and VAT_AM_Exp + VAT_AM_Cont, exactly the paper's stated outliers (2 SAT LAE, 1 VAT EAE, 1 VAT EAC) only if PM = late and AM = early"
+  },
+  {
+    "item": "outlier identities",
+    "paper": "4 outliers removed, identities in Supplementary 4D only (S2.9.p2)",
+    "data": "identified by the paper's stated criterion (number of genes > 10 raw counts, Supp 4 A-D): ['SAT_PM_Exp_d', 'SAT_PM_Exp_f', 'VAT_AM_Cont_e', 'VAT_AM_Exp_c']; robust z > 2.9 within tissue, all others < 1.7",
+    "disposition": "requires_explicit_deviation",
+    "resolution": "excluded; identity inferred from the stated criterion and group composition, not read from Supplementary 4D"
+  },
+  {
+    "item": "surrogate variables",
+    "paper": "2 SVs (sva on top 3000 variable genes) added to every DESeq2 model (S2.9.p2)",
+    "data": "no sva executor in the repository",
+    "disposition": "requires_explicit_deviation",
+    "resolution": "Wald contrasts run without SVs as a declared deviation"
+  },
+  {
+    "item": "log2FC shrinkage",
+    "paper": "apeglm-shrunken log2FC with |LFC| > 0.5 (S2.9.p2)",
+    "data": "run_deseq2_analysis returns unshrunken MLE log2FC (tools/deseq2_tools.py:136-152, no lfc_shrink)",
+    "disposition": "requires_explicit_deviation",
+    "resolution": "paper cutoffs applied to MLE log2FC; counts expected to be >= the paper's because shrinkage reduces |LFC|"
+  },
+  {
+    "item": "LRT interaction",
+    "paper": "DESeq2 LRT (full vs reduced) across both tissues (S2.9.p2)",
+    "data": "no DESeq2 LRT executor; SAT and VAT come from the same rats but GEO has no animal ID",
+    "disposition": "blocks_reproduction",
+    "resolution": "interaction case stopped (manual_review)"
+  },
+  {
+    "item": "Ensembl release",
+    "paper": "Ensembl release 104, rn6 (S2.9.p2)",
+    "data": "GEO data_processing says release-104 and also 'Assembly: rn6 (ensembl release 105)'",
+    "disposition": "executable_without_change",
+    "resolution": "noted only"
+  },
+  {
+    "item": "data availability",
+    "paper": "DA.p1: 'Data will be made available on request'",
+    "data": "GSE283493 public, PubMed ID 39832562 in SOFT header",
+    "disposition": "executable_without_change",
+    "resolution": "noted only"
+  }
+]

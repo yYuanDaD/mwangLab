@@ -1,0 +1,668 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37318869",
+  "subject_id": "case_02",
+  "created_at": "2026-10-19T16:39:06",
+  "finished_at": "2026-10-19T16:46:38",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10443797.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10443797.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:06",
+      "sha256": null,
+      "attributes": {
+        "sha256": "255b3e66699595275ae6c51405838205e8856793e01603974d94ce5a0c6ca823",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC10443797.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10443797.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:06",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9f874e6fe19bcc7c9e2ecefeaec019baefeac5f5523547d32d325cbc017d8d2c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE208639_metadata.csv",
+      "uri": "data\\GSE208639\\GSE208639_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:06",
+      "sha256": null,
+      "attributes": {
+        "sha256": "99585bae3093f366cc626694d4e692f8c4d38eecf91d4002b368ad3416edc3b2",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE208639_star_counts_reverse.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_01\\inputs\\GSE208639_star_counts_reverse.csv",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:06",
+      "sha256": null,
+      "attributes": {
+        "sha256": "75c7db494b6ad3f33388b095ffbc2cd5059efa27555433764d2e701070564251",
+        "kind": "matrix"
+      }
+    },
+    {
+      "source_id": "SRC-0005",
+      "origin": "artifact",
+      "label": "star_merge_report.json",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_01\\inputs\\star_merge_report.json",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:06",
+      "sha256": null,
+      "attributes": {
+        "sha256": "50dfa82e291162de490c8ace03fcb6b9ffb5277ec956466244af505f711b93c5",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE208639"
+        ],
+        "primary_estimand": "Effect of 12-week strength training on muscle gene expression in DM1, quantified as the change from pre- to post-training relative to unaffected controls (Δlog2FC = log2FC[post vs control] - log2FC[pre vs control]) and as % rescue of pre-training DEGs; analysed grouped and per individual (S2.2.p2, S2.5.p1, S4.6.p1)",
+        "planned_contrasts": [
+          {
+            "name": "grouped_pre_vs_control",
+            "locator": "S2.2.p2, S4.13.p1",
+            "test": "edgeR QL F-test"
+          },
+          {
+            "name": "grouped_post_vs_control",
+            "locator": "S2.2.p2, S4.13.p1",
+            "test": "edgeR QL F-test"
+          },
+          {
+            "name": "grouped_delta_log2FC (post-vs-control minus pre-vs-control)",
+            "locator": "S2.2.p2",
+            "test": "none (difference of two fitted log2FCs; no p-value)"
+          },
+          {
+            "name": "individual_<id>_pre_vs_control and individual_<id>_post_vs_control (n=1 vs 6 controls)",
+            "locator": "S2.2.p2, FIG1, S2.5.p1",
+            "test": "edgeR QL F-test"
+          }
+        ],
+        "paper_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "effect_cutoff_original": "log_2FC > |2|",
+          "inclusive": false,
+          "source_locator": "S4.4.p1",
+          "scope": "significant DEGs for the strength-training program; applied in S2.5.p1 to pre-training vs unaffected-control DEGs (raw P, no multiple-testing adjustment stated)"
+        },
+        "paper_method": "edgeR 3.34.1, quasi-likelihood F-test, each group vs unaffected controls (S4.4.p1, S4.13.p1)",
+        "blocking_or_covariance": {
+          "status": "not_reported",
+          "note": "Grouped analysis pools pre and post samples as two groups each vs controls; no subject blocking described (S2.2.p2)"
+        },
+        "sample_inclusion": [
+          "9 male DM1 patients, biopsy before and after 12-week strength training (S4.3.p1, ABS.p1)",
+          "6 male unaffected controls, single biopsy, no training (S4.3.p1)"
+        ],
+        "sample_exclusion": [
+          "participants 2182 and 1955 (poor RNA quantity/quality) - not deposited (S4.4.p1, S2.2.p1)"
+        ],
+        "case_scope": "Paper grouped analysis: grouped pre-training vs controls and grouped post-training vs controls (edgeR QL), Δlog2FC"
+      },
+      "reason": "Methods S4.3/S4.4/S4.13 and Results S2.2.p2/S2.5.p1: 9 DM1 pre/post + 6 controls; edgeR QL F-test of each group (grouped and per individual) vs controls; exercise effect = Δlog2FC and % rescue; DEG rule |log2FC|>2 & raw P<0.05. GSE208639 is the own deposit (S4.12.p1); other accessions are reanalysis/citations. No direct post-vs-pre test and no subject blocking reported.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:06"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE208639",
+        "matrix_file": "GSE208639_RAW.tar (24 STAR ReadsPerGene.out.tab.gz) merged to GSE208639_star_counts_reverse.csv",
+        "metadata_file": "data\\GSE208639\\GSE208639_metadata.csv",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 37318869",
+          "24 GSMs = 9 DM1 x (pre, post) + 6 controls, matching ABS.p1/S4.3.p1",
+          "participant IDs in titles (907, 2005, 523, 1791, 1806, 2002, 2019, 2110, 1242) match those named in S2.2-S2.7",
+          "2182 and 1955 absent, as excluded in S4.4.p1",
+          "GEO data_processing: STAR 2.7.9 --quantMode GeneCounts, hg38 (= S4.4.p1)"
+        ],
+        "alternatives": {
+          "GSE208639_FPKM.csv.gz": "FPKM, not the paper's edgeR input; not used",
+          "GSE208639_edgeR_output.csv": "authors' results; only the first xlsx sheet (grouped pre-training vs control) survived tool conversion; used only as a concordance reference"
+        }
+      },
+      "reason": "Series is linked to PMID 37318869; sample set, IDs and processing match the Methods.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:06"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 24,
+        "n_metadata": 24,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "matrix_column_source": "GSM prefix of each tar member file name (00_merge_star_counts.py)",
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.2.treatment",
+              "recode": {
+                "Pre-training": "pre",
+                "Post-training": "post",
+                "No training": "ctrl"
+              }
+            },
+            "subject": {
+              "source": "title",
+              "regex": ",\\s*((?:Control\\s+)?\\d+)$",
+              "recode": {
+                "2019": "p2019",
+                "907": "p907",
+                "2110": "p2110",
+                "2005": "p2005",
+                "1242": "p1242",
+                "523": "p523",
+                "1791": "p1791",
+                "1806": "p1806",
+                "2002": "p2002",
+                "Control 1": "c1",
+                "Control 2": "c2",
+                "Control 4": "c4",
+                "Control 10": "c10",
+                "Control 11": "c11",
+                "Control 13": "c13"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\aligned\\design_metadata.csv",
+          "sha256": "fa5929b50dc12c583ae7a6c040e3e2c9062245c875b75cf40ac10e76ff8149ad",
+          "levels": {
+            "grp": {
+              "pre": 9,
+              "post": 9,
+              "ctrl": 6
+            },
+            "subject": {
+              "p2019": 2,
+              "p907": 2,
+              "p2110": 2,
+              "p2005": 2,
+              "p1242": 2,
+              "p523": 2,
+              "p1791": 2,
+              "p1806": 2,
+              "p2002": 2,
+              "c1": 1,
+              "c2": 1,
+              "c4": 1,
+              "c10": 1,
+              "c11": 1,
+              "c13": 1
+            }
+          }
+        }
+      },
+      "reason": "Each STAR file name starts with its GSM accession; columns were named by that GSM and aligned exactly to the metadata index (24/24). subject parsed from title; grp from characteristics treatment. Title typo 'Muslce' (GSM6356075) does not affect parsing.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0003",
+        "ART-0002",
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:07"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR / DESeq2 (raw integer counts)",
+        "profile": {
+          "n_rows": null,
+          "n_samples": 24,
+          "min": 0.0,
+          "max": 15391748.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        },
+        "strand_column": "STAR column 4 (reverse strand); strand2/strand1 assigned-read ratio 6.6-13.1 in all 24 samples, consistent with NEBNext Directional (S4.3.p1)",
+        "paper_input": "STAR gene counts into edgeR (S4.4.p1)"
+      },
+      "reason": "Non-negative integers, STAR --quantMode GeneCounts per GEO data_processing; the 4 N_* summary rows removed; reverse-strand column selected from the data and the library kit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:07"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group comparisons vs common control, fitted separately (paper grouped analysis)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "pre_vs_ctrl",
+            "control": "ctrl",
+            "treatment": "pre",
+            "n": "6 vs 9"
+          },
+          {
+            "name": "post_vs_ctrl",
+            "control": "ctrl",
+            "treatment": "post",
+            "n": "6 vs 9"
+          },
+          {
+            "name": "delta_log2FC",
+            "definition": "log2FC(post vs ctrl) - log2FC(pre vs ctrl); derived, no test (S2.2.p2)"
+          }
+        ],
+        "formula": "~ grp (per fit)",
+        "estimand_type": "pre/post vs control are associational (disease vs healthy); Δlog2FC is the paper's grouped training-effect measure"
+      },
+      "reason": "S2.2.p2: all pretraining samples one group, all posttraining another; each compared with controls by QL F-test; Δlog2FC reported.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:42:15"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "excluded: one sample per subject within each fit"
+          },
+          {
+            "name": "age",
+            "disposition": "excluded: not in GEO metadata; paper notes controls younger (32 vs 48 y, S2.5.p2) - possible confound of the disease contrasts, largely cancels in Δlog2FC"
+          },
+          {
+            "name": "sex",
+            "disposition": "excluded: single level (male)"
+          }
+        ]
+      },
+      "reason": "Within each fit every subject contributes one sample; pairing across pre/post is not part of the paper's grouped route (handled in case_01).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:42:15"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "method": "edgeR QL F-test (inmoose.edgepy)",
+        "matrix_type": "raw counts",
+        "formula": "~ grp",
+        "prefilter": "per fit: keep genes with >=10 counts in at least one of the 15 samples (literal reading of S4.4.p1)",
+        "normalization": "library size only (no TMM)",
+        "paper_route": {
+          "method": "edgeR 3.34.1 (R) QL F-test with TMM normalization (edgeR default)",
+          "status": "blocked",
+          "reason": "inmoose.edgepy has no calcNormFactors/TMM (tools/edger_tools.py module docstring); the paper's exact gene filter is ambiguous and does not reproduce the authors' gene counts"
+        }
+      },
+      "reason": "Same model family and test as the paper; normalization differs -> declared deviation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:42:15"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "effect_cutoff_original": "log_2FC > |2|",
+          "inclusive": false,
+          "source_locator": "S4.4.p1",
+          "scope": "significant DEGs for the strength-training program; applied in S2.5.p1 to pre-training vs unaffected-control DEGs (raw P, no multiple-testing adjustment stated)"
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_cutoff": null,
+          "label": "audit"
+        }
+      },
+      "reason": "Paper rule applied exactly to both grouped fits (S2.5.p1 uses it for pre-vs-control DEGs).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:42:15"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "edgeR QL F-test (inmoose.edgepy)",
+        "formula": "~ grp",
+        "subset": "pre_vs_ctrl",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\pre_vs_ctrl\\DEG_results_pre_vs_ctrl.csv"
+        ],
+        "applied_counts": {
+          "deg_csv": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\pre_vs_ctrl\\DEG_results_pre_vs_ctrl.csv",
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 2",
+          "n_tested": 20852,
+          "n_significant": 475,
+          "n_up": 223,
+          "n_down": 252,
+          "deg_sanity": "ok"
+        },
+        "audit_counts": {
+          "deg_csv": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\pre_vs_ctrl\\DEG_results_pre_vs_ctrl.csv",
+          "rule": "padj < 0.05",
+          "n_tested": 20852,
+          "n_significant": 4453,
+          "n_up": 3310,
+          "n_down": 1143,
+          "deg_sanity": "ok"
+        }
+      },
+      "reason": "edgeR completed for pre vs ctrl (9 vs 6).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0006",
+        "ART-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:44:23"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "edgeR QL F-test (inmoose.edgepy)",
+        "formula": "~ grp",
+        "subset": "post_vs_ctrl",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\post_vs_ctrl\\DEG_results_post_vs_ctrl.csv"
+        ],
+        "applied_counts": {
+          "deg_csv": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\post_vs_ctrl\\DEG_results_post_vs_ctrl.csv",
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 2",
+          "n_tested": 21619,
+          "n_significant": 512,
+          "n_up": 377,
+          "n_down": 135,
+          "deg_sanity": "ok"
+        },
+        "audit_counts": {
+          "deg_csv": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\post_vs_ctrl\\DEG_results_post_vs_ctrl.csv",
+          "rule": "padj < 0.05",
+          "n_tested": 21619,
+          "n_significant": 828,
+          "n_up": 663,
+          "n_down": 165,
+          "deg_sanity": "ok"
+        }
+      },
+      "reason": "edgeR completed for post vs ctrl (9 vs 6).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007",
+        "ART-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:46:38"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "summary": "Paper grouped route (edgeR QL vs controls + Δlog2FC); deviation: no TMM."
+      },
+      "reason": "edgeR without TMM; otherwise as the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:46:38"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "01a713db1fc4a7a1db0b197fbecd7c8bc1a0ff727dcb632612aa6169da75f6ef",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "75c7db494b6ad3f33388b095ffbc2cd5059efa27555433764d2e701070564251",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\aligned\\aligned_metadata.csv",
+      "role": "aligned_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "99585bae3093f366cc626694d4e692f8c4d38eecf91d4002b368ad3416edc3b2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fa5929b50dc12c583ae7a6c040e3e2c9062245c875b75cf40ac10e76ff8149ad",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\design_checks.json",
+      "role": "design_checks",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "95f199b7e9c0ea8bad3ada793269e1f5bb55eb8270e6b2b5e27f3cc00bbc7825",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\pre_vs_ctrl\\DEG_results_pre_vs_ctrl.csv",
+      "role": "deg_table_pre_vs_ctrl",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0ecebf654294579ad3ed06105363743933c2137f93541c5db3428c89154695d8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\post_vs_ctrl\\DEG_results_post_vs_ctrl.csv",
+      "role": "deg_table_post_vs_ctrl",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "37ee48e4b27f0b44ffea50f68ece72fc4cc3d68595c3bcf6dcd15d3e9e0ce322",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\results\\grouped_delta_log2FC.csv",
+      "role": "grouped_delta_log2FC",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "83dd383dfa06cc8d9e72b2192334177715f188a7f1c0ecc1b41898689df0e465",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_02\\grouped_training_effect.json",
+      "role": "grouped_training_effect",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d563ef806627c76bbb497d29adad7d5d8ff69259cdaef7573f7c9926887619c3",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

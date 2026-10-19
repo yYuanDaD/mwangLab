@@ -1,0 +1,1178 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37318869",
+  "subject_id": "case_03",
+  "created_at": "2026-10-19T16:39:07",
+  "finished_at": "2026-10-19T16:48:40",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10443797.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10443797.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:07",
+      "sha256": null,
+      "attributes": {
+        "sha256": "255b3e66699595275ae6c51405838205e8856793e01603974d94ce5a0c6ca823",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC10443797.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10443797.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:07",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9f874e6fe19bcc7c9e2ecefeaec019baefeac5f5523547d32d325cbc017d8d2c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE208639_metadata.csv",
+      "uri": "data\\GSE208639\\GSE208639_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:07",
+      "sha256": null,
+      "attributes": {
+        "sha256": "99585bae3093f366cc626694d4e692f8c4d38eecf91d4002b368ad3416edc3b2",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE208639_star_counts_reverse.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_01\\inputs\\GSE208639_star_counts_reverse.csv",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:07",
+      "sha256": null,
+      "attributes": {
+        "sha256": "75c7db494b6ad3f33388b095ffbc2cd5059efa27555433764d2e701070564251",
+        "kind": "matrix"
+      }
+    },
+    {
+      "source_id": "SRC-0005",
+      "origin": "artifact",
+      "label": "star_merge_report.json",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_01\\inputs\\star_merge_report.json",
+      "locator": null,
+      "captured_at": "2026-10-19T16:39:07",
+      "sha256": null,
+      "attributes": {
+        "sha256": "50dfa82e291162de490c8ace03fcb6b9ffb5277ec956466244af505f711b93c5",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE208639"
+        ],
+        "primary_estimand": "Effect of 12-week strength training on muscle gene expression in DM1, quantified as the change from pre- to post-training relative to unaffected controls (Δlog2FC = log2FC[post vs control] - log2FC[pre vs control]) and as % rescue of pre-training DEGs; analysed grouped and per individual (S2.2.p2, S2.5.p1, S4.6.p1)",
+        "planned_contrasts": [
+          {
+            "name": "grouped_pre_vs_control",
+            "locator": "S2.2.p2, S4.13.p1",
+            "test": "edgeR QL F-test"
+          },
+          {
+            "name": "grouped_post_vs_control",
+            "locator": "S2.2.p2, S4.13.p1",
+            "test": "edgeR QL F-test"
+          },
+          {
+            "name": "grouped_delta_log2FC (post-vs-control minus pre-vs-control)",
+            "locator": "S2.2.p2",
+            "test": "none (difference of two fitted log2FCs; no p-value)"
+          },
+          {
+            "name": "individual_<id>_pre_vs_control and individual_<id>_post_vs_control (n=1 vs 6 controls)",
+            "locator": "S2.2.p2, FIG1, S2.5.p1",
+            "test": "edgeR QL F-test"
+          }
+        ],
+        "paper_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "effect_cutoff_original": "log_2FC > |2|",
+          "inclusive": false,
+          "source_locator": "S4.4.p1",
+          "scope": "significant DEGs for the strength-training program; applied in S2.5.p1 to pre-training vs unaffected-control DEGs (raw P, no multiple-testing adjustment stated)"
+        },
+        "paper_method": "edgeR 3.34.1, quasi-likelihood F-test, each group vs unaffected controls (S4.4.p1, S4.13.p1)",
+        "blocking_or_covariance": {
+          "status": "not_reported",
+          "note": "Grouped analysis pools pre and post samples as two groups each vs controls; no subject blocking described (S2.2.p2)"
+        },
+        "sample_inclusion": [
+          "9 male DM1 patients, biopsy before and after 12-week strength training (S4.3.p1, ABS.p1)",
+          "6 male unaffected controls, single biopsy, no training (S4.3.p1)"
+        ],
+        "sample_exclusion": [
+          "participants 2182 and 1955 (poor RNA quantity/quality) - not deposited (S4.4.p1, S2.2.p1)"
+        ],
+        "case_scope": "Paper individual analysis: each participant's pre and post sample (n=1) vs 6 controls"
+      },
+      "reason": "Methods S4.3/S4.4/S4.13 and Results S2.2.p2/S2.5.p1: 9 DM1 pre/post + 6 controls; edgeR QL F-test of each group (grouped and per individual) vs controls; exercise effect = Δlog2FC and % rescue; DEG rule |log2FC|>2 & raw P<0.05. GSE208639 is the own deposit (S4.12.p1); other accessions are reanalysis/citations. No direct post-vs-pre test and no subject blocking reported.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:07"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE208639",
+        "matrix_file": "GSE208639_RAW.tar (24 STAR ReadsPerGene.out.tab.gz) merged to GSE208639_star_counts_reverse.csv",
+        "metadata_file": "data\\GSE208639\\GSE208639_metadata.csv",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 37318869",
+          "24 GSMs = 9 DM1 x (pre, post) + 6 controls, matching ABS.p1/S4.3.p1",
+          "participant IDs in titles (907, 2005, 523, 1791, 1806, 2002, 2019, 2110, 1242) match those named in S2.2-S2.7",
+          "2182 and 1955 absent, as excluded in S4.4.p1",
+          "GEO data_processing: STAR 2.7.9 --quantMode GeneCounts, hg38 (= S4.4.p1)"
+        ],
+        "alternatives": {
+          "GSE208639_FPKM.csv.gz": "FPKM, not the paper's edgeR input; not used",
+          "GSE208639_edgeR_output.csv": "authors' results; only the first xlsx sheet (grouped pre-training vs control) survived tool conversion; used only as a concordance reference"
+        }
+      },
+      "reason": "Series is linked to PMID 37318869; sample set, IDs and processing match the Methods.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:07"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 24,
+        "n_metadata": 24,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "matrix_column_source": "GSM prefix of each tar member file name (00_merge_star_counts.py)",
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.2.treatment",
+              "recode": {
+                "Pre-training": "pre",
+                "Post-training": "post",
+                "No training": "ctrl"
+              }
+            },
+            "subject": {
+              "source": "title",
+              "regex": ",\\s*((?:Control\\s+)?\\d+)$",
+              "recode": {
+                "2019": "p2019",
+                "907": "p907",
+                "2110": "p2110",
+                "2005": "p2005",
+                "1242": "p1242",
+                "523": "p523",
+                "1791": "p1791",
+                "1806": "p1806",
+                "2002": "p2002",
+                "Control 1": "c1",
+                "Control 2": "c2",
+                "Control 4": "c4",
+                "Control 10": "c10",
+                "Control 11": "c11",
+                "Control 13": "c13"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\design_metadata.csv",
+          "sha256": "fa5929b50dc12c583ae7a6c040e3e2c9062245c875b75cf40ac10e76ff8149ad",
+          "levels": {
+            "grp": {
+              "pre": 9,
+              "post": 9,
+              "ctrl": 6
+            },
+            "subject": {
+              "p2019": 2,
+              "p907": 2,
+              "p2110": 2,
+              "p2005": 2,
+              "p1242": 2,
+              "p523": 2,
+              "p1791": 2,
+              "p1806": 2,
+              "p2002": 2,
+              "c1": 1,
+              "c2": 1,
+              "c4": 1,
+              "c10": 1,
+              "c11": 1,
+              "c13": 1
+            }
+          }
+        }
+      },
+      "reason": "Each STAR file name starts with its GSM accession; columns were named by that GSM and aligned exactly to the metadata index (24/24). subject parsed from title; grp from characteristics treatment. Title typo 'Muslce' (GSM6356075) does not affect parsing.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0003",
+        "ART-0002",
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:08"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR / DESeq2 (raw integer counts)",
+        "profile": {
+          "n_rows": null,
+          "n_samples": 24,
+          "min": 0.0,
+          "max": 15391748.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        },
+        "strand_column": "STAR column 4 (reverse strand); strand2/strand1 assigned-read ratio 6.6-13.1 in all 24 samples, consistent with NEBNext Directional (S4.3.p1)",
+        "paper_input": "STAR gene counts into edgeR (S4.4.p1)"
+      },
+      "reason": "Non-negative integers, STAR --quantMode GeneCounts per GEO data_processing; the 4 N_* summary rows removed; reverse-strand column selected from the data and the library kit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:39:08"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel: per-individual contrasts vs common control (n=1 arms)",
+        "formula": "~ 0 + C(unit)",
+        "design_column": "unit",
+        "contrasts": [
+          "p523_pre_vs_ctrl",
+          "p523_post_vs_ctrl",
+          "p907_pre_vs_ctrl",
+          "p907_post_vs_ctrl",
+          "p1242_pre_vs_ctrl",
+          "p1242_post_vs_ctrl",
+          "p1791_pre_vs_ctrl",
+          "p1791_post_vs_ctrl",
+          "p1806_pre_vs_ctrl",
+          "p1806_post_vs_ctrl",
+          "p2002_pre_vs_ctrl",
+          "p2002_post_vs_ctrl",
+          "p2005_pre_vs_ctrl",
+          "p2005_post_vs_ctrl",
+          "p2019_pre_vs_ctrl",
+          "p2019_post_vs_ctrl",
+          "p2110_pre_vs_ctrl",
+          "p2110_post_vs_ctrl",
+          "p523_post_vs_pre",
+          "p907_post_vs_pre",
+          "p1242_post_vs_pre",
+          "p1791_post_vs_pre",
+          "p1806_post_vs_pre",
+          "p2002_post_vs_pre",
+          "p2005_post_vs_pre",
+          "p2019_post_vs_pre",
+          "p2110_post_vs_pre"
+        ],
+        "estimand_type": "individual descriptive change; <id>_pre/post_vs_ctrl associational; <id>_post_vs_pre = paper's individual Δlog2FC (post-vs-ctrl minus pre-vs-ctrl)",
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\design_metadata.csv",
+          "columns": {
+            "unit": {
+              "source": "title",
+              "regex": "^(.*)$",
+              "recode": {
+                "Muscle, Pre-training, 2019": "p2019_pre",
+                "Muscle, Post-training, 2019": "p2019_post",
+                "Muscle, Pre-training, 907": "p907_pre",
+                "Muscle, Post-training, 907": "p907_post",
+                "Muscle, Pre-training, 2110": "p2110_pre",
+                "Muscle, Post-training, 2110": "p2110_post",
+                "Muscle, Pre-training, 2005": "p2005_pre",
+                "Muscle, Post-training, 2005": "p2005_post",
+                "Muscle, Pre-training, 1242": "p1242_pre",
+                "Muslce, Post-training, 1242": "p1242_post",
+                "Muscle, Pre-training, 523": "p523_pre",
+                "Muscle, Post-training, 523": "p523_post",
+                "Muscle, Pre-training, 1791": "p1791_pre",
+                "Muscle, Post-training, 1791": "p1791_post",
+                "Muscle, Pre-training, 1806": "p1806_pre",
+                "Muscle, Post-training, 1806": "p1806_post",
+                "Muscle, Pre-training, 2002": "p2002_pre",
+                "Muscle, Post-training, 2002": "p2002_post",
+                "Muscle, No training, Control 1": "ctrl",
+                "Muscle, No training, Control 2": "ctrl",
+                "Muscle, No training, Control 4": "ctrl",
+                "Muscle, No training, Control 10": "ctrl",
+                "Muscle, No training, Control 11": "ctrl",
+                "Muscle, No training, Control 13": "ctrl"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\design_metadata_units.csv",
+          "sha256": "ce1203d8a9d3362dda128a96d67e98e9ba586d43dddad34f7ad41fcebf01807f",
+          "levels": {
+            "unit": {
+              "ctrl": 6,
+              "p2019_pre": 1,
+              "p2019_post": 1,
+              "p907_pre": 1,
+              "p907_post": 1,
+              "p2110_pre": 1,
+              "p2110_post": 1,
+              "p2005_pre": 1,
+              "p2005_post": 1,
+              "p1242_pre": 1,
+              "p1242_post": 1,
+              "p523_pre": 1,
+              "p523_post": 1,
+              "p1791_pre": 1,
+              "p1791_post": 1,
+              "p1806_pre": 1,
+              "p1806_post": 1,
+              "p2002_pre": 1,
+              "p2002_post": 1
+            }
+          }
+        }
+      },
+      "reason": "S2.2.p2/FIG1/S2.5.p1: the same pre/post-vs-control approach applied to each individual is the paper's main analysis. One model with each DM1 sample as its own level estimates each individual-vs-control log2FC and the individual post-minus-pre difference (= Δlog2FC).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:21"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "excluded: absorbed - each unit is one subject x time sample; individual post_vs_pre contrasts are within-subject by construction"
+          },
+          {
+            "name": "age",
+            "disposition": "excluded: not in GEO metadata"
+          }
+        ]
+      },
+      "reason": "Full rank (19), residual df 5 from the 6 controls.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0005"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:21"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "method": "limma (inmoose) moderated t, multilevel contrasts",
+        "matrix_type": "raw counts",
+        "transform": "log2(CPM+1) via preprocess_counts (library-size CPM, no TMM)",
+        "formula": "~ 0 + C(unit)",
+        "prefilter": "preprocess_counts min_count=10, min_samples=1 (literal reading of S4.4.p1)",
+        "paper_route": {
+          "method": "edgeR 3.34.1 QL F-test, each individual sample vs 6 controls",
+          "status": "blocked",
+          "reason": "two-arm edgeR/DESeq2 executors reject a 1-sample arm (tools/analysis_policy.py:16 MIN_REPLICATES_PER_GROUP = 2); inmoose edgeR has no TMM"
+        }
+      },
+      "reason": "Validated multigroup limma executor; variance from controls, as in the paper's fits.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:21"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "effect_cutoff_original": "log_2FC > |2|",
+          "inclusive": false,
+          "source_locator": "S4.4.p1",
+          "scope": "significant DEGs for the strength-training program; applied in S2.5.p1 to pre-training vs unaffected-control DEGs (raw P, no multiple-testing adjustment stated)"
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "adjustment": "none",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 2.0,
+          "inclusive": false
+        }
+      },
+      "reason": "Paper's DEG rule (S4.4.p1, S2.5.p1) applied per contrast on the deviation route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:21"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "limma (inmoose) moderated t, multilevel contrasts",
+        "formula": "~ 0 + C(unit)",
+        "transform": "log2(CPM+1)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_pre_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_post_vs_ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_post_vs_pre.csv"
+        ],
+        "residual_df": 5,
+        "n_contrasts": 27,
+        "counts": {
+          "p523_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 322,
+            "n_up": 316,
+            "n_down": 6,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p523_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 27,
+            "n_up": 24,
+            "n_down": 3,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p907_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 54,
+            "n_up": 47,
+            "n_down": 7,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p907_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 912,
+            "n_up": 859,
+            "n_down": 53,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1242_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 45,
+            "n_up": 45,
+            "n_down": 0,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1242_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 390,
+            "n_up": 389,
+            "n_down": 1,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1791_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 67,
+            "n_up": 63,
+            "n_down": 4,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1791_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 19,
+            "n_up": 16,
+            "n_down": 3,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1806_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 28,
+            "n_up": 24,
+            "n_down": 4,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1806_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 16,
+            "n_up": 13,
+            "n_down": 3,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2002_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 12,
+            "n_up": 10,
+            "n_down": 2,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2002_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 7,
+            "n_up": 2,
+            "n_down": 5,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2005_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 24,
+            "n_up": 17,
+            "n_down": 7,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2005_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 62,
+            "n_up": 31,
+            "n_down": 31,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2019_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 46,
+            "n_up": 15,
+            "n_down": 31,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2019_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 23,
+            "n_up": 7,
+            "n_down": 16,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2110_pre_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 13,
+            "n_up": 1,
+            "n_down": 12,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2110_post_vs_ctrl": {
+            "n_tested": 21951,
+            "n_significant": 4,
+            "n_up": 2,
+            "n_down": 2,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p523_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 185,
+            "n_up": 3,
+            "n_down": 182,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p907_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 516,
+            "n_up": 424,
+            "n_down": 92,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1242_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 232,
+            "n_up": 225,
+            "n_down": 7,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1791_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 10,
+            "n_up": 1,
+            "n_down": 9,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p1806_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 15,
+            "n_up": 8,
+            "n_down": 7,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2002_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 11,
+            "n_up": 0,
+            "n_down": 11,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2005_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 8,
+            "n_up": 6,
+            "n_down": 2,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2019_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 4,
+            "n_up": 0,
+            "n_down": 4,
+            "deg_sanity": "tiny_n_per_group=1"
+          },
+          "p2110_post_vs_pre": {
+            "n_tested": 21951,
+            "n_significant": 0,
+            "n_up": 0,
+            "n_down": 0,
+            "deg_sanity": "tiny_n_per_group=1"
+          }
+        }
+      },
+      "reason": "27 contrasts from one fit; BH within contrast by executor; paper rule applied separately.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008",
+        "ART-0010",
+        "ART-0011",
+        "ART-0012"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:34"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "study",
+      "selected": {
+        "route": "exploratory",
+        "exploratory_reason": "n=1 per individual arm (< 3 replicates); residual df 5",
+        "summary": "Paper's individual analysis reproduced with limma multilevel model"
+      },
+      "reason": "Singleton arms -> exploratory by contract rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0005"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-19T16:48:40"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1ec664f4de2ae8991dd2e77a2fbbc1365ab2ced23d848b4ce9c46f4f76cc5857",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "75c7db494b6ad3f33388b095ffbc2cd5059efa27555433764d2e701070564251",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\aligned_metadata.csv",
+      "role": "aligned_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "99585bae3093f366cc626694d4e692f8c4d38eecf91d4002b368ad3416edc3b2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fa5929b50dc12c583ae7a6c040e3e2c9062245c875b75cf40ac10e76ff8149ad",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\aligned\\design_metadata_units.csv",
+      "role": "design_metadata_units",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ce1203d8a9d3362dda128a96d67e98e9ba586d43dddad34f7ad41fcebf01807f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\design_checks.json",
+      "role": "design_checks",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e28073b605ab22a6737a9ac99933d3f1c69659cdb874304f2b20fe111c90c751",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\multigroup_plan.json",
+      "role": "multigroup_plan",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "18d086e33099317ecbc2059e26a63c727a8ee1282960bebd90e55a03a6e1cdb2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\preprocess\\aligned_matrix_normalized.csv",
+      "role": "log2cpm",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f8cf2cc120cdbe5e743fc5be03c5f782e77eb1682e156c77ec139cb1305c78ac",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\threshold_counts.json",
+      "role": "threshold_counts",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "84b312de3803ba98e514becb75c013070820afcaf54d4e05611de40cbd08bbbe",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "89efaae5e4393d48809840c88ab4ce00028ce17fd50004fe85f90864b60763cb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "de0840ae35789c2567f46d0aa31d6199c5a22e4d1d08a6d7b95ec55e2df2b9c7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f672843e03c61a680c356c6645d865ba44b9019cce0726f4fd263ef024e5dd0b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0736dd136f28d9a4894367d5df3b5ad870788ee4180e607fe02116ee8487d452",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b4a119888852a7e8a8aec054486af9e4628c4e61ec345601862e2179a28a90c2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a11248dd84f91822c4dca6be8352840e6ea9c1c1e2d766da2977918a76d95ca8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "afcb750401e32170549843812cdce86fbb392449138f4cc6fa3cfd7742a56bd9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1ee8ab4379d2e1a19319a9e90e0e90df73331b10e537b8979b033266515b0f0e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d52c1acf150b9764a22c6cd3225f16c87afee86d80d7a64d78b22fbc1efd523f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "666b67a6f7573f9c65bc5398f722ef314a8c2c33fb80c4272068939940725524",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8e4b91837e6bb48f08288f1745518eb44696c7fa1f4f7a3057f0be747f4acb5f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "80f4cc80eef55dc2cd79a11ca2de3360592a4ec178bbdbcaf702e5bc25b31353",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0022",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "96dd0c5950f9e3a64936ae7c88e6c0e3473041ecad06f7ccd00f917039937b3b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0023",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d082c622737ce056f439c5b2579a1be9c0d9d47dd5068738f8b3ccdbac55fbb6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0024",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ce8609602460c7687453e6a686a9ee5f1c61e106283d33ba3d239392a4cd8999",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0025",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "349b95ce32cb9c40ab95c35622ea0114c186fa19e1d5f6b214b76dabab98e10e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0026",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_pre_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2d099238041934329b6639d2cd3fe459ac70b612c812f1942be5ddfec7e28d44",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0027",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_post_vs_ctrl.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e4066f4d15115a9e310a1a20613114f661a8326b7cf975f2f58e2d7d4403ad36",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0028",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p523_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "88aff6af8cef551cb9ad116c952e76b7493146864839e4c35bc35298cfc0b06c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0029",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p907_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a1c937e33b75f060ff7f069c5b36cd41d36f6a15f87a352f8c0171f23b2977ff",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0030",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1242_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c8947ab5a1de298ec8f8946c2de6f59c1700ffc729364d5b0dd16d91461dff03",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0031",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1791_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "73ac15d4850fd9f34014b6ecc7f2eb0974a622457cf0fb61061a0d3077b04446",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0032",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p1806_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9bfbedf42d2f37dec043e36d486f52d08f4e43f42e0343a7b70dba30112003cf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0033",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2002_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a79e1c86526d78fa67f9c8d3c9f5c154b8013b72a5d77c748d0fd8d2e5e09045",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0034",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2005_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f2cba3d17aa26cb2d02b87e7f9c5475f595eb27fc5fd67884efaa7c86cecfc5c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0035",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2019_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6c916ee01f45530abb56d66707de814dce385e7c52c98d5ad0f2c8f1f132a15e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0036",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\multigroup\\DEG_results_p2110_post_vs_pre.csv",
+      "role": "deg_table",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "830fd979dec486e88e898150f20154dd979333e11a8eda231deb473f44949de2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0037",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\results\\individual_rescue_summary.csv",
+      "role": "individual_rescue_summary",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "089f0af1beb483f98027e8b12f25aa412a3d95f47d89fc4335bd5e126b4dbb18",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0038",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37318869\\case_03\\concordance_with_authors_individual.json",
+      "role": "concordance_with_authors_individual",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "da59d1cb10f2f39018618ee50a1fd3add120731680d35058a55e43053fb0cc3f",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
