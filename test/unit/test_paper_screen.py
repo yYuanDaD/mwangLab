@@ -354,6 +354,14 @@ def test_series_linked_to_other_paper_is_reuse():
     md = "# Exercise\n\n## Methods\n\nCohorts: GSE123456 and our clinical data.\n"
     s = sc.screen_paper({"paper_id": "p", "pmid": "999"}, _doc(md), FakeHttp(_geo_routes(pubmedids=["111"])))
     assert (s.verdict, s.reason) == ("excluded", "no_own_deposit:linked_to_other_paper"), (s.verdict, s.reason)
+    # Linked to this paper's preprint or journal version (same title, another PMID): own.
+    routes = _geo_routes(pubmedids=["111"])
+    gds_summary = routes["esummary.fcgi"]
+    pubmed = json.dumps({"result": {"uids": ["111"], "111": {"title": "Exercise.", "pubdate": "2024",
+                                                             "articleids": []}}})
+    routes["esummary.fcgi"] = lambda params: pubmed if params["db"] == "pubmed" else gds_summary
+    s = sc.screen_paper({"paper_id": "p", "pmid": "999", "title": "Exercise"}, _doc(md), FakeHttp(routes))
+    assert s.verdict == "analyzable", (s.verdict, s.reason)
     # Linked to this paper, not linked yet, or with deposit wording: own.
     for pubmedids, doc in ((["999", "111"], _doc(md)), ([], _doc(md)), (["111"], _doc(PAPER_MD))):
         s = sc.screen_paper({"paper_id": "p", "pmid": "999"}, doc, FakeHttp(_geo_routes(pubmedids=pubmedids)))

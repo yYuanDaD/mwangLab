@@ -653,6 +653,20 @@ def on_topic(row: dict, doc: dict, topic: re.Pattern | None) -> bool:
     return bool(topic.search(" ".join([row.get("title", ""), doc.get("title", "")] + abstract)))
 
 
+def _norm_title(t: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", (t or "").lower())
+
+
+def _same_paper(row: dict, pmids: list[str], http: Http) -> bool:
+    """True when one of ``pmids`` is this paper under another record: a bioRxiv preprint
+    and its journal version get different PMIDs but keep the title (BMAL1 and exercise
+    training: PMID 37905004 vs 38950777)."""
+    title = _norm_title(row.get("title", ""))
+    if not title or not http:
+        return False
+    return any(_norm_title(r["title"]) == title for r in _pubmed_summaries(pmids, http, "geo_link"))
+
+
 def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bool = True,
                  check_design: bool = True, routes: set = SUPPORTED_ROUTES,
                  organisms: set | None = None, topic: re.Pattern | None = None) -> Screen:
@@ -694,7 +708,7 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
         info = geo_summary(gse, http) if http else None
         files = design = None
         if (info and pmid and info.get("pubmedids") and pmid not in info["pubmedids"]
-                and gse not in dep["said_own"]):
+                and gse not in dep["said_own"] and not _same_paper(row, info["pubmedids"], http)):
             # GEO links the series to other papers only, and this one never says it
             # deposited it: a public dataset listed in Methods (GSE91061 in a radiomics
             # paper). A paper GEO has not linked yet has an empty list and passes.
