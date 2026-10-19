@@ -156,3 +156,91 @@ file names behind them:
 - `transformed_RNA_seq_Data.xlsx`
 
 Generic names like these do need someone to look inside the file.
+
+## Rescreen after fixes (d43f1c9)
+
+The rescreen ran from cache: the HTTP cache had 2913 entries before and after, so nothing new
+was downloaded. It used the CLI defaults, which turn on a topic filter (title or abstract) and
+an organism filter (human, mouse, rat). The earlier screen is saved as `screen_first.csv` and
+`screen_summary_first.md`. `test/unit/test_paper_screen.py` passes 21/21.
+
+| Verdict | first | rescreen |
+|---|---:|---:|
+| analyzable | 66 | **50** (10 with counts inside a `_RAW.tar`) |
+| needs_inspection | 35 | 18 |
+| excluded | 899 | 932 |
+
+### What changed
+
+| first → rescreen | Papers |
+|---|---:|
+| excluded (various) → off_topic | 82 |
+| analyzable → unsupported_organism | 10 |
+| analyzable → off_topic | 9 |
+| needs_inspection (unlabelled) → off_topic / unsupported_organism | 11 |
+| needs_inspection (unlabelled) → de_tables_only | 2 |
+| needs_inspection (unlabelled) → normalized_only | 1 |
+| needs_inspection (unlabelled) → analyzable | 2 |
+| excluded group_too_small → analyzable | 1 |
+| other reason shifts among excluded | 8 |
+
+The new exclusion reasons are off_topic (101), unsupported_organism (19) and de_tables_only (2).
+needs_inspection with an unlabelled matrix fell from 28 to 12.
+
+### Papers that left analyzable (19)
+
+| Now | Papers | Correct? |
+|---|---|---|
+| unsupported_organism (10) | *Candida*, *Campylobacter*, *Photorhabdus*, zebrafish ×2, bovine muscle, *Drosophila* ×2 (one is "Modeling exercise using … Drosophila larvae"), hamster long COVID post-exercise, **"Exercise rescues obesogenic-related genes in the female hypothalamic arcuate nucleus" (GEO taxon *Rattus rattus*)** | Correct under the human/mouse/rat policy, except the *Rattus rattus* paper: it is an exercise study in rats, and GEO's label is almost certainly a mislabel of *R. norvegicus* (bug A) |
+| off_topic (9) | *Trichomonas*, *Aeromonas*, single-cell methods, skull-marrow macrophages, desmin chromatin, microglial Bmal1, time-restricted eating, HuR-null muscle glucose disposal, senolytic BI01 methylation | Correct. I read the abstracts of the HuR and BI01 papers: neither involves exercise |
+
+### Papers that joined analyzable (3)
+
+| Paper | Series | Correct? |
+|---|---|---|
+| PMID42155766, exercise and breast cancer immune microenvironment | GSE304653 (`CounTable.txt.gz`, now recognised) | correct |
+| PMID41964396, mitochondrial miRNA in human muscle before/after exercise | GSE220280, GSE276889 (`…_raw.csv.gz`, `…RAW_ENSEMBL.csv.gz`, now recognised) | correct |
+| 8de7ad50, ultrasound radiomics + immune gene signature, melanoma | GSE91061 | **wrong**. It passes the topic filter only through "training cohort" (machine learning). GSE91061, GSE78220 and GSE115821 are public anti-PD-1 melanoma datasets, reused but counted as own (bugs B, C) |
+
+### False-exclusion check
+
+- **Topic filter.** I scanned all 101 off_topic titles for muscle, activity, metabolism or
+  training words and read the abstracts of the borderline ones: aged-muscle glucocorticoid,
+  local muscle cooling at rest, HuR, BI01. None is an exercise study, so no false off_topic
+  calls were found.
+- **Organism filter.** One false exclusion (the *Rattus rattus* label). The other exercise
+  papers it removes (zebrafish, *Drosophila*, horse, hamster) are excluded by the policy, not
+  by error.
+- **Ownership.** No legitimate own deposit moved to cited. The only ownership change among
+  analyzable papers was PMID40259517, which is now off_topic first.
+
+### The 10 spot-check papers again
+
+| # | Paper | first → rescreen | Now correct? |
+|---|---|---|---|
+| 1 | PMID40295575 | analyzable → analyzable GSE283250 | yes |
+| 2 | PMID42277794 | analyzable → analyzable GSE263186 | yes |
+| 3 | PMID37242362 *Trichomonas* | analyzable → off_topic | yes (was wrong) |
+| 4 | PMID40803696 | analyzable → analyzable GSE295777 | yes |
+| 5 | PMID34943951 | analyzable → analyzable GSE188236 | yes |
+| 6 | PMID39338585 *E. coli* | needs_inspection → off_topic | yes (was wrong) |
+| 7 | aeab5224 CVR 2019 | analyzable → analyzable GSE129962 | yes |
+| 8 | PMID40021627 hamster | analyzable → unsupported_organism | yes, by policy |
+| 9 | 463ad4ee SCN clock | needs_inspection → normalized_only | yes (was wrong) |
+| 10 | PMID40259517 senolytic | analyzable → off_topic | yes (was partly) |
+
+**10/10**, up from 6/10 fully correct.
+
+### New bugs (not fixed in this pass)
+
+- **A. Organism names are matched exactly.** GEO taxon "Rattus rattus" on a lab-rat exercise
+  study is excluded. Accept the genus *Rattus*, or flag an unexpected species for inspection
+  instead of excluding it.
+- **B. "training" in the topic regex matches machine learning** ("training cohort", "training
+  set"). The melanoma radiomics paper got through this way. Require an exercise context, or
+  drop bare `train(ing|ed)` and keep "exercise training", "endurance/resistance/strength
+  training", "trained mice/rats/participants".
+- **C. Public datasets named only in a Methods table or list count as own.** GSE91061,
+  GSE78220 and GSE115821 in the melanoma paper are well-known public cohorts. Possible fixes:
+  a reverse check that the GEO series' PubMed links include the paper's PMID, which also
+  catches the PMID40259517 case; or using the GEO submission date versus the publication date.
