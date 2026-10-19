@@ -8,10 +8,11 @@ groups of three. Every paper gets one row with the verdict, the reason, and the 
 
 Layers (each cheap enough to run on a few hundred papers; nothing here calls an LLM):
 
-    1. text      full text via Europe PMC JATS, else the PDF (tools.pdf_markdown); own vs.
-                 cited accessions from the section each one appears in
+    1. text      full text via Europe PMC / NCBI PMC JATS, else the PDF (tools.pdf_markdown);
+                 the title or abstract must name the topic (exercise by default); own vs.
+                 cited accessions from the words around each mention, then the section
     2. deposit   GEO series summary (E-utilities esummary): data type, organism, sample
-                 count, platform; non-GEO repositories (PRIDE, ArrayExpress, SRA-only,
+                 count, platform; organism (human, mouse, rat by default); non-GEO repositories (PRIDE, ArrayExpress, SRA-only,
                  GSA) are recorded and routed, not analysed
     3. files     GEO supplementary listing: raw counts vs. normalised-only vs. per-sample
                  tar vs. nothing (bulk RNA-seq only); a _RAW.tar is judged from its
@@ -85,8 +86,15 @@ _SINGLE_CELL = re.compile(r"single[- ]?(cell|nucle(us|i))|scRNA|snRNA|10x genomi
 _RAW_COUNT_NAME = re.compile(
     r"(raw[._ -]?counts?|read[._ -]?counts?|counts?[._ -]?(matrix|table)|featurecounts?|htseq|"
     # "counts" as a word of its own, where "_" also separates words ("X_Full_Counts_v2.xlsx").
-    r"gene[._ -]?counts?|(?<![a-z])counts?(?![a-z])|expected[._ -]?count|umi[._ -]?counts?)", re.I)
-_NORMALISED_NAME = re.compile(r"(fpkm|rpkm|tpm|cpm|normali[sz]ed|norm[._]|vst|rlog|log2|abundance)", re.I)
+    r"gene[._ -]?counts?|(?<![a-z])counts?(?![a-z])|expected[._ -]?count|umi[._ -]?counts?|"
+    # "SI_allcounts", "CounTable", and "raw" as a word of its own ("silver_hmt_raw.csv.gz").
+    r"allcounts?|coun?t?table|(?<![a-z])raw(?![a-z]))", re.I)
+# "norm" joined to the next word too: "DESeq2_normcounts.xlsx", "Cortex_EV_NormCounts.xlsx".
+_NORMALISED_NAME = re.compile(r"(fpkm|rpkm|tpm|cpm|(?<![a-z])tmm(?![a-z])|normali[sz]ed|norm(?:[._-]|counts?|expr|data)|vst|rlog|log2|"
+                              r"abundance)", re.I)
+# Differential-expression result tables: they cannot feed a re-analysis.
+_DE_NAME = re.compile(r"((?<![a-z])(degs?|dges?)(?![a-z])|diff[._ -]?expr|differential|"
+                      r"(?<![a-z])de[._ -](summary|results?|tables?|genes?)|log2?fc|fold[._ -]?change)", re.I)
 _MATRIX_EXT = re.compile(r"\.(csv|tsv|txt|xlsx?|tab)(\.gz)?$", re.I)
 
 
@@ -258,6 +266,9 @@ def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
         end = accs.pop().start()
     cut = max(before.rfind(". ", 0, end), accs[-1].end() if accs else -1)
     window = before[cut + 1:] + text[i: i + 80]
+    # "deposited ... GSE294565 (Nolt et al. 2024)": the series came with an earlier paper.
+    if _CITE_AFTER.match(text[i + len(acc): i + len(acc) + 60]):
+        return "cited"
     if _OWN_NEAR.search(window):
         return "own"
     # "the GESTALT cohort^6 (GSE129643)": a reference marker right before the accession
@@ -267,6 +278,8 @@ def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
     return ""
 
 
+_CITE_AFTER = re.compile(r"\s*[(\[]\s*[A-Z][A-Za-z'’-]+(?:\s+et\s+al\.?|\s+(?:and|&)\s+[A-Z][A-Za-z'’-]+)?"
+                         r",?\s*\(?(?:19|20)\d{2}[a-z]?\s*\)?\s*[)\];]")
 _REF_BEFORE = re.compile(r"(\^\d+(?:[,–-]\^?\d+)*|\[\d+(?:[,–-]\d+)*\]|\(\d+(?:[,–-]\d+)*\))\s*[(\[]?\s*$")
 
 
@@ -334,14 +347,17 @@ def classify_supplementary(names: list[str]) -> dict:
 
     status: ``raw_counts`` (a file named like a count matrix), ``raw_tar`` (only a
     per-sample ``_RAW.tar``; its members may be counts or FPKM and need inspection),
-    ``normalized_only`` (FPKM/TPM/normalised files only), ``none``.
+    ``normalized_only`` (FPKM/TPM/normalised files only), ``unlabelled_matrix`` (a table
+    whose name says neither), ``de_tables_only`` (only differential-expression results),
+    ``none``.
     """
     names = [n for n in names if n.lower() not in ("filelist.txt",)]
+    de = [n for n in names if _MATRIX_EXT.search(n) and _DE_NAME.search(n)]
     raw = [n for n in names if _MATRIX_EXT.search(n) and _RAW_COUNT_NAME.search(n)
-           and not _NORMALISED_NAME.search(n)]
-    norm = [n for n in names if _MATRIX_EXT.search(n) and _NORMALISED_NAME.search(n)]
+           and not _NORMALISED_NAME.search(n) and n not in de]
+    norm = [n for n in names if _MATRIX_EXT.search(n) and _NORMALISED_NAME.search(n) and n not in de]
     tar = [n for n in names if n.lower().endswith("_raw.tar")]
-    other = [n for n in names if _MATRIX_EXT.search(n) and n not in raw and n not in norm]
+    other = [n for n in names if _MATRIX_EXT.search(n) and n not in raw and n not in norm and n not in de]
     if raw:
         status = "raw_counts"
     elif tar:
@@ -350,9 +366,11 @@ def classify_supplementary(names: list[str]) -> dict:
         status = "normalized_only"
     elif other:
         status = "unlabelled_matrix"
+    elif de:
+        status = "de_tables_only"
     else:
         status = "none"
-    return {"status": status, "raw": raw, "normalized": norm, "tar": tar, "other": other}
+    return {"status": status, "raw": raw, "normalized": norm, "tar": tar, "other": other, "de": de}
 
 
 # ---------------------------------------------------------------------------
@@ -574,23 +592,35 @@ class Screen:
 
 # Order matters: the reason recorded for a paper is the earliest layer it fails.
 REASONS = (
-    "no_full_text", "no_own_deposit", "data_on_request", "non_geo_repository",
-    "geo_not_public", "unsupported_data_type", "no_processed_matrix", "normalized_only",
+    "no_full_text", "off_topic", "no_own_deposit", "data_on_request", "non_geo_repository",
+    "geo_not_public", "unsupported_data_type", "unsupported_organism", "no_processed_matrix",
+    "de_tables_only", "normalized_only",
     "single_group", "group_too_small",
 )
 
 
+def organism_ok(taxon: str, organisms: set | None) -> bool:
+    """True when one of the series' organisms is supported (``organisms=None``: any)."""
+    if not organisms:
+        return True
+    return any(t.strip().lower() in organisms for t in re.split(r"[;,]", taxon or ""))
+
+
 def judge_series(info: dict | None, files: dict | None, design: dict | None,
-                 routes: set = SUPPORTED_ROUTES) -> tuple[str, str]:
+                 routes: set = SUPPORTED_ROUTES, organisms: set | None = None) -> tuple[str, str]:
     """(verdict, reason) for one GSE."""
     if info is None:
         return "excluded", "geo_not_public"
     if not set(info["data_type"].split("+")) & routes:
         return "excluded", f"unsupported_data_type:{info['data_type']}"
+    if not organism_ok(info.get("taxon", ""), organisms):
+        return "excluded", f"unsupported_organism:{info.get('taxon', '')}"
     if files is not None:
         st = files["status"]
         if st == "none":
             return "excluded", "no_processed_matrix"
+        if st == "de_tables_only":
+            return "excluded", "de_tables_only"
         if st == "normalized_only":
             return "excluded", "normalized_only"
     if design is not None:
@@ -606,9 +636,26 @@ def judge_series(info: dict | None, files: dict | None, design: dict | None,
     return "analyzable", ""
 
 
+def on_topic(row: dict, doc: dict, topic: re.Pattern | None) -> bool:
+    """True when the paper's title or abstract mentions the topic (``topic=None``: any).
+
+    Literature and GEO searches match on any field, so they return papers that only
+    mention the topic in passing (a Trichomonas drug-resistance study, an E. coli biofilm).
+    """
+    if topic is None:
+        return True
+    blocks = doc.get("blocks", [])
+    abstract = [b["text"] for b in blocks if b.get("section_class") == "abstract"] or [b["text"] for b in blocks[:5]]
+    return bool(topic.search(" ".join([row.get("title", ""), doc.get("title", "")] + abstract)))
+
+
 def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bool = True,
-                 check_design: bool = True, routes: set = SUPPORTED_ROUTES) -> Screen:
-    """Screen one paper. ``doc`` is its structured full text (None when unavailable)."""
+                 check_design: bool = True, routes: set = SUPPORTED_ROUTES,
+                 organisms: set | None = None, topic: re.Pattern | None = None) -> Screen:
+    """Screen one paper. ``doc`` is its structured full text (None when unavailable).
+
+    ``organisms`` (lower-case species names) and ``topic`` (a regex for the title or
+    abstract) are off when None; the CLI turns them on by default."""
     s = Screen(paper_id=row.get("paper_id") or row.get("paperId") or row.get("pmcid") or row.get("doi", ""),
                title=row.get("title", ""), pmcid=row.get("pmcid", ""), doi=row.get("doi", ""),
                source=row.get("source", ""), query=row.get("query", ""), linked_gse=row.get("linked_gse", ""))
@@ -616,6 +663,9 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
         s.verdict, s.reason = "excluded", "no_full_text"
         return s
     s.text_source = doc.get("structure_quality", "")
+    if not on_topic(row, doc, topic):
+        s.verdict, s.reason = "excluded", "off_topic"
+        return s
     dep = deposits_from_doc(doc)
     s.own_gse = dep["own"].get("geo", [])
     s.other_repos = {k: v for k, v in dep["own"].items() if k != "geo"}
@@ -638,7 +688,7 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
     for gse in s.own_gse:
         info = geo_summary(gse, http) if http else None
         files = design = None
-        if info and set(info["data_type"].split("+")) & routes:
+        if info and set(info["data_type"].split("+")) & routes and organism_ok(info["taxon"], organisms):
             if check_files:
                 files = classify_supplementary(list_geo_dir(GEO_SUPPL.format(stub=geo_stub(gse), gse=gse), http))
             if check_design:
@@ -648,7 +698,7 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
                     files["status"] = {"raw_counts": "raw_counts_in_tar", "normalized_only": "normalized_only",
                                        "no_count_files": "none"}.get(inside["status"], "raw_tar")
                 design.pop("sample_files", None)
-        verdict, reason = judge_series(info, files, design, routes)
+        verdict, reason = judge_series(info, files, design, routes, organisms)
         types.append(info["data_type"] if info else "not_public")
         results.append({"gse": gse, "verdict": verdict, "reason": reason,
                         "data_type": info["data_type"] if info else "", "taxon": info["taxon"] if info else "",
@@ -859,8 +909,18 @@ FIELDS = ["paper_id", "title", "pmcid", "doi", "source", "query", "linked_gse", 
           "own_gse", "cited_gse", "other_repos", "text_source", "series_json", "evidence_json"]
 
 
+DEFAULT_ORGANISMS = {"homo sapiens", "mus musculus", "rattus norvegicus"}
+# The exercise topic; --topic replaces it for another theme, --topic "" turns it off.
+DEFAULT_TOPIC = (r"exercis|physical(ly)? (activ|train|fit|inactiv)|\btrain(ing|ed)\b|endurance|resistance train|"
+                 r"strength train|aerobic|treadmill|wheel[- ]running|voluntary running|\brunning\b|swim|cycling|"
+                 r"sedentar|athlet|fitness|\bHIIT\b|interval train|detrain|muscle contraction|contractile activity|"
+                 r"overload|unloading|disuse|bed rest|inactivity|sprint|\bsports?\b|post-?run|runners?\b|"
+                 r"physical (function|performance|capacity)|exerkine|myokine|irisin")
+
+
 def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: bool = True,
-                routes: set = SUPPORTED_ROUTES) -> str:
+                routes: set = SUPPORTED_ROUTES, organisms: set | None = None,
+                topic: re.Pattern | None = None) -> str:
     os.makedirs(out_dir, exist_ok=True)
     http = Http(cache_dir=os.path.join(out_dir, "_http_cache"))
     with open(papers_csv, encoding="utf-8") as f:
@@ -874,7 +934,8 @@ def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: boo
         for i, row in enumerate(papers, 1):
             try:
                 doc = load_full_text(row, os.path.join(out_dir, "papers"), http)
-                s = screen_paper(row, doc, http, check_design=check_design, routes=routes)
+                s = screen_paper(row, doc, http, check_design=check_design, routes=routes,
+                                 organisms=organisms, topic=topic)
             except Exception as e:  # one bad paper never stops the batch
                 s = Screen(paper_id=row.get("paper_id", ""), title=row.get("title", ""),
                            source=row.get("source", ""), query=row.get("query", ""),
@@ -966,6 +1027,10 @@ def _main(argv=None) -> int:
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--no-design", action="store_true", help="skip the series-matrix design layer")
     p.add_argument("--routes", default="rnaseq", help="comma-separated supported data types")
+    p.add_argument("--organisms", default=",".join(sorted(DEFAULT_ORGANISMS)),
+                   help='comma-separated species kept (default human, mouse, rat); "any" keeps all')
+    p.add_argument("--topic", default=DEFAULT_TOPIC,
+                   help='regex the title or abstract must match (default: exercise terms); "" turns it off')
     p = sub.add_parser("summary")
     p.add_argument("screen_csv")
     a = ap.parse_args(argv)
@@ -984,7 +1049,11 @@ def _main(argv=None) -> int:
             w.writerows(rows)
         print(f"{len(rows)} papers -> {path}")
     elif a.cmd == "screen":
-        out = screen_file(a.papers_csv, a.out, a.limit, not a.no_design, set(a.routes.split(",")))
+        organisms = None if a.organisms.strip().lower() == "any" else \
+            {o.strip().lower() for o in a.organisms.split(",") if o.strip()}
+        topic = re.compile(a.topic, re.I) if a.topic else None
+        out = screen_file(a.papers_csv, a.out, a.limit, not a.no_design, set(a.routes.split(",")),
+                          organisms, topic)
         print(open(os.path.join(a.out, "screen_summary.md"), encoding="utf-8").read())
         print(out)
     else:

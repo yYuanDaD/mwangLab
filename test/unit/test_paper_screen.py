@@ -8,6 +8,7 @@ Run:  python test/unit/test_paper_screen.py
 
 import gzip
 import json
+import re
 import os
 import sys
 import tempfile
@@ -67,12 +68,12 @@ RNA-seq data were deposited in GEO under GSE123456.
 
 def _geo_routes(gse="GSE123456", gdstype="Expression profiling by high throughput sequencing",
                 suppl=("GSE123456_raw_counts.txt.gz", "filelist.txt"), groups=(4, 4), title="Bulk muscle",
-                sample_files=None):
+                sample_files=None, taxon="Mus musculus"):
     """GEO responses for one series. ``sample_files`` maps a per-sample file name (one per
     sample, named GSM<i>_<name>) to its content, for _RAW.tar series."""
     esearch = json.dumps({"esearchresult": {"idlist": ["200123456"]}})
     esummary = json.dumps({"result": {"200123456": {
-        "title": title, "summary": "", "gdstype": gdstype, "taxon": "Mus musculus",
+        "title": title, "summary": "", "gdstype": gdstype, "taxon": taxon,
         "n_samples": sum(groups), "gpl": "24247", "suppfile": "TXT",
         "samples": [{"accession": f"GSM{i}", "title": f"s{i}"} for i in range(sum(groups))]}}})
     suppl_html = "".join(f'<a href="{n}">{n}</a>' for n in suppl)
@@ -194,6 +195,16 @@ def test_supplementary_classification():
             "GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx"]
     assert c(real)["raw"] == ["GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx"], c(real)
     assert c(["GSE1_discounts.txt"])["status"] == "unlabelled_matrix"
+    # 1000-paper run (2026-10-19): names the first rules missed.
+    assert c(["GSE207992_DESeq2_normcounts.xlsx"])["status"] == "normalized_only"
+    assert c(["GSE1_Cortex_EV_NormCounts.xlsx"])["status"] == "normalized_only"
+    for name in ("GSE274311_SI_allcounts.txt.gz", "GSE1_CounTable.txt.gz", "GSE1_silver_hmt_raw.csv.gz",
+                 "GSE1_Human_skm_total_RNA_RAW_ENSEMBL.csv.gz"):
+        assert c([name])["status"] == "raw_counts", name
+    de = ["GSE1_DEG_CET_Post_vs_Pre.txt.gz", "GSE1_REST--_versus_REST++_DiffExpr.txt.gz",
+          "GSE1_de_summary.txt.gz", "GSE1_Gene_differential_expression.xlsx"]
+    assert c(de)["status"] == "de_tables_only", c(de)
+    assert c(de + ["GSE1_processed_data.txt.gz"])["status"] == "unlabelled_matrix"
 
 
 def test_data_from_named_authors_is_reuse():
@@ -300,6 +311,35 @@ RSEM = ("gene_id\ttranscript_id(s)\tlength\teffective_length\texpected_count\tTP
         + "".join(f"G{i}\tT{i}\t1000.00\t850.5\t{i * 1.37:.2f}\t{i * 0.11:.2f}\t{i * 0.07:.2f}\n" for i in range(200)))
 FPKM = "gene\tFPKM\n" + "".join(f"G{i}\t{i * 0.731:.3f}\n" for i in range(200))
 UNLABELLED_FLOATS = "".join(f"G{i}\t{i * 0.731 + 0.1:.3f}\n" for i in range(200))
+
+
+def test_citation_after_accession_is_reuse():
+    md = ("## Data availability\n\nRNA sequencing data have been deposited in GEO under accession "
+          "GSE294565 (Nolt et al. 2024). New data from this study are deposited under GSE300001.\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE300001"]} and dep["cited"] == ["GSE294565"], dep
+    # A plain parenthetical is not a citation.
+    dep = sc.deposits_from_doc(_doc("## Data availability\n\nData were deposited in GEO (GSE300002).\n"))
+    assert dep["own"] == {"geo": ["GSE300002"]}, dep
+
+
+def test_topic_and_organism_filters():
+    topic = re.compile(sc.DEFAULT_TOPIC, re.I)
+    off = _doc("# Drug resistance in Trichomonas vaginalis\n\n## Abstract\n\nMetronidazole resistance.\n\n"
+               + PAPER_MD.split("\n", 1)[1])
+    s = sc.screen_paper({"paper_id": "p", "title": "Drug resistance in Trichomonas vaginalis"}, off,
+                        FakeHttp(_geo_routes()), topic=topic)
+    assert (s.verdict, s.reason) == ("excluded", "off_topic"), (s.verdict, s.reason)
+    s = sc.screen_paper({"paper_id": "p", "title": "Training and muscle"}, _doc(PAPER_MD),
+                        FakeHttp(_geo_routes()), topic=topic, organisms=sc.DEFAULT_ORGANISMS)
+    assert s.verdict == "analyzable", (s.verdict, s.reason)
+    s = sc.screen_paper({"paper_id": "p", "title": "Training and muscle"}, _doc(PAPER_MD),
+                        FakeHttp(_geo_routes(taxon="Escherichia coli")), organisms=sc.DEFAULT_ORGANISMS)
+    assert (s.verdict, s.reason) == ("excluded", "unsupported_organism:Escherichia coli"), (s.verdict, s.reason)
+    # Filters are off unless asked for (library default), and a mixed-species series passes.
+    assert sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
+                           FakeHttp(_geo_routes(taxon="Escherichia coli"))).verdict == "analyzable"
+    assert sc.organism_ok("Homo sapiens; Escherichia coli", sc.DEFAULT_ORGANISMS)
 
 
 def test_sniff_count_file():
