@@ -86,3 +86,48 @@ def test_excel_every_sheet_kept(tmp_path):
     assert names == ["GSE208639_edgeR_output.csv", "GSE208639_edgeR_output__Pre_vs_Ctrl.csv",
                      "GSE208639_edgeR_output__Per_patient.csv", "GSE208639_edgeR_output__Counts.csv"], names
     assert x.exists()
+
+
+def test_gsea_rat_uses_mouse_hallmark_by_symbol(tmp_path, monkeypatch):
+    """Rat has no MSigDB collection: rat symbols are ranked against mh.all (10 rat papers
+    in the 47-paper list)."""
+    from tools import enrichment_tools as et
+    seen = {}
+
+    def fake_gmt(category, dbver):
+        seen["gmt"] = (category, dbver)
+        return {"HALLMARK_A": [f"Gene{i}" for i in range(40)], "HALLMARK_B": [f"Gene{i}" for i in range(40, 90)]}
+
+    class Res:
+        res2d = pd.DataFrame({"Term": ["HALLMARK_A", "HALLMARK_B"], "NES": [1.5, -1.2],
+                              "NOM p-val": [0.01, 0.02], "FDR q-val": [0.05, 0.1]})
+
+    monkeypatch.setattr(et, "_get_hallmark_gmt", fake_gmt)
+    monkeypatch.setattr(et.gp, "prerank", lambda **kw: Res())
+    deg = tmp_path / "DEG_rat.csv"
+    pd.DataFrame({"stat": [float(i % 17 - 8) for i in range(200)]},
+                 index=[f"Gene{i}" for i in range(200)]).to_csv(deg)
+    out = et.run_gsea_analysis.invoke({"deg_csv": str(deg), "organism": "Rat", "output_dir": str(tmp_path)})
+    assert seen["gmt"] == ("mh.all", "2024.1.Mm"), seen
+    assert "matched to mouse Hallmark by symbol: 90/90" in out, out
+    assert et._ORGANISM_GENE_SETS["Rat"] == et._ORGANISM_GENE_SETS["Mouse"]
+
+
+def test_tmm_recovers_composition_shift():
+    """10% of genes 8x up in one group: library-size scaling alone mis-scales the rest by
+    ~1.66x; TMM brings unchanged genes back to ~1 (edgeR calcNormFactors algorithm)."""
+    import numpy as np
+    from tools.de_common import tmm_factors
+    rng = np.random.default_rng(1)
+    mu = rng.gamma(2, 50, 2000)
+    up = mu.copy()
+    up[:200] *= 8
+    x = pd.concat([pd.DataFrame({f"a{i}": rng.poisson(mu) for i in range(4)}),
+                   pd.DataFrame({f"b{i}": rng.poisson(up) for i in range(4)})], axis=1)
+    f = tmm_factors(x)
+    assert abs(np.exp(np.log(f).mean()) - 1) < 1e-9
+    eff = x.sum() * f
+    ratio = (x.iloc[200:, :4] / eff[:4]).mean(axis=1).sum() / (x.iloc[200:, 4:] / eff[4:]).mean(axis=1).sum()
+    assert abs(ratio - 1) < 0.05, ratio
+    same = pd.DataFrame({f"s{i}": rng.poisson(mu) for i in range(4)})
+    assert (tmm_factors(same) - 1).abs().max() < 0.05
