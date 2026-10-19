@@ -9,7 +9,7 @@ Use the smallest tool surface that answers the request. This is an inventory, no
 | Sample alignment | `tools.native.align_to_metadata` (exact only); `tools/sample_align.py` is used inside executors |
 | Design and method gates | `tools/analysis_policy.py`, `tools/multifactor_design.py` |
 | Raw-count preprocessing and QC | `tools/preprocess_tools.py`, `tools/stats_tools.py` |
-| Two-arm differential analysis | `tools/deseq2_tools.py`, `tools/edger_tools.py`, `tools/limma_voom_tools.py`, `tools/limma_tools.py` |
+| Two-arm differential analysis | `tools/deseq2_tools.py` (MLE `log2FoldChange` plus apeglm `log2FoldChange_shrunk`), `tools/edger_tools.py` (TMM), `tools/limma_voom_tools.py`, `tools/limma_tools.py` |
 | Multi-level, factorial, paired-change limma | `tools/multigroup_tools.py` |
 | Enrichment (GSEA, ORA) | `tools/enrichment_tools.py`; check IDs first with `native.feature_id_report` |
 | Paper text | `tools/paper_tools.py` (Europe PMC fetch); `tools/paper_structure.py` (sections, tables, figure legends, citable block IDs); `tools/pdf_markdown.py` (PDF to the same structure via Docling or pymupdf4llm) |
