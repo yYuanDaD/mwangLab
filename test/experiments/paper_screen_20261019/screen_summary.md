@@ -2,8 +2,8 @@
 
 | Verdict | Papers |
 |---|---:|
-| excluded | 939 |
-| analyzable | 46 |
+| excluded | 938 |
+| analyzable | 47 |
 | needs_inspection | 15 |
 
 ## Why papers were excluded (first failing layer)
@@ -12,10 +12,10 @@
 |---|---:|
 | no_full_text | 199 |
 | off_topic | 137 |
-| no_own_deposit | 384 |
+| no_own_deposit | 382 |
 | data_on_request | 60 |
 | non_geo_repository | 25 |
-| unsupported_data_type | 48 |
+| unsupported_data_type | 49 |
 | unsupported_organism | 17 |
 | no_processed_matrix | 19 |
 | de_tables_only | 2 |
@@ -39,7 +39,7 @@
 |---|---:|---:|---:|
 | geo | 173 | 31 | 5 |
 | pubmed | 378 | 6 | 4 |
-| semantic_scholar | 449 | 9 | 6 |
+| semantic_scholar | 449 | 10 | 6 |
 
 ## Data types of the papers' own GEO series
 
