@@ -21,3 +21,13 @@ def test_limma_lfcse_is_per_gene_moderated_se(tmp_path):
     res = pd.read_csv(next((tmp_path / "out").glob("DEG_results_*.csv")), index_col=0)
     assert res["lfcSE"].nunique() > 100, out
     assert np.allclose(res["lfcSE"], (res["log2FoldChange"] / res["stat"]).abs())
+
+
+def test_deg_outputs_skips_enrichment_tables(tmp_path):
+    from tools import native
+    pd.DataFrame({"log2FoldChange": [1.0], "pvalue": [0.01], "padj": [0.02]}).to_csv(
+        tmp_path / "DEG_results_trt_vs_ctrl.csv")
+    (tmp_path / "gsea").mkdir()
+    pd.DataFrame({"Term": ["x"], "NES": [1.2], "FDR q-val": [0.1]}).to_csv(
+        tmp_path / "gsea" / "DEG_results_trt_vs_ctrl_GSEA_Hallmark.csv", index=False)
+    assert native.deg_outputs(tmp_path) == [str(tmp_path / "DEG_results_trt_vs_ctrl.csv")]

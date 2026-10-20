@@ -689,8 +689,17 @@ def find_outputs(output_dir: str | Path, pattern: str) -> list[str]:
 
 
 def deg_outputs(output_dir: str | Path) -> list[str]:
-    """Result tables written by the repository DE tools in output_dir, newest first."""
-    return find_outputs(output_dir, "DEG_results_*.csv")
+    """Result tables written by the repository DE tools in output_dir, newest first.
+
+    Enrichment outputs reuse the DEG file name as a prefix (``DEG_results_..._GSEA_Hallmark.csv``),
+    so a file counts only when its header has the DE tools' ``pvalue`` or ``padj`` column.
+    """
+    def is_deg_table(path: str) -> bool:
+        try:
+            return bool({"pvalue", "padj"} & set(pd.read_csv(path, nrows=0).columns))
+        except Exception:
+            return False
+    return [p for p in find_outputs(output_dir, "DEG_results_*.csv") if is_deg_table(p)]
 
 
 def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float = 0.05,
