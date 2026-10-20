@@ -89,3 +89,16 @@ def tmm_factors(counts: pd.DataFrame, logratio_trim: float = 0.3, sum_trim: floa
             factors[col] = float(2 ** (0.0 if not np.isfinite(f) else f))
     out = pd.Series(factors)[counts.columns]
     return out / np.exp(np.log(out).mean())
+
+
+def limma_standard_error(top: pd.DataFrame) -> pd.DataFrame:
+    """Replace inmoose's ``lfcSE`` with the moderated standard error, ``|logFC / t|``.
+
+    inmoose's topTable fills ``lfcSE`` with the unscaled coefficient SD (sqrt(1/n1 + 1/n2)),
+    the same constant for every gene; limma's moderated SE is sqrt(s2.post) times that.
+    """
+    top = top.copy()
+    if {"log2FoldChange", "stat"} <= set(top.columns):
+        with np.errstate(divide="ignore", invalid="ignore"):
+            top["lfcSE"] = (top["log2FoldChange"] / top["stat"]).abs()
+    return top
