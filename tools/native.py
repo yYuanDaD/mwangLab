@@ -479,6 +479,23 @@ def pairing_report(metadata: pd.DataFrame | str | Path, subject_column: str, con
     }
 
 
+def merge_raw_tar(data_dir: str | Path) -> dict:
+    """Merge a GEO ``*_RAW.tar`` of per-sample count files in ``data_dir`` into one matrix.
+
+    Handles plain gene/count tables, featureCounts output and STAR ``ReadsPerGene.out.tab``
+    (one strand column for all samples, chosen from the forward/reverse totals and printed).
+    Writes ``<accession>_merged_from_tar.csv`` next to the tar. Unparseable members are
+    printed as possible dropped samples, so compare ``n_samples`` with the GEO sample count.
+    """
+    from tools.geo_tar import unpack_and_merge_geo_tar
+    out = unpack_and_merge_geo_tar(str(data_dir))
+    if not out:
+        raise NativeToolError(f"no mergeable per-sample count files in a _RAW.tar under {data_dir}")
+    merged = read_table(out)
+    return {"output": out, "sha256": sha256(out), "n_genes": int(merged.shape[0]),
+            "n_samples": int(merged.shape[1]), "samples": [str(c) for c in merged.columns]}
+
+
 def log_transform(matrix_csv: str | Path, out_csv: str | Path, *, pseudocount: float = 1.0) -> dict:
     """Write log2(x + pseudocount) of a linear, non-negative matrix (for example FPKM/TPM)."""
     matrix = _numeric(read_table(matrix_csv), str(matrix_csv))
@@ -672,8 +689,17 @@ def find_outputs(output_dir: str | Path, pattern: str) -> list[str]:
 
 
 def deg_outputs(output_dir: str | Path) -> list[str]:
-    """Result tables written by the repository DE tools in output_dir, newest first."""
-    return find_outputs(output_dir, "DEG_results_*.csv")
+    """Result tables written by the repository DE tools in output_dir, newest first.
+
+    Enrichment outputs reuse the DEG file name as a prefix (``DEG_results_..._GSEA_Hallmark.csv``),
+    so a file counts only when its header has the DE tools' ``pvalue`` or ``padj`` column.
+    """
+    def is_deg_table(path: str) -> bool:
+        try:
+            return bool({"pvalue", "padj"} & set(pd.read_csv(path, nrows=0).columns))
+        except Exception:
+            return False
+    return [p for p in find_outputs(output_dir, "DEG_results_*.csv") if is_deg_table(p)]
 
 
 def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float = 0.05,

@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 from tools.analysis_policy import enforce_method_matrix_compatibility, numeric_matrix, PolicyViolation
+from tools.de_common import limma_standard_error
 
 
 def collapse_duplicate_genes(df: pd.DataFrame, label: str = "counts") -> pd.DataFrame:
@@ -121,7 +122,7 @@ def _fit_contrasts(expr: pd.DataFrame, meta: pd.DataFrame, formula: str,
             raise PolicyViolation(f"contrast {name!r} references missing coefficients {missing}; available={names}")
         cmat = pd.DataFrame({name: [float(vector.get(n, 0.0)) for n in names]}, index=names)
         cfit = eBayes(contrasts_fit(fit, contrasts=cmat))
-        top = pd.DataFrame(topTable(cfit, coef=name, number=expr.shape[0], sort_by="P", adjust_method="fdr_bh"))
+        top = limma_standard_error(pd.DataFrame(topTable(cfit, coef=name, number=expr.shape[0], sort_by="P", adjust_method="fdr_bh")))
         top = top.rename(columns={"adj_pvalue": "padj"})
         safe = "".join(c if c.isalnum() or c in "._-" else "_" for c in name).strip("_") or "contrast"
         out = os.path.join(output_dir, f"DEG_results_{safe}.csv")
