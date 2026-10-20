@@ -20,3 +20,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - The matrix has 25,262 genes against the paper's 25,282.
 - Mapping Ensembl IDs to symbols drops 10–15% of DEGs (mostly lncRNAs).
 - The limma fit takes more than 2 minutes, longer than the default 120 s command timeout.
+
+## PMID41283436 (GSE297318)
+
+- `native.deg_outputs(results_dir)` (`tools/native.py:691-693`, glob `DEG_results_*.csv`) also matches the GSEA output `results/gsea/DEG_results_..._GSEA_Hallmark.csv`. `apply_threshold` then fails with "no pvalue column in …GSEA_Hallmark.csv". The glob should exclude enrichment outputs.
+- The paper says "adjusted p-value < 0.05", but its DEG counts match raw p < 0.05 almost exactly (300/153 and 578/780 vs the paper's 302/156 and ~586/~802). Recorded as a paper discrepancy; the stated rule was kept.
+- Exercise vs sedentary is completely confounded with the sequencing project, so it was correctly refused.
+- The matrix columns (`GSM…_library_count`) appear only in GEO `supplementary_file_1`; rebuilt with `derive_columns`.
+- ORA with only 2 DEGs fails; this is expected, and the failure was recorded.
+
+## 0ae98542 (GSE152133)
+
+- **Screen false positive.** This is a cross-sectional aging study (6/24/28 months), and exercise capacity is only a measured trait. The topic filter passed it because the abstract mentions treadmill and wheel running. The run refused at the design gate, which is correct. The screen needs an "exercise intervention" check, not just exercise words.
