@@ -32,3 +32,18 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 0ae98542 (GSE152133)
 
 - **Screen false positive.** This is a cross-sectional aging study (6/24/28 months), and exercise capacity is only a measured trait. The topic filter passed it because the abstract mentions treadmill and wheel running. The run refused at the design gate, which is correct. The screen needs an "exercise intervention" check, not just exercise words.
+
+## 2f2aeb1c (GSE179302)
+
+- The `GSE179302_raw_counts.csv.gz` file has 88 columns (38 subjects, several visits) and does not match the 35 GSMs. The agent used the `_RAW.tar` instead (`native.merge_raw_tar`, 35/35, worked).
+- The DESeq2 multifactor design turns every covariate into a category (`tools/multifactor_design.py:126`, `astype(str)`), so continuous age cannot be fitted.
+- The limma executor calls `eBayes(fit)` with no trend option (`tools/limma_tools.py:162`).
+- ERCC spike-ins make up 41–70% of reads, differently by group, and nothing flags this. CPM including ERCC shifted the median log2FC by +0.44. Matrix profiling should detect and drop `ERCC-` rows.
+- sva and IHW are not available.
+- `case.evidence_item(...)` returns no `path` key (`KeyError: 'path'`).
+- The paper's 767 DEGs did not reproduce (0–5); the signal is confounded with race/ethnicity across tertiles.
+
+## 521e147b (GSE164798)
+
+- Each contrast is fitted on its own 8 samples, because the two-group executor subsets. Chgb has the same log2FC as the paper but padj ≈ 1 vs the paper's 0.02, so the paper probably fitted all 24 samples. This is the same limitation as with GSE308674, and it would be solved by fitting the full model and then extracting contrasts.
+- The skill's script prelude uses `parents[3]`; this run directory needs `parents[6]` (already in the pilot list).
