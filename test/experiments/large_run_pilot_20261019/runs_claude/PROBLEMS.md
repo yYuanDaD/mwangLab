@@ -47,3 +47,13 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 
 - Each contrast is fitted on its own 8 samples, because the two-group executor subsets. Chgb has the same log2FC as the paper but padj ≈ 1 vs the paper's 0.02, so the paper probably fitted all 24 samples. This is the same limitation as with GSE308674, and it would be solved by fitting the full model and then extracting contrasts.
 - The skill's script prelude uses `parents[3]`; this run directory needs `parents[6]` (already in the pilot list).
+
+## 53b3c290 (GSE255280)
+
+- DEG counts are far below the paper's (200 vs 989; 5 vs 517), even though the route matches. An unexplained PC1 (42% of variance) runs across all groups. The two-group fit (10 samples per genotype) may also lose power compared with a joint 20-sample fit. Partek settings are not reported.
+- GEO labels the KO acute-bout group "Exercise Trained" in `description`. The agent resolved this from the title, treatment and time fields.
+
+## 9157dc41 (GSE134698)
+
+- `summary.csv` has an empty `accession` column although `run.case(..., accession=...)` was passed. The value may be lost through `RunRecorder.open`/`finish` (`tools/native.py`, not traced).
+- The paper's significance (28 genes at padj < 0.1 with n = 3 pairs) does not reproduce: effect sizes match (r = 0.978), but the p-values do not. The paper's exact pipeline (phantasus, quantile/log input) is not recoverable.
