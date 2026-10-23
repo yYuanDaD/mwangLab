@@ -244,6 +244,15 @@ def codex_model_info(effort: str) -> dict:
     return {"provider": "codex-cli", "model": model, "reasoning_effort": effort}
 
 
+def default_codex_bin() -> str:
+    """The desktop app's bundled CLI (newer than the PATH install; its folder hash changes on update)."""
+    if os.environ.get("CODEX_BIN"):
+        return os.environ["CODEX_BIN"]
+    app_bins = sorted(Path(os.environ.get("LOCALAPPDATA", "")).glob("OpenAI/Codex/bin/*/codex.exe"),
+                      key=lambda p: p.stat().st_mtime, reverse=True)
+    return str(app_bins[0]) if app_bins else (shutil.which("codex") or "codex")
+
+
 def call_once_codex(prompt: str, effort: str, schema_path: Path, codex_bin: str) -> tuple[Optional[dict], dict]:
     t0 = time.time()
     usage, n_commands = {}, 0
@@ -478,12 +487,13 @@ def main(argv=None) -> int:
     ap.add_argument("--backend", choices=["provider", "codex-cli"], default="provider",
                     help="provider = the model configured in .env; codex-cli = local `codex exec`")
     ap.add_argument("--codex-effort", default="low", help="model_reasoning_effort for codex-cli")
-    ap.add_argument("--codex-bin", default=os.environ.get("CODEX_BIN") or shutil.which("codex") or "codex",
-                    help="codex executable; the desktop app bundles a newer one than the PATH install")
+    ap.add_argument("--codex-bin", default=None,
+                    help="codex executable; default: $CODEX_BIN, else the desktop app's bundled CLI, else PATH")
     ap.add_argument("--score-only", action="store_true")
     args = ap.parse_args(argv)
     args.suffix = f"_codex_{args.codex_effort}" if args.backend == "codex-cli" else ""
     args.log = args.log or f"calls{args.suffix}.jsonl"
+    args.codex_bin = args.codex_bin or default_codex_bin()
     if not args.score_only:
         run(args)
     score(args)

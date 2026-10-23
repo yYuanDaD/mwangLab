@@ -117,7 +117,7 @@ Findings so far:
 
 **Resume mark (2026-10-14, paused at the user's request).** Ultra stopped at 239 of 456 calls, with none failed. Metadata is complete (114). The paper arms have abstract 42, structured 42 and flat 41 calls, covering the first 14 manifest series. The log resumes from completed calls; run this to finish it:
 
-    python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --codex-effort ultra --codex-bin "%LOCALAPPDATA%/OpenAI/Codex/bin/2e5e00daee91c61d/codex.exe" --arms abstract structured flat --workers 4
+    python test/experiments/paper_evidence_ablation/run_arms.py --backend codex-cli --codex-effort ultra --arms abstract structured flat --workers 4
 
 The remaining 217 calls take about 1 h 15 min at about 21 s per call with 4 workers. After they finish, refresh the ultra columns above.
 
