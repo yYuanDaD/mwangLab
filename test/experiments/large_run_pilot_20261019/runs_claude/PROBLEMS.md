@@ -102,3 +102,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - GEO has one GSM per sequencing lane (60 GSMs for 30 libraries); no helper merges lanes.
 - The paper's method, threshold and DEG table are in a supplement Europe PMC will not serve; the workflow default (padj < 0.05) gives 0 DEGs vs the paper's 46, while the paper's top genes rank 1–26 in the same direction.
 - `case.add_output` builds evidence IDs from the file name only, so two `suitability.json` files share one ID (`tools/native.py:961-965`).
+
+## PMID39000297 (GSE232510)
+
+- Incomplete deposit: the chow-running group is missing and HFS has 3 of 4 libraries; GEO labels the rats "Rattus rattus" (paper: Wistar). The diet effect (paper 430 DEGs) does not reproduce (2).
+- Fixed after this paper: `tools/geo_tar.py` read header-less HTSeq files with their first gene as the header (one gene lost per sample) and kept the `__no_feature`/`__ambiguous` summary rows as genes; it now also warns when tar members share under half their feature IDs (also seen in GSE188236).
+- Fixed: `suitability.check_sex` returned `pass` when no X/Y marker was found (rat Ensembl IDs); it now returns `no_markers`.
+- `enumerate_comparisons` orders non-reference pairs alphabetically (`grp_HFS_vs_HFR`); a `references` dict cannot ask for HFR vs HFS. The agent re-oriented it by hand.
+- `run_deseq2_analysis` uses pydeseq2's independent-filtering alpha 0.05 with no parameter; R's default and this paper's FDR are 0.1.

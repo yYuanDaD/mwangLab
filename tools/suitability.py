@@ -382,7 +382,9 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
         p = table.at[s, "predicted_sex"] if table.at[s, "confidence"] != "ambiguous" else "unknown"
         by_sample[s] = r or (p if p != "unknown" else "")
     predicted = table["predicted_sex"].value_counts().to_dict()
-    return {"status": "mismatch" if mismatched else "pass",
+    called = sum(v for k, v in predicted.items() if k in ("male", "female"))
+    status = "mismatch" if mismatched else ("no_markers" if not called else "pass")
+    return {"status": status,
             "summary": msg.splitlines()[0] if msg else "",
             "metadata_sex_column": sex_col, "predicted": predicted, "mismatched": mismatched,
             "table": str(tsv), "sex_by_sample": by_sample,

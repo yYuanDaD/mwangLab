@@ -13,6 +13,14 @@ import pandas as pd
 from tools.omics_semantics import choose_count_column, choose_star_strand, read_star_reads_per_gene
 
 
+def _looks_numeric(value) -> bool:
+    try:
+        float(str(value))
+        return True
+    except ValueError:
+        return False
+
+
 def _tar_member_sample_name(name):
     """Sample id from a tar member name: the file name without its extensions."""
     base = os.path.basename(name)
@@ -93,7 +101,13 @@ def unpack_and_merge_geo_tar(data_dir):
         if df.shape[1] < 2:
             skipped.append((m.name, f"too_few_cols({df.shape[1]})"))
             continue
+        if _looks_numeric(df.columns[-1]):
+            # Header-less HTSeq/featureCounts output: the first gene was read as the header.
+            df = pd.read_csv(p, sep=None, engine="python", comment="#", header=None)
+            df.columns = ["gene_id"] + [f"col{i}" for i in range(1, df.shape[1])]
         gene_col = df.columns[0]
+        # HTSeq summary rows (__no_feature, __ambiguous, ...) are not genes.
+        df = df[~df[gene_col].astype(str).str.startswith("__")]
         decision = choose_count_column(df)
         if not decision.column:
             skipped.append((m.name, f"count_column_{decision.confidence}:{decision.reason}"))
@@ -115,6 +129,13 @@ def unpack_and_merge_geo_tar(data_dir):
     if not series:
         return None
 
+    union = set().union(*(set(s.index) for s in series))
+    shared = set.intersection(*(set(s.index) for s in series))
+    if len(shared) < 0.5 * len(union):
+        # Different assays or annotations in one tar (long + small RNA, GSE188236): the outer
+        # join below zero-fills every non-shared row.
+        print(f"  WARNING: tar members share only {len(shared)}/{len(union)} feature IDs; they may be "
+              f"different assays. Split them before analysis.")
     merged = pd.concat(series, axis=1, join="outer").fillna(0)
     merged.index.name = "gene_id"
     out_path = os.path.join(data_dir, f"{acc}_merged_from_tar.csv")

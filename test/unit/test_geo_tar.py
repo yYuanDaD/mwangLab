@@ -76,6 +76,18 @@ def test_merge_raw_tar_plain_counts(tmp_path):
     assert res["samples"] == ["GSM1_a", "GSM2_b"] and res["n_genes"] == len(GENES)
 
 
+def test_merge_raw_tar_headerless_htseq(tmp_path):
+    """GSE232510: header-less HTSeq files lost their first gene to the header, and the
+    __no_feature/__ambiguous summary rows were merged as genes."""
+    d = tmp_path / "GSE2"
+    d.mkdir()
+    table = "".join(f"{g}\t{i + 1}\n" for i, g in enumerate(GENES)) + "__no_feature\t2300000\n__ambiguous\t500\n"
+    _tar(str(d / "GSE2_RAW.tar"), {"GSM1_a.txt.gz": table, "GSM2_b.txt.gz": table})
+    res = native.merge_raw_tar(d)
+    merged = pd.read_csv(res["output"], index_col=0)
+    assert list(merged.index) == GENES, merged.index[:3]
+
+
 def test_excel_every_sheet_kept(tmp_path):
     x = tmp_path / "GSE208639_edgeR_output.xlsx"
     with pd.ExcelWriter(x) as w:
