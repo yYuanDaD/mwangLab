@@ -374,8 +374,11 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
     table.index = table.index.astype(str)
     sex_col = _detect_sex_column(metadata)
     reported = metadata[sex_col].map(_normalize_sex_value) if sex_col else pd.Series(dtype=str)
-    mismatched = (table.index[table["agreement"] == "MISMATCH"].tolist()
-                  if "agreement" in table.columns else [])
+    # A low-confidence call (both Y genes and Xist expressed) suggests mixed RNA, not a
+    # label swap (GSM7778285): listed under ``uncertain`` for a look, not as a mismatch.
+    flagged = table[table["agreement"] == "MISMATCH"] if "agreement" in table.columns else table.iloc[:0]
+    mismatched = flagged.index[flagged["confidence"] == "high"].tolist()
+    uncertain = flagged.index[flagged["confidence"] != "high"].tolist()
     by_sample = {}
     for s in table.index:
         r = str(reported.get(s, "")) if sex_col else ""
@@ -387,6 +390,7 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
     return {"status": status,
             "summary": msg.splitlines()[0] if msg else "",
             "metadata_sex_column": sex_col, "predicted": predicted, "mismatched": mismatched,
+            "uncertain": uncertain,
             "table": str(tsv), "sex_by_sample": by_sample,
             "sexes": sorted(v for v in set(by_sample.values()) if v)}
 

@@ -110,3 +110,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed: `suitability.check_sex` returned `pass` when no X/Y marker was found (rat Ensembl IDs); it now returns `no_markers`.
 - `enumerate_comparisons` orders non-reference pairs alphabetically (`grp_HFS_vs_HFR`); a `references` dict cannot ask for HFR vs HFS. The agent re-oriented it by hand.
 - `run_deseq2_analysis` uses pydeseq2's independent-filtering alpha 0.05 with no parameter; R's default and this paper's FDR are 0.1.
+
+## PMID39232281 (GSE243060)
+
+- Reproduced closely (19 tissues; totals within 1–7% of the paper; named-gene tissue counts match exactly). The run was interrupted by a session restart and resumed with `RunRecorder.open`.
+- Raw matrix column names mix R's `X` prefix (326) and none (93); library names come in four formats.
+- `suitability.check_covariance` failed whole tissues because a batch-like library-name format lines up with sex, although sex is only a stratum and every planned contrast is within sex. Not fixed: the agent left that column out of the candidates.
+- Fixed after this paper: a low-confidence sex call (Y genes and Xist both expressed, likely mixed RNA) was reported as a mismatch; it is now listed under `uncertain`. `joint_contrasts` silently skipped a planned contrast with n = 2; `include=[...]` now runs it (label it exploratory).
+- No executor for the paper's gene filter (normalized mean ≥ 10); applied by hand.

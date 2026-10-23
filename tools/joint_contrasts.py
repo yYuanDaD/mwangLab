@@ -75,11 +75,12 @@ def _numeric_covariates(meta: pd.DataFrame, covariates: Sequence[str]) -> list[s
 
 def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[dict], output_dir: str, *,
                      covariates: Sequence[str] = (), alpha: float = 0.05, n_cpus: int = 8,
-                     round_estimated_counts: bool = False) -> dict[str, Any]:
+                     round_estimated_counts: bool = False, include: Sequence[str] = ()) -> dict[str, Any]:
     """DESeq2 on every sample with ``~ covariates + cell``; one result file per comparison.
 
     Only comparisons marked ``analyzable`` are extracted; the others are listed as
-    skipped. Columns match ``run_deseq2_analysis`` (baseMean, log2FoldChange, lfcSE,
+    skipped unless named in ``include`` (a planned small-n contrast, labelled exploratory).
+    Columns match ``run_deseq2_analysis`` (baseMean, log2FoldChange, lfcSE,
     stat, pvalue, padj). Numeric covariates are continuous. Estimated counts (salmon,
     RSEM) need ``round_estimated_counts=True``; record the rounding in the method gate."""
     from pydeseq2.dds import DeseqDataSet
@@ -124,7 +125,7 @@ def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[d
 
     results, skipped = [], []
     for comp in comparisons:
-        if not comp.get("analyzable", True):
+        if not comp.get("analyzable", True) and comp["name"] not in include:
             skipped.append({"name": comp["name"], "reason": "a cell has fewer than 3 samples"})
             continue
         codes = [_code(cells, c["cell"]) for c in comp["cells"]]
@@ -142,7 +143,7 @@ def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[d
 
 
 def run_joint_limma(expression_csv: str, metadata_csv: str, comparisons: Sequence[dict], output_dir: str, *,
-                    covariates: Sequence[str] = ()) -> dict[str, Any]:
+                    covariates: Sequence[str] = (), include: Sequence[str] = ()) -> dict[str, Any]:
     """limma on a log-scale matrix with ``~ 0 + C(cell) + covariates``, via run_multigroup_analysis."""
     from tools.multigroup_tools import run_multigroup_analysis
 
@@ -159,7 +160,7 @@ def run_joint_limma(expression_csv: str, metadata_csv: str, comparisons: Sequenc
     meta[["cell"] + list(safe_cov.values())].to_csv(meta_path)
     contrasts, skipped = [], []
     for comp in comparisons:
-        if not comp.get("analyzable", True):
+        if not comp.get("analyzable", True) and comp["name"] not in include:
             skipped.append({"name": comp["name"], "reason": "a cell has fewer than 3 samples"})
             continue
         coef: dict[str, float] = {}
