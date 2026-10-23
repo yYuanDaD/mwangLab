@@ -78,3 +78,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed after this paper: `joint_contrasts` turned numeric covariates (RIN) into factors and rejected estimated counts; numeric covariates are now continuous and `run_joint_deseq2(round_estimated_counts=True)` rounds first. Planned interaction names written with `:` now match.
 - Fixed: the skill's script prelude used `parents[3]`; it now walks up to the repository root.
 - Rat GSEA uses mouse Hallmark sets by symbol (3408/4291 matched); no GO BP library for the paper's GO analysis.
+
+## PMID34943951 (GSE188236)
+
+- **Screen false positive (series level).** The paper has a real exercise study, but on other accessions (microarrays GSE72462/GSE161749); GSE188236 is its in-vitro TGF-β myotube arm. The new exercise-design check works on the paper, not the series, so it still passes. Refused correctly at design.
+- `tools/geo_tar.py:118` merges per-sample files with `join="outer").fillna(0)`: here it joined long-RNA (60,666 genes) and small-RNA (602 IDs) files into one matrix and zero-filled the gaps, with no assay check or warning.
+- Fixed after this paper: `suitability.check_sex` crashed when the metadata had no sex column, and `required_data` read "normalized counts" as raw counts.
+- GEO says the per-sample files are DESeq2-normalized counts, yet the values are integers; `profile_matrix` can only flag it through provenance.
+- `summary.csv` accession empty again (known).

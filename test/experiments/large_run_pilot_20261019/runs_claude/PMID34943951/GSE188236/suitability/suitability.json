@@ -1,0 +1,161 @@
+{
+  "case_id": "GSE188236",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "trt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "normalized counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "normalized counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "trt"
+      ],
+      "levels": {
+        "trt": {
+          "ctrl": 5,
+          "tgfb": 5,
+          "tgfbsb": 5
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(trt)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 3,
+      "n_analyzable": 3,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    }
+  },
+  "comparisons": [
+    {
+      "name": "trt_tgfb_vs_ctrl",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "tgfb",
+      "reference": "ctrl",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "tgfb"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "ctrl"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_tgfbsb_vs_ctrl",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "tgfbsb",
+      "reference": "ctrl",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "tgfbsb"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "ctrl"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_tgfbsb_vs_tgfb",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "tgfbsb",
+      "reference": "tgfb",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "tgfbsb"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "tgfb"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

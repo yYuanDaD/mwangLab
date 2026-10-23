@@ -73,7 +73,8 @@ REQUIRED_DATA = {
 }
 
 _TYPE_TO_KEY = (
-    ("single", "scrnaseq"), ("pseudobulk", "scrnaseq"), ("estimated", "bulk_rnaseq_counts"), ("raw", "bulk_rnaseq_counts"), ("count", "bulk_rnaseq_counts"),
+    ("single", "scrnaseq"), ("pseudobulk", "scrnaseq"), ("normali", "bulk_rnaseq_normalized"),
+    ("estimated", "bulk_rnaseq_counts"), ("raw", "bulk_rnaseq_counts"), ("count", "bulk_rnaseq_counts"),
     ("fpkm", "bulk_rnaseq_normalized"), ("rpkm", "bulk_rnaseq_normalized"), ("tpm", "bulk_rnaseq_normalized"),
     ("beta", "methylation"), ("m-value", "methylation"), ("intensity", "proteomics"),
     ("array", "microarray"), ("log", "microarray"),
@@ -364,7 +365,8 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
     table.index = table.index.astype(str)
     sex_col = _detect_sex_column(metadata)
     reported = metadata[sex_col].map(_normalize_sex_value) if sex_col else pd.Series(dtype=str)
-    mismatched = table.index[table.get("agreement", pd.Series(dtype=str)) == "MISMATCH"].tolist()
+    mismatched = (table.index[table["agreement"] == "MISMATCH"].tolist()
+                  if "agreement" in table.columns else [])
     by_sample = {}
     for s in table.index:
         r = str(reported.get(s, "")) if sex_col else ""

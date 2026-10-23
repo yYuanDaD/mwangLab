@@ -115,6 +115,8 @@ def test_sex_check_and_split():
         assert sx["status"] == "mismatch" and sx["mismatched"] == [swapped], sx
         plan = su.sex_split_plan(meta, ["grp"], sx["sex_by_sample"])
         assert plan["split"] and plan["analyzable_per_sex"]["male"] and plan["analyzable_per_sex"]["female"], plan
+        nosex = su.check_sex(path, meta.drop(columns=["sex"]), out_dir=d)   # no metadata sex column
+        assert nosex["status"] == "pass" and nosex["mismatched"] == [], nosex
         one = su.sex_split_plan(meta, ["grp"], {s: "male" for s in meta.index})
         assert not one["split"] and one["reason"] == "one sex only"
 
@@ -134,6 +136,7 @@ def test_report_and_markdown():
         bad = su.report(case_id="toy", matrix_type="ambiguous", metadata=meta, factors=["grp"], out_dir=d)
         assert bad["verdict"] == "not_analyzable" and bad["failed"] == ["data_type"]
     assert su.required_data("FPKM")["key"] == "bulk_rnaseq_normalized"
+    assert su.required_data("DESeq2-normalized counts")["key"] == "bulk_rnaseq_normalized"
 
 
 def test_joint_deseq2_uses_every_sample():
