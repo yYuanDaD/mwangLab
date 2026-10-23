@@ -68,13 +68,20 @@ def _safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", name).strip("_") or "contrast"
 
 
+def _numeric_covariates(meta: pd.DataFrame, covariates: Sequence[str]) -> list[str]:
+    """Covariates whose values are all numbers (RIN, age): fitted as continuous, not as factors."""
+    return [c for c in covariates if pd.to_numeric(meta[c], errors="coerce").notna().all()]
+
+
 def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[dict], output_dir: str, *,
-                     covariates: Sequence[str] = (), alpha: float = 0.05, n_cpus: int = 8) -> dict[str, Any]:
+                     covariates: Sequence[str] = (), alpha: float = 0.05, n_cpus: int = 8,
+                     round_estimated_counts: bool = False) -> dict[str, Any]:
     """DESeq2 on every sample with ``~ covariates + cell``; one result file per comparison.
 
     Only comparisons marked ``analyzable`` are extracted; the others are listed as
     skipped. Columns match ``run_deseq2_analysis`` (baseMean, log2FoldChange, lfcSE,
-    stat, pvalue, padj)."""
+    stat, pvalue, padj). Numeric covariates are continuous. Estimated counts (salmon,
+    RSEM) need ``round_estimated_counts=True``; record the rounding in the method gate."""
     from pydeseq2.dds import DeseqDataSet
     from pydeseq2.ds import DeseqStats
 
@@ -92,14 +99,19 @@ def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[d
     if len(common) < len(meta):
         raise PolicyViolation(f"exact alignment incomplete: {len(common)}/{len(meta)} metadata samples in the matrix")
     counts = counts.loc[:, common]
+    if round_estimated_counts:
+        counts = counts.round()
     enforce_method_matrix_compatibility(counts, method="deseq2")
     counts = counts.round().astype(int).T
     counts = counts.loc[:, (counts != 0).any(axis=0)]
     meta = meta.loc[common]
     safe_cov = {c: f"cov{i}" for i, c in enumerate(covariates)}
-    design = meta.rename(columns=safe_cov)[list(safe_cov.values()) + ["cell"]].astype(str)
+    continuous = [safe_cov[c] for c in _numeric_covariates(meta, covariates)]
+    design = meta.rename(columns=safe_cov)[list(safe_cov.values()) + ["cell"]]
+    for col in design.columns:
+        design[col] = pd.to_numeric(design[col]) if col in continuous else design[col].astype(str)
     dds = DeseqDataSet(counts=counts, metadata=design, design_factors=list(safe_cov.values()) + ["cell"],
-                       refit_cooks=True, n_cpus=n_cpus, quiet=True)
+                       continuous_factors=continuous or None, refit_cooks=True, n_cpus=n_cpus, quiet=True)
     dds.deseq2()
     columns = list(dds.obsm["design_matrix"].columns)
 
@@ -139,9 +151,10 @@ def run_joint_limma(expression_csv: str, metadata_csv: str, comparisons: Sequenc
     meta.index = meta.index.astype(str)
     meta, cells = add_cell_column(meta, comparisons)
     safe_cov = {c: f"cov{i}" for i, c in enumerate(covariates)}
+    continuous = {safe_cov[c] for c in _numeric_covariates(meta, covariates)}
     meta = meta.rename(columns=safe_cov)
     for c in safe_cov.values():
-        meta[c] = meta[c].astype(str)
+        meta[c] = pd.to_numeric(meta[c]) if c in continuous else meta[c].astype(str)
     meta_path = os.path.join(output_dir, "joint_metadata.csv")
     meta[["cell"] + list(safe_cov.values())].to_csv(meta_path)
     contrasts, skipped = [], []
@@ -154,7 +167,7 @@ def run_joint_limma(expression_csv: str, metadata_csv: str, comparisons: Sequenc
             key = f"C(cell)[{_code(cells, c['cell'])}]"
             coef[key] = coef.get(key, 0.0) + s
         contrasts.append({"name": _safe(comp["name"]), "coefficients": coef})
-    formula = "~ 0 + C(cell)" + "".join(f" + C({c})" for c in safe_cov.values())
+    formula = "~ 0 + C(cell)" + "".join(f" + {c}" if c in continuous else f" + C({c})" for c in safe_cov.values())
     out = run_multigroup_analysis(expression_csv, meta_path,
                                   {"analysis_type": "multilevel", "formula": formula, "contrasts": contrasts},
                                   output_dir)

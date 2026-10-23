@@ -243,6 +243,8 @@ def check_sample_size(comparisons: Sequence[dict], planned: Sequence[str] = ()) 
     ``planned`` uses the enumerated names (``grp_O_vs_Y``); names that match no
     comparison are listed in ``unknown_planned`` and make the check ``partial``."""
     names = {c["name"] for c in comparisons}
+    # "line:load_LRT:FO_vs_HRT:CTRL" and the stored "line_load_LRT_FO_vs_HRT_CTRL" are the same name.
+    planned = [re.sub(r"[^A-Za-z0-9._-]+", "_", p).strip("_") for p in planned]
     ok = [c["name"] for c in comparisons if c["analyzable"]]
     small = [c["name"] for c in comparisons if not c["analyzable"]]
     known = [p for p in planned if p in names]

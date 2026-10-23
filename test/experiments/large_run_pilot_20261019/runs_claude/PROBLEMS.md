@@ -70,3 +70,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `sex_split_plan` ignored the reference level, so per-sex names were reversed. Fixed.
 - `RunRecorder` still refuses an existing run directory after a rejected first script (same as GSE273041).
 - The paper's repetitive-element attenuation does not reproduce in a combined gene+RE DESeq2 fit; the paper may have normalized RE separately.
+
+## PMID33486778 (GSE156724)
+
+- `GSE156724_Raw_gene_counts_matrix.txt.gz` holds salmon/tximport estimated counts (34% integers) despite "Raw" in the name; the new screen value check calls it `estimated_counts`.
+- No executor for the paper's voom + TMM + RIN model with an interaction contrast: `tools/limma_voom_tools.py:130-131` casts to int and is two-arm only; `tools/limma_voom.R` has no TMM and only `~ g`. limma on log2(CPM+1) ran as a declared deviation.
+- Fixed after this paper: `joint_contrasts` turned numeric covariates (RIN) into factors and rejected estimated counts; numeric covariates are now continuous and `run_joint_deseq2(round_estimated_counts=True)` rounds first. Planned interaction names written with `:` now match.
+- Fixed: the skill's script prelude used `parents[3]`; it now walks up to the repository root.
+- Rat GSEA uses mouse Hallmark sets by symbol (3408/4291 matched); no GO BP library for the paper's GO analysis.

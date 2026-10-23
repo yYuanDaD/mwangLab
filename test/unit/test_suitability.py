@@ -86,6 +86,7 @@ def test_sample_size_and_grouping():
     ok = su.enumerate_comparisons(_design(), ["grp"])
     ss = su.check_sample_size(ok, planned=["O_vs_Y"])   # not an enumerated name
     assert ss["status"] == "partial" and ss["unknown_planned"] == ["O_vs_Y"], ss
+    assert su.check_sample_size(ok, planned=["grp:ex_vs_sed"])["unknown_planned"] == []
 
 
 def test_covariance_decisions():
@@ -151,6 +152,12 @@ def test_joint_deseq2_uses_every_sample():
         inter = next(r for r in out["results"] if r["kind"] == "interaction")
         res = pd.read_csv(inter["path"], index_col=0)
         assert abs(res.loc["G0", "log2FoldChange"]) < 0.7, res.loc["G0"]   # same effect in WT and KO
+        meta["rin"] = [7.0 + (i % 5) / 10 for i in range(len(meta))]
+        meta.to_csv(mpath)
+        (counts + 0.4).to_csv(cpath)                                         # estimated counts
+        out = jc.run_joint_deseq2(cpath, mpath, comps[:1], d, covariates=["rin"], n_cpus=1,
+                                  round_estimated_counts=True)
+        assert len(out["results"]) == 1, out
 
 
 def test_joint_limma():
@@ -163,6 +170,10 @@ def test_joint_limma():
         meta.to_csv(mpath)
         out = jc.run_joint_limma(epath, mpath, comps, d, covariates=["sex"])
         assert out["n_samples"] == 24 and out["n_contrasts"] == 1, out
+        meta["rin"] = [7.0 + (i % 5) / 10 for i in range(len(meta))]   # continuous, not a 5-level factor
+        meta.to_csv(mpath)
+        out = jc.run_joint_limma(epath, mpath, comps, d, covariates=["rin"])
+        assert out["formula"] == "~ 0 + C(cell) + cov0", out["formula"]
         res = pd.read_csv(out["results"][0]["path"], index_col=0)
         assert res.loc["G0", "padj"] < 1e-3, res.loc["G0"]
 

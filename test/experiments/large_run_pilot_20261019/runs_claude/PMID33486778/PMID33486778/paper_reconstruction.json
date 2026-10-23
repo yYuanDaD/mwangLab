@@ -1,0 +1,84 @@
+{
+  "paper_id": "PMID33486778 / PMC8686756 (Exp Physiol 2021)",
+  "accessions": [
+    "GSE156724"
+  ],
+  "accession_locator": "DA.p1",
+  "assay": "bulk total RNA-seq (TruSeq Stranded Total RNA, Ribo-Zero Gold), rat plantaris, NextSeq 500 PE100; Salmon + tximport gene-level counts (S2.4.p1, S2.5.p2)",
+  "sample_inclusion": [
+    "24 female rats, generation 19, 14 months old: HRT and LRT lines x {FO 14 d, non-overloaded control}, n = 6/group, separate animals (S2.2.p1, S2.3.p1)"
+  ],
+  "sample_exclusion": [
+    "not_reported (none)"
+  ],
+  "factors": [
+    {
+      "name": "line",
+      "levels": [
+        "HRT (high responder to endurance training)",
+        "LRT (low responder)"
+      ],
+      "type": "between-animal, selectively bred genotype",
+      "locator": "S2.2.p1"
+    },
+    {
+      "name": "overload",
+      "levels": [
+        "CTRL (no surgery)",
+        "FO (14 d synergist ablation)"
+      ],
+      "type": "between-animal; FO limb from FO animals vs plantaris of separate control animals",
+      "locator": "S2.2.p1, S2.3.p1"
+    }
+  ],
+  "primary_estimand": "Transcriptome response of plantaris muscle to 14 days of functional overload (synergist-ablation mechanical loading, a resistance-type contractile stimulus) within each endurance-trainability line (FOinLRT, FOinHRT), and the line difference in that response (DELTA = FOinLRT - FOinHRT, a 2x2 interaction). The endurance training itself (8 weeks, ~12 weeks of age) was used only to phenotype/breed the lines and precedes the sampled period by ~1 year; there is no sedentary-vs-trained contrast in the sequenced samples.",
+  "planned_contrasts": [
+    {
+      "name": "FOinLRT",
+      "definition": "LRT FO vs LRT CTRL",
+      "locator": "S2.5.p3"
+    },
+    {
+      "name": "FOinHRT",
+      "definition": "HRT FO vs HRT CTRL",
+      "locator": "S2.5.p3"
+    },
+    {
+      "name": "DELTA",
+      "definition": "(LRT FO - LRT CTRL) - (HRT FO - HRT CTRL)",
+      "locator": "S2.5.p3"
+    }
+  ],
+  "exploratory_contrasts": [
+    "LRT vs HRT within CTRL",
+    "LRT vs HRT within FO"
+  ],
+  "blocking_or_covariance": {
+    "status": "not_required for animal (one sample per animal); RIN covariate in the paper model",
+    "locator": "S2.5.p2"
+  },
+  "matrix_scale": "Salmon estimated counts summarised by tximport (non-integer) (S2.5.p2; GEO data_processing)",
+  "paper_method": "edgeR TMM + limma-voom, linear model incl. RNA integrity (RIN) covariate; genes with median CPM < 0.5 over all 24 samples excluded (S2.5.p2)",
+  "paper_formula": "not_reported explicitly; implied ~ group (4 cells) + RIN with contrasts FOinLRT, FOinHRT, DELTA",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "not_reported (limma topTable default BH assumed)",
+    "cutoff": 0.001,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "effect_cutoff_original": "fold change > 2 ('twofold or greater' in S3.5.p1)",
+    "inclusive": false,
+    "source_locator": "S2.5.p3; FIG2; S3.5.p1"
+  },
+  "reported_counts": {
+    "n_genes_after_filter": "14,956 (S3.4.p1)",
+    "FOinLRT": "1866 DEGs, 92.4% up (S3.5.p1, FIG2; FDR<0.001, FC>2)",
+    "FOinHRT": "2460 DEGs, 79.6% up (S3.5.p1, FIG2)",
+    "common": "1612 (S3.5.p1)",
+    "DELTA": "no DEG count reported; analysed by GSEA (224 GO BP differ, 96 up / 101 down magnitude, 27 direction; S3.6.p1)"
+  },
+  "enrichment": {
+    "method": "GSEA on limma moderated t, GO biological process, clusterProfiler, 10,000 permutations, size 25-500; FDR<0.05 and P<0.001 for display",
+    "locator": "S2.5.p3, S3.6.p1, FIG4"
+  }
+}

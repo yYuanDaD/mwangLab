@@ -64,7 +64,7 @@ Record `derived` (sources, regexes, mappings, levels) as evidence in the alignme
 Keep driver scripts in `output/<run_name>/scripts/` so they stay with the run, and start each with:
 
 ```python
-import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # repository root
+import sys, pathlib; sys.path.insert(0, str(next(p for p in pathlib.Path(__file__).resolve().parents if (p / "tools" / "native.py").exists())))  # repository root
 from tools import native
 ```
 

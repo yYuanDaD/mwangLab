@@ -35,7 +35,7 @@ The recorder saves its state after every call. To continue the run from a later 
 Save driver scripts in `output/<run_name>/scripts/`, so they stay with the run, and start each one with:
 
 ```python
-import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # repository root
+import sys, pathlib; sys.path.insert(0, str(next(p for p in pathlib.Path(__file__).resolve().parents if (p / "tools" / "native.py").exists())))  # repository root
 ```
 
 Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_helpers.py` for decisions unless the user asks for that external-agent backend.

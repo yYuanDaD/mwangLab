@@ -1,0 +1,268 @@
+{
+  "case_id": "PMID33486778",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "line",
+    "load"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "line",
+        "load"
+      ],
+      "levels": {
+        "line": {
+          "HRT": 12,
+          "LRT": 12
+        },
+        "load": {
+          "FO": 12,
+          "CTRL": 12
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(line) + C(load)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 21,
+        "min_cell_size": 6
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "load_FO_vs_CTRL_line-LRT",
+        "load_FO_vs_CTRL_line-HRT",
+        "line_load_LRT_FO_vs_HRT_CTRL"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 24 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "unknown": 24
+      },
+      "mismatched": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33486778\\PMID33486778\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "line_LRT_vs_HRT_load-CTRL",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "load": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "load": "CTRL",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "load": "CTRL",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_LRT_vs_HRT_load-FO",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "load": "FO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "load": "FO",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "load": "FO",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "load_FO_vs_CTRL_line-HRT",
+      "kind": "simple",
+      "factor": "load",
+      "test": "FO",
+      "reference": "CTRL",
+      "within": {
+        "line": "HRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "HRT",
+            "load": "FO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "load": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "load_FO_vs_CTRL_line-LRT",
+      "kind": "simple",
+      "factor": "load",
+      "test": "FO",
+      "reference": "CTRL",
+      "within": {
+        "line": "LRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "LRT",
+            "load": "FO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "load": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_load_LRT_FO_vs_HRT_CTRL",
+      "kind": "interaction",
+      "factor": "line:load",
+      "test": "LRT:FO",
+      "reference": "HRT:CTRL",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "line": "LRT",
+            "load": "FO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "load": "FO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "load": "CTRL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "load": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
