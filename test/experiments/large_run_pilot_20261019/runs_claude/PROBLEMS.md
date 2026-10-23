@@ -118,3 +118,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `suitability.check_covariance` failed whole tissues because a batch-like library-name format lines up with sex, although sex is only a stratum and every planned contrast is within sex. Not fixed: the agent left that column out of the candidates.
 - Fixed after this paper: a low-confidence sex call (Y genes and Xist both expressed, likely mixed RNA) was reported as a mismatch; it is now listed under `uncertain`. `joint_contrasts` silently skipped a planned contrast with n = 2; `include=[...]` now runs it (label it exploratory).
 - No executor for the paper's gene filter (normalized mean ≥ 10); applied by hand.
+
+## PMID39356750 (GSE270400)
+
+- Reproduced: log2FC matches the authors' deposited table (r = 0.9999999). The paper's 12 h count (93) follows padj < 0.05 without its stated FC ≥ 2 cutoff.
+- Matrix columns use author labels (`12h-01-R`) found nowhere in GEO; rebuilt from title group + replicate by hand. No helper for "label = f(group, replicate)".
+- `tools/enrichment_tools.py:222` filters strictly `|log2FC| > cutoff`, so an inclusive FC ≥ 2 rule cannot be expressed; `:235` MyGene mapped 23 of 31 rat Ensembl IDs, silently dropping 8 DEGs from ORA.
+- Download tools take `geo_accession=`; the native-execution reference has no download entry.
