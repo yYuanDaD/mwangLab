@@ -9,7 +9,9 @@ groups of three. Every paper gets one row with the verdict, the reason, and the 
 Layers (each cheap enough to run on a few hundred papers; nothing here calls an LLM):
 
     1. text      full text via Europe PMC / NCBI PMC JATS, else the PDF (tools.pdf_markdown);
-                 the title or abstract must name the topic (exercise by default); own vs.
+                 the title or abstract must name the topic (exercise by default), and the
+                 abstract, methods or results must describe the paper's own exercise
+                 groups or protocol, not just mention exercise; own vs.
                  cited accessions from the words around each mention, then the section
     2. deposit   GEO series summary (E-utilities esummary): data type, organism, sample
                  count, platform; organism (human, mouse, rat by default); non-GEO repositories (PRIDE, ArrayExpress, SRA-only,
@@ -117,12 +119,18 @@ class Http:
         raw = url + "?" + json.dumps(params or {}, sort_keys=True)
         return os.path.join(self.cache_dir, hashlib.sha1(raw.encode()).hexdigest()[:20])
 
-    def get(self, url: str, params: dict | None = None, binary: bool = False, timeout: int = 60):
-        """Body (str, or bytes when binary) or None on 404 / repeated failure."""
+    def get(self, url: str, params: dict | None = None, binary: bool = False, timeout: int = 60,
+            max_bytes: int = 0):
+        """Body (str, or bytes when binary) or None on 404 / repeated failure.
+
+        ``max_bytes``: stop after this many bytes (the head of a large matrix file)."""
         params = dict(params or {})
         if url.startswith(EUTILS) and self.api_key:
             params["api_key"] = self.api_key
-        path = self._key(url, {k: v for k, v in params.items() if k != "api_key"}) if self.cache_dir else ""
+        key_params = {k: v for k, v in params.items() if k != "api_key"}
+        if max_bytes:
+            key_params["__max_bytes__"] = max_bytes
+        path = self._key(url, key_params) if self.cache_dir else ""
         if path and os.path.exists(path):
             with open(path, "rb") as f:
                 data = f.read()
@@ -141,7 +149,7 @@ class Http:
                 time.sleep(wait)
             self._last = time.time()
             try:
-                r = requests.get(url, params=params, headers=headers, timeout=timeout)
+                r = requests.get(url, params=params, headers=headers, timeout=timeout, stream=bool(max_bytes))
             except Exception:
                 time.sleep(2 ** attempt)
                 continue
@@ -160,7 +168,15 @@ class Http:
                 time.sleep(20 * (attempt + 1) if s2 and r.status_code == 429 else 2 ** (attempt + 1))
                 continue
             r.raise_for_status()
-            data = r.content
+            if max_bytes:
+                data = b""
+                for chunk in r.iter_content(65536):
+                    data += chunk
+                    if len(data) >= max_bytes:
+                        break
+                r.close()
+            else:
+                data = r.content
             break
         if data is None:
             return None
@@ -455,6 +471,10 @@ def geo_design(gse: str, http: Http) -> dict:
     samples = parse_series_matrix_samples("".join(head))
     out = design_from_samples(samples)
     out["matrix_files"] = len(files)
+    # Every data-processing line (the sample table keeps only the first): the one that
+    # names RPKM or salmon is often the last.
+    proc = [next(csv.reader([ln], delimiter="\t"))[1:2] for ln in head if ln.startswith("!Sample_data_processing")]
+    out["processing"] = " | ".join(dict.fromkeys(v[0].strip() for v in proc if v and v[0].strip()))[:2000]
     # Per-sample supplementary files (the members of a _RAW.tar), first file per sample.
     cols = [c for c in samples.columns if c.startswith("supplementary_file")]
     out["sample_files"] = [u for u in (samples[c].iloc[i] for i in range(len(samples)) for c in cols[:1])
@@ -485,7 +505,7 @@ def _numeric_columns(text: str, max_rows: int = 3000) -> tuple[list[str], list[l
     cols = []
     for j in range(1, width):
         vals = [r[j] for r in rows if len(r) > j]
-        nums = [float(v) for v in vals if _is_number(v)]
+        nums = [float(v.strip().strip('"')) for v in vals if _is_number(v)]
         cols.append(nums if vals and len(nums) >= 0.9 * len(vals) else [])
     return header, cols
 
@@ -516,6 +536,73 @@ def sniff_count_file(text: str) -> str:
         return "unknown"
     integer = sum(1 for v in col if v >= 0 and v == int(v)) / len(col)
     return "raw_counts" if integer >= 0.99 else "normalized"
+
+
+def sniff_matrix_file(text: str) -> str:
+    """'raw_counts', 'mostly_integer' or 'decimal' (or 'unknown') for a genes x samples
+    matrix, from its values.
+
+    File names are not enough: ``GSE273041_raw_counts.txt.gz`` holds RPKM. Decimals alone
+    do not prove normalisation either: salmon/RSEM/Partek estimated counts and
+    featureCounts fractional multi-mapper counts are decimal counts. ``check_raw_values``
+    settles a decimal file with the series' data-processing text."""
+    header, cols = _numeric_columns(text)
+    if any("expected_count" in h.lower() for h in header):
+        return "raw_counts"
+    values = [v for c in cols for v in c]
+    if len(values) < 200:
+        return "unknown"
+    # Within 0.01 of an integer: salmon's merged counts carry 132.001-style noise.
+    integer = sum(1 for v in values if v >= 0 and abs(v - round(v)) <= 0.01) / len(values)
+    if integer >= 0.99:
+        return "raw_counts"
+    return "mostly_integer" if integer >= 0.5 else "decimal"
+
+
+def _head_text(raw: bytes) -> str:
+    """Text of a (possibly truncated, possibly gzipped) file head, last partial line dropped."""
+    import zlib
+    if raw[:2] == b"\x1f\x8b":
+        try:
+            raw = zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(raw)
+        except zlib.error:
+            return ""
+    text = raw.decode("utf-8", errors="replace")
+    return text.rsplit("\n", 1)[0] if "\n" in text else text
+
+
+# A unit, not "normalized counts": GEO texts often list a raw and a normalised file.
+_PROCESSING_NORMALISED = re.compile(r"fpkm|rpkm|tpm|(?<![a-z])cpm|per kilobase", re.I)
+_PROCESSING_ESTIMATED = re.compile(r"rsem|salmon|kallisto|expected[_ ]count|estimated counts?|tximport|partek e/?m|"
+                                   r"fraction(al)?|multi-?mapp", re.I)
+
+
+def check_raw_values(gse: str, files: dict, http: Http, processing: str = "",
+                     max_bytes: int = 2_000_000) -> dict:
+    """Sniff the values of the files named like raw counts (first two text files).
+
+    Returns ``{"status": ..., "sniffed": {...}}`` with status ``raw_counts`` (integers),
+    ``estimated_counts`` (decimal counts: salmon, RSEM, fractional featureCounts),
+    ``normalized_only`` (decimals, and the data-processing text names FPKM/RPKM/TPM),
+    ``decimal_unexplained`` (decimals the processing text does not explain) or ``unknown``
+    (no text file could be read: Excel, download failure)."""
+    sniffed = {}
+    base = GEO_SUPPL.format(stub=geo_stub(gse), gse=gse)
+    for name in [n for n in files.get("raw", []) if not re.search(r"\.xlsx?$", n, re.I)][:2]:
+        raw = http.get(base + name, binary=True, timeout=120, max_bytes=max_bytes)
+        sniffed[name] = sniff_matrix_file(_head_text(raw)) if raw else "unknown"
+    kinds = set(sniffed.values()) - {"unknown"}
+    if not kinds:
+        status = "unknown"
+    elif "raw_counts" in kinds:
+        status = "raw_counts"
+    elif _PROCESSING_NORMALISED.search(processing) and not _PROCESSING_ESTIMATED.search(processing):
+        status = "normalized_only"
+    elif _PROCESSING_ESTIMATED.search(processing) or kinds == {"mostly_integer"}:
+        status = "estimated_counts"
+    else:
+        status = "decimal_unexplained"
+    return {"status": status, "sniffed": sniffed}
 
 
 def inspect_sample_files(urls: list[str], http: Http, n_sniff: int = 2) -> dict:
@@ -594,7 +681,7 @@ class Screen:
 
 # Order matters: the reason recorded for a paper is the earliest layer it fails.
 REASONS = (
-    "no_full_text", "off_topic", "no_own_deposit", "data_on_request", "non_geo_repository",
+    "no_full_text", "off_topic", "no_exercise_contrast", "no_own_deposit", "data_on_request", "non_geo_repository",
     "geo_not_public", "unsupported_data_type", "unsupported_organism", "no_processed_matrix",
     "de_tables_only", "normalized_only",
     "single_group", "group_too_small",
@@ -627,6 +714,8 @@ def judge_series(info: dict | None, files: dict | None, design: dict | None,
             return "excluded", "de_tables_only"
         if st == "normalized_only":
             return "excluded", "normalized_only"
+        if st == "decimal_unexplained":
+            return "needs_inspection", "matrix_decimal_unexplained"
     if design is not None:
         ds = design.get("status")
         if ds == "single_group":
@@ -653,6 +742,28 @@ def on_topic(row: dict, doc: dict, topic: re.Pattern | None) -> bool:
     return bool(topic.search(" ".join([row.get("title", ""), doc.get("title", "")] + abstract)))
 
 
+# Sections where a paper describes its own design; the introduction and discussion
+# talk about exercise in general.
+_DESIGN_SECTIONS = {"abstract", "methods", "results", "other"}
+
+
+def contrast_evidence(doc: dict, contrast: re.Pattern | None, limit: int = 4) -> list[str]:
+    """Phrases where the paper describes its own exercise groups, protocol or comparison.
+
+    A topic word is not enough: an aging study that measured treadmill capacity
+    (GSE152133), a diet study and a vessel-stretch study all name exercise in the
+    abstract or introduction but have no exercise arm. ``contrast=None``: not checked."""
+    if contrast is None:
+        return ["(not checked)"]
+    hits = []
+    for b in doc.get("blocks", []):
+        if b.get("section_class") in _DESIGN_SECTIONS:
+            hits += [f"{b.get('id', '')}: {m.group(0)[:80]}" for m in contrast.finditer(b.get("text", ""))]
+            if len(hits) >= limit:
+                break
+    return hits[:limit]
+
+
 def _norm_title(t: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", (t or "").lower())
 
@@ -669,11 +780,13 @@ def _same_paper(row: dict, pmids: list[str], http: Http) -> bool:
 
 def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bool = True,
                  check_design: bool = True, routes: set = SUPPORTED_ROUTES,
-                 organisms: set | None = None, topic: re.Pattern | None = None) -> Screen:
+                 organisms: set | None = None, topic: re.Pattern | None = None,
+                 contrast: re.Pattern | None = None) -> Screen:
     """Screen one paper. ``doc`` is its structured full text (None when unavailable).
 
-    ``organisms`` (lower-case species names) and ``topic`` (a regex for the title or
-    abstract) are off when None; the CLI turns them on by default."""
+    ``organisms`` (lower-case species names), ``topic`` (a regex for the title or
+    abstract) and ``contrast`` (a regex for the paper's own exercise groups or protocol,
+    see ``contrast_evidence``) are off when None; the CLI turns them on by default."""
     s = Screen(paper_id=row.get("paper_id") or row.get("paperId") or row.get("pmcid") or row.get("doi", ""),
                title=row.get("title", ""), pmcid=row.get("pmcid", ""), doi=row.get("doi", ""),
                source=row.get("source", ""), query=row.get("query", ""), linked_gse=row.get("linked_gse", ""))
@@ -683,6 +796,10 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
     s.text_source = doc.get("structure_quality", "")
     if not on_topic(row, doc, topic):
         s.verdict, s.reason = "excluded", "off_topic"
+        return s
+    found = contrast_evidence(doc, contrast)
+    if not found:
+        s.verdict, s.reason = "excluded", "no_exercise_contrast"
         return s
     dep = deposits_from_doc(doc)
     s.own_gse = dep["own"].get("geo", [])
@@ -723,6 +840,14 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
                 files = classify_supplementary(list_geo_dir(GEO_SUPPL.format(stub=geo_stub(gse), gse=gse), http))
             if check_design:
                 design = geo_design(gse, http)
+                if files and files["status"] == "raw_counts":
+                    files["value_check"] = vc = check_raw_values(gse, files, http, design.get("processing", ""))
+                    if vc["status"] in ("normalized_only", "decimal_unexplained"):
+                        # Named raw_counts but holds decimals (GSE273041: RPKM). A _RAW.tar may
+                        # still hold per-sample counts (GSE179302).
+                        files["status"] = "raw_tar" if files["tar"] else vc["status"]
+                    vc["processing"] = design["processing"][:300]
+                design.pop("processing", None)
                 if files and files["status"] == "raw_tar":
                     files["tar_inspection"] = inside = inspect_sample_files(design.get("sample_files", []), http)
                     files["status"] = {"raw_counts": "raw_counts_in_tar", "normalized_only": "normalized_only",
@@ -950,11 +1075,44 @@ DEFAULT_TOPIC = (r"exercis|physical(ly)? (activ|train|fit|inactiv)|endurance|"
                  r"sedentar|athlet|fitness|\bHIIT\b|interval train|detrain|muscle contraction|contractile activity|"
                  r"overload|unloading|disuse|bed rest|inactivity|sprint|\bsports?\b|post-?run|runners?\b|"
                  r"physical (function|performance|capacity)|exerkine|myokine|irisin")
+# The paper's own exercise groups, protocol or comparison (contrast_evidence);
+# --contrast "" turns the check off.
+_EX_WORD = (r"(exercis\w*|train\w*|running|runners?|treadmill|wheels?|swim\w*|cycling|sprint\w*|endurance|"
+            r"resistance|aerobic|HIIT|interval|sedentar\w*|athletes?|bouts?|physical(ly)? (activ\w*|inactiv\w*)|"
+            r"detrain\w*|unloading|immobili[sz]\w*|bed ?rest|hindlimb (suspension|unloading)|disuse|overload|"
+            r"contractions?|electrical stimulation)")
+DEFAULT_CONTRAST = "|".join(f"(?:{p})" for p in (
+    # "exercise group", "sedentary mice", "trained legs"
+    r"\b(exercis\w*|train\w*|running|runners?|treadmill|wheel|swim\w*|sedentar\w*|endurance|resistance|HIIT|"
+    r"active|inactive|immobili[sz]ed|unloaded|athletes?) (group|groups|mice|rats?|animals|participants|subjects|"
+    r"cohort|arms?|conditions?|legs?|limbs?|volunteers|men|women|individuals|patients|state)\b",
+    # "were randomized to ... wheel running", "underwent 8 weeks of training"
+    r"(underw\w+|complet\w+|perform\w+|subjected to|assigned (to|into)|randomi[sz]ed (to|into)|allocated (to|into)|"
+    r"participated in|enrolled in|given access to|housed with)[^.]{0,80}" + _EX_WORD,
+    r"\b(acute|single|one|an?) (bout|session)s? of",
+    r"\b(pre|post)[- ]?(exercise|training|intervention|run|bout)",
+    r"before and (immediately |\d+ ?h(ours?)? )?after[^.]{0,60}" + _EX_WORD,
+    r"(exercise|training|running|treadmill|swim\w*|wheel[- ]running|endurance|resistance|interval)"
+    r"([- ]for[- ]\w+\W{0,2})?[- ](protocol|program|programme|intervention|regimen|paradigm|sessions?)",
+    # "mice were trained", "participants were exercised"
+    r"\b(mice|rats?|animals|participants|subjects|volunteers|patients|men|women) (were|was) "
+    r"(trained|exercised|detrained|immobili[sz]ed)",
+    r"\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|sixteen)[- ](week|wk|day|month)s?[- ]"
+    r"(of )?([a-z]+\W{1,2}){0,3}(exercise|training|wheel|treadmill|running|endurance|resistance|swim|immobili|unloading|"
+    r"suspension|bed ?rest)",
+    r"\b(exercised|trained|untrained|detrained) (mice|rats?|animals|group|subjects|participants|individuals|men|"
+    r"women|state|muscle|leg)",
+    # Associational designs: activity tertiles, athletes vs controls
+    r"(tertiles?|quartiles?|levels?|groups?) of (habitual )?physical activity|physical activity "
+    r"(tertiles?|quartiles?|levels?|groups?)",
+    r"(athletes|trained|active|sedentary) (vs\.?|versus|and|compared (with|to)) (\w+ )?(controls?|untrained|"
+    r"sedentary|inactive|non-?athletes)",
+))
 
 
 def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: bool = True,
                 routes: set = SUPPORTED_ROUTES, organisms: set | None = None,
-                topic: re.Pattern | None = None) -> str:
+                topic: re.Pattern | None = None, contrast: re.Pattern | None = None) -> str:
     os.makedirs(out_dir, exist_ok=True)
     http = Http(cache_dir=os.path.join(out_dir, "_http_cache"))
     with open(papers_csv, encoding="utf-8") as f:
@@ -969,7 +1127,7 @@ def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: boo
             try:
                 doc = load_full_text(row, os.path.join(out_dir, "papers"), http)
                 s = screen_paper(row, doc, http, check_design=check_design, routes=routes,
-                                 organisms=organisms, topic=topic)
+                                 organisms=organisms, topic=topic, contrast=contrast)
             except Exception as e:  # one bad paper never stops the batch
                 s = Screen(paper_id=row.get("paper_id", ""), title=row.get("title", ""),
                            source=row.get("source", ""), query=row.get("query", ""),
@@ -1065,6 +1223,9 @@ def _main(argv=None) -> int:
                    help='comma-separated species kept (default human, mouse, rat); "any" keeps all')
     p.add_argument("--topic", default=DEFAULT_TOPIC,
                    help='regex the title or abstract must match (default: exercise terms); "" turns it off')
+    p.add_argument("--contrast", default=DEFAULT_CONTRAST,
+                   help="regex for the paper's own exercise groups or protocol in its abstract, methods "
+                        'or results (default: exercise designs); "" turns it off')
     p = sub.add_parser("summary")
     p.add_argument("screen_csv")
     a = ap.parse_args(argv)
@@ -1087,7 +1248,7 @@ def _main(argv=None) -> int:
             {o.strip().lower() for o in a.organisms.split(",") if o.strip()}
         topic = re.compile(a.topic, re.I) if a.topic else None
         out = screen_file(a.papers_csv, a.out, a.limit, not a.no_design, set(a.routes.split(",")),
-                          organisms, topic)
+                          organisms, topic, re.compile(a.contrast, re.I) if a.contrast else None)
         print(open(os.path.join(a.out, "screen_summary.md"), encoding="utf-8").read())
         print(out)
     else:

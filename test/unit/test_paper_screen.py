@@ -28,7 +28,7 @@ class FakeHttp(sc.Http):
         self.routes = routes
         self.calls = []
 
-    def get(self, url, params=None, binary=False, timeout=60):
+    def get(self, url, params=None, binary=False, timeout=60, max_bytes=0):
         self.calls.append((url, params))
         for key, val in self.routes.items():
             if key in url or (params and key == params.get("term")):
@@ -397,6 +397,91 @@ def test_raw_tar_judged_from_sample_files():
         routes[k] = None
     s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
     assert (s.verdict, s.reason) == ("needs_inspection", "matrix_raw_tar"), (s.verdict, s.reason)
+
+
+def _matrix(fmt, n=60):
+    rows = ["gene\ts1\ts2\ts3\ts4"]
+    for i in range(n):
+        rows.append(f"G{i}\t" + "\t".join(fmt(i, j) for j in range(4)))
+    return "\n".join(rows) + "\n"
+
+
+def test_sniff_matrix_file_and_value_check():
+    counts = _matrix(lambda i, j: str(i * 7 + j))
+    salmon = _matrix(lambda i, j: f"{i * 7 + j}.001" if j == 0 else str(i * 7 + j))
+    fractional = _matrix(lambda i, j: f"{i}.5" if (i + j) % 3 == 0 else str(i))
+    rpkm = _matrix(lambda i, j: f"{(i + 1) / 7:.4f}")
+    assert sc.sniff_matrix_file(counts) == "raw_counts"
+    assert sc.sniff_matrix_file(salmon) == "raw_counts"     # 132.001-style noise is still a count
+    assert sc.sniff_matrix_file(fractional) == "mostly_integer"
+    assert sc.sniff_matrix_file(rpkm) == "decimal"
+    assert sc.sniff_matrix_file('gene\ts1\n"G1"\t"3"\n') == "unknown"   # quoted numbers, too few values
+    files = {"raw": ["GSE1_raw_counts.txt.gz"]}
+
+    def check(content, processing=""):
+        return sc.check_raw_values("GSE1", files, FakeHttp({"GSE1_raw_counts": gzip.compress(content.encode())}),
+                                   processing)["status"]
+    assert check(counts) == "raw_counts"
+    assert check(rpkm, "processed data are RPKM normalized read counts") == "normalized_only"
+    assert check(rpkm, "quasi-mapped using Salmon; tximport") == "estimated_counts"
+    assert check(rpkm) == "decimal_unexplained"
+    assert check(fractional) == "estimated_counts"
+
+
+def test_raw_counts_named_file_with_rpkm_values():
+    """GSE273041: a file named raw_counts that holds RPKM is not a count matrix."""
+    rpkm = _matrix(lambda i, j: f"{(i + 1) / 7:.4f}", n=8)
+    # The file's route goes first: the suppl/ listing route is a prefix of its URL.
+    routes = {"GSE123456_raw_counts.txt.gz": gzip.compress(rpkm.encode()), **_geo_routes()}
+    matrix_key = next(k for k in routes if k.endswith("_series_matrix.txt.gz"))
+    header = gzip.decompress(routes[matrix_key]).decode().replace(
+        "!series_matrix_table_begin",
+        "!Sample_data_processing\t\"alignment via TopHat\"\n"
+        "!Sample_data_processing\t\"processed data are RPKM normalized read counts\"\n!series_matrix_table_begin")
+    routes[matrix_key] = gzip.compress(header.encode())
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
+    # 8 genes x 8 samples is below the sniff minimum: the name decides, as before.
+    assert s.verdict == "analyzable", s.series
+    routes["GSE123456_raw_counts.txt.gz"] = gzip.compress(_matrix(lambda i, j: f"{(i + 1) / 7:.4f}").encode())
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
+    assert (s.verdict, s.reason) == ("excluded", "normalized_only"), (s.verdict, s.reason)
+    assert "RPKM" in s.series[0]["files"]["value_check"]["processing"]
+    assert "processing" not in s.series[0]["design"]
+
+
+AGING_MD = """# Muscle transcriptome and physical function in older mice
+
+## Abstract
+
+We measured physical function and exercise capacity (treadmill, voluntary wheel running)
+in 6, 24 and 28 month old mice and related it to muscle gene expression.
+
+## Introduction
+
+Exercise in its many forms preserves physical function during aging.
+
+## Methods
+
+Mice aged 6, 24 and 28 months were tested on a treadmill to exhaustion.
+
+## Data availability
+
+RNA-seq data were deposited in GEO under GSE123456.
+"""
+
+
+def test_exercise_contrast_required():
+    contrast = re.compile(sc.DEFAULT_CONTRAST, re.I)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(AGING_MD), FakeHttp(_geo_routes()), contrast=contrast)
+    assert (s.verdict, s.reason) == ("excluded", "no_exercise_contrast"), (s.verdict, s.reason)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(_geo_routes()), contrast=contrast)
+    assert s.verdict == "analyzable", (s.verdict, s.reason)    # "Mice were trained for six weeks."
+    for text in ("Rats were randomized to sedentary or wheel running groups.",
+                 "Biopsies were taken before and after a 12-week strength-training program.",
+                 "Patients were grouped by physical activity tertiles.",
+                 "Participants performed a single bout of cycling."):
+        assert sc.contrast_evidence(_doc(f"# T\n\n## Methods\n\n{text}\n"), contrast), text
+    assert sc.contrast_evidence(_doc(AGING_MD), None) == ["(not checked)"]
 
 
 JATS_BODY = ("<pmc-articleset><article><front><article-meta><title-group><article-title>T</article-title>"
