@@ -238,15 +238,21 @@ def _comparison(kind, factor, test, ref, within, cells, meta, min_group) -> dict
 
 def check_sample_size(comparisons: Sequence[dict], planned: Sequence[str] = ()) -> dict:
     """2.4: comparisons with a group under 3 are not analyzable. Fails when no
-    comparison (or no planned one, when given) is analyzable."""
+    comparison (or no planned one, when given) is analyzable.
+
+    ``planned`` uses the enumerated names (``grp_O_vs_Y``); names that match no
+    comparison are listed in ``unknown_planned`` and make the check ``partial``."""
+    names = {c["name"] for c in comparisons}
     ok = [c["name"] for c in comparisons if c["analyzable"]]
     small = [c["name"] for c in comparisons if not c["analyzable"]]
-    planned_ok = [p for p in planned if p in ok]
-    status = "pass" if (planned_ok if planned else ok) else "fail"
-    if status == "pass" and small:
+    known = [p for p in planned if p in names]
+    unknown = [p for p in planned if p not in names]
+    planned_ok = [p for p in known if p in ok]
+    status = "pass" if (planned_ok if known else ok) else "fail"
+    if status == "pass" and (small or unknown):
         status = "partial"
     return {"status": status, "n_comparisons": len(comparisons), "n_analyzable": len(ok),
-            "too_small": small, "planned_analyzable": planned_ok}
+            "too_small": small, "planned_analyzable": planned_ok, "unknown_planned": unknown}
 
 
 # ---------------------------------------------------------------------------
@@ -371,7 +377,7 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
 
 
 def sex_split_plan(metadata: pd.DataFrame, factors: Sequence[str], sex_by_sample: dict,
-                   min_group: int = MIN_GROUP) -> dict:
+                   min_group: int = MIN_GROUP, references: dict | None = None) -> dict:
     """Run males and females separately when both are present, even if the paper pooled them.
 
     Returns the comparisons per sex (from ``enumerate_comparisons`` with sex as a
@@ -384,11 +390,11 @@ def sex_split_plan(metadata: pd.DataFrame, factors: Sequence[str], sex_by_sample
     if len(sexes) < 2:
         return {"split": False, "sexes": sexes,
                 "reason": "one sex only" if sexes else "sex unknown for every sample"}
-    comps = enumerate_comparisons(known, factors, strata=["_sex"], min_group=min_group)
+    comps = enumerate_comparisons(known, factors, strata=["_sex"], min_group=min_group, references=references)
     per_sex = {sx: [c["name"] for c in comps if c["within"].get("_sex") == sx and c["analyzable"]] for sx in sexes}
     return {"split": True, "sexes": sexes, "n_unknown": int((~meta["_sex"].isin(sexes)).sum()),
             "analyzable_per_sex": per_sex, "comparisons": comps,
-            "note": "pooled analysis keeps sex as a covariate; per-sex analyses are added as exploratory "
+            "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory "
                     "when the paper pooled"}
 
 
@@ -419,7 +425,8 @@ def report(*, case_id: str, matrix_type: str, metadata: pd.DataFrame, factors: S
         checks["sex"] = check_sex(matrix_csv, metadata, organism=organism, out_dir=out_dir)
         if checks["grouping"]["status"] == "pass":
             checks["sex"]["split_plan"] = {k: v for k, v in sex_split_plan(
-                metadata, factors, checks["sex"].get("sex_by_sample", {})).items() if k != "comparisons"}
+                metadata, factors, checks["sex"].get("sex_by_sample", {}), references=references).items()
+                if k != "comparisons"}
         checks["sex"].pop("sex_by_sample", None)
     hard = [k for k in ("data_type", "grouping", "covariance", "sample_size")
             if checks.get(k, {}).get("status") == "fail"]
@@ -450,8 +457,9 @@ def to_markdown(r: dict) -> str:
         lines.append(f"| Covariance | {cv['status']} | {cv['covariance_status']}; {detail} |")
     if "sample_size" in c:
         ss = c["sample_size"]
+        unknown = f"; planned names not found: {', '.join(ss['unknown_planned'])}" if ss.get("unknown_planned") else ""
         lines.append(f"| Sample size | {ss['status']} | {ss['n_analyzable']}/{ss['n_comparisons']} comparisons "
-                     f"have >= {MIN_GROUP} per group |")
+                     f"have >= {MIN_GROUP} per group{unknown} |")
     if "sex" in c:
         sx = c["sex"]
         split = sx.get("split_plan", {})

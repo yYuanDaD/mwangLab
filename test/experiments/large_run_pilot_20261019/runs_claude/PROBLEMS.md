@@ -57,3 +57,16 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 
 - `summary.csv` has an empty `accession` column although `run.case(..., accession=...)` was passed. The value may be lost through `RunRecorder.open`/`finish` (`tools/native.py`, not traced).
 - The paper's significance (28 genes at padj < 0.1 with n = 3 pairs) does not reproduce: effect sizes match (r = 0.978), but the p-values do not. The paper's exact pipeline (phantasus, quantile/log input) is not recoverable.
+
+## PMID32625117 (GSE140089)
+
+- Finished on 2026-10-20 but was not recorded before the interruption; recorded afterwards (no wall time or token count).
+
+## PMID33257951 (GSE153100)
+
+- First paper run with the suitability report in the design gate.
+- The deposited `GSE153100_counts.xlsx` stores 28 gene symbols as Excel dates (MARCH1-11, MARC1/2, SEPT1-15, DEC1). The xlsx-to-csv conversion (`tools/geo_tools.py:85-114`) writes them as `2020-03-01 00:00:00`; MARCH1/MARC1 and MARCH2/MARC2 then collide, and the duplicate-gene collapse would sum them. Repaired in the driver script; no tool check.
+- `suitability.check_sample_size` failed the case when `planned` names did not match the enumerated names, with no hint. Fixed: unknown names are listed and the check is `partial`; the skill now says which names to use.
+- `sex_split_plan` ignored the reference level, so per-sex names were reversed. Fixed.
+- `RunRecorder` still refuses an existing run directory after a rejected first script (same as GSE273041).
+- The paper's repetitive-element attenuation does not reproduce in a combined gene+RE DESeq2 fit; the paper may have normalized RE separately.

@@ -83,6 +83,9 @@ def test_sample_size_and_grouping():
     g = su.check_grouping(meta, ["grp", "geno"])
     assert g["status"] == "fail" and "without a value" in g["problems"][0], g
     assert su.check_grouping(meta, ["missing"])["status"] == "fail"
+    ok = su.enumerate_comparisons(_design(), ["grp"])
+    ss = su.check_sample_size(ok, planned=["O_vs_Y"])   # not an enumerated name
+    assert ss["status"] == "partial" and ss["unknown_planned"] == ["O_vs_Y"], ss
 
 
 def test_covariance_decisions():
