@@ -1,0 +1,263 @@
+{
+  "case_id": "GSE255280",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "ex"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "ex"
+      ],
+      "levels": {
+        "geno": {
+          "veh": 10,
+          "ko": 10
+        },
+        "ex": {
+          "ctrl": 10,
+          "ex": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(ex)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 17,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 20 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 20
+      },
+      "mismatched": [],
+      "table": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\suitability_check\\GSE255280\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_ko_vs_veh_ex-ctrl",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "ko",
+      "reference": "veh",
+      "within": {
+        "ex": "ctrl"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "ctrl",
+            "geno": "ko"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "ex": "ctrl",
+            "geno": "veh"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_ko_vs_veh_ex-ex",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "ko",
+      "reference": "veh",
+      "within": {
+        "ex": "ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "ex",
+            "geno": "ko"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "ex": "ex",
+            "geno": "veh"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_ex_vs_ctrl_geno-ko",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "ex",
+      "reference": "ctrl",
+      "within": {
+        "geno": "ko"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "ko",
+            "ex": "ex"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "ko",
+            "ex": "ctrl"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_ex_vs_ctrl_geno-veh",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "ex",
+      "reference": "ctrl",
+      "within": {
+        "geno": "veh"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "veh",
+            "ex": "ex"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "veh",
+            "ex": "ctrl"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_ex_ko_ex_vs_veh_ctrl",
+      "kind": "interaction",
+      "factor": "geno:ex",
+      "test": "ko:ex",
+      "reference": "veh:ctrl",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "geno": "ko",
+            "ex": "ex"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "veh",
+            "ex": "ex"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "ko",
+            "ex": "ctrl"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "veh",
+            "ex": "ctrl"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
