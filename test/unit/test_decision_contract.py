@@ -1,4 +1,4 @@
-"""Decision-contract v2: record fields and case-level invariants."""
+"""Decision contract (v2, v3): record fields and case-level invariants."""
 
 import copy
 import json
@@ -227,6 +227,33 @@ class ThresholdNameTests(unittest.TestCase):
         same = set_final(paired_case(), "threshold",
                          paper_threshold={**paper, "adjustment": "BH"}, applied_threshold=applied)
         self.assertEqual(check_case(same, "c1"), [])
+
+
+class SuitabilityTests(unittest.TestCase):
+    """Contract v3: a valid design carries the pre-analysis suitability verdict."""
+
+    def design(self, **final):
+        record = rec("design", {"analysis_type": "two-arm", "design_column": "g", "control": "a",
+                                "treatment": "b", **final})
+        record["contract_version"] = "3"
+        return record
+
+    def test_v3_design_needs_suitability(self):
+        self.assertTrue(any("final.suitability" in e for e in check_record(self.design())))
+        self.assertEqual(check_record(self.design(suitability={"verdict": "analyzable"})), [])
+        self.assertEqual(check_record(self.design(suitability={"verdict": "partially_analyzable"})), [])
+        errors = check_record(self.design(suitability={"verdict": "not_analyzable", "failed": ["grouping"]}))
+        self.assertTrue(any("not_analyzable" in e for e in errors), errors)
+
+    def test_v2_records_and_legacy_skip_it(self):
+        self.assertEqual(check_record(rec("design", {"analysis_type": "two-arm", "design_column": "g",
+                                                     "control": "a", "treatment": "b"})), [])
+        self.assertEqual(check_record(self.design(), legacy=True), [])
+
+    def test_refused_design_needs_no_report(self):
+        record = self.design()
+        record.update(decision_status="refused", stop_reason="no exercise arm", final={})
+        self.assertEqual(check_record(record), [])
 
 
 if __name__ == "__main__":

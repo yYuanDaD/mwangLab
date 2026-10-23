@@ -65,6 +65,9 @@ Complete them in this order for every case:
    - A deterministic summary that a later gate needs, such as cells per donor and cell type from pseudobulk aggregation, may be computed earlier and registered as evidence.
 4. `matrix`: decide the matrix type from `native.profile_matrix` values plus file name, platform, and processing notes. Compare it with the paper's stated input. An ambiguous type stops the case.
 5. `design`: decide the estimand structure.
+   - First run the suitability report: `rep, item, summary = case.suitability(matrix_type=..., metadata=<aligned metadata DataFrame>, factors=[...], matrix_csv=<aligned matrix>, organism=..., subject=<subject column or None>, planned=[...])`. It checks data type and required data, that the groups are determinable, covariance candidates, n >= 3 per group, lists every sensible comparison, and compares sex from X/Y genes with the metadata. Put `summary` in `final.suitability` and `item` in the evidence. A `not_analyzable` verdict stops the case at this gate; read `<case>/suitability/suitability.md` for the reason.
+   - A sex mismatch is a labelling problem: fix or exclude the samples (record which) before any model. When both sexes are present, add per-sex analyses as exploratory even if the paper pooled them (the report's `split_plan`).
+   - Time series and multi-factor designs: run every analyzable comparison the report lists, from one model fitted on all samples (`tools.joint_contrasts`). The paper's planned contrasts keep their route; the others are exploratory.
    - One control with several levels: one model with planned contrasts, never pooled levels.
    - Factorial: keep every factor and the interaction the question needs.
    - Repeated measures: time as a factor plus the subject key.

@@ -20,7 +20,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
-CONTRACT_VERSION = "2"
+CONTRACT_VERSION = "3"
+# v3: a valid design carries final.suitability, the pre-analysis report's verdict
+# (tools/suitability.py); records written under v2 are checked without it.
+SUITABILITY_VERDICTS = {"analyzable", "partially_analyzable", "not_analyzable"}
 STAGES = (
     "paper_reconstruction", "ownership", "alignment", "matrix", "design",
     "covariance", "method", "threshold", "execution", "enrichment", "study",
@@ -160,6 +163,14 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
             errors.append(f"{source}: valid design needs final.formula or final.design_column")
         if not (final.get("contrasts") or (final.get("control") and final.get("treatment"))):
             errors.append(f"{source}: valid design needs final.contrasts or final.control and final.treatment")
+        suit = final.get("suitability")
+        if int(record.get("contract_version") or CONTRACT_VERSION) >= 3 and not legacy:
+            if not isinstance(suit, dict) or suit.get("verdict") not in SUITABILITY_VERDICTS:
+                errors.append(f"{source}: valid design needs final.suitability with a verdict from "
+                              f"case.suitability(...) (one of {sorted(SUITABILITY_VERDICTS)})")
+            elif suit["verdict"] == "not_analyzable":
+                errors.append(f"{source}: the suitability report says not_analyzable "
+                              f"(failed: {suit.get('failed')}); the design cannot be valid")
     if stage == "alignment" and status == "valid":
         coverage = final.get("coverage")
         if not isinstance(coverage, (int, float)) or not 0 <= coverage <= 1:

@@ -964,6 +964,23 @@ class CaseRecorder:
         artifact_id = self.evidence.add_artifact(str(path), role=role)
         return self._evidence_item(path, "tool_output", artifact_id)
 
+    def suitability(self, **kwargs) -> tuple[dict, dict, dict]:
+        """Run the pre-analysis suitability report (``tools.suitability.report``) into
+        ``<case>/suitability/`` before the design gate.
+
+        Returns (report, evidence item, summary). Put the summary in the design record's
+        ``final.suitability`` and the evidence item in its evidence: a valid design needs
+        both, and cannot be valid when the verdict is ``not_analyzable``."""
+        from tools import suitability as su
+        out = self.dir / "suitability"
+        rep = su.report(case_id=self.case_id, out_dir=out, **kwargs)
+        item = self.add_output(out / "suitability.json", "suitability_report")
+        summary = {"verdict": rep["verdict"], "failed": rep["failed"], "warnings": rep["warnings"],
+                   "report": str(out / "suitability.md"),
+                   "n_comparisons": len(rep["comparisons"]),
+                   "n_analyzable": sum(c["analyzable"] for c in rep["comparisons"])}
+        return rep, item, summary
+
     def write_json(self, name: str, payload: Any, role: str | None = None) -> dict:
         path = self.dir / name
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=str), encoding="utf-8")

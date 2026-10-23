@@ -73,7 +73,7 @@ REQUIRED_DATA = {
 }
 
 _TYPE_TO_KEY = (
-    ("estimated", "bulk_rnaseq_counts"), ("raw", "bulk_rnaseq_counts"), ("count", "bulk_rnaseq_counts"),
+    ("single", "scrnaseq"), ("pseudobulk", "scrnaseq"), ("estimated", "bulk_rnaseq_counts"), ("raw", "bulk_rnaseq_counts"), ("count", "bulk_rnaseq_counts"),
     ("fpkm", "bulk_rnaseq_normalized"), ("rpkm", "bulk_rnaseq_normalized"), ("tpm", "bulk_rnaseq_normalized"),
     ("beta", "methylation"), ("m-value", "methylation"), ("intensity", "proteomics"),
     ("array", "microarray"), ("log", "microarray"),
@@ -274,6 +274,10 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
     decisions, blocking, covariates, stop = [], [], [], []
     subject = subject or next((c for c in meta.columns if SUBJECT_COLUMN.search(str(c))
                                and c not in factors and 1 < meta[c].nunique() < len(meta)), None)
+    if subject and subject not in meta.columns:
+        decisions.append({"column": subject, "decision": "omit",
+                          "reason": "not a sample-level column (for example a pseudobulk key built later)"})
+        subject = None
     if subject:
         repeated = any(native.pairing_report(meta, subject, f, sorted(meta[f].astype(str).unique()))
                        ["repeated_across_levels"] for f in factors)
