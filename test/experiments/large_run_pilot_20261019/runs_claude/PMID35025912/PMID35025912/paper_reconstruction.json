@@ -1,0 +1,112 @@
+{
+  "paper_id": "PMID35025912 / PMC8757917 (PLoS One 2022)",
+  "accessions": [
+    "GSE159861"
+  ],
+  "accession_locator": "S7.p1",
+  "assay": "bulk total RNA-seq (TruSeq Stranded Total RNA, Ribo-Zero Gold), NextSeq 500 PE100; Salmon 0.9.1 -> tximport gene-level (S2.2.p1-p2)",
+  "sample_inclusion": [
+    "24 female rats, generation 19, 14 months: HRT and LRT lines x {3 d hindlimb cast immobilisation (HI), control (CTRL)}, n=6/group, separate control animals (S2.p1, S2.1.p2)",
+    "plantaris and soleus from each animal (immobilised limb for HI) -> 48 libraries (S2.1.p2, S2.2.p1)"
+  ],
+  "sample_exclusion": [
+    "not_reported (none)"
+  ],
+  "factors": [
+    {
+      "name": "line",
+      "levels": [
+        "HRT",
+        "LRT"
+      ],
+      "type": "between-animal selectively bred genotype (endurance trainability)",
+      "locator": "S2.p1"
+    },
+    {
+      "name": "trt",
+      "levels": [
+        "CTRL",
+        "HI"
+      ],
+      "type": "between-animal, randomised (S2.p1)",
+      "locator": "S2.p1, S2.1.p2"
+    },
+    {
+      "name": "tis",
+      "levels": [
+        "plantaris",
+        "soleus"
+      ],
+      "type": "within-animal (two muscles per rat); analysed separately",
+      "locator": "S2.1.p2, FIG2"
+    }
+  ],
+  "primary_estimand": "Within each muscle (plantaris, soleus): transcriptome response to 3 d hindlimb immobilisation (disuse atrophy) in each endurance-trainability line (HIinLRT, HIinHRT), and the line difference in that response (DELTA = HIinLRT - HIinHRT, a line x treatment interaction). The 8-week endurance training at ~12 weeks only phenotyped the breeding lines; all sequenced rats are 14 months old and there is no trained-vs-sedentary contrast in the sequenced samples. 'Exercise' enters as the genetic endurance-trainability line (associational).",
+  "planned_contrasts": [
+    {
+      "name": "PLN_HIinLRT",
+      "definition": "plantaris LRT HI vs LRT CTRL",
+      "locator": "S2.2.p2, S3.5.p1"
+    },
+    {
+      "name": "PLN_HIinHRT",
+      "definition": "plantaris HRT HI vs HRT CTRL",
+      "locator": "S2.2.p2, S3.5.p1"
+    },
+    {
+      "name": "PLN_DELTA",
+      "definition": "plantaris (LRT HI - LRT CTRL) - (HRT HI - HRT CTRL)",
+      "locator": "S2.2.p2"
+    },
+    {
+      "name": "SOL_HIinLRT",
+      "definition": "soleus LRT HI vs LRT CTRL",
+      "locator": "S2.2.p2, S3.5.p1"
+    },
+    {
+      "name": "SOL_HIinHRT",
+      "definition": "soleus HRT HI vs HRT CTRL",
+      "locator": "S2.2.p2, S3.5.p1"
+    },
+    {
+      "name": "SOL_DELTA",
+      "definition": "soleus (LRT HI - LRT CTRL) - (HRT HI - HRT CTRL)",
+      "locator": "S2.2.p2"
+    }
+  ],
+  "exploratory_contrasts": [
+    "LRT vs HRT within CTRL and within HI, per muscle (associational, genotype)"
+  ],
+  "blocking_or_covariance": {
+    "status": "one sample per animal per muscle; RIN covariate in the paper model (S2.2.p2); animal key not reported",
+    "locator": "S2.2.p2"
+  },
+  "matrix_scale": "Salmon estimated counts summarised by tximport (S2.2.p2; GEO data_processing)",
+  "paper_method": "limma-voom with RNA integrity (RIN) covariate; gene filter not stated (14,789 genes 'detected/expressed', S3.4.p1, S3.5.p1, FIG2)",
+  "paper_formula": "not_reported; implied group means + RIN with pairwise contrasts HIinLRT, HIinHRT, DELTA",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (limma topTable default; method not named)",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "effect_cutoff_original": "logFC > 1 (S3.5.p1, FIG2 legend); applied to |logFC| (up and down DEGs counted)",
+    "inclusive": false,
+    "source_locator": "S3.5.p1; FIG2",
+    "conflicting_statement": "S2.2.p2 says significance accepted at FDR < 0.001 (no effect cutoff)"
+  },
+  "reported_counts": {
+    "n_genes": "14,789 (S3.4.p1, S3.5.p1, FIG2)",
+    "PLN_HIinLRT": "744 DEGs, 58.5% down (S3.5.p1; logFC>1, FDR<0.05)",
+    "PLN_HIinHRT": "251 DEGs, 66.5% down",
+    "SOL_HIinLRT": "294 DEGs, 57.1% down",
+    "SOL_HIinHRT": "326 DEGs, 57.1% down",
+    "common_all_four": "40 genes (S3.5.p1)",
+    "DELTA": "no DEG count; GSEA GO BP: 140 processes plantaris, 118 soleus (S3.6.p1)",
+    "atrogenes_logFC": "PLN HRT Trim63 1.41, Fbxo32 1.62, Hdac4 2.14; PLN LRT Trim63 2.55, Fbxo32 2.74, Hdac4 2.89; SOL Hdac4 1.85 (HRT) / 2.21 (LRT) (S3.7.p1)"
+  },
+  "enrichment": {
+    "method": "GSEA ranked by t on GO BP, clusterProfiler, 10,000 permutations, size 25-500; FDR<0.05 & P<0.001",
+    "locator": "S2.2.p2, S3.6.p1"
+  }
+}

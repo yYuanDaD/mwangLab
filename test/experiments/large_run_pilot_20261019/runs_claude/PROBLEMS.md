@@ -86,3 +86,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed after this paper: `suitability.check_sex` crashed when the metadata had no sex column, and `required_data` read "normalized counts" as raw counts.
 - GEO says the per-sample files are DESeq2-normalized counts, yet the values are integers; `profile_matrix` can only flag it through provenance.
 - `summary.csv` accession empty again (known).
+
+## PMID35025912 (GSE159861)
+
+- Second paper whose voom + covariate model has no executor (`tools/limma_voom.R:30` fits only `~ g`; `tools/limma_voom_tools.py:131` casts to int, two arms only). TMM exists only as `tools/de_common.py:tmm_factors` and no limma path uses it; a TMM audit restored the paper's down-regulated majority. A covariate-capable voom + TMM executor would fix both rat-line papers.
+- The suitability report cannot see a within-animal factor (both muscles from each rat) when no animal ID is deposited; it called covariance not_required and listed tissue comparisons that are invalid without an animal key. The agent excluded them by hand.
+- `native.derive_columns` cannot build a key from several fields; matrix columns (`HRT_CTRL_SOL_rep1`) are a reordered GEO title.
+- The paper's thresholds disagree (Methods FDR < 0.001; Results/FIG2 FDR < 0.05 and logFC > 1); GEO RIN goes down to 7.8 while the paper says > 8.0.

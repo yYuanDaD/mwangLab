@@ -1,0 +1,760 @@
+{
+  "case_id": "PMID35025912",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "tis",
+    "line",
+    "trt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "tis",
+        "line",
+        "trt"
+      ],
+      "levels": {
+        "tis": {
+          "PLN": 24,
+          "SOL": 24
+        },
+        "line": {
+          "HRT": 24,
+          "LRT": 24
+        },
+        "trt": {
+          "HI": 24,
+          "CTRL": 24
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(tis) + C(line) + C(trt)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 44,
+        "min_cell_size": 6
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 18,
+      "n_analyzable": 18,
+      "too_small": [],
+      "planned_analyzable": [
+        "trt_HI_vs_CTRL_tis-PLN_line-LRT",
+        "trt_HI_vs_CTRL_tis-PLN_line-HRT",
+        "line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+        "trt_HI_vs_CTRL_tis-SOL_line-LRT",
+        "trt_HI_vs_CTRL_tis-SOL_line-HRT",
+        "line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 48 samples.",
+      "metadata_sex_column": "characteristics_ch1.3.Sex",
+      "predicted": {
+        "unknown": 48
+      },
+      "mismatched": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "tis_SOL_vs_PLN_line-HRT_trt-CTRL",
+      "kind": "simple",
+      "factor": "tis",
+      "test": "SOL",
+      "reference": "PLN",
+      "within": {
+        "line": "HRT",
+        "trt": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "HRT",
+            "trt": "CTRL",
+            "tis": "SOL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "trt": "CTRL",
+            "tis": "PLN"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_SOL_vs_PLN_line-HRT_trt-HI",
+      "kind": "simple",
+      "factor": "tis",
+      "test": "SOL",
+      "reference": "PLN",
+      "within": {
+        "line": "HRT",
+        "trt": "HI"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "HRT",
+            "trt": "HI",
+            "tis": "SOL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "trt": "HI",
+            "tis": "PLN"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_SOL_vs_PLN_line-LRT_trt-CTRL",
+      "kind": "simple",
+      "factor": "tis",
+      "test": "SOL",
+      "reference": "PLN",
+      "within": {
+        "line": "LRT",
+        "trt": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "LRT",
+            "trt": "CTRL",
+            "tis": "SOL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "trt": "CTRL",
+            "tis": "PLN"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_SOL_vs_PLN_line-LRT_trt-HI",
+      "kind": "simple",
+      "factor": "tis",
+      "test": "SOL",
+      "reference": "PLN",
+      "within": {
+        "line": "LRT",
+        "trt": "HI"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "LRT",
+            "trt": "HI",
+            "tis": "SOL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "trt": "HI",
+            "tis": "PLN"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "tis": "PLN",
+        "trt": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "PLN",
+            "trt": "CTRL",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "trt": "CTRL",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_LRT_vs_HRT_tis-PLN_trt-HI",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "tis": "PLN",
+        "trt": "HI"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "PLN",
+            "trt": "HI",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "trt": "HI",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "tis": "SOL",
+        "trt": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "SOL",
+            "trt": "CTRL",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "trt": "CTRL",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_LRT_vs_HRT_tis-SOL_trt-HI",
+      "kind": "simple",
+      "factor": "line",
+      "test": "LRT",
+      "reference": "HRT",
+      "within": {
+        "tis": "SOL",
+        "trt": "HI"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "SOL",
+            "trt": "HI",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "trt": "HI",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_HI_vs_CTRL_tis-PLN_line-HRT",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "HI",
+      "reference": "CTRL",
+      "within": {
+        "tis": "PLN",
+        "line": "HRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "HRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "HRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_HI_vs_CTRL_tis-PLN_line-LRT",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "HI",
+      "reference": "CTRL",
+      "within": {
+        "tis": "PLN",
+        "line": "LRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "LRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "LRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_HI_vs_CTRL_tis-SOL_line-HRT",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "HI",
+      "reference": "CTRL",
+      "within": {
+        "tis": "SOL",
+        "line": "HRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "HRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "HRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_HI_vs_CTRL_tis-SOL_line-LRT",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "HI",
+      "reference": "CTRL",
+      "within": {
+        "tis": "SOL",
+        "line": "LRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "LRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "LRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_line_SOL_LRT_vs_PLN_HRT_trt-CTRL",
+      "kind": "interaction",
+      "factor": "tis:line",
+      "test": "SOL:LRT",
+      "reference": "PLN:HRT",
+      "within": {
+        "trt": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "CTRL",
+            "tis": "SOL",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "CTRL",
+            "tis": "PLN",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "CTRL",
+            "tis": "SOL",
+            "line": "HRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "CTRL",
+            "tis": "PLN",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_line_SOL_LRT_vs_PLN_HRT_trt-HI",
+      "kind": "interaction",
+      "factor": "tis:line",
+      "test": "SOL:LRT",
+      "reference": "PLN:HRT",
+      "within": {
+        "trt": "HI"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "HI",
+            "tis": "SOL",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "HI",
+            "tis": "PLN",
+            "line": "LRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "HI",
+            "tis": "SOL",
+            "line": "HRT"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "trt": "HI",
+            "tis": "PLN",
+            "line": "HRT"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_trt_SOL_HI_vs_PLN_CTRL_line-HRT",
+      "kind": "interaction",
+      "factor": "tis:trt",
+      "test": "SOL:HI",
+      "reference": "PLN:CTRL",
+      "within": {
+        "line": "HRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "HRT",
+            "tis": "SOL",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "tis": "PLN",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "tis": "SOL",
+            "trt": "CTRL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "HRT",
+            "tis": "PLN",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tis_trt_SOL_HI_vs_PLN_CTRL_line-LRT",
+      "kind": "interaction",
+      "factor": "tis:trt",
+      "test": "SOL:HI",
+      "reference": "PLN:CTRL",
+      "within": {
+        "line": "LRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "LRT",
+            "tis": "SOL",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "tis": "PLN",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "tis": "SOL",
+            "trt": "CTRL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "line": "LRT",
+            "tis": "PLN",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+      "kind": "interaction",
+      "factor": "line:trt",
+      "test": "LRT:HI",
+      "reference": "HRT:CTRL",
+      "within": {
+        "tis": "PLN"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "LRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "HRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "LRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "PLN",
+            "line": "HRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+      "kind": "interaction",
+      "factor": "line:trt",
+      "test": "LRT:HI",
+      "reference": "HRT:CTRL",
+      "within": {
+        "tis": "SOL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "LRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "HRT",
+            "trt": "HI"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "LRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tis": "SOL",
+            "line": "HRT",
+            "trt": "CTRL"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
