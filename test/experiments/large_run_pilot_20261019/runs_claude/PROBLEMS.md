@@ -93,3 +93,12 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - The suitability report cannot see a within-animal factor (both muscles from each rat) when no animal ID is deposited; it called covariance not_required and listed tissue comparisons that are invalid without an animal key. The agent excluded them by hand.
 - `native.derive_columns` cannot build a key from several fields; matrix columns (`HRT_CTRL_SOL_rep1`) are a reordered GEO title.
 - The paper's thresholds disagree (Methods FDR < 0.001; Results/FIG2 FDR < 0.05 and logFC > 1); GEO RIN goes down to 7.8 while the paper says > 8.0.
+
+## PMID37724990 (GSE183150)
+
+- Fixed after this paper: `suitability.check_covariance` tested `~ arm + time + subject`, which is never full rank when each subject sits in one arm, and called the case not_analyzable. Between-subject factors are now flagged for paired change or a mixed model.
+- No DESeq2 route for subject nested in arm with an arm × time interaction; limma paired change was the only valid route.
+- `run.finish()` closes every open case, so calling it in an intermediate script forced two rebuilds. The skill now says to call it once, in the last script.
+- GEO has one GSM per sequencing lane (60 GSMs for 30 libraries); no helper merges lanes.
+- The paper's method, threshold and DEG table are in a supplement Europe PMC will not serve; the workflow default (padj < 0.05) gives 0 DEGs vs the paper's 46, while the paper's top genes rank 1–26 in the same direction.
+- `case.add_output` builds evidence IDs from the file name only, so two `suitability.json` files share one ID (`tools/native.py:961-965`).

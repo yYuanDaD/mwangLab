@@ -1,0 +1,131 @@
+{
+  "case_id": "GSE183150",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "ex": 9,
+          "uc": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "lane_gsms",
+          "decision": "omit",
+          "reason": "sample_identifier: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 13,
+        "min_cell_size": 6
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_ex_vs_uc"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 15 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 12,
+        "male": 3
+      },
+      "mismatched": [],
+      "table": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37724990\\GSE183150\\suitability\\library_counts_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "grp_ex_vs_uc__sex-female"
+          ],
+          "male": []
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_ex_vs_uc",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "ex",
+      "reference": "uc",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "ex"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "grp": "uc"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

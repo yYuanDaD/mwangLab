@@ -90,7 +90,7 @@ Complete them in this order for every case:
 
 After all cases:
 
-- Call `run.finish()`.
+- Call `run.finish()` once, in the last script: it closes every open case, and a finished run cannot be reopened. Earlier scripts continue the run with `RunRecorder.open(...)`.
 - Validate with `python <skill_dir>/scripts/validate_decision_contract.py <run_dir>`.
 - If the evaluator skill is installed, audit with `evaluate-bioinformatics-agent`.
 

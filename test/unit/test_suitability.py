@@ -101,6 +101,10 @@ def test_covariance_decisions():
                           index=[f"s{i}" for i in range(8)])
     cv = su.check_covariance(paired, ["time"])
     assert cv["blocking_terms"] == ["subject"] and cv["covariance_status"] == "required", cv
+    # Arm is between subjects (GSE183150): still analyzable, flagged for paired change.
+    paired["arm"] = ["ex"] * 4 + ["uc"] * 4
+    cv = su.check_covariance(paired, ["arm", "time"])
+    assert cv["status"] == "pass" and cv["between_subject_factors"] == ["arm"], cv
 
 
 def test_sex_check_and_split():

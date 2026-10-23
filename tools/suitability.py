@@ -318,7 +318,15 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
             covariates.append(col)
             decisions.append({"column": col, "decision": "candidate_covariate",
                               "reason": "crossed with the design factors; include if the paper did or PCA shows it"})
-    terms = list(factors) + blocking + covariates
+    # A factor constant within each subject (exercise vs usual care, each person in one arm)
+    # is aliased with the subject term, so ~ arm + time + subject is never full rank. Its
+    # effects are still estimable: within-subject differences (paired_change) or a mixed model.
+    between = [f for f in factors if blocking and meta.groupby(blocking[0])[f].nunique().max() == 1]
+    for f in between:
+        decisions.append({"column": f, "decision": "between_subjects",
+                          "reason": f"constant within each {blocking[0]}: fit within-{blocking[0]} differences "
+                                    "(paired_change) or a mixed model; not subject + factor in one fixed model"})
+    terms = [f for f in factors if f not in between] + blocking + covariates
     rank = native.design_check(meta, terms) if terms else None
     if rank and not rank["full_rank"]:
         # Covariates that break the rank are dropped from the candidate list, with the reason.
@@ -332,6 +340,7 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
     status = "fail" if stop or (rank and not rank["full_rank"]) or (rank and rank["residual_df"] < 1) else "pass"
     return {"status": status, "covariance_status": "required" if blocking else "not_required",
             "blocking_terms": blocking, "covariates": covariates, "stopping_columns": stop,
+            "between_subject_factors": between,
             "decisions": decisions,
             "design": {k: rank[k] for k in ("formula_equivalent", "rank", "full_rank", "residual_df",
                                              "min_cell_size")} if rank else None}
