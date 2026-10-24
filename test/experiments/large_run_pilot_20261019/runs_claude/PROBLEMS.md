@@ -125,3 +125,8 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Matrix columns use author labels (`12h-01-R`) found nowhere in GEO; rebuilt from title group + replicate by hand. No helper for "label = f(group, replicate)".
 - `tools/enrichment_tools.py:222` filters strictly `|log2FC| > cutoff`, so an inclusive FC ≥ 2 rule cannot be expressed; `:235` MyGene mapped 23 of 31 rat Ensembl IDs, silently dropping 8 DEGs from ORA.
 - Download tools take `geo_accession=`; the native-execution reference has no download entry.
+
+## PMID39383215 (GSE245048)
+
+- Third series-level screen false positive (after GSE188236, and GSE152133 at paper level): the paper's exercise cohorts were not sequenced; the series is genotype only. Refused correctly at design.
+- `tools/analysis_policy.py:41-43` keeps a column unless every value fails numeric conversion, so featureCounts `seqnames`, `start`, `end`, `length` pass as sample columns (alignment excluded them).
