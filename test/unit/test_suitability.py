@@ -119,6 +119,10 @@ def test_sex_check_and_split():
         assert sx["status"] == "mismatch" and sx["mismatched"] == [swapped], sx
         plan = su.sex_split_plan(meta, ["grp"], sx["sex_by_sample"])
         assert plan["split"] and plan["analyzable_per_sex"]["male"] and plan["analyzable_per_sex"]["female"], plan
+        nomark = os.path.join(d, "nomarkers.csv")
+        counts.drop(index=["Xist", "Ddx3y", "Uty", "Kdm5d"]).to_csv(nomark)
+        fallback = su.check_sex(nomark, meta, out_dir=d)            # no markers: metadata sex is used
+        assert fallback["status"] == "no_markers" and fallback["sexes"] == ["female", "male"], fallback
         nosex = su.check_sex(path, meta.drop(columns=["sex"]), out_dir=d)   # no metadata sex column
         assert nosex["status"] == "pass" and nosex["mismatched"] == [], nosex
         one = su.sex_split_plan(meta, ["grp"], {s: "male" for s in meta.index})

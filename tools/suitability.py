@@ -369,7 +369,13 @@ def check_sex(matrix_csv: str | Path, metadata: pd.DataFrame, *, organism: str =
     meta_csv.unlink(missing_ok=True)
     tsv = out_dir / f"{Path(matrix_csv).stem}_sex_check.tsv"
     if not tsv.exists():
-        return {"status": "no_markers", "summary": msg.splitlines()[0] if msg else "", "sex_by_sample": {}}
+        # No markers to check against, but the metadata sex can still drive the per-sex plan.
+        col = _detect_sex_column(metadata)
+        by_sample = ({str(k): v for k, v in metadata[col].map(_normalize_sex_value).items() if v}
+                     if col else {})
+        return {"status": "no_markers", "summary": msg.splitlines()[0] if msg else "",
+                "metadata_sex_column": col, "sex_by_sample": by_sample,
+                "sexes": sorted(set(by_sample.values()))}
     table = pd.read_csv(tsv, sep="\t", index_col=0)
     table.index = table.index.astype(str)
     sex_col = _detect_sex_column(metadata)

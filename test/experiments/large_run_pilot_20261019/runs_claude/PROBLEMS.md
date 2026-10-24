@@ -166,3 +166,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Counts above the paper (318 vs 145; 214 vs 18) with no explanation found (pairwise and shrinkage audits do not close it); the matrix is author-filtered and rounded. The paper's "training mitigates" claim rests on comparing two thresholded lists; the formal interaction gives 0 DEGs.
 - `check_sex` ignores a `gene_symbol` column in the file (third paper); `apply_threshold` cannot mix strict and inclusive cutoffs; no LFC shrinkage option in `run_joint_deseq2`.
 - The agent believed rat enrichment is unsupported; rat GSEA/ORA via mouse gene sets exists since the pilot fixes, so the skill text should say so.
+
+## PMID40693573 (GSE151066 + GSE279359)
+
+- Human part close (259/194 vs 210/116, marker genes up); mouse long-read part not reproducible from the filtered deposit (2,974 known genes vs the paper's ~6,000; Fbxo32 and Fos absent). The paper's topic, alternative splicing, has no executor (rMATS / IsoformSwitchAnalyzeR / Swan).
+- `GSE279359_processed_counts.txt.gz` has a header one field shorter than its rows; `native.read_table` (`tools/native.py:199-201`) then reads annotation columns as numbers with no warning.
+- Fixed after this paper: with no sex markers, `check_sex` returned no sexes even when GEO metadata has a sex column; it now falls back to the metadata sex.
+- `check_sex` only recognises symbols (Ensembl-indexed human matrix needed a renamed copy); `run_deseq2_analysis` has no rounding option for RSEM counts; the contract allows one paper threshold, so the paper's relaxed second rule is an audit.
