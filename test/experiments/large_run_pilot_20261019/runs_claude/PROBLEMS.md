@@ -160,3 +160,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `RunRecorder.case()` does not restore a case's accession after `RunRecorder.open()` (`tools/native.py:859-865`); `summary.csv` accession empty when it is not passed again.
 - Possible undocumented pairing (library numbering) changes the result about 100-fold (32 vs 3133); the unpaired fit is primary.
 - Xist missing from the deposited matrix, so the sex check has no female marker.
+
+## PMID40650303 (GSE298775)
+
+- Counts above the paper (318 vs 145; 214 vs 18) with no explanation found (pairwise and shrinkage audits do not close it); the matrix is author-filtered and rounded. The paper's "training mitigates" claim rests on comparing two thresholded lists; the formal interaction gives 0 DEGs.
+- `check_sex` ignores a `gene_symbol` column in the file (third paper); `apply_threshold` cannot mix strict and inclusive cutoffs; no LFC shrinkage option in `run_joint_deseq2`.
+- The agent believed rat enrichment is unsupported; rat GSEA/ORA via mouse gene sets exists since the pilot fixes, so the skill text should say so.
