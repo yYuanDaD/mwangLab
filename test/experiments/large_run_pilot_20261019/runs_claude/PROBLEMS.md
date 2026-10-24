@@ -145,3 +145,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `suitability.check_sex` needs gene symbols; a RefSeq-indexed matrix finds no markers (same as Entrez in GSE275818).
 - `enumerate_comparisons` fixes the direction of non-reference pairs alphabetically (`grp_SS_vs_SES`, opposite to the exercise effect); no option to set it (also GSE232510).
 - No t-test executor; GSEA is Hallmark only (no MSigDB M5 GO). `summary.csv` leaves control/treatment blank for multilevel designs.
+
+## PMID40577041 (GSE267763)
+
+- Reproduced (32 vs 34; 0 vs 0; 0 vs 0) on limma with TMM-scaled log-CPM.
+- **Third paper hit by the voom executor's missing TMM** (`tools/limma_voom.R:12-13,31`; `tools/limma_voom_tools.py:60-67` takes no norm factors). On the mitochondria fraction (mito rRNA 9–77% of reads, TMM factors 0.10–2.66) plain voom piles p-values near 1: 0 of 7,210 genes at p < 0.05 vs the paper's 365. The first pass used it and was redone.
+- No check flags a p-value histogram piled up near 1; `deg_sanity` said ok.
+- The voom executor prints counts at padj < 0.05 and |log2FC| > 1 regardless of the paper rule (`tools/limma_voom_tools.py:158-167`). No executor applies a CPM-in-all-samples filter.
