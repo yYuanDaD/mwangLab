@@ -130,3 +130,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 
 - Third series-level screen false positive (after GSE188236, and GSE152133 at paper level): the paper's exercise cohorts were not sequenced; the series is genotype only. Refused correctly at design.
 - `tools/analysis_policy.py:41-43` keeps a column unless every value fails numeric conversion, so featureCounts `seqnames`, `start`, `end`, `length` pass as sample columns (alignment excluded them).
+
+## PMID39821584 (GSE275818)
+
+- Reproduced with a pairwise fit (within 2–4% of the paper); the skill's joint model gives up to 31% more DEGs (2397 vs 1823) because the paper's provider apparently fitted each pair alone. The skill has no rule for a paper whose fit structure is pairwise.
+- `suitability.check_sex` found no markers because the matrix index is Entrez IDs; it does not use a `gene_name` column in the file. Checked by hand: all male.
+- No automatic Entrez → symbol mapping even when the file carries symbols; `run_enrichment_analysis` filters only on padj, so the paper's raw-p list rule cannot be used for ORA (`tools/enrichment_tools.py:217-218`).
+- `apply_threshold(inclusive=...)` applies to both cutoffs, so "p ≤ x and |LFC| > y" cannot be expressed.
