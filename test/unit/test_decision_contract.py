@@ -229,6 +229,15 @@ class ThresholdNameTests(unittest.TestCase):
         self.assertEqual(check_case(same, "c1"), [])
 
 
+class RoundingTests(unittest.TestCase):
+    def test_rounding_documented_on_method_covers_execution(self):
+        records = set_final(paired_case(), "matrix", matrix_type="estimated counts (salmon)")
+        set_final(records, "method", matrix_type="estimated counts (salmon)")
+        self.assertTrue(any("rounding_documented" in e for e in check_case(records, "c1")))
+        set_final(records, "method", rounding_documented="rounded to integers before DESeq2")
+        self.assertEqual([e for e in check_case(records, "c1") if "rounding" in e], [])
+
+
 class SuitabilityTests(unittest.TestCase):
     """Contract v3: a valid design carries the pre-analysis suitability verdict."""
 

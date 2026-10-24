@@ -309,6 +309,8 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
     # A transform declared in the method decision applies to the executed analysis too.
     case_transform = next((str((r.get("final") or {}).get("transform")) for r in valid("method")
                            if (r.get("final") or {}).get("transform")), "")
+    # So does documented rounding of estimated counts.
+    case_rounding = any((r.get("final") or {}).get("rounding_documented") for r in valid("method"))
     for record in valid("method") + [r for r in by_stage.get("execution", [])
                                      if r.get("execution_status") == "completed"]:
         final = record.get("final") or {}
@@ -317,7 +319,8 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
         transform = str(final.get("transform") or case_transform).lower()
         if family == "count" and types & {"linear_normalized", "log_scale", "methylation_beta"}:
             errors.append(f"{case_id}: count-based method {final.get('method')!r} on {sorted(types)} matrix")
-        if family == "count" and "estimated_counts" in types and not final.get("rounding_documented"):
+        if family == "count" and "estimated_counts" in types and not (final.get("rounding_documented")
+                                                                        or case_rounding):
             errors.append(f"{case_id}: count method on estimated counts needs final.rounding_documented")
         if family == "log_linear" and types & {"raw_counts", "linear_normalized", "methylation_beta",
                                                "estimated_counts"} and not transform:
