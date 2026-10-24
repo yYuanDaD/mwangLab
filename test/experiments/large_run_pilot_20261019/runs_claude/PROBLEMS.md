@@ -137,3 +137,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `suitability.check_sex` found no markers because the matrix index is Entrez IDs; it does not use a `gene_name` column in the file. Checked by hand: all male.
 - No automatic Entrez → symbol mapping even when the file carries symbols; `run_enrichment_analysis` filters only on padj, so the paper's raw-p list rule cannot be used for ORA (`tools/enrichment_tools.py:217-218`).
 - `apply_threshold(inclusive=...)` applies to both cutoffs, so "p ≤ x and |LFC| > y" cannot be expressed.
+
+## PMID40295575 (GSE283250)
+
+- `tools/geo_tar.py:108,116-118` keys tar members on their first column (here gene symbol) and keeps the first duplicate, silently dropping 10,116 of 33,299 transcript rows. The agent merged on transcript ID by hand.
+- Cufflinks estimated counts saved as integers look like raw counts; nothing checks provenance.
+- `suitability.check_sex` needs gene symbols; a RefSeq-indexed matrix finds no markers (same as Entrez in GSE275818).
+- `enumerate_comparisons` fixes the direction of non-reference pairs alphabetically (`grp_SS_vs_SES`, opposite to the exercise effect); no option to set it (also GSE232510).
+- No t-test executor; GSEA is Hallmark only (no MSigDB M5 GO). `summary.csv` leaves control/treatment blank for multilevel designs.
