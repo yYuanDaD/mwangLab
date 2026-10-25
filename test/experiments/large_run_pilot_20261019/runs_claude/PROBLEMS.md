@@ -231,3 +231,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Reproduced (79 vs 87; 281 vs 293).
 - Fixed after this paper: `run_deseq2_analysis` now takes `alpha` (independent filtering was fixed at pydeseq2's 0.05; R and this paper use 0.1; also seen in GSE232510, GSE301564); the validator now accepts "gene symbol"/"symbol"/"ensembl" spellings for `feature_id_type` (also GSE282942).
 - No Reactome ORA executor; IPA is proprietary.
+
+## PMID42277794 (GSE263186)
+
+- No paper counts (volcano plots only); TNFα-NFκB direction matches, other pathway reversals do not. Trem1 itself is barely expressed; the paper's TREM-1 claim rests on IPA.
+- Fig. 4A uses n = 2 for one group while Methods and GEO have 3; the dropped sample is unnamed (count moves 452 → 319).
+- `case.finish(n_deg=...)` takes one integer, so `summary.csv` shows one contrast's count for multi-contrast cases; `control` is empty when the design uses a `contrasts` list.
+- `tools/geo_tar.py:30` leaves `.STAR` in column names (also GSE295777).
