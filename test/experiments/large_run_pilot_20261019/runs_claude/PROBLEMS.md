@@ -251,3 +251,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - **Fixed after this paper (serious):** `run_deseq2_analysis` fitted numeric subject IDs passed in `covariate_columns` as one continuous slope, silently unpairing the design (1,105 vs 2,819 DEGs; a singular fit for the male subset). Covariates are now cast to categories before the fit; regression test `test/unit/test_deseq2_numeric_subject.py`. A scan of the earlier runs' aligned metadata found no other numeric subject/visit column passed this way, so no earlier result is affected.
 - `joint_contrasts` cannot fit subject nested in intensity with an intensity × time model; separate paired fits plus limma paired change were used.
 - Three sub-series share one 62-sample metadata file; the 3 h matrix labels donors by number while GEO titles use initials.
+
+## PMID42666019 (GSE326247)
+
+- Third "exercise mediator" design (myoblasts treated with EVs from exercised muscle); the paper's SED < CE < EE gene increase holds only for SED → CE.
+- `native.feature_id_report` (`tools/native.py:552`) calls StringTie-prefixed IDs (`gene-Slc19a1`) plain symbols, and `check_sex` misses markers behind the prefix.
+- The deposited xlsx has a blank row that survives xlsx-to-CSV conversion (`tools/geo_tools.py:85`).
+- No standard `paper_route` status for "same method, different model fit" (joint vs pairwise); free text is accepted unchecked.
