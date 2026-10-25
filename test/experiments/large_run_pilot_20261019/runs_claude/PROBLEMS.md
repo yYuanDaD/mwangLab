@@ -248,6 +248,6 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42594877 (GSE308252)
 
 - Reproduced (2819 vs 2600; 1960 vs 1677; 26 vs 25).
-- **Fixed after this paper (serious):** `run_deseq2_analysis` fitted numeric subject IDs passed in `covariate_columns` as one continuous slope, silently unpairing the design (1,105 vs 2,819 DEGs; a singular fit for the male subset). Covariates are now cast to categories before the fit; regression test `test/unit/test_deseq2_numeric_subject.py`. Earlier runs that passed numeric subject IDs through `covariate_columns` should be rechecked.
+- **Fixed after this paper (serious):** `run_deseq2_analysis` fitted numeric subject IDs passed in `covariate_columns` as one continuous slope, silently unpairing the design (1,105 vs 2,819 DEGs; a singular fit for the male subset). Covariates are now cast to categories before the fit; regression test `test/unit/test_deseq2_numeric_subject.py`. A scan of the earlier runs' aligned metadata found no other numeric subject/visit column passed this way, so no earlier result is affected.
 - `joint_contrasts` cannot fit subject nested in intensity with an intensity × time model; separate paired fits plus limma paired change were used.
 - Three sub-series share one 62-sample metadata file; the 3 h matrix labels donors by number while GEO titles use initials.
