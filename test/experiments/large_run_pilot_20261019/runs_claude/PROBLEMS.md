@@ -258,3 +258,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `native.feature_id_report` (`tools/native.py:552`) calls StringTie-prefixed IDs (`gene-Slc19a1`) plain symbols, and `check_sex` misses markers behind the prefix.
 - The deposited xlsx has a blank row that survives xlsx-to-CSV conversion (`tools/geo_tools.py:85`).
 - No standard `paper_route` status for "same method, different model fit" (joint vs pairwise); free text is accepted unchecked.
+
+## PMID42802483 (GSE331495)
+
+- Sixth screen false positive: aging cohort cell lines; the exercise pilot was not sequenced. Refused correctly at design.
+- `case.suitability` writes to one fixed `<case>/suitability/` folder, so a case with two matrices overwrites the first report (`tools/native.py:967-982`).
+- GEO stores age group as "genotype" and sex as "batch"; a keyword batch picker would misread them.
+- Accession blank in `summary.csv` again after `RunRecorder.open` (known).

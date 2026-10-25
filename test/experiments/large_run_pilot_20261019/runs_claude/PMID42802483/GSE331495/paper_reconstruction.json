@@ -1,0 +1,61 @@
+{
+  "paper_id": "PMID42802483 / PMC13617198 / doi:10.1111/acel.70734",
+  "accessions": [
+    "GSE331495"
+  ],
+  "assay": "bulk polyA RNA-seq of cultured primary dermal fibroblasts (9) and directly converted induced neurons (13) from SHOCK healthy-aging donors (S4.6.p1, S4.6.p2, DA.p1)",
+  "organism": "Homo sapiens",
+  "sample_inclusion": "fibroblasts: 4 young (23-33 y) + 5 older (64-72 y); iNs: 8 young (23-35 y) + 5 older (64-76 y); donors selected a priori by age and sex (S4.6.p1, S4.6.p2, S4.1.p1)",
+  "sample_exclusion": "not_reported (all samples met QC, S4.6.p3)",
+  "factors": [
+    {
+      "name": "age group",
+      "levels": [
+        "Young",
+        "Older"
+      ]
+    },
+    {
+      "name": "sex",
+      "levels": [
+        "F",
+        "M"
+      ]
+    },
+    {
+      "name": "cell type",
+      "levels": [
+        "fibroblast",
+        "iN"
+      ],
+      "note": "processed and analyzed separately"
+    }
+  ],
+  "exercise_factor_in_this_accession": "none. The paper's only exercise component is the STRONG pilot (5 older adults, 12-week mild exercise), measured as PBMC autophagy flux by LC3B-II Western blot (S2.5.p1-p3, S4.2.p1, S4.10.p1, S4.11.p1); it was not sequenced. Treadmill exercise in SHOCK (S2.4.p1) is a fitness assessment correlated with flux, not an intervention and not sequenced.",
+  "primary_estimand": "RNA-seq: effect of donor age (older vs young) on gene expression within fibroblasts and within iNs, adjusted for sex (~ sex + age) (S4.6.p4). Exercise estimand (pre vs post 12-week mild exercise) exists only for PBMC autophagy flux protein readout, not for transcription.",
+  "planned_contrasts": [
+    "fibroblast: older vs young, ~ sex + age, DESeq2 + apeglm (S2.1.p1, S4.6.p4)",
+    "iN: older vs young, ~ sex + age, DESeq2 + apeglm (S2.1.p3, S4.6.p4)"
+  ],
+  "exercise_contrasts_in_paper": [
+    "PBMC autophagy flux week 12 vs week 0, paired t-test, N=5 (FIG5B) - protein assay, no GEO data"
+  ],
+  "repeated_measure_unit": "none in RNA-seq (one sample per donor per cell type; 5 donors are subject-matched across fibroblast and iN but cell types are analyzed separately, S2.1.p3)",
+  "normalization": "nf-core/rnaseq STAR + Salmon, tximport gene counts (salmon.merged.gene_counts.tsv); DESeq2, genes with <10 total counts removed (S4.6.p3, S4.6.p4)",
+  "paper_method": "DESeq2 ~ sex + age, Wald test, apeglm LFC shrinkage (S4.6.p4)",
+  "paper_threshold": {
+    "metric": "padj",
+    "adjustment": "BH",
+    "cutoff": 0.05,
+    "effect_metric": "log2FoldChange (apeglm-shrunken)",
+    "effect_cutoff": 1.0,
+    "effect_cutoff_original": "|log2 fold change| > 1",
+    "inclusive": false,
+    "source_locator": "S4.6.p4",
+    "applies_to": "older vs young donors (age), not exercise"
+  },
+  "paper_result": {
+    "fibroblast_older_vs_young": "94 up + 188 down = 282 DEGs (S2.1.p1)",
+    "iN_older_vs_young": "fewer DEGs than fibroblasts; count not stated (S2.1.p3, SUP1 Figure S1D)"
+  }
+}
