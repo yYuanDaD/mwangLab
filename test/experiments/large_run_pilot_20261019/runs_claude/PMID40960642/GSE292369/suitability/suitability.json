@@ -1,0 +1,257 @@
+{
+  "case_id": "GSE292369",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "cond",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "cond",
+        "time"
+      ],
+      "levels": {
+        "cond": {
+          "PLA": 17,
+          "KME": 17
+        },
+        "time": {
+          "POST": 18,
+          "PRE": 16
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "one sample per subject per factor level set: an identifier, not a block"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(cond) + C(time)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 31,
+        "min_cell_size": 8
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_POST_vs_PRE_cond-PLA",
+        "time_POST_vs_PRE_cond-KME",
+        "cond_time_KME_POST_vs_PLA_PRE",
+        "cond_KME_vs_PLA_time-POST",
+        "cond_KME_vs_PLA_time-PRE"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 34 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 34
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40960642\\GSE292369\\suitability\\aligned_matrix_34_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "cond_KME_vs_PLA_time-POST",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "KME",
+      "reference": "PLA",
+      "within": {
+        "time": "POST"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "POST",
+            "cond": "KME"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "time": "POST",
+            "cond": "PLA"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_KME_vs_PLA_time-PRE",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "KME",
+      "reference": "PLA",
+      "within": {
+        "time": "PRE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "PRE",
+            "cond": "KME"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "PRE",
+            "cond": "PLA"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_POST_vs_PRE_cond-KME",
+      "kind": "simple",
+      "factor": "time",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {
+        "cond": "KME"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "KME",
+            "time": "POST"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "cond": "KME",
+            "time": "PRE"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_POST_vs_PRE_cond-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {
+        "cond": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "PLA",
+            "time": "POST"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "cond": "PLA",
+            "time": "PRE"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_time_KME_POST_vs_PLA_PRE",
+      "kind": "interaction",
+      "factor": "cond:time",
+      "test": "KME:POST",
+      "reference": "PLA:PRE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cond": "KME",
+            "time": "POST"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "cond": "PLA",
+            "time": "POST"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "cond": "KME",
+            "time": "PRE"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cond": "PLA",
+            "time": "PRE"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

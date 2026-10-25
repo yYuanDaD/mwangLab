@@ -185,3 +185,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed after this paper: `suitability.BATCH_COLUMN` matched a bare "run", so the exercise factor's own source column (`characteristics run: sed/run`) was flagged as a confounded batch and the case called not_analyzable. "run" now needs an id/date/number suffix, and a column with the same values as a design factor is treated as its source, not a batch.
 - Second paper where the paper's DEG lists come from separate two-group fits (named genes significant only there); see REVIEW.md question 3.
 - `tools/deseq2_tools.py:155` calls `DeseqStats` without `alpha`, so independent filtering is always 0.05 (paper: FDR 0.1).
+
+## PMID40960642 (GSE292369)
+
+- Exercise effect reproduced in direction and named genes, 36% more DEGs (paper's Partek gene filter unknown); ketone effect near null as in the paper.
+- `enumerate_comparisons` never offers a pooled main effect (time averaged over condition), the paper's headline estimand; `run_joint_deseq2` cannot combine a visit block nested in condition with cell contrasts.
+- No helper sums transcript-level estimated counts to genes (`native.collapse_to_genes` picks one row per gene, wrong for counts); `run_deseq2_analysis` has no rounding option.
+- The deposited normalized matrix silently drops 2 outlier libraries the paper never mentions.
