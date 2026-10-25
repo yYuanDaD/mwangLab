@@ -203,7 +203,8 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
             and record["execution_status"] in {"completed", "failed"}:
         errors.append(f"{source}: decision gate {stage} keeps execution_status not_started; "
                       "only execution and enrichment records run something")
-    if stage == "enrichment" and status == "valid":
+    # A planned enrichment that was not run only needs reason_not_run (checked above).
+    if stage == "enrichment" and status == "valid" and record["execution_status"] != "not_run":
         errors.extend(_enrichment_errors(final, source))
     if stage == "study" and status == "valid" and final.get("route") not in STUDY_ROUTES:
         errors.append(f"{source}: study route must be one of {sorted(STUDY_ROUTES)}")

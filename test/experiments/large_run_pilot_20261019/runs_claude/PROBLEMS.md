@@ -217,3 +217,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `tools/geo_tools.py:29,35` reads and writes GEO metadata without an encoding: "HSP90α" became mojibake on Windows and broke `derive_columns`.
 - `decision_contract` accepts only the exact tokens `gene_symbol` / `ensembl_gene` for `feature_id_type`; "gene symbol" fails with a misleading "needs id_mapping" error.
 - `RunRecorder` cannot roll back a half-written stage; each retry needed a manual restore.
+
+## PMID41964396 (GSE220280 + GSE276889)
+
+- Reproduced: mRNA up counts 173/418 vs 178/465; miRNA raw-p counts 15/11/22 vs 16/11/22 and miR-146b-5p p-values match, only with subject blocking.
+- Fixed after this paper: the validator demanded ORA fields (`input_threshold`, `id_mapping`) on an enrichment record that was planned but not run; `reason_not_run` is now enough, as the reference says.
+- No `CaseRecorder` amend: the agent patched one field of `decisions.json` by hand (labelled in the record).
+- `run_joint_deseq2` has no prefilter option and fits numeric subject IDs (1–12) as a continuous covariate; recode them to strings.
+- The agent stalled once during download (stream watchdog); files were already there and it resumed.
