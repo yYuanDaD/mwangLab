@@ -192,3 +192,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `enumerate_comparisons` never offers a pooled main effect (time averaged over condition), the paper's headline estimand; `run_joint_deseq2` cannot combine a visit block nested in condition with cell contrasts.
 - No helper sums transcript-level estimated counts to genes (`native.collapse_to_genes` picks one row per gene, wrong for counts); `run_deseq2_analysis` has no rounding option.
 - The deposited normalized matrix silently drops 2 outlier libraries the paper never mentions.
+
+## PMID41142228 (GSE308626)
+
+- No paper DEG total to compare; named genes and the OXPHOS decrease reproduce.
+- `tools/geo_tar.py:57-59` silently skips tar members that are not `.txt/.tsv/.csv/.tab` (here 10 RSEM `genes.results` files beside 10 STAR tables) and reports only the members it read.
+- `run_gsea_analysis` ranks every non-zero gene with no low-count prefilter (19% tied ranking values) and supports Hallmark only.
