@@ -244,3 +244,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Second paper whose counts match raw p < 0.05, not its stated q < 0.05 (464/296 vs 486/270; with FDR: 106/4). Same question as GSE297318 in REVIEW.md.
 - The PCA does not show the T/TE separation the paper describes; one outlier sample.
 - `decision-contract.md` does not say `input_threshold` must be a dict; matrix columns needed a prefix stripped from GEO titles by hand.
+
+## PMID42594877 (GSE308252)
+
+- Reproduced (2819 vs 2600; 1960 vs 1677; 26 vs 25).
+- **Fixed after this paper (serious):** `run_deseq2_analysis` fitted numeric subject IDs passed in `covariate_columns` as one continuous slope, silently unpairing the design (1,105 vs 2,819 DEGs; a singular fit for the male subset). Covariates are now cast to categories before the fit; regression test `test/unit/test_deseq2_numeric_subject.py`. Earlier runs that passed numeric subject IDs through `covariate_columns` should be rechecked.
+- `joint_contrasts` cannot fit subject nested in intensity with an intensity × time model; separate paired fits plus limma paired change were used.
+- Three sub-series share one 62-sample metadata file; the 3 h matrix labels donors by number while GEO titles use initials.

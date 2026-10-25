@@ -138,6 +138,12 @@ def run_deseq2_analysis(
         level_codes = {str(control_group): "A_control", str(treatment_group): "B_treatment"}
         level_codes.update({v: f"C_other{i}" for i, v in enumerate(others)})
         metadata_df[safe_col] = metadata_df[safe_col].astype(str).map(level_codes)
+        # Covariates are categorical (subject, batch): numeric subject IDs read from CSV must
+        # not become one continuous slope, which silently unpairs a paired design (GSE308252).
+        if multifactor_plan is not None:
+            for col in multifactor_plan.covariates:
+                safe = multifactor_plan.safe_columns[col]
+                metadata_df[safe] = metadata_df[safe].astype(str)
 
         print(f"Running DESeq2 on {len(counts_df.index)} samples and {len(counts_df.columns)} genes...")
 
