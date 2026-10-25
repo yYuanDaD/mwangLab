@@ -210,3 +210,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed after this paper: GEO's `batch` field held Before/After, so `check_covariance` called it completely confounded and stopped the case. A column that splits the samples exactly like a factor (under other labels) is now `check` (partial): the agent decides whether it is the factor's own column or an aliased batch.
 - The report's between-subject note missed the nested re-parameterisation (subject + per-arm post effects) the paper used; `run_joint_deseq2` cannot take it directly.
 - The excluded participant is not named in the paper (inferred from PCA); deposit has unscaled salmon counts, not lengthScaledTPM.
+
+## PMID41933175 (GSE282942)
+
+- Second "exercise mediator" case (irisin on cultured cells, no exercise arm), run as a proxy; same open question as GSE294230.
+- `tools/geo_tools.py:29,35` reads and writes GEO metadata without an encoding: "HSP90α" became mojibake on Windows and broke `derive_columns`.
+- `decision_contract` accepts only the exact tokens `gene_symbol` / `ensembl_gene` for `feature_id_type`; "gene symbol" fails with a misleading "needs id_mapping" error.
+- `RunRecorder` cannot roll back a half-written stage; each retry needed a manual restore.
