@@ -213,7 +213,10 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
 
 def _enrichment_errors(final: dict, source: str) -> list[str]:
     errors = []
-    id_type = str(final.get("feature_id_type", "")).lower()
+    # "gene symbol", "Gene-Symbol" and "symbol" all mean gene_symbol.
+    id_type = re.sub(r"[\s-]+", "_", str(final.get("feature_id_type", "")).strip().lower())
+    id_type = {"symbol": "gene_symbol", "symbols": "gene_symbol", "gene_symbols": "gene_symbol",
+               "ensembl": "ensembl_gene", "ensembl_gene_id": "ensembl_gene"}.get(id_type, id_type)
     if id_type and id_type not in GENE_SET_READY_IDS and not final.get("id_mapping"):
         errors.append(f"{source}: feature_id_type {id_type!r} needs final.id_mapping (for example a "
                       "platform annotation or ID-to-symbol table) before gene-set analysis")

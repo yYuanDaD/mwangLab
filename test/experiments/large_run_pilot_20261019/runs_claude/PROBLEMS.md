@@ -225,3 +225,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - No `CaseRecorder` amend: the agent patched one field of `decisions.json` by hand (labelled in the record).
 - `run_joint_deseq2` has no prefilter option and fits numeric subject IDs (1–12) as a continuous covariate; recode them to strings.
 - The agent stalled once during download (stream watchdog); files were already there and it resumed.
+
+## PMID42155766 (GSE304653)
+
+- Reproduced (79 vs 87; 281 vs 293).
+- Fixed after this paper: `run_deseq2_analysis` now takes `alpha` (independent filtering was fixed at pydeseq2's 0.05; R and this paper use 0.1; also seen in GSE232510, GSE301564); the validator now accepts "gene symbol"/"symbol"/"ensembl" spellings for `feature_id_type` (also GSE282942).
+- No Reactome ORA executor; IPA is proprietary.

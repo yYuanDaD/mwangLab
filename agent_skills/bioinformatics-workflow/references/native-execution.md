@@ -110,8 +110,8 @@ All executors read the aligned files. Raw-count executors require integer counts
 
 | Route | Call |
 |---|---|
-| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="")` |
-| limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="")` |
+| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="", alpha=0.05)` (set `alpha` to the paper's FDR; R uses 0.1) |
+| limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="", alpha=0.05)` (set `alpha` to the paper's FDR; R uses 0.1) |
 | edgeR, two arms, no covariates | `run_edger_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | limma-voom (needs R + limma) | `run_limma_voom_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | one model, several levels / factorial / paired change | `tools.multigroup_tools:run_multigroup_analysis(expression_csv, metadata_csv, plan, output_dir)` (plain function; through `call_tool` a `PolicyViolation` becomes a `NativeToolError`) |

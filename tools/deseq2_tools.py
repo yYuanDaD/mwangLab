@@ -27,9 +27,13 @@ def run_deseq2_analysis(
     output_dir: str = "./output",
     covariate_columns: str = "",
     interaction_terms: str = "",
+    alpha: float = 0.05,
 ) -> str:
     """
     Run Differential Expression Analysis using PyDESeq2.
+
+    ``alpha`` is the independent-filtering target (pydeseq2 default 0.05; R DESeq2's
+    results() uses 0.1). Set it to the paper's FDR cutoff.
 
     Args:
         counts_csv: Path to the raw counts CSV file (must be unnormalized raw counts).
@@ -155,6 +159,7 @@ def run_deseq2_analysis(
         stat_res = DeseqStats(
             dds,
             contrast=(safe_col, "B_treatment", "A_control"),
+            alpha=alpha,
             n_cpus=8,
         )
         stat_res.summary()
