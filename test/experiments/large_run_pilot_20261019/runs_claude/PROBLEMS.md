@@ -173,3 +173,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `GSE279359_processed_counts.txt.gz` has a header one field shorter than its rows; `native.read_table` (`tools/native.py:199-201`) then reads annotation columns as numbers with no warning.
 - Fixed after this paper: with no sex markers, `check_sex` returned no sexes even when GEO metadata has a sex column; it now falls back to the metadata sex.
 - `check_sex` only recognises symbols (Ensembl-indexed human matrix needed a renamed copy); `run_deseq2_analysis` has no rounding option for RSEM counts; the contract allows one paper threshold, so the paper's relaxed second rule is an audit.
+
+## PMID40803696 (GSE295777)
+
+- Fourth series-level screen false positive: the swimming cohort was not sequenced; the series is genotype under pressure overload. Refused correctly at design.
+- The X/Y sex check finds 2 female + 2 male per arm (high confidence) although the paper says male mice; balanced, so not confounded.
+- `native.merge_raw_tar` names columns after tar members (`GSM8957194_F-9.STAR`); `tools/geo_tar.py:30-31` strips only `.ReadsPerGene.out`, so columns need renaming to the GSM ID before exact alignment.
