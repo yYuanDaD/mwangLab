@@ -198,3 +198,8 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - No paper DEG total to compare; named genes and the OXPHOS decrease reproduce.
 - `tools/geo_tar.py:57-59` silently skips tar members that are not `.txt/.tsv/.csv/.tab` (here 10 RSEM `genes.results` files beside 10 STAR tables) and reports only the members it read.
 - `run_gsea_analysis` ranks every non-zero gene with no low-count prefilter (19% tied ranking values) and supports Hallmark only.
+
+## PMID41213899 (GSE263103–GSE263106)
+
+- Fifth screen false positive: a knockout/ageing study where exercise is only a treadmill phenotype test. Refused correctly at design (3 age cases).
+- Sex check calls all 36 samples male (high confidence) although the paper says mixed sexes; GEO has no sex field.
