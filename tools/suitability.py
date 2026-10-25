@@ -263,7 +263,8 @@ def check_sample_size(comparisons: Sequence[dict], planned: Sequence[str] = ()) 
 # ---------------------------------------------------------------------------
 
 SUBJECT_COLUMN = re.compile(r"subject|donor|patient|participant|individual|animal|mouse id|rat id|pair", re.I)
-BATCH_COLUMN = re.compile(r"batch|lane|flow ?cell|run|plate|chip|slide|library|seq(uencing)?[ _-]?(date|run)|"
+BATCH_COLUMN = re.compile(r"batch|lane|flow ?cell|run[ _-]?(id|date|number|no)\b|plate|chip|slide|library|"
+                          r"seq(uencing)?[ _-]?(date|run)|"
                           r"processing|cohort|site|center|centre", re.I)
 
 
@@ -300,6 +301,15 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
     cand = list(candidates) if candidates is not None else [
         c for c in meta.columns if BATCH_COLUMN.search(str(c)) and c not in factors and c != subject]
     for col in cand:
+        # A column with the same values as a factor is that factor's source column
+        # (characteristics "run: sed/run" behind a derived grp), not a batch. A batch that
+        # merely splits the samples the same way (sequencing project P1/P2) still stops.
+        alias = next((f for f in factors if (meta[col].astype(str).str.strip().str.lower()
+                                             == meta[f].astype(str).str.strip().str.lower()).all()), None)
+        if alias:
+            decisions.append({"column": col, "decision": "omit",
+                              "reason": f"same grouping as design factor {alias} (its source column)"})
+            continue
         worst = "crossed"
         for f in factors:
             rep = native.confounding_report(meta, f, [col])[0]["status"]

@@ -1,0 +1,85 @@
+{
+  "paper_id": "PMID40932577 / PMC12972430 / doi 10.1007/s11357-025-01856-7",
+  "accessions": [
+    "GSE301564"
+  ],
+  "assay": "bulk RNA-seq, gastrocnemius, STAR mm10 + featureCounts Ensembl 100 gene counts, non-mitochondrial genes (S2.10.p1)",
+  "organism": "Mus musculus, female C57BL/6JN, >17 months (S2.1.p1)",
+  "sample_inclusion": [
+    "n = 3-4 randomly selected per group for RNA-seq (S2.9.p1)",
+    "Low Run n=4, High Run n=4, controls n=3-4 (FIG6 legend)"
+  ],
+  "sample_exclusion": [
+    "not_reported"
+  ],
+  "factors": [
+    {
+      "name": "Frailty",
+      "levels": [
+        "Low (<=1 frailty markers)",
+        "High (>=2 markers)"
+      ],
+      "reference": "Low",
+      "note": "retrospective stratification, not randomized (S2.2.p2)"
+    },
+    {
+      "name": "Run",
+      "levels": [
+        "Control (cage sedentary)",
+        "Run (2 bouts downhill running, harvest 24 h later)"
+      ],
+      "reference": "Control",
+      "note": "randomized (S2.2.p2)"
+    }
+  ],
+  "primary_estimand": "Effect of downhill running stress (24 h after 2 bouts) on gastrocnemius gene expression, within Low- and High-frailty aged female mice, and how it differs between them (Frailty x Run)",
+  "planned_contrasts": [
+    "run_run_vs_sed_frail-low",
+    "run_run_vs_sed_frail-high",
+    "frail_run_high_run_vs_low_sed"
+  ],
+  "planned_contrast_labels": {
+    "run_run_vs_sed_frail-low": "Low Run vs Low Control (LR vs LC): running effect in Low-frailty mice",
+    "run_run_vs_sed_frail-high": "High Run vs High Control (HR vs HC): running effect in High-frailty mice",
+    "frail_run_high_run_vs_low_sed": "Frailty x Run interaction: (HR - HC) - (LR - LC)"
+  },
+  "blocking_or_covariance": {
+    "status": "not_required",
+    "note": "independent animals, one gastrocnemius per mouse; no batch reported"
+  },
+  "matrix_scale": "featureCounts raw gene counts (S2.10.p1); VST matrix also deposited",
+  "paper_method": "DESeq2 (R 1.23.10 per paper / 1.32.0 per GEO) Wald test, two-factor model (Frailty, Run) with pairwise comparisons; BH FDR",
+  "paper_formula": "two-factor model with interaction (coefficients Frailty, Run, Frailty x Run) - exact formula not printed (S2.10.p2)",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH",
+    "cutoff": 0.1,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": false,
+    "source_locator": "S2.10.p1",
+    "note": "'DEGs were determined at an FDR q < 0.1'; no fold-change cutoff stated"
+  },
+  "paper_reported_deg_counts": "not_reported in the main text (DEG lists in Supplemental Tables 1-2, not available here)",
+  "paper_reported_deg_examples": {
+    "HR_vs_HC": {
+      "up": [
+        "Ifi47",
+        "Iigp1",
+        "Isg20",
+        "Mpeg1",
+        "Ccl8",
+        "Ctss"
+      ],
+      "down": [
+        "Fosb",
+        "Junb"
+      ],
+      "claim": "DEGs at FDR q < 0.1 unique to the High group (S3.5.p3, FIG6e)"
+    }
+  },
+  "paper_enrichment": {
+    "GSEA": "GSEA 2.2.1 preranked by Wald stat, MSigDB 2024.1.Mm H, M2 CP, M5; FDR q < 0.05 (S2.10.p2); 284 sets with Frailty x Run interaction; top: OXPHOS / ATP biosynthesis / complex I assembly, up in LR vs LC and down in HR vs HC (S3.5.p1-p2)",
+    "ORA": "DAVID EASE < 0.05 on HR vs HC and LR vs LC DEG lists; inflammation pathways only in High (S3.5.p3)"
+  }
+}

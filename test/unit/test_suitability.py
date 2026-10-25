@@ -93,9 +93,13 @@ def test_covariance_decisions():
     meta = _design()
     cv = su.check_covariance(meta, ["grp", "geno"], candidates=["batch"])
     assert cv["status"] == "pass" and cv["covariates"] == ["batch"], cv
-    meta["run"] = meta["grp"]   # sequencing run aliased with the exercise arm (GSE297318)
+    meta["run"] = meta["grp"]   # the factor's own source column (GSE301564): not a batch
     cv = su.check_covariance(meta, ["grp"], candidates=["run"])
-    assert cv["status"] == "fail" and cv["stopping_columns"] == ["run"], cv
+    assert cv["status"] == "pass" and cv["stopping_columns"] == [], cv
+    # Sequencing project aliased with the exercise arm, with its own labels (GSE297318).
+    meta["seq_run"] = meta["grp"].map({"sed": "P1", "ex": "P2"})
+    cv = su.check_covariance(meta, ["grp"], candidates=["seq_run"])
+    assert cv["status"] == "fail" and cv["stopping_columns"] == ["seq_run"], cv
     # Paired: each subject sampled pre and post.
     paired = pd.DataFrame({"time": ["pre", "post"] * 4, "subject": [f"p{i // 2}" for i in range(8)]},
                           index=[f"s{i}" for i in range(8)])

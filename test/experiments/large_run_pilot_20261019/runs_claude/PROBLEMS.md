@@ -179,3 +179,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fourth series-level screen false positive: the swimming cohort was not sequenced; the series is genotype under pressure overload. Refused correctly at design.
 - The X/Y sex check finds 2 female + 2 male per arm (high confidence) although the paper says male mice; balanced, so not confounded.
 - `native.merge_raw_tar` names columns after tar members (`GSM8957194_F-9.STAR`); `tools/geo_tar.py:30-31` strips only `.ReadsPerGene.out`, so columns need renaming to the GSM ID before exact alignment.
+
+## PMID40932577 (GSE301564)
+
+- Fixed after this paper: `suitability.BATCH_COLUMN` matched a bare "run", so the exercise factor's own source column (`characteristics run: sed/run`) was flagged as a confounded batch and the case called not_analyzable. "run" now needs an id/date/number suffix, and a column with the same values as a design factor is treated as its source, not a batch.
+- Second paper where the paper's DEG lists come from separate two-group fits (named genes significant only there); see REVIEW.md question 3.
+- `tools/deseq2_tools.py:155` calls `DeseqStats` without `alpha`, so independent filtering is always 0.05 (paper: FDR 0.1).
