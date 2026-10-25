@@ -1,0 +1,275 @@
+{
+  "case_id": "PMID42363191",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "tumor",
+    "ex"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "tumor",
+        "ex"
+      ],
+      "levels": {
+        "tumor": {
+          "no": 8,
+          "yes": 8
+        },
+        "ex": {
+          "ex": 8,
+          "sed": 8
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "characteristics_ch1.3.batch",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(tumor) + C(ex)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 13,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "tumor_yes_vs_no_ex-sed",
+        "ex_ex_vs_sed_tumor-yes"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 16 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 16
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42363191\\PMID42363191\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "tumor_yes_vs_no_ex-ex",
+      "kind": "simple",
+      "factor": "tumor",
+      "test": "yes",
+      "reference": "no",
+      "within": {
+        "ex": "ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "ex",
+            "tumor": "yes"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "ex": "ex",
+            "tumor": "no"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tumor_yes_vs_no_ex-sed",
+      "kind": "simple",
+      "factor": "tumor",
+      "test": "yes",
+      "reference": "no",
+      "within": {
+        "ex": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "sed",
+            "tumor": "yes"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "ex": "sed",
+            "tumor": "no"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_ex_vs_sed_tumor-no",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "ex",
+      "reference": "sed",
+      "within": {
+        "tumor": "no"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tumor": "no",
+            "ex": "ex"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tumor": "no",
+            "ex": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_ex_vs_sed_tumor-yes",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "ex",
+      "reference": "sed",
+      "within": {
+        "tumor": "yes"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tumor": "yes",
+            "ex": "ex"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tumor": "yes",
+            "ex": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tumor_ex_yes_ex_vs_no_sed",
+      "kind": "interaction",
+      "factor": "tumor:ex",
+      "test": "yes:ex",
+      "reference": "no:sed",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "tumor": "yes",
+            "ex": "ex"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tumor": "no",
+            "ex": "ex"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tumor": "yes",
+            "ex": "sed"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tumor": "no",
+            "ex": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

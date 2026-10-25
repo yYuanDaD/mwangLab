@@ -238,3 +238,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fig. 4A uses n = 2 for one group while Methods and GEO have 3; the dropped sample is unnamed (count moves 452 → 319).
 - `case.finish(n_deg=...)` takes one integer, so `summary.csv` shows one contrast's count for multi-contrast cases; `control` is empty when the design uses a `contrasts` list.
 - `tools/geo_tar.py:30` leaves `.STAR` in column names (also GSE295777).
+
+## PMID42363191 (GSE328094)
+
+- Second paper whose counts match raw p < 0.05, not its stated q < 0.05 (464/296 vs 486/270; with FDR: 106/4). Same question as GSE297318 in REVIEW.md.
+- The PCA does not show the T/TE separation the paper describes; one outlier sample.
+- `decision-contract.md` does not say `input_threshold` must be a dict; matrix columns needed a prefix stripped from GEO titles by hand.
