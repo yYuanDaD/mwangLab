@@ -1,0 +1,280 @@
+{
+  "case_id": "GSE312780",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "arm",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "arm",
+        "time"
+      ],
+      "levels": {
+        "arm": {
+          "CREST": 16,
+          "BFRT": 16
+        },
+        "time": {
+          "pre": 16,
+          "post": 16
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [
+        "arm"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "arm",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 17,
+        "full_rank": true,
+        "residual_df": 15,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre_arm-BFRT",
+        "time_post_vs_pre_arm-CREST",
+        "arm_time_BFRT_post_vs_CREST_pre"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 32 samples.",
+      "metadata_sex_column": "sex",
+      "predicted": {
+        "male": 26,
+        "female": 6
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41610852\\GSE312780\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_post_vs_pre__sex-female_arm-CREST"
+          ],
+          "male": [
+            "arm_BFRT_vs_CREST__sex-male_time-post",
+            "arm_BFRT_vs_CREST__sex-male_time-pre",
+            "time_post_vs_pre__sex-male_arm-BFRT",
+            "time_post_vs_pre__sex-male_arm-CREST",
+            "arm_time_BFRT_post_vs_CREST_pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "arm_BFRT_vs_CREST_time-post",
+      "kind": "simple",
+      "factor": "arm",
+      "test": "BFRT",
+      "reference": "CREST",
+      "within": {
+        "time": "post"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "post",
+            "arm": "BFRT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "post",
+            "arm": "CREST"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "arm_BFRT_vs_CREST_time-pre",
+      "kind": "simple",
+      "factor": "arm",
+      "test": "BFRT",
+      "reference": "CREST",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "arm": "BFRT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "arm": "CREST"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_arm-BFRT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "arm": "BFRT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "arm": "BFRT",
+            "time": "post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "arm": "BFRT",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_arm-CREST",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "arm": "CREST"
+      },
+      "cells": [
+        {
+          "cell": {
+            "arm": "CREST",
+            "time": "post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "arm": "CREST",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "arm_time_BFRT_post_vs_CREST_pre",
+      "kind": "interaction",
+      "factor": "arm:time",
+      "test": "BFRT:post",
+      "reference": "CREST:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "arm": "BFRT",
+            "time": "post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "arm": "CREST",
+            "time": "post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "arm": "BFRT",
+            "time": "pre"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "arm": "CREST",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

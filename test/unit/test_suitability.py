@@ -99,7 +99,7 @@ def test_covariance_decisions():
     # Sequencing project aliased with the exercise arm, with its own labels (GSE297318).
     meta["seq_run"] = meta["grp"].map({"sed": "P1", "ex": "P2"})
     cv = su.check_covariance(meta, ["grp"], candidates=["seq_run"])
-    assert cv["status"] == "fail" and cv["stopping_columns"] == ["seq_run"], cv
+    assert cv["status"] == "partial" and cv["check_columns"] == ["seq_run"], cv
     # Paired: each subject sampled pre and post.
     paired = pd.DataFrame({"time": ["pre", "post"] * 4, "subject": [f"p{i // 2}" for i in range(8)]},
                           index=[f"s{i}" for i in range(8)])

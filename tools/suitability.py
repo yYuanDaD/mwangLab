@@ -281,7 +281,7 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
     """
     from tools import native
     meta = metadata.copy()
-    decisions, blocking, covariates, stop = [], [], [], []
+    decisions, blocking, covariates, stop, check = [], [], [], [], []
     subject = subject or next((c for c in meta.columns if SUBJECT_COLUMN.search(str(c))
                                and c not in factors and 1 < meta[c].nunique() < len(meta)), None)
     if subject and subject not in meta.columns:
@@ -320,7 +320,16 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
                 worst = rep
         if worst in ("constant", "sample_identifier"):
             decisions.append({"column": col, "decision": "omit", "reason": f"{worst}: carries no batch information"})
-        elif worst in ("complete_confounding", "primary_nested_in_candidate"):
+        elif worst == "complete_confounding":
+            # Same split as a factor under other labels: either that factor's own GEO column
+            # (a "batch" field holding Before/After, GSE312780) or a batch aliased with it
+            # (sequencing project = exercise arm, GSE297318). Only the agent can tell which.
+            check.append(col)
+            decisions.append({"column": col, "decision": "check",
+                              "reason": "splits the samples exactly like a design factor: if it is that factor's "
+                                        "own column, ignore it; if it is a batch, the comparison cannot be "
+                                        "separated from it and the case stops"})
+        elif worst == "primary_nested_in_candidate":
             stop.append(col)
             decisions.append({"column": col, "decision": "stop",
                               "reason": f"{worst} with a design factor: its effect cannot be separated"})
@@ -347,9 +356,11 @@ def check_covariance(metadata: pd.DataFrame, factors: Sequence[str], *,
                 decisions.append({"column": col, "decision": "omit", "reason": "makes the design rank deficient"})
                 terms.remove(col)
                 rank = trial
-    status = "fail" if stop or (rank and not rank["full_rank"]) or (rank and rank["residual_df"] < 1) else "pass"
+    status = "fail" if stop or (rank and not rank["full_rank"]) or (rank and rank["residual_df"] < 1) else (
+        "partial" if check else "pass")
     return {"status": status, "covariance_status": "required" if blocking else "not_required",
             "blocking_terms": blocking, "covariates": covariates, "stopping_columns": stop,
+            "check_columns": check,
             "between_subject_factors": between,
             "decisions": decisions,
             "design": {k: rank[k] for k in ("formula_equivalent", "rank", "full_rank", "residual_df",

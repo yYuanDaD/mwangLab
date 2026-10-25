@@ -203,3 +203,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 
 - Fifth screen false positive: a knockout/ageing study where exercise is only a treadmill phenotype test. Refused correctly at design (3 age cases).
 - Sex check calls all 36 samples male (high confidence) although the paper says mixed sexes; GEO has no sex field.
+
+## PMID41610852 (GSE312780)
+
+- Counts 3–4× the paper (415/48 vs 110/18) with the BFRT >> CREST pattern intact; likely cause: no apeglm shrinkage option in `run_joint_deseq2`.
+- Fixed after this paper: GEO's `batch` field held Before/After, so `check_covariance` called it completely confounded and stopped the case. A column that splits the samples exactly like a factor (under other labels) is now `check` (partial): the agent decides whether it is the factor's own column or an aliased batch.
+- The report's between-subject note missed the nested re-parameterisation (subject + per-arm post effects) the paper used; `run_joint_deseq2` cannot take it directly.
+- The excluded participant is not named in the paper (inferred from PCA); deposit has unscaled salmon counts, not lengthScaledTPM.
