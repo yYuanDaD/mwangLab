@@ -284,3 +284,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Partial: no raw counts on GEO (the "rawcounts" file is a normalized 4,635-gene subset), so limma on log2 normalized values ran as a deviation. Fold changes match GEO's own Partek table (r 0.92–0.96). Blocking on animal (each rat gave a trained and a control limb) removes most of the paper's d30 down-regulation, which the untrained limb shares.
 - `native.derive_columns` extracts one regex group, so a key from two fields (animal + side) had to be built by hand (`tools/native.py:341-348`).
 - `check_sex` cannot read transcript-level rows (`Xist-201`); `profile_matrix` returned no type candidates; `CaseRecorder.dir` is relative when the run directory is given relative.
+
+## PMID31197156 (GSE124819)
+
+- The paper is a Data Descriptor with no DE test; the screen should flag this paper type. Ran with the workflow default.
+- `download_supplementary_files` (`tools/geo_tools.py:68-80`) downloads every file with no size or type filter: here a >9 GB bigWig-only `_RAW.tar` that hit the timeout.
+- Rat has no `Xist` in Rnor_6.0 Ensembl 93, so the sex check cannot call female rats.
+- `summary.csv` `n_contrasts` counts the design's planned contrasts, not the comparisons actually run (`tools/native.py:1085`).
+- Paper and GEO disagree on exercise schedule and collection time (possible 2-week alias with exercise).
