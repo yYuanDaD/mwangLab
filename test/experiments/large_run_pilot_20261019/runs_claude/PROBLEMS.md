@@ -265,3 +265,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - `case.suitability` writes to one fixed `<case>/suitability/` folder, so a case with two matrices overwrites the first report (`tools/native.py:967-982`).
 - GEO stores age group as "genotype" and sex as "batch"; a keyword batch picker would misread them.
 - Accession blank in `summary.csv` again after `RunRecorder.open` (known).
+
+## PMID31350552 (GSE129962)
+
+- Partial: exercise effects 1724/1409 vs 2529/2391, pathways match; the genotype contrast at 6 months does not (64 vs 781) and Dsp expression does not clearly separate genotypes.
+- Fixed after this paper: edgeR wrote the unsigned QL F statistic into `stat`, so default GSEA (which ranks on `stat`) would rank on an unsigned value. `stat` is now sign(log2FC)·√F, with F kept in its own column.
+- edgeR executor has no interaction/covariate interface and no low-expression filter (`tools/edger_tools.py:105-115`).
+- ERCC rows missing in some samples reveal two counting runs aliased with exercise at 6 months; the skill does not say how to treat an inferred, undocumented batch.

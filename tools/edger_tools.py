@@ -21,6 +21,7 @@ Notes:
 """
 
 import os
+import numpy as np
 import pandas as pd
 from patsy import dmatrix
 from inmoose.edgepy import DGEList, glmQLFTest, topTags
@@ -129,6 +130,11 @@ def run_edger_analysis(
         res = res.rename(columns={"adj_pvalue": "padj"})
         if "padj" not in res.columns and "FDR" in res.columns:
             res["padj"] = res["FDR"]
+        # The QL F statistic is unsigned; GSEA ranks on `stat`, so store sign(log2FC) * sqrt(F)
+        # there (as limma's t) and keep F itself in its own column.
+        if "stat" in res.columns and "log2FoldChange" in res.columns and (res["stat"].dropna() >= 0).all():
+            res["F"] = res["stat"]
+            res["stat"] = np.sign(res["log2FoldChange"]) * np.sqrt(res["F"].clip(lower=0))
         front = [c for c in ["baseMean", "logCPM", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj"] if c in res.columns]
         rest = [c for c in res.columns if c not in front]
         res = res[front + rest]
