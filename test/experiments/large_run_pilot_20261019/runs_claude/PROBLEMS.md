@@ -278,3 +278,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Reproduced (4243 vs 4058), helped by the authors' public script (rounding recipe, reference level, filter).
 - Fixed after this paper: a case created in one script and first recorded in the next reopened without its accession (`summary.csv` empty in five runs). `RunRecorder.case` now saves the case state at once, and `RunRecorder.open` loads cases with no records yet.
 - GEO calls RSEM expected counts "raw read counts"; `case.suitability` has no "estimated counts" matrix-type word.
+
+## PMID36468768 (GSE196147)
+
+- Partial: no raw counts on GEO (the "rawcounts" file is a normalized 4,635-gene subset), so limma on log2 normalized values ran as a deviation. Fold changes match GEO's own Partek table (r 0.92–0.96). Blocking on animal (each rat gave a trained and a control limb) removes most of the paper's d30 down-regulation, which the untrained limb shares.
+- `native.derive_columns` extracts one regex group, so a key from two fields (animal + side) had to be built by hand (`tools/native.py:341-348`).
+- `check_sex` cannot read transcript-level rows (`Xist-201`); `profile_matrix` returned no type candidates; `CaseRecorder.dir` is relative when the run directory is given relative.
