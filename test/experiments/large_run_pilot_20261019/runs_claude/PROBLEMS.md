@@ -292,3 +292,10 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Rat has no `Xist` in Rnor_6.0 Ensembl 93, so the sex check cannot call female rats.
 - `summary.csv` `n_contrasts` counts the design's planned contrasts, not the comparisons actually run (`tools/native.py:1085`).
 - Paper and GEO disagree on exercise schedule and collection time (possible 2-week alias with exercise).
+
+## PMID41787055 (GSE293221)
+
+- Exercise vs control: the joint 9-sample model gives exactly the paper's 32 (named genes match); the two-arm fit gives 385. PhAm vs control does not reproduce (2589/3694 vs 176).
+- The agent reported that `run_deseq2_analysis` thresholds shrunken fold changes; checked: it writes the MLE in `log2FoldChange` and the apeglm value in a separate `log2FoldChange_shrunk` column (`tools/deseq2_tools.py:176-182`), so `apply_threshold` uses the MLE. Not a bug, but the skill should say which column is thresholded.
+- No helper merges per-sample HTSeq tables in native mode beyond `merge_raw_tar` (the agent merged by hand); the RPKM > 1 filter cannot be applied without gene lengths.
+- Exercise mice were singly housed, the other arms group-housed: housing is aliased with exercise.
