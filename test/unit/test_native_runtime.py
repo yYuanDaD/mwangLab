@@ -325,6 +325,16 @@ class ModalityHelperTests(unittest.TestCase):
             status = json.loads((Path(tmp) / "run" / "run_status.json").read_text(encoding="utf-8"))
             self.assertEqual(status["status"], "partial")
 
+    def test_accession_survives_reopen_before_first_record(self):
+        # Large run: a case created in one script and first recorded in the next lost its
+        # accession (summary.csv showed it empty).
+        native.enable_native_mode()
+        with tempfile.TemporaryDirectory() as tmp:
+            native.RunRecorder(Path(tmp) / "run", request="r", platform_name="test",
+                               decision_maker="test", case_ids=["c1"]).case("c1", "GSE1")
+            reopened = native.RunRecorder.open(Path(tmp) / "run")
+            self.assertEqual(reopened.case("c1").accession, "GSE1")
+
 
 class RoundThreeFixTests(unittest.TestCase):
     def test_large_linear_values_are_not_integers(self):

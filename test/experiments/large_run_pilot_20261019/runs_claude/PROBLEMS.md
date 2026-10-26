@@ -272,3 +272,9 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - Fixed after this paper: edgeR wrote the unsigned QL F statistic into `stat`, so default GSEA (which ranks on `stat`) would rank on an unsigned value. `stat` is now sign(log2FC)·√F, with F kept in its own column.
 - edgeR executor has no interaction/covariate interface and no low-expression filter (`tools/edger_tools.py:105-115`).
 - ERCC rows missing in some samples reveal two counting runs aliased with exercise at 6 months; the skill does not say how to treat an inferred, undocumented batch.
+
+## PMID35456380 (GSE164890)
+
+- Reproduced (4243 vs 4058), helped by the authors' public script (rounding recipe, reference level, filter).
+- Fixed after this paper: a case created in one script and first recorded in the next reopened without its accession (`summary.csv` empty in five runs). `RunRecorder.case` now saves the case state at once, and `RunRecorder.open` loads cases with no records yet.
+- GEO calls RSEM expected counts "raw read counts"; `case.suitability` has no "estimated counts" matrix-type word.

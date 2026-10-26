@@ -839,7 +839,8 @@ class RunRecorder:
         run = cls(run_dir, request=manifest.get("request", ""), platform_name=manifest.get("platform", ""),
                   decision_maker=manifest.get("decision_maker", ""), case_ids=manifest.get("case_ids", []),
                   _resume=True)
-        for case_dir in sorted(p for p in run_dir.iterdir() if (p / "decisions.json").exists()):
+        for case_dir in sorted(p for p in run_dir.iterdir()
+                               if (p / "decisions.json").exists() or (p / "case_state.json").exists()):
             run.cases[case_dir.name] = CaseRecorder._load(run, case_dir)
             if case_dir.name not in run._case_order:
                 run._case_order.append(case_dir.name)
@@ -863,6 +864,11 @@ class RunRecorder:
             index = self._case_order.index(case_id) + 1
             self.tracker.begin_study(accession or case_id, index, len(self._case_order))
             self.cases[case_id] = CaseRecorder(self, case_id, accession)
+            # Save now: a case with no record yet would otherwise reopen without its accession.
+            self.cases[case_id]._save_state()
+        elif accession and not self.cases[case_id].accession:
+            self.cases[case_id].accession = accession
+            self.cases[case_id]._save_state()
         return self.cases[case_id]
 
     def finish(self) -> dict:
@@ -918,7 +924,8 @@ class CaseRecorder:
         state_path = case_dir / "case_state.json"
         state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
         case = cls(run, case_dir.name, state.get("accession"))
-        case.records = json.loads((case_dir / "decisions.json").read_text(encoding="utf-8"))
+        decisions = case_dir / "decisions.json"
+        case.records = json.loads(decisions.read_text(encoding="utf-8")) if decisions.exists() else []
         evidence_path = case_dir / "evidence.json"
         if evidence_path.exists():
             case.evidence.bundle = EvidenceBundle.model_validate(
