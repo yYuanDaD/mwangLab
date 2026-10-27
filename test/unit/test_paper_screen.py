@@ -564,6 +564,22 @@ def test_collect_caps_at_max_and_mixes_sources():
     assert rows[1]["pdf_url"] == "http://x/1.pdf", rows[1]
 
 
+def test_collect_shares_exclude_and_years():
+    s2 = json.dumps({"data": [{"paperId": f"S{i}", "title": f"Paper S{i}", "year": 2018,
+                               "externalIds": {}, "openAccessPdf": {"url": ""}} for i in range(6)]})
+    pub_search = json.dumps({"esearchresult": {"idlist": [str(200 + i) for i in range(6)]}})
+    pub_sum = json.dumps({"result": {"uids": [str(200 + i) for i in range(6)], **{
+        str(200 + i): {"title": f"Paper P{i}", "pubdate": "2019", "articleids": []} for i in range(6)}}})
+    http = FakeHttp({"semanticscholar": s2, "esearch.fcgi": pub_search, "esummary.fcgi": pub_sum})
+    rows = sc.collect_papers("exercise", http, max_papers=4, start_year=2015,
+                             shares={"s2": 0.25, "pubmed": 0.75},
+                             exclude=[{"pmid": "200", "title": "", "doi": ""}])
+    ids = [r["paper_id"] for r in rows]
+    assert sum(i.startswith("S") for i in ids) == 1 and len(ids) == 4, ids
+    assert "PMID200" not in ids, ids                                  # already screened
+    assert any("2015:" in str((c[1] or {}).get("term", "")) for c in http.calls), http.calls  # year range sent
+
+
 def main() -> int:
     tests = [v for k, v in globals().items() if k.startswith("test_") and callable(v)]
     failed = 0

@@ -883,15 +883,15 @@ SOURCES = ("s2", "pubmed", "geo")
 _GEO_RNASEQ = '"expression profiling by high throughput sequencing"[DataSet Type]'
 
 
-def _s2_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+def _s2_rows(query: str, http: Http, n: int, end_year: int = 0, start_year: int = 0) -> list[dict]:
     rows: list[dict] = []
     offset = 0
     while len(rows) < n and offset < 1000:
         params = {"query": query, "fields": "title,abstract,year,externalIds,openAccessPdf",
                   "limit": min(100, n - len(rows)), "offset": offset,
                   "fieldsOfStudy": "Medicine,Biology"}
-        if end_year:
-            params["year"] = f"-{end_year}"
+        if end_year or start_year:
+            params["year"] = f"{start_year or ''}-{end_year or ''}"
         s = http.get(S2_SEARCH + "?openAccessPdf", params)
         data = (json.loads(s).get("data") or []) if s else []
         if s is None:
@@ -925,17 +925,17 @@ def _pubmed_summaries(pmids: list[str], http: Http, source: str) -> list[dict]:
     return rows
 
 
-def _pubmed_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+def _pubmed_rows(query: str, http: Http, n: int, end_year: int = 0, start_year: int = 0) -> list[dict]:
     term = f"({query}) AND free full text[sb]"
-    if end_year:
-        term += f" AND 1800:{end_year}[dp]"
+    if end_year or start_year:
+        term += f" AND {start_year or 1800}:{end_year or 3000}[dp]"
     s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "pubmed", "term": term, "retmax": n,
                                                "sort": "relevance", "retmode": "json"})
     pmids = json.loads(s)["esearchresult"]["idlist"] if s else []
     return _pubmed_summaries(pmids, http, "pubmed")
 
 
-def _geo_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
+def _geo_rows(query: str, http: Http, n: int, end_year: int = 0, start_year: int = 0) -> list[dict]:
     """Papers linked from GEO bulk RNA-seq series that match the query.
 
     Starting from the deposit finds papers that have their own data, which a literature
@@ -944,8 +944,8 @@ def _geo_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
     the text. ``linked_gse`` records the series that led to the paper.
     """
     term = f"({query}) AND gse[Entry Type] AND {_GEO_RNASEQ}"
-    if end_year:
-        term += f" AND 1800:{end_year}[PDAT]"
+    if end_year or start_year:
+        term += f" AND {start_year or 1800}:{end_year or 3000}[PDAT]"
     s = http.get(f"{EUTILS}/esearch.fcgi", {"db": "gds", "term": term, "retmax": max(n * 3, 100),
                                                "retmode": "json"})
     uids = json.loads(s)["esearchresult"]["idlist"] if s else []
@@ -967,8 +967,14 @@ def _geo_rows(query: str, http: Http, n: int, end_year: int = 0) -> list[dict]:
     return rows
 
 
+def _paper_keys(r: dict) -> list[str]:
+    return [k for k in (r.get("doi") and "doi:" + r["doi"], r.get("pmid") and "pmid:" + r["pmid"],
+                        "t:" + re.sub(r"\W+", "", (r.get("title") or "").lower())[:80]) if k]
+
+
 def collect_papers(query, http: Http, max_papers: int = 200, end_year: int = 0,
-                   sources=("s2", "pubmed")) -> list[dict]:
+                   sources=("s2", "pubmed"), start_year: int = 0, shares: dict | None = None,
+                   exclude: list[dict] | None = None) -> list[dict]:
     """Up to ``max_papers`` papers for one query or a list of queries.
 
     Each (query, source) list is relevance-ranked; the lists are taken in turn so every
@@ -976,34 +982,46 @@ def collect_papers(query, http: Http, max_papers: int = 200, end_year: int = 0,
     ``pubmed`` (PubMed free-full-text hits), ``geo`` (papers linked from matching GEO
     bulk RNA-seq series). Deduplicated by DOI, then PMID, then title; a duplicate fills in
     the kept row's missing PMCID / PDF URL / linked series.
+
+    ``start_year``/``end_year`` bound the publication year. ``shares`` ({source: fraction})
+    caps each source at that share of ``max_papers`` (a source that falls short leaves its
+    room to the others). ``exclude`` rows (an earlier papers.csv) are never returned.
     """
     queries = [query] if isinstance(query, str) else list(query)
     fetch = {"s2": _s2_rows, "pubmed": _pubmed_rows, "geo": _geo_rows}
     lists = []
     for q in queries:
         for src in sources:
-            rows = fetch[src](q, http, max_papers, end_year)
+            want = max_papers if not shares else max(1, round(max_papers * shares.get(src, 0) * 3 / len(queries)))
+            rows = fetch[src](q, http, want, end_year, start_year)
             for r in rows:
                 r["query"] = q
                 r.setdefault("linked_gse", "")
             lists.append(rows)
     merged = [x[i] for i in range(max((len(x) for x in lists), default=0)) for x in lists if i < len(x)]
+    seen = {k for r in (exclude or []) for k in _paper_keys(r)}
+    cap = ({s: round(max_papers * f) for s, f in shares.items()} if shares else None)
     kept: dict[str, dict] = {}
-    out = []
+    out, overflow, used = [], [], Counter()
     for r in merged:
-        keys = [k for k in (r["doi"] and "doi:" + r["doi"], r["pmid"] and "pmid:" + r["pmid"],
-                            "t:" + re.sub(r"\W+", "", r["title"].lower())[:80]) if k]
+        keys = _paper_keys(r)
+        if any(k in seen for k in keys):
+            continue
         first = next((kept[k] for k in keys if k in kept), None)
         if first is not None:
             for f in ("pmcid", "pdf_url", "pmid", "doi", "linked_gse"):
                 first[f] = first[f] or r[f]
             continue
-        if len(out) >= max_papers:
-            continue
         for k in keys:
             kept[k] = r
+        src = {"semantic_scholar": "s2"}.get(r["source"], r["source"])
+        if cap is not None and used[src] >= cap.get(src, 0):
+            overflow.append(r)
+            continue
+        used[src] += 1
         out.append(r)
-    return out
+    out += overflow[:max(0, max_papers - len(out))]
+    return out[:max_papers]
 
 
 def _pmcid(v) -> str:
@@ -1211,6 +1229,10 @@ def _main(argv=None) -> int:
     p.add_argument("--out", required=True)
     p.add_argument("--max", type=int, default=200, help="total papers across all queries and sources")
     p.add_argument("--end-year", type=int, default=0)
+    p.add_argument("--start-year", type=int, default=0)
+    p.add_argument("--shares", default="",
+                   help="per-source share of --max, e.g. geo=0.7,s2=0.15,pubmed=0.15")
+    p.add_argument("--exclude", default="", help="papers.csv of an earlier run; its papers are skipped")
     p.add_argument("--sources", default="s2,pubmed",
                    help="comma-separated: s2, pubmed, geo (papers linked from GEO bulk RNA-seq series)")
     p = sub.add_parser("screen", help="screen a papers.csv, write screen.csv + screen_summary.md")
@@ -1235,8 +1257,10 @@ def _main(argv=None) -> int:
         bad = set(sources) - set(SOURCES)
         if bad:
             ap.error(f"unknown source(s) {sorted(bad)}; choose from {', '.join(SOURCES)}")
+        shares = {k: float(v) for k, v in (x.split("=") for x in a.shares.split(",") if x)} or None
+        exclude = list(csv.DictReader(open(a.exclude, encoding="utf-8"))) if a.exclude else None
         rows = collect_papers(a.query, Http(cache_dir=os.path.join(a.out, "_http_cache")), a.max,
-                              a.end_year, sources)
+                              a.end_year, sources, start_year=a.start_year, shares=shares, exclude=exclude)
         path = os.path.join(a.out, "papers.csv")
         with open(path, "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) if rows else ["paper_id"])
