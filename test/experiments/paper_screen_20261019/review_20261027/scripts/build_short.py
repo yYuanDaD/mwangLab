@@ -70,3 +70,25 @@ dv = DataValidation(type="list", formula1='"是,不是,看不出"', allow_blank=
 w3.freeze_panes = "D2"
 out = os.path.join(REV, "review_sheet_short.xlsx"); wb.save(out)
 print(out, len(rows), "rows;", [s2.cell(r, 3).value[:50] for r in pick])
+
+# 4. correctly excluded examples, one per layer
+wb = load_workbook(out)
+w4 = wb.create_sheet("4 正确排除的例子")
+EX = [2, 5, 13, 16, 20, 24, 41, 46]   # review, off-topic, meta-analysis, qPCR, reuse, privacy, DE tables only, scRNA n=2
+keep4 = ["#", "筛选层", "标题", "相关 GSE", "筛选器的理由", "我的说明", "原文摘录", "全文（本地）", "全文（PMC）", "DOI", "GEO 链接"]
+w4.append(keep4 + ["你的结论", "你的备注"])
+for i in EX:
+    r = i + 1
+    w4.append([s1.cell(r, hdr.index(k) + 1).value for k in keep4] + ["", ""])
+    for k, name in enumerate(keep4, 1):
+        h = s1.cell(r, hdr.index(name) + 1).hyperlink
+        if h is not None:
+            c = w4.cell(w4.max_row, k); c.hyperlink = h.target; c.style = "Hyperlink"
+for c in w4[1]: c.font = Font(bold=True); c.fill = blue
+for row in w4.iter_rows(min_row=2):
+    for c in row: c.alignment = Alignment(wrap_text=True, vertical="top")
+for k, w in enumerate([4, 20, 40, 14, 36, 45, 60, 16, 16, 16, 16, 14, 30], 1): w4.column_dimensions[w4.cell(1, k).column_letter].width = w
+for r in range(2, w4.max_row + 1): w4.cell(r, 12).fill = yellow; w4.cell(r, 13).fill = yellow
+dv = DataValidation(type="list", formula1='"确实不能用,其实能用,看不出"', allow_blank=True); w4.add_data_validation(dv); dv.add(f"L2:L{w4.max_row}")
+w4.freeze_panes = "D2"
+wb.save(out); print("sheet 4:", [w4.cell(r, 3).value[:40] for r in range(2, w4.max_row + 1)])
