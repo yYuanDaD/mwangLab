@@ -363,3 +363,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34142717 (GSE178262)
 
 - decision_contract.py:281 null vs log2FC effect_metric false mismatch; case_runner.py:804 n_deg blank w/o primary; suitability.py:214 misses Ex3 interaction; inspect ignores lanes Details: `PMID34142717/HANDBACK.md`.
+
+## 4671b217019c4b33082d92b0995509e11af7babc (GSE245594)
+
+- case_runner.py:54 _EXTENSIONS skips .xls.gz TSV (inspect found no matrix); inputs.matrix resolved under data_root; key_patterns cannot combine 2 groups; no transcript->gene enrichment Details: `4671b217019c4b33082d92b0995509e11af7babc/HANDBACK.md`.

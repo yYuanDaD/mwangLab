@@ -1,0 +1,156 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42310491",
+  "request": "Analyze GSE324036 for PMID 42310491 (Cardiovascular Exercise Drives Neuroprotection in a Mouse Model of Spinocerebellar Ataxia 1 Via Rescue of Aberrant Splicing.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE324036",
+      "accession": "GSE324036",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC13482548.paper.md"],
+        "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42310491/GSE324036_metadata_with_sex.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42310491/GSE324036_merged_from_tar_gsm.csv", "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42310491/add_inferred_sex.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE324036"],
+            "assay": "bulk total RNA-seq (rRNA-depleted, NEBNext Ultra II Directional, PE151) of whole cerebellum; STAR 2.7.10a GeneCounts on GRCm39 (S1.8.p2-p3)",
+            "organism": "Mus musculus",
+            "factors": {"genotype": ["WT", "Atxn1 154Q/2Q (SCA1, Het)"], "treatment": ["sedentary", "voluntary wheel running 4-16 weeks of age"]},
+            "sample_inclusion": "n = 3 per group, 4 groups (S3 limitations: 'n = 3/group'); 12 GEO samples; male and female littermates (S1.1.p1), sex per sample not given",
+            "primary_estimand": "Effect of 12 weeks voluntary wheel running on cerebellar gene expression: WT exercise vs WT sedentary (549 DEGs), and within SCA1 mice SCA exercise vs SCA sedentary; plus genotype effect (SCA sedentary vs WT sedentary) and SCA exercise vs WT sedentary for rescue analysis (S2.5.p1, Fig 5)",
+            "planned_contrasts": [
+              "WT exercise vs WT sedentary (S2.5.p1; paper: 549 DEGs)",
+              "SCA sedentary vs WT sedentary (S2.5.p1: 76 DEGs; Fig 5C legend: 79 DEGs)",
+              "SCA exercise vs WT sedentary (Fig 5A/5C; count not stated)",
+              "SCA exercise vs SCA sedentary (S2.5.p1: Calb1/Trpc3 p-adj > 0.99; count not stated, 'minimal')"
+            ],
+            "repeated_measure_unit": "none; one cerebellum per animal",
+            "paper_method": "DESeq2 1.46.0 pairwise group comparisons (S1.8.p3); exact model/formula not stated",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "source_locator": "S2.5.p1, FIG5 legend (methods S1.8.p3 typo 'p-adj < |0.5|')"},
+            "paper_results": "549 DEGs WT ex vs WT sed; 76/79 DEGs SCA sed vs WT sed; Calb1 log2FC -0.825 padj 0.0019 and Trpc3 log2FC -0.669 padj 0.013 in SCA sed vs WT sed; exercise in SCA minimal"
+          },
+          "reasoning": "Methods S1.8.p3 give DESeq2 and the threshold; results S2.5.p1 and Fig 5 legend define the four pairwise group comparisons and the 0.05 adjusted-p cutoff. The paper's main exercise finding is at the splicing (rMATS) level, which is out of scope for gene-level DE; the gene-level DE comparisons are reproduced here.",
+          "confidence": "high",
+          "locator": "S1.8.p3; S2.5.p1; FIG5"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S8.p1 names GSE324036", "GEO titles 'Cerebellum, Sedentary/Exercise SCA/Wt' match the 2x2 design", "12 samples = 4 groups x n=3 as in S3", "STAR GeneCounts on GRCm39 matches S1.8.p3", "contact Berglund lab (author)"]},
+          "reasoning": "Paper data availability S8.p1 deposits RNA-seq under GSE324036; metadata and per-sample STAR ReadsPerGene files match the described design and pipeline.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"genotype": "characteristics_ch1.1.genotype", "treatment": "characteristics_ch1.2.treatment"},
+          "patterns": {},
+          "recode": {"genotype": {"Het": "SCA", "Wt": "WT"}, "treatment": {"Sedentary": "sed", "Exercise": "ex"}, "grp": {"WT_sed": "WTsed", "WT_ex": "WTex", "SCA_sed": "SCAsed", "SCA_ex": "SCAex"}},
+          "combine": {"grp": ["genotype", "treatment"]},
+          "exclude_samples": {},
+          "reasoning": "Tar columns become GSM ids that equal the metadata index (12/12). Genotype (Het = Atxn1 154Q/2Q heterozygous knock-in) and treatment come from the GEO characteristics; they agree with the sample titles and the tar file names. grp combines them into the four paper groups.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All-integer STAR --quantMode GeneCounts output (GEO data_processing; paper S1.8.p3). The merged column is the 4th ReadsPerGene column (reverse strand), which carries ~28M assigned reads vs ~1.7M for the forward-strand column, as expected for the dUTP NEBNext Ultra II Directional library; N_* summary rows are not in the matrix. Paper input to DESeq2 is the same STAR counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WTsed"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_WTex_vs_WTsed", "grp_SCAex_vs_SCAsed", "grp_SCAsed_vs_WTsed", "grp_SCAex_vs_WTsed"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multi-group (2x2 factorial expressed as 4 groups, pairwise planned contrasts)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_WTex_vs_WTsed", "control": "WTsed", "treatment": "WTex", "role": "primary"},
+              {"name": "grp_SCAex_vs_SCAsed", "control": "SCAsed", "treatment": "SCAex", "role": "secondary"},
+              {"name": "grp_SCAsed_vs_WTsed", "control": "WTsed", "treatment": "SCAsed", "role": "secondary"},
+              {"name": "grp_SCAex_vs_WTsed", "control": "WTsed", "treatment": "SCAex", "role": "secondary"}
+            ]
+          },
+          "reasoning": "The paper reports pairwise DESeq2 comparisons between the four genotype x treatment groups (S2.5.p1, Fig 5), not an interaction term, so one DESeq2 model on all 12 samples with a 4-level group factor and planned pairwise contrasts reproduces its estimands. Exercise effect in WT is primary; exercise effect within SCA1 is the second exercise estimand; the two contrasts against WT sedentary are the paper's disease/rescue comparisons.",
+          "candidates": [
+            {"value": "~ genotype * treatment with interaction coefficient", "reason_rejected": "paper does not test an interaction at gene level; pairwise group contrasts are its estimands"},
+            {"value": "separate two-group fits per comparison", "reason_rejected": "the paper does not state the subsetting; one model on all 12 samples is the standard DESeq2 group design and pools dispersion across groups with n=3"}
+          ],
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "sex", "disposition": "sensitivity_only"}]},
+          "confounding_candidates": ["sex"],
+          "reasoning": "Independent animals, one sample each; no batch or lane recorded. GEO does not record sex; X/Y inference (Xist vs chrY, all high confidence) gives WTsed 3M, WTex 2M1F, SCAsed 2M1F, SCAex 1M2F, so sex is unbalanced but not aliased with group. The paper pooled sexes without adjustment, so the paper-aligned model has no covariate; a ~ sex + grp model runs as a sensitivity analysis. Per-sex analyses are not analyzable (n < 3 per group per sex).",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, joint model)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 1.46.0 (R)", "status": "reproduced_with_port", "reason": "pydeseq2 port of the same model"},
+            "deviations": ["pydeseq2 instead of R DESeq2 1.46.0; paper's exact formula and any lfcShrink/independent filtering settings not stated"]
+          },
+          "transform": null,
+          "reasoning": "Raw STAR gene counts support DESeq2, which the paper used (S1.8.p3).",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Methods S1.8.p3 print 'p-adj < |0.5|' (typo); results S2.5.p1 and Fig 5/S5 legends state p-adj < 0.05 and log2FC > |0.5|, which is applied."
+          },
+          "reasoning": "S2.5.p1: 'significantly (p-adj < 0.05, log2FC > |0.5|)'; same in FIG5 and SUP5 legends.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "n = 3 per group; paper itself calls the DE analysis underpowered (S3)",
+              "the paper's principal exercise finding is splicing (rMATS), which is not reproduced here",
+              "paper gives 76 (text) vs 79 (Fig 5C) DEGs for SCA sed vs WT sed"
+            ]
+          },
+          "paper_counts": {"main/grp_WTex_vs_WTsed": 549, "main/grp_SCAsed_vs_WTsed": 76},
+          "paper_genes": {"main/grp_SCAsed_vs_WTsed": ["Calb1", "Trpc3"], "main/grp_SCAex_vs_SCAsed": ["Calb1", "Trpc3", "Bdnf", "Egf", "Cic"], "main/grp_SCAex_vs_WTsed": ["Calb1", "Trpc3"]},
+          "reasoning": "Counts and named genes from S2.5.p1 (Supplementary Table S2 not available).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DEG threshold", "paper": "Methods: p-adj < |0.5|; Results/legends: p-adj < 0.05", "data": "n/a", "disposition": "executable_without_change"},
+        {"item": "SCA sed vs WT sed DEG count", "paper": "76 (S2.5.p1) vs 79 (Fig 5C)", "data": "n/a", "disposition": "executable_without_change"},
+        {"item": "sex", "paper": "male and female mice used (S1.1.p1)", "data": "sex not recorded per sample in GEO", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "main",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "reasoning": "One DESeq2 ~ grp model on all 12 samples; planned pairwise contrasts as in the paper."
+        },
+        {
+          "name": "sexadj",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned", "covariates": ["sex"]},
+          "role": "sensitivity",
+          "reasoning": "Same planned contrasts adjusted for X/Y-inferred sex, because sex is unbalanced across groups (WTsed all male)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "main/grp_WTex_vs_WTsed", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper runs Metascape GO on DEGs (Fig 5B, SUP5A for WT sed vs WT ex)."}
+      ]
+    }
+  ]
+}

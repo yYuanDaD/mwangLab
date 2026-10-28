@@ -341,7 +341,8 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
     patsy formula. Use this before any formula-based step:
 
     - ``aliases``: ``{"subject": "characteristics_ch1.0.subject"}`` copies a column.
-    - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group.
+    - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group;
+      several groups are joined with ``_`` (``r"(Sed|Ex) ([0-9]+)"`` gives ``Sed_1``).
     - ``combine``: ``{"tgrp": ["diet", "time"]}`` joins columns with ``_``, for a key
       built from several fields. It joins the recoded values of its sources.
     - ``recode``: ``{"grp": {"sedentary_control": "sed", ...}}`` maps values of a new
@@ -361,7 +362,9 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
     for new, (source, pattern) in (patterns or {}).items():
         if source not in meta.columns:
             raise NativeToolError(f"pattern source column {source!r} not in metadata")
-        extracted = meta[source].astype(str).str.extract(pattern, expand=False)
+        groups = meta[source].astype(str).str.extract(pattern, expand=True)
+        # several groups are joined with "_": ("title", r"(Sed|Ex) (\d+)") gives "Sed_1"
+        extracted = groups.iloc[:, 0] if groups.shape[1] == 1 else             groups.apply(lambda row: None if row.isna().any() else "_".join(row), axis=1)
         if extracted.isna().any():
             missing = meta.index[extracted.isna()].tolist()[:5]
             raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")

@@ -1,0 +1,126 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/4671b217019c4b33082d92b0995509e11af7babc",
+  "request": "Analyze GSE245594 for PMID 38773896 (Combined Endurance and Resistance Exercise Mitigates Age-Associated Cardiac Dysfunction): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Code session (claude-opus-5-5)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE245594",
+      "accession": "GSE245594",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC11579252.paper.md"],
+        "metadata": "GSE245594/GSE245594_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/4671b217019c4b33082d92b0995509e11af7babc/prep/GSE245594_fpkm_transcripts_gsm.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/4671b217019c4b33082d92b0995509e11af7babc/prep/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE245594"],
+            "assay": "bulk RNA-seq (Novogene, Illumina), left ventricle of 22-month-old C57BL/6 male mice (S2.1.p1, S2.2.p1)",
+            "sample_inclusion": "sedentary vs swimming, n = 4 per group (S2.2.p1); the resistance-running arm was not sequenced",
+            "factors": {"exercise": ["Sedentary", "Swimming (8 weeks, 60 min/day, 5 d/week)"]},
+            "primary_estimand": "Effect of 8-week swimming training versus sedentary on left-ventricle transcript expression in aged (22-month) male mice",
+            "planned_contrasts": ["Swimming vs Sedentary (S2.2.p1, S3.1.p1; paper gives no DE-transcript count)"],
+            "repeated_measure_unit": "none (independent animals)",
+            "normalization": "StringTie-eB FPKM per transcript (S2.2.p1)",
+            "paper_method": "Ballgown transcript-level test (linear-model F-test on log2(FPKM+1)), adjusted p (S2.2.p1)",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.2.p1"},
+            "secondary_paper_rule": "fold-change > 2 and P < 0.05 for heatmap, GO and iRegulon gene sets (S3.1.p1, S3.1.p3, FIG1 E-H); FIG1 C/G/H legends say log2 fold-change > 2 instead",
+            "paper_results": "No DE-transcript count reported. KEGG top-10 down: oxidative phosphorylation, ROS, diabetic cardiomyopathy; GSEA up: cardiac muscle contraction, cGMP-PKG, longevity, mitophagy, mTOR; Usf2 FPKM higher in swimming (FIG5C, t-test P<0.05)"
+          },
+          "reasoning": "S2.2.p1 defines the sequenced samples (sedentary vs swimming LV, n=4), the pipeline (StringTie-eB + Ballgown, transcript level) and the DE rule (P-adjust < 0.05, no fold-change cutoff). S2.1.p1 says the swimming cohort was male. The FC>2, P<0.05 lists in S3.1 feed GO/TF analyses and are kept as an audit rule.",
+          "confidence": "high",
+          "locator": "S2.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE245594 as the deposit of this mRNA-seq", "8 GSM samples: 4 Swimming + 4 Sedentary, heart, Mus musculus, matching S2.2.p1 n=4 per group", "matrix columns Sed_1-4 / SW_1-4 match the two arms", "transcript IDs include StringTie TCONS_ novel transcripts, consistent with the paper's StringTie pipeline"]},
+          "reasoning": "Data availability statement DA.p1 deposits the mRNA-seq as GSE245594; sample counts and arms match S2.2.p1.",
+          "confidence": "high",
+          "locator": "DA.p1"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["characteristics_ch1.2.treatment", "^(Swimming|Sedentary)$"]},
+          "recode": {"grp": {"Swimming": "SW", "Sedentary": "SED"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "The deposited column names (Sed_N, SW_N) do not occur in metadata. prep/prep_matrix.py renamed each column to the GSM whose title has the same arm word and replicate number (title 'Sedentary, bio rep N' -> Sed_N, 'Swimming, bio rep N' -> SW_N); this is a label match, not column order. Alignment is then exact on the GSM index. grp comes from the treatment characteristic.",
+          "confidence": "medium",
+          "candidates": [{"value": "align by column position", "reason_rejected": "never align by position"}]
+        },
+        "matrix": {
+          "matrix_type": "FPKM (transcript level, StringTie)",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "reasoning": "File name fpkm_mRNA; non-integer values from 0 upward; rows are ENSMUST and TCONS transcript IDs. The paper's input (S2.2.p1) is StringTie-eB FPKM per transcript analysed with Ballgown. GEO data_processing describes STAR/featureCounts/Salmon, which does not match the file; the file content and paper agree on FPKM. No count matrix is deposited.",
+          "confidence": "high",
+          "candidates": [{"value": "raw counts", "reason_rejected": "values are non-integer FPKM; no count file deposited"}]
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "organism": "Mouse",
+          "planned": ["grp_SW_vs_SED"],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "SW",
+            "contrasts": [{"name": "grp_SW_vs_SED", "control": "SED", "treatment": "SW", "role": "primary"}]
+          },
+          "reasoning": "Two independent groups of aged male mice, swimming vs sedentary (S2.2.p1, S3.1.p1). Single factor; no time, subject or batch column.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, randomly assigned (S2.1.p1); metadata records no batch, sex or lane variable that varies across samples.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(FPKM+1), transcript level",
+            "formula": "~ grp",
+            "paper_route": {"method": "Ballgown stattest (transcript FPKM, linear-model F-test, FDR)", "status": "blocked", "reason": "Ballgown is not an available executor in this repository; the Ballgown input object (ctab files) is not deposited"},
+            "deviations": ["limma moderated t replaces the unmoderated Ballgown linear-model F-test on the same log2(FPKM+1) scale; no expression-variance prefilter (paper states none)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: FPKM -> log2(x+1) then limma. This is the closest validated route to Ballgown, which also fits a linear model on log2(FPKM+1) per transcript.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "deviation_note": "Audit rule is the secondary paper rule FC > 2, P < 0.05 used for gene lists (S3.1.p1, S3.1.p3)"
+          },
+          "reasoning": "S2.2.p1: transcripts with P-adjust < 0.05 are differentially expressed; no fold-change cutoff. Audit: fold-change > 2 (|log2FC| > 1) and raw P < 0.05 per S3.1.p1/p3.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["paper reports no DE-transcript count to compare", "limma instead of Ballgown", "transcript-level IDs; gene-level enrichment not run", "n = 4 per group"]},
+          "reasoning": "Planned contrast runs on the deposited FPKM with the paper threshold through a declared alternative method.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "processing pipeline", "paper": "StringTie-eB FPKM + Ballgown (S2.2.p1)", "data": "GEO data_processing: STAR, featureCounts, Salmon; deposited file is FPKM with StringTie TCONS IDs", "disposition": "executable_without_change"},
+        {"item": "fold-change rule in figure legends", "paper": "text: fold-change > 2, P < 0.05 (S3.1.p1/p3); FIG1 C/G/H: log2 fold-change > 2", "data": "n/a", "disposition": "executable_without_change"},
+        {"item": "DE method", "paper": "Ballgown", "data": "FPKM only; Ballgown not available", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {"name": "grp_SW_vs_SED", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "SW"},
+         "role": "primary", "reasoning": "Planned swimming vs sedentary contrast on log2(FPKM+1)."}
+      ],
+      "enrichment": [
+        {"execution": "grp_SW_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "Paper reports GO/KEGG/GSEA; rows are transcript IDs (ENSMUST/TCONS), so the runner is expected to record this as not run."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,728 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38232699",
+  "subject_id": "GSE236402",
+  "created_at": "2026-10-28T16:45:12",
+  "finished_at": null,
+  "status": null,
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10829790.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10829790.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "a1496850e686e8d29d9166d9c0da9cedcf44a9dc0927241488a969e44515420f",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE236402_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE236402\\GSE236402_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2c70e0aba3a9938de5dcb9941b325542bbf274427ab3dd60cec270b4e6325cf5",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE236402_raw_counts.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE236402\\GSE236402_raw_counts.txt.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0ccb55030d0af76c5d35e45670fbf0c8838d7ce7d43a590f0c4b09e9cdf85240",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE214284 (SuperSeries, TAB1)",
+          "GSE236402 (platelet-derived plasma particle bulk RNA-seq)"
+        ],
+        "assay": "bulk RNA-seq of low-speed-pelleted platelet-derived plasma particles (CD41+CD45-CD235a-)",
+        "sample_inclusion": "3 female ME/CFS cases and 3 female healthy controls, each at baseline (BL, pre-CPET) and 24 h post-CPET (PC) (S2.6.p4, FIG6 E-F, S4.4.5.1.p1)",
+        "factors": {
+          "disease": [
+            "HC",
+            "ME"
+          ],
+          "time": [
+            "BL",
+            "PC"
+          ]
+        },
+        "repeated_measure_unit": "individual (each subject sampled at BL and PC)",
+        "primary_estimand": "Difference between ME/CFS and controls in the within-individual exercise response (PC/BL ratio, 'deltaRNA') of platelet-particle gene expression, i.e. disease x time difference-in-differences controlling for individual of origin (S2.6.p1, S2.6.p4, S4.5.1.3.p3, S4.5.3.p1)",
+        "planned_contrasts": [
+          "paired deltaRNA (PC/BL) ME vs HC, controlling for individual (S2.6.p4, FIG6F, Data S14; paper reports GSEA only: platelet-function sets up, translation sets down; no per-gene DEG count for bulk)",
+          "ME vs HC at BL (S2.6.p4, Data S13: transcriptomes differ; DEG count not given in text)",
+          "ME vs HC at PC (S2.6.p4: no significant differential expression)"
+        ],
+        "paper_method": "DESeq2 on STAR GeneCounts (genes >10 reads in >=3 libraries) for cohort comparisons; paired analysis = per-individual PC/BL ratio of DESeq2-normalized counts floored at 1, geometric mean per cohort, log2(case/control) ranked into fgsea (genes with >=2 ratios per cohort) (S4.5.3.p1, S4.5.1.3.p3)",
+        "paper_threshold": {
+          "metric": "not_reported",
+          "adjustment": "not_reported",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S4.5.3.p1"
+        },
+        "paper_results": "BL: platelet-function GSEA sets down in ME; PC: no significant DE; paired: platelet-function sets up and translation sets down in ME ratios vs HC (FIG6C,F)"
+      },
+      "reason": "S2.6.p4 and FIG6 E-F describe 3 HC and 3 ME/CFS (all female) at BL and PC; S4.5.3.p1 gives DESeq2 and the paired-ratio GSEA as described for scRNA platelets (S4.5.1.3.p3). The exercise question the paper asks is whether the exercise-induced change differs between ME/CFS and controls (PEM), i.e. a difference in within-individual change. No DEG threshold is stated for the bulk data.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:12"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE236402\\GSE236402_raw_counts.txt.gz",
+        "owned": true,
+        "checks": [
+          "series_id lists GSE214284 (SuperSeries in TAB1) and GSE236402",
+          "source/tissue plasma; treatment_protocol: plasma before and 24h after CPET, 100xg then particle pelleting",
+          "12 samples = 3 case + 3 control x D1-preCPET/D2-24hPostCPET, matching S2.6.p4",
+          "STAR GeneCounts raw counts, hg38 Ensembl, as in S4.5.3.p1"
+        ],
+        "accession": "GSE236402",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE236402\\GSE236402_metadata.csv"
+      },
+      "reason": "Sub-series of the paper's SuperSeries; design (3 vs 3, BL and PC) and protocol match S2.6.p4 and S4.4.5.1.p1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:12"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "disease": {
+              "alias_of": "characteristics_ch1.2.disease state",
+              "recode": {
+                "case": "ME",
+                "control": "HC"
+              }
+            },
+            "time": {
+              "alias_of": "characteristics_ch1.1.timepoint",
+              "recode": {
+                "D1-preCPET": "BL",
+                "D2-24hPostCPET": "PC"
+              }
+            },
+            "subject": {
+              "source": "title",
+              "regex": "^COR-(\\d+)-D\\d",
+              "recode": {
+                "1433": "s1433",
+                "1726": "s1726",
+                "2349": "s2349",
+                "3013": "s3013",
+                "4614": "s4614",
+                "5587": "s5587"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\design_metadata.csv",
+          "sha256": "4d496f708bdb60d2a5bc47936579444b9fb2bb5ab1731c55e52791ea2121c64c",
+          "levels": {
+            "disease": {
+              "ME": 6,
+              "HC": 6
+            },
+            "time": {
+              "BL": 6,
+              "PC": 6
+            },
+            "subject": {
+              "s1433": 2,
+              "s1726": 2,
+              "s2349": 2,
+              "s3013": 2,
+              "s4614": 2,
+              "s5587": 2
+            }
+          }
+        }
+      },
+      "reason": "description 'raw_counts.txt:<column>' names the matrix column (12/12 match; title carries a '#2' suffix on two re-sequenced D2 libraries). subject from the COR id in title, time and disease from characteristics. Title and description COR ids agree for every GSM here.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:19"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\aligned_matrix.csv",
+          "sha256": "e42ed3500dc2cdc8ad209a7e769ce811f67b6609741d2547290ea555086b59fc",
+          "n_features": 58884,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 10095107.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer fraction 1.0, max ~1.0e7, no negatives; data_processing: STAR --quantMode GeneCounts raw counts per gene; paper S4.5.3.p1 used DESeq2 on raw counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:20"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired_change",
+        "formula": "within-subject delta = log2(CPM+1)[PC] - log2(CPM+1)[BL]; delta ~ C(disease)",
+        "design_column": "disease",
+        "contrasts": [
+          {
+            "name": "deltaRNA_ME_vs_HC",
+            "suitability_name": "disease_time_ME_PC_vs_HC_BL",
+            "description": "difference between ME and HC in within-subject PC-BL change (disease x time)",
+            "role": "primary"
+          },
+          {
+            "name": "disease_ME_vs_HC_time-BL",
+            "control": "HC",
+            "treatment": "ME",
+            "role": "secondary",
+            "estimand_type": "associational"
+          },
+          {
+            "name": "disease_ME_vs_HC_time-PC",
+            "control": "HC",
+            "treatment": "ME",
+            "role": "secondary",
+            "estimand_type": "associational"
+          },
+          {
+            "name": "time_PC_vs_BL_disease-ME",
+            "control": "BL",
+            "treatment": "PC",
+            "role": "exploratory"
+          },
+          {
+            "name": "time_PC_vs_BL_disease-HC",
+            "control": "BL",
+            "treatment": "PC",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "Disease x time with every subject sampled at both times (3 per cell). The paper's exercise estimand is the case-control difference in per-individual PC/BL change (S4.5.1.3.p3, S2.6.p4), run here as a paired-change model. The two between-cohort contrasts at BL and PC are the paper's supporting comparisons (Data S13; 'no significant DE at PC'), cross-sectional and associational. Within-group PC vs BL (subject-blocked) are exploratory; the paper reports them only for scRNA (S2.6.p1: none significant).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:23"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "included: removed by within-subject differencing in the paired-change model; included as a blocking covariate in the within-group PC vs BL DESeq2 fits"
+          },
+          {
+            "name": "subject (between-cohort BL and PC contrasts)",
+            "disposition": "nested: one sample per subject in each cross-sectional subset; cannot be blocked"
+          },
+          {
+            "name": "sex",
+            "disposition": "excluded: all subjects female (FIG6 legend)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(disease) + C(time) + C(subject)",
+          "n_samples": 12,
+          "n_columns": 8,
+          "columns": [
+            "Intercept",
+            "disease_ME",
+            "time_PC",
+            "subject_s1726",
+            "subject_s2349",
+            "subject_s3013",
+            "subject_s4614",
+            "subject_s5587"
+          ],
+          "rank": 7,
+          "full_rank": false,
+          "residual_df": 5,
+          "levels": {
+            "disease": {
+              "ME": 6,
+              "HC": 6
+            },
+            "time": {
+              "BL": 6,
+              "PC": 6
+            },
+            "subject": {
+              "s1433": 2,
+              "s1726": 2,
+              "s2349": 2,
+              "s3013": 2,
+              "s4614": 2,
+              "s5587": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "HC",
+                "BL",
+                "s1726"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "HC",
+                "BL",
+                "s3013"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "HC",
+                "BL",
+                "s5587"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "HC",
+                "PC",
+                "s1726"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "HC",
+                "PC",
+                "s3013"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "HC",
+                "PC",
+                "s5587"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "BL",
+                "s1433"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "BL",
+                "s2349"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "BL",
+                "s4614"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "PC",
+                "s1433"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "PC",
+                "s2349"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ME",
+                "PC",
+                "s4614"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "subject",
+            "n_levels": 6,
+            "status": "nested_in_primary",
+            "crosstab": {
+              "HC": {
+                "s1433": 0,
+                "s1726": 2,
+                "s2349": 0,
+                "s3013": 2,
+                "s4614": 0,
+                "s5587": 2
+              },
+              "ME": {
+                "s1433": 2,
+                "s1726": 0,
+                "s2349": 2,
+                "s3013": 0,
+                "s4614": 2,
+                "s5587": 0
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Repeated samples per individual (BL and PC). Paired-change differencing removes subject; within-group time fits use ~ subject + time. Subject is nested in disease, so it cannot be blocked in disease contrasts at a fixed time point. No batch column is recorded.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:23"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "limma (paired_change: moderated t on within-subject log2(CPM+1) differences, ~ C(disease)); DESeq2 Wald for cohort and within-group contrasts",
+        "formula": "delta(PC-BL) ~ C(disease); DESeq2: ~ disease (per time point), ~ subject + time (per disease group)",
+        "paper_route": {
+          "method": "per-individual PC/BL ratio of DESeq2-normalized counts floored at 1, geometric mean per cohort, log2(ME/HC) ranked into fgsea; no per-gene test reported for the bulk paired analysis",
+          "status": "blocked",
+          "reason": "no repository executor computes the geometric-mean ratio ranking; limma paired_change on log2(CPM+1) estimates the same difference in within-individual log change and adds a per-gene moderated test"
+        },
+        "deviations": [
+          "paired analysis by limma on log2(CPM+1) differences instead of DESeq2-normalized count ratios",
+          "GSEA on MSigDB Hallmark only (paper: Hallmark, C2 KEGG, C2 Reactome, C5 GO BP)",
+          "low-count filter is the executors' own, not the paper's >10 reads in >=3 libraries"
+        ],
+        "transform": "log2(CPM+1)"
+      },
+      "reason": "Raw counts. Cohort and within-group comparisons follow the paper's DESeq2 route on the aligned counts. The paired difference-in-change is fitted with the paired_change executor (limma), which needs log2(CPM+1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:27"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "not_reported",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "threshold_source": "workflow_default",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_cutoff": null,
+          "label": "DESeq2 results() default alpha, which the authors' unstated rule most likely used"
+        }
+      },
+      "reason": "The paper states no DEG cutoff for the plasma-particle RNA-seq (S4.5.3.p1); the workflow default BH padj < 0.05 without fold-change rule applies. padj < 0.1 is reported separately as an audit rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:27"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_multigroup_analysis",
+        "subset": "deltaRNA",
+        "role": "primary",
+        "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\transformed\\aligned_matrix_normalized.csv",
+        "transform": "log2(CPM+1)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\results\\deltaRNA\\followup_PC\\DEG_results_ME_vs_HC.csv"
+        ],
+        "counts": {
+          "deltaRNA/ME_vs_HC": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 8530,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.1",
+              "n_tested": 8530,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's exercise estimand: ME vs HC difference in within-individual PC-BL change (S4.5.1.3.p3, S2.6.p4).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:25"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c01605f4a1b32dbac862fcae0a09cd2933c9323cf5eb800a6ec19f16426467e0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c14bb55b60909e117381fea2da447de5bbbbcd9daa1008bfb81ae8fa9bf61941",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e42ed3500dc2cdc8ad209a7e769ce811f67b6609741d2547290ea555086b59fc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4d496f708bdb60d2a5bc47936579444b9fb2bb5ab1731c55e52791ea2121c64c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "995fe51936731ccecadd1b1accee5f4e69abd2efd21dce8761343ebc61f26b00",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a70bb335c914b84636c3761f7fe0fe365e2127ab580c68bb3f4eb426c295a30a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\transformed\\aligned_matrix_normalized.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8a8385f1b44237ca8b52684fe29d8244c9e6d4369f523eba9c8f393e10c6fa5f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\results\\deltaRNA\\followup_PC\\DEG_results_ME_vs_HC.csv",
+      "role": "deg_deltaRNA/ME_vs_HC",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f713ddc36afae2472b15b79fc55f49a329079a03437bc3b1b0668679dfde5d10",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -299,7 +299,7 @@ def _contained_keys(cols: set[str], meta: pd.DataFrame) -> list[dict]:
             out.append({"key": f"{column} (contains the name)", "matched": len(found),
                         "of_metadata": int(len(meta)), "of_matrix": len(cols),
                         "example": {"value": _short(values[example], 80), "matrix_column": found[example]},
-                        "use": f'alignment.key_patterns {{"key": ["{column}", "<regex with one group>"]}}, '
+                        "use": f'alignment.key_patterns {{"key": ["{column}", "<regex; several groups are joined with _>"]}}, '
                                'then key_column "key"'})
     return out
 

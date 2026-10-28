@@ -1,0 +1,173 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID28273480",
+  "request": "Analyze GSE97084 for PMID 28273480 (Enhanced Protein Translation Underlies Improved Metabolic and Physical Adaptations to Different Exercise Training Modes in Young and Old Humans.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE97084",
+      "accession": "GSE97084",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC5423095.paper.md"],
+        "metadata": "GSE97084/GSE97084_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID28273480/GSE97084_merged_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID28273480/prep_merge_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE97084"],
+            "assay": "bulk RNA-seq (TruSeq v2, HiSeq 2000) of vastus lateralis biopsies at 1000 hr, baseline and 72 hr after the last bout of 12 weeks training (S4.4.1.p1, S1.p3)",
+            "primary_estimand": "within-subject change in muscle gene expression after 12 weeks of training (post vs pre), separately for each training mode (HIIT, RT, CT) within each age group (Young 18-30, Old 65-80) (S2.4.p1, FIG4 A-F)",
+            "planned_contrasts": [
+              "Young HIIT post vs pre (FIG4A)",
+              "Old HIIT post vs pre (FIG4B; paper: 553 genes increased, S2.4.p2/S2.6.p5)",
+              "Young RT post vs pre (FIG4C; 35% fewer up genes than young HIIT, S2.4.p1)",
+              "Old RT post vs pre (FIG4D; 70% fewer up genes than old HIIT, ~166)",
+              "Young CT post vs pre (FIG4E; 28% fewer up genes than young HIIT)",
+              "Old CT post vs pre (FIG4F; 84% fewer up genes than old HIIT, ~88)",
+              "Baseline Old vs Young (S2.4.p1; 267 lower + 166 higher in old = 433), associational"
+            ],
+            "factors": {"age": ["Young", "Old"], "mode": ["HIIT", "RT", "CT"], "time": ["Pre", "Post"]},
+            "repeated_measure_unit": "participant (pre and post biopsy from the same person)",
+            "inclusion": "all participants with RNA-seq at both timepoints; CT pre-training = post-SED biopsy (B), the pre-SED (A) biopsy is not deposited",
+            "paper_method": "not stated for RNA-seq (MapRSeq pipeline, 'as previously described (Lanza et al., 2012)'); comparisons are per mode-by-age pre vs post",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "source_locator": "S4.4.1.p1 (FDR <= 0.05 and |log2FC| >= 0.5); FIG4 legend"},
+            "paper_results": {"old_HIIT_up": 553, "young_unique_up": {"HIIT": 274, "RT": 74, "CT": 170}, "old_unique_up": {"HIIT": 396, "RT": 33, "CT": 19}, "baseline_old_vs_young": {"lower_in_old": 267, "higher_in_old": 166}, "named_old_HIIT_up": ["MT-RNR1", "MT-RNR2", "MT-TL1", "MT-TV", "MT-TR", "MT-TG"]}
+          },
+          "reasoning": "S2.1.p2: randomized to HIIT/RT/CT within age groups; S1.p3 and S2.4.p1: RNA-seq at baseline and post-training; FIG4 A-F gives six training-induced DEG sets by mode and age; S4.4.1.p1 gives the threshold (FDR-corrected p <= 0.05 and |log2FC| >= 0.5). The DE software is not named. S2.4.p1 gives baseline age differences (267/166). Only up counts are reported for training contrasts.",
+          "confidence": "high",
+          "locator": "S2.4.p1, S2.4.p2, S4.4.1.p1, FIG4"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO extract_protocol quotes the paper's S4.4.1.p1 text verbatim", "vastus lateralis, Homo sapiens, Young/Old x HIIT/Resistance/Combined x Pre/PostTraining matches S2.1", "Mayo Clinic submitter matches the study site", "103 deposited samples in two count files, all present in metadata"]},
+          "reasoning": "GEO series GSE97084 extraction protocol text is identical to the paper's gene expression methods (S4.4.1.p1) and the factors match the trial design (S2.1.p2).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^(\\S+) "]},
+          "key_column": "key",
+          "patterns": {"subject": ["title", "^(\\d+)[A-Za-z]"]},
+          "aliases": {"age": "characteristics_ch1.0.age", "mode": "characteristics_ch1.1.exercise type", "time": "characteristics_ch1.2.biopsy timepoint", "batch": "description"},
+          "recode": {
+            "mode": {"HIIT": "HIIT", "Resistance": "RT", "Combined": "CT"},
+            "time": {"PreTraining": "Pre", "PostTraining": "Post"},
+            "batch": {"GeneCount_raw.tsv": "B1", "GeneCount_raw_2.tsv": "B2"}
+          },
+          "combine": {"cohort": ["age", "mode"]},
+          "final": {},
+          "reasoning": "Matrix columns were renamed by prep_merge_counts.py to the sample code (e.g. 10B, 18A) that starts each GEO title; key derived from title by regex and matched exactly. Subject = leading number of the code (10B/10C are the same CT participant; letter = visit). cohort = age x mode for stratified paired fits.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE97084_GeneCount_raw.tsv.gz + GSE97084_GeneCount_raw_2.tsv.gz merged on Ensembl GeneID", "paper_input": "raw reads per gene from MapRSeq"},
+          "reasoning": "All values integers, library sizes 14-72M; GEO data_processing: 'tab-delimited text files of raw reads per gene in each sample' (MapRSeq). Raw counts suit a negative-binomial model.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "Pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["cohort"],
+          "planned": [
+            "time_Post_vs_Pre_cohort-Young_HIIT",
+            "time_Post_vs_Pre_cohort-Old_HIIT",
+            "time_Post_vs_Pre_cohort-Young_RT",
+            "time_Post_vs_Pre_cohort-Old_RT",
+            "time_Post_vs_Pre_cohort-Young_CT",
+            "time_Post_vs_Pre_cohort-Old_CT"
+          ],
+          "covariate_candidates": ["batch"],
+          "final": {
+            "analysis_type": "paired pre/post within each age x mode stratum",
+            "design_column": "time",
+            "contrasts": [
+              {"name": "Young_HIIT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Old_HIIT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Young_RT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Old_RT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Young_CT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Old_CT", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "baseline_Old_vs_Young", "control": "Young", "treatment": "Old", "role": "secondary", "estimand_type": "associational"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled training (all modes) post vs pre", "reason_rejected": "paper reports each mode and age separately (FIG4 A-F); pooling changes the estimand"},
+            {"value": "one joint model with mode x age x time interaction", "reason_rejected": "paper compares mode-specific sets by overlap, not by interaction tests; per-stratum paired fits reproduce FIG4"}
+          ],
+          "reasoning": "Each participant has pre and post biopsies (S2.1.p2: baseline and post-training studies in all participants); FIG4 A-F are post vs pre within each mode x age. Time is the factor, subject the blocking key, cohort a stratum. Baseline Old vs Young (S2.4.p1) is a cross-sectional associational comparison on pre-training biopsies.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "confounding_candidates": ["batch", "age", "mode"],
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [
+              {"name": "subject", "disposition": "blocking term in every paired fit (~ subject + time)"},
+              {"name": "batch", "disposition": "count-file/sequencing batch is constant within subject, so absorbed by subject in paired fits; added only in a sensitivity run of the unpaired baseline age comparison"}
+            ]
+          },
+          "reasoning": "Repeated measures: pre and post from the same participant, so subject is blocked. The two deposited count files (different library depths) split subjects, not timepoints, so batch is nested in subject.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, ~ subject + time, per stratum, complete pairs)",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "not stated (MapRSeq, Lanza et al. 2012)", "status": "unknown", "reason": "the paper does not name its DE software; DESeq2 on raw counts with subject blocking is the validated route"},
+            "deviations": ["DE software not named in paper; DESeq2 paired model used", "paper may have analyzed all participants rather than complete pairs; we keep complete pairs only (Young CT subject 27 has no post sample)"]
+          },
+          "transform": null,
+          "reasoning": "Raw counts -> DESeq2 with subject blocking reproduces the paired pre/post comparison of FIG4.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "inclusive": true},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "inclusive": true},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null}
+          },
+          "reasoning": "S4.4.1.p1: FDR-corrected p <= 0.05 and absolute log2 fold change >= 0.5 (inclusive). FIG4 legend repeats it. Audit: FDR < 0.05 only.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "paper_up_counts": {"time_Post_vs_Pre_Old_HIIT": 553, "time_Post_vs_Pre_Old_RT": "~166 (70% fewer than old HIIT)", "time_Post_vs_Pre_Old_CT": "~88 (84% fewer)", "young": "not stated as totals; RT 35% and CT 28% fewer than young HIIT"},
+            "caveats": ["Training-contrast paper counts are up-regulated genes only; baseline 433 is total", "DE software not named in paper"]
+          },
+          "paper_counts": {"baseline_Old_vs_Young": 433},
+          "paper_genes": {"time_Post_vs_Pre_Old_HIIT": ["MT-RNR1", "MT-RNR2", "MT-TL1", "MT-TV", "MT-TR", "MT-TG"]},
+          "reasoning": "DE method not stated so the route is a declared deviation (DESeq2 paired). Compare our up counts with the paper's up counts (S2.4.p1-p2).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE software", "paper": "not named (MapRSeq pipeline, Lanza 2012)", "data": "raw counts", "disposition": "executable_with_declared_deviation"},
+        {"item": "CT baseline", "paper": "CT had a 12-week SED period; pre-SED and post-SED studies", "data": "only the post-SED (pre-training, letter B) and post-training (C) biopsies are deposited", "disposition": "executable_without_change"},
+        {"item": "Young CT subject 27", "paper": "n/a", "data": "27B (pre) has no post sample", "disposition": "excluded from paired fit by complete_pairs; kept in baseline age comparison"}
+      ],
+      "executions": [
+        {"name": "time_Post_vs_Pre_Young_HIIT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Young_HIIT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4A paired post vs pre"},
+        {"name": "time_Post_vs_Pre_Old_HIIT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Old_HIIT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4B paired post vs pre"},
+        {"name": "time_Post_vs_Pre_Young_RT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Young_RT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4C paired post vs pre"},
+        {"name": "time_Post_vs_Pre_Old_RT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Old_RT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4D paired post vs pre"},
+        {"name": "time_Post_vs_Pre_Young_CT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Young_CT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4E paired post vs pre"},
+        {"name": "time_Post_vs_Pre_Old_CT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": ["subject"], "alpha": 0.05}, "subset": {"cohort": ["Old_CT"]}, "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["Pre", "Post"]}, "role": "primary", "reasoning": "FIG4F paired post vs pre"},
+        {"name": "baseline_Old_vs_Young", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "age", "control_group": "Young", "treatment_group": "Old", "alpha": 0.05}, "subset": {"time": ["Pre"]}, "role": "secondary", "reasoning": "S2.4.p1 baseline age difference on pre-training biopsies; associational"},
+        {"name": "baseline_Old_vs_Young_batch", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "age", "control_group": "Young", "treatment_group": "Old", "covariate_columns": ["batch"], "alpha": 0.05}, "subset": {"time": ["Pre"]}, "role": "sensitivity", "reasoning": "same with sequencing-batch (count file) covariate"}
+      ],
+      "enrichment": [
+        {"execution": "time_Post_vs_Pre_Old_HIIT", "ora": true, "gsea": true, "reasoning": "S2.6.p5 / FIG6A: pathway and GSEA results for old HIIT"},
+        {"execution": "time_Post_vs_Pre_Young_HIIT", "ora": true, "gsea": true, "reasoning": "S2.4.p3: young HIIT GSEA"}
+      ]
+    }
+  ]
+}
