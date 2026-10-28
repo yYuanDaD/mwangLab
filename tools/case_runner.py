@@ -506,7 +506,18 @@ class CaseRun:
             return Path(inputs.matrix)
         merged = native.merge_raw_tar(Path(inputs.metadata).parent)
         self.result["raw_tar"] = {k: merged[k] for k in ("output", "n_genes", "n_samples")}
-        return Path(merged["output"])
+        # Tar members are named GSM<id>_<label>; keep the GSM id so exact alignment to the
+        # metadata index works. Written in the case dir; the cached merge stays untouched.
+        gsm = [re.match(r"(GSM\d+)_", c) for c in merged["samples"]]
+        if not all(gsm) or len({m.group(1) for m in gsm}) != len(gsm):
+            return Path(merged["output"])
+        table = native.read_table(merged["output"])
+        table.columns = [m.group(1) for m in gsm]
+        path = self.case.dir / "input" / "merged_from_tar_gsm.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        table.to_csv(path)
+        self.result["raw_tar"]["renamed_to_gsm"] = str(path)
+        return path
 
     def _transform(self, source: Path, transform: Optional[str], tdir: Path, pseudocount: float = 1.0) -> Path:
         if transform == "log2(x+1)":
