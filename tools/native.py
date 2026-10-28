@@ -317,6 +317,7 @@ def align_to_metadata(matrix_path: str | Path, metadata_path: str | Path, out_di
 def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
                    aliases: dict[str, str] | None = None,
                    patterns: dict[str, tuple[str, str]] | None = None,
+                   combine: dict[str, Sequence[str]] | None = None,
                    recode: dict[str, dict[str, str]] | None = None) -> dict:
     """Write a metadata copy with short, formula-safe columns, and return the mapping.
 
@@ -325,6 +326,8 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
 
     - ``aliases``: ``{"subject": "characteristics_ch1.0.subject"}`` copies a column.
     - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group.
+    - ``combine``: ``{"tgrp": ["diet", "time"]}`` joins columns (after aliases and
+      patterns, before recode) with ``_``, for a key built from several fields.
     - ``recode``: ``{"grp": {"sedentary_control": "sed", ...}}`` maps values of a new
       column to safe labels; every value must be mapped.
 
@@ -347,6 +350,12 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
             raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")
         meta[new] = extracted
         record["columns"][new] = {"source": source, "regex": pattern}
+    for new, sources in (combine or {}).items():
+        missing = [c for c in sources if c not in meta.columns]
+        if missing:
+            raise NativeToolError(f"combine sources for {new!r} not in metadata: {missing}")
+        meta[new] = meta[list(sources)].astype(str).agg("_".join, axis=1)
+        record["columns"][new] = {"combine": list(sources), "separator": "_"}
     for column, mapping in (recode or {}).items():
         if column not in meta.columns:
             raise NativeToolError(f"recode column {column!r} not in metadata")
