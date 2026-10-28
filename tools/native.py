@@ -326,10 +326,11 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
 
     - ``aliases``: ``{"subject": "characteristics_ch1.0.subject"}`` copies a column.
     - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group.
-    - ``combine``: ``{"tgrp": ["diet", "time"]}`` joins columns (after aliases and
-      patterns, before recode) with ``_``, for a key built from several fields.
+    - ``combine``: ``{"tgrp": ["diet", "time"]}`` joins columns with ``_``, for a key
+      built from several fields. It joins the recoded values of its sources.
     - ``recode``: ``{"grp": {"sedentary_control": "sed", ...}}`` maps values of a new
-      column to safe labels; every value must be mapped.
+      column to safe labels; every value must be mapped. Source columns are recoded
+      before ``combine``; a combined column is recoded after it.
 
     Raises when a source column is missing, a pattern does not match every row,
     or a recode leaves a value unmapped. Never guesses a label.
@@ -350,20 +351,26 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
             raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")
         meta[new] = extracted
         record["columns"][new] = {"source": source, "regex": pattern}
-    for new, sources in (combine or {}).items():
+    combine = combine or {}
+
+    def _recode(columns):
+        for column, mapping in columns:
+            if column not in meta.columns:
+                raise NativeToolError(f"recode column {column!r} not in metadata")
+            unmapped = sorted(set(meta[column].astype(str)) - set(mapping))
+            if unmapped:
+                raise NativeToolError(f"recode for {column!r} leaves values unmapped: {unmapped}")
+            meta[column] = meta[column].astype(str).map(mapping)
+            record["columns"].setdefault(column, {})["recode"] = mapping
+
+    _recode([(c, m) for c, m in (recode or {}).items() if c not in combine])
+    for new, sources in combine.items():
         missing = [c for c in sources if c not in meta.columns]
         if missing:
             raise NativeToolError(f"combine sources for {new!r} not in metadata: {missing}")
         meta[new] = meta[list(sources)].astype(str).agg("_".join, axis=1)
-        record["columns"][new] = {"combine": list(sources), "separator": "_"}
-    for column, mapping in (recode or {}).items():
-        if column not in meta.columns:
-            raise NativeToolError(f"recode column {column!r} not in metadata")
-        unmapped = sorted(set(meta[column].astype(str)) - set(mapping))
-        if unmapped:
-            raise NativeToolError(f"recode for {column!r} leaves values unmapped: {unmapped}")
-        meta[column] = meta[column].astype(str).map(mapping)
-        record["columns"].setdefault(column, {})["recode"] = mapping
+        record["columns"][new] = {"combine": list(sources), "separator": "_", "of": "recoded values"}
+    _recode([(c, m) for c, m in (recode or {}).items() if c in combine])
     for new in record["columns"]:
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", new):
             raise NativeToolError(f"derived column name {new!r} is not formula-safe")

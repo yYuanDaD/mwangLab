@@ -14,7 +14,7 @@ All three print compact JSON; the tools' own output goes to a log file. Run them
 
 `inspect` downloads the series when it is not cached, then reports:
 
-- `matrices`: each candidate file with integer fraction, range, missing values, duplicated IDs, type `candidates`, annotation columns, example sample columns and feature IDs, and `alignment_keys` (which metadata column equals the matrix column names, and how many match). A `_RAW.tar` is merged when no other matrix exists (or with `--merge-tar`).
+- `matrices`: each candidate file with integer fraction, range, missing values, duplicated IDs, type `candidates`, annotation columns, example sample columns and feature IDs, and `alignment_keys` (which metadata column equals the matrix column names, and how many match; `<column> (contains the name)` means the names sit inside that field, as in `Library name: CN2`, so derive the key with `key_patterns`). A `_RAW.tar` is merged when no other matrix exists (or with `--merge-tar`).
 - `metadata`: `grouping_columns` with level counts, `per_sample_columns` (keys such as `title`, `description`), `constant_columns` (including `data_processing`, which often states the matrix type), and the rest.
 
 Read the paper next (`python -m tools.paper_structure section <paper.json> <block ids>` or the `.paper.md`), then write the spec.
@@ -25,13 +25,14 @@ One run holds one or more cases (normally one GEO series each):
 
 ```json
 {"run_dir": "...", "request": "...", "decision_maker": "<agent and model>", "platform": "claude-code",
+ "data_root": "data",
  "cases": [{"case_id": "GSE1", "accession": "GSE1",
-            "inputs": {"paper": ["<paper.md>"], "metadata": "data/GSE1/GSE1_metadata.csv",
-                       "matrix": "data/GSE1/<file>", "raw_tar": false, "prep_scripts": []},
+            "inputs": {"paper": ["<paper.md>"], "metadata": "GSE1/GSE1_metadata.csv",
+                       "matrix": "GSE1/<file>", "raw_tar": false, "prep_scripts": []},
             "gates": {...}, "discrepancies": [...], "executions": [...], "enrichment": [...]}]}
 ```
 
-`inputs`: give `matrix` or `"raw_tar": true` (merges `data/<GSE>/<GSE>_RAW.tar`; tar columns become GSM ids). When the deposited file must be repaired first (Excel-mangled gene names, broken rows, lanes to merge), write one small script, save its output, point `matrix` at it and list the script in `prep_scripts`.
+`data_root` (the same folder as inspect's `--data-root`) makes relative `metadata` and `matrix` paths resolve inside it; absolute paths are used as given. `inputs`: give `matrix` or `"raw_tar": true` (merges `data/<GSE>/<GSE>_RAW.tar`; tar columns become GSM ids). When the deposited file must be repaired first (Excel-mangled gene names, broken rows, lanes to merge), write one small script, save its output, point `matrix` at it and list the script in `prep_scripts`.
 
 Every gate has `final` (your decision), `reasoning` (with paper locators), `confidence` (`high`/`medium`/`low`), optional `locator`, `candidates` (rejected alternatives: `{"value", "reason_rejected"}`), and `decision_status` (`valid` by default; `refused`/`manual_review`/`unresolved` with `stop_reason` stops the case there — omit the later gates). The runner adds the computed facts to each record; you cannot overwrite them.
 
@@ -39,9 +40,9 @@ Every gate has `final` (your decision), `reasoning` (with paper locators), `conf
 |---|---|---|---|
 | `paper_reconstruction` | | `accessions`, `primary_estimand`, `planned_contrasts`, `paper_threshold` (object), plus factors, inclusion, method, paper results | |
 | `ownership` | | `owned` (true/false), checks | accession, files |
-| `alignment` | `key_column` (null = metadata index), `aliases`, `patterns` (`{"grp": ["title", "regex with one group"]}`), `combine` (`{"tgrp": ["diet", "time"]}`, joined with `_`, before recode), `recode` (every value mapped), `key_patterns` (derive the key column itself first), `exclude_samples` (`{id: reason}`) | | method, coverage, unmatched IDs, derived columns and levels |
+| `alignment` | `key_column` (null = metadata index), `aliases`, `patterns` (`{"grp": ["title", "regex with one group"]}`), `combine` (`{"tgrp": ["diet", "time"]}`, joins the recoded source values with `_`), `recode` (every value mapped; a combined column is recoded after it is built, so its keys use the recoded source values, e.g. `HC_BL`), `key_patterns` (derive the key column itself first), `exclude_samples` (`{id: reason}`) | | method, coverage, unmatched IDs, derived columns and levels |
 | `matrix` | `matrix_type`, `recommended_method` | source, paper input | profile |
-| `design` | `factors`, `references`, `subject`, `organism` (`Mouse`/`Human`/`Rat`), `planned` (suitability names `<factor>_<test>_vs_<ref>`), `covariate_candidates` | `analysis_type`, `design_column` or `formula`, `contrasts` or `control`+`treatment` | suitability verdict |
+| `design` | `factors`, `references`, `subject`, `organism` (`Mouse`/`Human`/`Rat`), `planned` (suitability names `<factor>_<test>_vs_<ref>`, plus `_<stratum>-<level>` per stratum), `covariate_candidates`, `strata` (columns analyzed separately, such as sorted fractions or tissues: comparisons never cross them) | `analysis_type`, `design_column` or `formula`, `contrasts` or `control`+`treatment` | suitability verdict |
 | `covariance` | `confounding_candidates` | `status` (`required`/`not_required`), `blocking_terms`, `covariates` (`{"name", "disposition"}`) | design check, confounding report |
 | `method` | `transform` (`log2(x+1)`, `log2(CPM+1)`, `beta_to_m`, `round`) | `method` (named first: `DESeq2`, `limma`, `edgeR`, ...), `formula`, `paper_route`, `deviations`; `rounding_documented: true` for estimated counts | `matrix_type` |
 | `threshold` | | `paper_threshold`, `threshold_source` (`paper`, `paper_on_deviation_route`, `workflow_default`), `applied_threshold`, optional `audit_threshold`, `deviation_note` | |
@@ -65,13 +66,15 @@ Each execution: `name` (also the result-table name), `tool`, `args`, `role` (`pr
 | edgeR (TMM), two arms | `tools.edger_tools:run_edger_analysis` | `design_column`, `control_group`, `treatment_group` |
 | limma-voom (needs R) | `tools.limma_voom_tools:run_limma_voom_analysis` | as edgeR |
 
+For separate fits per fraction, put the fraction column in `strata`, the treatment in `factors`, and give each execution a `subset` of one fraction.
+
 Per execution, optionally: `subset` (`{"tissue": ["soleus"]}` keeps those samples), `complete_pairs` (`{"subject": "subject", "condition": "time", "levels": ["pre", "post"]}`), `transform` (this execution only, for example `log2(CPM+1)` for a limma sensitivity run next to DESeq2), `matrix: "aligned"` (skip the case-level transform).
 
 Joint and multigroup executions return one table per comparison, named `<execution>/<comparison>`; use those names in `paper_counts`, `paper_genes` and `enrichment`.
 
 ## 4. Enrichment
 
-`{"execution": "<table name>", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "..."}`. ORA uses the applied threshold (recorded as an audit rule when the applied metric is raw p); GSEA uses the full ranking. IDs that are not gene symbols or Ensembl genes are recorded as `not_run`. Rat runs on mouse gene sets by symbol.
+`{"execution": "<table name>", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "..."}`. ORA uses the applied threshold (recorded as an audit rule when the applied metric is raw p); GSEA uses the full ranking. Up and down ORA for one table are two entries (`"direction": "up"` / `"down"`); each writes to its own folder. IDs that are not gene symbols or Ensembl genes are recorded as `not_run`. Rat runs on mouse gene sets by symbol.
 
 ## 5. Execute and fix
 

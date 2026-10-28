@@ -111,9 +111,8 @@ def gse164890(root: str) -> dict:
 def gse273041(root: str) -> dict:
     g = old_gates("PMID40069235", "case_01")
     design = g["design"]["final"]
-    tgrp = {f"{d}_{t}": ("BL" if t == "Base" else f"{dd}_{tt}")
-            for d, dd in (("HiCarb", "HC"), ("LowCarb", "LC"))
-            for t, tt in (("Base", "BL"), ("IP", "H0"), ("IP120", "H2"))}
+    # combine joins the recoded diet/time values
+    tgrp = {f"{d}_{t}": ("BL" if t == "BL" else f"{d}_{t}") for d in ("HC", "LC") for t in ("BL", "H0", "H2")}
     plan = {"analysis_type": "repeated_multilevel", "formula": design["formula"], "contrasts": design["contrasts"]}
     return {
         "case_id": "case_01", "accession": "GSE273041",

@@ -98,6 +98,8 @@ class DesignGate(Gate):
     covariate_candidates: Optional[list[str]] = None
     organism: str = "Mouse"
     planned: list[str] = Field(default_factory=list)
+    strata: list[str] = Field(
+        default_factory=list, description="columns analyzed separately (e.g. cell fraction); comparisons stay within one")
 
 
 class CovarianceGate(Gate):
@@ -207,7 +209,19 @@ class Spec(BaseModel):
     request: str
     decision_maker: str
     platform: str = "claude-code"
+    data_root: Optional[str] = Field(
+        None, description="relative inputs.metadata / inputs.matrix are read from here, e.g. GSE1/GSE1_metadata.csv")
     cases: list[Case]
+
+    @model_validator(mode="after")
+    def _resolve_inputs(self):
+        if self.data_root:
+            for case in self.cases:
+                for field in ("metadata", "matrix"):
+                    value = getattr(case.inputs, field)
+                    if value and not Path(value).is_absolute():
+                        setattr(case.inputs, field, str(Path(self.data_root) / value))
+        return self
 
 
 # ---------------------------------------------------------------- inspect
@@ -261,7 +275,33 @@ def _key_matches(columns: list[str], meta: pd.DataFrame) -> list[dict]:
         hits = int(values.isin(cols).sum())
         if hits:
             out.append({"key": name, "matched": hits, "of_metadata": int(len(meta)), "of_matrix": len(cols)})
+    if not any(d["matched"] == len(cols) for d in out):
+        out += _contained_keys(cols, meta)
     return sorted(out, key=lambda d: -d["matched"])
+
+
+def _contained_keys(cols: set[str], meta: pd.DataFrame) -> list[dict]:
+    """Metadata columns whose text holds exactly one matrix column name as a whole token
+    (``Library name: CN2``): derive the key with ``alignment.key_patterns``."""
+    out = []
+    names = sorted(cols, key=len, reverse=True)
+    for column in meta.columns:
+        values = meta[column].dropna().astype(str)
+        if values.nunique() != len(meta):
+            continue
+        found = {}
+        for idx, text in values.items():
+            hit = [c for c in names if re.search(rf"(?<![A-Za-z0-9]){re.escape(c)}(?![A-Za-z0-9])", text)]
+            if len(hit) == 1:
+                found[idx] = hit[0]
+        if len(found) >= max(2, len(meta) // 2) and len(set(found.values())) == len(found):
+            example = next(iter(found))
+            out.append({"key": f"{column} (contains the name)", "matched": len(found),
+                        "of_metadata": int(len(meta)), "of_matrix": len(cols),
+                        "example": {"value": _short(values[example], 80), "matrix_column": found[example]},
+                        "use": f'alignment.key_patterns {{"key": ["{column}", "<regex with one group>"]}}, '
+                               'then key_column "key"'})
+    return out
 
 
 def _candidate_files(data_dir: Path) -> list[Path]:
@@ -463,7 +503,7 @@ class CaseRun:
         rep, suit_item, summary = case.suitability(
             matrix_type=m.matrix_type, metadata=self.dm, factors=d.factors, matrix_csv=str(self.mat_path),
             organism=d.organism, subject=d.subject, covariate_candidates=d.covariate_candidates,
-            references=d.references or None, planned=d.planned)
+            references=d.references or None, planned=d.planned, strata=d.strata)
         self.comparisons = rep["comparisons"]
         self.result["suitability"] = summary
         design_final = {**d.final, "suitability": summary}
@@ -687,6 +727,7 @@ class CaseRun:
             return
         runs = []
         if en.ora:
+            ora_dir = "ora" if en.direction == "all" else f"ora_{en.direction}"  # up and down never share files
             rule = _threshold_kwargs(self.applied)
             as_applied = rule["metric"] == "padj"
             input_threshold = (self.applied if as_applied else
@@ -694,11 +735,11 @@ class CaseRun:
             runs.append(("ORA (Enrichr GO BP/MF/CC + KEGG)", "tools.enrichment_tools:run_enrichment_analysis",
                          {"deg_csv": deg, "organism": organism, "padj_cutoff": float(input_threshold.get("cutoff", 0.05)),
                           "log2fc_cutoff": float(input_threshold.get("effect_cutoff") or 0.0),
-                          "direction": en.direction, "output_dir": str(out / "ora")},
+                          "direction": en.direction, "output_dir": str(out / ora_dir)},
                          {"gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, "
                                        "GO_Cellular_Component_2023, KEGG",
-                          "input_threshold": input_threshold,
-                          "input_threshold_source": "applied" if as_applied else "audit"}, out / "ora"))
+                          "input_threshold": input_threshold, "direction": en.direction,
+                          "input_threshold_source": "applied" if as_applied else "audit"}, out / ora_dir))
         if en.gsea:
             runs.append(("GSEA preranked (gseapy prerank)", "tools.enrichment_tools:run_gsea_analysis",
                          {"deg_csv": deg, "organism": organism, "ranking_metric": en.ranking_metric,
@@ -713,7 +754,9 @@ class CaseRun:
                     raise native.NativeToolError(f"no output written: {_short(message, 500)}")
                 self.case.decide("enrichment", final=final, evidence=evidence, reasoning=en.reasoning or method,
                                  confidence="high", execution_status="completed")
-                status[f"{en.execution} {method.split()[0]}"] = "completed"
+                label = method.split()[0] + ("" if method.startswith("GSEA") or en.direction == "all"
+                                             else f" {en.direction}")
+                status[f"{en.execution} {label}"] = "completed"
             except native.NativeToolError as exc:
                 final["execution_error"] = _short(exc, 1500)
                 self.case.decide("enrichment", final=final, evidence=evidence, reasoning=en.reasoning or method,
@@ -783,11 +826,12 @@ TEMPLATE = {
     "request": "Analyze GSE000000 for PMID 0 (<title>): how exercise affects gene expression as the paper intends.",
     "decision_maker": "<model> session",
     "platform": "claude-code",
+    "data_root": "data",
     "cases": [{
         "case_id": "GSE000000",
         "accession": "GSE000000",
-        "inputs": {"paper": ["<papers>/PMC0.paper.md"], "metadata": "data/GSE000000/GSE000000_metadata.csv",
-                   "matrix": "data/GSE000000/GSE000000_counts.csv.gz", "raw_tar": False, "prep_scripts": []},
+        "inputs": {"paper": ["<papers>/PMC0.paper.md"], "metadata": "GSE000000/GSE000000_metadata.csv",
+                   "matrix": "GSE000000/GSE000000_counts.csv.gz", "raw_tar": False, "prep_scripts": []},
         "gates": {
             "paper_reconstruction": {"final": {"accessions": ["GSE000000"], "primary_estimand": "...",
                                                "planned_contrasts": ["EX vs SED (S2.1.p1; paper: 120 DEGs)"],

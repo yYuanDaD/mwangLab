@@ -169,5 +169,44 @@ r3 = case_runner.execute(os.path.join(run_dir, "bad_pattern.json"))
 check("did not match every row" in r3["cases"][0].get("error", {}).get("message", ""),
       f"pattern error surfaces: {r3['cases'][0].get('error', {}).get('message', '')[:120]}")
 
+# inspect: matrix names held inside a metadata field ("Library name: CN2")
+meta = pd.read_csv(os.path.join(DATA, "GSE900001", "GSE900001_metadata.csv"), index_col=0)
+meta["description"] = "Library name: " + meta["title"]
+meta = meta.drop(columns="title")
+inner = case_runner._key_matches(list(meta["description"].str[len("Library name: "):]), meta)
+check(inner and inner[0]["key"] == "description (contains the name)" and inner[0]["matched"] == 12,
+      f"inspect finds names inside a field: {inner[:1]}")
+
+# combine joins recoded source values; the combined column is recoded after
+from tools import native, suitability
+dm = pd.DataFrame({"cell": ["cancer", "cancer", "TME", "TME"], "grp": ["Sendentary", "Exercise"] * 2},
+                  index=[f"s{i}" for i in range(4)])
+dm.to_csv(os.path.join(ROOT, "combine_in.csv"))
+native.derive_columns(os.path.join(ROOT, "combine_in.csv"), os.path.join(ROOT, "combine_out.csv"),
+                      combine={"cgrp": ["cell", "grp"]},
+                      recode={"cell": {"cancer": "CC", "TME": "TME"}, "grp": {"Sendentary": "SED", "Exercise": "EX"},
+                              "cgrp": {"CC_SED": "CCSED", "CC_EX": "CCEX", "TME_SED": "TMESED", "TME_EX": "TMEEX"}})
+out = pd.read_csv(os.path.join(ROOT, "combine_out.csv"), index_col=0)
+check(list(out["cgrp"]) == ["CCSED", "CCEX", "TMESED", "TMEEX"] and list(out["cell"]) == ["CC", "CC", "TME", "TME"],
+      f"combine after source recode: {list(out['cgrp'])}")
+
+# strata: comparisons stay within a fraction
+strat = pd.DataFrame({"cell": ["CC"] * 6 + ["TME"] * 6, "grp": (["SED"] * 3 + ["EX"] * 3) * 2},
+                     index=[f"s{i}" for i in range(12)])
+rep = suitability.report(case_id="strata", matrix_type="raw counts", metadata=strat, factors=["grp"],
+                         references={"grp": "SED"}, strata=["cell"], out_dir=os.path.join(ROOT, "strata"),
+                         planned=["grp_EX_vs_SED_cell-CC", "grp_EX_vs_SED_cell-TME"])
+names = sorted(c["name"] for c in rep["comparisons"])
+check(names == ["grp_EX_vs_SED_cell-CC", "grp_EX_vs_SED_cell-TME"] and rep["verdict"] == "analyzable",
+      f"strata comparisons: {names}, {rep['verdict']}")
+
+# data_root: relative inputs are read from it
+rel = json.loads(json.dumps(spec))
+rel["data_root"] = DATA
+rel["cases"][0]["inputs"].update(metadata="GSE900001/GSE900001_metadata.csv", matrix="GSE900001/GSE900001_counts.csv.gz")
+parsed = case_runner.Spec.model_validate(rel)
+check(parsed.cases[0].inputs.metadata == os.path.join(DATA, "GSE900001", "GSE900001_metadata.csv"),
+      f"data_root resolves inputs: {parsed.cases[0].inputs.metadata}")
+
 print("\nRESULT:", "FAIL" if failures else "PASS", f"({len(failures)} failed)")
 sys.exit(1 if failures else 0)
