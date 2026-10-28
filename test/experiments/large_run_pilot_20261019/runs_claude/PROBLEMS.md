@@ -331,3 +331,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 0f65e49e563e3417d3cee92f75eba6244b276201 (GSE236613)
 
 - geo_tar.py:92-119 merges FPKM+counts files per GSM into one matrix (18 cols/9 GSM); runner effect_cutoff symmetric only (case_runner.py:399); ORA falls back to 5 padj genes Details: `0f65e49e563e3417d3cee92f75eba6244b276201/HANDBACK.md`.
+
+## PMID42679010 (GSE344550)
+
+- minor: inspect type candidates ignore data_processing 'RPKM normalized' statement Details: `PMID42679010/HANDBACK.md`.
+
+## 4a5659c6cb4aaab7fd11fbaa777c9b851c089468 (GSE129694)
+
+- inspect downloads 11GB+ bigwig RAW.tar (case_runner.py:321, geo_tools.py:69-78; truncated tar left in data/GSE129694); NaN recode fails native.py:376; partial cols shown constant case_runner.py:240 Details: `4a5659c6cb4aaab7fd11fbaa777c9b851c089468/HANDBACK.md`.

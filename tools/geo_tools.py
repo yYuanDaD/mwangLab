@@ -64,6 +64,7 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
         downloaded_files = []
         converted_files = []
         skipped_files = []
+        oversize_files = []
 
         for link in soup.find_all("a"):
             href = link.get("href")
@@ -79,7 +80,18 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
                     skipped_files.append(file_path)
                     continue
 
-                urllib.request.urlretrieve(file_url, file_path)
+                # Per-sample archives can be tens of GB (bigWig, BAM). Skip files over the limit
+                # (BIOAGENT_MAX_SUPPL_GB, default 3) and download to .part so an interrupted
+                # transfer is never mistaken for a complete file by the skip-if-exists check.
+                try:
+                    size = int(requests.head(file_url, timeout=30).headers.get("Content-Length") or 0)
+                except Exception:
+                    size = 0
+                if size > float(os.getenv("BIOAGENT_MAX_SUPPL_GB", "3")) * 1e9:
+                    oversize_files.append(f"{href} ({size / 1e9:.1f} GB)")
+                    continue
+                urllib.request.urlretrieve(file_url, file_path + ".part")
+                os.replace(file_path + ".part", file_path)
                 downloaded_files.append(file_path)
 
                 if file_path.endswith(".xlsx") or file_path.endswith(".xls"):
@@ -88,7 +100,7 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
                     except Exception as e:
                         converted_files.append(f"{file_path} (not converted: {type(e).__name__}: {e})")
 
-        if not downloaded_files and not skipped_files:
+        if not downloaded_files and not skipped_files and not oversize_files:
             return f"Target {geo_accession} has no supplementary files provided."
 
         res_str = (f"Supplementary files ready in {target_dir}: "
@@ -96,6 +108,9 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
         if converted_files:
             res_str += f"Automatically converted {len(converted_files)} Excel files to CSV format for downstream use:\n"
             res_str += "\n".join(converted_files)
+        if oversize_files:
+            res_str += ("\nNot downloaded (over BIOAGENT_MAX_SUPPL_GB): " + ", ".join(oversize_files)
+                        + ". Set BIOAGENT_MAX_SUPPL_GB higher if the matrix is only in that file.")
 
         return res_str
 

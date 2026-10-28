@@ -1,0 +1,117 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42679010",
+  "request": "Analyze GSE344550 for PMID 42679010 (Outbreaks of fluconazole-resistant Candida parapsilosis are driven by low-biofilm-producing isolates that emerge under host selection.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE344550",
+      "accession": "GSE344550",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13557500.paper.md"],
+        "metadata": "GSE344550/GSE344550_metadata.csv",
+        "matrix": "GSE344550/GSE344550_macrophage_counts_rpkm.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE344550", "GSE312575"],
+            "assay": "bulk RNA-seq of primary human monocyte-derived macrophages infected ex vivo with C. parapsilosis isolates (GSE344550); fungal RNA-seq in GSE312575",
+            "primary_estimand": "Macrophage transcriptional response to low-biofilm-producing (LBP: 29T, 49B) versus biofilm-producing (BP: 1T, 35B) C. parapsilosis isolates at 3 h and 24 h post-infection. No exercise, training, or physical-activity factor exists anywhere in the study.",
+            "factors": {"biofilm_group": ["uninfected control", "BP", "LBP"], "time": ["control", "3 h", "24 h"]},
+            "sample_inclusion": "macrophages from human donors infected with 4 isolates or uninfected; 30 libraries in GEO",
+            "planned_contrasts": [
+              "BP vs LBP infected macrophages at 3 h (S4.13.p1, S2.7.p1)",
+              "BP vs LBP infected macrophages at 24 h (S4.13.p1, S2.7.p1)"
+            ],
+            "paper_threshold": {
+              "metric": null,
+              "cutoff": null,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "source_locator": "S4.13.p1",
+              "note": "paper states only |log2FC| > 1; no p or FDR rule is stated"
+            },
+            "paper_method": "edgeR on raw counts, TMM library normalization, low-expression filtering, ~ 0 + group:time; fgsea preranked on log2FC (S4.13.p1)",
+            "paper_results": "DEG counts for macrophages are not stated in the text; results reported as GSEA (Fig 5, S4 Fig)"
+          },
+          "reasoning": "The paper (PMID 42679010) studies fluconazole-resistant Candida parapsilosis outbreak isolates, biofilm phenotypes, and host immune interaction. GSE344550 is the macrophage infection RNA-seq (FN.p1). Methods S4.13.p1 define the model ~0+group:time with BP vs LBP contrasts at 3 h and 24 h and |log2FC|>1. Nothing in the study concerns exercise.",
+          "confidence": "high",
+          "locator": "FN.p1; S2.7.p1; S4.10.p2; S4.13.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "FN.p1 names GSE344550 as the macrophage RNA-seq",
+              "GEO organism Homo sapiens, cell type Macrophage, strains 1T/29T/35B/49B match S4.13.p1",
+              "contact Nobile Lab (UC Merced), consistent with the paper's authors"
+            ]
+          },
+          "reasoning": "Accession, sample annotations (strain, time) and the single supplementary matrix all match the paper's macrophage experiment.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^Library name: (AM\\d+)$"]},
+          "patterns": {
+            "strain": ["title", "^(?:Infected with )?(Control|1T|29T|35B|49B)"],
+            "bgrp": ["title", "^(?:Infected with )?(Control|1T|29T|35B|49B)"]
+          },
+          "aliases": {"time": "characteristics_ch1.2.time"},
+          "recode": {
+            "strain": {"Control": "CTRL", "1T": "S1T", "29T": "S29T", "35B": "S35B", "49B": "S49B"},
+            "bgrp": {"Control": "CTRL", "1T": "BP", "35B": "BP", "29T": "LBP", "49B": "LBP"},
+            "time": {"Control": "T0", "3 hour": "h3", "24 hour": "h24"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns AM* equal the 'Library name' inside the GEO description field (inspect: 30/30). Strain and biofilm group (BP = 1T, 35B; LBP = 29T, 49B per S4.13.p1) come from the title; time from characteristics.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "RPKM (linear normalized)",
+          "recommended_method": "limma on log2(RPKM+1)",
+          "reasoning": "File name 'counts_rpkm', GEO data_processing 'Supplementary files format and content: RPKM normalized transcripts', integer fraction 0.55 with fractional values (e.g. 1.63403). The paper used raw counts with edgeR (S4.13.p1); raw counts are not deposited, so edgeR could not be reproduced exactly.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["bgrp", "time"],
+          "references": {"bgrp": "CTRL", "time": "T0"},
+          "organism": "Human",
+          "planned": [],
+          "final": {
+            "analysis_type": "none",
+            "contrasts": []
+          },
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the series contains only uninfected and C. parapsilosis-infected human macrophages (factors: fungal isolate biofilm group BP/LBP and hours post-infection). There is no exercise, training or physical-activity arm, so the requested estimand (effect of exercise on gene expression) is not identifiable. The paper's own BP-vs-LBP contrast is not an exercise comparison and is not manufactured as one.",
+          "candidates": [
+            {"value": "bgrp LBP vs BP at 3 h / 24 h (paper's contrast)", "reason_rejected": "infection-isolate comparison, not exercise; out of scope for the request"},
+            {"value": "infected vs uninfected control", "reason_rejected": "infection effect, not exercise"}
+          ],
+          "reasoning": "Request asks for exercise effects; paper (ABS.p1, S2.7.p1, S4.13.p1) and GEO metadata contain no exercise factor.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "matrix input",
+          "paper": "edgeR on raw counts (S4.13.p1)",
+          "data": "only RPKM-normalized matrix deposited",
+          "disposition": "would block paper route; moot because case refused at design"
+        },
+        {
+          "item": "control labelling",
+          "paper": "timepoints control, 3 h, 24 h (S4.13.p1)",
+          "data": "uninfected controls exist at time 'Control' (3), '3 hour' (2) and '24 hour' (3); infected 3 h has 1T n=2, 35B n=2",
+          "disposition": "recorded only"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

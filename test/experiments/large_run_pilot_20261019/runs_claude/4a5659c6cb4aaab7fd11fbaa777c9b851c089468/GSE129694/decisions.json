@@ -53,7 +53,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T16:05:04+00:00"
+    "recorded_at": "2026-10-28T16:06:28+00:00"
   },
   {
     "contract_version": "3",
@@ -98,7 +98,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T16:05:04+00:00"
+    "recorded_at": "2026-10-28T16:06:28+00:00"
   },
   {
     "contract_version": "3",
@@ -193,7 +193,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T16:05:04+00:00"
+    "recorded_at": "2026-10-28T16:06:29+00:00"
   },
   {
     "contract_version": "3",
@@ -248,6 +248,81 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T16:05:04+00:00"
+    "recorded_at": "2026-10-28T16:06:30+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE129694",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC7093805.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC7093805.paper.md",
+        "sha256": "8092f8201add62289474febb6d5666ff7b7d678390f19a11061ab1ad80381a87"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\4a5659c6cb4aaab7fd11fbaa777c9b851c089468\\GSE129694\\aligned\\design_metadata.csv",
+        "sha256": "274045e2b4c28f329cf6bd95dd2d9eeb5aa91bfaccdaff8b199cd21358ea0715"
+      },
+      {
+        "id": "tool_output:suitability.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\4a5659c6cb4aaab7fd11fbaa777c9b851c089468\\GSE129694\\suitability\\suitability.json",
+        "sha256": "28954e4bcf0e315913c488029903609c5a27e3f2396f2f4cb5bcbb97d7755c0a"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "grp_SWIM_vs_SWW (exercise modality, time-matched at 13.5 wk)",
+        "reason_rejected": "compares two exercise types; does not estimate the effect of exercise versus no exercise that the request and Fig. 1b ask for"
+      },
+      {
+        "value": "pooled exercise (SWIM+SWW) vs CONT",
+        "reason_rejected": "pools two biologically distinct exercise modalities the paper treats separately (TAB2)"
+      },
+      {
+        "value": "CONT vs NoSCI, TX vs NoSCI",
+        "reason_rejected": "injury-severity contrasts, not exercise"
+      }
+    ],
+    "final": {
+      "analysis_type": "multi-group, one control with two exercise levels",
+      "design_column": "grp",
+      "formula": "~ grp",
+      "contrasts": [
+        {
+          "name": "grp_SWIM_vs_CONT",
+          "control": "CONT",
+          "treatment": "SWIM",
+          "role": "primary"
+        },
+        {
+          "name": "grp_SWW_vs_CONT",
+          "control": "CONT",
+          "treatment": "SWW",
+          "role": "primary"
+        }
+      ],
+      "suitability": {
+        "verdict": "not_analyzable",
+        "failed": [
+          "covariance"
+        ],
+        "warnings": [],
+        "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\4a5659c6cb4aaab7fd11fbaa777c9b851c089468\\GSE129694\\suitability\\suitability.md",
+        "n_comparisons": 10,
+        "n_analyzable": 10
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper-defined exercise contrasts would be each exercise arm vs the contused, activity-restricted, unexercised CONT SCI arm (Fig. 1b, S2.1.p1), in one model over all five groups. The suitability report fails covariance: time post-SCI (8.5/11.5/13.5 wk) is a function of grp, and for both planned contrasts SWIM and SWW are all 13.5 wk while CONT is all 11.5 wk. S2.3.p1 explains that the exercise arms needed extra time for facility introduction plus 10 weeks of training, so the delay is built into the protocol rather than a technical batch; the authors note all collections were past the acute-to-chronic transition, but give no evidence that 11.5 vs 13.5 weeks is transcriptionally neutral in soleus, which continues to remodel after SCI. Time cannot be included as a covariate (aliased) or ignored without changing the estimand. Refused here because the runner makes a not_analyzable suitability verdict incompatible with a valid design; the covariance finding (time aliased with exercise) is the reason.",
+    "decision_status": "refused",
+    "execution_status": "not_started",
+    "stop_reason": "Sacrifice time post-SCI is completely confounded with exercise: every SWIM and SWW animal was collected at 13.5 weeks and every CONT SCI animal at 11.5 weeks (GEO characteristics time; paper S2.3.p1, TAB1). No unexercised contused group exists at 13.5 weeks and no exercised group at 11.5 weeks, so both planned contrasts estimate exercise plus two extra weeks of chronic SCI, tiny-cage restriction and age, and the two cannot be separated in any model. The time-matched alternative (SWIM vs SWW) compares exercise modalities, not exercise versus no exercise. Suitability report: covariance fail, time nested with grp (GSE129694/suitability/suitability.md).",
+    "recorded_at": "2026-10-28T16:06:47+00:00"
   }
 ]

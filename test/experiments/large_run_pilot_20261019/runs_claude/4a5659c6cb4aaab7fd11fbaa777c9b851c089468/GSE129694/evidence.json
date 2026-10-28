@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "run_id": "4a5659c6cb4aaab7fd11fbaa777c9b851c089468",
   "subject_id": "GSE129694",
-  "created_at": "2026-10-28T12:05:04",
-  "finished_at": null,
-  "status": null,
+  "created_at": "2026-10-28T12:06:28",
+  "finished_at": "2026-10-28T12:06:47",
+  "status": "stopped:design",
   "error": null,
   "sources": [
     {
@@ -13,7 +13,7 @@
       "label": "PMC7093805.paper.md",
       "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC7093805.paper.md",
       "locator": null,
-      "captured_at": "2026-10-28T12:05:04",
+      "captured_at": "2026-10-28T12:06:28",
       "sha256": null,
       "attributes": {
         "sha256": "8092f8201add62289474febb6d5666ff7b7d678390f19a11061ab1ad80381a87",
@@ -26,7 +26,7 @@
       "label": "GSE129694_metadata.csv",
       "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE129694\\GSE129694_metadata.csv",
       "locator": null,
-      "captured_at": "2026-10-28T12:05:04",
+      "captured_at": "2026-10-28T12:06:28",
       "sha256": null,
       "attributes": {
         "sha256": "7c8c48ad0b0afcc1bf2e42f17e6735ccdb65b573b77ab6bb4341220457fc7a02",
@@ -39,7 +39,7 @@
       "label": "GSE129694_GeneMatrix_RawCounts_InjuryActivity.txt.gz",
       "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE129694\\GSE129694_GeneMatrix_RawCounts_InjuryActivity.txt.gz",
       "locator": null,
-      "captured_at": "2026-10-28T12:05:04",
+      "captured_at": "2026-10-28T12:06:28",
       "sha256": null,
       "attributes": {
         "sha256": "78cd1d5a6b1a6859f844ed5651d352521e57b001115476460860a0b6f119e9df",
@@ -97,7 +97,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-10-28T12:05:04"
+      "recorded_at": "2026-10-28T12:06:28"
     },
     {
       "decision_id": "DEC-0002",
@@ -128,7 +128,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-10-28T12:05:04"
+      "recorded_at": "2026-10-28T12:06:28"
     },
     {
       "decision_id": "DEC-0003",
@@ -199,7 +199,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-10-28T12:05:04"
+      "recorded_at": "2026-10-28T12:06:29"
     },
     {
       "decision_id": "DEC-0004",
@@ -240,7 +240,55 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-10-28T12:05:04"
+      "recorded_at": "2026-10-28T12:06:30"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group, one control with two exercise levels",
+        "design_column": "grp",
+        "formula": "~ grp",
+        "contrasts": [
+          {
+            "name": "grp_SWIM_vs_CONT",
+            "control": "CONT",
+            "treatment": "SWIM",
+            "role": "primary"
+          },
+          {
+            "name": "grp_SWW_vs_CONT",
+            "control": "CONT",
+            "treatment": "SWW",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "covariance"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\4a5659c6cb4aaab7fd11fbaa777c9b851c089468\\GSE129694\\suitability\\suitability.md",
+          "n_comparisons": 10,
+          "n_analyzable": 10
+        }
+      },
+      "reason": "Paper-defined exercise contrasts would be each exercise arm vs the contused, activity-restricted, unexercised CONT SCI arm (Fig. 1b, S2.1.p1), in one model over all five groups. The suitability report fails covariance: time post-SCI (8.5/11.5/13.5 wk) is a function of grp, and for both planned contrasts SWIM and SWW are all 13.5 wk while CONT is all 11.5 wk. S2.3.p1 explains that the exercise arms needed extra time for facility introduction plus 10 weeks of training, so the delay is built into the protocol rather than a technical batch; the authors note all collections were past the acute-to-chronic transition, but give no evidence that 11.5 vs 13.5 weeks is transcriptionally neutral in soleus, which continues to remodel after SCI. Time cannot be included as a covariate (aliased) or ignored without changing the estimand. Refused here because the runner makes a not_analyzable suitability verdict incompatible with a valid design; the covariance finding (time aliased with exercise) is the reason.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "Sacrifice time post-SCI is completely confounded with exercise: every SWIM and SWW animal was collected at 13.5 weeks and every CONT SCI animal at 11.5 weeks (GEO characteristics time; paper S2.3.p1, TAB1). No unexercised contused group exists at 13.5 weeks and no exercised group at 11.5 weeks, so both planned contrasts estimate exercise plus two extra weeks of chronic SCI, tiny-cage restriction and age, and the two cannot be separated in any model. The time-matched alternative (SWIM vs SWW) compares exercise modalities, not exercise versus no exercise. Suitability report: covariance fail, time nested with grp (GSE129694/suitability/suitability.md)."
+      },
+      "recorded_at": "2026-10-28T12:06:47"
     }
   ],
   "artifacts": [
@@ -291,6 +339,16 @@
       "produced_by": null,
       "media_type": "text/csv",
       "sha256": "2df1445c74f1ccc1e3c6a6e87ed69b821e8feb95efb7ccac078036070516c785",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\4a5659c6cb4aaab7fd11fbaa777c9b851c089468\\GSE129694\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "28954e4bcf0e315913c488029903609c5a27e3f2396f2f4cb5bcbb97d7755c0a",
       "evidence_ids": [],
       "attributes": {}
     }
