@@ -18,25 +18,8 @@ The agent session running this skill is the scientific decision-maker. It reads 
    - If the repository is not found or packages are missing, follow [Setup](references/setup.md).
    - Each capability (`deseq2`, `limma_two_group`, `limma_multigroup`, `methylation`, `proteomics_preprocess`, `single_cell_aggregation`, `gsea_and_ora`, ...) says whether its route can run here.
    - If no differential-analysis capability is available (`de_capable: false`), tell the user the run will be decision-only. Each valid plan is then recorded with its `execution_error`. Never replace a missing executor with a hand-written statistical model.
-3. Read [Native execution](references/native-execution.md) for the calling convention, the external-LLM block, formula-safe column names, and the run layout. For single-cell, proteomics, methylation, or enrichment, also read [Modalities](references/modalities.md).
-4. Start the run:
-
-```python
-from tools import native
-native.enable_native_mode()  # blocks hidden external LLM calls inside repository tools
-run = native.RunRecorder("output/<run_name>", request="<user request>",
-                         platform_name="<codex | claude-code | ...>",
-                         decision_maker="<this agent and model, if known>", case_ids=[...])
-case = run.case("<case_id>", accession="<GSE...>")
-```
-
-The recorder saves its state after every call. To continue the run from a later command, use `run = native.RunRecorder.open("output/<run_name>")` and `case = run.case("<case_id>")`.
-
-Save driver scripts in `output/<run_name>/scripts/`, so they stay with the run, and start each one with:
-
-```python
-import sys, pathlib; sys.path.insert(0, str(next(p for p in pathlib.Path(__file__).resolve().parents if (p / "tools" / "native.py").exists())))  # repository root
-```
+3. Bulk data (raw or estimated counts, FPKM/TPM/RPKM, log-scale arrays) goes through the **case spec route**: read [Case spec](references/case-spec.md) and nothing else about execution. You decide every gate in one JSON spec; `python -m tools.case_runner execute <spec>` aligns, checks, runs the executors, applies thresholds, runs enrichment, writes the run layout, and validates the records. Do not write driver scripts for steps the runner covers, and do not read `tools/native.py` or earlier runs' scripts to learn the API.
+4. Single-cell, proteomics, and methylation pipelines, or an analysis the runner cannot express, use the scripted route: read [Native execution](references/native-execution.md) and [Modalities](references/modalities.md).
 
 Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_helpers.py` for decisions unless the user asks for that external-agent backend.
 
@@ -47,25 +30,25 @@ Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_
   - `paper_threshold` is the article's exact rule. Do not turn FDR into raw p, and do not add `|log2FC| > 1` when the paper has none. Convert a fold change with its exact value: FC 1.5 becomes `|log2FC| > log2(1.5)` = 0.5849625, not a rounded number.
   - `audit_threshold` is a separate, labelled comparison rule.
   - When the paper states nothing, use `workflow_default` (BH-adjusted p < 0.05, no effect-size cutoff) and say so.
-  - Repository tools print their own `n_deg` summaries. Count with `native.apply_threshold` instead.
+  - Repository tools print their own `n_deg` summaries. Counts come from the stated rule only (the runner applies `applied_threshold` and `audit_threshold`).
 - **Decisions and execution are separate.**
   - `decision_status` says whether the route is scientifically valid; `execution_status` says whether the tool ran.
   - A valid plan whose tool failed is acceptable.
   - A completed run on an invalid plan is a blocking failure.
-- **Record before acting.** Write each gate with `case.decide(...)` before moving to the next one. `RunRecorder` rejects records that break the [Decision contract](references/decision-contract.md). Decision gates keep `execution_status="not_started"`; only the `execution` record carries `completed` or `failed`.
+- **Every gate is recorded.** The runner writes the gates in order and rejects records that break the [Decision contract](references/decision-contract.md); its errors name the field to fix.
 
 ## Gates
 
-Complete them in this order for every case:
+Decide them in this order for every case. Each maps to one gate of the case spec; the tools named are what the runner calls for you.
 
 1. `paper_reconstruction`: build the study map — accessions, assay, sample inclusion and exclusion, factors and levels, primary estimand, planned contrasts, repeated-measure unit, normalization, method, and paper threshold, each with a locator in the paper.
 2. `ownership`: identify the matrix and metadata files and confirm they belong to the paper's accession and samples.
-3. `alignment`: map the deposited matrix's columns to metadata samples with `native.align_to_metadata` (exact match on the index or on one named column, such as `title`). Never align by position. Record coverage and unmatched IDs. Then create short, formula-safe columns with `native.derive_columns` (for example `subject`, `time`, `grp`). Pass the aligned files to every later tool, so that no tool falls back to LLM alignment, and use the derived names in every formula and record.
+3. `alignment`: map the matrix columns to metadata samples by exact match on the index or one named column (`key_column`, from inspect's `alignment_keys`). Never align by position. Then create short, formula-safe columns (`aliases`, `patterns`, `combine`, `recode`; for example `subject`, `time`, `grp`) and use these names in every formula and argument.
    - Steps that change values (filters, imputation, transforms) are method decisions, run at execution.
    - A deterministic summary that a later gate needs, such as cells per donor and cell type from pseudobulk aggregation, may be computed earlier and registered as evidence.
-4. `matrix`: decide the matrix type from `native.profile_matrix` values plus file name, platform, and processing notes. Compare it with the paper's stated input. An ambiguous type stops the case.
+4. `matrix`: decide the matrix type from the profile values plus file name, platform, and processing notes (`data_processing`); a file named raw counts can hold RPKM or estimated counts. Compare it with the paper's stated input. An ambiguous type stops the case.
 5. `design`: decide the estimand structure.
-   - First run the suitability report: `rep, item, summary = case.suitability(matrix_type=..., metadata=<aligned metadata DataFrame>, factors=[...], matrix_csv=<aligned matrix>, organism=..., subject=<subject column or None>, planned=[...])`; `planned` uses the report's comparison names (`<factor>_<test>_vs_<reference>`, for example `grp_O_vs_Y`), so list them with `references=` set and copy the names. It checks data type and required data, that the groups are determinable, covariance candidates, n >= 3 per group, lists every sensible comparison, and compares sex from X/Y genes with the metadata. Put `summary` in `final.suitability` and `item` in the evidence. A `not_analyzable` verdict stops the case at this gate; read `<case>/suitability/suitability.md` for the reason.
+   - The runner runs the suitability report from `factors`, `references`, `subject`, and `planned` (comparison names `<factor>_<test>_vs_<reference>`, for example `grp_O_vs_Y`). It checks data type, determinable groups, covariance candidates, n >= 3 per group, lists every sensible comparison, and compares sex from X/Y genes with the metadata. A `not_analyzable` verdict stops a valid design; read `<case>/suitability/suitability.md` and refuse the design or fix the factors.
    - A sex mismatch is a labelling problem: fix or exclude the samples (record which) before any model. When both sexes are present, add per-sex analyses as exploratory even if the paper pooled them (the report's `split_plan`).
    - Time series and multi-factor designs: run every analyzable comparison the report lists, from one model fitted on all samples (`tools.joint_contrasts`). The paper's planned contrasts keep their route; the others are exploratory.
    - One control with several levels: one model with planned contrasts, never pooled levels.
@@ -74,31 +57,27 @@ Complete them in this order for every case:
    - Clustering, prognostic, or validation-only studies get no manufactured contrast.
    - A cross-sectional comparison defined by the paper (for example trained versus untrained people) stays valid with `estimand_type: associational`; do not describe it as an effect of the intervention.
    - When several columns could define the contrast, decide from the paper and record the rejected alternatives.
-6. `covariance`: use `native.pairing_report`, `native.confounding_report`, and `native.design_check`.
+6. `covariance`: the runner adds the design check and confounding report to the record; read them in the output.
    - Treat donor, subject, and animal keys as blocking decisions, not annotations.
    - Do not add covariates because of their column names.
    - A covariate completely confounded with the treatment stops the case. A design that is not full rank, or that has no residual degrees of freedom, also stops it.
 7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it. Otherwise the method decision stays `valid`, carries `paper_route: {"method": ..., "status": "blocked", "reason": ...}`, and names the validated alternative that runs as a declared deviation.
 8. `threshold`: record `paper_threshold`, `threshold_source`, and the `applied_threshold`.
-9. `execution`: run the approved route with `native.call_tool("tools.<module>:<function>", ...)`, which turns an import failure into a recordable `NativeToolError`. Apply the threshold with `native.apply_threshold` and register outputs with `case.add_output`. A failure is recorded as `valid` + `failed` with `final.execution_error`.
+9. `execution`: list the approved executor calls; a failure is recorded as `valid` + `failed` with its error. Never replace a missing executor with your own model.
 10. `enrichment` (optional): only when the request or paper calls for pathway results.
-    - Check IDs with `native.feature_id_report`. Map probes or proteins to genes with `native.collapse_to_genes`.
+    - IDs that are not gene symbols or Ensembl genes are recorded as not run. Map probes or proteins to genes first (scripted route, `native.collapse_to_genes`).
     - GSEA uses the full ranking; an ORA gene list uses the applied threshold.
     - It runs only after a completed execution. Without one, record the plan as `valid` + `not_run` with `reason_not_run`.
     - A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).
-11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed. Then call `case.finish(n_deg=..., deg_sanity=...)`.
+11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed, with the paper's counts and named genes to compare.
 
-After all cases:
-
-- Call `run.finish()` once, in the last script: it closes every open case, and a finished run cannot be reopened. Earlier scripts continue the run with `RunRecorder.open(...)`.
-- Validate with `python <skill_dir>/scripts/validate_decision_contract.py <run_dir>`.
-- If the evaluator skill is installed, audit with `evaluate-bioinformatics-agent`.
+`execute` finishes the run and validates the decision contract. If the evaluator skill is installed, audit with `evaluate-bioinformatics-agent`.
 
 ## When to stop
 
 Use `refused` when the available data cannot identify the estimand, such as no exercise contrast or treatment aliased with batch. Use `manual_review` when a specific fact or executor could unblock it, such as unknown pairing, an ambiguous matrix scale, or a missing file.
 
-Record every gate in order up to and including the one that stops the case. For example, a sequenced sample set with no exercise arm is refused at `design`, after `paper_reconstruction`, `ownership`, `alignment`, and `matrix` are recorded. Do not record later gates or a `study` record for a stopped case; `case.finish()` marks its route `stopped`.
+Record every gate in order up to and including the one that stops the case. For example, a sequenced sample set with no exercise arm is refused at `design`, after `paper_reconstruction`, `ownership`, `alignment`, and `matrix`. Leave the later gates and executions out of the spec; the case's route becomes `stopped`.
 
 Small n alone is not a reason to stop: run the planned contrast and label it exploratory under the rule in the decision contract.
 
@@ -119,7 +98,8 @@ Do not summarize success by DEG or p-value counts.
 
 - [Setup](references/setup.md): installing the repository and environment on a new machine; installing the skill for Codex and Claude Code; self-test.
 - [Modalities](references/modalities.md): single-cell pseudobulk, proteomics, methylation, and the enrichment gate.
-- [Native execution](references/native-execution.md): calling convention, executor signatures, multigroup plan schema, run layout.
+- [Case spec](references/case-spec.md): the default route; spec fields, executors, fixing a failed run.
+- [Native execution](references/native-execution.md): scripted route, executor signatures, multigroup plan schema, run layout.
 - [Decision contract](references/decision-contract.md): record fields per stage, status rules, invariants the validator enforces.
 - [Decision gates](references/decision-gates.md): contrast, multi-group, covariance, and stop conditions.
 - [Paper reconstruction](references/paper-reconstruction.md): study maps, discrepancies, thresholds.
