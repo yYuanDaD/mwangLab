@@ -399,6 +399,19 @@ def _threshold_kwargs(rule: dict) -> dict:
             "effect_cutoff": rule.get("effect_cutoff"), "inclusive": bool(rule.get("inclusive", False))}
 
 
+def _n_ora_input(deg_csv: str, cutoff: float, lfc: float, direction: str) -> Optional[int]:
+    """Genes that pass the ORA input rule, or None when the table lacks padj/log2FoldChange."""
+    table = pd.read_csv(deg_csv, index_col=0)
+    if not {"padj", "log2FoldChange"} <= set(table.columns):
+        return None
+    hit = (table["padj"] < cutoff) & (table["log2FoldChange"].abs() > lfc)
+    if direction == "up":
+        hit &= table["log2FoldChange"] > 0
+    elif direction == "down":
+        hit &= table["log2FoldChange"] < 0
+    return int(hit.sum())
+
+
 def _gene_lookup(deg_csv: str, genes: list[str], organism: str = "Mouse") -> dict:
     table = pd.read_csv(deg_csv, index_col=0)
     upper = {str(i).upper(): i for i in table.index}
@@ -761,6 +774,16 @@ class CaseRun:
                          {"gene_sets": "MSigDB Hallmark", "ranking_metric": en.ranking_metric}, out / "gsea"))
         for method, tool, kwargs, extra, odir in runs:
             final = {**base, "method": method, **extra}
+            label = method.split()[0] + ("" if method.startswith("GSEA") or en.direction == "all"
+                                         else f" {en.direction}")
+            if method.startswith("ORA"):
+                n_in = _n_ora_input(deg, kwargs["padj_cutoff"], kwargs["log2fc_cutoff"], en.direction)
+                if n_in == 0:
+                    final["reason_not_run"] = "no gene passes the ORA input threshold"
+                    self.case.decide("enrichment", final=final, evidence=evidence,
+                                     reasoning=en.reasoning or method, confidence="high", execution_status="not_run")
+                    status[f"{en.execution} {label}"] = "not_run: 0 input genes"
+                    continue
             try:
                 message = native.call_tool(tool, **kwargs)
                 final.update(outputs=[str(p) for p in sorted(odir.rglob("*.csv"))], summary=_short(message, 1500))
@@ -768,14 +791,12 @@ class CaseRun:
                     raise native.NativeToolError(f"no output written: {_short(message, 500)}")
                 self.case.decide("enrichment", final=final, evidence=evidence, reasoning=en.reasoning or method,
                                  confidence="high", execution_status="completed")
-                label = method.split()[0] + ("" if method.startswith("GSEA") or en.direction == "all"
-                                             else f" {en.direction}")
                 status[f"{en.execution} {label}"] = "completed"
             except native.NativeToolError as exc:
                 final["execution_error"] = _short(exc, 1500)
                 self.case.decide("enrichment", final=final, evidence=evidence, reasoning=en.reasoning or method,
                                  confidence="high", execution_status="failed")
-                status[f"{en.execution} {method.split()[0]}"] = "failed: " + _short(exc, 200)
+                status[f"{en.execution} {label}"] = "failed: " + _short(exc, 200)
 
     def _study(self, st: StudyGate, paper_ev: list[dict], mat_item: dict) -> None:
         genes = {}

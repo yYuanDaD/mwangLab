@@ -26,3 +26,5 @@ zero-DEG ORA recorded as failed and the ORA status key losing its direction (row
 `alignment.key_patterns` limits (rows 4, 11); no low-count gene filter in the runner or edgeR
 (rows 6, 11); `_RAW.tar` members of different types (FPKM + counts) merged into one matrix
 (rows 10, 14); inspect not using GEO `data_processing` for the matrix type (rows 8, 13).
+
+Resumed 2026-10-28 20:40 at row 19 (owner: "继续"), after patching the ORA status problem.
