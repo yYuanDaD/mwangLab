@@ -1,0 +1,251 @@
+{
+  "case_id": "GSE324257",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "stim"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "TPM",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "TPM",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "stim"
+      ],
+      "levels": {
+        "geno": {
+          "ctrl": 6,
+          "ko": 6
+        },
+        "stim": {
+          "basal": 6,
+          "eps": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(stim)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "stim_eps_vs_basal_geno-ctrl",
+        "stim_eps_vs_basal_geno-ko",
+        "geno_stim_ko_eps_vs_ctrl_basal",
+        "geno_ko_vs_ctrl_stim-basal"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 7,
+        "unknown": 5
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42711121\\GSE324257\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_ko_vs_ctrl_stim-basal",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "ko",
+      "reference": "ctrl",
+      "within": {
+        "stim": "basal"
+      },
+      "cells": [
+        {
+          "cell": {
+            "stim": "basal",
+            "geno": "ko"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "stim": "basal",
+            "geno": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_ko_vs_ctrl_stim-eps",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "ko",
+      "reference": "ctrl",
+      "within": {
+        "stim": "eps"
+      },
+      "cells": [
+        {
+          "cell": {
+            "stim": "eps",
+            "geno": "ko"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "stim": "eps",
+            "geno": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "stim_eps_vs_basal_geno-ctrl",
+      "kind": "simple",
+      "factor": "stim",
+      "test": "eps",
+      "reference": "basal",
+      "within": {
+        "geno": "ctrl"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "ctrl",
+            "stim": "eps"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "ctrl",
+            "stim": "basal"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "stim_eps_vs_basal_geno-ko",
+      "kind": "simple",
+      "factor": "stim",
+      "test": "eps",
+      "reference": "basal",
+      "within": {
+        "geno": "ko"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "ko",
+            "stim": "eps"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "ko",
+            "stim": "basal"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_stim_ko_eps_vs_ctrl_basal",
+      "kind": "interaction",
+      "factor": "geno:stim",
+      "test": "ko:eps",
+      "reference": "ctrl:basal",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "geno": "ko",
+            "stim": "eps"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "ctrl",
+            "stim": "eps"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "ko",
+            "stim": "basal"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "ctrl",
+            "stim": "basal"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

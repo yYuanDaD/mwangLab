@@ -1,0 +1,191 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42711121",
+  "request": "Analyze GSE324257 for PMID 42711121 (MAFF is a transcription factor that regulates contraction-induced skeletal muscle transcription.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5[1m]) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE324257",
+      "accession": "GSE324257",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13554480.paper.md"],
+        "metadata": "GSE324257/GSE324257_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42711121/prep/GSE324257_TPM_merged_expressed.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42711121/prep/merge_tpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE324257"],
+            "assay": "bulk poly(A) RNA-seq, Illumina NovaSeq X Plus PE150, C2C12 myotubes (S4.10.p1)",
+            "primary_estimand": "Effect of 24 h electrical pulse stimulation (EPS, in vitro exercise-mimicking contraction; S2.1.p2, S4.9.p1) on gene expression in control C2C12 myotubes, and its dependence on Maff (EPS response in Maff KO myotubes; genotype x EPS interaction; S2.4.p1)",
+            "factors": {"genotype": ["Ctrl", "Maff KO"], "stimulation": ["basal", "EPS 24 h"]},
+            "sample_inclusion": "All 12 GEO samples: Ctrl basal, Ctrl EPS, KO basal, KO EPS, n = 3 each (GEO characteristics). RNA harvested at day 7 of differentiation; EPS applied from day 6 for 24 h (S4.2.p2, S4.7.p1, S4.9.p1)",
+            "planned_contrasts": [
+              "EPS vs basal in Ctrl myotubes (exercise effect; S2.4.p1 qRT-PCR only, no RNA-seq DEG count reported)",
+              "EPS vs basal in Maff KO myotubes (S2.4.p1 qRT-PCR only)",
+              "genotype x EPS interaction (attenuated EPS response in KO; S2.4.p1)",
+              "Maff KO vs Ctrl at day 7, basal (S2.3.p2: RNA-seq 588 down / 687 up DEGs, adjusted P < 0.001, n = 3/group, FIG6)"
+            ],
+            "repeated_measure_unit": "none; independent culture wells, no pairing reported",
+            "normalization": "RaNA-seq framework, GRCm38; TPM deposited (S4.10.p1, GEO data_processing)",
+            "paper_method": "DESeq2 (S4.10.p1); paper does not state the design formula or which samples entered the KO vs Ctrl test",
+            "paper_threshold": {
+              "metric": "padj",
+              "adjustment": "not stated (DESeq2 default BH)",
+              "cutoff": 0.001,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "inclusive": false,
+              "source_locator": "S2.3.p2"
+            },
+            "paper_results": {
+              "KO_vs_Ctrl_RNAseq": "588 down, 687 up at adjusted P < 0.001; down includes muscle contraction/sarcomere genes; qRT-PCR down: Tnnc1, Xirp1, Xirp2, Myl1, Mybpc2, Nrap (S2.3.p2, FIG6)",
+              "EPS_in_Ctrl_qPCR": "EPS up in Ctrl: Myh2, Myh7, Abra, Acta1, Actc1, Atp2a2, Mettl21c; Maff and Mafa induced (FIG1 D); Myh1 and Egr1 unchanged (S2.4.p1)",
+              "EPS_in_KO_qPCR": "EPS responses not significant / blunted in KO; Myh4 reduced by EPS in KO only (S2.4.p1)"
+            }
+          },
+          "reasoning": "The RNA-seq section (S4.10.p1) names GSE324257 and DESeq2. The only RNA-seq DEG count reported is KO vs Ctrl (S2.3.p2, adjusted P < 0.001, no fold-change rule). The exercise question in this paper is the in vitro EPS model (S2.1.p2 calls it an exercise-mimicking system), reported by qRT-PCR (S2.4.p1, FIG8). GEO deposits EPS and basal samples for both genotypes, so the EPS contrasts can be computed from the RNA-seq, but the paper gives no RNA-seq EPS DEG count to compare.",
+          "confidence": "high",
+          "locator": "S2.3.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["series_id GSE324257 in metadata", "paper S4.10.p1 and S7.p1 name GSE324257", "C2C12 myotubes, Ctrl/Maff KO x basal/EPS, n=3 each matches paper design", "matrix columns Ctrl_1..KO_E3 equal GEO library names in the description field", "TPM columns sum to 1e6"]},
+          "reasoning": "Metadata and both supplementary TPM files belong to GSE324257, the accession the paper names (S4.10.p1, S7.p1). Library names match one-to-one.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: ([^,]+),"]},
+          "aliases": {"geno": "characteristics_ch1.1.genotype", "stim": "characteristics_ch1.2.treatment"},
+          "patterns": {},
+          "recode": {
+            "geno": {"Ctrl": "ctrl", "KO": "ko"},
+            "stim": {"wild type C2C12": "basal", "wild type C2C12 with EPS": "eps", "Maff KO C2C12": "basal", "Maff KO C2C12 with EPS": "eps"}
+          },
+          "combine": {"cell_grp": ["geno", "stim"]},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are the GEO library names, held in the description field ('Library name: Ctrl_1,TPMs(Ctrl).xlsx'); the key is extracted from it and matched exactly. geno and stim come from the GEO genotype and treatment characteristics.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma on log2(TPM+1)",
+          "reasoning": "GEO data_processing states TPM values; every column sums to exactly 1,000,000; non-integer values (integer fraction 0.46 only because of zeros). The paper ran DESeq2 (S4.10.p1) on counts that were not deposited. TPM cannot go to DESeq2 and must not be rounded into counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "stim"],
+          "references": {"geno": "ctrl", "stim": "basal"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["stim_eps_vs_basal_geno-ctrl", "stim_eps_vs_basal_geno-ko", "geno_stim_ko_eps_vs_ctrl_basal", "geno_ko_vs_ctrl_stim-basal"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "factorial 2x2 (genotype x stimulation), independent samples",
+            "formula": "~ 0 + C(cell)  (cell = geno x stim, 4 cells of n=3)",
+            "contrasts": [
+              {"name": "stim_eps_vs_basal_geno-ctrl", "control": "ctrl basal", "treatment": "ctrl eps", "role": "primary"},
+              {"name": "stim_eps_vs_basal_geno-ko", "control": "ko basal", "treatment": "ko eps", "role": "secondary"},
+              {"name": "geno_stim_ko_eps_vs_ctrl_basal", "control": "EPS effect in ctrl", "treatment": "EPS effect in ko", "role": "secondary"},
+              {"name": "geno_ko_vs_ctrl_stim-basal", "control": "ctrl basal", "treatment": "ko basal", "role": "secondary"},
+              {"name": "geno_ko_vs_ctrl_stim-eps", "control": "ctrl eps", "treatment": "ko eps", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool EPS and basal, compare KO vs Ctrl on all 12", "reason_rejected": "mixes the EPS factor into the genotype contrast; paper reports n=3/group for KO vs Ctrl (FIG6)"},
+            {"value": "pool genotypes, EPS vs basal on all 12", "reason_rejected": "paper's hypothesis is that the EPS response differs by genotype (S2.4.p1); pooling hides it"},
+            {"value": "separate two-group fits per genotype", "reason_rejected": "one model on all 12 samples gives a common variance estimate and the interaction"}
+          ],
+          "reasoning": "The exercise estimand is EPS vs basal in control myotubes (S2.4.p1); the paper's question is whether Maff KO changes it, so EPS in KO and the interaction are planned too. KO vs Ctrl basal is the paper's reported RNA-seq comparison (S2.3.p2; day-7 basal samples, n=3/group, assumed because the paper does not say whether EPS samples entered it). KO vs Ctrl under EPS is exploratory.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [{"name": "batch / culture replicate", "disposition": "excluded: not recorded in GEO or the paper"}]
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent C2C12 wells; no subject, pairing, or batch is recorded in GEO or stated in the paper. Sample correlations on log2(TPM+1) show an unrecorded structure that crosses the EPS factor (Ctrl_1, Ctrl_E1, Ctrl_E3, KO_3, KO_E1, KO_E3 versus the other six); it is not documented, so it is reported as a caveat and not modelled.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) joint model on log2(TPM+1)",
+            "formula": "~ 0 + C(cell)",
+            "transform": "log2(x+1)",
+            "low_expression_filter": "TPM >= 1 in >= 3 samples (prep/merge_tpm.py), 13,779 of 34,866 genes kept",
+            "paper_route": {"method": "DESeq2 on counts", "status": "blocked", "reason": "only TPM deposited in GEO (supplementary files and data_processing); DESeq2 needs integer counts"},
+            "deviations": ["limma on log2(TPM+1) instead of DESeq2 on counts", "low-expression filter TPM>=1 in >=3 samples instead of DESeq2 independent filtering"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: TPM -> log2(x+1) -> limma. The paper route (DESeq2) is blocked because counts were not deposited; this runs as a declared deviation.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.001, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.001, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "paper rule (adjusted P < 0.001, S2.3.p2) applied to limma BH-adjusted p; it is the paper's only RNA-seq DE rule and is applied to the EPS contrasts too. Audit: BH padj < 0.05 (workflow default)."
+          },
+          "reasoning": "S2.3.p2: DEGs at adjusted P < 0.001, no fold-change rule. Applied unchanged on the limma route.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "paper reports no RNA-seq DEG count for EPS; EPS comparisons can be checked only against the qRT-PCR genes",
+              "which samples entered the paper's KO vs Ctrl DESeq2 is not stated; basal day-7 samples assumed",
+              "unrecorded sample-correlation structure crossing EPS (see covariance)",
+              "limma on log2(TPM+1) instead of DESeq2 on counts"
+            ]
+          },
+          "paper_counts": {"joint/geno_ko_vs_ctrl_stim-basal": 1275},
+          "paper_genes": {
+            "joint/stim_eps_vs_basal_geno-ctrl": ["ENSMUSG00000042622", "ENSMUSG00000033196", "ENSMUSG00000053093", "ENSMUSG00000042895", "ENSMUSG00000031972", "ENSMUSG00000068614", "ENSMUSG00000029467", "ENSMUSG00000047343", "ENSMUSG00000047591", "ENSMUSG00000056328", "ENSMUSG00000038418"],
+            "joint/stim_eps_vs_basal_geno-ko": ["ENSMUSG00000033196", "ENSMUSG00000053093", "ENSMUSG00000042895", "ENSMUSG00000031972", "ENSMUSG00000068614", "ENSMUSG00000029467", "ENSMUSG00000047343", "ENSMUSG00000057003"],
+            "joint/geno_ko_vs_ctrl_stim-basal": ["ENSMUSG00000042622", "ENSMUSG00000091898", "ENSMUSG00000079243", "ENSMUSG00000027022", "ENSMUSG00000061816", "ENSMUSG00000038670", "ENSMUSG00000049134", "ENSMUSG00000009471", "ENSMUSG00000057003"]
+          },
+          "reasoning": "Gene IDs are MyGene.info mouse Ensembl IDs. EPS Ctrl: Maff, Myh2, Myh7, Abra, Acta1, Actc1, Atp2a2, Mettl21c, Mafa (up by qPCR), Myh1, Egr1 (unchanged). EPS KO: same set plus Myh4 (down in KO). KO vs Ctrl: Maff, Tnnc1, Xirp1, Xirp2, Myl1, Mybpc2, Nrap (down), Myod1, Myh4.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method and input", "paper": "DESeq2 on RaNA-seq counts (S4.10.p1)", "data": "only TPM deposited", "disposition": "declared_deviation: limma on log2(TPM+1)"},
+        {"item": "EPS RNA-seq result", "paper": "EPS effects reported only by qRT-PCR (S2.4.p1, FIG8); RNA-seq section describes KO vs Ctrl only", "data": "GEO includes EPS samples for both genotypes", "disposition": "executable_without_change: EPS contrasts computed, compared with qPCR genes only"},
+        {"item": "samples in KO vs Ctrl", "paper": "n=3/group at day 7 (FIG6)", "data": "6 Ctrl and 6 KO samples (3 basal + 3 EPS each)", "disposition": "executable_without_change: basal samples used; EPS-condition KO vs Ctrl run as exploratory"},
+        {"item": "RNA-seq day", "paper": "S4.10.p1 day 7; S4.9.p1 EPS at day 6 for 24 h", "data": "not stated in GEO", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "all", "covariates": []},
+          "role": "primary",
+          "reasoning": "One limma model ~ 0 + C(cell) on all 12 samples; planned contrasts (EPS in Ctrl primary, EPS in KO, interaction, KO vs Ctrl basal) plus the remaining analyzable comparison (KO vs Ctrl under EPS) as exploratory."
+        },
+        {
+          "name": "geno_avg_sens",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "multilevel", "formula": "~ 0 + C(cell_grp)",
+                            "contrasts": [{"name": "ko_vs_ctrl_avg_over_stim",
+                                           "coefficients": {"C(cell_grp)[ko_basal]": 0.5, "C(cell_grp)[ko_eps]": 0.5,
+                                                            "C(cell_grp)[ctrl_basal]": -0.5, "C(cell_grp)[ctrl_eps]": -0.5}}]}},
+          "role": "sensitivity",
+          "reasoning": "The paper does not say which samples entered its KO vs Ctrl DESeq2; this sensitivity averages the genotype effect over basal and EPS (6 vs 6) in the same cell-means model, to see whether the sample-set choice explains the gap to the paper's 1,275 DEGs."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/stim_eps_vs_basal_geno-ctrl", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "pathway view of the primary exercise (EPS) effect in control myotubes"},
+        {"execution": "joint/geno_ko_vs_ctrl_stim-basal", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GO/Reactome results for KO vs Ctrl (S2.3.p2, FIG6)"}
+      ]
+    }
+  ]
+}

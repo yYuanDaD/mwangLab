@@ -299,3 +299,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 - The agent reported that `run_deseq2_analysis` thresholds shrunken fold changes; checked: it writes the MLE in `log2FoldChange` and the apeglm value in a separate `log2FoldChange_shrunk` column (`tools/deseq2_tools.py:176-182`), so `apply_threshold` uses the MLE. Not a bug, but the skill should say which column is thresholded.
 - No helper merges per-sample HTSeq tables in native mode beyond `merge_raw_tar` (the agent merged by hand); the RPKM > 1 filter cannot be applied without gene lengths.
 - Exercise mice were singly housed, the other arms group-housed: housing is aliased with exercise.
+
+## PMID40623475 (GSE302911)
+
+- no duplicate-sample-column check (native.py:246); key_patterns one group only (native.py:345); "all" gives only vs-ref comparisons (case_runner.py:671); finish n_deg = first table Details: `PMID40623475/HANDBACK.md`.
+
+## PMID39393048 (GSE267512)
+
+- complete_pairs TypeError (case_runner.py:607 vs native.py:672 keyword-only args); _gene_lookup (case_runner.py:400) misses symbols on Ensembl-indexed tables Details: `PMID39393048/HANDBACK.md`.
+
+## PMID42711121 (GSE324257)
+
+- inspect reads .xlsx as text (case_runner.py:54/native.py:215); gene lookup has no Ensembl-to-symbol mapping (case_runner.py:400); zero-DEG ORA recorded failed, not not_run (:754) Details: `PMID42711121/HANDBACK.md`.

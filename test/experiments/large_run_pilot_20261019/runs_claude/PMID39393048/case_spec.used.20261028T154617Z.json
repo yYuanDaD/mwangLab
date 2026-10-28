@@ -1,0 +1,127 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39393048",
+  "request": "Analyze GSE267512 for PMID 39393048 (Bioavailable testosterone and androgen receptor activation, but not total testosterone, are associated with muscle mass and strength in females.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5[1m]) Claude Code subagent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE267512",
+      "accession": "GSE267512",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12456396.paper.md"],
+        "metadata": "GSE267512/GSE267512_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID39393048/prep/GSE267512_counts_rowmean_ge10.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID39393048/prep_filter_meancount.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE267512"],
+            "assay": "bulk total RNA-seq (TruSeq Stranded Total RNA, Ribo-Zero Gold), vastus lateralis, Kallisto GRCh38 gene counts (S2.12.6.p1)",
+            "sample_inclusion": "untrained pre-menopausal females, 12-week resistance training; 27 completed; Fig 7 legend: n = 35 pre-training, 27 post-training (S2.2.p1, FIG7)",
+            "factors": {"timepoint": ["PRE", "POST"], "ID": "participant (repeated measure)"},
+            "primary_estimand": "within-participant change in vastus lateralis gene expression after 12 weeks of resistance training (POST vs PRE), DESeq2 ~ ID + timepoint",
+            "planned_contrasts": ["timepoint POST vs PRE (S3.6.p1, FIG7; paper: 214 DEGs, 122 up, 92 down at FDR < 0.05)"],
+            "repeated_measure_unit": "participant ID (S2.14.p6)",
+            "gene_filter": "text: mean across samples <= 10 RPM removed (63%), 14,979 genes kept (S2.12.6.p1); authors' code: rowMeans(counts) >= 10",
+            "paper_method": "DESeq2 ~ ID + timepoint (S2.14.p6); results() defaults (alpha 0.1) per authors' GitHub script",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S2.14.p7"},
+            "paper_results": "214 DEGs (122 up, 92 down); RPS6KC1 up 11% FDR < 0.01; TRIM63, FBXO32, TRAF6, FOXO1, FOXO3 unchanged; AR mRNA FDR = 0.956 (S3.6.p1, S3.4.p2, S3.3)",
+            "secondary_analyses_not_reproduced": "ChEA3 TF enrichment on DEGs; gene association with total testosterone (no hormone values in GEO)"
+          },
+          "reasoning": "S2.14.p6 states DESeq2 with Genes ~ ID + timepoint, ID for repeated measures; S2.14.p7 FDR-adjusted P < 0.05 with no fold-change rule; S3.6.p1 reports 214 DEGs (122 up / 92 down). The pre/post resistance-training contrast is the exercise estimand the paper intends.",
+          "locator": "S2.12.6.p1, S2.14.p6, S2.14.p7, S3.6.p1, FIG7"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.12.6.p1 and S13.p1 name GSE267512", "GEO: 57 female vastus lateralis samples, PRE/POST of a 12-week resistance training program, Kallisto GRCh38, contact Danielle Hiam (author D.H. performed transcriptomics, S7.p1)", "GeneCounts_RAW_DATA is the wide gene count matrix described in data_processing"]},
+          "reasoning": "Paper names GSE267512 as its RNA-seq deposit; the GEO treatment protocol matches the paper's 12-week resistance training of untrained pre-menopausal females, and the submitter is a paper author."
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "subject": ["title", "^([A-Z]{4})(?:PRE|POST)$"],
+            "time": ["characteristics_ch1.4.treatment", "^(PRE|POST)$"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal metadata title for 57/57 samples (inspect alignment_keys). Title = 4-letter participant code + PRE/POST; subject is the code, time from the treatment characteristic. 24 participants have both timepoints, 7 only PRE, 2 only POST; all are kept because the paper's model included unpaired samples (35 pre / 27 post)."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"note": "Kallisto gene-level counts deposited as integers ('aligned raw gene counts' per data_processing); the paper ran DESeq2 directly on them. Pre-filtered with the authors' rowMeans >= 10 rule (prep_filter_meancount.py)."},
+          "reasoning": "integer fraction 1.0, range 0-7.0e6, library sizes 20-29 M; GEO data_processing: 'Long/Wide format of aligned raw gene counts' from Kallisto. Kallisto estimates are summed/rounded to integers by the submitters; the paper used this matrix in DESeq2 (S2.14.p6), so it is treated as count-scale input.",
+          "confidence": "medium",
+          "candidates": [{"value": "normalized integers", "reason_rejected": "library sizes vary 20-29 M and data_processing calls them raw counts"}]
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_POST_vs_PRE"],
+          "covariate_candidates": null,
+          "final": {
+            "analysis_type": "paired two-group (repeated measures)",
+            "design_column": "time",
+            "control": "PRE",
+            "treatment": "POST",
+            "contrasts": [{"name": "time_POST_vs_PRE", "control": "PRE", "treatment": "POST", "role": "primary"}]
+          },
+          "reasoning": "Each participant is her own control (S2.2.p1); paper's model ~ ID + timepoint (S2.14.p6). All samples are female (metadata), so no sex split.",
+          "candidates": [{"value": "age covariate", "reason_rejected": "not in the paper's model and constant within participant (absorbed by ID)"}]
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking factor (paper's ID term)"}]},
+          "confounding_candidates": null,
+          "reasoning": "Repeated biopsies from the same participant; the paper blocks on ID (S2.14.p6). Subjects with one sample only contribute to dispersion, as in the paper's fit."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "DESeq2 ~ ID + timepoint", "status": "reproduced"},
+            "deviations": ["pydeseq2 instead of R DESeq2 1.32", "57 GEO samples (31 PRE / 26 POST) instead of the paper's 35 / 27", "gene filter follows the authors' code (rowMeans >= 10, 14,830 genes) rather than the text's '10 RPM' wording (14,979 in paper)"]
+          },
+          "transform": null,
+          "reasoning": "Paper method reproducible on the count matrix; alpha 0.1 in the primary run matches R results() defaults used in the authors' script; alpha 0.05 as sensitivity."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null}
+          },
+          "reasoning": "S2.14.p7: FDR-adjusted P < 0.05; no fold-change cutoff."
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["8 of the paper's samples (4 PRE-only, 1 POST) are absent from GEO", "ChEA3 TF enrichment and testosterone-association analyses not reproduced"]},
+          "paper_counts": {"time_POST_vs_PRE": 214, "time_POST_vs_PRE_alpha005": 214, "time_POST_vs_PRE_pairs_only": 214},
+          "paper_genes": {"time_POST_vs_PRE": ["RPS6KC1", "TRIM63", "FBXO32", "TRAF6", "FOXO1", "FOXO3", "AR"]},
+          "reasoning": "Paper: 214 DEGs (122 up, 92 down) POST vs PRE; RPS6KC1 significant; the others reported as unchanged."
+        }
+      },
+      "discrepancies": [
+        {"item": "sample set", "paper": "35 pre, 27 post (FIG7); 27 completers (S2.2.p1)", "data": "57 GEO samples: 31 PRE, 26 POST; 24 complete pairs, 7 PRE-only, 2 POST-only", "disposition": "executable_without_change"},
+        {"item": "gene filter", "paper": "text: mean <= 10 RPM removed, 14,979 kept; authors' code: rowMeans(counts) >= 10", "data": "10 RPM rule keeps only 6,084 genes (85% removed, contradicting the stated 63%); rowMeans >= 10 keeps 14,830 (63.4% removed)", "disposition": "executable_without_change"},
+        {"item": "independent filtering alpha", "paper": "R results() default alpha 0.1, DEGs at padj < 0.05", "data": "pydeseq2 alpha set to 0.1 in primary, 0.05 sensitivity", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "time_POST_vs_PRE", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "PRE", "treatment_group": "POST", "covariate_columns": "subject", "alpha": 0.1},
+         "role": "primary", "reasoning": "paper's DESeq2 ~ ID + timepoint on all deposited samples; alpha 0.1 = R results() default in authors' script"},
+        {"name": "time_POST_vs_PRE_alpha005", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "PRE", "treatment_group": "POST", "covariate_columns": "subject", "alpha": 0.05},
+         "role": "sensitivity", "reasoning": "independent-filtering target equal to the paper FDR"},
+        {"name": "time_POST_vs_PRE_pairs_only", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "PRE", "treatment_group": "POST", "covariate_columns": "subject", "alpha": 0.1},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["PRE", "POST"]},
+         "role": "sensitivity", "reasoning": "24 complete pairs only; checks that singleton subjects do not drive the result"}
+      ],
+      "enrichment": []
+    }
+  ]
+}

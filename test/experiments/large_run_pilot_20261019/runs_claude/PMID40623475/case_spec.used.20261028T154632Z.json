@@ -1,0 +1,163 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40623475",
+  "request": "Analyze GSE302911 for PMID 40623475 (Endurance training promotes chromatin closure and timely repression of the post-exercise immediate early stress response.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [{
+    "case_id": "GSE302911",
+    "accession": "GSE302911",
+    "inputs": {
+      "paper": ["test/experiments/paper_screen_20261019/papers/PMC12309500.paper.md"],
+      "metadata": "GSE302911/GSE302911_metadata.csv",
+      "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID40623475/prep/GSE302911_TPM_renamed.csv",
+      "raw_tar": false,
+      "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID40623475/prep/prep_matrix.py"]
+    },
+    "gates": {
+      "paper_reconstruction": {
+        "final": {
+          "accessions": ["GSE302911 (bulk quadriceps RNA-seq, analysed here)", "GSE302910 (myonuclear ATAC-seq, not analysed)"],
+          "assay": "bulk RNA-seq, M. quadriceps, Illumina NovaSeq 6000, STAR + salmon, TPM matrix (S2.8.p1)",
+          "organism": "Mouse, male C57BL/6 WT, 22-26 weeks at sacrifice (S2.1.p1)",
+          "factors": {"training": ["sedentary", "untrained", "trained (12 wk voluntary wheel)"], "time_post_exhaustive_bout": ["0h", "6h", "72h"]},
+          "groups": "7 groups x n=3: sedentary; untrained 0h/6h/72h; trained 0h/6h/72h (S2.3.p1, GEO treatment column)",
+          "primary_estimand": "Bulk-muscle gene expression change in each exercised condition (untrained or trained, 0h/6h/72h after an exhaustive treadmill bout) versus sedentary baseline",
+          "planned_contrasts": [
+            "untrained 0h vs sedentary (FIG4 A; count shown only in figure, myonuclear subset)",
+            "untrained 6h vs sedentary (FIG4 A)",
+            "untrained 72h vs sedentary (FIG4 A)",
+            "trained 0h vs sedentary (FIG4 A)",
+            "trained 6h vs sedentary (FIG4 A)",
+            "trained 72h vs sedentary (FIG4 A)"
+          ],
+          "inclusion": "all 21 samples; DEG counts in FIG4 A restricted to the ATAC-derived myonuclear gene subset (23% of genes, S3.4.p1), which needs GSE302910 peak calls and is not reproduced",
+          "repeated_measure_unit": "none; independent animals per group",
+          "paper_method": "DESeq2 (GEO data_processing: Differential expression analysis was performed with DESeq2 v3.16); input stated as salmon TPM collected into a count matrix (S2.8.p1)",
+          "paper_threshold": {"metric": "FDR", "adjustment": "BH (DESeq2 default)", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.585, "effect_cutoff_original": "log2 fold change +/- 0.585", "inclusive": false, "source_locator": "FIG4"},
+          "paper_results": "1,848 myonuclear-subset genes up/down in >=1 condition (S3.4.p1); more up/down at 0h trained vs untrained, similar up at 6h, more down in trained at 6h, very few changes at 72h (S3.4.p1); Klf5 and Esrrg show training-state-dependent expression (S3.4.p1, FIG4 C)"
+        },
+        "reasoning": "S2.3.p1 defines 12-week wheel training then one exhaustive bout with sacrifice at 0h/6h/72h; S3.4.p1 and FIG4 define RNA-seq DEGs as each condition versus sedentary at |log2FC| 0.585 and FDR<0.05; S2.8.p1 states salmon TPM; GEO data_processing names DESeq2. Per-contrast DEG counts exist only in Figure 4A bars and only for the myonuclear subset, so no numeric paper count is available for a genome-wide comparison.",
+        "locator": "S3.4.p1",
+        "confidence": "high"
+      },
+      "ownership": {
+        "final": {"owned": true, "checks": ["S10.p1 names GSE302911 as the RNA-seq deposit", "metadata series_id GSE302911, quadriceps, Mus musculus, wildtype", "7 treatment levels x 3 matches S2.3.p1 design", "treatment_protocol matches 12-week wheel training + exhaustive bout + 0/6/72h sacrifice"]},
+        "reasoning": "Data availability S10.p1 deposits RNA-seq under GSE302911; GEO groups, tissue and protocol match the paper.",
+        "locator": "S10.p1",
+        "confidence": "high"
+      },
+      "alignment": {
+        "key_column": "libkey",
+        "key_patterns": {"libkey": ["description", "Library name: (\\S+?),RNASeq"]},
+        "recode": {"grp": {
+          "sedentary": "SED",
+          "untrained 0h post-exercise": "U0", "untrained 6h post-exercise": "U6", "untrained 72h post-exercise": "U72",
+          "trained 0h post-exercise": "T0", "trained 6h post-exercise": "T6", "trained 72h post-exercise": "T72"}},
+        "aliases": {"grp": "characteristics_ch1.3.treatment"},
+        "exclude_samples": {
+          "GSM9113520": "Untrained_0h_1 column is byte-identical to Trained_0h_1 across all 53,738 genes in the deposited TPM matrix; one library was deposited twice and the true group of the duplicated profile cannot be determined",
+          "GSM9113529": "Trained_0h_1 column is byte-identical to Untrained_0h_1; excluded with its twin because the duplicated profile cannot belong to both groups"
+        },
+        "reasoning": "Matrix columns were renamed by name rule (prep_matrix.py inserts the underscore before the replicate digit, checked against GEO library names) and matched exactly to the Library name token in GEO description. Group from GEO characteristics treatment. Duplicate-column check found Untrained_0h1 == Trained_0h1 exactly (25,037 shared non-zero values, equal library sums 997,304); both copies excluded.",
+        "confidence": "high"
+      },
+      "matrix": {
+        "matrix_type": "TPM",
+        "recommended_method": "limma on log2(TPM+1)",
+        "final": {"source": "GSE302911_RNA-seq_Count_Matrix_TPM_allconditions.tsv.gz", "paper_input": "salmon TPM (S2.8.p1)"},
+        "reasoning": "File name says TPM; S2.8.p1 says TPM values were collected; column sums are ~997,300-997,900 (TPM sums to 1e6 before gene filtering) and values are non-integer. No raw or estimated counts are deposited, so count methods are not valid.",
+        "locator": "S2.8.p1",
+        "confidence": "high"
+      },
+      "design": {
+        "factors": ["grp"],
+        "references": {"grp": "SED"},
+        "organism": "Mouse",
+        "planned": ["grp_U0_vs_SED", "grp_U6_vs_SED", "grp_U72_vs_SED", "grp_T0_vs_SED", "grp_T6_vs_SED", "grp_T72_vs_SED"],
+        "final": {
+          "analysis_type": "multi-group, one control (sedentary) with six exercised conditions; one model",
+          "design_column": "grp",
+          "formula": "~ grp",
+          "contrasts": [
+            {"name": "grp_U0_vs_SED", "control": "SED", "treatment": "U0", "role": "primary"},
+            {"name": "grp_U6_vs_SED", "control": "SED", "treatment": "U6", "role": "primary"},
+            {"name": "grp_U72_vs_SED", "control": "SED", "treatment": "U72", "role": "primary"},
+            {"name": "grp_T0_vs_SED", "control": "SED", "treatment": "T0", "role": "primary"},
+            {"name": "grp_T6_vs_SED", "control": "SED", "treatment": "T6", "role": "primary"},
+            {"name": "grp_T72_vs_SED", "control": "SED", "treatment": "T72", "role": "primary"}
+          ]
+        },
+        "candidates": [
+          {"value": "training x time factorial", "reason_rejected": "sedentary has no time level and is neither trained nor exercised; the paper compares every condition to sedentary (FIG4)"},
+          {"value": "pooled exercised vs sedentary", "reason_rejected": "pools distinct levels; paper reports per-condition contrasts"}
+        ],
+        "reasoning": "FIG4 A/B and S3.4.p1: each exercised condition versus sedentary. One model on all samples with six planned contrasts; other pairwise comparisons (e.g. trained vs untrained at a time point) are exploratory. Trained-vs-sedentary contrasts combine 12-week training and the acute bout, as in the paper.",
+        "locator": "FIG4",
+        "confidence": "high"
+      },
+      "covariance": {
+        "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+        "confounding_candidates": null,
+        "reasoning": "Independent animals, one sample per mouse; no batch, lane or sex variation recorded (all male, S2.1.p1).",
+        "confidence": "high"
+      },
+      "method": {
+        "final": {
+          "method": "limma (moderated t, empirical Bayes) on log2(TPM+1)",
+          "formula": "~ grp",
+          "paper_route": {"method": "DESeq2", "status": "blocked", "reason": "only a TPM matrix is deposited (supplementary file NONE per sample); DESeq2 requires raw counts and TPM must not be rounded to integers"},
+          "deviations": ["limma on log2(TPM+1) instead of DESeq2", "two duplicated 0h samples excluded (0h groups n=2)"]
+        },
+        "transform": "log2(x+1)",
+        "reasoning": "Matrix policy: TPM -> log2(x+1) -> limma. Paper's DESeq2 route blocked by missing counts; declared deviation.",
+        "confidence": "high"
+      },
+      "threshold": {
+        "final": {
+          "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.585, "inclusive": false},
+          "threshold_source": "paper_on_deviation_route",
+          "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.585, "inclusive": false},
+          "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+          "deviation_note": "same BH FDR and |log2FC| rule applied to limma statistics instead of DESeq2; BH applied within each contrast"
+        },
+        "reasoning": "FIG4 legend: log2 fold change +/- 0.585, FDR <0.05. The paper states the log2 cutoff directly (0.585), so it is used as written rather than log2(1.5)=0.5849625.",
+        "locator": "FIG4",
+        "confidence": "high"
+      },
+      "study": {
+        "final": {
+          "route": "declared_deviation",
+          "exploratory_reason": "grp_U0_vs_SED and grp_T0_vs_SED have n=2 in the exercised arm after excluding the duplicated library; non-planned pairwise comparisons are exploratory",
+          "caveats": ["paper DEG counts (FIG4 A) are restricted to an ATAC-derived myonuclear subset and given only as bars, so our genome-wide counts are not directly comparable", "trained-vs-sedentary contrasts confound training and acute exercise by design"]
+        },
+        "paper_counts": {},
+        "paper_genes": {
+          "joint/grp_U6_vs_SED": ["Klf5", "Esrrg", "Fos", "Atf3", "Nr4a3"],
+          "joint/grp_T6_vs_SED": ["Klf5", "Esrrg", "Atf3"],
+          "joint/grp_U0_vs_SED": ["Fos", "Jun", "Egr1", "Atf3", "Nr4a1"],
+          "joint/grp_T0_vs_SED": ["Fos", "Jun", "Egr1", "Atf3", "Nr4a1"]
+        },
+        "reasoning": "Declared deviation (limma on log2 TPM). Paper names Klf5 and Esrrg as training-state-dependent exercise genes (S3.4.p1, FIG4 C) and immediate early genes Fos, Jun, Atf3, Egr1, Nr4a family (S3.5.p1, motif level).",
+        "confidence": "medium"
+      }
+    },
+    "discrepancies": [
+      {"item": "DE method", "paper": "DESeq2 (GEO data_processing)", "data": "only TPM deposited", "disposition": "declared_deviation: limma on log2(TPM+1)"},
+      {"item": "duplicated sample", "paper": "n=3 per group", "data": "Untrained_0h1 and Trained_0h1 columns identical", "disposition": "both excluded; 0h contrasts n=2 vs 3, exploratory"},
+      {"item": "DEG universe", "paper": "FIG4 A counts restricted to myonuclear ATAC-derived subset", "data": "genome-wide bulk table", "disposition": "not reproduced; counts not comparable"}
+    ],
+    "executions": [
+      {"name": "joint", "tool": "tools.joint_contrasts:run_joint_limma",
+       "args": {"comparisons": "all", "covariates": []},
+       "role": "primary",
+       "reasoning": "One limma model ~ grp on all 19 retained samples; the six vs-sedentary contrasts are the paper's planned ones, other pairwise comparisons (e.g. T0 vs U0) exploratory"}
+    ],
+    "enrichment": [
+      {"execution": "joint/grp_U0_vs_SED", "ora": false, "gsea": true, "reasoning": "paper reports GO terms for RNA-seq (S2.9.p1); GSEA Hallmark on full ranking"},
+      {"execution": "joint/grp_U6_vs_SED", "ora": false, "gsea": true, "reasoning": "as above"},
+      {"execution": "joint/grp_T0_vs_SED", "ora": false, "gsea": true, "reasoning": "as above"},
+      {"execution": "joint/grp_T6_vs_SED", "ora": false, "gsea": true, "reasoning": "as above"}
+    ]
+  }]
+}

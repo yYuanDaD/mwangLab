@@ -1,0 +1,1369 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID39393048",
+  "subject_id": "GSE267512",
+  "created_at": "2026-10-28T11:46:17",
+  "finished_at": "2026-10-28T11:47:05",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12456396.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC12456396.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T11:46:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1b434f6466bbd9b183410beae190ab72b34ec454f4ee27543931f4967f77d04b",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE267512_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE267512\\GSE267512_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T11:46:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "13ac3dff578aaacabfffff7f9a39dcfb213ecab984b69f7da12c1d00d81645c5",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_filter_meancount.py",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\prep_filter_meancount.py",
+      "locator": null,
+      "captured_at": "2026-10-28T11:46:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9eb872fdc9e12a9059b82d2ff0d71b9842a65078572782d239d0ee1dd3513196",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE267512_counts_rowmean_ge10.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\prep\\GSE267512_counts_rowmean_ge10.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T11:46:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f9b3f074bf6baecde217ac7c8287e0d0dedcf96a32aff072e486dde79808e0f9",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE267512"
+        ],
+        "assay": "bulk total RNA-seq (TruSeq Stranded Total RNA, Ribo-Zero Gold), vastus lateralis, Kallisto GRCh38 gene counts (S2.12.6.p1)",
+        "sample_inclusion": "untrained pre-menopausal females, 12-week resistance training; 27 completed; Fig 7 legend: n = 35 pre-training, 27 post-training (S2.2.p1, FIG7)",
+        "factors": {
+          "timepoint": [
+            "PRE",
+            "POST"
+          ],
+          "ID": "participant (repeated measure)"
+        },
+        "primary_estimand": "within-participant change in vastus lateralis gene expression after 12 weeks of resistance training (POST vs PRE), DESeq2 ~ ID + timepoint",
+        "planned_contrasts": [
+          "timepoint POST vs PRE (S3.6.p1, FIG7; paper: 214 DEGs, 122 up, 92 down at FDR < 0.05)"
+        ],
+        "repeated_measure_unit": "participant ID (S2.14.p6)",
+        "gene_filter": "text: mean across samples <= 10 RPM removed (63%), 14,979 genes kept (S2.12.6.p1); authors' code: rowMeans(counts) >= 10",
+        "paper_method": "DESeq2 ~ ID + timepoint (S2.14.p6); results() defaults (alpha 0.1) per authors' GitHub script",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.14.p7"
+        },
+        "paper_results": "214 DEGs (122 up, 92 down); RPS6KC1 up 11% FDR < 0.01; TRIM63, FBXO32, TRAF6, FOXO1, FOXO3 unchanged; AR mRNA FDR = 0.956 (S3.6.p1, S3.4.p2, S3.3)",
+        "secondary_analyses_not_reproduced": "ChEA3 TF enrichment on DEGs; gene association with total testosterone (no hormone values in GEO)"
+      },
+      "reason": "S2.14.p6 states DESeq2 with Genes ~ ID + timepoint, ID for repeated measures; S2.14.p7 FDR-adjusted P < 0.05 with no fold-change rule; S3.6.p1 reports 214 DEGs (122 up / 92 down). The pre/post resistance-training contrast is the exercise estimand the paper intends.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:18"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\prep\\GSE267512_counts_rowmean_ge10.csv",
+        "owned": true,
+        "checks": [
+          "S2.12.6.p1 and S13.p1 name GSE267512",
+          "GEO: 57 female vastus lateralis samples, PRE/POST of a 12-week resistance training program, Kallisto GRCh38, contact Danielle Hiam (author D.H. performed transcriptomics, S7.p1)",
+          "GeneCounts_RAW_DATA is the wide gene count matrix described in data_processing"
+        ],
+        "accession": "GSE267512",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE267512\\GSE267512_metadata.csv"
+      },
+      "reason": "Paper names GSE267512 as its RNA-seq deposit; the GEO treatment protocol matches the paper's 12-week resistance training of untrained pre-menopausal females, and the submitter is a paper author.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:18"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 57,
+        "n_metadata": 57,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "title",
+              "regex": "^([A-Z]{4})(?:PRE|POST)$"
+            },
+            "time": {
+              "source": "characteristics_ch1.4.treatment",
+              "regex": "^(PRE|POST)$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\design_metadata.csv",
+          "sha256": "a0257ea5b92b94050af43f8e416de74256176606105e21d522cfacf4f447600b",
+          "levels": {
+            "subject": {
+              "ALOR": 2,
+              "ANJA": 2,
+              "BRBO": 2,
+              "BRGA": 2,
+              "CHMA": 2,
+              "CHRU": 2,
+              "ELSC": 2,
+              "ELWA": 2,
+              "EVZA": 2,
+              "GEYO": 2,
+              "HAME": 2,
+              "ISUR": 2,
+              "JAMI": 2,
+              "JANI": 2,
+              "JESI": 2,
+              "JOSA": 2,
+              "LAJU": 2,
+              "NAHI": 2,
+              "NAWO": 2,
+              "OLMO": 2,
+              "PABR": 2,
+              "SELA": 2,
+              "SHVA": 2,
+              "SOBR": 2,
+              "BRST": 1,
+              "COGR": 1,
+              "FLTH": 1,
+              "GAVA": 1,
+              "KACO": 1,
+              "SADI": 1,
+              "SICE": 1,
+              "TEOC": 1,
+              "WAAL": 1
+            },
+            "time": {
+              "PRE": 31,
+              "POST": 26
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal metadata title for 57/57 samples (inspect alignment_keys). Title = 4-letter participant code + PRE/POST; subject is the code, time from the treatment characteristic. 24 participants have both timepoints, 7 only PRE, 2 only POST; all are kept because the paper's model included unpaired samples (35 pre / 27 post).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:18"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "note": "Kallisto gene-level counts deposited as integers ('aligned raw gene counts' per data_processing); the paper ran DESeq2 directly on them. Pre-filtered with the authors' rowMeans >= 10 rule (prep_filter_meancount.py).",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\aligned_matrix.csv",
+          "sha256": "9cb8c6b94573f6c94af5d55e43f0593a5f89df9eed9cd147de6af765e0b98c27",
+          "n_features": 14830,
+          "n_samples": 57,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 7017190.0,
+          "median": 174.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer fraction 1.0, range 0-7.0e6, library sizes 20-29 M; GEO data_processing: 'Long/Wide format of aligned raw gene counts' from Kallisto. Kallisto estimates are summed/rounded to integers by the submitters; the paper used this matrix in DESeq2 (S2.14.p6), so it is treated as count-scale input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:19"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired two-group (repeated measures)",
+        "design_column": "time",
+        "control": "PRE",
+        "treatment": "POST",
+        "contrasts": [
+          {
+            "name": "time_POST_vs_PRE",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Each participant is her own control (S2.2.p1); paper's model ~ ID + timepoint (S2.14.p6). All samples are female (metadata), so no sex split.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:23"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "blocking factor (paper's ID term)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 57,
+          "n_columns": 34,
+          "columns": [
+            "Intercept",
+            "time_PRE",
+            "subject_ANJA",
+            "subject_BRBO",
+            "subject_BRGA",
+            "subject_BRST",
+            "subject_CHMA",
+            "subject_CHRU",
+            "subject_COGR",
+            "subject_ELSC",
+            "subject_ELWA",
+            "subject_EVZA",
+            "subject_FLTH",
+            "subject_GAVA",
+            "subject_GEYO",
+            "subject_HAME",
+            "subject_ISUR",
+            "subject_JAMI",
+            "subject_JANI",
+            "subject_JESI",
+            "subject_JOSA",
+            "subject_KACO",
+            "subject_LAJU",
+            "subject_NAHI",
+            "subject_NAWO",
+            "subject_OLMO",
+            "subject_PABR",
+            "subject_SADI",
+            "subject_SELA",
+            "subject_SHVA",
+            "subject_SICE",
+            "subject_SOBR",
+            "subject_TEOC",
+            "subject_WAAL"
+          ],
+          "rank": 34,
+          "full_rank": true,
+          "residual_df": 23,
+          "levels": {
+            "time": {
+              "PRE": 31,
+              "POST": 26
+            },
+            "subject": {
+              "ALOR": 2,
+              "ANJA": 2,
+              "BRBO": 2,
+              "BRGA": 2,
+              "CHMA": 2,
+              "CHRU": 2,
+              "ELSC": 2,
+              "ELWA": 2,
+              "EVZA": 2,
+              "GEYO": 2,
+              "HAME": 2,
+              "ISUR": 2,
+              "JAMI": 2,
+              "JANI": 2,
+              "JESI": 2,
+              "JOSA": 2,
+              "LAJU": 2,
+              "NAHI": 2,
+              "NAWO": 2,
+              "OLMO": 2,
+              "PABR": 2,
+              "SELA": 2,
+              "SHVA": 2,
+              "SOBR": 2,
+              "BRST": 1,
+              "COGR": 1,
+              "FLTH": 1,
+              "GAVA": 1,
+              "KACO": 1,
+              "SADI": 1,
+              "SICE": 1,
+              "TEOC": 1,
+              "WAAL": 1
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "POST",
+                "ALOR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "ANJA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "BRBO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "BRGA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "CHMA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "CHRU"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "ELSC"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "ELWA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "EVZA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "GEYO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "HAME"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "ISUR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "JAMI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "JANI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "JESI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "JOSA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "LAJU"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NAHI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NAWO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "OLMO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "PABR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "SADI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "SELA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "SHVA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "SICE"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "SOBR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "ALOR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "ANJA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "BRBO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "BRGA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "BRST"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "CHMA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "CHRU"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "COGR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "ELSC"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "ELWA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "EVZA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "FLTH"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "GAVA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "GEYO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "HAME"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "ISUR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "JAMI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "JANI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "JESI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "JOSA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "KACO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "LAJU"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NAHI"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NAWO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "OLMO"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "PABR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "SELA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "SHVA"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "SOBR"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "TEOC"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "WAAL"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 57,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 57,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.age of_donor",
+            "n_levels": 14,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "18": 2,
+                "19": 6,
+                "20": 1,
+                "21": 1,
+                "22": 2,
+                "23": 2,
+                "25": 3,
+                "26": 2,
+                "27": 0,
+                "28": 2,
+                "30": 2,
+                "31": 1,
+                "32": 1,
+                "37": 1
+              },
+              "PRE": {
+                "18": 4,
+                "19": 7,
+                "20": 1,
+                "21": 0,
+                "22": 3,
+                "23": 3,
+                "25": 4,
+                "26": 2,
+                "27": 1,
+                "28": 2,
+                "30": 2,
+                "31": 1,
+                "32": 0,
+                "37": 1
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.4.treatment",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "POST": {
+                "POST": 26,
+                "PRE": 0
+              },
+              "PRE": {
+                "POST": 0,
+                "PRE": 31
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 57,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "subject",
+            "n_levels": 33,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "ALOR": 1,
+                "ANJA": 1,
+                "BRBO": 1,
+                "BRGA": 1,
+                "BRST": 0,
+                "CHMA": 1,
+                "CHRU": 1,
+                "COGR": 0,
+                "ELSC": 1,
+                "ELWA": 1,
+                "EVZA": 1,
+                "FLTH": 0,
+                "GAVA": 0,
+                "GEYO": 1,
+                "HAME": 1,
+                "ISUR": 1,
+                "JAMI": 1,
+                "JANI": 1,
+                "JESI": 1,
+                "JOSA": 1,
+                "KACO": 0,
+                "LAJU": 1,
+                "NAHI": 1,
+                "NAWO": 1,
+                "OLMO": 1,
+                "PABR": 1,
+                "SADI": 1,
+                "SELA": 1,
+                "SHVA": 1,
+                "SICE": 1,
+                "SOBR": 1,
+                "TEOC": 0,
+                "WAAL": 0
+              },
+              "PRE": {
+                "ALOR": 1,
+                "ANJA": 1,
+                "BRBO": 1,
+                "BRGA": 1,
+                "BRST": 1,
+                "CHMA": 1,
+                "CHRU": 1,
+                "COGR": 1,
+                "ELSC": 1,
+                "ELWA": 1,
+                "EVZA": 1,
+                "FLTH": 1,
+                "GAVA": 1,
+                "GEYO": 1,
+                "HAME": 1,
+                "ISUR": 1,
+                "JAMI": 1,
+                "JANI": 1,
+                "JESI": 1,
+                "JOSA": 1,
+                "KACO": 1,
+                "LAJU": 1,
+                "NAHI": 1,
+                "NAWO": 1,
+                "OLMO": 1,
+                "PABR": 1,
+                "SADI": 0,
+                "SELA": 1,
+                "SHVA": 1,
+                "SICE": 0,
+                "SOBR": 1,
+                "TEOC": 1,
+                "WAAL": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Repeated biopsies from the same participant; the paper blocks on ID (S2.14.p6). Subjects with one sample only contribute to dispersion, as in the paper's fit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:23"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "DESeq2 ~ ID + timepoint",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 instead of R DESeq2 1.32",
+          "57 GEO samples (31 PRE / 26 POST) instead of the paper's 35 / 27",
+          "gene filter follows the authors' code (rowMeans >= 10, 14,830 genes) rather than the text's '10 RPM' wording (14,979 in paper)"
+        ]
+      },
+      "reason": "Paper method reproducible on the count matrix; alpha 0.1 in the primary run matches R results() defaults used in the authors' script; alpha 0.05 as sensitivity.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:23"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        }
+      },
+      "reason": "S2.14.p7: FDR-adjusted P < 0.05; no fold-change cutoff.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:23"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_POST_vs_PRE",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 57,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\aligned_matrix.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\results\\time_POST_vs_PRE\\DEG_results_POST_vs_PRE.csv"
+        ],
+        "counts": {
+          "time_POST_vs_PRE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 13679,
+              "n_significant": 211,
+              "n_up": 119,
+              "n_down": 92,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper's DESeq2 ~ ID + timepoint on all deposited samples; alpha 0.1 = R results() default in authors' script",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:46:46"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_POST_vs_PRE_alpha005",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 57,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\aligned_matrix.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\results\\time_POST_vs_PRE_alpha005\\DEG_results_POST_vs_PRE.csv"
+        ],
+        "counts": {
+          "time_POST_vs_PRE_alpha005": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14830,
+              "n_significant": 218,
+              "n_up": 126,
+              "n_down": 92,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "independent-filtering target equal to the paper FDR",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:47:04"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8018103861285b21693a934e5561631487301395bf299f05ab02d668150cf2b3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "cbb029a072260793ca8a53381cdb6e42dddfbd8708114afed75dd8ae3cceae6a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9cb8c6b94573f6c94af5d55e43f0593a5f89df9eed9cd147de6af765e0b98c27",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a0257ea5b92b94050af43f8e416de74256176606105e21d522cfacf4f447600b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d9f74c856124fddac51044c9eb936b3a23c68c982bed3a3a53b9d3c0187098c4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "210d01f0abce009f31fa3a293d72dd2859efc398abd02e0c231b70aefea4eedd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\results\\time_POST_vs_PRE\\DEG_results_POST_vs_PRE.csv",
+      "role": "deg_time_POST_vs_PRE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e0d8b62c07942231cd133eb56c283941cf49cb1e8b6110126cf089433bfaf863",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39393048\\GSE267512\\results\\time_POST_vs_PRE_alpha005\\DEG_results_POST_vs_PRE.csv",
+      "role": "deg_time_POST_vs_PRE_alpha005",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d91f83ddc527b5fb930ea1d7502442820bdcf63d3d7ae44594ea2fab6ae6b8ac",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

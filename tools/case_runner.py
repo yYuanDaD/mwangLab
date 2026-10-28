@@ -397,9 +397,21 @@ def _threshold_kwargs(rule: dict) -> dict:
             "effect_cutoff": rule.get("effect_cutoff"), "inclusive": bool(rule.get("inclusive", False))}
 
 
-def _gene_lookup(deg_csv: str, genes: list[str]) -> dict:
+def _gene_lookup(deg_csv: str, genes: list[str], organism: str = "Mouse") -> dict:
     table = pd.read_csv(deg_csv, index_col=0)
     upper = {str(i).upper(): i for i in table.index}
+    if genes and not any(g.upper() in upper for g in genes) and             str(table.index[0]).upper().startswith("ENS"):
+        # Ensembl-indexed table: paper genes are symbols, so map the index to symbols first.
+        from tools import enrichment_tools
+        stripped = {str(i).split(".")[0]: i for i in table.index}
+        species = "rat" if organism.lower() == "rat" else ("human" if organism.lower() == "human" else "mouse")
+        try:
+            symbols = enrichment_tools._query_symbols(list(stripped), species)
+        except Exception:
+            symbols = {}
+        for ens, sym in symbols.items():
+            if sym and str(sym).upper() not in upper:
+                upper[str(sym).upper()] = stripped[ens]
     cols = [c for c in ("baseMean", "AveExpr", "log2FoldChange", "logFC", "padj", "adj.P.Val", "pvalue")
             if c in table.columns]
     out = {}
@@ -767,7 +779,8 @@ class CaseRun:
         genes = {}
         for name, wanted in st.paper_genes.items():
             if name in self.outputs:
-                genes[name] = _gene_lookup(self.outputs[name]["deg_csv"], wanted)
+                genes[name] = _gene_lookup(self.outputs[name]["deg_csv"], wanted,
+                                             self.spec.gates.design.organism)
         results = {name: {"n_deg": o["applied"]["n_significant"], "up": o["applied"]["n_up"],
                           "down": o["applied"]["n_down"], "rule": o["applied"]["rule"],
                           **({"audit_n": o["audit"]["n_significant"]} if "audit" in o else {})}
