@@ -323,3 +323,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37365374 (GSE230002)
 
 - tools/suitability.py:75-80 substring type map sends 'log2 CPM...prior count' to counts route (no cpm key); inspect xlsx UnicodeDecodeError; paired_change AveExpr is diff mean Details: `PMID37365374/HANDBACK.md`.
+
+## PMID40993371 (GSE302867)
+
+- suitability.py:201-203 fixes non-reference pair direction alphabetically, so run_joint_limma (case_runner.py:691) cannot take KOEx_vs_KOSed; used multigroup plan instead Details: `PMID40993371/HANDBACK.md`.
+
+## 0f65e49e563e3417d3cee92f75eba6244b276201 (GSE236613)
+
+- geo_tar.py:92-119 merges FPKM+counts files per GSM into one matrix (18 cols/9 GSM); runner effect_cutoff symmetric only (case_runner.py:399); ORA falls back to 5 padj genes Details: `0f65e49e563e3417d3cee92f75eba6244b276201/HANDBACK.md`.

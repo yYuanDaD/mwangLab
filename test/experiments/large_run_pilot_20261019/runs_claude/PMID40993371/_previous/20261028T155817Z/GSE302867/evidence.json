@@ -1,0 +1,841 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID40993371",
+  "subject_id": "GSE302867",
+  "created_at": "2026-10-28T11:57:25",
+  "finished_at": "2026-10-28T11:57:36",
+  "status": "failed_execution",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13158892.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13158892.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T11:57:25",
+      "sha256": null,
+      "attributes": {
+        "sha256": "20d1101bba6cdf1f09798cdedc517dbb6fd0509d5e8177d912c96f7d99fc06f4",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE302867_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE302867\\GSE302867_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T11:57:25",
+      "sha256": null,
+      "attributes": {
+        "sha256": "64346da14e733679452974e6f1b5e1b2bba62ce27c18f5a992479cfe64239e3d",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE302867_processed_data_fpkm.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE302867\\GSE302867_processed_data_fpkm.txt.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T11:57:25",
+      "sha256": null,
+      "attributes": {
+        "sha256": "cf2d8eab0f125ade2c8c56d1ce55ecac03287fd20f26fa24a278d774cfd26af9",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE302867"
+        ],
+        "assay": "bulk polyA RNA-seq of whole mouse heart (Illumina HiSeq2500, Novogene)",
+        "design": "2x2 factorial: genotype (WT vs cardiomyocyte-specific PGC-1a KO) x exercise (sedentary vs 6-week voluntary wheel running), n=5 male mice per group (Fig 2e/f, Fig 4a legends)",
+        "sample_inclusion": "20 hearts, 5 per group; all male",
+        "primary_estimand": "Effect of 6-week voluntary wheel endurance training on the heart transcriptome within each genotype (WT_Ex vs WT_Sed; KO_Ex vs KO_Sed), Fig 2e-f",
+        "planned_contrasts": [
+          "WT_Ex vs WT_Sed (Fig 2e GSEA Hallmark OXPHOS NES=5.14 FDR=8.8e-5; Fig 2f; no DEG count reported)",
+          "KO_Ex vs KO_Sed (Fig 2e GSEA OXPHOS NES=-10.22 FDR=8.2e-5; no DEG count reported)",
+          "KO_Sed vs WT_Sed (Fig 4a volcano, Gdf15 most upregulated; no DEG count reported)",
+          "KO_Ex vs WT_Ex (Fig 4a volcano, Gdf15 most upregulated; no DEG count reported)"
+        ],
+        "repeated_measure_unit": "none; each mouse contributes one heart",
+        "normalization": "DESeq2 normalized counts",
+        "paper_method": "DESeq2 (S4.10.p1); GSEA classic mode on Hallmark MH and M8 gene sets",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "source_locator": "S4.10.p1"
+        },
+        "paper_results": "No DEG counts given in text or figure legends; GSEA OXPHOS up in WT training, depleted in KO training (FIG11 e); Gdf15 top upregulated KO vs WT in both states (S2.4.p2, FIG13 a)"
+      },
+      "reason": "S4.10.p1: DESeq2, DE if |log2FC|>1 and BH-adjusted P<0.05. FIG11 (Fig 2e-f): bulk cardiac RNA-seq n=5/group, WT_Ex vs WT_Sed and KO_Ex vs KO_Sed GSEA. FIG13 (Fig 4a): KO_Sed vs WT_Sed and KO_Ex vs WT_Ex volcano plots, DESeq2 FDR<0.05. S2.4.p2: 4 groups sequenced. DA.p1 names GSE302867. The request is the exercise effect, so the two within-genotype training contrasts are primary; the genotype contrasts are secondary.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:25"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE302867\\GSE302867_processed_data_fpkm.txt.gz",
+        "owned": true,
+        "checks": [
+          "DA.p1 deposits bulk heart RNA-seq under GSE302867",
+          "GEO: Heart, Mus musculus, male, HiSeq 2500 (matches S4.10.p1), 20 samples = 4 groups x 5 (matches Fig 2e n=5/group)",
+          "sample titles WT_Sed/KO_Sed/WT_Ex/KO_Ex match the paper's group names"
+        ],
+        "accession": "GSE302867",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE302867\\GSE302867_metadata.csv"
+      },
+      "reason": "Data availability statement DA.p1 names GSE302867; platform, tissue, sex, and group structure all match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:25"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 20,
+        "n_metadata": 20,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^((?:WT|KO)_(?:Sed|Ex))_\\d+$",
+              "recode": {
+                "WT_Sed": "WTSed",
+                "KO_Sed": "KOSed",
+                "WT_Ex": "WTEx",
+                "KO_Ex": "KOEx"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\design_metadata.csv",
+          "sha256": "f9b0591c4d85a4d79b3c0b585ef7fd6e387c153441c1c3239afd4512fb4b9503",
+          "levels": {
+            "grp": {
+              "WTSed": 5,
+              "KOSed": 5,
+              "WTEx": 5,
+              "KOEx": 5
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns G1-1..G4-5 equal the library names in the GEO description field (inspect: 20/20 match). Group comes from the title (WT_Sed_1 etc.), which agrees with the genotype and treatment characteristics columns. Level names recoded to be formula-safe.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:26"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "FPKM",
+        "recommended_method": "limma on log2(FPKM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\aligned_matrix.csv",
+          "sha256": "82f59ff802abde7ef6a81f2c9528357122732e6a1362474c560e9589831936b4",
+          "n_features": 25851,
+          "n_samples": 20,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 69408.85291,
+          "median": 0.641952291,
+          "integer_fraction": 0.1661,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "File name processed_data_fpkm; GEO data_processing: featureCounts then FPKM normalization, supplementary file contains FPKM; integer fraction 0.17, max 69409, non-negative. Paper analysed counts with DESeq2, but raw counts were not deposited, so the paper's input is unavailable.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:26"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group (2x2 factorial as four cell means, one model)",
+        "design_column": "grp",
+        "formula": "~ 0 + grp",
+        "contrasts": [
+          {
+            "name": "grp_WTEx_vs_WTSed",
+            "control": "WTSed",
+            "treatment": "WTEx",
+            "role": "primary"
+          },
+          {
+            "name": "grp_KOEx_vs_KOSed",
+            "control": "KOSed",
+            "treatment": "KOEx",
+            "role": "primary"
+          },
+          {
+            "name": "grp_KOSed_vs_WTSed",
+            "control": "WTSed",
+            "treatment": "KOSed",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_KOEx_vs_WTEx",
+            "control": "WTEx",
+            "treatment": "KOEx",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "partially_analyzable",
+          "failed": [],
+          "warnings": [
+            "sample_size"
+          ],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "Paper's exercise estimands are simple effects of training within genotype (FIG11 e); genotype effects within state are Fig 4a. One cell-means model with four planned contrasts keeps every factor level separate.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:35"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 20,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_KOSed",
+            "grp_WTEx",
+            "grp_WTSed"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 16,
+          "levels": {
+            "grp": {
+              "WTSed": 5,
+              "KOSed": 5,
+              "WTEx": 5,
+              "KOEx": 5
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "KOEx"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "KOSed"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "WTEx"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "WTSed"
+              ],
+              "n": 5
+            }
+          ],
+          "min_cell_size": 5,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.genotype",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOEx": {
+                "knockout": 5,
+                "wild-type": 0
+              },
+              "KOSed": {
+                "knockout": 5,
+                "wild-type": 0
+              },
+              "WTEx": {
+                "knockout": 0,
+                "wild-type": 5
+              },
+              "WTSed": {
+                "knockout": 0,
+                "wild-type": 5
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.4.treatment",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOEx": {
+                "exercised": 5,
+                "sedentary": 0
+              },
+              "KOSed": {
+                "exercised": 0,
+                "sedentary": 5
+              },
+              "WTEx": {
+                "exercised": 5,
+                "sedentary": 0
+              },
+              "WTSed": {
+                "exercised": 0,
+                "sedentary": 5
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.5.batch",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          }
+        ]
+      },
+      "reason": "Independent mice, one heart each; GEO batch field is a single date for all samples, sex constant male, age constant 14-16 weeks. No blocking unit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:35"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "FPKM",
+        "method": "limma (limma-trend on log2(FPKM+1))",
+        "formula": "~ 0 + grp",
+        "paper_route": {
+          "method": "DESeq2 on raw counts",
+          "status": "blocked",
+          "reason": "GEO deposits FPKM only; raw featureCounts counts were not deposited, and FPKM must not be rounded into counts"
+        },
+        "deviations": [
+          "limma on log2(FPKM+1) instead of DESeq2 on counts; fold changes are on the log2(FPKM+1) scale and are compressed for low-expression genes"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Matrix-method policy: FPKM -> log2(x+1) -> limma. Paper route DESeq2 blocked by missing counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "Paper rule applied to limma on log2(FPKM+1); log2FC from log FPKM is not identical to DESeq2 shrunken/MLE log2FC"
+      },
+      "reason": "S4.10.p1: up if log2FC>1, down if log2FC<-1, BH-adjusted P<0.05. Audit rule padj<0.05 without fold-change cutoff for comparison with Fig 4a (FDR<0.05).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "execution_error": "NativeToolError: comparisons not in the suitability report: ['grp_KOEx_vs_KOSed', 'grp_KOEx_vs_WTEx']; known: ['grp_KOEx_vs_WTSed', 'grp_KOSed_vs_KOEx', 'grp_KOSed_vs_WTSed', 'grp_WTEx_vs_KOEx', 'grp_WTEx_vs_KOSed', 'grp_WTEx_vs_WTSed']"
+      },
+      "reason": "one limma model on all 20 samples, four planned contrasts; the two training contrasts are the primary exercise estimands, genotype contrasts secondary",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint/grp_WTEx_vs_WTSed",
+        "method": "GSEA preranked",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for joint/grp_WTEx_vs_WTSed"
+      },
+      "reason": "paper Fig 2e: Hallmark GSEA for WT training (OXPHOS up)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint/grp_KOEx_vs_KOSed",
+        "method": "GSEA preranked",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for joint/grp_KOEx_vs_KOSed"
+      },
+      "reason": "paper Fig 2e: Hallmark GSEA for KO training (OXPHOS depleted)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "paper reports no DEG counts for any contrast, so counts cannot be compared",
+          "limma on log2(FPKM+1) replaces the paper's DESeq2 on counts",
+          "paper's GSEA used DESeq2 normalized expression with phenotype permutation; ours is preranked on the limma t statistic"
+        ],
+        "results": {},
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {}
+      },
+      "reason": "S2.4.p2/FIG13: Gdf15 the most upregulated gene in KO vs WT in both states; Ppargc1a is the knocked-out gene (expected down). Training contrasts have only pathway-level claims (OXPHOS GSEA), checked through enrichment.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:57:36"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "590724854834fe7397bf26ab5e38d564a13743262fb7efce00aa4678e101f6c1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e626175e47993fdbdde2e7ed0a67609a0a784237b4e7332c5e8eb674b2f535cf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "82f59ff802abde7ef6a81f2c9528357122732e6a1362474c560e9589831936b4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f9b0591c4d85a4d79b3c0b585ef7fd6e387c153441c1c3239afd4512fb4b9503",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1e681ea891fdf74caf1c4b4873212fce78b5b4bbed856fd0aabace4c7154ee13",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "23e014313c3d6cf2f78f0df22c9e880f5698c52a22bb3c005110d3475ce878f5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9b063edca921c6378ee6ac395e9e022c6350c6b4724be03f7bb2dd04268fc2c5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4d0def63b45fb50fc1d7a7c0d5a61b63911e759fe61a52faf36bdea1b2134ded",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

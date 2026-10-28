@@ -1,0 +1,165 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID31700184",
+  "request": "Analyze GSE124799 for PMID 31700184 (Exercise reduces inflammatory cell production and cardiovascular inflammation via instruction of hematopoietic progenitor cells.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE124799",
+      "accession": "GSE124799",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC6858591.paper.md"],
+        "metadata": "GSE124799/GSE124799_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID31700184/GSE124799_counts_titled.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID31700184/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE124799"],
+            "assay": "bulk RNA-seq (SMART-Seq v4 + NexteraXT, SE75, NextSeq 500) of FACS-sorted bone-marrow LSK cells",
+            "organism": "Mouse (male C57BL/6, 16-17 weeks at harvest)",
+            "factors": {"activity group": ["Sed (igloo)", "Ex (running wheel 6 weeks)", "ExSed (wheel 6 weeks then igloo 3 weeks)"]},
+            "sample_inclusion": "3 mice per group, 9 LSK libraries, all deposited",
+            "primary_estimand": "Effect of 6 weeks of voluntary wheel running on the LSK (HSPC) transcriptome: Ex vs Sed",
+            "planned_contrasts": [
+              "Ex vs Sed (S2.3.p3, Fig. 3o-r; Supplementary Table 2, count not stated in text)",
+              "ExSed vs Sed (S2.3.p3, Fig. 3o; persistence after wheel withdrawal)"
+            ],
+            "paper_pooled_contrast_not_reproduced": "All Ex (Ex + ExSed pooled) vs Sed (Fig. 3o, GSEA only)",
+            "repeated_measure_unit": "none; one library per mouse, independent animals",
+            "normalization": "Salmon 0.11.3 -> tximport gene-level counts -> edgeR (S4.13.p2)",
+            "paper_method": "edgeR on tximport gene-level counts (model details not stated); GSEA on edgeR fold-change ranking (MSigDB Reactome, 1000 gene-set permutations); clusterProfiler GO/Reactome ORA on genes >= 2-fold down in Ex vs Sed",
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.13.p2 (no DEG cutoff); Fig. 3p,q legend uses >=2-fold down for ORA input only"},
+            "paper_results": "Reactome Cell Cycle downregulated in Ex (rank 2/410, FDR=0.004) and ExSed (rank 49/410, FDR=0.01); immune activation GO terms enriched in down genes; OXPHOS gene sets in Fig. 3r"
+          },
+          "reasoning": "S2.3.p3 states RNA-seq of LSK from sedentary, exercising and post-exercise-sedentary cohorts with DEGs in Supplementary Table 2; S4.13.p1-p2 give library prep, Salmon/tximport quantification and edgeR. The paper reports no DEG count or DEG cutoff in the text; Supplementary Table 2 is not available here. The study is a one-factor, three-level design with Sed as baseline.",
+          "confidence": "high",
+          "locator": "S2.3.p3; S4.13.p1; S4.13.p2; Fig. 3 legend (FIG13)"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.13.p2 and S4.23.p1 name GSE124799 for the RNA-seq raw counts", "GEO source: LSK sorted from long bones and pelvic bone, Mus musculus, contact MGH Center for Systems Biology (author institution)", "groups Sed/Ex/ExSed x3 match the paper's three cohorts", "data_processing: Salmon 0.11.3 + tximport, matching S4.13.p2", "GSE110639 is the ATAC-seq series and is not used"]},
+          "reasoning": "The single supplementary matrix GSE124799_counts.txt.gz is the series' counts file (description: counts.txt) and its 9 columns correspond one-to-one to the 9 GSM titles.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(Sed|Ex|ExSed) \\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns Sed_1..ExSed_3 differ from GEO titles 'Sed 1'..'ExSed 3' only by '_' vs ' '. prep_matrix.py renames columns by that substitution and checks every renamed name exists in the titles (name-based, not positional); alignment is then exact on title. grp is parsed from the title and agrees with characteristics 'sample group' (Sed/Ex/ExSed).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "data_processing: 'Transcript abundance quantified by Salmon version 0.11.3, and gene-level count matrices created by importing transcript quantification data using tximport'; S4.13.p2 says the same and calls them raw counts processed with edgeR. The deposited values are all integers (integer_fraction 1.0, max 408364, median 2), i.e. tximport gene-level estimated counts already rounded by the depositor; Ensembl gene IDs; no length normalization (not TPM). Treated as estimated counts with documented integer rounding, suitable for count models.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Sed"},
+          "organism": "Mouse",
+          "planned": ["grp_Ex_vs_Sed", "grp_ExSed_vs_Sed"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group",
+            "design_column": "grp",
+            "formula": "~ grp",
+            "contrasts": [
+              {"name": "grp_Ex_vs_Sed", "control": "Sed", "treatment": "Ex", "role": "primary"},
+              {"name": "grp_ExSed_vs_Sed", "control": "Sed", "treatment": "ExSed", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled All Ex (Ex+ExSed) vs Sed", "reason_rejected": "pools two biologically distinct levels (active vs withdrawn); the paper used it only for GSEA (Fig. 3o); not reproduced"},
+            {"value": "ExSed vs Ex", "reason_rejected": "not a planned contrast in the paper"}
+          ],
+          "reasoning": "One factor with three levels and Sed as baseline (S2.3.p3, Fig. 3a). All nine samples in one model, planned baseline-vs-level contrasts only. All male, one tissue/cell type, independent animals. The primary exercise effect is Ex vs Sed; ExSed vs Sed tests persistence after wheel withdrawal.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one library per mouse; GEO records no batch, sex (all male), or age variation (16-17 weeks); no covariate is added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, one model ~ grp on all 9 samples)",
+            "formula": "~ grp",
+            "rounding_documented": true,
+            "paper_route": {"method": "edgeR on all three groups", "status": "blocked", "reason": "the edgeR executor (tools/edger_tools.py) supports only two-arm subsets (~ Treatment on the two groups), so a single three-level edgeR model with planned contrasts cannot be run; the paper's exact edgeR model is also unstated"},
+            "deviations": ["DESeq2 one-model planned contrasts replace the paper's edgeR", "edgeR QL two-arm fits per contrast run as sensitivity analyses closest to the paper's method"]
+          },
+          "transform": null,
+          "reasoning": "Integer tximport counts support count models (S4.13.p2). Policy: one model with all levels for a single factor with k>2 levels; joint DESeq2 provides that. The deposited counts are already integers, so round_estimated_counts is a no-op recorded for provenance. edgeR two-arm (glmQLFit) per contrast runs as sensitivity to approximate the paper's tool.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "deviation_note": "The paper states no DEG cutoff for RNA-seq; BH padj < 0.05 without effect-size rule is the workflow default. The audit rule adds |log2FC| > 1 because the paper's ORA (Fig. 3p,q) used >=2-fold downregulated genes; it is a labelled comparison only."
+          },
+          "reasoning": "S4.13.p2 and S2.3.p3 give no DEG significance cutoff; Fig. 3p,q legend gives only the 2-fold ORA input rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "n=3 per group",
+              "paper DEG counts are only in Supplementary Table 2 (not available); no count comparison possible",
+              "pooled All-Ex GSEA not reproduced",
+              "paper GSEA used MSigDB Reactome; the runner's GSEA uses MSigDB Hallmark, so only the direction of cell-cycle/proliferation sets (E2F targets, G2M checkpoint, MYC targets) and OXPHOS is comparable"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Primary result is a declared deviation (DESeq2 instead of edgeR) at the workflow-default threshold; the paper's comparable claims are GSEA-level: proliferation/cell-cycle sets down in Ex and ExSed vs Sed.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method", "paper": "edgeR (S4.13.p2)", "data": "edgeR executor is two-arm only; one-model DESeq2 primary, edgeR two-arm sensitivity", "disposition": "declared_deviation"},
+        {"item": "DEG threshold", "paper": "not stated; Supplementary Table 2 not available", "data": "workflow default padj<0.05; audit padj<0.05 & |log2FC|>1", "disposition": "declared_deviation"},
+        {"item": "Pooled All Ex vs Sed GSEA (Fig. 3o)", "paper": "Ex+ExSed pooled vs Sed", "data": "levels kept separate", "disposition": "not_reproduced"},
+        {"item": "GSEA collection", "paper": "MSigDB Reactome (410 sets), ranked by edgeR fold change", "data": "MSigDB Hallmark, ranked by log2FoldChange", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned", "covariates": [], "alpha": 0.05, "round_estimated_counts": true},
+          "role": "primary",
+          "reasoning": "one DESeq2 model ~ grp on all 9 samples, planned contrasts Ex vs Sed (primary) and ExSed vs Sed (secondary)"
+        },
+        {
+          "name": "edgeR_Ex_vs_Sed",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "Ex"},
+          "role": "sensitivity",
+          "reasoning": "paper's edgeR family, two-arm QL fit on the Ex and Sed samples"
+        },
+        {
+          "name": "edgeR_ExSed_vs_Sed",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "ExSed"},
+          "role": "sensitivity",
+          "reasoning": "paper's edgeR family, two-arm QL fit on the ExSed and Sed samples"
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_Ex_vs_Sed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "log2FoldChange", "reasoning": "paper ran GSEA on fold-change ranking for Ex vs Sed (Fig. 3o,r)"},
+        {"execution": "joint/grp_ExSed_vs_Sed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "log2FoldChange", "reasoning": "paper ran GSEA for ExSed vs Sed (Fig. 3o)"},
+        {"execution": "joint/grp_Ex_vs_Sed", "ora": true, "gsea": false, "direction": "down", "reasoning": "paper ran GO/Reactome ORA on genes down in Ex vs Sed (Fig. 3p,q)"}
+      ]
+    }
+  ]
+}

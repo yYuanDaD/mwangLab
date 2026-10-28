@@ -237,6 +237,25 @@ def _comparison(kind, factor, test, ref, within, cells, meta, min_group) -> dict
             "analyzable": all(c["n"] >= min_group for c in sized)}
 
 
+def add_reversed_planned(comparisons: list[dict], planned: Sequence[str] = ()) -> list[dict]:
+    """Add the reverse of a simple comparison when the paper plans that direction.
+
+    Non-reference pairs are enumerated later-vs-earlier (or by name), so a planned
+    ``grp_KOEx_vs_KOSed`` may only exist as ``grp_KOSed_vs_KOEx``."""
+    names = {c["name"] for c in comparisons}
+    wanted = {re.sub(r"[^A-Za-z0-9._-]+", "_", p).strip("_") for p in planned} - names
+    for c in list(comparisons):
+        if c["kind"] != "simple" or not wanted:
+            continue
+        where = "".join(f"_{k}-{v}" for k, v in c["within"].items())
+        name = re.sub(r"[^A-Za-z0-9._-]+", "_", f"{c['factor']}_{c['reference']}_vs_{c['test']}{where}").strip("_")
+        if name in wanted:
+            comparisons.append({**c, "name": name, "test": c["reference"], "reference": c["test"],
+                                "cells": list(reversed(c["cells"]))})
+            wanted.discard(name)
+    return comparisons
+
+
 def check_sample_size(comparisons: Sequence[dict], planned: Sequence[str] = ()) -> dict:
     """2.4: comparisons with a group under 3 are not analyzable. Fails when no
     comparison (or no planned one, when given) is analyzable.
@@ -470,7 +489,8 @@ def report(*, case_id: str, matrix_type: str, metadata: pd.DataFrame, factors: S
     if checks["grouping"]["status"] == "pass":
         checks["covariance"] = check_covariance(metadata, factors, subject=subject,
                                                 candidates=covariate_candidates)
-        comps = enumerate_comparisons(metadata, factors, references=references, strata=strata)
+        comps = add_reversed_planned(
+            enumerate_comparisons(metadata, factors, references=references, strata=strata), planned)
         checks["sample_size"] = check_sample_size(comps, planned)
     if matrix_csv is not None:
         checks["sex"] = check_sex(matrix_csv, metadata, organism=organism, out_dir=out_dir)

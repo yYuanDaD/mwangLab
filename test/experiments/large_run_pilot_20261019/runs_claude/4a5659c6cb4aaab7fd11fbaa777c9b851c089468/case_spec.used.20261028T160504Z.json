@@ -1,0 +1,196 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/4a5659c6cb4aaab7fd11fbaa777c9b851c089468",
+  "request": "Analyze GSE129694 for the paper (RNA-seq data of soleus muscle tissue after spinal cord injury under conditions of inactivity and applied exercise): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE129694",
+      "accession": "GSE129694",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC7093805.paper.md"
+        ],
+        "metadata": "GSE129694/GSE129694_metadata.csv",
+        "matrix": "GSE129694/GSE129694_GeneMatrix_RawCounts_InjuryActivity.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE129694 (soleus; part of SuperSeries GSE129704)"
+            ],
+            "assay": "bulk polyA RNA-seq, 75 bp SE, NextSeq 500; STAR -> HTSeq raw gene counts, 24,613 Ensembl Rn6 v93 loci (S2.6.p1, S1.p2)",
+            "organism": "Rat (female Sprague Dawley)",
+            "sample_inclusion": "20 animals, 5 groups x 4: No SCI, TX SCI, CONT SCI, CONT SCI + SWIM, CONT SCI + SWW (S2.1.p1, TAB3). All tiny-cage housed from 3 d post-injury (S2.2.p3). PCA also shown with CONT SCI rep 3, SWIM rep 2, SWW rep 2 removed (S1.p2, FIG1) but no exclusion rule is stated.",
+            "factors": {
+              "grp": [
+                "NoSCI",
+                "TX",
+                "CONT",
+                "SWIM",
+                "SWW"
+              ]
+            },
+            "sacrifice_time": "TX 8.5 wk, No SCI and CONT SCI 11.5 wk (equivalent), SWIM and SWW 13.5 wk post-SCI (S2.3.p1, TAB1); exercise began 14 d post-injury, 5 d/wk for 10 wk (S2.2.p3)",
+            "primary_estimand": "Exercise effect in contused, activity-restricted soleus: CONT SCI + SWIM vs CONT SCI and CONT SCI + SWW vs CONT SCI (Fig. 1b 'comparison of SCI alone and SCI followed by exercise'; TAB2 'effects of these two forms of exercise rehabilitation')",
+            "planned_contrasts": [
+              "SWIM vs CONT (FIG1 b, S1.p2; paper: no DE result reported)",
+              "SWW vs CONT (FIG1 b, S1.p2; paper: no DE result reported)"
+            ],
+            "repeated_measure_unit": "none; one soleus per animal, independent animals",
+            "paper_method": "not_reported for DE; DESeq2 RLE normalization and VST for PCA only (S2.6.p2, S2.6.p3)",
+            "paper_threshold": {
+              "metric": null,
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "not_reported (data descriptor; no DE analysis)"
+            },
+            "paper_results": "No DEG counts or DE gene lists. Only QC, PCA (FIG1) and mean RLE expression of top genes in four GO categories in CONT SCI vs No SCI (FIG2)."
+          },
+          "reasoning": "Data in Brief descriptor (PMC7093805). Five groups, n=4 each (S2.1.p1). The exercise question is the SCI-alone vs SCI+exercise comparison shown in Fig. 1b/c and named in TAB2. The paper performs no differential expression and states no threshold. S2.3.p1 states that sacrifice time differs by condition: exercise arms 13.5 weeks vs CONT SCI 11.5 weeks, because the exercise arms needed extra time for facility introduction and 10 weeks of training.",
+          "confidence": "high",
+          "locator": "S2.1.p1; S2.3.p1; S1.p2; TAB1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "ABS.p1 and TAB1 name GSE129694",
+              "GEO metadata: 20 GSM3720169-GSM3720188, soleus muscle, Rattus norvegicus, series_id GSE129694,GSE129704 (TAB2 SuperSeries)",
+              "matrix GSE129694_GeneMatrix_RawCounts_InjuryActivity.txt.gz has 20 sample columns equal to the GEO 'description' field, matching the paper's 5 groups x 4 replicates",
+              "the _RAW.tar holds per-sample UCSC bigwig tracks (supplementary_file_1 *.bw), not count tables; it is not used"
+            ]
+          },
+          "reasoning": "Accession, organism, tissue, sample count, and group structure match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "aliases": {
+            "grp": "source_name_ch1",
+            "time": "source_name_ch1"
+          },
+          "patterns": {},
+          "combine": {},
+          "recode": {
+            "grp": {
+              "No SCI": "NoSCI",
+              "Complete transection SCI": "TX",
+              "Contusion SCI": "CONT",
+              "Contusion SCI + SWIM": "SWIM",
+              "Contusion SCI + SWW": "SWW"
+            },
+            "time": {
+              "No SCI": "w11p5",
+              "Complete transection SCI": "w8p5",
+              "Contusion SCI": "w11p5",
+              "Contusion SCI + SWIM": "w13p5",
+              "Contusion SCI + SWW": "w13p5"
+            }
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. Contusion_Soleus_SWIM_Replicate_1) equal the GEO 'description' field exactly (inspect: 20/20). grp comes from source_name_ch1 (5 levels x 4). GEO splits sacrifice time across two shifted, partly empty characteristics columns (ch1.3.time = 13.5 weeks for the 8 SWIM/SWW samples, ch1.2.time = 11.5 weeks for No SCI and Contusion SCI, 8.5 weeks for transection). Coalescing them with recode failed because derive_columns cannot map missing values (native.py:376), so 'time' is recoded from source_name_ch1; the mapping was checked sample by sample against both GEO time columns and matches S2.3.p1. No samples excluded: the paper's PCA-based removal (S1.p2) is a visualization, not a stated exclusion rule.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "File named RawCounts; GEO data_processing and S2.6.p1 state HTSeq read counts on Ensembl Rn6 v93 (24,613 loci); paper S1.p2 calls it 'a gene matrix of raw read counts'. Profile check from inspect confirms integer values.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "CONT"
+          },
+          "subject": null,
+          "organism": "Rat",
+          "planned": [
+            "grp_SWIM_vs_CONT",
+            "grp_SWW_vs_CONT"
+          ],
+          "covariate_candidates": [
+            "time"
+          ],
+          "final": {
+            "analysis_type": "multi-group, one control with two exercise levels",
+            "design_column": "grp",
+            "formula": "~ grp",
+            "contrasts": [
+              {
+                "name": "grp_SWIM_vs_CONT",
+                "control": "CONT",
+                "treatment": "SWIM",
+                "role": "primary"
+              },
+              {
+                "name": "grp_SWW_vs_CONT",
+                "control": "CONT",
+                "treatment": "SWW",
+                "role": "primary"
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "value": "grp_SWIM_vs_SWW (exercise modality, time-matched at 13.5 wk)",
+              "reason_rejected": "compares two exercise types; does not estimate the effect of exercise versus no exercise that the request and Fig. 1b ask for"
+            },
+            {
+              "value": "pooled exercise (SWIM+SWW) vs CONT",
+              "reason_rejected": "pools two biologically distinct exercise modalities the paper treats separately (TAB2)"
+            },
+            {
+              "value": "CONT vs NoSCI, TX vs NoSCI",
+              "reason_rejected": "injury-severity contrasts, not exercise"
+            }
+          ],
+          "reasoning": "Paper-defined exercise contrasts: each exercise arm vs the contused, activity-restricted, unexercised CONT SCI arm (Fig. 1b, S2.1.p1). One model over all five groups with planned contrasts. Independent animals.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "unresolved",
+            "blocking_terms": [],
+            "covariates": [
+              {
+                "name": "time",
+                "disposition": "aliased"
+              }
+            ]
+          },
+          "confounding_candidates": [
+            "time"
+          ],
+          "decision_status": "refused",
+          "stop_reason": "Sacrifice time post-SCI is completely confounded with exercise: every SWIM and SWW animal was collected at 13.5 weeks and every CONT SCI animal at 11.5 weeks (GEO characteristics time; paper S2.3.p1, TAB1). No unexercised contused group exists at 13.5 weeks and no exercised group at 11.5 weeks, so both planned contrasts estimate exercise plus two extra weeks of chronic SCI, tiny-cage restriction and age, and the two cannot be separated in any model. The time-matched alternative (SWIM vs SWW) compares exercise modalities, not exercise versus no exercise.",
+          "reasoning": "S2.3.p1 explains that the exercise arms needed extra time for facility introduction plus 10 weeks of training, so the delay is built into the protocol rather than a technical batch; the authors note all collections were past the acute-to-chronic transition, but give no evidence that 11.5 vs 13.5 weeks is transcriptionally neutral in soleus, which continues to remodel after SCI. Time cannot be included as a covariate (aliased) or ignored without changing the estimand.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "time-matched control for exercise",
+          "paper": "Exercise groups sacrificed at 13.5 weeks; CONT SCI at 11.5 weeks (S2.3.p1)",
+          "data": "GEO time field: SWIM/SWW = 13.5 weeks after injury; Contusion SCI = 11.5 weeks after injury",
+          "disposition": "blocks_estimand"
+        },
+        {
+          "item": "outlier samples",
+          "paper": "PCA separation improves with CONT SCI rep 3, SWIM rep 2, SWW rep 2 removed (S1.p2, FIG1 c); no exclusion rule stated",
+          "data": "all 20 samples present",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

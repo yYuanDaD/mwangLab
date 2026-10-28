@@ -46,7 +46,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:25+00:00"
+    "recorded_at": "2026-10-28T15:58:17+00:00"
   },
   {
     "contract_version": "3",
@@ -90,7 +90,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:25+00:00"
+    "recorded_at": "2026-10-28T15:58:17+00:00"
   },
   {
     "contract_version": "3",
@@ -169,7 +169,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:26+00:00"
+    "recorded_at": "2026-10-28T15:58:18+00:00"
   },
   {
     "contract_version": "3",
@@ -224,7 +224,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:26+00:00"
+    "recorded_at": "2026-10-28T15:58:18+00:00"
   },
   {
     "contract_version": "3",
@@ -307,7 +307,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:35+00:00"
+    "recorded_at": "2026-10-28T15:58:23+00:00"
   },
   {
     "contract_version": "3",
@@ -623,7 +623,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:35+00:00"
+    "recorded_at": "2026-10-28T15:58:23+00:00"
   },
   {
     "contract_version": "3",
@@ -646,7 +646,7 @@
     "candidates": [],
     "final": {
       "matrix_type": "FPKM",
-      "method": "limma (limma-trend on log2(FPKM+1))",
+      "method": "limma (lmFit + contrasts.fit + eBayes, cell-means model on log2(FPKM+1))",
       "formula": "~ 0 + grp",
       "paper_route": {
         "method": "DESeq2 on raw counts",
@@ -664,7 +664,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:58:24+00:00"
   },
   {
     "contract_version": "3",
@@ -706,7 +706,7 @@
     "decision_status": "valid",
     "execution_status": "not_started",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:58:24+00:00"
   },
   {
     "contract_version": "3",
@@ -728,19 +728,102 @@
     ],
     "candidates": [],
     "final": {
-      "method": "run_joint_limma",
+      "method": "run_multigroup_analysis",
       "subset": "joint",
       "role": "primary",
-      "tool": "tools.joint_contrasts:run_joint_limma",
-      "execution_error": "NativeToolError: comparisons not in the suitability report: ['grp_KOEx_vs_KOSed', 'grp_KOEx_vs_WTEx']; known: ['grp_KOEx_vs_WTSed', 'grp_KOSed_vs_KOEx', 'grp_KOSed_vs_WTSed', 'grp_WTEx_vs_KOEx', 'grp_WTEx_vs_KOSed', 'grp_WTEx_vs_WTSed']"
+      "tool": "tools.multigroup_tools:run_multigroup_analysis",
+      "n_samples": 20,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\transformed\\log2_matrix.csv",
+      "transform": "log2(x+1)",
+      "formula": "~ 0 + C(grp)",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_WTEx_vs_WTSed.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_KOEx_vs_KOSed.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_KOSed_vs_WTSed.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_KOEx_vs_WTEx.csv"
+      ],
+      "counts": {
+        "joint/grp_WTEx_vs_WTSed": {
+          "applied": {
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 25851,
+            "n_significant": 24,
+            "n_up": 22,
+            "n_down": 2,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 25851,
+            "n_significant": 466,
+            "n_up": 252,
+            "n_down": 214,
+            "deg_sanity": "ok"
+          }
+        },
+        "joint/grp_KOEx_vs_KOSed": {
+          "applied": {
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 25851,
+            "n_significant": 164,
+            "n_up": 130,
+            "n_down": 34,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 25851,
+            "n_significant": 4061,
+            "n_up": 1947,
+            "n_down": 2114,
+            "deg_sanity": "ok"
+          }
+        },
+        "joint/grp_KOSed_vs_WTSed": {
+          "applied": {
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 25851,
+            "n_significant": 111,
+            "n_up": 74,
+            "n_down": 37,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 25851,
+            "n_significant": 1676,
+            "n_up": 887,
+            "n_down": 789,
+            "deg_sanity": "ok"
+          }
+        },
+        "joint/grp_KOEx_vs_WTEx": {
+          "applied": {
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 25851,
+            "n_significant": 318,
+            "n_up": 191,
+            "n_down": 127,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 25851,
+            "n_significant": 4215,
+            "n_up": 2152,
+            "n_down": 2063,
+            "deg_sanity": "ok"
+          }
+        }
+      }
     },
     "paper": {},
     "confidence": "high",
-    "reasoning": "one limma model on all 20 samples, four planned contrasts; the two training contrasts are the primary exercise estimands, genotype contrasts secondary",
+    "reasoning": "one limma cell-means model on all 20 samples with the four planned contrasts in the paper's direction (run_joint_limma only offers KOSed_vs_KOEx / WTEx_vs_KOEx for the non-reference pairs, i.e. reversed sign); the two training contrasts are the primary exercise estimands, genotype contrasts secondary",
     "decision_status": "valid",
-    "execution_status": "failed",
+    "execution_status": "completed",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:58:28+00:00"
   },
   {
     "contract_version": "3",
@@ -748,28 +831,32 @@
     "stage": "enrichment",
     "evidence": [
       {
-        "id": "tool_output:aligned_matrix.csv",
+        "id": "tool_output:DEG_results_grp_WTEx_vs_WTSed.csv",
         "kind": "tool_output",
-        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\aligned_matrix.csv",
-        "sha256": "82f59ff802abde7ef6a81f2c9528357122732e6a1362474c560e9589831936b4"
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_WTEx_vs_WTSed.csv",
+        "sha256": "8e4d60394ab99fceadc40235414f0329ee6db7c2b0d4f264623d5f37979c7492"
       }
     ],
     "candidates": [],
     "final": {
       "organism": "Mouse",
       "subset": "joint/grp_WTEx_vs_WTSed",
-      "method": "GSEA preranked",
-      "gene_sets": "not run",
-      "feature_id_type": "unknown",
-      "reason_not_run": "no completed result for joint/grp_WTEx_vs_WTSed"
+      "feature_id_type": "ensembl_gene",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\enrichment_joint_grp_WTEx_vs_WTSed\\gsea\\DEG_results_grp_WTEx_vs_WTSed_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 25171 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 45 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.27 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_P53_PATHWAY | NES=2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HYPOXIA | NES=2.07 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.02 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.94 | NOM p=0.00e+00 | FDR q=4.14e-04 - HALLMARK_ESTROGEN_RESPONSE_LATE | NES=1.93 | NOM p=0.00e+00 | FDR q=3.68e-04 - HALLMARK_UV_RESPONSE_UP | NES=1.84 | NOM p=0.00e+00 | FDR q=8.29e-04 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.64 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.15 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-1.85 | NOM p=0.00e+00 | FDR q=1.18e-03 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.75 | NOM p=0.00e+00 | FDR q=2.33e-03 - HALLMARK_PEROXISOME | NES=-1.62 | NOM p=3.73e-03 | FDR q=4.88e-03 - HALLMARK_PROTEIN_SECRETION | NES=-1.61 | NOM p=0.00e+00 | FDR q=4.36e-03 - HALLMARK_MYC_TARGETS_V1 | NES=-1.44 | NOM p=1.08e-02 | FDR q=2.73e-02 - HALLMARK_MTORC1_SIGNALIN..."
     },
     "paper": {},
     "confidence": "high",
     "reasoning": "paper Fig 2e: Hallmark GSEA for WT training (OXPHOS up)",
     "decision_status": "valid",
-    "execution_status": "not_run",
+    "execution_status": "completed",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:59:32+00:00"
   },
   {
     "contract_version": "3",
@@ -777,28 +864,32 @@
     "stage": "enrichment",
     "evidence": [
       {
-        "id": "tool_output:aligned_matrix.csv",
+        "id": "tool_output:DEG_results_grp_KOEx_vs_KOSed.csv",
         "kind": "tool_output",
-        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\aligned\\aligned_matrix.csv",
-        "sha256": "82f59ff802abde7ef6a81f2c9528357122732e6a1362474c560e9589831936b4"
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\joint\\DEG_results_grp_KOEx_vs_KOSed.csv",
+        "sha256": "646e2791e7b32c7cfbbc38ac07e3516a718d916982195acafa0062d6e0dbe1e7"
       }
     ],
     "candidates": [],
     "final": {
       "organism": "Mouse",
       "subset": "joint/grp_KOEx_vs_KOSed",
-      "method": "GSEA preranked",
-      "gene_sets": "not run",
-      "feature_id_type": "unknown",
-      "reason_not_run": "no completed result for joint/grp_KOEx_vs_KOSed"
+      "feature_id_type": "ensembl_gene",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40993371\\GSE302867\\results\\enrichment_joint_grp_KOEx_vs_KOSed\\gsea\\DEG_results_grp_KOEx_vs_KOSed_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 25171 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 47 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=3.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.66 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=2.64 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=2.41 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.38 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MITOTIC_SPINDLE | NES=2.35 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.34 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.30 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.54 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.70 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.58 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_PEROXISOME | NES=-2.03 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_DNA_REPAIR | NES=-1.98 | NOM p=0.00e+00 | FDR q=8.44e-05 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.83 | NOM p=0.00e+00 | FDR q=3.62e-04 ..."
     },
     "paper": {},
     "confidence": "high",
     "reasoning": "paper Fig 2e: Hallmark GSEA for KO training (OXPHOS depleted)",
     "decision_status": "valid",
-    "execution_status": "not_run",
+    "execution_status": "completed",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:59:38+00:00"
   },
   {
     "contract_version": "3",
@@ -826,17 +917,75 @@
         "limma on log2(FPKM+1) replaces the paper's DESeq2 on counts",
         "paper's GSEA used DESeq2 normalized expression with phenotype permutation; ours is preranked on the limma t statistic"
       ],
-      "results": {},
+      "results": {
+        "joint/grp_WTEx_vs_WTSed": {
+          "n_deg": 24,
+          "up": 22,
+          "down": 2,
+          "rule": "padj < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 466
+        },
+        "joint/grp_KOEx_vs_KOSed": {
+          "n_deg": 164,
+          "up": 130,
+          "down": 34,
+          "rule": "padj < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 4061
+        },
+        "joint/grp_KOSed_vs_WTSed": {
+          "n_deg": 111,
+          "up": 74,
+          "down": 37,
+          "rule": "padj < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 1676
+        },
+        "joint/grp_KOEx_vs_WTEx": {
+          "n_deg": 318,
+          "up": 191,
+          "down": 127,
+          "rule": "padj < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 4215
+        }
+      },
       "paper_counts": {},
       "comparison": {},
-      "paper_gene_check": {}
+      "paper_gene_check": {
+        "joint/grp_KOSed_vs_WTSed": {
+          "Gdf15": {
+            "AveExpr": 2.8898,
+            "log2FoldChange": 2.9416,
+            "padj": 0.0001,
+            "pvalue": 0.0
+          },
+          "Ppargc1a": {
+            "AveExpr": 4.2064,
+            "log2FoldChange": 0.8572,
+            "padj": 0.0111,
+            "pvalue": 0.0003
+          }
+        },
+        "joint/grp_KOEx_vs_WTEx": {
+          "Gdf15": {
+            "AveExpr": 2.8898,
+            "log2FoldChange": 3.4427,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "Ppargc1a": {
+            "AveExpr": 4.2064,
+            "log2FoldChange": 0.5304,
+            "padj": 0.0702,
+            "pvalue": 0.0127
+          }
+        }
+      }
     },
     "paper": {},
     "confidence": "medium",
     "reasoning": "S2.4.p2/FIG13: Gdf15 the most upregulated gene in KO vs WT in both states; Ppargc1a is the knocked-out gene (expected down). Training contrasts have only pathway-level claims (OXPHOS GSEA), checked through enrichment.",
     "decision_status": "valid",
-    "execution_status": "failed",
+    "execution_status": "completed",
     "stop_reason": null,
-    "recorded_at": "2026-10-28T15:57:36+00:00"
+    "recorded_at": "2026-10-28T15:59:38+00:00"
   }
 ]
