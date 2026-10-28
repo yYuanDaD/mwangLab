@@ -252,6 +252,10 @@ def _key_matches(columns: list[str], meta: pd.DataFrame) -> list[dict]:
             base = values.map(lambda v: re.sub(r"(\.(txt|tsv|csv|tab|bam))?(\.gz)?$", "", v.rsplit("/", 1)[-1]))
             if not base.equals(values) and base.nunique() == len(meta):
                 candidates[f"{column} (file basename)"] = base
+    # GEO tar members are named GSM<id>_<label>; execute renames such columns to the GSM id.
+    gsm = {re.match(r"(GSM\d+)_", c).group(1) for c in cols if re.match(r"(GSM\d+)_", c)}
+    if len(gsm) == len(cols):
+        cols = gsm
     out = []
     for name, values in candidates.items():
         hits = int(values.isin(cols).sum())
