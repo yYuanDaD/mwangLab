@@ -641,8 +641,9 @@ class CaseRun:
         table.loc[:, list(meta.index)].to_csv(matrix_path)
         if ex.complete_pairs:
             cp = ex.complete_pairs
-            pairs = native.complete_pairs_subset(matrix_path, meta_path, cp["subject"], cp["condition"],
-                                                 cp["levels"], idir / "paired")
+            pairs = native.complete_pairs_subset(matrix_path, meta_path, idir / "paired",
+                                                 subject_column=cp["subject"], condition_column=cp["condition"],
+                                                 levels=cp["levels"])
             self.result.setdefault("pairs", {})[ex.name] = {k: pairs[k] for k in ("n_samples", "n_complete_pairs",
                                                                                  "excluded_subjects")}
             matrix_path, meta_path = Path(pairs["matrix"]), Path(pairs["metadata"])

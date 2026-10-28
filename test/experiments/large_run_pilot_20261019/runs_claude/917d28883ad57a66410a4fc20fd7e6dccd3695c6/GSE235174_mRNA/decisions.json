@@ -246,5 +246,667 @@
     "execution_status": "not_started",
     "stop_reason": null,
     "recorded_at": "2026-10-28T20:56:22+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC10262399.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10262399.paper.md",
+        "sha256": "ba514b2c7bfec07d5ae5aa3c2dcffb00645b869b3919102c4e2f53755e702f52"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\design_metadata.csv",
+        "sha256": "6b57290674b2d506cf05d8f7baf83226015fd64afe2fc77c33089fff5514e60f"
+      },
+      {
+        "id": "tool_output:suitability.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\suitability\\suitability.json",
+        "sha256": "ed771e708948dcd4162ecafe8234e49c17f6eb1a3b4ea563a8acb4c67df4e1da"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "characteristics_ch1.4.treatment (NC vs after 12weeks aerobic exercises)",
+        "reason_rejected": "identical split to title-derived time; title used for formula-safe levels"
+      }
+    ],
+    "final": {
+      "analysis_type": "two-group",
+      "design_column": "time",
+      "control": "pre",
+      "treatment": "post",
+      "contrasts": [
+        {
+          "name": "time_post_vs_pre",
+          "control": "pre",
+          "treatment": "post",
+          "role": "primary"
+        }
+      ],
+      "suitability": {
+        "verdict": "analyzable",
+        "failed": [],
+        "warnings": [],
+        "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\suitability\\suitability.md",
+        "n_comparisons": 1,
+        "n_analyzable": 1
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Within-patient pre/post exercise contrast, 4 vs 4. Only one factor; all patients male (TAB1), so no sex split. Paper estimand is the post-vs-pre change.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:56:52+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "covariance",
+    "evidence": [
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\design_metadata.csv",
+        "sha256": "6b57290674b2d506cf05d8f7baf83226015fd64afe2fc77c33089fff5514e60f"
+      },
+      {
+        "id": "metadata:GSE235174_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE235174\\GSE235174_metadata.csv",
+        "sha256": "12ce33aa382907bc561d4b9d5e402093538239c071811131e18d984421772589"
+      },
+      {
+        "id": "paper:PMC10262399.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10262399.paper.md",
+        "sha256": "ba514b2c7bfec07d5ae5aa3c2dcffb00645b869b3919102c4e2f53755e702f52"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        {
+          "name": "subject",
+          "disposition": "sensitivity only (paired DESeq2 secondary execution)"
+        }
+      ],
+      "design_check": {
+        "formula_equivalent": "~ C(time)",
+        "n_samples": 8,
+        "n_columns": 2,
+        "columns": [
+          "Intercept",
+          "time_pre"
+        ],
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 6,
+        "levels": {
+          "time": {
+            "pre": 4,
+            "post": 4
+          }
+        },
+        "cells": [
+          {
+            "cell": [
+              "post"
+            ],
+            "n": 4
+          },
+          {
+            "cell": [
+              "pre"
+            ],
+            "n": 4
+          }
+        ],
+        "min_cell_size": 4,
+        "missing_values": {}
+      },
+      "confounding": [
+        {
+          "column": "subject",
+          "n_levels": 4,
+          "status": "crossed",
+          "crosstab": {
+            "post": {
+              "P1": 1,
+              "P2": 1,
+              "P3": 1,
+              "P4": 1
+            },
+            "pre": {
+              "P1": 1,
+              "P2": 1,
+              "P3": 1,
+              "P4": 1
+            }
+          }
+        }
+      ]
+    },
+    "paper": {},
+    "confidence": "medium",
+    "reasoning": "Paper's DESeq analysis is a two-group comparison with no subject term (S2.4.p2), so the paper-aligned primary run is unblocked. The design is truly repeated-measures, but the pairing key is only inferred from sample-name suffixes, so a subject-blocked DESeq2 run is added as a secondary sensitivity analysis rather than the primary route.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:56:52+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "method",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+        "sha256": "de3880cd4f5e1791955539ffc84af71a1f371ea2967019c9339b2a99f9097efc"
+      },
+      {
+        "id": "paper:PMC10262399.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10262399.paper.md",
+        "sha256": "ba514b2c7bfec07d5ae5aa3c2dcffb00645b869b3919102c4e2f53755e702f52"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "raw counts",
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ time",
+      "paper_route": {
+        "method": "DESeq (2012, nbinomTest)",
+        "status": "blocked",
+        "reason": "original DESeq package is not available in this environment; DESeq2 is its successor with the same negative-binomial counts model"
+      },
+      "deviations": [
+        "DESeq2 instead of DESeq (2012)"
+      ]
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Counts -> negative-binomial model as in the paper; DESeq2 replaces DESeq as a declared deviation.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:56:52+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "threshold",
+    "evidence": [
+      {
+        "id": "paper:PMC10262399.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10262399.paper.md",
+        "sha256": "ba514b2c7bfec07d5ae5aa3c2dcffb00645b869b3919102c4e2f53755e702f52"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "paper_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": true
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": true
+      },
+      "audit_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null
+      },
+      "deviation_note": "Paper rule (raw p < 0.05 and |log2FC| >= 1) applied unchanged on the DESeq2 route; BH padj < 0.05 reported as audit."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S3.2.p1 / S4.p2: log2 FoldChange >= 1.0 and p-values < 0.05 (both directions counted).",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:56:52+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+        "sha256": "de3880cd4f5e1791955539ffc84af71a1f371ea2967019c9339b2a99f9097efc"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\design_metadata.csv",
+        "sha256": "6b57290674b2d506cf05d8f7baf83226015fd64afe2fc77c33089fff5514e60f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "time_post_vs_pre",
+      "role": "primary",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 8,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+      "formula": "~ time",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv"
+      ],
+      "counts": {
+        "time_post_vs_pre": {
+          "applied": {
+            "rule": "pvalue <= 0.05 and |log2FoldChange| >= 1",
+            "n_tested": 16721,
+            "n_significant": 110,
+            "n_up": 65,
+            "n_down": 45,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 16721,
+            "n_significant": 0,
+            "n_up": 0,
+            "n_down": 0,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's unpaired two-group negative-binomial test (DESeq -> DESeq2).",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:57:47+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+        "sha256": "de3880cd4f5e1791955539ffc84af71a1f371ea2967019c9339b2a99f9097efc"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\design_metadata.csv",
+        "sha256": "6b57290674b2d506cf05d8f7baf83226015fd64afe2fc77c33089fff5514e60f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "time_post_vs_pre_paired",
+      "role": "sensitivity",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 8,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+      "formula": "~ subject + time",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\time_post_vs_pre_paired\\DEG_results_post_vs_pre.csv"
+      ],
+      "counts": {
+        "time_post_vs_pre_paired": {
+          "applied": {
+            "rule": "pvalue <= 0.05 and |log2FoldChange| >= 1",
+            "n_tested": 16781,
+            "n_significant": 89,
+            "n_up": 46,
+            "n_down": 43,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 16781,
+            "n_significant": 0,
+            "n_up": 0,
+            "n_down": 0,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Subject-blocked (~ subject + time) sensitivity; pairing inferred from aPR_k/bPR_k names.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:58:12+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_post_vs_pre.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv",
+        "sha256": "1b20833c389da657ade267c1b5f15feb40691682f7ec18e0dbdf004f186e128f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Human",
+      "subset": "time_post_vs_pre",
+      "feature_id_type": "gene_symbol",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_cutoff": 1.0
+      },
+      "direction": "up",
+      "input_threshold_source": "audit",
+      "reason_not_run": "no gene passes the ORA input threshold"
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper runs GO/KEGG on up-regulated DE-mRNAs separately (S3.3.p1).",
+    "decision_status": "valid",
+    "execution_status": "not_run",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:58:12+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_post_vs_pre.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv",
+        "sha256": "1b20833c389da657ade267c1b5f15feb40691682f7ec18e0dbdf004f186e128f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Human",
+      "subset": "time_post_vs_pre",
+      "feature_id_type": "gene_symbol",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_cutoff": 1.0
+      },
+      "direction": "down",
+      "input_threshold_source": "audit",
+      "reason_not_run": "no gene passes the ORA input threshold"
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper runs GO/KEGG on down-regulated DE-mRNAs separately (S3.3.p1).",
+    "decision_status": "valid",
+    "execution_status": "not_run",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:58:12+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_post_vs_pre.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv",
+        "sha256": "1b20833c389da657ade267c1b5f15feb40691682f7ec18e0dbdf004f186e128f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Human",
+      "subset": "time_post_vs_pre",
+      "feature_id_type": "gene_symbol",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\results\\enrichment_time_post_vs_pre\\gsea\\DEG_results_post_vs_pre_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 16781 Human genes ranked by 'stat'. 50 Hallmark sets tested, 25 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_UV_RESPONSE_DN | NES=1.43 | NOM p=6.91e-03 | FDR q=4.01e-01 - HALLMARK_TGF_BETA_SIGNALING | NES=1.32 | NOM p=8.23e-02 | FDR q=5.22e-01 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.27 | NOM p=5.71e-02 | FDR q=5.65e-01 - HALLMARK_COMPLEMENT | NES=1.26 | NOM p=4.37e-02 | FDR q=4.34e-01 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.26 | NOM p=5.93e-02 | FDR q=3.73e-01 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.26 | NOM p=5.83e-02 | FDR q=3.11e-01 - HALLMARK_APICAL_SURFACE | NES=1.24 | NOM p=1.57e-01 | FDR q=3.03e-01 - HALLMARK_MYOGENESIS | NES=1.22 | NOM p=8.83e-02 | FDR q=3.01e-01 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=1.17 | NOM p=1.77e-01 | FDR q=3.97e-01 - HALLMARK_PI3K_AKT_MTOR_SIGNALING | NES=1.10 | NOM p=2.67e-01 | FDR q=5.73e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-3.21 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_E2F_TARGETS | NES=-2.63 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=-2.25 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_G2M_CHECKPOINT | NES=-2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_DNA_REPAIR | NES=-2.05 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=-1.97 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | ..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Hallmark GSEA on full ranking as a supporting pathway view (paper used GSVA).",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:58:20+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE235174_mRNA",
+    "stage": "study",
+    "evidence": [
+      {
+        "id": "paper:PMC10262399.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10262399.paper.md",
+        "sha256": "ba514b2c7bfec07d5ae5aa3c2dcffb00645b869b3919102c4e2f53755e702f52"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\917d28883ad57a66410a4fc20fd7e6dccd3695c6\\GSE235174_mRNA\\aligned\\aligned_matrix.csv",
+        "sha256": "de3880cd4f5e1791955539ffc84af71a1f371ea2967019c9339b2a99f9097efc"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "route": "declared_deviation",
+      "caveats": [
+        "n = 4 patients; raw-p threshold gives many false positives expected under the null",
+        "DESeq2 shrinkage/dispersion differs from DESeq (2012), so exact counts will differ",
+        "pairing in the secondary run is inferred from sample names"
+      ],
+      "results": {
+        "time_post_vs_pre": {
+          "n_deg": 110,
+          "up": 65,
+          "down": 45,
+          "rule": "pvalue <= 0.05 and |log2FoldChange| >= 1",
+          "audit_n": 0
+        },
+        "time_post_vs_pre_paired": {
+          "n_deg": 89,
+          "up": 46,
+          "down": 43,
+          "rule": "pvalue <= 0.05 and |log2FoldChange| >= 1",
+          "audit_n": 0
+        }
+      },
+      "paper_counts": {
+        "time_post_vs_pre": 86
+      },
+      "comparison": {
+        "time_post_vs_pre": {
+          "ours": 110,
+          "paper": 86
+        }
+      },
+      "paper_gene_check": {
+        "time_post_vs_pre": {
+          "CDK1": {
+            "baseMean": 11.5878,
+            "log2FoldChange": -1.6661,
+            "padj": 0.9995,
+            "pvalue": 0.0083
+          },
+          "TTK": {
+            "baseMean": 13.9483,
+            "log2FoldChange": -1.4688,
+            "padj": 0.9995,
+            "pvalue": 0.0096
+          },
+          "HJURP": {
+            "baseMean": 10.8633,
+            "log2FoldChange": -1.9059,
+            "padj": 0.9995,
+            "pvalue": 0.0054
+          },
+          "DLGAP5": {
+            "baseMean": 20.0493,
+            "log2FoldChange": -1.135,
+            "padj": 0.9995,
+            "pvalue": 0.029
+          },
+          "PCLAF": {
+            "baseMean": 11.6699,
+            "log2FoldChange": -1.2008,
+            "padj": 0.9995,
+            "pvalue": 0.1197
+          },
+          "GINS2": {
+            "baseMean": 8.3493,
+            "log2FoldChange": -2.1738,
+            "padj": 0.9995,
+            "pvalue": 0.0031
+          },
+          "TYMS": {
+            "baseMean": 32.1931,
+            "log2FoldChange": -1.4785,
+            "padj": 0.9995,
+            "pvalue": 0.0052
+          },
+          "DTL": {
+            "baseMean": 28.1801,
+            "log2FoldChange": -1.1279,
+            "padj": 0.9995,
+            "pvalue": 0.0365
+          },
+          "KIFC1": {
+            "baseMean": 24.1177,
+            "log2FoldChange": -1.1781,
+            "padj": 0.9995,
+            "pvalue": 0.0092
+          },
+          "ELANE": {
+            "baseMean": 85.8783,
+            "log2FoldChange": -2.3947,
+            "padj": null,
+            "pvalue": null
+          },
+          "PLCB4": {
+            "baseMean": 25.3444,
+            "log2FoldChange": 2.9407,
+            "padj": null,
+            "pvalue": null
+          },
+          "CCL23": {
+            "baseMean": 6.8726,
+            "log2FoldChange": -2.216,
+            "padj": 0.9995,
+            "pvalue": 0.1184
+          },
+          "CPA3": {
+            "baseMean": 50.6857,
+            "log2FoldChange": -2.1455,
+            "padj": 0.9995,
+            "pvalue": 0.078
+          },
+          "IGF2R": {
+            "baseMean": 37911.1098,
+            "log2FoldChange": 0.6985,
+            "padj": 0.9995,
+            "pvalue": 0.0881
+          },
+          "SCN1B": {
+            "baseMean": 118.4374,
+            "log2FoldChange": 1.3524,
+            "padj": 0.9995,
+            "pvalue": 0.0057
+          },
+          "FPR3": {
+            "baseMean": 15.9977,
+            "log2FoldChange": -1.6921,
+            "padj": 0.9995,
+            "pvalue": 0.017
+          },
+          "DEFA4": {
+            "baseMean": 97.1494,
+            "log2FoldChange": -1.999,
+            "padj": null,
+            "pvalue": null
+          },
+          "MPO": {
+            "baseMean": 343.4051,
+            "log2FoldChange": -2.0122,
+            "padj": null,
+            "pvalue": null
+          },
+          "AZU1": {
+            "baseMean": 108.978,
+            "log2FoldChange": -2.4052,
+            "padj": null,
+            "pvalue": null
+          },
+          "CYB5D1": {
+            "baseMean": 505.7899,
+            "log2FoldChange": 1.6578,
+            "padj": 0.9995,
+            "pvalue": 0.0004
+          },
+          "KNCN": {
+            "baseMean": 3.3797,
+            "log2FoldChange": 3.0885,
+            "padj": 0.9995,
+            "pvalue": 0.0302
+          },
+          "SPDYA": {
+            "baseMean": 7.7794,
+            "log2FoldChange": 1.6015,
+            "padj": 0.9995,
+            "pvalue": 0.1004
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper reports 86 DE-mRNAs for post vs pre.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-28T20:58:20+00:00"
   }
 ]

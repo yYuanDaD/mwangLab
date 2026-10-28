@@ -28,3 +28,7 @@ zero-DEG ORA recorded as failed and the ORA status key losing its direction (row
 (rows 10, 14); inspect not using GEO `data_processing` for the matrix type (rows 8, 13).
 
 Resumed 2026-10-28 20:40 at row 19 (owner: "继续"), after patching the ORA status problem.
+
+Owner 2026-10-28 20:57: "就跑5篇" — read as: this round runs rows 19–23 only, then stops. Row 24
+(PMID41835150) had just started and was stopped; its partial folder is in
+`runs_claude/_interrupted/` (not committed). Next time start at row 24.

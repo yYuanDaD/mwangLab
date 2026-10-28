@@ -371,3 +371,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42310491 (GSE324036)
 
 - raw_tar looks for tar beside metadata, not data_root (case_runner.py:578); free-text confounding_candidates crashes with bare KeyError; inferred sex not usable as covariate without prep Details: `PMID42310491/HANDBACK.md`.
+
+## PMID38232699 (GSE214282;GSE236402)
+
+- case_runner.py:634 calls complete_pairs_subset positionally, so it raises TypeError; deseq2_tools.py:180 always shrinks log2FC, giving 40% tied GSEA ranks Details: `PMID38232699/HANDBACK.md`.
+
+## 917d28883ad57a66410a4fc20fd7e6dccd3695c6 (GSE235174)
+
+- case_runner.py:768-771 ORA forced to padj when applied rule is raw p (0 genes in); deseq2_tools.py:160 Cook's fixed, NaN p for ELANE/MPO; :105 list covariate crash Details: `917d28883ad57a66410a4fc20fd7e6dccd3695c6/HANDBACK.md`.
