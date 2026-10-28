@@ -17,3 +17,12 @@ Branch `claude/project-thread-5415h4` = `claude/project-thread-s8u35g` + the cas
 A paper counts as done when its `paper_id` is in `runs_claude/progress.csv`. A paper whose folder
 exists but is not in progress.csv was interrupted: move its folder to
 `runs_claude/_interrupted/<paper_id>_<time>/` and rerun it.
+
+## Paused 2026-10-28 after 16/211 (owner's request)
+
+Done: queue rows 2–16 and 18 (see `runs_claude/progress.csv`). Next in `run_order_211.txt`: 19.
+Nothing was interrupted. Problems seen in 2+ papers but not yet patched (candidates before resuming):
+zero-DEG ORA recorded as failed and the ORA status key losing its direction (rows 3, 12, 14);
+`alignment.key_patterns` limits (rows 4, 11); no low-count gene filter in the runner or edgeR
+(rows 6, 11); `_RAW.tar` members of different types (FPKM + counts) merged into one matrix
+(rows 10, 14); inspect not using GEO `data_processing` for the matrix type (rows 8, 13).

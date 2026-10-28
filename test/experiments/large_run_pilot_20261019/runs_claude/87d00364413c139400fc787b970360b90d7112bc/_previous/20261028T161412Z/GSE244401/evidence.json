@@ -1,0 +1,390 @@
+{
+  "schema_version": "1.0",
+  "run_id": "87d00364413c139400fc787b970360b90d7112bc",
+  "subject_id": "GSE244401",
+  "created_at": "2026-10-28T12:13:29",
+  "finished_at": "2026-10-28T12:13:47",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC11245363.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC11245363.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T12:13:29",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2077e028ff87d6677e3343af10a44e64a21fac3e36f62b1cfdec306d312c8a3f",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE244401_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE244401\\GSE244401_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T12:13:29",
+      "sha256": null,
+      "attributes": {
+        "sha256": "12177bf7574dd306a97160d0c1a55c747f23bcfada7da8832853a35bcf2c43f6",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE244401_processed_data.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE244401\\GSE244401_processed_data.txt.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T12:13:29",
+      "sha256": null,
+      "attributes": {
+        "sha256": "28f9dfda346f1ee93acc2d8286d872bb9cb7fc78ac84b736805f6d940f2ab866",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE244401"
+        ],
+        "assay": "whole-blood bulk RNA-seq (PAXgene, polyA, NovaSeq), HISAT2 + featureCounts raw counts, GRCh38 (S2.3.p1)",
+        "sample_inclusion": "23 pediatric SCA (HbSS or S/beta0) and 17 age/ethnicity-matched healthy controls with valid RNA-seq both pre and post exercise (S2.1.p1, S3.p1, TAB1); 80 samples",
+        "factors": {
+          "group": [
+            "SCA",
+            "CON"
+          ],
+          "time": [
+            "pre (baseline)",
+            "post (immediately after CIIT)"
+          ],
+          "sex": "covariate",
+          "exercise_intensity": "50% vs 70% peak workload, pooled by the authors (S2.4.p1)"
+        },
+        "repeated_measure_unit": "participant (pre and post blood draw from the same child, S2.3.p1); the paper does not state how within-subject correlation was modelled",
+        "primary_estimand": "acute exercise effect (post vs pre) on whole-blood gene expression within SCA and within controls, and the group x time interaction (difference of the exercise response SCA vs CON)",
+        "planned_contrasts": [
+          "post vs pre within SCA (S3.p1; paper: 391 up + 133 down = 524, P<0.01; Supp Table S2)",
+          "post vs pre within CON (S3.p1; paper: 333 up + 290 down = 623, P<0.01; Supp Table S3)",
+          "group x time interaction (S2.4.p1, S3.p1; paper: 101 up + 59 down = 160, P<0.01; Supp Table S4)",
+          "SCA vs CON at baseline, secondary/non-exercise (S3.p1; paper: 2264 genes, FDR<0.001 and +/-1.50 log2FC; Supp Table S1)"
+        ],
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false,
+          "source_locator": "S2.4.p1"
+        },
+        "paper_threshold_baseline": {
+          "metric": "FDR",
+          "cutoff": 0.001,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.5,
+          "source_locator": "S2.4.p1, S3.p1"
+        },
+        "paper_method": "limma-voom normalization of raw counts; limma linear models adjusted by sex with a group x time interaction term (limma v3.50.3) (S2.4.p1)",
+        "paper_results": {
+          "SCA_post_vs_pre": {
+            "up": 391,
+            "down": 133
+          },
+          "CON_post_vs_pre": {
+            "up": 333,
+            "down": 290
+          },
+          "interaction": {
+            "up": 101,
+            "down": 59
+          },
+          "baseline_SCA_vs_CON": {
+            "total": 2264,
+            "up": 2256,
+            "down": 7
+          }
+        }
+      },
+      "reason": "S2.3.p1 gives assay and GSE244401; S2.4.p1 gives limma-voom, sex adjustment, interaction term, P<0.01 for exercise effects and FDR<0.001 for baseline; S3.p1 gives the DEG counts; TAB1 gives 23 SCA (11M/12F) and 17 CON (12M/5F). The paper does not state whether pairing was modelled (subject block, duplicateCorrelation, or none).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T12:13:29"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE244401\\GSE244401_processed_data.txt.gz",
+        "owned": true,
+        "checks": [
+          "S2.3.p1 names GSE244401",
+          "GEO contact Abel Plaza-Florido, UC Irvine PERC = paper group",
+          "80 samples = 40 participants x 2 time points; 23 SCA x2 = 46 and 17 CON x2 = 34 match TAB1",
+          "metadata sex counts per group (SCA 12F/11M, CON 5F/12M) match TAB1",
+          "data_processing: HISAT2 + featureCounts raw counts matches S2.3.p1"
+        ],
+        "accession": "GSE244401",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE244401\\GSE244401_metadata.csv"
+      },
+      "reason": "The series is the paper's own deposit and its sample set matches the paper's included participants exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T12:13:29"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 80,
+        "n_metadata": 80,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.0.health status",
+              "recode": {
+                "sickle cell anemia (SCA)": "SCA",
+                "healthy control (CON)": "CON"
+              }
+            },
+            "time": {
+              "alias_of": "characteristics_ch1.2.time",
+              "recode": {
+                "time 1": "pre",
+                "time 2": "post"
+              }
+            },
+            "sex": {
+              "alias_of": "characteristics_ch1.5.Sex"
+            },
+            "intensity": {
+              "alias_of": "characteristics_ch1.4.exercise intensity"
+            },
+            "subject": {
+              "source": "title",
+              "regex": "^([A-Z]+\\d+)_T[12]$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\design_metadata.csv",
+          "sha256": "499b4d15191064255e1419236139b99b8b4f0bc02a9154109fc8b69480b659a4",
+          "levels": {
+            "grp": {
+              "SCA": 46,
+              "CON": 34
+            },
+            "time": {
+              "pre": 40,
+              "post": 40
+            },
+            "sex": {
+              "male": 46,
+              "female": 34
+            },
+            "intensity": {
+              "vigorous": 44,
+              "moderate": 36
+            },
+            "subject": {
+              "CON02": 2,
+              "CON05": 2,
+              "CON06": 2,
+              "CON07": 2,
+              "CON08": 2,
+              "CON09": 2,
+              "CON10": 2,
+              "CON11": 2,
+              "CON12": 2,
+              "CON13": 2,
+              "CON14": 2,
+              "CON17": 2,
+              "CON18": 2,
+              "CON19": 2,
+              "CON20": 2,
+              "CON21": 2,
+              "CON22": 2,
+              "SCA01": 2,
+              "SCA03": 2,
+              "SCA04": 2,
+              "SCA05": 2,
+              "SCA09": 2,
+              "SCA08": 2,
+              "SCA12": 2,
+              "SCA13": 2,
+              "SCA14": 2,
+              "SCA15": 2,
+              "SCA16": 2,
+              "SCA17": 2,
+              "SCA18": 2,
+              "SCA19": 2,
+              "SCA22": 2,
+              "SCA23": 2,
+              "SCA26": 2,
+              "SCA27": 2,
+              "SCA28": 2,
+              "SCA29": 2,
+              "SCA31": 2,
+              "SCA32": 2,
+              "SCA34": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal metadata title (80/80, inspect alignment_keys). subject = participant code from title (CON02, SCA01, ...); T1/T2 suffix agrees with characteristics 'time 1'/'time 2'; time 1 = baseline (before CIIT), time 2 = immediately after (S2.3.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T12:13:38"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE244401_processed_data.txt.gz (GEO supplementary)",
+        "paper_input": "featureCounts raw counts (S2.3.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "limma-voom",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\aligned_matrix.csv",
+          "sha256": "f6c1d8e61f7490c536bed9ddaa4228855b6b154754f414511ab8b27ed0efc733",
+          "n_features": 60675,
+          "n_samples": 80,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 20891043.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer fraction 1.0, max 2.1e7, Ensembl gene IDs, 60675 features; GEO data_processing and S2.3.p1 both say featureCounts raw counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T12:13:40"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b9c3ebdf7682fb49292b49ce6b8fac9c747e15fc9e35f659f0c58ae41f815f72",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "805689ba0a92636d791fbb2735ebeba09c1edad3deb27ff23423dc1836f91690",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f6c1d8e61f7490c536bed9ddaa4228855b6b154754f414511ab8b27ed0efc733",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "499b4d15191064255e1419236139b99b8b4f0bc02a9154109fc8b69480b659a4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e97dadc3e518b72a05ca8697a46b1dc7bf5070e91b17f198a13ea9fae41fc505",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0604e7cb6105c8201605b975fed56edf2755807bb11e35b33eb68e12a74d85e3",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "case_id": "GSE178262_wheel",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "act",
+    "zt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts (tximport lengthScaledTPM gene-level pseudo-counts from kallisto)",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts (tximport lengthScaledTPM gene-level pseudo-counts from kallisto)",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "act",
+        "zt"
+      ],
+      "levels": {
+        "act": {
+          "CTRL": 8,
+          "DA": 8
+        },
+        "zt": {
+          "Z04": 8,
+          "Z16": 8
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(act) + C(zt)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 13,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "act_DA_vs_CTRL_zt-Z04",
+        "act_DA_vs_CTRL_zt-Z16"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 16 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 16
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34142717\\GSE178262_wheel\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "act_DA_vs_CTRL_zt-Z04",
+      "kind": "simple",
+      "factor": "act",
+      "test": "DA",
+      "reference": "CTRL",
+      "within": {
+        "zt": "Z04"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "Z04",
+            "act": "DA"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "zt": "Z04",
+            "act": "CTRL"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_DA_vs_CTRL_zt-Z16",
+      "kind": "simple",
+      "factor": "act",
+      "test": "DA",
+      "reference": "CTRL",
+      "within": {
+        "zt": "Z16"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "Z16",
+            "act": "DA"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "zt": "Z16",
+            "act": "CTRL"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_Z16_vs_Z04_act-CTRL",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "Z16",
+      "reference": "Z04",
+      "within": {
+        "act": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "act": "CTRL",
+            "zt": "Z16"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "act": "CTRL",
+            "zt": "Z04"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_Z16_vs_Z04_act-DA",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "Z16",
+      "reference": "Z04",
+      "within": {
+        "act": "DA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "act": "DA",
+            "zt": "Z16"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "act": "DA",
+            "zt": "Z04"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_zt_DA_Z16_vs_CTRL_Z04",
+      "kind": "interaction",
+      "factor": "act:zt",
+      "test": "DA:Z16",
+      "reference": "CTRL:Z04",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "act": "DA",
+            "zt": "Z16"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "act": "CTRL",
+            "zt": "Z16"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "act": "DA",
+            "zt": "Z04"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "act": "CTRL",
+            "zt": "Z04"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

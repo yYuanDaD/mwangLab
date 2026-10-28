@@ -339,3 +339,27 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 4a5659c6cb4aaab7fd11fbaa777c9b851c089468 (GSE129694)
 
 - inspect downloads 11GB+ bigwig RAW.tar (case_runner.py:321, geo_tools.py:69-78; truncated tar left in data/GSE129694); NaN recode fails native.py:376; partial cols shown constant case_runner.py:240 Details: `4a5659c6cb4aaab7fd11fbaa777c9b851c089468/HANDBACK.md`.
+
+## PMID42356398 (GSE319093)
+
+- case_runner.py:297 _contained_keys threshold uses len(meta)//2, not len(cols), so inspect missed description-held column keys in multi-matrix series Details: `PMID42356398/HANDBACK.md`.
+
+## PMID42241015 (GSE324100)
+
+- case_runner.py:778 failed-ORA status key drops direction (up overwritten by down); inspect (case_runner.py:347) no warning for transposed samples-as-rows matrix Details: `PMID42241015/HANDBACK.md`.
+
+## PMID31700184 (GSE124799)
+
+- edger_tools.py:106-107 no low-count filter, 0 DEGs; edgeR QL fit takes 13 min; case_runner.py:84 key_patterns cannot map Sed_1 to Sed 1 (prep script needed) Details: `PMID31700184/HANDBACK.md`.
+
+## 2dc6a81416a9ea416897c61448c83a8fbba91f10 (GSE195585)
+
+- case_runner.py:569 raw_tar mixes TPM+count members silently; decision_contract.py:284 compares effect_metric with null cutoff, fails only at finish; zero-DEG ORA marked failed Details: `2dc6a81416a9ea416897c61448c83a8fbba91f10/HANDBACK.md`.
+
+## 87d00364413c139400fc787b970360b90d7112bc (GSE244401)
+
+- suitability.py:369-377 one-at-a-time drop of rank-breaking covariates; no TMM on limma paths (preprocess_tools.py:111, limma_voom.R:12) gives globin artifacts; voom two-group only Details: `87d00364413c139400fc787b970360b90d7112bc/HANDBACK.md`.
+
+## PMID34142717 (GSE178262)
+
+- decision_contract.py:281 null vs log2FC effect_metric false mismatch; case_runner.py:804 n_deg blank w/o primary; suitability.py:214 misses Ex3 interaction; inspect ignores lanes Details: `PMID34142717/HANDBACK.md`.

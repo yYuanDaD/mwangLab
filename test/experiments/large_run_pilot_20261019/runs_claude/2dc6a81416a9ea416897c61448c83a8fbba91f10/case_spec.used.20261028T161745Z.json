@@ -1,0 +1,213 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/2dc6a81416a9ea416897c61448c83a8fbba91f10",
+  "request": "Analyze GSE195585 for the paper (Supplementation of Specific Collagen Peptides Following High-Load Resistance Exercise Upregulates Gene Expression in Pathways Involved in Skeletal Muscle Signal Transduction; PMID 35480041): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE195585",
+      "accession": "GSE195585",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC9037237.paper.md"],
+        "metadata": "GSE195585/GSE195585_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/2dc6a81416a9ea416897c61448c83a8fbba91f10/input/GSE195585_kallisto_est_counts_gsm.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/2dc6a81416a9ea416897c61448c83a8fbba91f10/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE195585"],
+            "assay": "bulk RNA-seq (BGISEQ-500, PE), human vastus lateralis biopsies; kallisto 0.46.1 counts on GRCh38.p13 GENCODE (S2.8.p1, S2.9.p1)",
+            "sample_inclusion": "30 recreationally active young men, randomized 15 CP (collagen peptides, 'verum' in GEO) / 15 PLA; biopsies at baseline, 1 h, 4 h, 24 h after one high-load knee-extension bout (S2.1.p1, S2.4.p1, S3.p1). GEO has 119 samples: subject ID17 (CP) has no 24 h sample.",
+            "factors": {"supplement": ["PLA", "CP"], "time": ["baseline", "1h", "4h", "24h"], "repeated_measure_unit": "participant (4 biopsies each)"},
+            "primary_estimand": "Within-subject change in skeletal-muscle gene expression after acute resistance exercise (1, 4, 24 h vs pre-exercise baseline) in each supplement arm, and the CP-vs-PLA difference in that change at each time point (S2.9.p1, S3.2.p1-S3.4.p1).",
+            "planned_contrasts": [
+              "PLA: 1h/4h/24h vs baseline (S3.2.p1, S3.3.p1, Fig 3; reported as pathway NES only, no DEG counts)",
+              "CP: 1h/4h/24h vs baseline (S3.2.p1, S3.3.p1, Fig 3; pathway NES only)",
+              "CP vs PLA change at 1h/4h/24h (S2.9.p1 'comparison of changes between CP and placebo ... for every timepoint'; pathway NES only)"
+            ],
+            "paper_method": "voom logCPM + limma linear models (systemPipeR); fgsea / EnrichmentBrowser GSEA on KEGG (S2.9.p1, S2.9.p2)",
+            "normalization": "voom log2-CPM (S2.9.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.9.p1"},
+            "paper_results": "No DEG counts reported. Pathways: PI3K-Akt up at 1 h in both arms and at 4 h in CP only; MAPK up at 1 h and 4 h in both arms; CP > PLA for both at 4 h; mTOR not significant (S3.2.p1-S3.4.p1). Named genes in CP vs PLA at 4 h: ANGPT1, TGFB1 (S4.p3, S4.p6)."
+          },
+          "reasoning": "Methods S2.4.p1 and S2.9.p1 define a randomized two-arm pre/post design with four biopsies per participant; the exercise effect is the within-subject change from baseline, reported per arm (Fig 3, S3.2.p1-S3.4.p1). The paper applies FDR 0.05 without a fold-change rule (S2.9.p1). The paper's results are pathway-level only.",
+          "locator": "S2.9.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.8.p1 and S8.p1 name GSE195585", "GEO: 119 vastus lateralis samples, Homo sapiens, BGISEQ-500, kallisto counts, matching S2.8.p1/S2.9.p1", "treatment placebo/verum x time 0h/1h/4h/24h for 30 subjects (ID01-ID30) matches S2.4.p1 and S3.p1 (15/15)"]},
+          "reasoning": "The paper deposits GSE195585 and its metadata matches the described design.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": ["characteristics_ch1.0.treatment", "^(placebo|verum)$"],
+            "time": ["characteristics_ch1.1.time", "^(\\d+)h$"],
+            "subject": ["title", "_(ID\\d+)_"]
+          },
+          "recode": {
+            "grp": {"placebo": "PLA", "verum": "CP"},
+            "time": {"0": "t0", "1": "t1", "4": "t4", "24": "t24"}
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "prep_matrix.py builds the matrix from the per-sample '-raw_counts' tar members only (the TPM members are dropped) and names columns by GSM id after asserting each file name's arm, time and subject number against the GEO record. Columns therefore align exactly to the metadata index. grp/time come from the GEO characteristics; subject from the title (Muscle biopsy_ID10_Baseline).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "limma on log2(CPM+1)",
+          "final": {"source": "kallisto quant 0.46.1 est_counts summed to GENCODE genes (GEO data_processing: 'Get raw counts with kallisto quant'); file name '-raw_counts'", "paper_input": "kallisto counts transformed with voom to logCPM (S2.9.p1)"},
+          "reasoning": "Values are non-integer (about 26% of entries fractional, e.g. 52.9982), as expected for kallisto estimated counts, despite the '-raw_counts' file name; the companion TPM files were excluded. This matches the paper's stated input (kallisto counts into voom), so a log-CPM limma route reproduces the paper's scale.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time", "grp"],
+          "references": {"time": "t0", "grp": "PLA"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [
+            "time_t1_vs_t0_grp-PLA", "time_t4_vs_t0_grp-PLA", "time_t24_vs_t0_grp-PLA",
+            "time_t1_vs_t0_grp-CP", "time_t4_vs_t0_grp-CP", "time_t24_vs_t0_grp-CP",
+            "time_grp_t1_CP_vs_t0_PLA", "time_grp_t4_CP_vs_t0_PLA", "time_grp_t24_CP_vs_t0_PLA"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "repeated-measures two-arm x four-timepoint (paired change from baseline)",
+            "formula": "per follow-up time: delta(subject) = expr(follow-up) - expr(baseline); delta ~ 0 + C(grp)",
+            "estimand_type": "within-subject pre/post change after acute exercise (no non-exercise control arm)",
+            "contrasts": [
+              {"name": "time_t1_vs_t0_grp-PLA", "role": "primary", "meaning": "exercise response at 1 h in the placebo arm"},
+              {"name": "time_t4_vs_t0_grp-PLA", "role": "primary", "meaning": "exercise response at 4 h in the placebo arm"},
+              {"name": "time_t24_vs_t0_grp-PLA", "role": "primary", "meaning": "exercise response at 24 h in the placebo arm"},
+              {"name": "time_t1_vs_t0_grp-CP", "role": "secondary", "meaning": "exercise + CP response at 1 h"},
+              {"name": "time_t4_vs_t0_grp-CP", "role": "secondary", "meaning": "exercise + CP response at 4 h"},
+              {"name": "time_t24_vs_t0_grp-CP", "role": "secondary", "meaning": "exercise + CP response at 24 h"},
+              {"name": "time_grp_t1_CP_vs_t0_PLA", "role": "secondary", "meaning": "CP minus PLA change at 1 h (supplement x exercise)"},
+              {"name": "time_grp_t4_CP_vs_t0_PLA", "role": "secondary", "meaning": "CP minus PLA change at 4 h"},
+              {"name": "time_grp_t24_CP_vs_t0_PLA", "role": "secondary", "meaning": "CP minus PLA change at 24 h"},
+              {"name": "time_*_vs_t0_pooled", "role": "exploratory", "meaning": "average change over both arms (both arms exercised)"}
+            ]
+          },
+          "reasoning": "The paper analyses change from baseline per arm and the between-arm difference in change at each time point (S2.9.p1, Fig 3). Every participant exercised, so there is no non-exercise control: the time contrasts estimate the post-exercise response plus anything else that changes over the sampling day (repeated biopsy, fasting, time of day, the drink). The placebo arm is the cleanest estimate of the exercise response and is primary; the CP arm and the CP-vs-PLA difference in change are the paper's other planned estimands. Group-at-time cross-sectional contrasts are rejected because the paper compares changes, not post-exercise levels.",
+          "candidates": [
+            {"value": "pooled time contrasts as primary", "reason_rejected": "the paper reports each arm separately; pooled change kept as exploratory"},
+            {"value": "CP vs PLA at each time point (unpaired levels)", "reason_rejected": "paper compares changes from baseline; between-subject level differences ignore the pairing"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [],
+            "implementation": "within-subject differencing (follow-up minus baseline per participant); subjects without both samples are excluded per follow-up"
+          },
+          "confounding_candidates": [],
+          "reasoning": "Four biopsies per participant (S2.4.p1); participant is the repeated-measure unit and must be blocked. Subjects are nested in arm, so a fixed subject term in one joint cell model would be collinear with the arm cells; the paired-change model removes subject effects by differencing and keeps the CP-vs-PLA difference in change estimable. No batch or other covariate is recorded; all participants are male (S2.1.p1).",
+          "confidence": "high"
+        },
+        "method": {
+          "transform": "log2(CPM+1)",
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on within-subject differences of log2(CPM+1); run_multigroup_analysis paired_change",
+            "formula": "delta ~ 0 + C(grp), one fit per follow-up time",
+            "paper_route": {"method": "voom + limma (precision weights) with subject handling not stated", "status": "blocked", "reason": "the repository's limma-voom executor (tools/limma_voom_tools.py) fits two arms only, with no blocking or contrast input, so it cannot express the paired repeated-measures design; voom precision weights are not available in the paired-change executor"},
+            "deviations": ["log2(CPM+1) from preprocess_counts (low-expression filter) instead of voom logCPM with precision weights", "paired differencing to block on subject; the paper does not state how repeated measures were modelled"]
+          },
+          "reasoning": "Matrix-method policy allows limma on log2(CPM+1) for count data and needs no rounding of the kallisto estimated counts. The paired-change executor gives the per-arm change and the CP-vs-PLA difference in change, the paper's estimands, with subject blocked.",
+          "candidates": [
+            {"value": "limma-voom two-arm (tools.limma_voom_tools)", "reason_rejected": "cannot block on subject or express difference in change"},
+            {"value": "joint DESeq2 ~ subject + cell after rounding", "reason_rejected": "subject nested in arm makes the cell+subject design rank deficient; paper used limma"}
+          ],
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "deviation_note": "Paper's FDR 0.05 rule applied on the log2(CPM+1) paired-change limma route; audit adds |log2FC| > log2(1.5) for comparison only."
+          },
+          "reasoning": "S2.9.p1: 'false positive rate of alpha = 0.05 with FDR correction'; no fold-change rule.",
+          "locator": "S2.9.p1",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "No non-exercise control arm: time contrasts include effects of repeated biopsy, fasting, time of day and the drink.",
+              "Paper reports only pathway NES, no DEG counts, so DEG counts cannot be compared.",
+              "24 h pairs exclude subject ID17 (no 24 h sample).",
+              "Enrichment uses MSigDB Hallmark GSEA and Enrichr GO/KEGG ORA, not the paper's fgsea on KEGG."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "change_t4/time_grp_t4_CP_vs_t0_PLA": ["ANGPT1", "TGFB1"]
+          },
+          "reasoning": "Paper-aligned estimands on a declared deviation route (log2CPM limma with paired differencing instead of voom).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample count", "paper": "30 participants x 4 biopsies = 120 (S2.4.p1, S3.p1)", "data": "119 GEO samples; ID17 has no 24 h sample", "disposition": "executable_without_change"},
+        {"item": "matrix type", "paper": "kallisto counts into voom (S2.9.p1)", "data": "GEO '-raw_counts' files hold non-integer kallisto estimated counts; separate TPM files also present", "disposition": "executable_without_change"},
+        {"item": "repeated-measures model", "paper": "limma per time point; subject handling not stated (S2.9.p1)", "data": "subject recoverable from titles (ID01-ID30)", "disposition": "executable_with_declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "change_t1",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "t0", "followup_levels": ["t1"], "group_column": "grp", "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "time_t1_vs_t0_grp-PLA", "coefficients": {"C(grp)[PLA]": 1}},
+              {"name": "time_t1_vs_t0_grp-CP", "coefficients": {"C(grp)[CP]": 1}},
+              {"name": "time_grp_t1_CP_vs_t0_PLA", "coefficients": {"C(grp)[CP]": 1, "C(grp)[PLA]": -1}},
+              {"name": "time_t1_vs_t0_pooled", "coefficients": {"C(grp)[CP]": 0.5, "C(grp)[PLA]": 0.5}}
+            ]}},
+          "role": "primary",
+          "reasoning": "1 h minus baseline per participant; per-arm change, CP-vs-PLA difference in change, pooled change (exploratory)."
+        },
+        {
+          "name": "change_t4",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "t0", "followup_levels": ["t4"], "group_column": "grp", "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "time_t4_vs_t0_grp-PLA", "coefficients": {"C(grp)[PLA]": 1}},
+              {"name": "time_t4_vs_t0_grp-CP", "coefficients": {"C(grp)[CP]": 1}},
+              {"name": "time_grp_t4_CP_vs_t0_PLA", "coefficients": {"C(grp)[CP]": 1, "C(grp)[PLA]": -1}},
+              {"name": "time_t4_vs_t0_pooled", "coefficients": {"C(grp)[CP]": 0.5, "C(grp)[PLA]": 0.5}}
+            ]}},
+          "role": "primary",
+          "reasoning": "4 h minus baseline per participant (the paper's peak time point)."
+        },
+        {
+          "name": "change_t24",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "t0", "followup_levels": ["t24"], "group_column": "grp", "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "time_t24_vs_t0_grp-PLA", "coefficients": {"C(grp)[PLA]": 1}},
+              {"name": "time_t24_vs_t0_grp-CP", "coefficients": {"C(grp)[CP]": 1}},
+              {"name": "time_grp_t24_CP_vs_t0_PLA", "coefficients": {"C(grp)[CP]": 1, "C(grp)[PLA]": -1}},
+              {"name": "time_t24_vs_t0_pooled", "coefficients": {"C(grp)[CP]": 0.5, "C(grp)[PLA]": 0.5}}
+            ]}},
+          "role": "primary",
+          "reasoning": "24 h minus baseline per participant; ID17 has no 24 h sample and is excluded by the executor."
+        }
+      ],
+      "enrichment": [
+        {"execution": "change_t1/time_t1_vs_t0_grp-PLA", "ora": false, "gsea": true, "reasoning": "paper reports GSEA pathways for each arm vs baseline (S3.2.p1-S3.4.p1)"},
+        {"execution": "change_t4/time_t4_vs_t0_grp-PLA", "ora": false, "gsea": true, "reasoning": "paper reports GSEA pathways for each arm vs baseline"},
+        {"execution": "change_t4/time_t4_vs_t0_grp-CP", "ora": false, "gsea": true, "reasoning": "paper reports GSEA pathways for each arm vs baseline"},
+        {"execution": "change_t4/time_grp_t4_CP_vs_t0_PLA", "ora": true, "gsea": true, "reasoning": "paper's headline CP-vs-PLA pathway result at 4 h (S3.2.p1, S3.3.p1)"}
+      ]
+    }
+  ]
+}

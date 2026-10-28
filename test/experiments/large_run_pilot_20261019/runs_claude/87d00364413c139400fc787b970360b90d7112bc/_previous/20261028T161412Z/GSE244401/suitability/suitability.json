@@ -1,0 +1,301 @@
+{
+  "case_id": "GSE244401",
+  "verdict": "not_analyzable",
+  "failed": [
+    "covariance"
+  ],
+  "warnings": [],
+  "factors": [
+    "grp",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp",
+        "time"
+      ],
+      "levels": {
+        "grp": {
+          "SCA": 46,
+          "CON": 34
+        },
+        "time": {
+          "pre": 40,
+          "post": 40
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "fail",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [
+        "sex",
+        "intensity"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "grp"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "intensity",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "grp",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject) + C(sex) + C(intensity)",
+        "rank": 41,
+        "full_rank": false,
+        "residual_df": 39,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre_grp-SCA",
+        "time_post_vs_pre_grp-CON",
+        "grp_time_SCA_post_vs_CON_pre",
+        "grp_SCA_vs_CON_time-pre"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 80 samples.",
+      "metadata_sex_column": "characteristics_ch1.5.Sex",
+      "predicted": {
+        "male": 46,
+        "female": 34
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\87d00364413c139400fc787b970360b90d7112bc\\GSE244401\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "grp_SCA_vs_CON__sex-female_time-post",
+            "grp_SCA_vs_CON__sex-female_time-pre",
+            "time_post_vs_pre__sex-female_grp-CON",
+            "time_post_vs_pre__sex-female_grp-SCA",
+            "grp_time_SCA_post_vs_CON_pre__sex-female"
+          ],
+          "male": [
+            "grp_SCA_vs_CON__sex-male_time-post",
+            "grp_SCA_vs_CON__sex-male_time-pre",
+            "time_post_vs_pre__sex-male_grp-CON",
+            "time_post_vs_pre__sex-male_grp-SCA",
+            "grp_time_SCA_post_vs_CON_pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_SCA_vs_CON_time-post",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "SCA",
+      "reference": "CON",
+      "within": {
+        "time": "post"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "post",
+            "grp": "SCA"
+          },
+          "n": 23
+        },
+        {
+          "cell": {
+            "time": "post",
+            "grp": "CON"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_SCA_vs_CON_time-pre",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "SCA",
+      "reference": "CON",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "SCA"
+          },
+          "n": 23
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "CON"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_grp-CON",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "grp": "CON"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CON",
+            "time": "post"
+          },
+          "n": 17
+        },
+        {
+          "cell": {
+            "grp": "CON",
+            "time": "pre"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_grp-SCA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "grp": "SCA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "SCA",
+            "time": "post"
+          },
+          "n": 23
+        },
+        {
+          "cell": {
+            "grp": "SCA",
+            "time": "pre"
+          },
+          "n": 23
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_time_SCA_post_vs_CON_pre",
+      "kind": "interaction",
+      "factor": "grp:time",
+      "test": "SCA:post",
+      "reference": "CON:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "SCA",
+            "time": "post"
+          },
+          "n": 23
+        },
+        {
+          "cell": {
+            "grp": "CON",
+            "time": "post"
+          },
+          "n": 17
+        },
+        {
+          "cell": {
+            "grp": "SCA",
+            "time": "pre"
+          },
+          "n": 23
+        },
+        {
+          "cell": {
+            "grp": "CON",
+            "time": "pre"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

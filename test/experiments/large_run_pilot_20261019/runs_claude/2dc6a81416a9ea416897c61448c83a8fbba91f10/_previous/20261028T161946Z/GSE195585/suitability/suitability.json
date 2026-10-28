@@ -1,0 +1,675 @@
+{
+  "case_id": "GSE195585",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time",
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time",
+        "grp"
+      ],
+      "levels": {
+        "time": {
+          "t0": 30,
+          "t1": 30,
+          "t4": 30,
+          "t24": 29
+        },
+        "grp": {
+          "PLA": 60,
+          "CP": 59
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "grp"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "grp",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 33,
+        "full_rank": true,
+        "residual_df": 86,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 19,
+      "n_analyzable": 19,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_t1_vs_t0_grp-PLA",
+        "time_t4_vs_t0_grp-PLA",
+        "time_t24_vs_t0_grp-PLA",
+        "time_t1_vs_t0_grp-CP",
+        "time_t4_vs_t0_grp-CP",
+        "time_t24_vs_t0_grp-CP",
+        "time_grp_t1_CP_vs_t0_PLA",
+        "time_grp_t4_CP_vs_t0_PLA",
+        "time_grp_t24_CP_vs_t0_PLA"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 119 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 119
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\2dc6a81416a9ea416897c61448c83a8fbba91f10\\GSE195585\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_t1_vs_t0_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t1",
+      "reference": "t0",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t1"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t4_vs_t0_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t4",
+      "reference": "t0",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t4"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t0_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t0",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t24"
+          },
+          "n": 14
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t4_vs_t1_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t4",
+      "reference": "t1",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t4"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t1"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t1_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t1",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t24"
+          },
+          "n": 14
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t1"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t4_grp-CP",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t4",
+      "within": {
+        "grp": "CP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t24"
+          },
+          "n": 14
+        },
+        {
+          "cell": {
+            "grp": "CP",
+            "time": "t4"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t1_vs_t0_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t1",
+      "reference": "t0",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t1"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t4_vs_t0_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t4",
+      "reference": "t0",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t4"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t0_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t0",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t24"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t0"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t4_vs_t1_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t4",
+      "reference": "t1",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t4"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t1"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t1_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t1",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t24"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t1"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_t24_vs_t4_grp-PLA",
+      "kind": "simple",
+      "factor": "time",
+      "test": "t24",
+      "reference": "t4",
+      "within": {
+        "grp": "PLA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t24"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "grp": "PLA",
+            "time": "t4"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CP_vs_PLA_time-t0",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CP",
+      "reference": "PLA",
+      "within": {
+        "time": "t0"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CP_vs_PLA_time-t1",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CP",
+      "reference": "PLA",
+      "within": {
+        "time": "t1"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "t1",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t1",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CP_vs_PLA_time-t24",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CP",
+      "reference": "PLA",
+      "within": {
+        "time": "t24"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "t24",
+            "grp": "CP"
+          },
+          "n": 14
+        },
+        {
+          "cell": {
+            "time": "t24",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CP_vs_PLA_time-t4",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CP",
+      "reference": "PLA",
+      "within": {
+        "time": "t4"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "t4",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t4",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_grp_t1_CP_vs_t0_PLA",
+      "kind": "interaction",
+      "factor": "time:grp",
+      "test": "t1:CP",
+      "reference": "t0:PLA",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "t1",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t1",
+            "grp": "PLA"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_grp_t24_CP_vs_t0_PLA",
+      "kind": "interaction",
+      "factor": "time:grp",
+      "test": "t24:CP",
+      "reference": "t0:PLA",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "t24",
+            "grp": "CP"
+          },
+          "n": 14
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t24",
+            "grp": "PLA"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_grp_t4_CP_vs_t0_PLA",
+      "kind": "interaction",
+      "factor": "time:grp",
+      "test": "t4:CP",
+      "reference": "t0:PLA",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "t4",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "CP"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t4",
+            "grp": "PLA"
+          },
+          "n": 15
+        },
+        {
+          "cell": {
+            "time": "t0",
+            "grp": "PLA"
+          },
+          "n": 15
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

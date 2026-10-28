@@ -1,0 +1,178 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42241015",
+  "request": "Analyze GSE324100 for PMID 42241015 (Exercise training prior to and during cancer in mice preserves muscle mass, reduces tumour weight and suppresses molecular mediators of cachexia.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE324100",
+      "accession": "GSE324100",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13370699.paper.md"],
+        "metadata": "GSE324100/GSE324100_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42241015/GSE324100_normalized_counts_genes_x_samples.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42241015/prep_transpose.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE324100"],
+            "assay": "bulk total RNA-seq, gastrocnemius, BALB/c mice (S2.7.p1)",
+            "factors": {"tumour": ["PBS", "C26"], "intervention": ["SED", "PoWeR (progressive weighted wheel running, ~11.5-12 wk, 8 wk before and 3.5 wk after C26 inoculation)"], "sex": ["Male", "Female"]},
+            "sample_inclusion": "subset of n = 2-3 mice per sex per group chosen to represent group averages (S2.7.p1); FIG8 legend: PBS SED n=6, PBS PoWeR n=6, C26 SED n=5, C26 PoWeR n=5; sexes collapsed (S2.8.p1, S3.7.p1)",
+            "primary_estimand": "effect of PoWeR training on gastrocnemius gene expression in healthy mice (PBS PoWeR vs PBS SED) and in tumour-bearing mice (C26 PoWeR vs C26 SED); tumour effect C26 SED vs PBS SED as context",
+            "planned_contrasts": [
+              "PBS PoWeR vs PBS SED (S3.7.p1; paper: 42 DEGs)",
+              "C26 SED vs PBS SED (S3.7.p1; paper: 2740 DEGs)",
+              "C26 PoWeR vs C26 SED (S3.7.p1; paper: 963 DEGs)"
+            ],
+            "repeated_measure_unit": "none; one gastrocnemius per independent mouse",
+            "normalization": "DESeq2 median ratio after excluding genes with max count < 5 (S2.7.p1)",
+            "paper_method": "DESeq2 in Partek Flow, sexes pooled, genes with geometric mean < 1 excluded before BH correction (S2.7.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.7.p1"},
+            "paper_results": {"PBS_PoWeR_vs_PBS_SED": 42, "C26_SED_vs_PBS_SED": 2740, "C26_PoWeR_vs_C26_SED": 963, "corrected_mito_genes": 131}
+          },
+          "reasoning": "S2.7.p1 gives assay, normalisation, DESeq2 and BH FDR < 0.05 with no fold-change rule. S3.7.p1 gives the three pairwise comparisons and their DEG counts; FIG8 legend gives n per group; S2.8.p1 says sexes were collapsed for all presented analyses.",
+          "confidence": "high",
+          "locator": "S2.7.p1; S3.7.p1; FIG8"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S15.p1 names GSE324100 as the RNA-seq deposit", "GEO: gastrocnemius, BALB/c, PBS/C26 x Sedentary/PoWeR, 22 samples = 6+6+5+5 as in FIG8", "deposited matrix Group/Sex labels agree with GEO titles/sex for all 22 libraries (prep_transpose.py)"]},
+          "reasoning": "Accession cited in data availability (S15.p1); sample counts and groups match the FIG8 legend exactly; the supplementary matrix carries its own group labels which agree with metadata.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"lib": ["description", "Library name: (P\\d+_S\\d+)"]},
+          "key_column": "lib",
+          "patterns": {
+            "tum": ["title", "^(?:Male|Female)(PBS|C26)"],
+            "ex": ["title", "(SED|PoWeR)\\d+$"]
+          },
+          "aliases": {"sex": "characteristics_ch1.2.Sex"},
+          "combine": {"grp": ["tum", "ex"]},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are library names (P1_S25 ...); GEO description holds 'Library name: P1_S25' (one has a trailing underscore, P6_S30_, which the regex drops). Exact match on the derived key. Group labels from title; grp combines tumour and intervention into four cells.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "DESeq2 median-ratio normalized counts (linear normalized, non-integer)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "integer fraction 0.03, max 1.35e6, no negatives; file name says Normalized_counts and data_processing states 'Normalized with DESeq2 median ratio ... Supplementary files format and content: DESeq2 Normalized Counts'. Raw counts were not deposited (supplementary_file_1 NONE on samples; only this series file). The paper's input is raw counts into DESeq2 (S2.7.p1), so the paper input is unavailable.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "PBS_SED"},
+          "organism": "Mouse",
+          "planned": ["grp_PBS_PoWeR_vs_PBS_SED", "grp_C26_SED_vs_PBS_SED", "grp_C26_PoWeR_vs_C26_SED"],
+          "covariate_candidates": ["sex"],
+          "final": {
+            "analysis_type": "multi-group (4 cells, one model, planned pairwise contrasts)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_PBS_PoWeR_vs_PBS_SED", "control": "PBS_SED", "treatment": "PBS_PoWeR", "role": "primary"},
+              {"name": "grp_C26_PoWeR_vs_C26_SED", "control": "C26_SED", "treatment": "C26_PoWeR", "role": "primary"},
+              {"name": "grp_C26_SED_vs_PBS_SED", "control": "PBS_SED", "treatment": "C26_SED", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Paper compares the four tumour x intervention cells pairwise with sexes pooled (S3.7.p1, S2.8.p1). One model on all 22 samples with planned pairwise contrasts, never pooled levels. Exercise contrasts within PBS and within C26 are primary; the tumour effect is secondary context. Rejected: a two-factor main-effect model (paper does not report main effects, and an exercise main effect would average over tumour status, which the paper treats separately); sex-split primary analyses (paper pooled; per-sex is exploratory).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [{"name": "sex", "disposition": "sensitivity: ~ sex + grp; paper pooled sexes without a stated sex term"}]
+          },
+          "confidence": "medium",
+          "confounding_candidates": ["sex"],
+          "reasoning": "Independent animals, one muscle each, single batch (characteristics batch = 1). Sex is roughly balanced across cells (3M/3F, 3M/3F, 2M/3F, 2M/3F) so not confounded with grp. The paper pooled sexes and states no sex covariate, so the primary model is ~ grp; a ~ sex + grp model is run as sensitivity."
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(x+1) of DESeq2-normalized counts",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on raw counts", "status": "blocked", "reason": "only DESeq2 median-ratio normalized (non-integer) counts were deposited; raw counts unavailable and rounding normalized counts is not a documented recipe"},
+            "deviations": ["limma on log2(normalized+1) instead of DESeq2 Wald on raw counts", "no Partek geometric-mean < 1 independent filter reproduced; the depositor already removed genes with max count < 5"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized expression -> log2(x+1) then limma. DESeq2 on normalized counts would misstate the mean-variance model and size factors.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "deviation_note": "paper rule (BH FDR < 0.05, no fold-change cutoff) applied to the limma deviation route; audit rule adds |log2FC| > log2(1.5) for comparison only"
+          },
+          "reasoning": "S2.7.p1: BH-adjusted P < 0.05 defines DEGs; no fold-change rule stated.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["paper used DESeq2 on raw counts; only normalized counts deposited, so limma on log2(normalized+1) is used", "n = 5-6 per cell (2-3 per sex); per-sex analyses are exploratory"]
+          },
+          "paper_counts": {
+            "primary/grp_PBS_PoWeR_vs_PBS_SED": 42,
+            "primary/grp_C26_SED_vs_PBS_SED": 2740,
+            "primary/grp_C26_PoWeR_vs_C26_SED": 963
+          },
+          "paper_genes": {
+            "primary/grp_PBS_PoWeR_vs_PBS_SED": ["Myl6b", "Erfe", "Sbk2", "Igf1", "Macir", "Phka1"],
+            "primary/grp_C26_PoWeR_vs_C26_SED": ["Cs", "Sdhb"]
+          },
+          "reasoning": "Paper counts and named genes from S3.7.p1.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "input matrix", "paper": "DESeq2 on raw counts (S2.7.p1)", "data": "only DESeq2 median-ratio normalized counts deposited, samples as rows", "disposition": "declared_deviation"},
+        {"item": "matrix orientation", "paper": "n/a", "data": "deposited file is samples x genes with three label columns; transposed by prep_transpose.py after checking labels against GEO", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "primary",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_PBS_PoWeR_vs_PBS_SED", "grp_C26_SED_vs_PBS_SED", "grp_C26_PoWeR_vs_C26_SED"]},
+          "role": "primary",
+          "reasoning": "one limma model ~ grp on all 22 samples; the paper's three pairwise comparisons"
+        },
+        {
+          "name": "sex_adjusted",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_PBS_PoWeR_vs_PBS_SED", "grp_C26_SED_vs_PBS_SED", "grp_C26_PoWeR_vs_C26_SED"], "covariates": ["sex"]},
+          "role": "sensitivity",
+          "reasoning": "same contrasts with sex as an additive covariate"
+        },
+        {
+          "name": "female_only",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_PBS_PoWeR_vs_PBS_SED", "grp_C26_SED_vs_PBS_SED", "grp_C26_PoWeR_vs_C26_SED"]},
+          "subset": {"sex": ["Female"]},
+          "role": "exploratory",
+          "reasoning": "per-sex split (suitability: per-sex analysis yes; paper Appendix FIG16 stratified by sex); females n=3 per cell"
+        },
+        {
+          "name": "male_only",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_PBS_PoWeR_vs_PBS_SED", "grp_C26_SED_vs_PBS_SED", "grp_C26_PoWeR_vs_C26_SED"]},
+          "subset": {"sex": ["Male"]},
+          "role": "exploratory",
+          "reasoning": "per-sex split; males n=3 in PBS cells, n=2 in C26 cells (small n, exploratory only)"
+        }
+      ],
+      "enrichment": [
+        {"execution": "primary/grp_PBS_PoWeR_vs_PBS_SED", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "paper reports GO for up/down DEGs (S2.7.p1)"},
+        {"execution": "primary/grp_PBS_PoWeR_vs_PBS_SED", "ora": true, "gsea": false, "direction": "down", "ranking_metric": "stat", "reasoning": "down-regulated ORA"},
+        {"execution": "primary/grp_C26_PoWeR_vs_C26_SED", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "paper FIG8G: up GO terms aerobic respiration / mitochondria"},
+        {"execution": "primary/grp_C26_PoWeR_vs_C26_SED", "ora": true, "gsea": false, "direction": "down", "ranking_metric": "stat", "reasoning": "paper FIG8H: down GO terms ECM / macrophage activation"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,501 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/87d00364413c139400fc787b970360b90d7112bc",
+  "request": "Analyze GSE244401 for the paper (Whole-Blood Transcriptome Analysis Reveals Distinct Gene Expression Signatures in Pediatric Patients with Sickle Cell Anemia Before and After Exercise): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5[1m]) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE244401",
+      "accession": "GSE244401",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC11245363.paper.md"
+        ],
+        "metadata": "GSE244401/GSE244401_metadata.csv",
+        "matrix": "GSE244401/GSE244401_processed_data.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE244401"
+            ],
+            "assay": "whole-blood bulk RNA-seq (PAXgene, polyA, NovaSeq), HISAT2 + featureCounts raw counts, GRCh38 (S2.3.p1)",
+            "sample_inclusion": "23 pediatric SCA (HbSS or S/beta0) and 17 age/ethnicity-matched healthy controls with valid RNA-seq both pre and post exercise (S2.1.p1, S3.p1, TAB1); 80 samples",
+            "factors": {
+              "group": [
+                "SCA",
+                "CON"
+              ],
+              "time": [
+                "pre (baseline)",
+                "post (immediately after CIIT)"
+              ],
+              "sex": "covariate",
+              "exercise_intensity": "50% vs 70% peak workload, pooled by the authors (S2.4.p1)"
+            },
+            "repeated_measure_unit": "participant (pre and post blood draw from the same child, S2.3.p1); the paper does not state how within-subject correlation was modelled",
+            "primary_estimand": "acute exercise effect (post vs pre) on whole-blood gene expression within SCA and within controls, and the group x time interaction (difference of the exercise response SCA vs CON)",
+            "planned_contrasts": [
+              "post vs pre within SCA (S3.p1; paper: 391 up + 133 down = 524, P<0.01; Supp Table S2)",
+              "post vs pre within CON (S3.p1; paper: 333 up + 290 down = 623, P<0.01; Supp Table S3)",
+              "group x time interaction (S2.4.p1, S3.p1; paper: 101 up + 59 down = 160, P<0.01; Supp Table S4)",
+              "SCA vs CON at baseline, secondary/non-exercise (S3.p1; paper: 2264 genes, FDR<0.001 and +/-1.50 log2FC; Supp Table S1)"
+            ],
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.01,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false,
+              "source_locator": "S2.4.p1"
+            },
+            "paper_threshold_baseline": {
+              "metric": "FDR",
+              "cutoff": 0.001,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.5,
+              "source_locator": "S2.4.p1, S3.p1"
+            },
+            "paper_method": "limma-voom normalization of raw counts; limma linear models adjusted by sex with a group x time interaction term (limma v3.50.3) (S2.4.p1)",
+            "paper_results": {
+              "SCA_post_vs_pre": {
+                "up": 391,
+                "down": 133
+              },
+              "CON_post_vs_pre": {
+                "up": 333,
+                "down": 290
+              },
+              "interaction": {
+                "up": 101,
+                "down": 59
+              },
+              "baseline_SCA_vs_CON": {
+                "total": 2264,
+                "up": 2256,
+                "down": 7
+              }
+            }
+          },
+          "reasoning": "S2.3.p1 gives assay and GSE244401; S2.4.p1 gives limma-voom, sex adjustment, interaction term, P<0.01 for exercise effects and FDR<0.001 for baseline; S3.p1 gives the DEG counts; TAB1 gives 23 SCA (11M/12F) and 17 CON (12M/5F). The paper does not state whether pairing was modelled (subject block, duplicateCorrelation, or none).",
+          "confidence": "high",
+          "locator": "S2.4.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S2.3.p1 names GSE244401",
+              "GEO contact Abel Plaza-Florido, UC Irvine PERC = paper group",
+              "80 samples = 40 participants x 2 time points; 23 SCA x2 = 46 and 17 CON x2 = 34 match TAB1",
+              "metadata sex counts per group (SCA 12F/11M, CON 5F/12M) match TAB1",
+              "data_processing: HISAT2 + featureCounts raw counts matches S2.3.p1"
+            ]
+          },
+          "reasoning": "The series is the paper's own deposit and its sample set matches the paper's included participants exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {
+            "grp": "characteristics_ch1.0.health status",
+            "time": "characteristics_ch1.2.time",
+            "sex": "characteristics_ch1.5.Sex",
+            "intensity": "characteristics_ch1.4.exercise intensity"
+          },
+          "patterns": {
+            "subject": [
+              "title",
+              "^([A-Z]+\\d+)_T[12]$"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "sickle cell anemia (SCA)": "SCA",
+              "healthy control (CON)": "CON"
+            },
+            "time": {
+              "time 1": "pre",
+              "time 2": "post"
+            }
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal metadata title (80/80, inspect alignment_keys). subject = participant code from title (CON02, SCA01, ...); T1/T2 suffix agrees with characteristics 'time 1'/'time 2'; time 1 = baseline (before CIIT), time 2 = immediately after (S2.3.p1).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "limma-voom",
+          "final": {
+            "source": "GSE244401_processed_data.txt.gz (GEO supplementary)",
+            "paper_input": "featureCounts raw counts (S2.3.p1)"
+          },
+          "reasoning": "integer fraction 1.0, max 2.1e7, Ensembl gene IDs, 60675 features; GEO data_processing and S2.3.p1 both say featureCounts raw counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp",
+            "time"
+          ],
+          "references": {
+            "grp": "CON",
+            "time": "pre"
+          },
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [
+            "time_post_vs_pre_grp-SCA",
+            "time_post_vs_pre_grp-CON",
+            "grp_time_SCA_post_vs_CON_pre",
+            "grp_SCA_vs_CON_time-pre"
+          ],
+          "covariate_candidates": [
+            "sex"
+          ],
+          "strata": [],
+          "final": {
+            "analysis_type": "repeated-measures 2x2 (group between subjects x time within subjects)",
+            "formula": "within each group: DESeq2 ~ subject + time (paired); interaction: limma on within-subject differences ~ 0 + C(grp) (exploratory); baseline: DESeq2 ~ sex + grp on pre samples",
+            "contrasts": [
+              {
+                "name": "time_post_vs_pre_grp-SCA",
+                "control": "pre",
+                "treatment": "post",
+                "role": "primary"
+              },
+              {
+                "name": "time_post_vs_pre_grp-CON",
+                "control": "pre",
+                "treatment": "post",
+                "role": "primary"
+              },
+              {
+                "name": "grp_time_SCA_post_vs_CON_pre",
+                "control": "CON response",
+                "treatment": "SCA response",
+                "role": "primary"
+              },
+              {
+                "name": "grp_SCA_vs_CON_time-pre",
+                "control": "CON",
+                "treatment": "SCA",
+                "role": "secondary"
+              }
+            ]
+          },
+          "reasoning": "S1.p4/S2.4.p1: within-group post vs pre and the group x time interaction are the exercise estimands; baseline SCA vs CON is a disease (associational) comparison kept as secondary. Exercise intensity is not a factor because the authors pooled 50% and 70% (S2.4.p1, S4.p7). Post-exercise SCA vs CON is not a paper contrast and is not run.",
+          "candidates": [
+            {
+              "value": "intensity as a factor (moderate vs vigorous)",
+              "reason_rejected": "paper pooled intensities (S2.4.p1); exploratory only in the paper with no reported result"
+            },
+            {
+              "value": "unpaired ~ grp*time + sex ignoring subject",
+              "reason_rejected": "pre and post samples come from the same child; ignoring the pairing misstates the variance of within-subject effects"
+            }
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": [
+              {
+                "name": "sex",
+                "disposition": "paper adjusts by sex (S2.4.p1); constant within subject, so it cancels in the paired post-pre differences; included as a covariate in the baseline between-group model"
+              },
+              {
+                "name": "intensity",
+                "disposition": "not modelled; authors pooled intensities (S2.4.p1)"
+              }
+            ]
+          },
+          "confounding_candidates": [
+            "sex",
+            "intensity"
+          ],
+          "reasoning": "Each participant contributes a pre and a post sample, so the participant is the blocking unit for the exercise contrasts; it is handled by taking within-subject differences (paired change), equivalent to a subject fixed-effect model. Group and sex are between-subject and are not estimable alongside subject fixed effects, which is why the baseline comparison is fitted on pre samples only with sex as a covariate. Sex enters the baseline DESeq2 model as a covariate; intensity is subject-level as well and was left out of the covariate candidates (it is not in the paper's model).",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), paired ~ subject + time within each group; limma paired-change on log2(CPM+1) for the interaction (exploratory)",
+            "formula": "~ subject + time (SCA and CON fitted separately); interaction: delta ~ 0 + C(grp), C(grp)[SCA]-C(grp)[CON]; baseline: ~ sex + grp",
+            "paper_route": {
+              "method": "limma-voom with sex-adjusted group x time interaction model",
+              "status": "blocked",
+              "reason": "tools/limma_voom_tools.py:60 run_limma_voom_analysis is two-group only (no covariates, blocking or interaction) and tools/limma_voom.R:12 uses colSums library sizes without TMM; tools/multigroup_tools.py fits limma on log2(CPM+1) from tools/preprocess_tools.py:111-113, also without TMM. In this whole-blood data globin genes take ~70% of reads in SCA vs ~26% in controls and fall ~2-3 points after exercise, so library-size-only normalization shifts every non-globin gene (first attempt: SCA post vs pre 3923 up / 3 down; baseline 16587 down)."
+            },
+            "deviations": [
+              "within-group exercise effects: DESeq2 median-of-ratios (composition-robust) with subject blocking instead of limma-voom",
+              "interaction: no composition-robust executor supports subject-nested-in-group plus an interaction; limma on log2(CPM+1) within-subject differences is run and labelled exploratory (expected upward bias in SCA-minus-CON change)",
+              "pairing modelled explicitly; the paper does not state its pairing model; sex cancels within subject",
+              "baseline: DESeq2 ~ sex + grp on pre samples instead of limma-voom"
+            ]
+          },
+          "transform": "log2(CPM+1)",
+          "reasoning": "Raw featureCounts counts. Whole blood with SCA reticulocytosis: globin read fraction 0.72 (SCA pre) vs 0.27 (CON pre), and it drops after exercise in 34/40 subjects. Library-size CPM (no TMM) therefore inflates non-globin genes after exercise and deflates them in SCA at baseline. DESeq2 size factors (median of ratios) are robust to this and support subject blocking, so they carry the within-group and baseline contrasts. The case-level log2(CPM+1) transform is used only by the exploratory interaction fit.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.01,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.01,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_cutoff": null
+            },
+            "deviation_note": "Exercise rule P<0.01 with no fold-change cutoff (S2.4.p1, S3.p1 'FC ranged from ...' is descriptive). The baseline table has a different paper rule (FDR<0.001, +/-1.50 log2FC); its count under that rule is computed from the result table and reported separately; the applied P<0.01 count for baseline is not comparable."
+          },
+          "reasoning": "S2.4.p1: 'P-value cut-off of 0.01 for exercise effects on gene expression'; audit rule BH padj<0.05 shown for reference.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "paper used limma-voom; within-group effects here use DESeq2 with subject blocking",
+              "interaction comes from a library-size-normalized limma fit and is exploratory (globin composition shift)",
+              "paper's pairing model is not stated",
+              "raw P<0.01 over ~20k genes carries many expected false positives (~200 per contrast)"
+            ]
+          },
+          "paper_counts": {
+            "exercise_SCA": 524,
+            "exercise_CON": 623,
+            "exercise/interaction_SCA_vs_CON": 160
+          },
+          "paper_genes": {
+            "exercise_SCA": [
+              "CD247",
+              "DUSP2",
+              "GZMB",
+              "PRF1"
+            ],
+            "exercise_CON": [
+              "DUSP2",
+              "PRF1",
+              "FOS",
+              "FOSB",
+              "CSF2"
+            ],
+            "exercise/interaction_SCA_vs_CON": [
+              "FOS",
+              "FOSB",
+              "CSF2"
+            ]
+          },
+          "reasoning": "S3.p1 counts; S4.p3 and S4.p5 named genes.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "normalization/weights",
+          "paper": "limma-voom (S2.4.p1)",
+          "data": "globin reads ~70% (SCA) vs ~26% (CON) and change with exercise; available voom/limma executors have no TMM, so DESeq2 carries the within-group contrasts",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "pairing",
+          "paper": "not stated; model 'adjusted by sex' with interaction term",
+          "data": "every participant has a pre and post sample (40 complete pairs)",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "baseline DEG total",
+          "paper": "2264 genes, but 2256 up + 7 down = 2263 (S3.p1)",
+          "data": "n/a",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "composition bias in library-size normalization",
+          "paper": "not discussed",
+          "data": "first attempt with log2(CPM+1) limma gave SCA post vs pre 3923 up / 3 down and baseline 16587 down (see _previous/)",
+          "disposition": "declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "exercise_SCA",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post",
+            "covariate_columns": "subject",
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "SCA"
+            ]
+          },
+          "matrix": "aligned",
+          "role": "primary",
+          "reasoning": "SCA post vs pre with subject blocking (~ subject + time), composition-robust size factors (S3.p1 Supp Table S2)."
+        },
+        {
+          "name": "exercise_CON",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post",
+            "covariate_columns": "subject",
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "CON"
+            ]
+          },
+          "matrix": "aligned",
+          "role": "primary",
+          "reasoning": "CON post vs pre with subject blocking (S3.p1 Supp Table S3)."
+        },
+        {
+          "name": "exercise",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "paired_change",
+              "subject_column": "subject",
+              "time_column": "time",
+              "baseline_level": "pre",
+              "followup_levels": [
+                "post"
+              ],
+              "group_column": "grp",
+              "formula": "~ 0 + C(grp)",
+              "contrasts": [
+                {
+                  "name": "SCA_post_vs_pre",
+                  "coefficients": {
+                    "C(grp)[SCA]": 1
+                  }
+                },
+                {
+                  "name": "CON_post_vs_pre",
+                  "coefficients": {
+                    "C(grp)[CON]": 1
+                  }
+                },
+                {
+                  "name": "interaction_SCA_vs_CON",
+                  "coefficients": {
+                    "C(grp)[SCA]": 1,
+                    "C(grp)[CON]": -1
+                  }
+                }
+              ]
+            }
+          },
+          "role": "exploratory",
+          "reasoning": "Only executor that fits the group x time interaction with within-subject pairing: limma on the 40 post-pre differences; group means give within-group effects and their difference the interaction. log2(CPM+1) without TMM biases SCA changes upward, so all three tables are exploratory; the interaction is the one used for comparison with the paper."
+        },
+        {
+          "name": "baseline_SCA_vs_CON",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "CON",
+            "treatment_group": "SCA",
+            "covariate_columns": "sex",
+            "alpha": 0.001
+          },
+          "subset": {
+            "time": [
+              "pre"
+            ]
+          },
+          "matrix": "aligned",
+          "role": "secondary",
+          "reasoning": "Paper's sex-adjusted baseline disease comparison (S3.p1), pre samples only; associational, not an exercise effect."
+        },
+        {
+          "name": "voom_unpaired_SCA",
+          "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post"
+          },
+          "subset": {
+            "grp": [
+              "SCA"
+            ]
+          },
+          "matrix": "aligned",
+          "role": "sensitivity",
+          "reasoning": "Paper's voom normalization, without pairing or sex (executor limits); shows how much the pairing and weighting choices move the counts. No TMM in tools/limma_voom.R, so this also shows the composition artifact."
+        },
+        {
+          "name": "voom_unpaired_CON",
+          "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post"
+          },
+          "subset": {
+            "grp": [
+              "CON"
+            ]
+          },
+          "matrix": "aligned",
+          "role": "sensitivity",
+          "reasoning": "As voom_unpaired_SCA, for controls. No TMM in tools/limma_voom.R, so this also shows the composition artifact."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "exercise_SCA",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports KEGG pathways for the SCA exercise response (TAB3)"
+        },
+        {
+          "execution": "exercise_CON",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports KEGG pathways for the CON exercise response (TAB4)"
+        },
+        {
+          "execution": "exercise/interaction_SCA_vs_CON",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports IL-17 signaling for the interaction (TAB5); exploratory table, GSEA only"
+        }
+      ]
+    }
+  ]
+}

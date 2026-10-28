@@ -75,3 +75,26 @@
 ## 已修的工具问题（本轮）
 
 联合模型（全样本拟合后逐个提取比较），适用性报告进 design 关口，raw count 按数值判断，运动设计检查，X/Y 性别校验，连续协变量，估计计数取整，无标题行的 HTSeq 合并，缺性别列时报错，组内 / 组间受试者因子。仍未修的见 `PROBLEMS.md`。
+
+## 211 篇运行：第一批（2026-10-28，按你的要求暂停在 16/211）
+
+case spec 路线（`tools/case_runner.py`）。每篇一个独立子代理，最多 5 篇并行。16 篇全部通过决策记录校验（VALID）：12 篇跑完，4 篇在 design 门正确拒绝（数据里没有可用的运动对照）。工具补丁见 `../PATCHES_211.md`，续跑方法见 `../RESUME_211.md`。
+
+| 队列号 | 文章 | 系列 | 状态 | 我们 vs 原文 | 用时（分钟） |
+|---|---|---|---|---|---:|
+| 4 | PMID40623475 | GSE302911 | finished | 6/6 contrasts (0h n=2, exploratory); DEGs U0/U6/U72/T0/T6/T72 351/386/0/372/303/9; paper gives no counts (Fig4A bars, myonuclear subset only) | 6.8 |
+| 2 | PMID39393048 | GSE267512 | finished | 1/1 contrast (POST vs PRE, FDR<0.05): 211 DEGs (119 up/92 down) vs paper 214 (122/92); named-gene FDRs match the paper to about 0.01 | 6.8 |
+| 3 | PMID42711121 | GSE324257 | finished | 4 planned + 1 exploratory contrasts; EPS-in-Ctrl 0 DEGs (paper: qPCR only); KO vs Ctrl basal 129 at padj<0.001 vs paper 1275 (6v6 sensitivity 927) | 7.6 |
+| 8 | PMID34358431 | GSE174785 | refused | 0/2 contrasts run; GSE174785 has no exercise arm (soleus vs EDL ECs x WT vs Atf4-KO, sedentary). Paper: 782 WT RmEC vs WmEC DEGs (padj<0.05, LFC>1); not exercise | 3.1 |
+| 6 | PMID35133080 | GSE186045 | finished | 2/2 contrasts (limma log2TPM deviation, no counts deposited); padj<0.05 DEGs CON 820 / EX 11 vs paper 1352 / 132; GO terms match | 7.0 |
+| 5 | PMID37365374 | GSE230002 | finished | 2/2 contrasts (limma paired on log2CPM, edgeR blocked); DEGs 122/0 vs paper 877/1 at FDR<0.05,/log2FC/>0.3; 12/12 key genes up, 5 pass; OXPHOS enrichment matches | 7.2 |
+| 9 | PMID40993371 | GSE302867 | finished | 4/4 contrasts (limma log2FPKM, paper DESeq2 blocked); DEGs WTEx/WTSed 24, KOEx/KOSed 164, KO/WT sed 111, ex 318; paper gives no counts; Gdf15 ok, WT OXPHOS sign opposite | 6.1 |
+| 10 | 0f65e49e563e | GSE236613 | finished | 2/2 contrasts (DESeq2, p<0.05 & FC 1.2); RE vs NE 754 vs paper 4423; NE vs Sham 2737 vs 6697; qPCR gene directions match (Acp5/Fos/Fosb/Calcr) | 5.4 |
+| 13 | PMID42679010 | GSE344550 | refused | 0/2 contrasts run; refused at design: GSE344550 is Candida-infected vs uninfected human macrophages (BP/LBP x time), no exercise arm; paper gives no DEG counts (/log2FC/>1) | 3.1 |
+| 7 | 4a5659c6cb4a | GSE129694 | refused | 0/2 contrasts run; refused at design: exercise arms (13.5 wk) fully confounded with sacrifice time vs CONT SCI (11.5 wk); paper reports no DEGs/threshold | 18.6 |
+| 16 | PMID42356398 | GSE319093 | refused | 0/0 exercise contrasts; RNA-seq is genotype/hypoxia/HFrD/AAV/C2C12 only; exercise (swim test S2.5) never sequenced; refused at design | 4.3 |
+| 12 | PMID42241015 | GSE324100 | finished | 3/3 contrasts (limma deviation, FDR<0.05): PBS-ex 0 vs 42, C26-tumour 2165 vs 2740, C26-ex 255 vs 963; paper genes same direction, padj>0.05 | 17.2 |
+| 11 | PMID31700184 | GSE124799 | finished | 2/2 contrasts; DESeq2 DEGs 28/14 (Ex/ExSed vs Sed, padj<0.05 default); paper no cutoff or count (Supp T2); edgeR 0/0; paper's cell-cycle GSEA drop not seen | 22.7 |
+| 14 | 2dc6a81416a9 | GSE195585 | finished | 9 paper contrasts+3 pooled; PLA 1/4/24h DEGs 2101/4869/3185, CP 2117/5675/2628, CPvsPLA 0/0/0; paper gives no DEG counts (KEGG NES only); ANGPT1/TGFB1 ns | 18.7 |
+| 15 | 87d00364413c | GSE244401 | finished | 3/3 exercise contrasts, P<0.01: SCA 1262 vs 524, CON 883 vs 623, interaction 114 vs 160 (exploratory); baseline 795 vs 2264 | 17.3 |
+| 18 | PMID34142717 | GSE178262 | finished | 6/6 contrasts; wheel DA vs CTRL 2257/369 vs paper 2094/368 (FDR<=0.05); 4 treadmill tables 1457/2335/912/2904, paper counts only in Fig5 Venns | 10.6 |

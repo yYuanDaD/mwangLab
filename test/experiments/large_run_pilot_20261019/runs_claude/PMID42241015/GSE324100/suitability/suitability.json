@@ -1,0 +1,285 @@
+{
+  "case_id": "GSE324100",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "DESeq2 median-ratio normalized counts (linear normalized, non-integer)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "DESeq2 median-ratio normalized counts (linear normalized, non-integer)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "PBS_SED": 6,
+          "PBS_PoWeR": 6,
+          "C26_SED": 5,
+          "C26_PoWeR": 5
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "sex"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp) + C(sex)",
+        "rank": 5,
+        "full_rank": true,
+        "residual_df": 17,
+        "min_cell_size": 2
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 7,
+      "n_analyzable": 7,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_PBS_PoWeR_vs_PBS_SED",
+        "grp_C26_SED_vs_PBS_SED",
+        "grp_C26_PoWeR_vs_C26_SED"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 22 samples.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "predicted": {
+        "female": 11,
+        "male": 10,
+        "unknown": 1
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42241015\\GSE324100\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "grp_C26_SED_vs_C26_PoWeR__sex-female",
+            "grp_PBS_PoWeR_vs_C26_PoWeR__sex-female",
+            "grp_C26_PoWeR_vs_PBS_SED__sex-female",
+            "grp_PBS_PoWeR_vs_C26_SED__sex-female",
+            "grp_C26_SED_vs_PBS_SED__sex-female",
+            "grp_PBS_PoWeR_vs_PBS_SED__sex-female"
+          ],
+          "male": [
+            "grp_PBS_PoWeR_vs_PBS_SED__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_C26_SED_vs_C26_PoWeR",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "C26_SED",
+      "reference": "C26_PoWeR",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "C26_SED"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "C26_PoWeR"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_PBS_PoWeR_vs_C26_PoWeR",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "PBS_PoWeR",
+      "reference": "C26_PoWeR",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "PBS_PoWeR"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "C26_PoWeR"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_C26_PoWeR_vs_PBS_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "C26_PoWeR",
+      "reference": "PBS_SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "C26_PoWeR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "PBS_SED"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_PBS_PoWeR_vs_C26_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "PBS_PoWeR",
+      "reference": "C26_SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "PBS_PoWeR"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "C26_SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_C26_SED_vs_PBS_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "C26_SED",
+      "reference": "PBS_SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "C26_SED"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "PBS_SED"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_PBS_PoWeR_vs_PBS_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "PBS_PoWeR",
+      "reference": "PBS_SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "PBS_PoWeR"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "PBS_SED"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_C26_PoWeR_vs_C26_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "C26_PoWeR",
+      "reference": "C26_SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "C26_PoWeR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "C26_SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
