@@ -1,0 +1,335 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34358431",
+  "subject_id": "GSE174785",
+  "created_at": "2026-10-28T11:54:12",
+  "finished_at": "2026-10-28T11:54:41",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8432967.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC8432967.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T11:54:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "b742ccc470bf903a0bd4a6e8a490795c7a35d625649101a26d376a29d326d6f1",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE174785_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T11:54:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T11:54:31",
+      "sha256": null,
+      "attributes": {
+        "sha256": "34e990ca8bcb71e62f2d5b097f68b9581d94da5e47b63ae5d66f3b8f8bf228e3",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE174785"
+        ],
+        "other_accessions_in_paper": {
+          "GSE158984": "scRNA-seq of muscle ECs, including sedentary vs 14-day voluntary wheel running (S2.5.p1, KRT/TAB1 line 177); not the accession assigned here"
+        },
+        "assay": "bulk RNA-seq (Smart-seq2 / TruSeq per GEO), kallisto quantification, FACS-sorted muscle endothelial cells (S4.4.3.p1)",
+        "samples": "20 samples: RmECs (soleus, oxidative) and WmECs (EDL, glycolytic) from WT and Atf4 EC-knockout (Atf4^dEC/dEC) mice, n=5 per group (GEO titles; S2.6.p1, Fig6B-D)",
+        "factors": {
+          "muscle_ec": [
+            "RmEC (soleus)",
+            "WmEC (EDL)"
+          ],
+          "genotype": [
+            "WT",
+            "Atf4 EC-KO"
+          ]
+        },
+        "exercise_factor_in_this_accession": "none: all bulk samples are sedentary/unperturbed mice; exercise (14-day wheel running) appears only in histology, EdU/flow, and the scRNA-seq of GSE158984 (S2.5.p1, Fig5, Fig6E-I)",
+        "primary_estimand": "Baseline transcriptional difference between oxidative (RmEC) and glycolytic (WmEC) capillary ECs, and its dependence on Atf4 (S2.2.p2, S2.6.p1). Not an exercise effect.",
+        "planned_contrasts": [
+          "WT RmEC vs WT WmEC (S2.2.p2, Fig2G, S2.6.p1; paper: 782 DEGs)",
+          "Atf4-KO RmEC vs Atf4-KO WmEC (S2.6.p1, Fig6B; paper: 211 remaining of WT DEGs)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "source_locator": "S2.6.p1; Fig6C legend; S4.4.3.p2 ('log fold change > 1 and adjusted p-value < 0.05')"
+        },
+        "paper_method": "DESeq2 on kallisto counts, genes with <=1 count across all samples removed (S4.4.3.p1)"
+      },
+      "reason": "The paper's exercise question (wheel running, S2.5.p1) is answered with histology, EdU, flow cytometry and scRNA-seq (GSE158984). The bulk RNA-seq deposited as GSE174785 (DA.p1, TAB1 line 178: 'RNA-seq raw data for RmECs versus WmECs, WT and Atf4 dEC/dEC') compares muscle-EC subtypes and genotypes in non-exercised mice.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:54:31"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 and key resources table name GSE174785 as the bulk RNA-seq of RmECs vs WmECs, WT and Atf4 dEC/dEC",
+          "20 GSM samples = 2 muscles x 2 genotypes x 5 reps, matching Fig6D design",
+          "data_processing: kallisto + DESeq2, matching S4.4.3.p1"
+        ],
+        "accession": "GSE174785",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv"
+      },
+      "reason": "Paper data-availability statement and GEO metadata agree.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:54:31"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 20,
+        "n_metadata": 20,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "muscle": {
+              "alias_of": "source_name_ch1",
+              "recode": {
+                "Soleus muscle": "R",
+                "Extensor digitorum longus muscle": "W"
+              }
+            },
+            "genotype": {
+              "alias_of": "characteristics_ch1.2.genotype",
+              "recode": {
+                "Wild type": "WT",
+                "EC specific Atf4-/-": "KO"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\design_metadata.csv",
+          "sha256": "d666a1e0d9ba2fdb78c9c00119cfe5be31c83f60dbd45558453b0828e7a7d7be",
+          "levels": {
+            "muscle": {
+              "R": 10,
+              "W": 10
+            },
+            "genotype": {
+              "KO": 10,
+              "WT": 10
+            }
+          }
+        }
+      },
+      "reason": "Merged-tar columns are GSM ids that equal the metadata index exactly (inspect: 20/20). Muscle (source_name_ch1) and genotype define the groups.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:54:34"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "feature_level": "transcript (ENSMUST), kallisto est_counts column per sample (sums 8.5e6-1.6e7, not TPM which sums to 1e6)",
+        "paper_input": "kallisto counts to DESeq2 (S4.4.3.p1)",
+        "matrix_type": "estimated counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\aligned_matrix.csv",
+          "sha256": "34e990ca8bcb71e62f2d5b097f68b9581d94da5e47b63ae5d66f3b8f8bf228e3",
+          "n_features": 129439,
+          "n_samples": 20,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 2263230.0,
+          "median": 0.0,
+          "integer_fraction": 0.6186,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Per-sample kallisto abundance files have est_counts and tpm; the merged matrix holds est_counts (column sum of GSM5328123 = 1.411e7 equals its est_counts sum). Fractional estimated counts at transcript level; a gene-level summary would be needed before DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T11:54:35"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none (refused)",
+        "available_factors": [
+          "muscle EC subtype R vs W",
+          "genotype KO vs WT"
+        ],
+        "exercise_contrast": null,
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "GEO characteristics carry only cell type, strain, genotype and muscle; treatment_protocol describes tamoxifen only. Paper S2.5.p1 and Fig6E-I put exercise in histology/EdU, not in this bulk RNA-seq.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise arm in GSE174785: all 20 samples are sedentary WT or Atf4-EC-KO mice split by muscle (soleus vs EDL). The only identifiable contrasts are muscle EC subtype and genotype, which are not exercise effects; the paper's exercise transcriptomics is scRNA-seq in GSE158984."
+      },
+      "recorded_at": "2026-10-28T11:54:41"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4ab852cef27598df7add354b0f42622f57663b4cbb20c172ea87fccd7c5dc63f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "142211682da03bedd4646abf0345ab40d7491ec5152a78a8fc0735ad5458f973",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "34e990ca8bcb71e62f2d5b097f68b9581d94da5e47b63ae5d66f3b8f8bf228e3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d666a1e0d9ba2fdb78c9c00119cfe5be31c83f60dbd45558453b0828e7a7d7be",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dbbc8b958a9492218cd75501c08b6209cf50768ac6ebb4386161038c856de588",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34358431\\GSE174785\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8cd75bfb89c9416e0340a4ca254bbb93a6eac68bacb8b5bda54788abc2cc9e1e",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

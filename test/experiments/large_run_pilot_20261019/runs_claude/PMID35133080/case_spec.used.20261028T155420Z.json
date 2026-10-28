@@ -1,0 +1,190 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35133080",
+  "request": "Analyze GSE186045 for PMID 35133080 (RNA sequencing on muscle biopsy from a 5-week bed rest study reveals the effect of exercise and potential interactions with dorsal root ganglion neurons.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE186045",
+      "accession": "GSE186045",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC8823189.paper.md"],
+        "metadata": "GSE186045/GSE186045_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35133080/prep/GSE186045_tpm_meanTPMgt0.1.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID35133080/prep/repair_tpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE186045"],
+            "assay": "bulk stranded mRNA-seq, 76-bp single-end, HiSeq; human vastus lateralis needle biopsies (S2.2.p1)",
+            "design": "13 subjects (BR-CON n=6: 5M+1F; BR-EX n=7: 5M+2F), biopsy pre and post 35-day -6 deg head-down-tilt bed rest; BR-EX did rowing ergometry 6 d/wk + biweekly resistance training (S2.1.p1, TAB1, S2.2.p1)",
+            "factors": {"grp": ["BR-CON (bed rest only)", "BR-EX (bed rest + exercise countermeasure)"], "time": ["baseline (pre)", "post-intervention (post)"], "subject": "13 subjects, each sampled pre and post"},
+            "sample_inclusion": "all 26 libraries (13 subjects x 2) in the unblinded DESeq2 analysis of 'male and female subjects' (S3.2.p1); females were excluded only from the blinded analysis (S2.4.p1)",
+            "primary_estimand": "Within-group change post-bed-rest vs baseline, separately in BR-CON and BR-EX (nested design, paired within subject); the exercise effect is read as the contrast between these two responses (1352 vs 132 DEGs) (S2.5.p1, S3.2.p1, ABS.p1)",
+            "planned_contrasts": [
+              "BR-CON post vs pre, paired within subject (S3.2.p1; paper: 1352 DEGs, 591 up / 761 down)",
+              "BR-EX post vs pre, paired within subject (S3.2.p1; paper: 132 DEGs, 69 up / 63 down)"
+            ],
+            "repeated_measure_unit": "subject (pre and post biopsy from the same volunteer; S2.5.p1 'Pairing was done for within-subject pre- and post-biopsies')",
+            "normalization": "STAR GeneCounts -> DESeq2 counts model; StringTie TPM re-normalized over protein-coding genes used for blinded analysis and gene filter (S2.3.p3, S2.5.p1)",
+            "paper_method": "DESeq2, nested design (group-specific condition effects, subject nested in group), BH-adjusted p (S2.5.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "gene_filter": "protein-coding genes with TPM > 0.1", "source_locator": "S2.5.p1"},
+            "paper_results": {"BR-CON": {"n": 1352, "up": 591, "down": 761}, "BR-EX": {"n": 132, "up": 69, "down": 63}, "shared": 36, "locator": "S3.2.p1, TAB2"},
+            "enrichment": "Enrichr GO BP on up and down DEG sets per group (S2.5.p1, TAB3, TAB4)"
+          },
+          "reasoning": "S2.1.p1/TAB1 give the two randomized arms and the pre/post biopsies; S2.5.p1 states DESeq2 with a nested design, within-subject pairing, protein-coding genes TPM > 0.1 and BH-adjusted p < 0.05; S3.2.p1 gives counts per arm. The paper has no direct interaction test; the exercise effect is the comparison of the two within-arm responses.",
+          "confidence": "high",
+          "locator": "S2.5.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper S2.3.p3 names GSE186045", "GEO subject IDs 1A..6B2, sex and arm match TAB1 for all 13 subjects", "26 libraries = 13 subjects x pre/post as in TAB1", "matrix has 17,730 coding genes, the paper's protein-coding count (S3.1.p1)"]},
+          "reasoning": "Accession cited in the paper's methods; per-sample subject, sex and arm agree with Table 1; the deposited TPM table is the only processed matrix (GEO data_processing: tpm_table.xlsx with TPMs for non-mitochondrial coding genes).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(\\S+-(?:pre|post)) "]},
+          "aliases": {
+            "subject": "characteristics_ch1.0.subject id",
+            "grp": "characteristics_ch1.0.subject id",
+            "sex": "characteristics_ch1.1.Sex",
+            "time": "characteristics_ch1.3.sample regimen"
+          },
+          "combine": {"cpost": ["grp", "time"], "epost": ["grp", "time"]},
+          "recode": {
+            "grp": {"1A": "ex", "1B": "con", "2A": "con", "2B": "ex", "3A": "ex", "3B": "con", "4A": "ex", "4B": "con", "5A": "con", "5B": "ex", "6A": "con", "6B1": "ex", "6B2": "ex"},
+            "time": {"pre-bedrest": "pre", "post 5 week bedrest": "post"},
+            "cpost": {"con_post": "1", "con_pre": "0", "ex_post": "0", "ex_pre": "0"},
+            "epost": {"ex_post": "1", "ex_pre": "0", "con_post": "0", "con_pre": "0"}
+          },
+          "exclude_samples": {},
+          "final": {"key": "GEO title prefix '<subject>-<pre|post>' equals the repaired matrix column names", "grp_source": "subject -> arm from paper TAB1; agrees with GEO 'sample intervention' on every post sample (pre samples carry 'Not applicable')", "indicators": "cpost/epost = 1 for post samples of BR-CON / BR-EX, used for the nested design"},
+          "reasoning": "Matrix columns (1A-PRE ...) were renamed to lower-case pre/post in prep/repair_tpm.py so they equal the key extracted from GEO titles; exact name match, no positional alignment. The arm is a subject-level attribute (GEO lists it only on post samples), so grp is recoded from subject ID using TAB1, which agrees with GEO.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma",
+          "final": {"source": "GSE186045_tpm_table (GEO supplementary), repaired header; filtered to mean TPM > 0.1 across 26 libraries (paper S2.5.p1 filter), 14,027 of 17,730 genes", "paper_input": "DESeq2 on STAR GeneCounts read counts, which are not deposited in GEO"},
+          "reasoning": "Values are non-integer (14.7% integer, mostly zeros), each column sums to exactly 1e6, file named tpm_table and GEO data_processing says Transcripts per Million: linear TPM, not counts. The paper's DESeq2 input (read counts) is not available.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp", "time"],
+          "references": {"grp": "con", "time": "pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_post_vs_pre_grp-con", "time_post_vs_pre_grp-ex"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "nested repeated measures (time within arm, subject blocked)",
+            "formula": "~ C(subject) + cpost + epost",
+            "contrasts": [
+              {"name": "con_post_vs_pre", "suitability_name": "time_post_vs_pre_grp-con", "role": "primary", "description": "BR-CON post vs pre within subject"},
+              {"name": "ex_post_vs_pre", "suitability_name": "time_post_vs_pre_grp-ex", "role": "primary", "description": "BR-EX post vs pre within subject"},
+              {"name": "ex_vs_con_change", "suitability_name": "grp_time_ex_post_vs_con_pre", "role": "secondary", "description": "difference of the two within-subject changes (exercise x time interaction); not tested in the paper"}
+            ]
+          },
+          "candidates": [
+            {"value": "grp ex vs con at post only (between subjects)", "reason_rejected": "ignores pairing; the paper analyzes within-subject change"},
+            {"value": "pooled time post vs pre", "reason_rejected": "paper estimates group-specific condition effects, not a pooled bed-rest effect"}
+          ],
+          "reasoning": "S2.5.p1: nested design, group-specific post-vs-baseline effects with within-subject pairing. Subject fixed effects absorb the arm main effect; cpost/epost are arm-specific post indicators, giving the two planned within-arm changes and their difference (interaction, secondary). Females included as in S3.2.p1.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [
+              {"name": "subject", "disposition": "included"},
+              {"name": "grp", "disposition": "nested: arm is constant within subject, its main effect is absorbed by the subject terms"},
+              {"name": "sex", "disposition": "nested: constant within subject, absorbed by the subject terms"}
+            ]
+          },
+          "confounding_candidates": [],
+          "reasoning": "Pre and post biopsies from the same volunteer (S2.5.p1 pairing). Sex and age are subject-level and absorbed by subject blocking; no batch or lane column in GEO. Library depth differs for females (TAB1, ~80M vs ~25M reads) but TPM is depth-normalized and pairing is within subject.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (lmFit + eBayes, inmoose) on log2(TPM+1)",
+            "formula": "~ C(subject) + cpost + epost",
+            "paper_route": {"method": "DESeq2 nested design on read counts", "status": "blocked", "reason": "only TPM is deposited (GEO supplementary tpm_table); STAR GeneCounts counts are not in GEO, and rounding TPM to integers is not valid for a count model"},
+            "deviations": ["limma on log2(TPM+1) instead of DESeq2 on counts", "gene filter implemented as mean TPM > 0.1 over all 26 libraries (paper says only 'TPM > 0.1')", "GEO table excludes mitochondrially encoded genes (data_processing), which the paper may have kept"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix and method policy: linear TPM -> log2(x+1) then limma. One model on all 26 samples mirrors the paper's single nested DESeq2 fit with shared variance.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "S2.5.p1 and TAB2/TAB5 use BH-adjusted p < 0.05 with no fold-change cutoff; S3.2.p1 writes 'p < 0.05', recorded as an audit rule only (raw p < 0.05)"
+          },
+          "reasoning": "S2.5.p1: 'an adjusted p-value of <0.05'; all Table 2 adj. p values are below 0.05. No effect-size cutoff stated.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["limma on log2(TPM+1) instead of DESeq2 on counts: DEG counts not expected to match exactly", "n = 6 vs 7 subjects; females have ~3x library depth", "interaction contrast is our addition, secondary"]},
+          "paper_counts": {"nested/con_post_vs_pre": 1352, "nested/ex_post_vs_pre": 132},
+          "paper_genes": {
+            "nested/con_post_vs_pre": ["PDK4", "CXCL9", "ANGPTL4", "OTUD1", "GAL3ST1", "KIT", "PDE11A", "ATF3", "NMRK2", "CA14", "IGFN1", "LRRC52", "SLC26A9", "ETNPPL", "LBP", "PGF", "IL18", "CCL2"],
+            "nested/ex_post_vs_pre": ["PDP1", "GABBR2", "KIT", "SV2B", "C1QTNF9", "NR4A3", "LBP", "LRRC52", "OTUD1", "XIRP1", "CXCL12", "JAM2"]
+          },
+          "reasoning": "Paper route blocked (no counts); run is the declared limma deviation on the same nested contrasts.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE input", "paper": "DESeq2 on read counts (S2.5.p1)", "data": "GEO has only TPM (tpm_table), no counts", "disposition": "declared_deviation: limma on log2(TPM+1)"},
+        {"item": "threshold wording", "paper": "methods S2.5.p1: adjusted p < 0.05; results S3.2.p1: 'p < 0.05'", "data": "n/a", "disposition": "use adjusted p (methods + Table 2 adj. p); raw p as audit"},
+        {"item": "gene filter", "paper": "protein-coding genes with TPM > 0.1 (S2.5.p1)", "data": "17,730 coding genes deposited", "disposition": "implemented as mean TPM > 0.1 across 26 libraries (14,027 genes)"},
+        {"item": "mitochondrial genes", "paper": "mitochondrial respiration genes reported in enrichment (TAB3)", "data": "GEO table contains non-mitochondrial coding genes only", "disposition": "executable_without_change (nuclear-encoded OXPHOS genes are present)"}
+      ],
+      "executions": [
+        {
+          "name": "nested",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {
+            "analysis_type": "multilevel",
+            "formula": "~ C(subject) + cpost + epost",
+            "contrasts": [
+              {"name": "con_post_vs_pre", "coefficients": {"cpost": 1}},
+              {"name": "ex_post_vs_pre", "coefficients": {"epost": 1}},
+              {"name": "ex_vs_con_change", "coefficients": {"epost": 1, "cpost": -1}}
+            ]}},
+          "role": "primary",
+          "reasoning": "One limma fit on all 26 samples, subject fixed effects, arm-specific post effects (paper's nested design)."
+        },
+        {
+          "name": "nested_male",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "subset": {"sex": ["male"]},
+          "args": {"plan": {
+            "analysis_type": "multilevel",
+            "formula": "~ C(subject) + cpost + epost",
+            "contrasts": [
+              {"name": "con_post_vs_pre", "coefficients": {"cpost": 1}},
+              {"name": "ex_post_vs_pre", "coefficients": {"epost": 1}},
+              {"name": "ex_vs_con_change", "coefficients": {"epost": 1, "cpost": -1}}
+            ]}},
+          "role": "exploratory",
+          "reasoning": "Male-only (5 vs 5 matched pairs, the blinded-analysis set); females (1 con, 2 ex) are too few for a female-only fit."
+        }
+      ],
+      "enrichment": [
+        {"execution": "nested/con_post_vs_pre", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "paper TAB3 GO BP on BR-CON up DEGs"},
+        {"execution": "nested/con_post_vs_pre", "ora": true, "gsea": false, "direction": "down", "ranking_metric": "stat", "reasoning": "paper TAB3 GO BP on BR-CON down DEGs"},
+        {"execution": "nested/ex_post_vs_pre", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "paper TAB4 GO BP on BR-EX up DEGs"},
+        {"execution": "nested/ex_post_vs_pre", "ora": true, "gsea": false, "direction": "down", "ranking_metric": "stat", "reasoning": "paper TAB4 GO BP on BR-EX down DEGs"}
+      ]
+    }
+  ]
+}

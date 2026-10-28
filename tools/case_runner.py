@@ -307,7 +307,9 @@ def _contained_keys(cols: set[str], meta: pd.DataFrame) -> list[dict]:
 def _candidate_files(data_dir: Path) -> list[Path]:
     files = [p for p in sorted(data_dir.iterdir()) if p.is_file()
              and p.name.lower().endswith(_EXTENSIONS) and "metadata" not in p.name.lower()]
-    return files
+    # download_supplementary_files writes a .csv next to each .xlsx; profile that copy once.
+    names = {p.name.lower() for p in files}
+    return [p for p in files if not (p.suffix.lower() == ".xlsx" and p.name.lower()[:-5] + ".csv" in names)]
 
 
 def inspect_series(accession: str, *, data_root: str = "data", merge_tar: bool = False,

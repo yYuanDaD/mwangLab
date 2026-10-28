@@ -311,3 +311,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42711121 (GSE324257)
 
 - inspect reads .xlsx as text (case_runner.py:54/native.py:215); gene lookup has no Ensembl-to-symbol mapping (case_runner.py:400); zero-DEG ORA recorded failed, not not_run (:754) Details: `PMID42711121/HANDBACK.md`.
+
+## PMID34358431 (GSE174785)
+
+- inspect calls the merged kallisto tar matrix 'linear_normalized or estimated_counts' and does not say it used est_counts (checked by hand) Details: `PMID34358431/HANDBACK.md`.
+
+## PMID35133080 (GSE186045)
+
+- inspect cannot read .xlsx (case_runner.py:54, native.py:201); Excel title row breaks header/keys; no gene-filter option in runner; multigroup eBayes lacks trend Details: `PMID35133080/HANDBACK.md`.
+
+## PMID37365374 (GSE230002)
+
+- tools/suitability.py:75-80 substring type map sends 'log2 CPM...prior count' to counts route (no cpm key); inspect xlsx UnicodeDecodeError; paired_change AveExpr is diff mean Details: `PMID37365374/HANDBACK.md`.

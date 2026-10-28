@@ -1,0 +1,170 @@
+{
+  "case_id": "GSE230002",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "log2 CPM (edgeR moderated log2CPM, prior count), gene symbols",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "log2 CPM (edgeR moderated log2CPM, prior count), gene symbols",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "Post": 13,
+          "Pre": 13
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 14,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 2,
+      "n_analyzable": 2,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_Post_vs_Pre_arm-EX",
+        "time_Post_vs_Pre_arm-DIET"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 26 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 16,
+        "male": 10
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37365374\\GSE230002\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_Post_vs_Pre__sex-female"
+          ],
+          "male": [
+            "time_Post_vs_Pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_Post_vs_Pre_arm-DIET",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "arm": "DIET"
+      },
+      "cells": [
+        {
+          "cell": {
+            "arm": "DIET",
+            "time": "Post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "arm": "DIET",
+            "time": "Pre"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_arm-EX",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "arm": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "arm": "EX",
+            "time": "Post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "arm": "EX",
+            "time": "Pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

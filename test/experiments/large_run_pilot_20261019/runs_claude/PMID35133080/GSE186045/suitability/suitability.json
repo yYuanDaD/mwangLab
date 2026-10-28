@@ -1,0 +1,277 @@
+{
+  "case_id": "GSE186045",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "TPM",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "TPM",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp",
+        "time"
+      ],
+      "levels": {
+        "grp": {
+          "ex": 14,
+          "con": 12
+        },
+        "time": {
+          "post": 13,
+          "pre": 13
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "grp"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "grp",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 14,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre_grp-con",
+        "time_post_vs_pre_grp-ex"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 26 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "male": 20,
+        "unknown": 6
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35133080\\GSE186045\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [],
+          "male": [
+            "grp_ex_vs_con__sex-male_time-post",
+            "grp_ex_vs_con__sex-male_time-pre",
+            "time_post_vs_pre__sex-male_grp-con",
+            "time_post_vs_pre__sex-male_grp-ex",
+            "grp_time_ex_post_vs_con_pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_ex_vs_con_time-post",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "ex",
+      "reference": "con",
+      "within": {
+        "time": "post"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "post",
+            "grp": "ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "post",
+            "grp": "con"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_ex_vs_con_time-pre",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "ex",
+      "reference": "con",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "con"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_grp-con",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "grp": "con"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "con",
+            "time": "post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "con",
+            "time": "pre"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_grp-ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "grp": "ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "ex",
+            "time": "post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "ex",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_time_ex_post_vs_con_pre",
+      "kind": "interaction",
+      "factor": "grp:time",
+      "test": "ex:post",
+      "reference": "con:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "ex",
+            "time": "post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "con",
+            "time": "post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "ex",
+            "time": "pre"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "con",
+            "time": "pre"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

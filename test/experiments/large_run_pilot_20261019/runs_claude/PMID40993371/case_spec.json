@@ -1,0 +1,187 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40993371",
+  "request": "Analyze GSE302867 for PMID 40993371 (Cardiac adaptation to endurance exercise training requires suppression of GDF15 via PGC-1α.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE302867",
+      "accession": "GSE302867",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13158892.paper.md"],
+        "metadata": "GSE302867/GSE302867_metadata.csv",
+        "matrix": "GSE302867/GSE302867_processed_data_fpkm.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE302867"],
+            "assay": "bulk polyA RNA-seq of whole mouse heart (Illumina HiSeq2500, Novogene)",
+            "design": "2x2 factorial: genotype (WT vs cardiomyocyte-specific PGC-1a KO) x exercise (sedentary vs 6-week voluntary wheel running), n=5 male mice per group (Fig 2e/f, Fig 4a legends)",
+            "sample_inclusion": "20 hearts, 5 per group; all male",
+            "primary_estimand": "Effect of 6-week voluntary wheel endurance training on the heart transcriptome within each genotype (WT_Ex vs WT_Sed; KO_Ex vs KO_Sed), Fig 2e-f",
+            "planned_contrasts": [
+              "WT_Ex vs WT_Sed (Fig 2e GSEA Hallmark OXPHOS NES=5.14 FDR=8.8e-5; Fig 2f; no DEG count reported)",
+              "KO_Ex vs KO_Sed (Fig 2e GSEA OXPHOS NES=-10.22 FDR=8.2e-5; no DEG count reported)",
+              "KO_Sed vs WT_Sed (Fig 4a volcano, Gdf15 most upregulated; no DEG count reported)",
+              "KO_Ex vs WT_Ex (Fig 4a volcano, Gdf15 most upregulated; no DEG count reported)"
+            ],
+            "repeated_measure_unit": "none; each mouse contributes one heart",
+            "normalization": "DESeq2 normalized counts",
+            "paper_method": "DESeq2 (S4.10.p1); GSEA classic mode on Hallmark MH and M8 gene sets",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "source_locator": "S4.10.p1"
+            },
+            "paper_results": "No DEG counts given in text or figure legends; GSEA OXPHOS up in WT training, depleted in KO training (FIG11 e); Gdf15 top upregulated KO vs WT in both states (S2.4.p2, FIG13 a)"
+          },
+          "reasoning": "S4.10.p1: DESeq2, DE if |log2FC|>1 and BH-adjusted P<0.05. FIG11 (Fig 2e-f): bulk cardiac RNA-seq n=5/group, WT_Ex vs WT_Sed and KO_Ex vs KO_Sed GSEA. FIG13 (Fig 4a): KO_Sed vs WT_Sed and KO_Ex vs WT_Ex volcano plots, DESeq2 FDR<0.05. S2.4.p2: 4 groups sequenced. DA.p1 names GSE302867. The request is the exercise effect, so the two within-genotype training contrasts are primary; the genotype contrasts are secondary.",
+          "confidence": "high",
+          "locator": "S4.10.p1; FIG11; FIG13; S2.4.p2; DA.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 deposits bulk heart RNA-seq under GSE302867",
+              "GEO: Heart, Mus musculus, male, HiSeq 2500 (matches S4.10.p1), 20 samples = 4 groups x 5 (matches Fig 2e n=5/group)",
+              "sample titles WT_Sed/KO_Sed/WT_Ex/KO_Ex match the paper's group names"
+            ]
+          },
+          "reasoning": "Data availability statement DA.p1 names GSE302867; platform, tissue, sex, and group structure all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["description", "^Library name: (\\S+)$"]},
+          "key_column": "key",
+          "patterns": {"grp": ["title", "^((?:WT|KO)_(?:Sed|Ex))_\\d+$"]},
+          "recode": {"grp": {"WT_Sed": "WTSed", "KO_Sed": "KOSed", "WT_Ex": "WTEx", "KO_Ex": "KOEx"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns G1-1..G4-5 equal the library names in the GEO description field (inspect: 20/20 match). Group comes from the title (WT_Sed_1 etc.), which agrees with the genotype and treatment characteristics columns. Level names recoded to be formula-safe.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "reasoning": "File name processed_data_fpkm; GEO data_processing: featureCounts then FPKM normalization, supplementary file contains FPKM; integer fraction 0.17, max 69409, non-negative. Paper analysed counts with DESeq2, but raw counts were not deposited, so the paper's input is unavailable.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WTSed"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_WTEx_vs_WTSed", "grp_KOEx_vs_KOSed", "grp_KOSed_vs_WTSed", "grp_KOEx_vs_WTEx"],
+          "final": {
+            "analysis_type": "multi-group (2x2 factorial as four cell means, one model)",
+            "design_column": "grp",
+            "formula": "~ 0 + grp",
+            "contrasts": [
+              {"name": "grp_WTEx_vs_WTSed", "control": "WTSed", "treatment": "WTEx", "role": "primary"},
+              {"name": "grp_KOEx_vs_KOSed", "control": "KOSed", "treatment": "KOEx", "role": "primary"},
+              {"name": "grp_KOSed_vs_WTSed", "control": "WTSed", "treatment": "KOSed", "role": "secondary"},
+              {"name": "grp_KOEx_vs_WTEx", "control": "WTEx", "treatment": "KOEx", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled Ex vs Sed across genotypes", "reason_rejected": "paper analyses training within each genotype and the genotypes respond in opposite directions (Fig 2e); pooling would average opposite effects"},
+            {"value": "separate two-group fits per genotype", "reason_rejected": "one model on all 20 samples gives a shared variance estimate and is the paper's 4-group layout"}
+          ],
+          "reasoning": "Paper's exercise estimands are simple effects of training within genotype (FIG11 e); genotype effects within state are Fig 4a. One cell-means model with four planned contrasts keeps every factor level separate.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent mice, one heart each; GEO batch field is a single date for all samples, sex constant male, age constant 14-16 weeks. No blocking unit.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (lmFit + contrasts.fit + eBayes, cell-means model on log2(FPKM+1))",
+            "formula": "~ 0 + grp",
+            "paper_route": {"method": "DESeq2 on raw counts", "status": "blocked", "reason": "GEO deposits FPKM only; raw featureCounts counts were not deposited, and FPKM must not be rounded into counts"},
+            "deviations": ["limma on log2(FPKM+1) instead of DESeq2 on counts; fold changes are on the log2(FPKM+1) scale and are compressed for low-expression genes"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix-method policy: FPKM -> log2(x+1) -> limma. Paper route DESeq2 blocked by missing counts.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper rule applied to limma on log2(FPKM+1); log2FC from log FPKM is not identical to DESeq2 shrunken/MLE log2FC"
+          },
+          "reasoning": "S4.10.p1: up if log2FC>1, down if log2FC<-1, BH-adjusted P<0.05. Audit rule padj<0.05 without fold-change cutoff for comparison with Fig 4a (FDR<0.05).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "paper reports no DEG counts for any contrast, so counts cannot be compared",
+              "limma on log2(FPKM+1) replaces the paper's DESeq2 on counts",
+              "paper's GSEA used DESeq2 normalized expression with phenotype permutation; ours is preranked on the limma t statistic"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "joint/grp_KOSed_vs_WTSed": ["Gdf15", "Ppargc1a"],
+            "joint/grp_KOEx_vs_WTEx": ["Gdf15", "Ppargc1a"]
+          },
+          "reasoning": "S2.4.p2/FIG13: Gdf15 the most upregulated gene in KO vs WT in both states; Ppargc1a is the knocked-out gene (expected down). Training contrasts have only pathway-level claims (OXPHOS GSEA), checked through enrichment.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "DE input and method",
+          "paper": "DESeq2 on counts (S4.10.p1; GEO data_processing)",
+          "data": "only FPKM deposited",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "training duration",
+          "paper": "6 weeks voluntary wheel running for molecular analyses (S4.4.p1, FIG11)",
+          "data": "GEO age 14-16 weeks, treatment 'exercised'; consistent",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {
+            "analysis_type": "multilevel",
+            "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "grp_WTEx_vs_WTSed", "coefficients": {"C(grp)[WTEx]": 1, "C(grp)[WTSed]": -1}},
+              {"name": "grp_KOEx_vs_KOSed", "coefficients": {"C(grp)[KOEx]": 1, "C(grp)[KOSed]": -1}},
+              {"name": "grp_KOSed_vs_WTSed", "coefficients": {"C(grp)[KOSed]": 1, "C(grp)[WTSed]": -1}},
+              {"name": "grp_KOEx_vs_WTEx", "coefficients": {"C(grp)[KOEx]": 1, "C(grp)[WTEx]": -1}}
+            ]}},
+          "role": "primary",
+          "reasoning": "one limma cell-means model on all 20 samples with the four planned contrasts in the paper's direction (run_joint_limma only offers KOSed_vs_KOEx / WTEx_vs_KOEx for the non-reference pairs, i.e. reversed sign); the two training contrasts are the primary exercise estimands, genotype contrasts secondary"
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_WTEx_vs_WTSed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper Fig 2e: Hallmark GSEA for WT training (OXPHOS up)"},
+        {"execution": "joint/grp_KOEx_vs_KOSed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper Fig 2e: Hallmark GSEA for KO training (OXPHOS depleted)"}
+      ]
+    }
+  ]
+}

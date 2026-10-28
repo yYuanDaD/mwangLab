@@ -1,0 +1,167 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37365374",
+ "request": "Analyze GSE230002 for PMID 37365374 (Dietary weight loss-induced improvements in metabolic function are enhanced by exercise in people with obesity and prediabetes.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [{
+  "case_id": "GSE230002",
+  "accession": "GSE230002",
+  "inputs": {
+   "paper": ["test/experiments/paper_screen_20261019/papers/PMC10515726.paper.md"],
+   "metadata": "GSE230002/GSE230002_metadata.csv",
+   "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37365374/prep/GSE230002_log2cpm_filtered.csv",
+   "raw_tar": false,
+   "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID37365374/prep/filter_low_expression.py"]
+  },
+  "gates": {
+   "paper_reconstruction": {
+    "final": {
+     "accessions": ["GSE230002"],
+     "assay": "bulk total-RNA RNA-seq of vastus lateralis muscle (S3.10.2.p1, S1.4.p1)",
+     "design": "two parallel arms (concurrent trials NCT02706288 / NCT02706262), each sampled Before and After ~10% weight loss; Diet+EX (calorie restriction + multi-modal exercise) vs Diet-ONLY (calorie restriction alone) (S3.1.p1)",
+     "sample_inclusion": "RNA-seq on Diet-ONLY n=6 and Diet+EX n=7 (one Diet+EX sample excluded for poor RNA quality) (FIG8, S3.10.2.p1)",
+     "factors": {"arm": ["Diet-ONLY", "Diet+EX"], "time": ["Before", "After"]},
+     "repeated_measure_unit": "participant (paired Before/After biopsies)",
+     "primary_estimand": "Within-arm change in muscle gene expression After vs Before weight loss, in Diet+EX (the exercise-containing arm) and in Diet-ONLY; the exercise contribution is read as the difference between the two arms' responses (S1.4.p1, S3.13.2.1.p1). The paper tested the between-arm difference only for selected genes by ANCOVA (FIG8).",
+     "planned_contrasts": [
+      "Diet+EX After vs Before (S1.4.p1; paper: 877 DEGs, 623 up / 254 down)",
+      "Diet-ONLY After vs Before (S1.4.p1; paper: 1 DEG, HMOX1 down)"
+     ],
+     "paper_method": "edgeR 3.40.2, Before vs After within each group (S3.13.2.1.p1); expression presented as log2 CPM (S3.10.2.p1)",
+     "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3, "source_locator": "S3.13.2.1.p1; FIG8"},
+     "paper_results": "877 DEGs in Diet+EX (623 up, 254 down), 1 DEG in Diet-ONLY (HMOX1 down); upregulated DEGs enriched for mitochondrial energy metabolism and angiogenesis GO-BP terms (DAVID, FDR<0.01); key genes PPARGC1A, MFF, CS, MDH1, CYCS, ATP5F1A, ACADVL, ACADM, LPL, CD36, VEGFA, KDR increased more in Diet+EX (S1.4.p1, FIG8)"
+    },
+    "reasoning": "Study map from S3.1.p1 (arms, trials), S3.10.2.p1 (RNA-seq, exclusion), S3.13.2.1.p1 (edgeR, threshold), S1.4.p1 and FIG8 (counts, genes). The exercise question is answered by the Diet+EX within-arm change against the Diet-ONLY within-arm change.",
+    "confidence": "high",
+    "locator": "S3.13.2.1.p1"
+   },
+   "ownership": {
+    "final": {"owned": true, "checks": [
+     "DA.p1 names GSE230002 as this study's RNA-seq deposit",
+     "GEO: Homo sapiens skeletal muscle, before/after 10% weight loss in people with obesity and prediabetes, Washington University group",
+     "26 samples = 13 participants x 2 timepoints, matching Diet-ONLY n=6 + Diet+EX n=7 (FIG8)"]},
+    "reasoning": "Accession named in the paper's data availability; sample structure matches the paper's RNA-seq n.",
+    "confidence": "high"
+   },
+   "alignment": {
+    "key_column": "title",
+    "patterns": {
+     "arm": ["title", "^(PE|PSQ)-\\d+(?:Pre|Post)$"],
+     "time": ["title", "^P\\w*-\\d+(Pre|Post)$"],
+     "subject": ["title", "^(P\\w*-\\d+)(?:Pre|Post)$"]
+    },
+    "recode": {"arm": {"PE": "EX", "PSQ": "DIET"}},
+    "aliases": {},
+    "combine": {},
+    "exclude_samples": {},
+    "reasoning": "Matrix columns equal metadata title exactly (inspect: 26/26). GEO carries only a Before/After treatment field; the arm is not labelled. Title prefixes split participants into PE (7) and PSQ (6). The paper's RNA-seq arms are Diet+EX n=7 and Diet-ONLY n=6 (FIG8), so PE = Diet+EX (EX) and PSQ = Diet-ONLY (DIET); this is the only count-consistent assignment. Supporting check on the deposited values: PPARGC1A rises in all 7 PE participants (paper: increased with Diet+EX) and HMOX1 falls in 5/6 PSQ participants (paper's single Diet-ONLY DEG). Time from the Pre/Post suffix agrees with the GEO treatment field (Before/After); subject is the participant ID.",
+    "confidence": "medium",
+    "candidates": [{"value": "PE = Diet-ONLY, PSQ = Diet+EX", "reason_rejected": "arm sizes would be 7 Diet-ONLY / 6 Diet+EX, contradicting FIG8 (Diet-ONLY n=6, Diet+EX n=7)"}]
+   },
+   "matrix": {
+    "matrix_type": "log2 CPM (edgeR moderated log2CPM, prior count), gene symbols",
+    "recommended_method": "limma",
+    "reasoning": "Values are non-integer, range -5.55 to 18.5, median -2.3 with a floor at the prior-count value: log2 CPM. File name 'gene_moderated_log2cpm' and GEO data_processing ('CPM calculated from gene counts ... log-transformed (attached processed data file)') agree. The paper's input to edgeR was raw featureCounts, which are not deposited (the log2CPM table is the only supplementary file).",
+    "confidence": "high"
+   },
+   "design": {
+    "factors": ["time"],
+    "references": {"time": "Pre"},
+    "subject": "subject",
+    "organism": "Human",
+    "strata": ["arm"],
+    "planned": ["time_Post_vs_Pre_arm-EX", "time_Post_vs_Pre_arm-DIET"],
+    "covariate_candidates": [],
+    "final": {
+     "analysis_type": "paired two-timepoint, per arm",
+     "design_column": "time",
+     "control": "Pre",
+     "treatment": "Post",
+     "contrasts": [
+      {"name": "time_Post_vs_Pre_arm-EX", "control": "Pre", "treatment": "Post", "role": "primary", "stratum": {"arm": "EX"}},
+      {"name": "time_Post_vs_Pre_arm-DIET", "control": "Pre", "treatment": "Post", "role": "secondary", "stratum": {"arm": "DIET"}}
+     ]
+    },
+    "reasoning": "The paper analyzes Before vs After within each group (S3.13.2.1.p1); arm is therefore a stratum and time the tested factor, with participant as the repeated-measure unit. The exercise effect proper (difference of changes between arms) is not a paper DE contrast; it is added as an exploratory paired-change model.",
+    "confidence": "high",
+    "candidates": [
+     {"value": "Post vs Pre pooled across arms", "reason_rejected": "mixes the two interventions; the paper analyzes arms separately"},
+     {"value": "EX vs DIET at Post only", "reason_rejected": "cross-sectional between-person comparison ignores baseline; not the paper's estimand"}
+    ]
+   },
+   "covariance": {
+    "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking factor (paired Before/After biopsies)"}]},
+    "confounding_candidates": [],
+    "reasoning": "Each participant contributes a Before and an After biopsy, so participant is blocked as a fixed effect in each per-arm model. No batch, sex or lane columns are deposited; nothing else is added.",
+    "confidence": "high"
+   },
+   "method": {
+    "final": {
+     "method": "limma (moderated t, eBayes) on log2 CPM, paired ~ subject + time, per arm",
+     "formula": "~ subject + time",
+     "paper_route": {"method": "edgeR 3.40.2 on raw counts", "status": "blocked", "reason": "only a moderated log2CPM matrix is deposited; raw counts needed by edgeR's negative-binomial model are unavailable"},
+     "deviations": [
+      "limma on deposited log2CPM instead of edgeR on counts",
+      "low-expression filter (log2CPM >= 0 in >= 6 samples; 13,851 of 34,259 genes kept) applied by prep/filter_low_expression.py, standing in for the paper's unstated edgeR filtering",
+      "duplicate gene symbols collapsed to the highest-mean row by the limma executor",
+      "paired blocking on participant assumed; the paper does not state whether its edgeR model was paired"
+     ]
+    },
+    "transform": null,
+    "reasoning": "Matrix is already log2 CPM, so limma is the validated route (matrix-method policy: log-scale -> limma). The edgeR route is blocked by missing counts. Paired design follows the repeated-measure structure.",
+    "confidence": "medium"
+   },
+   "threshold": {
+    "final": {
+     "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3},
+     "threshold_source": "paper_on_deviation_route",
+     "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3, "inclusive": false},
+     "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+     "deviation_note": "paper's FDR<0.05 and |log2FC|>0.3 applied to limma results instead of edgeR"
+    },
+    "reasoning": "S3.13.2.1.p1 and FIG8: |log2 fold change| > 0.3 and two-sided FDR < 0.05; the cutoff is already on log2 scale.",
+    "confidence": "high"
+   },
+   "study": {
+    "final": {"route": "declared_deviation", "caveats": [
+     "arm labels inferred from title prefixes by arm size (PE=Diet+EX n=7, PSQ=Diet-ONLY n=6)",
+     "limma on log2CPM replaces edgeR on counts",
+     "gene filter chosen by the agent",
+     "Diet+EX change reflects weight loss plus exercise; the exercise-specific estimand is the exploratory arm-by-time interaction"]},
+    "paper_counts": {"time_Post_vs_Pre_arm-EX": 877, "time_Post_vs_Pre_arm-DIET": 1},
+    "paper_genes": {
+     "time_Post_vs_Pre_arm-EX": ["PPARGC1A", "MFF", "CS", "MDH1", "CYCS", "ATP5F1A", "ACADVL", "ACADM", "LPL", "CD36", "VEGFA", "KDR"],
+     "time_Post_vs_Pre_arm-DIET": ["HMOX1"],
+     "exercise_interaction/ex_vs_diet_change": ["PPARGC1A", "MFF", "CS", "MDH1", "CYCS", "ATP5F1A", "ACADVL", "ACADM", "LPL", "CD36", "VEGFA", "KDR"]
+    },
+    "reasoning": "Paper counts from S1.4.p1; named genes from S1.4.p1 / FIG8 (the 12 genes were reported as increasing more in Diet+EX than Diet-ONLY by ANCOVA).",
+    "confidence": "medium"
+   }
+  },
+  "discrepancies": [
+   {"item": "arm label", "paper": "Diet-ONLY n=6, Diet+EX n=7 (FIG8)", "data": "GEO has no arm field; title prefixes PE (7) and PSQ (6)", "disposition": "executable_without_change"},
+   {"item": "matrix", "paper": "edgeR on gene counts (S3.13.2.1.p1)", "data": "only moderated log2CPM deposited", "disposition": "declared_deviation"},
+   {"item": "GEO processing note", "paper": "Before vs After DE", "data": "data_processing mentions Pearson correlation with AT pO2 (P<0.005), text apparently reused from another submission", "disposition": "executable_without_change"}
+  ],
+  "executions": [
+   {"name": "time_Post_vs_Pre_arm-EX", "tool": "tools.limma_tools:run_limma_analysis",
+    "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": "subject"},
+    "subset": {"arm": ["EX"]}, "role": "primary",
+    "reasoning": "Diet+EX After vs Before, paired on participant (paper's 877-DEG contrast)."},
+   {"name": "time_Post_vs_Pre_arm-DIET", "tool": "tools.limma_tools:run_limma_analysis",
+    "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": "subject"},
+    "subset": {"arm": ["DIET"]}, "role": "secondary",
+    "reasoning": "Diet-ONLY After vs Before, paired on participant (paper's 1-DEG contrast)."},
+   {"name": "exercise_interaction", "tool": "tools.multigroup_tools:run_multigroup_analysis",
+    "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "Pre", "followup_levels": ["Post"], "group_column": "arm", "formula": "~ C(arm)", "contrasts": [{"name": "ex_vs_diet_change", "coefficients": {"C(arm)[T.EX]": 1}}]}},
+    "role": "exploratory",
+    "reasoning": "Exercise-specific estimand: (Post-Pre) in Diet+EX minus (Post-Pre) in Diet-ONLY; the paper tested this only for selected genes by ANCOVA, so genome-wide it is exploratory."}
+  ],
+  "enrichment": [
+   {"execution": "time_Post_vs_Pre_arm-EX", "ora": true, "gsea": false, "direction": "up", "reasoning": "paper ran GO-BP enrichment on Diet+EX upregulated DEGs (FIG8b)"},
+   {"execution": "time_Post_vs_Pre_arm-EX", "ora": true, "gsea": false, "direction": "down", "reasoning": "paper reports two downregulated GO-BP pathways (S1.4.p1)"},
+   {"execution": "time_Post_vs_Pre_arm-EX", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Hallmark GSEA on the full ranking as a supporting pathway view"}
+  ]
+ }]
+}

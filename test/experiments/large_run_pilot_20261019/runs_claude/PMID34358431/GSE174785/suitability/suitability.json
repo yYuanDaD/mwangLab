@@ -1,0 +1,257 @@
+{
+  "case_id": "GSE174785",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "muscle",
+    "genotype"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "muscle",
+        "genotype"
+      ],
+      "levels": {
+        "muscle": {
+          "R": 10,
+          "W": 10
+        },
+        "genotype": {
+          "KO": 10,
+          "WT": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(muscle) + C(genotype)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 17,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Mouse') or lack sex chromosomes.",
+      "metadata_sex_column": "",
+      "sexes": [],
+      "split_plan": {
+        "split": false,
+        "sexes": [],
+        "reason": "sex unknown for every sample"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "muscle_R_vs_W_genotype-KO",
+      "kind": "simple",
+      "factor": "muscle",
+      "test": "R",
+      "reference": "W",
+      "within": {
+        "genotype": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "KO",
+            "muscle": "R"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "genotype": "KO",
+            "muscle": "W"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "muscle_R_vs_W_genotype-WT",
+      "kind": "simple",
+      "factor": "muscle",
+      "test": "R",
+      "reference": "W",
+      "within": {
+        "genotype": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "WT",
+            "muscle": "R"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "genotype": "WT",
+            "muscle": "W"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_KO_vs_WT_muscle-R",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "muscle": "R"
+      },
+      "cells": [
+        {
+          "cell": {
+            "muscle": "R",
+            "genotype": "KO"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "muscle": "R",
+            "genotype": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_KO_vs_WT_muscle-W",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "muscle": "W"
+      },
+      "cells": [
+        {
+          "cell": {
+            "muscle": "W",
+            "genotype": "KO"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "muscle": "W",
+            "genotype": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "muscle_genotype_R_KO_vs_W_WT",
+      "kind": "interaction",
+      "factor": "muscle:genotype",
+      "test": "R:KO",
+      "reference": "W:WT",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "muscle": "R",
+            "genotype": "KO"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "muscle": "W",
+            "genotype": "KO"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "muscle": "R",
+            "genotype": "WT"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "muscle": "W",
+            "genotype": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
