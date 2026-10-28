@@ -172,6 +172,8 @@ def main():
     ap.add_argument("--projects", default=str(root))
     ap.add_argument("--progress", default=str(DEFAULT_PROGRESS))
     ap.add_argument("--out", default=str(HERE))
+    ap.add_argument("--match", default="runs_claude|large_run",
+                    help="regex the first prompt must contain (default: the 45-paper run)")
     args = ap.parse_args()
     papers = load_papers(args.progress)
     out = Path(args.out)
@@ -186,7 +188,7 @@ def main():
         if not turns:
             continue
         prompt = meta["prompt"]
-        if "runs_claude" not in prompt and "large_run" not in prompt:
+        if not re.search(args.match, prompt):
             continue
         hits = match_paper(prompt, papers)
         if not hits:
