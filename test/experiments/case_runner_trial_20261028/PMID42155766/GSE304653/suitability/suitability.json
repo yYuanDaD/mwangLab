@@ -1,0 +1,260 @@
+{
+  "case_id": "GSE304653",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "cgrp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "cgrp"
+      ],
+      "levels": {
+        "cgrp": {
+          "CCSED": 8,
+          "CCEX": 7,
+          "TMESED": 4,
+          "TMEEX": 4
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(cgrp)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 19,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "cgrp_CCEX_vs_CCSED"
+      ],
+      "unknown_planned": [
+        "cgrp_TMEEX_vs_TMESED"
+      ]
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 23 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 23
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\case_runner_trial_20261028\\PMID42155766\\GSE304653\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "cgrp_CCEX_vs_CCSED",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "CCEX",
+      "reference": "CCSED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "CCEX"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cgrp": "CCSED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cgrp_TMEEX_vs_CCEX",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "TMEEX",
+      "reference": "CCEX",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "TMEEX"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "cgrp": "CCEX"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cgrp_TMESED_vs_CCEX",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "TMESED",
+      "reference": "CCEX",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "TMESED"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "cgrp": "CCEX"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cgrp_TMEEX_vs_CCSED",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "TMEEX",
+      "reference": "CCSED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "TMEEX"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "cgrp": "CCSED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cgrp_TMESED_vs_CCSED",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "TMESED",
+      "reference": "CCSED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "TMESED"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "cgrp": "CCSED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cgrp_TMESED_vs_TMEEX",
+      "kind": "simple",
+      "factor": "cgrp",
+      "test": "TMESED",
+      "reference": "TMEEX",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cgrp": "TMESED"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "cgrp": "TMEEX"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
