@@ -150,6 +150,9 @@ class Inputs(BaseModel):
     matrix: Optional[str] = None
     raw_tar: bool = False
     prep_scripts: list[str] = Field(default_factory=list)
+    series_dir: Optional[str] = Field(
+        None, description="folder with the series' downloads (set from data_root); raw_tar looks here "
+                          "when the metadata is a prepared copy elsewhere")
 
     @model_validator(mode="after")
     def _one_matrix(self):
@@ -219,8 +222,12 @@ class Spec(BaseModel):
             for case in self.cases:
                 for field in ("metadata", "matrix"):
                     value = getattr(case.inputs, field)
-                    if value and not Path(value).is_absolute():
+                    # a path that already exists from the repository root (e.g. a prepared file in
+                    # the run directory) is kept; only data-relative paths get data_root in front
+                    if value and not Path(value).is_absolute() and not Path(value).exists():
                         setattr(case.inputs, field, str(Path(self.data_root) / value))
+                if not case.inputs.series_dir:
+                    case.inputs.series_dir = str(Path(self.data_root) / case.accession)
         return self
 
 
@@ -575,7 +582,10 @@ class CaseRun:
         inputs = self.spec.inputs
         if inputs.matrix:
             return Path(inputs.matrix)
-        merged = native.merge_raw_tar(Path(inputs.metadata).parent)
+        folder = Path(inputs.metadata).parent
+        if inputs.series_dir and not list(folder.glob("*_RAW.tar")):
+            folder = Path(inputs.series_dir)
+        merged = native.merge_raw_tar(folder)
         self.result["raw_tar"] = {k: merged[k] for k in ("output", "n_genes", "n_samples")}
         # Tar members are named GSM<id>_<label>; keep the GSM id so exact alignment to the
         # metadata index works. Written in the case dir; the cached merge stays untouched.

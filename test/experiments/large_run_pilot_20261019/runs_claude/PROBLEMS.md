@@ -367,3 +367,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 4671b217019c4b33082d92b0995509e11af7babc (GSE245594)
 
 - case_runner.py:54 _EXTENSIONS skips .xls.gz TSV (inspect found no matrix); inputs.matrix resolved under data_root; key_patterns cannot combine 2 groups; no transcript->gene enrichment Details: `4671b217019c4b33082d92b0995509e11af7babc/HANDBACK.md`.
+
+## PMID42310491 (GSE324036)
+
+- raw_tar looks for tar beside metadata, not data_root (case_runner.py:578); free-text confounding_candidates crashes with bare KeyError; inferred sex not usable as covariate without prep Details: `PMID42310491/HANDBACK.md`.

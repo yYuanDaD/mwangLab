@@ -1,0 +1,1929 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID28273480",
+  "subject_id": "GSE97084",
+  "created_at": "2026-10-28T16:45:36",
+  "finished_at": "2026-10-28T16:52:28",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC5423095.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC5423095.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:36",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0333e6d1282b8e812588c42555641ea1cd619becc3eb437d18e0d27605080b0f",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE97084_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE97084\\GSE97084_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:36",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c8aa76d6a05aa5b8b13a38ddcf3c6fd48502b09fb93d813d1da98ab84a8a0238",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_merge_counts.py",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\prep_merge_counts.py",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:36",
+      "sha256": null,
+      "attributes": {
+        "sha256": "da25ef0780c6c6079fae06e684208453599556d11dd189e810ba2480e00d20b1",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE97084_merged_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084_merged_counts.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T16:45:36",
+      "sha256": null,
+      "attributes": {
+        "sha256": "21472835e8c47d522b26529886b5258f88440bc398dcbd746db816361559316a",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE97084"
+        ],
+        "assay": "bulk RNA-seq (TruSeq v2, HiSeq 2000) of vastus lateralis biopsies at 1000 hr, baseline and 72 hr after the last bout of 12 weeks training (S4.4.1.p1, S1.p3)",
+        "primary_estimand": "within-subject change in muscle gene expression after 12 weeks of training (post vs pre), separately for each training mode (HIIT, RT, CT) within each age group (Young 18-30, Old 65-80) (S2.4.p1, FIG4 A-F)",
+        "planned_contrasts": [
+          "Young HIIT post vs pre (FIG4A)",
+          "Old HIIT post vs pre (FIG4B; paper: 553 genes increased, S2.4.p2/S2.6.p5)",
+          "Young RT post vs pre (FIG4C; 35% fewer up genes than young HIIT, S2.4.p1)",
+          "Old RT post vs pre (FIG4D; 70% fewer up genes than old HIIT, ~166)",
+          "Young CT post vs pre (FIG4E; 28% fewer up genes than young HIIT)",
+          "Old CT post vs pre (FIG4F; 84% fewer up genes than old HIIT, ~88)",
+          "Baseline Old vs Young (S2.4.p1; 267 lower + 166 higher in old = 433), associational"
+        ],
+        "factors": {
+          "age": [
+            "Young",
+            "Old"
+          ],
+          "mode": [
+            "HIIT",
+            "RT",
+            "CT"
+          ],
+          "time": [
+            "Pre",
+            "Post"
+          ]
+        },
+        "repeated_measure_unit": "participant (pre and post biopsy from the same person)",
+        "inclusion": "all participants with RNA-seq at both timepoints; CT pre-training = post-SED biopsy (B), the pre-SED (A) biopsy is not deposited",
+        "paper_method": "not stated for RNA-seq (MapRSeq pipeline, 'as previously described (Lanza et al., 2012)'); comparisons are per mode-by-age pre vs post",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "inclusive": true,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "source_locator": "S4.4.1.p1 (FDR <= 0.05 and |log2FC| >= 0.5); FIG4 legend"
+        },
+        "paper_results": {
+          "old_HIIT_up": 553,
+          "young_unique_up": {
+            "HIIT": 274,
+            "RT": 74,
+            "CT": 170
+          },
+          "old_unique_up": {
+            "HIIT": 396,
+            "RT": 33,
+            "CT": 19
+          },
+          "baseline_old_vs_young": {
+            "lower_in_old": 267,
+            "higher_in_old": 166
+          },
+          "named_old_HIIT_up": [
+            "MT-RNR1",
+            "MT-RNR2",
+            "MT-TL1",
+            "MT-TV",
+            "MT-TR",
+            "MT-TG"
+          ]
+        }
+      },
+      "reason": "S2.1.p2: randomized to HIIT/RT/CT within age groups; S1.p3 and S2.4.p1: RNA-seq at baseline and post-training; FIG4 A-F gives six training-induced DEG sets by mode and age; S4.4.1.p1 gives the threshold (FDR-corrected p <= 0.05 and |log2FC| >= 0.5). The DE software is not named. S2.4.p1 gives baseline age differences (267/166). Only up counts are reported for training contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:36"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084_merged_counts.csv",
+        "owned": true,
+        "checks": [
+          "GEO extract_protocol quotes the paper's S4.4.1.p1 text verbatim",
+          "vastus lateralis, Homo sapiens, Young/Old x HIIT/Resistance/Combined x Pre/PostTraining matches S2.1",
+          "Mayo Clinic submitter matches the study site",
+          "103 deposited samples in two count files, all present in metadata"
+        ],
+        "accession": "GSE97084",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE97084\\GSE97084_metadata.csv"
+      },
+      "reason": "GEO series GSE97084 extraction protocol text is identical to the paper's gene expression methods (S4.4.1.p1) and the factors match the trial design (S2.1.p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:36"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 103,
+        "n_metadata": 103,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "age": {
+              "alias_of": "characteristics_ch1.0.age"
+            },
+            "mode": {
+              "alias_of": "characteristics_ch1.1.exercise type",
+              "recode": {
+                "HIIT": "HIIT",
+                "Resistance": "RT",
+                "Combined": "CT"
+              }
+            },
+            "time": {
+              "alias_of": "characteristics_ch1.2.biopsy timepoint",
+              "recode": {
+                "PreTraining": "Pre",
+                "PostTraining": "Post"
+              }
+            },
+            "batch": {
+              "alias_of": "description",
+              "recode": {
+                "GeneCount_raw.tsv": "B1",
+                "GeneCount_raw_2.tsv": "B2"
+              }
+            },
+            "subject": {
+              "source": "title",
+              "regex": "^(\\d+)[A-Za-z]"
+            },
+            "cohort": {
+              "combine": [
+                "age",
+                "mode"
+              ],
+              "separator": "_",
+              "of": "recoded values"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\design_metadata.csv",
+          "sha256": "b870d1397f70e0d978c7bc7f6f7a8f467cd92bcce21ad66be0545db0925738e7",
+          "levels": {
+            "age": {
+              "Young": 57,
+              "Old": 46
+            },
+            "mode": {
+              "HIIT": 38,
+              "RT": 36,
+              "CT": 29
+            },
+            "time": {
+              "Pre": 52,
+              "Post": 51
+            },
+            "batch": {
+              "B1": 63,
+              "B2": 40
+            },
+            "subject": {
+              "10": 2,
+              "11": 2,
+              "13": 2,
+              "14": 2,
+              "15": 2,
+              "16": 2,
+              "17": 2,
+              "18": 2,
+              "19": 2,
+              "1": 2,
+              "20": 2,
+              "21": 2,
+              "22": 2,
+              "23": 2,
+              "24": 2,
+              "25": 2,
+              "26": 2,
+              "28": 2,
+              "29": 2,
+              "2": 2,
+              "30": 2,
+              "31": 2,
+              "32": 2,
+              "33": 2,
+              "34": 2,
+              "35": 2,
+              "36": 2,
+              "37": 2,
+              "38": 2,
+              "39": 2,
+              "3": 2,
+              "40": 2,
+              "41": 2,
+              "42": 2,
+              "43": 2,
+              "44": 2,
+              "45": 2,
+              "46": 2,
+              "47": 2,
+              "48": 2,
+              "49": 2,
+              "4": 2,
+              "50": 2,
+              "51": 2,
+              "52": 2,
+              "53": 2,
+              "5": 2,
+              "6": 2,
+              "7": 2,
+              "8": 2,
+              "9": 2,
+              "27": 1
+            },
+            "cohort": {
+              "Young_HIIT": 22,
+              "Young_RT": 20,
+              "Old_HIIT": 16,
+              "Old_RT": 16,
+              "Young_CT": 15,
+              "Old_CT": 14
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns were renamed by prep_merge_counts.py to the sample code (e.g. 10B, 18A) that starts each GEO title; key derived from title by regex and matched exactly. Subject = leading number of the code (10B/10C are the same CT participant; letter = visit). cohort = age x mode for stratified paired fits.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:45:59"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE97084_GeneCount_raw.tsv.gz + GSE97084_GeneCount_raw_2.tsv.gz merged on Ensembl GeneID",
+        "paper_input": "raw reads per gene from MapRSeq",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\aligned_matrix.csv",
+          "sha256": "064b6154394b729ae38110170a1952cfeecf8c60d0fc69c6b93c9c59d58b3ad0",
+          "n_features": 57773,
+          "n_samples": 103,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3259913.0,
+          "median": 1.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integers, library sizes 14-72M; GEO data_processing: 'tab-delimited text files of raw reads per gene in each sample' (MapRSeq). Raw counts suit a negative-binomial model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:06"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired pre/post within each age x mode stratum",
+        "design_column": "time",
+        "contrasts": [
+          {
+            "name": "Young_HIIT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "Old_HIIT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "Young_RT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "Old_RT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "Young_CT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "Old_CT",
+            "control": "Pre",
+            "treatment": "Post",
+            "role": "primary"
+          },
+          {
+            "name": "baseline_Old_vs_Young",
+            "control": "Young",
+            "treatment": "Old",
+            "role": "secondary",
+            "estimand_type": "associational"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "Each participant has pre and post biopsies (S2.1.p2: baseline and post-training studies in all participants); FIG4 A-F are post vs pre within each mode x age. Time is the factor, subject the blocking key, cohort a stratum. Baseline Old vs Young (S2.4.p1) is a cross-sectional associational comparison on pre-training biopsies.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:44"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "blocking term in every paired fit (~ subject + time)"
+          },
+          {
+            "name": "batch",
+            "disposition": "count-file/sequencing batch is constant within subject, so absorbed by subject in paired fits; added only in a sensitivity run of the unpaired baseline age comparison"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 103,
+          "n_columns": 53,
+          "columns": [
+            "Intercept",
+            "time_Pre",
+            "subject_10",
+            "subject_11",
+            "subject_13",
+            "subject_14",
+            "subject_15",
+            "subject_16",
+            "subject_17",
+            "subject_18",
+            "subject_19",
+            "subject_2",
+            "subject_20",
+            "subject_21",
+            "subject_22",
+            "subject_23",
+            "subject_24",
+            "subject_25",
+            "subject_26",
+            "subject_27",
+            "subject_28",
+            "subject_29",
+            "subject_3",
+            "subject_30",
+            "subject_31",
+            "subject_32",
+            "subject_33",
+            "subject_34",
+            "subject_35",
+            "subject_36",
+            "subject_37",
+            "subject_38",
+            "subject_39",
+            "subject_4",
+            "subject_40",
+            "subject_41",
+            "subject_42",
+            "subject_43",
+            "subject_44",
+            "subject_45",
+            "subject_46",
+            "subject_47",
+            "subject_48",
+            "subject_49",
+            "subject_5",
+            "subject_50",
+            "subject_51",
+            "subject_52",
+            "subject_53",
+            "subject_6",
+            "subject_7",
+            "subject_8",
+            "subject_9"
+          ],
+          "rank": 53,
+          "full_rank": true,
+          "residual_df": 50,
+          "levels": {
+            "time": {
+              "Pre": 52,
+              "Post": 51
+            },
+            "subject": {
+              "10": 2,
+              "11": 2,
+              "13": 2,
+              "14": 2,
+              "15": 2,
+              "16": 2,
+              "17": 2,
+              "18": 2,
+              "19": 2,
+              "1": 2,
+              "20": 2,
+              "21": 2,
+              "22": 2,
+              "23": 2,
+              "24": 2,
+              "25": 2,
+              "26": 2,
+              "28": 2,
+              "29": 2,
+              "2": 2,
+              "30": 2,
+              "31": 2,
+              "32": 2,
+              "33": 2,
+              "34": 2,
+              "35": 2,
+              "36": 2,
+              "37": 2,
+              "38": 2,
+              "39": 2,
+              "3": 2,
+              "40": 2,
+              "41": 2,
+              "42": 2,
+              "43": 2,
+              "44": 2,
+              "45": 2,
+              "46": 2,
+              "47": 2,
+              "48": 2,
+              "49": 2,
+              "4": 2,
+              "50": 2,
+              "51": 2,
+              "52": 2,
+              "53": 2,
+              "5": 2,
+              "6": 2,
+              "7": 2,
+              "8": 2,
+              "9": 2,
+              "27": 1
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "Post",
+                "1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "13"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "25"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "28"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "29"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "31"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "36"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "39"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "40"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "41"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "43"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "45"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "47"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "48"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "8"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Post",
+                "9"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "13"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "25"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "28"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "29"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "31"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "36"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "39"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "40"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "41"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "43"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "45"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "47"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "48"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "8"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "Pre",
+                "9"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "batch",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "Post": {
+                "B1": 31,
+                "B2": 20
+              },
+              "Pre": {
+                "B1": 32,
+                "B2": 20
+              }
+            }
+          },
+          {
+            "column": "age",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "Post": {
+                "Old": 23,
+                "Young": 28
+              },
+              "Pre": {
+                "Old": 23,
+                "Young": 29
+              }
+            }
+          },
+          {
+            "column": "mode",
+            "n_levels": 3,
+            "status": "crossed",
+            "crosstab": {
+              "Post": {
+                "CT": 14,
+                "HIIT": 19,
+                "RT": 18
+              },
+              "Pre": {
+                "CT": 15,
+                "HIIT": 19,
+                "RT": 18
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Repeated measures: pre and post from the same participant, so subject is blocked. The two deposited count files (different library depths) split subjects, not timepoints, so batch is nested in subject.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:45"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, ~ subject + time, per stratum, complete pairs)",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "not stated (MapRSeq, Lanza et al. 2012)",
+          "status": "unknown",
+          "reason": "the paper does not name its DE software; DESeq2 on raw counts with subject blocking is the validated route"
+        },
+        "deviations": [
+          "DE software not named in paper; DESeq2 paired model used",
+          "paper may have analyzed all participants rather than complete pairs; we keep complete pairs only (Young CT subject 27 has no post sample)"
+        ]
+      },
+      "reason": "Raw counts -> DESeq2 with subject blocking reproduces the paired pre/post comparison of FIG4.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:45"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": true
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        }
+      },
+      "reason": "S4.4.1.p1: FDR-corrected p <= 0.05 and absolute log2 fold change >= 0.5 (inclusive). FIG4 legend repeats it. Audit: FDR < 0.05 only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:46:45"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Young_HIIT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 22,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Young_HIIT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4A paired post vs pre",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:47:19"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Old_HIIT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 16,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Old_HIIT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4B paired post vs pre",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:47:34"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Young_RT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Young_RT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4C paired post vs pre",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:47:42"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Old_RT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 16,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Old_RT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4D paired post vs pre",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:47:55"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Young_CT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 14,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Young_CT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4E paired post vs pre; subject 27 (pre only) dropped by subject subset because the runner complete_pairs option crashes (case_runner.py:634)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:48:05"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_Post_vs_Pre_Old_CT",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 14,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\time_Post_vs_Pre_Old_CT\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "FIG4F paired post vs pre",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:48:22"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "baseline_Old_vs_Young",
+        "role": "secondary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 52,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\baseline_Old_vs_Young\\input\\matrix.csv",
+        "formula": "~ age",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\baseline_Old_vs_Young\\DEG_results_Old_vs_Young.csv"
+        ],
+        "counts": {
+          "baseline_Old_vs_Young": {
+            "applied": {
+              "rule": "padj <= 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 28040,
+              "n_significant": 2063,
+              "n_up": 1704,
+              "n_down": 359,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 28040,
+              "n_significant": 6881,
+              "n_up": 3669,
+              "n_down": 3212,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "S2.4.p1 baseline age difference on pre-training biopsies; associational",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:13"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "baseline_Old_vs_Young_batch",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 52,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\baseline_Old_vs_Young_batch\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: 'list' object has no attribute 'strip'"
+      },
+      "reason": "same with sequencing-batch (count file) covariate",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_Post_vs_Pre_Old_HIIT",
+        "method": "ORA (Enrichr GO + KEGG)",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for time_Post_vs_Pre_Old_HIIT"
+      },
+      "reason": "S2.6.p5 / FIG6A: pathway and GSEA results for old HIIT",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_Post_vs_Pre_Old_HIIT",
+        "method": "GSEA preranked",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for time_Post_vs_Pre_Old_HIIT"
+      },
+      "reason": "S2.6.p5 / FIG6A: pathway and GSEA results for old HIIT",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    },
+    {
+      "decision_id": "DEC-0019",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_Post_vs_Pre_Young_HIIT",
+        "method": "ORA (Enrichr GO + KEGG)",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for time_Post_vs_Pre_Young_HIIT"
+      },
+      "reason": "S2.4.p3: young HIIT GSEA",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    },
+    {
+      "decision_id": "DEC-0020",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_Post_vs_Pre_Young_HIIT",
+        "method": "GSEA preranked",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for time_Post_vs_Pre_Young_HIIT"
+      },
+      "reason": "S2.4.p3: young HIIT GSEA",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    },
+    {
+      "decision_id": "DEC-0021",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "paper_up_counts": {
+          "time_Post_vs_Pre_Old_HIIT": 553,
+          "time_Post_vs_Pre_Old_RT": "~166 (70% fewer than old HIIT)",
+          "time_Post_vs_Pre_Old_CT": "~88 (84% fewer)",
+          "young": "not stated as totals; RT 35% and CT 28% fewer than young HIIT"
+        },
+        "caveats": [
+          "Training-contrast paper counts are up-regulated genes only; baseline 433 is total",
+          "DE software not named in paper"
+        ],
+        "results": {
+          "baseline_Old_vs_Young": {
+            "n_deg": 2063,
+            "up": 1704,
+            "down": 359,
+            "rule": "padj <= 0.05 and |log2FoldChange| >= 0.5",
+            "audit_n": 6881
+          }
+        },
+        "paper_counts": {
+          "baseline_Old_vs_Young": 433
+        },
+        "comparison": {
+          "baseline_Old_vs_Young": {
+            "ours": 2063,
+            "paper": 433
+          }
+        },
+        "paper_gene_check": {}
+      },
+      "reason": "DE method not stated so the route is a declared deviation (DESeq2 paired). Compare our up counts with the paper's up counts (S2.4.p1-p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T16:52:28"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7abf7e222eb8d58edaef3691fd983e8273cedd95bc3abd826b47bf8ce39e87a3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b485e3ed7c414c4e56f496f8b33d3f6a4f0669590ce102fb4a4a6444e6075f14",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "064b6154394b729ae38110170a1952cfeecf8c60d0fc69c6b93c9c59d58b3ad0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b870d1397f70e0d978c7bc7f6f7a8f467cd92bcce21ad66be0545db0925738e7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8de5e5b585563bfe494cbfd579a1057b3140a23dc99ecb7920a226f53ffc8571",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7c03b04f07749a04660296bb9ce709f038ee2f46291a70b28f7a9650a24c0b2d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\results\\baseline_Old_vs_Young\\DEG_results_Old_vs_Young.csv",
+      "role": "deg_baseline_Old_vs_Young",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "75e496ec5edcf9565070bbbec85e0cc81045e0b5ce60854c23fae0239b8bc302",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "80c94a7fb729eac5f2b320913ccd5d980a2414e926e742f26e580724a26623e4",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "case_id": "GSE214282",
+  "verdict": "not_analyzable",
+  "failed": [
+    "sample_size"
+  ],
+  "warnings": [],
+  "factors": [],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [],
+      "levels": {},
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "data_processing",
+        "library_selection",
+        "library_source",
+        "library_strategy"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "library_selection",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "library_source",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(data_processing) + C(library_selection) + C(library_source) + C(library_strategy)",
+        "rank": 1,
+        "full_rank": true,
+        "residual_df": 7,
+        "min_cell_size": 8
+      }
+    },
+    "sample_size": {
+      "status": "fail",
+      "n_comparisons": 0,
+      "n_analyzable": 0,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Mouse') or lack sex chromosomes.",
+      "metadata_sex_column": "",
+      "sexes": [],
+      "split_plan": {
+        "split": false,
+        "sexes": [],
+        "reason": "sex unknown for every sample"
+      }
+    }
+  },
+  "comparisons": []
+}

@@ -1,0 +1,260 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38232699",
+  "request": "Analyze GSE214282 and GSE236402 for PMID 38232699 (Single-cell transcriptomics of the immune system in ME/CFS at baseline and following symptom provocation.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5[1m]) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE214282",
+      "accession": "GSE214282",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC10829790.paper.md"],
+        "metadata": "GSE214282/GSE214282_metadata.csv",
+        "matrix": "GSE214282/GSE214282_rawCounts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE214284 (SuperSeries, TAB1)", "GSE214282 (classical monocyte bulk RNA-seq)"],
+            "assay": "bulk RNA-seq of MACS-purified CD14+CD16- classical monocytes from cryopreserved PBMCs",
+            "sample_inclusion": "4 female ME/CFS cases (low SF36v2 PCS) and 4 female controls matched for age and BMI, individuals distinct from the scRNA-seq cohort; PBMCs drawn 24 h post-CPET only (S4.4.3.1.p1, S2.3.p1)",
+            "factors": {"disease": ["control", "case"]},
+            "time_points": "post-CPET only (single time point)",
+            "primary_estimand": "Cross-sectional ME/CFS vs control difference in classical monocytes at 24 h post-CPET (validation of the scRNA-seq monocyte signature); no within-subject or between-arm exercise contrast",
+            "planned_contrasts": ["ME/CFS vs control classical monocytes, post-CPET (S2.3.p1, FIG3 A-C; paper reports GSEA and selected genes, no DEG count)"],
+            "repeated_measure_unit": "none",
+            "paper_method": "DESeq2 on STAR GeneCounts, genes with >10 reads in >=3 libraries; log2FC from DESeq2 into fgsea (S4.5.3.p1)",
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.5.3.p1"},
+            "paper_results": "CCL4 up and CXCR4 down concordant with scRNA-seq; CSF2, CCL20, CCL5, CCL3 up (S2.3.p1, FIG3C)"
+          },
+          "reasoning": "S2.3.p1 and S4.4.3.1.p1: classical monocytes from 4 female cases and 4 female controls, PBMCs isolated post-CPET only. GEO series summary agrees ('PBMCs were collected 24h after participants conducted a CPET'). The paper uses this dataset to validate the baseline monocyte case-control signature, not to measure an exercise response.",
+          "locator": "S2.3.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 38232699", "series_id lists SuperSeries GSE214284 named in TAB1", "8 samples = 4 case + 4 control, all titled -D2 (post-CPET), matching S4.4.3.1.p1", "data_processing: STAR --quantMode GeneCounts raw counts, DESeq2, as in S4.5.3.p1"]},
+          "reasoning": "Series is a sub-series of GSE214284 (TAB1), cites PMID 38232699, and its sample design matches the paper's monocyte bulk RNA-seq cohort.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^(\\S+) col in rawCounts\\.txt file$"]},
+          "aliases": {"disease": "characteristics_ch1.1.disease state"},
+          "patterns": {},
+          "recode": {"disease": {"case": "ME", "control": "HC"}},
+          "exclude_samples": {},
+          "reasoning": "The GEO description field names the matrix column for each GSM ('COR.1726.D2 col in rawCounts.txt file'), so the key is taken from description. Note: the GSM title and the description disagree for 6 of 8 samples (e.g. GSM6603103 title COR-4361-D2 vs description COR.5655.D2); the description is the field that explicitly states the matrix column, so it is used. This label uncertainty is recorded as a discrepancy; it does not affect the stop decision below because no exercise contrast exists in either mapping.",
+          "confidence": "medium"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer fraction 1.0, max 674163; data_processing: STAR --quantMode GeneCounts raw counts per gene; paper S4.5.3.p1 used DESeq2 on raw counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: all 8 samples are post-CPET (24 h) only, with no pre-exercise or non-exercised arm; the only comparison is ME/CFS vs control at one post-exercise time point, which is a disease estimand, not an exercise effect. The paper uses it to validate the baseline monocyte case-control signature (S2.3.p1).",
+          "candidates": [
+            {"value": "disease ME vs HC (post-CPET)", "reason_rejected": "cross-sectional disease contrast at a single post-exercise time point; does not identify any effect of exercise and the paper does not present it as one"}
+          ],
+          "reasoning": "S4.4.3.1.p1: 'we used PBMCs from eight post-CPET females'; GEO treatment_protocol: blood collected 24h after CPET; every title ends in -D2. Without a baseline sample there is no within-subject change and no exercise-vs-no-exercise arm.",
+          "locator": "S4.4.3.1.p1",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "GSM title vs description subject IDs", "paper": "not described", "data": "title and description name different COR subject IDs for 6/8 GSMs (only GSM6603102 COR-1726 and GSM6603109 COR-1433 agree); disease labels attach to GSM rows, so case/control assignment of matrix columns depends on which field is correct", "disposition": "recorded; case refused at design for a reason independent of this (no exercise contrast)"}
+      ],
+      "executions": [],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE236402",
+      "accession": "GSE236402",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC10829790.paper.md"],
+        "metadata": "GSE236402/GSE236402_metadata.csv",
+        "matrix": "GSE236402/GSE236402_raw_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE214284 (SuperSeries, TAB1)", "GSE236402 (platelet-derived plasma particle bulk RNA-seq)"],
+            "assay": "bulk RNA-seq of low-speed-pelleted platelet-derived plasma particles (CD41+CD45-CD235a-)",
+            "sample_inclusion": "3 female ME/CFS cases and 3 female healthy controls, each at baseline (BL, pre-CPET) and 24 h post-CPET (PC) (S2.6.p4, FIG6 E-F, S4.4.5.1.p1)",
+            "factors": {"disease": ["HC", "ME"], "time": ["BL", "PC"]},
+            "repeated_measure_unit": "individual (each subject sampled at BL and PC)",
+            "primary_estimand": "Difference between ME/CFS and controls in the within-individual exercise response (PC/BL ratio, 'deltaRNA') of platelet-particle gene expression, i.e. disease x time difference-in-differences controlling for individual of origin (S2.6.p1, S2.6.p4, S4.5.1.3.p3, S4.5.3.p1)",
+            "planned_contrasts": [
+              "paired deltaRNA (PC/BL) ME vs HC, controlling for individual (S2.6.p4, FIG6F, Data S14; paper reports GSEA only: platelet-function sets up, translation sets down; no per-gene DEG count for bulk)",
+              "ME vs HC at BL (S2.6.p4, Data S13: transcriptomes differ; DEG count not given in text)",
+              "ME vs HC at PC (S2.6.p4: no significant differential expression)"
+            ],
+            "paper_method": "DESeq2 on STAR GeneCounts (genes >10 reads in >=3 libraries) for cohort comparisons; paired analysis = per-individual PC/BL ratio of DESeq2-normalized counts floored at 1, geometric mean per cohort, log2(case/control) ranked into fgsea (genes with >=2 ratios per cohort) (S4.5.3.p1, S4.5.1.3.p3)",
+            "paper_threshold": {"metric": "not_reported", "adjustment": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.5.3.p1"},
+            "paper_results": "BL: platelet-function GSEA sets down in ME; PC: no significant DE; paired: platelet-function sets up and translation sets down in ME ratios vs HC (FIG6C,F)"
+          },
+          "reasoning": "S2.6.p4 and FIG6 E-F describe 3 HC and 3 ME/CFS (all female) at BL and PC; S4.5.3.p1 gives DESeq2 and the paired-ratio GSEA as described for scRNA platelets (S4.5.1.3.p3). The exercise question the paper asks is whether the exercise-induced change differs between ME/CFS and controls (PEM), i.e. a difference in within-individual change. No DEG threshold is stated for the bulk data.",
+          "locator": "S2.6.p4",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["series_id lists GSE214284 (SuperSeries in TAB1) and GSE236402", "source/tissue plasma; treatment_protocol: plasma before and 24h after CPET, 100xg then particle pelleting", "12 samples = 3 case + 3 control x D1-preCPET/D2-24hPostCPET, matching S2.6.p4", "STAR GeneCounts raw counts, hg38 Ensembl, as in S4.5.3.p1"]},
+          "reasoning": "Sub-series of the paper's SuperSeries; design (3 vs 3, BL and PC) and protocol match S2.6.p4 and S4.4.5.1.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^raw_counts\\.txt:(.+)$"]},
+          "aliases": {"disease": "characteristics_ch1.2.disease state", "time": "characteristics_ch1.1.timepoint"},
+          "patterns": {"subject": ["title", "^COR-(\\d+)-D\\d"]},
+          "recode": {
+            "disease": {"case": "ME", "control": "HC"},
+            "time": {"D1-preCPET": "BL", "D2-24hPostCPET": "PC"},
+            "subject": {"1433": "s1433", "1726": "s1726", "2349": "s2349", "3013": "s3013", "4614": "s4614", "5587": "s5587"}
+          },
+          "exclude_samples": {},
+          "reasoning": "description 'raw_counts.txt:<column>' names the matrix column (12/12 match; title carries a '#2' suffix on two re-sequenced D2 libraries). subject from the COR id in title, time and disease from characteristics. Title and description COR ids agree for every GSM here.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer fraction 1.0, max ~1.0e7, no negatives; data_processing: STAR --quantMode GeneCounts raw counts per gene; paper S4.5.3.p1 used DESeq2 on raw counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["disease", "time"],
+          "references": {"disease": "HC", "time": "BL"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["disease_time_ME_PC_vs_HC_BL", "disease_ME_vs_HC_time-BL", "disease_ME_vs_HC_time-PC"],
+          "final": {
+            "analysis_type": "paired_change",
+            "formula": "within-subject delta = log2(CPM+1)[PC] - log2(CPM+1)[BL]; delta ~ C(disease)",
+            "design_column": "disease",
+            "contrasts": [
+              {"name": "deltaRNA_ME_vs_HC", "suitability_name": "disease_time_ME_PC_vs_HC_BL", "description": "difference between ME and HC in within-subject PC-BL change (disease x time)", "role": "primary"},
+              {"name": "disease_ME_vs_HC_time-BL", "control": "HC", "treatment": "ME", "role": "secondary", "estimand_type": "associational"},
+              {"name": "disease_ME_vs_HC_time-PC", "control": "HC", "treatment": "ME", "role": "secondary", "estimand_type": "associational"},
+              {"name": "time_PC_vs_BL_disease-ME", "control": "BL", "treatment": "PC", "role": "exploratory"},
+              {"name": "time_PC_vs_BL_disease-HC", "control": "BL", "treatment": "PC", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled PC vs BL across all 6 subjects", "reason_rejected": "the paper's estimand is the disease difference in exercise response, and pooling hides it; within-group time contrasts are run separately as exploratory"},
+            {"value": "unpaired 4-cell DESeq2 ~ cell", "reason_rejected": "ignores the within-individual pairing the paper explicitly uses"}
+          ],
+          "reasoning": "Disease x time with every subject sampled at both times (3 per cell). The paper's exercise estimand is the case-control difference in per-individual PC/BL change (S4.5.1.3.p3, S2.6.p4), run here as a paired-change model. The two between-cohort contrasts at BL and PC are the paper's supporting comparisons (Data S13; 'no significant DE at PC'), cross-sectional and associational. Within-group PC vs BL (subject-blocked) are exploratory; the paper reports them only for scRNA (S2.6.p1: none significant).",
+          "locator": "S2.6.p4",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [
+              {"name": "subject", "disposition": "included: removed by within-subject differencing in the paired-change model; included as a blocking covariate in the within-group PC vs BL DESeq2 fits"},
+              {"name": "subject (between-cohort BL and PC contrasts)", "disposition": "nested: one sample per subject in each cross-sectional subset; cannot be blocked"},
+              {"name": "sex", "disposition": "excluded: all subjects female (FIG6 legend)"}
+            ]
+          },
+          "confounding_candidates": ["subject"],
+          "reasoning": "Repeated samples per individual (BL and PC). Paired-change differencing removes subject; within-group time fits use ~ subject + time. Subject is nested in disease, so it cannot be blocked in disease contrasts at a fixed time point. No batch column is recorded.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (paired_change: moderated t on within-subject log2(CPM+1) differences, ~ C(disease)); DESeq2 Wald for cohort and within-group contrasts",
+            "formula": "delta(PC-BL) ~ C(disease); DESeq2: ~ disease (per time point), ~ subject + time (per disease group)",
+            "paper_route": {"method": "per-individual PC/BL ratio of DESeq2-normalized counts floored at 1, geometric mean per cohort, log2(ME/HC) ranked into fgsea; no per-gene test reported for the bulk paired analysis", "status": "blocked", "reason": "no repository executor computes the geometric-mean ratio ranking; limma paired_change on log2(CPM+1) estimates the same difference in within-individual log change and adds a per-gene moderated test"},
+            "deviations": ["paired analysis by limma on log2(CPM+1) differences instead of DESeq2-normalized count ratios", "GSEA on MSigDB Hallmark only (paper: Hallmark, C2 KEGG, C2 Reactome, C5 GO BP)", "low-count filter is the executors' own, not the paper's >10 reads in >=3 libraries"]
+          },
+          "transform": "log2(CPM+1)",
+          "reasoning": "Raw counts. Cohort and within-group comparisons follow the paper's DESeq2 route on the aligned counts. The paired difference-in-change is fitted with the paired_change executor (limma), which needs log2(CPM+1).",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.1, "effect_cutoff": null, "label": "DESeq2 results() default alpha, which the authors' unstated rule most likely used"}
+          },
+          "reasoning": "The paper states no DEG cutoff for the plasma-particle RNA-seq (S4.5.3.p1); the workflow default BH padj < 0.05 without fold-change rule applies. padj < 0.1 is reported separately as an audit rule.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "exploratory_reason": "3 biological replicates per cell (n=3 vs 3); residual df for paired-change model = 4, for within-group subject-blocked fits = 2 (< 4)",
+            "caveats": ["paired analysis by limma instead of the paper's ratio-of-geometric-means ranking", "paper reports pathway results only for the paired analysis; no paper DEG count exists for it", "Data S13 BL DEG count not available in the text"]
+          },
+          "paper_counts": {"disease_ME_vs_HC_time-PC": 0},
+          "paper_genes": {},
+          "reasoning": "Planned estimand matches the paper; execution of the paired analysis is a declared deviation. Every contrast is exploratory by the n<3-per-arm/residual-df rule boundary (3 per cell, low residual df).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "paired-analysis statistic", "paper": "geometric mean of per-individual PC/BL ratios, log2(ME/HC), GSEA only", "data": "executable as limma paired_change on log2(CPM+1)", "disposition": "declared deviation"},
+        {"item": "gene-set libraries", "paper": "Hallmark, C2 KEGG, C2 Reactome, C5 GO BP", "data": "repository GSEA uses MSigDB Hallmark only", "disposition": "declared deviation; GO BP platelet-activation sets cannot be compared directly"}
+      ],
+      "executions": [
+        {
+          "name": "deltaRNA",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "BL", "followup_levels": ["PC"], "group_column": "disease", "formula": "~ C(disease)", "contrasts": [{"name": "ME_vs_HC", "coefficients": {"C(disease)[T.ME]": 1}}]}},
+          "role": "primary",
+          "reasoning": "Paper's exercise estimand: ME vs HC difference in within-individual PC-BL change (S4.5.1.3.p3, S2.6.p4)."
+        },
+        {
+          "name": "disease_ME_vs_HC_time-BL",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "matrix": "aligned",
+          "subset": {"time": ["BL"]},
+          "args": {"design_column": "disease", "control_group": "HC", "treatment_group": "ME", "alpha": 0.05},
+          "role": "secondary",
+          "reasoning": "Paper Data S13: DESeq2 ME vs HC at BL."
+        },
+        {
+          "name": "disease_ME_vs_HC_time-PC",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "matrix": "aligned",
+          "subset": {"time": ["PC"]},
+          "args": {"design_column": "disease", "control_group": "HC", "treatment_group": "ME", "alpha": 0.05},
+          "role": "secondary",
+          "reasoning": "Paper S2.6.p4: no significant DE between PC cases and controls."
+        },
+        {
+          "name": "time_PC_vs_BL_disease-ME",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "matrix": "aligned",
+          "subset": {"disease": ["ME"]},
+          "args": {"design_column": "time", "control_group": "BL", "treatment_group": "PC", "covariate_columns": "subject", "alpha": 0.05},
+          "role": "exploratory",
+          "reasoning": "Within-ME exercise response, subject-blocked (paper reports the analogous scRNA comparison as non-significant, S2.6.p1)."
+        },
+        {
+          "name": "time_PC_vs_BL_disease-HC",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "matrix": "aligned",
+          "subset": {"disease": ["HC"]},
+          "args": {"design_column": "time", "control_group": "BL", "treatment_group": "PC", "covariate_columns": "subject", "alpha": 0.05},
+          "role": "exploratory",
+          "reasoning": "Within-HC exercise response, subject-blocked."
+        }
+      ],
+      "enrichment": [
+        {"execution": "deltaRNA/ME_vs_HC", "ora": false, "gsea": true, "ranking_metric": "log2FoldChange", "reasoning": "Paper's exercise result is GSEA on the paired log2 ratio difference (FIG6F, Data S14); ranked by log2 fold change as in S4.5.1.3.p2."},
+        {"execution": "disease_ME_vs_HC_time-BL", "ora": false, "gsea": true, "ranking_metric": "log2FoldChange", "reasoning": "Paper FIG6C: platelet-function sets down in ME at BL by GSEA on DESeq2 log2FC."}
+      ]
+    }
+  ]
+}

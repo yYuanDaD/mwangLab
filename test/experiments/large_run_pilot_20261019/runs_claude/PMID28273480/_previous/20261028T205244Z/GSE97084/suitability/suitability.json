@@ -1,0 +1,292 @@
+{
+  "case_id": "GSE97084",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "Pre": 52,
+          "Post": 51
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "batch",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "batch",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 53,
+        "full_rank": true,
+        "residual_df": 50,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_Post_vs_Pre_cohort-Young_HIIT",
+        "time_Post_vs_Pre_cohort-Old_HIIT",
+        "time_Post_vs_Pre_cohort-Young_RT",
+        "time_Post_vs_Pre_cohort-Old_RT",
+        "time_Post_vs_Pre_cohort-Young_CT",
+        "time_Post_vs_Pre_cohort-Old_CT"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 103 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 55,
+        "female": 48
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID28273480\\GSE97084\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_Post_vs_Pre__sex-female"
+          ],
+          "male": [
+            "time_Post_vs_Pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_Post_vs_Pre_cohort-Old_CT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Old_CT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Old_CT",
+            "time": "Post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "Old_CT",
+            "time": "Pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_cohort-Old_HIIT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Old_HIIT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Old_HIIT",
+            "time": "Post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "Old_HIIT",
+            "time": "Pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_cohort-Old_RT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Old_RT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Old_RT",
+            "time": "Post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "Old_RT",
+            "time": "Pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_cohort-Young_CT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Young_CT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Young_CT",
+            "time": "Post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "Young_CT",
+            "time": "Pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_cohort-Young_HIIT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Young_HIIT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Young_HIIT",
+            "time": "Post"
+          },
+          "n": 11
+        },
+        {
+          "cell": {
+            "cohort": "Young_HIIT",
+            "time": "Pre"
+          },
+          "n": 11
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_cohort-Young_RT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "cohort": "Young_RT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "Young_RT",
+            "time": "Post"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "cohort": "Young_RT",
+            "time": "Pre"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

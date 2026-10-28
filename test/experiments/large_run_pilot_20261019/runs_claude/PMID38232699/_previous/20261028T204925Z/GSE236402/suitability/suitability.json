@@ -1,0 +1,286 @@
+{
+  "case_id": "GSE236402",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "disease",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "disease",
+        "time"
+      ],
+      "levels": {
+        "disease": {
+          "ME": 6,
+          "HC": 6
+        },
+        "time": {
+          "BL": 6,
+          "PC": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "disease"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "disease",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 7,
+        "full_rank": true,
+        "residual_df": 5,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "disease_time_ME_PC_vs_HC_BL",
+        "disease_ME_vs_HC_time-BL",
+        "disease_ME_vs_HC_time-PC"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "unknown": 9,
+        "female": 3
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38232699\\GSE236402\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "disease_ME_vs_HC_time-BL",
+      "kind": "simple",
+      "factor": "disease",
+      "test": "ME",
+      "reference": "HC",
+      "within": {
+        "time": "BL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "BL",
+            "disease": "ME"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "time": "BL",
+            "disease": "HC"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "disease_ME_vs_HC_time-PC",
+      "kind": "simple",
+      "factor": "disease",
+      "test": "ME",
+      "reference": "HC",
+      "within": {
+        "time": "PC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "PC",
+            "disease": "ME"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "time": "PC",
+            "disease": "HC"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_PC_vs_BL_disease-HC",
+      "kind": "simple",
+      "factor": "time",
+      "test": "PC",
+      "reference": "BL",
+      "within": {
+        "disease": "HC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "disease": "HC",
+            "time": "PC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "disease": "HC",
+            "time": "BL"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_PC_vs_BL_disease-ME",
+      "kind": "simple",
+      "factor": "time",
+      "test": "PC",
+      "reference": "BL",
+      "within": {
+        "disease": "ME"
+      },
+      "cells": [
+        {
+          "cell": {
+            "disease": "ME",
+            "time": "PC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "disease": "ME",
+            "time": "BL"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "disease_time_ME_PC_vs_HC_BL",
+      "kind": "interaction",
+      "factor": "disease:time",
+      "test": "ME:PC",
+      "reference": "HC:BL",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "disease": "ME",
+            "time": "PC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "disease": "HC",
+            "time": "PC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "disease": "ME",
+            "time": "BL"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "disease": "HC",
+            "time": "BL"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
