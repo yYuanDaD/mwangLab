@@ -16,11 +16,16 @@ Layers (each cheap enough to run on a few hundred papers; nothing here calls an 
     2. deposit   GEO series summary (E-utilities esummary): data type, organism, sample
                  count, platform; organism (human, mouse, rat by default); non-GEO repositories (PRIDE, ArrayExpress, SRA-only,
                  GSA) are recorded and routed, not analysed
-    3. files     GEO supplementary listing: raw counts vs. normalised-only vs. per-sample
-                 tar vs. nothing (bulk RNA-seq only); a _RAW.tar is judged from its
-                 per-sample files (listed in the series matrix), sniffing one or two
-    4. design    GEO sample characteristics (series matrix): groups, smallest group, sex
-                 column; uses metadata_structural's deterministic design-column picker
+    3. files     GEO supplementary listing: raw counts vs. TPM/FPKM (limma) vs. per-sample
+                 tar vs. nothing (bulk RNA-seq only); values and column names decide over
+                 file names; a _RAW.tar is judged from its per-sample files (listed in the
+                 series matrix), sniffing one or two
+    4. design    GEO sample characteristics (series matrix): two compared groups of >= 3
+                 (small extra groups are flagged, not fatal), sex composition and the arms
+                 per sex; uses metadata_structural's deterministic design-column picker
+
+GEO's own PMID -> series links (elink) add the series GEO links to the paper first, so a
+paper whose text omits its accession, or whose full text was not fetched, is not lost.
 
 Verdicts: ``analyzable`` · ``needs_inspection`` (a layer could not decide, e.g. only a
 ``_RAW.tar``) · ``excluded`` with a reason code.
@@ -163,7 +168,7 @@ class Http:
                 # it so a rerun does not spend the full retry backoff on every such paper.
                 data = b"\x00404"
                 break
-            if r.status_code in (429, 500, 502, 503, 504):
+            if r.status_code == 429 or r.status_code >= 500:
                 # The shared anonymous Semantic Scholar pool throttles for tens of seconds.
                 time.sleep(20 * (attempt + 1) if s2 and r.status_code == 429 else 2 ** (attempt + 1))
                 continue
@@ -261,6 +266,10 @@ _OWN_NEAR = re.compile(
     r"data (from|of|for) this (study|article|paper)|(this|the present|the current) study (are|is) available", re.I)
 
 
+# "data are publicly available (GSE205676)", "publicly available repositories (GEO: ...)":
+# the deposit itself. "analysed publicly available datasets: GSE113165" stays reuse.
+_PUBLICLY = re.compile(r"\b(is|are|be|been|was|were)\s+(made\s+|now\s+)?publicly (available|accessible)|"
+                       r"publicly (available|accessible)\s+(repositor\w*|databases?|in|at|on|via|through|from the)", re.I)
 _LIST_GAP = re.compile(r"[\s,;/()\[\]]*((and|or|&)[\s,;()]*)?", re.I)
 
 
@@ -288,6 +297,11 @@ def _mention_phrase(acc: str, bid: str, by_id: dict) -> str:
         return "cited"
     if _OWN_NEAR.search(window):
         return "own"
+    # "All RNA-seq data are publicly available (GSE205676)" in a data-availability
+    # statement describes the paper's own deposit; elsewhere "a publicly available
+    # dataset (GSE163356)" is reuse.
+    if by_id[bid].get("section_class") == "data_availability":
+        window = _PUBLICLY.sub("", window)
     # "the GESTALT cohort^6 (GSE129643)": a reference marker right before the accession
     # credits the dataset to another paper.
     if _CITED_NEAR.search(window) or _REF_BEFORE.search(text[max(0, i - 40): i]):
@@ -337,6 +351,7 @@ def geo_summary(gse: str, http: Http) -> dict | None:
     return {
         "gse": gse,
         "title": rec.get("title", ""),
+        "summary": rec.get("summary", ""),
         "gdstype": rec.get("gdstype", ""),
         "data_type": classify_gdstype(rec.get("gdstype", ""), text),
         "taxon": rec.get("taxon", ""),
@@ -346,6 +361,39 @@ def geo_summary(gse: str, http: Http) -> dict | None:
         "sample_titles": [x.get("title", "") for x in rec.get("samples", []) or []],
         "pubmedids": [str(x) for x in rec.get("pubmedids", []) or []],
     }
+
+
+def geo_linked_series(pmid: str, http: Http) -> list[str]:
+    """GSE accessions GEO links to a PubMed ID (elink pubmed -> gds)."""
+    if not pmid or not http:
+        return []
+    s = http.get(f"{EUTILS}/elink.fcgi", {"dbfrom": "pubmed", "db": "gds", "id": pmid, "retmode": "json"})
+    try:
+        sets = json.loads(s)["linksets"] if s else []
+    except (ValueError, KeyError):
+        return []
+    uids = [u for ls in sets for db in ls.get("linksetdbs", []) if db.get("linkname") == "pubmed_gds"
+            for u in db.get("links", [])]
+    # A GDS uid 2xxxxxxxx is series GSExxxxxxxx; other uids are DataSets and platforms.
+    return sorted({f"GSE{int(u) - 200000000}" for u in uids if str(u).startswith("2") and len(str(u)) == 9},
+                  key=lambda g: int(g[3:]))
+
+
+def geo_owned_series(row: dict, http: Http) -> list[str]:
+    """Series GEO links to this paper first: the paper's own deposit even when its text
+    omits the accession (GSE235174), calls it "publicly available", or was not fetched.
+
+    A series GEO also links to an earlier paper belongs to that paper (GSE163356, reused
+    for validation); a preprint and its journal version count as one paper."""
+    pmid = str(row.get("pmid") or "").strip()
+    own = []
+    for gse in geo_linked_series(pmid, http):
+        info = geo_summary(gse, http)
+        first = (info or {}).get("pubmedids", [])[:1]
+        if info and (first == [pmid] or _norm_title(info["title"]) == _norm_title(row.get("title", ""))
+                     or _same_paper(row, first, http)):
+            own.append(gse)
+    return own
 
 
 # ---------------------------------------------------------------------------
@@ -438,18 +486,78 @@ def design_from_samples(df) -> dict:
         source = "title"
     sex_col = next((c for c in df.columns if re.search(r"\b(sex|gender)\b", str(c), re.I)), "")
     sexes = sorted(set(df[sex_col].astype(str).str.lower())) if sex_col else []
+    sex = df[sex_col].astype(str).map(_sex_of) if sex_col else None
+    composition = _sex_composition(sex)
     if series is None:
-        return {"status": "single_group", "n_samples": len(df), "sex_column": sex_col, "sexes": sexes}
-    sizes = series.value_counts()
-    return {
-        "status": "ok" if int(sizes.min()) >= 3 else "group_too_small",
+        return {"status": "single_group", "n_samples": len(df), "sex_column": sex_col, "sexes": sexes,
+                "sex_composition": composition}
+    series = series.astype(str).str.strip()
+    labelled = series[series != ""]
+    sizes = labelled.value_counts()
+    if len(sizes) < 2:
+        return {"status": "single_group", "n_samples": len(df), "sex_column": sex_col, "sexes": sexes,
+                "sex_composition": composition}
+    out = {
+        "status": "ok" if _two_arms_of_three(sizes) else "group_too_small",
         "design_column": source,
         "groups": {str(k): int(v) for k, v in sizes.items()},
         "min_group": int(sizes.min()),
         "n_samples": len(df),
         "sex_column": sex_col,
         "sexes": sexes,
+        "sex_composition": composition,
     }
+    # A series holding several experiments (GSE297515: exercise, injury and a 2-sample
+    # Yoda1 arm; 67 samples unlabelled in this column) keeps its usable comparison.
+    small = {str(k): int(v) for k, v in sizes.items() if v < 3}
+    if small:
+        out["small_groups"] = small
+    if len(series) - len(labelled):
+        out["unlabelled_samples"] = int(len(series) - len(labelled))
+    if composition == "mixed":
+        # Male and female are analysed separately: each sex needs its own two arms of three.
+        per = {sx: {str(k): int(v) for k, v in labelled[sex[labelled.index] == sx].value_counts().items()}
+               for sx in ("male", "female")}
+        out["per_sex_groups"] = per
+        out["per_sex_ok"] = {sx: _two_arms_of_three(g) for sx, g in per.items()}
+    return out
+
+
+# Group labels of an exercise arm ("AEX.d1", "Exercise-trained (ExT)", "wheel running").
+_EX_ARM = re.compile(r"exercis|train|run|wheel|swim|treadmill|endurance|resistance|HIIT|sprint|"
+                     r"(?<![a-z])(a?ex|ext)(?![a-z])", re.I)
+
+
+def _two_arms_of_three(sizes) -> bool:
+    """True when two groups that would be compared both have >= 3 samples: an exercise arm
+    and another arm when the labels name exercise, else any two groups (pre/post, time
+    points). A small unrelated group does not fail the series."""
+    sizes = {k: int(v) for k, v in dict(sizes).items()}
+    ex = [g for g in sizes if _EX_ARM.search(str(g))]
+    if ex and len(ex) < len(sizes):
+        return any(sizes[g] >= 3 for g in ex) and any(v >= 3 for g, v in sizes.items() if g not in ex)
+    return sum(v >= 3 for v in sizes.values()) >= 2
+
+
+def _sex_of(v: str) -> str:
+    low = str(v).strip().lower()
+    if re.fullmatch(r"(f|female|females|woman|women|girl|girls)", low):
+        return "female"
+    if re.fullmatch(r"(m|male|males|man|men|boy|boys)", low):
+        return "male"
+    return ""
+
+
+def _sex_composition(sex) -> str:
+    """all_male / all_female / mixed, or unknown (no usable sex column: check X/Y genes)."""
+    if sex is None:
+        return "unknown"
+    seen = set(sex) - {""}
+    if seen == {"male"}:
+        return "all_male"
+    if seen == {"female"}:
+        return "all_female"
+    return "mixed" if seen == {"male", "female"} else "unknown"
 
 
 def geo_design(gse: str, http: Http) -> dict:
@@ -486,6 +594,10 @@ def geo_design(gse: str, http: Http) -> dict:
 # Layer 3b: what is inside a _RAW.tar, from the per-sample files
 # ---------------------------------------------------------------------------
 
+# Members of a _RAW.tar that hold one sample's table: salmon quant.sf, RSEM *.results too.
+_MEMBER_EXT = re.compile(r"\.(csv|tsv|txt|tab|sf|results)(\.gz)?$", re.I)
+# 10x / single-cell members: a series GEO labels bulk RNA-seq can still be single-cell.
+_SINGLE_CELL_FILE = re.compile(r"barcodes\.tsv|features\.tsv|matrix\.mtx|feature_bc_matrix|\.h5ad?(\.gz)?$", re.I)
 _NON_MATRIX_EXT = re.compile(
     r"\.(bw|bigwig|bed|bedgraph|bdg|wig|bam|sam|cram|h5|hdf5|mtx|narrowpeak|broadpeak|cel|idat|"
     r"gtf|gff3?|fa|fasta|fastq|fq|vcf|tdf|png|pdf|cov|rds|rda)(\.gz)?$", re.I)
@@ -522,8 +634,9 @@ def sniff_count_file(text: str) -> str:
     """'raw_counts', 'normalized' or 'unknown' for one per-sample expression file."""
     header, cols = _numeric_columns(text)
     low = [h.lower() for h in header]
-    # RSEM *.genes.results: expected_count (rounded for DESeq2) sits left of TPM/FPKM.
-    if "expected_count" in low:
+    # RSEM *.genes.results (expected_count), salmon quant.sf (NumReads), kallisto
+    # abundance.tsv (est_counts): estimated counts sit next to TPM/FPKM.
+    if any(h in low for h in ("expected_count", "numreads", "est_counts")):
         return "raw_counts"
     numeric = [(j, c) for j, c in enumerate(cols) if c]
     if not numeric:
@@ -547,8 +660,8 @@ def sniff_matrix_file(text: str) -> str:
     featureCounts fractional multi-mapper counts are decimal counts. ``check_raw_values``
     settles a decimal file with the series' data-processing text."""
     header, cols = _numeric_columns(text)
-    if any("expected_count" in h.lower() for h in header):
-        return "raw_counts"
+    if any(h.lower() in ("expected_count", "numreads", "est_counts") or _COUNT_COLUMN.search(h) for h in header):
+        return "raw_counts" if _count_columns_integer(header, cols) else "decimal"
     values = [v for c in cols for v in c]
     if len(values) < 200:
         return "unknown"
@@ -556,7 +669,34 @@ def sniff_matrix_file(text: str) -> str:
     integer = sum(1 for v in values if v >= 0 and abs(v - round(v)) <= 0.01) / len(values)
     if integer >= 0.99:
         return "raw_counts"
+    # A file holding blocks of several kinds (mRNA counts, lncRNA FPKM, circRNA counts):
+    # two or more integer sample columns are a count block.
+    names = [header[j + 1] if len(header) > j + 1 else "" for j in range(len(cols))]
+    per = [(n, _integer_share(c)) for n, c in zip(names, cols) if len(c) >= 20]
+    whole = [f for n, f in per if f >= 0.99 and not _NOT_SAMPLE_COLUMN.search(n)]
+    if len(whole) >= 2 and any(f < 0.5 for _, f in per):
+        return "mixed"
     return "mostly_integer" if integer >= 0.5 else "decimal"
+
+
+# A per-sample count column in a wide table ("Count (FC1)", "read_count_S1"), not a
+# normalised one ("normalized count").
+_COUNT_COLUMN = re.compile(r"^(read[ _]?)?counts?\b|\b(read[ _]?)?counts?[ _]*\(", re.I)
+_NOT_SAMPLE_COLUMN = re.compile(r"start|end|length|len\b|pos|chr|strand|width|id$", re.I)
+
+
+def _integer_share(col: list) -> float:
+    return sum(1 for v in col if v >= 0 and abs(v - round(v)) <= 0.01) / len(col) if col else 0.0
+
+
+def _count_columns_integer(header: list, cols: list) -> bool:
+    """True when the columns named like counts (Novogene "Count (S1)", RSEM expected_count)
+    hold integer-like values."""
+    picked = [c for j, c in enumerate(cols) if c and len(header) > j + 1 and
+              (_COUNT_COLUMN.search(header[j + 1]) or header[j + 1].lower() in ("expected_count", "numreads",
+                                                                                "est_counts"))
+              and not _NORMALISED_NAME.search(header[j + 1].replace("count", ""))]
+    return bool(picked) and sum(_integer_share(c) >= 0.99 for c in picked) >= len(picked) / 2
 
 
 def _head_text(raw: bytes) -> str:
@@ -577,25 +717,48 @@ _PROCESSING_ESTIMATED = re.compile(r"rsem|salmon|kallisto|expected[_ ]count|esti
                                    r"fraction(al)?|multi-?mapp", re.I)
 
 
+def _sniff_supplementary(gse: str, name: str, http: Http, max_bytes: int = 2_000_000) -> str:
+    """sniff_matrix_file on one supplementary file: the head of a text file, or the first
+    rows of an Excel workbook (read whole; Novogene's gene_expression.xlsx is ~15 MB)."""
+    url = GEO_SUPPL.format(stub=geo_stub(gse), gse=gse) + name
+    if not re.search(r"\.xlsx?$", name, re.I):
+        raw = http.get(url, binary=True, timeout=120, max_bytes=max_bytes)
+        return sniff_matrix_file(_head_text(raw)) if raw else "unknown"
+    if not name.lower().endswith(".xlsx"):
+        return "unknown"
+    raw = http.get(url, binary=True, timeout=300)
+    if not raw or len(raw) > 60_000_000:
+        return "unknown"
+    try:
+        from openpyxl import load_workbook
+        ws = load_workbook(io.BytesIO(raw), read_only=True, data_only=True).worksheets[0]
+        rows = [["" if v is None else str(v) for v in r] for r in ws.iter_rows(max_row=3001, values_only=True)]
+    except Exception:
+        return "unknown"
+    return sniff_matrix_file("\n".join("\t".join(r) for r in rows if any(r)))
+
+
 def check_raw_values(gse: str, files: dict, http: Http, processing: str = "",
-                     max_bytes: int = 2_000_000) -> dict:
+                     max_bytes: int = 2_000_000, key: str = "raw") -> dict:
     """Sniff the values of the files named like raw counts (first two text files).
 
-    Returns ``{"status": ..., "sniffed": {...}}`` with status ``raw_counts`` (integers),
+    ``key="other"`` checks the unlabelled tables instead. Returns
+    ``{"status": ..., "sniffed": {...}}`` with status ``raw_counts`` (integers, or an
+    integer count block in a mixed file),
     ``estimated_counts`` (decimal counts: salmon, RSEM, fractional featureCounts),
     ``normalized_only`` (decimals, and the data-processing text names FPKM/RPKM/TPM),
     ``decimal_unexplained`` (decimals the processing text does not explain) or ``unknown``
     (no text file could be read: Excel, download failure)."""
-    sniffed = {}
-    base = GEO_SUPPL.format(stub=geo_stub(gse), gse=gse)
-    for name in [n for n in files.get("raw", []) if not re.search(r"\.xlsx?$", n, re.I)][:2]:
-        raw = http.get(base + name, binary=True, timeout=120, max_bytes=max_bytes)
-        sniffed[name] = sniff_matrix_file(_head_text(raw)) if raw else "unknown"
+    sniffed = {name: _sniff_supplementary(gse, name, http, max_bytes) for name in files.get(key, [])[:2]}
     kinds = set(sniffed.values()) - {"unknown"}
     if not kinds:
         status = "unknown"
-    elif "raw_counts" in kinds:
+    elif "raw_counts" in kinds or "mixed" in kinds:
         status = "raw_counts"
+    elif kinds == {"mostly_integer"}:
+        # Mostly whole numbers are counts (estimated or fractional), whatever the
+        # processing text says about the series' other, normalised files.
+        status = "estimated_counts"
     elif _PROCESSING_NORMALISED.search(processing) and not _PROCESSING_ESTIMATED.search(processing):
         status = "normalized_only"
     elif _PROCESSING_ESTIMATED.search(processing) or kinds == {"mostly_integer"}:
@@ -615,10 +778,14 @@ def inspect_sample_files(urls: list[str], http: Http, n_sniff: int = 2) -> dict:
     names = [u.rsplit("/", 1)[-1] for u in urls]
     if not names:
         return {"status": "unknown", "why": "no per-sample files listed"}
-    tables = [(u, n) for u, n in zip(urls, names) if _MATRIX_EXT.search(n) and not _NON_MATRIX_EXT.search(n)]
+    if any(_SINGLE_CELL_FILE.search(n) for n in names):
+        return {"status": "single_cell", "examples": names[:3]}
+    tables = [(u, n) for u, n in zip(urls, names) if _MEMBER_EXT.search(n) and not _NON_MATRIX_EXT.search(n)]
     if not tables:
         return {"status": "no_count_files", "examples": names[:3]}
-    if all(_NORMALISED_NAME.search(n) and not _RAW_COUNT_NAME.search(n) for _, n in tables):
+    # kallisto's abundance.tsv carries est_counts: let the values decide.
+    if all(_NORMALISED_NAME.search(n) and not _RAW_COUNT_NAME.search(n) and "abundance.tsv" not in n.lower()
+           for _, n in tables):
         return {"status": "normalized_only", "examples": [n for _, n in tables[:3]], "why": "file names"}
     kinds = []
     for u, n in tables[:n_sniff]:
@@ -664,12 +831,16 @@ class Screen:
     source: str = ""
     query: str = ""
     linked_gse: str = ""
+    route: str = ""
+    missing: str = ""
+    flags: list = field(default_factory=list)
 
     def row(self) -> dict:
         return {
             "paper_id": self.paper_id, "title": self.title, "pmcid": self.pmcid, "doi": self.doi,
             "source": self.source, "query": self.query, "linked_gse": self.linked_gse,
-            "verdict": self.verdict, "reason": self.reason,
+            "verdict": self.verdict, "reason": self.reason, "route": self.route,
+            "missing": self.missing, "flags": ";".join(self.flags),
             "analyzable_gse": ";".join(self.analyzable_gse), "data_types": self.data_types,
             "own_gse": ";".join(self.own_gse), "cited_gse": ";".join(self.cited_gse),
             "other_repos": ";".join(f"{k}:{','.join(v)}" for k, v in self.other_repos.items()),
@@ -677,6 +848,58 @@ class Screen:
             "series_json": json.dumps(self.series, ensure_ascii=False),
             "evidence_json": json.dumps(self.evidence, ensure_ascii=False),
         }
+
+
+# Analysis route per matrix (references/matrix-method-policy.md of the workflow skill).
+ROUTE = {"raw_counts": "counts", "raw_counts_in_tar": "counts", "normalized_only": "limma"}
+
+# What each data type needs before it can be analysed. Only bulk RNA-seq is routed now;
+# the other rows say what a later route would need.
+REQUIRED_DATA = {
+    "bulk RNA-seq, counts (DESeq2/edgeR/limma-voom)": "genes x samples raw count matrix, or one count table "
+        "per sample (featureCounts/HTSeq/STAR, RSEM expected_count, salmon NumReads); sample groups; sex per "
+        "sample or X/Y genes in the matrix",
+    "bulk RNA-seq, TPM/FPKM/log (limma)": "genes x samples TPM/FPKM/CPM or log matrix; sample groups; sex per "
+        "sample or X/Y genes in the matrix",
+    "microarray (not routed)": "normalised log expression matrix (series matrix or CEL files) with the platform "
+        "annotation; sample groups; sex",
+    "single-cell (not routed)": "raw UMI counts per cell with a cell-to-sample map, for pseudobulk; sample groups; sex",
+    "methylation (not routed)": "beta or M values per CpG; sample groups; sex",
+}
+
+# What a paper lacks, by the layer it failed.
+MISSING = {
+    "no_full_text": "full text, or a GEO series linked to the paper's PMID",
+    "off_topic": "an exercise topic",
+    "no_exercise_contrast": "the paper's own exercise groups or protocol",
+    "no_own_deposit": "the paper's own GEO deposit",
+    "data_on_request": "a public deposit (data on request only)",
+    "non_geo_repository": "a GEO series with a processed matrix (data elsewhere or raw reads only)",
+    "geo_not_public": "a public GEO series",
+    "unsupported_data_type": "bulk RNA-seq data",
+    "unsupported_organism": "human, mouse or rat samples",
+    "no_processed_matrix": "a count or TPM/FPKM matrix (GEO has no processed matrix)",
+    "de_tables_only": "a count or TPM/FPKM matrix (GEO has DE tables only)",
+    "normalized_only": "raw counts (only TPM/FPKM; limma is off with --counts-only)",
+    "single_group": "two or more sample groups",
+    "group_too_small": "3 or more samples in each of two compared groups",
+}
+
+
+def series_flags(design: dict | None) -> list[str]:
+    """Checks for the analysis: sex composition (all male / all female / mixed / unknown),
+    arms short of 3 once split by sex, extra small groups, unlabelled samples."""
+    if not design:
+        return []
+    flags = [f"sex:{design.get('sex_composition', 'unknown')}"]
+    for sx, ok in (design.get("per_sex_ok") or {}).items():
+        if not ok:
+            flags.append(f"{sx}_arms_below_3")
+    if design.get("small_groups"):
+        flags.append("small_groups:" + ",".join(f"{k}={v}" for k, v in design["small_groups"].items()))
+    if design.get("unlabelled_samples"):
+        flags.append(f"unlabelled_samples:{design['unlabelled_samples']}")
+    return flags
 
 
 # Order matters: the reason recorded for a paper is the earliest layer it fails.
@@ -698,8 +921,10 @@ def organism_ok(taxon: str, organisms: set | None) -> bool:
 
 
 def judge_series(info: dict | None, files: dict | None, design: dict | None,
-                 routes: set = SUPPORTED_ROUTES, organisms: set | None = None) -> tuple[str, str]:
-    """(verdict, reason) for one GSE."""
+                 routes: set = SUPPORTED_ROUTES, organisms: set | None = None,
+                 counts_only: bool = False) -> tuple[str, str]:
+    """(verdict, reason) for one GSE. TPM/FPKM/log matrices pass (they go to limma)
+    unless ``counts_only``."""
     if info is None:
         return "excluded", "geo_not_public"
     if not set(info["data_type"].split("+")) & routes:
@@ -708,11 +933,13 @@ def judge_series(info: dict | None, files: dict | None, design: dict | None,
         return "excluded", f"unsupported_organism:{info.get('taxon', '')}"
     if files is not None:
         st = files["status"]
+        if st == "single_cell":
+            return "excluded", "unsupported_data_type:scrnaseq"
         if st == "none":
             return "excluded", "no_processed_matrix"
         if st == "de_tables_only":
             return "excluded", "de_tables_only"
-        if st == "normalized_only":
+        if st == "normalized_only" and counts_only:
             return "excluded", "normalized_only"
         if st == "decimal_unexplained":
             return "needs_inspection", "matrix_decimal_unexplained"
@@ -781,18 +1008,44 @@ def _same_paper(row: dict, pmids: list[str], http: Http) -> bool:
 def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bool = True,
                  check_design: bool = True, routes: set = SUPPORTED_ROUTES,
                  organisms: set | None = None, topic: re.Pattern | None = None,
-                 contrast: re.Pattern | None = None) -> Screen:
+                 contrast: re.Pattern | None = None, counts_only: bool = False) -> Screen:
     """Screen one paper. ``doc`` is its structured full text (None when unavailable).
 
     ``organisms`` (lower-case species names), ``topic`` (a regex for the title or
     abstract) and ``contrast`` (a regex for the paper's own exercise groups or protocol,
-    see ``contrast_evidence``) are off when None; the CLI turns them on by default."""
+    see ``contrast_evidence``) are off when None; the CLI turns them on by default.
+    Series GEO links to the paper first count as its own, with or without full text.
+    ``counts_only`` excludes TPM/FPKM-only series instead of routing them to limma."""
+    s = _screen_paper(row, doc, http, check_files, check_design, routes, organisms, topic, contrast, counts_only)
+    best = next((r for r in s.series if r["gse"] in s.analyzable_gse), None)
+    if best is None:
+        best = next((r for r in s.series if r["verdict"] == "needs_inspection"), None)
+    if best is not None:
+        s.flags = series_flags(best.get("design"))
+    s.route = ";".join(dict.fromkeys(r.get("route", "") for r in s.series if r["gse"] in s.analyzable_gse))
+    if s.verdict == "excluded":
+        s.missing = MISSING.get(s.reason.split(":")[0], "")
+    elif s.verdict == "analyzable" and "sex:unknown" in s.flags:
+        s.missing = "sex per sample (check X/Y genes)"
+    return s
+
+
+def _screen_paper(row, doc, http, check_files, check_design, routes, organisms, topic, contrast,
+                  counts_only) -> Screen:
     s = Screen(paper_id=row.get("paper_id") or row.get("paperId") or row.get("pmcid") or row.get("doi", ""),
                title=row.get("title", ""), pmcid=row.get("pmcid", ""), doi=row.get("doi", ""),
                source=row.get("source", ""), query=row.get("query", ""), linked_gse=row.get("linked_gse", ""))
+    geo_own = geo_owned_series(row, http) if http else []
     if not doc or not doc.get("blocks"):
-        s.verdict, s.reason = "excluded", "no_full_text"
-        return s
+        if not geo_own:
+            s.verdict, s.reason = "excluded", "no_full_text"
+            return s
+        # No full text, but GEO links the paper to its own series: judge the topic and
+        # the exercise design from the title and the series' GEO summaries.
+        infos = [geo_summary(g, http) or {} for g in geo_own]
+        geo_text = " ".join(f"{i.get('title', '')}. {i.get('summary', '')}" for i in infos)
+        doc = {"title": row.get("title", ""), "structure_quality": "geo_only",
+               "blocks": [{"id": "GEO", "section_class": "abstract", "kind": "paragraph", "text": geo_text}]}
     s.text_source = doc.get("structure_quality", "")
     if not on_topic(row, doc, topic):
         s.verdict, s.reason = "excluded", "off_topic"
@@ -802,6 +1055,13 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
         s.verdict, s.reason = "excluded", "no_exercise_contrast"
         return s
     dep = deposits_from_doc(doc)
+    for gse in geo_own:
+        # GEO's own link wins over the wording around a mention (or its absence).
+        if gse not in dep["own"].get("geo", []):
+            dep["own"].setdefault("geo", []).append(gse)
+        if gse in dep["cited"]:
+            dep["cited"].remove(gse)
+        dep["said_own"].append(gse)
     s.own_gse = dep["own"].get("geo", [])
     s.other_repos = {k: v for k, v in dep["own"].items() if k != "geo"}
     s.cited_gse = dep["cited"]
@@ -847,15 +1107,25 @@ def screen_paper(row: dict, doc: dict | None, http: Http | None, check_files: bo
                         # still hold per-sample counts (GSE179302).
                         files["status"] = "raw_tar" if files["tar"] else vc["status"]
                     vc["processing"] = design["processing"][:300]
+                elif files and files["status"] == "unlabelled_matrix":
+                    # A table named neither counts nor FPKM: its columns or values decide
+                    # (Novogene gene_expression.xlsx has "Count (S1)" columns).
+                    files["value_check"] = vc = check_raw_values(gse, files, http, design.get("processing", ""),
+                                                                 key="other")
+                    files["status"] = {"raw_counts": "raw_counts", "estimated_counts": "raw_counts",
+                                       "normalized_only": "normalized_only"}.get(vc["status"], "unlabelled_matrix")
+                    vc["processing"] = design["processing"][:300]
                 design.pop("processing", None)
                 if files and files["status"] == "raw_tar":
                     files["tar_inspection"] = inside = inspect_sample_files(design.get("sample_files", []), http)
                     files["status"] = {"raw_counts": "raw_counts_in_tar", "normalized_only": "normalized_only",
-                                       "no_count_files": "none"}.get(inside["status"], "raw_tar")
+                                       "no_count_files": "none", "single_cell": "single_cell"}.get(inside["status"],
+                                                                                                  "raw_tar")
                 design.pop("sample_files", None)
-        verdict, reason = judge_series(info, files, design, routes, organisms)
+        verdict, reason = judge_series(info, files, design, routes, organisms, counts_only)
         types.append(info["data_type"] if info else "not_public")
         results.append({"gse": gse, "verdict": verdict, "reason": reason,
+                        "route": ROUTE.get((files or {}).get("status"), "") if verdict == "analyzable" else "",
                         "data_type": info["data_type"] if info else "", "taxon": info["taxon"] if info else "",
                         "n_samples": info["n_samples"] if info else 0,
                         "files": files, "design": design})
@@ -1078,7 +1348,8 @@ def load_full_text(row: dict, papers_dir: str, http: Http) -> dict | None:
 # Batch + summary
 # ---------------------------------------------------------------------------
 
-FIELDS = ["paper_id", "title", "pmcid", "doi", "source", "query", "linked_gse", "verdict", "reason", "analyzable_gse", "data_types",
+FIELDS = ["paper_id", "title", "pmcid", "doi", "source", "query", "linked_gse", "verdict", "reason", "route",
+          "missing", "flags", "analyzable_gse", "data_types",
           "own_gse", "cited_gse", "other_repos", "text_source", "series_json", "evidence_json"]
 
 
@@ -1130,7 +1401,8 @@ DEFAULT_CONTRAST = "|".join(f"(?:{p})" for p in (
 
 def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: bool = True,
                 routes: set = SUPPORTED_ROUTES, organisms: set | None = None,
-                topic: re.Pattern | None = None, contrast: re.Pattern | None = None) -> str:
+                topic: re.Pattern | None = None, contrast: re.Pattern | None = None,
+                counts_only: bool = False) -> str:
     os.makedirs(out_dir, exist_ok=True)
     http = Http(cache_dir=os.path.join(out_dir, "_http_cache"))
     with open(papers_csv, encoding="utf-8") as f:
@@ -1145,7 +1417,7 @@ def screen_file(papers_csv: str, out_dir: str, limit: int = 0, check_design: boo
             try:
                 doc = load_full_text(row, os.path.join(out_dir, "papers"), http)
                 s = screen_paper(row, doc, http, check_design=check_design, routes=routes,
-                                 organisms=organisms, topic=topic, contrast=contrast)
+                                 organisms=organisms, topic=topic, contrast=contrast, counts_only=counts_only)
             except Exception as e:  # one bad paper never stops the batch
                 s = Screen(paper_id=row.get("paper_id", ""), title=row.get("title", ""),
                            source=row.get("source", ""), query=row.get("query", ""),
@@ -1218,6 +1490,17 @@ def summarize(screen_csv: str) -> str:
                          f"{sum(r['verdict'] == 'needs_inspection' for r in sub)} |")
     lines += ["", "## Data types of the papers' own GEO series", "", "| Data type | Papers |", "|---|---:|"]
     lines += [f"| {k} | {v} |" for k, v in types.most_common()]
+    ok = [r for r in rows if r["verdict"] == "analyzable"]
+    if ok:
+        routes = Counter(r.get("route", "") for r in ok)
+        lines += ["", "## Analysable papers by route", "", "| Route | Papers |", "|---|---:|"]
+        lines += [f"| {k or '?'} | {v} |" for k, v in routes.most_common()]
+        flags = Counter(f.split(":")[0] if not f.startswith("sex:") else f
+                        for r in ok for f in filter(None, r.get("flags", "").split(";")))
+        lines += ["", "## Checks for the analysable papers", "", "| Flag | Papers |", "|---|---:|"]
+        lines += [f"| {k} | {v} |" for k, v in sorted(flags.items())]
+    lines += ["", "## What each data type needs", "", "| Data type | Needed |", "|---|---|"]
+    lines += [f"| {k} | {v} |" for k, v in REQUIRED_DATA.items()]
     return "\n".join(lines) + "\n"
 
 
@@ -1240,6 +1523,8 @@ def _main(argv=None) -> int:
     p.add_argument("--out", required=True)
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--no-design", action="store_true", help="skip the series-matrix design layer")
+    p.add_argument("--counts-only", action="store_true",
+                   help="exclude series with only TPM/FPKM/log matrices instead of routing them to limma")
     p.add_argument("--routes", default="rnaseq", help="comma-separated supported data types")
     p.add_argument("--organisms", default=",".join(sorted(DEFAULT_ORGANISMS)),
                    help='comma-separated species kept (default human, mouse, rat); "any" keeps all')
@@ -1272,7 +1557,8 @@ def _main(argv=None) -> int:
             {o.strip().lower() for o in a.organisms.split(",") if o.strip()}
         topic = re.compile(a.topic, re.I) if a.topic else None
         out = screen_file(a.papers_csv, a.out, a.limit, not a.no_design, set(a.routes.split(",")),
-                          organisms, topic, re.compile(a.contrast, re.I) if a.contrast else None)
+                          organisms, topic, re.compile(a.contrast, re.I) if a.contrast else None,
+                          a.counts_only)
         print(open(os.path.join(a.out, "screen_summary.md"), encoding="utf-8").read())
         print(out)
     else:

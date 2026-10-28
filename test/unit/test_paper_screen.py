@@ -266,13 +266,19 @@ def test_end_to_end_exclusions():
     cases = [
         (_geo_routes(gdstype="Expression profiling by array"), "unsupported_data_type:microarray"),
         (_geo_routes(title="Single-cell RNA-seq atlas"), "unsupported_data_type:scrnaseq"),
-        (_geo_routes(suppl=("GSE123456_TPM.txt.gz",)), "normalized_only"),
         (_geo_routes(suppl=("filelist.txt",)), "no_processed_matrix"),
         (_geo_routes(groups=(2, 2)), "group_too_small"),
     ]
     for routes, reason in cases:
         s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
         assert (s.verdict, s.reason) == ("excluded", reason), (reason, s.verdict, s.reason)
+    # A TPM/FPKM-only series goes to limma; --counts-only excludes it as before.
+    tpm = _geo_routes(suppl=("GSE123456_TPM.txt.gz",))
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(tpm))
+    assert (s.verdict, s.route) == ("analyzable", "limma"), (s.verdict, s.reason, s.route)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(tpm), counts_only=True)
+    assert (s.verdict, s.reason) == ("excluded", "normalized_only"), (s.verdict, s.reason)
+    assert s.missing.startswith("raw counts"), s.missing
     routes = _geo_routes()
     routes["esearch.fcgi"] = json.dumps({"esearchresult": {"idlist": []}})
     assert sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes)).reason == "geo_not_public"
@@ -385,8 +391,10 @@ def test_raw_tar_judged_from_sample_files():
     f = s.series[0]["files"]
     assert f["status"] == "raw_counts_in_tar" and f["tar_inspection"]["n_tables"] == 8, f
     assert "sample_files" not in s.series[0]["design"]
-    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
-                        FakeHttp(_geo_routes(suppl=tar, sample_files={"genes.txt.gz": FPKM})))
+    fpkm = _geo_routes(suppl=tar, sample_files={"genes.txt.gz": FPKM})
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(fpkm))
+    assert (s.verdict, s.route) == ("analyzable", "limma"), (s.verdict, s.reason)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(fpkm), counts_only=True)
     assert (s.verdict, s.reason) == ("excluded", "normalized_only"), (s.verdict, s.reason)
     s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD),
                         FakeHttp(_geo_routes(suppl=tar, sample_files={"signal.bw": "x"})))
@@ -444,6 +452,8 @@ def test_raw_counts_named_file_with_rpkm_values():
     assert s.verdict == "analyzable", s.series
     routes["GSE123456_raw_counts.txt.gz"] = gzip.compress(_matrix(lambda i, j: f"{(i + 1) / 7:.4f}").encode())
     s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes))
+    assert (s.verdict, s.route) == ("analyzable", "limma"), (s.verdict, s.reason, s.route)
+    s = sc.screen_paper({"paper_id": "p"}, _doc(PAPER_MD), FakeHttp(routes), counts_only=True)
     assert (s.verdict, s.reason) == ("excluded", "normalized_only"), (s.verdict, s.reason)
     assert "RPKM" in s.series[0]["files"]["value_check"]["processing"]
     assert "processing" not in s.series[0]["design"]
@@ -578,6 +588,87 @@ def test_collect_shares_exclude_and_years():
     assert sum(i.startswith("S") for i in ids) == 1 and len(ids) == 4, ids
     assert "PMID200" not in ids, ids                                  # already screened
     assert any("2015:" in str((c[1] or {}).get("term", "")) for c in http.calls), http.calls  # year range sent
+
+
+def test_publicly_available_deposit_is_own():
+    """GSE205676 / GSE242861: "publicly available" in a data statement is the deposit itself."""
+    md = ("## Data availability\n\nAll RNA-seq dataset is publicly available (GSE205676) at the GEO.\n\n"
+          "## Methods\n\nTo validate, a publicly available dataset was used (GSE163356).\n")
+    dep = sc.deposits_from_doc(_doc(md))
+    assert dep["own"] == {"geo": ["GSE205676"]} and dep["cited"] == ["GSE163356"], dep
+    md = ("## Data availability\n\nAll data are included in this article and publicly available "
+          "repositories (GEO: GSE242861).\n")
+    assert sc.deposits_from_doc(_doc(md))["own"] == {"geo": ["GSE242861"]}
+
+
+def _elink(*uids):
+    return json.dumps({"linksets": [{"linksetdbs": [{"linkname": "pubmed_gds", "links": list(uids)}]}]})
+
+
+def test_geo_linked_series_are_own():
+    """GSE235174: GEO links the paper first, though its text never names the series."""
+    md = "# Exercise in COPD\n\n## Methods\n\nPatients underwent 12 weeks of aerobic training.\n"
+    routes = {"elink.fcgi": _elink("200123456", "100001"), **_geo_routes(pubmedids=["999"])}
+    s = sc.screen_paper({"paper_id": "p", "pmid": "999", "title": "Exercise in COPD"}, _doc(md), FakeHttp(routes))
+    assert (s.verdict, s.own_gse) == ("analyzable", ["GSE123456"]), (s.verdict, s.reason, s.own_gse)
+    # GEO links an earlier paper first: the series is that paper's, reused here.
+    routes = {"elink.fcgi": _elink("200123456"), **_geo_routes(pubmedids=["111", "999"], title="Other study")}
+    s = sc.screen_paper({"paper_id": "p", "pmid": "999", "title": "Exercise in COPD"}, _doc(md), FakeHttp(routes))
+    assert s.own_gse == [], s.own_gse
+    # No full text: the GEO summary stands in for the topic and design checks.
+    routes = {"elink.fcgi": _elink("200123456"), **_geo_routes(pubmedids=["999"])}
+    summary = json.loads(routes["esummary.fcgi"])
+    summary["result"]["200123456"]["summary"] = "Sedentary and trained mice were compared after 6 weeks of wheel running."
+    routes["esummary.fcgi"] = json.dumps(summary)
+    row = {"paper_id": "p", "pmid": "999", "title": "Exercise remodels muscle"}
+    s = sc.screen_paper(row, None, FakeHttp(routes))
+    assert (s.verdict, s.text_source) == ("analyzable", "geo_only"), (s.verdict, s.reason, s.text_source)
+    assert sc.screen_paper(row, None, FakeHttp(_geo_routes())).reason == "no_full_text"
+
+
+def test_design_compared_arms_and_sex():
+    """GSE297515: a 2-sample Yoda1 arm and unlabelled samples do not fail SED vs AEX."""
+    import pandas as pd
+    labels = ["SED"] * 6 + ["AEX"] * 3 + ["Yoda1.2h"] * 2 + [""] * 4
+    df = pd.DataFrame({"geo_accession": [f"GSM{i}" for i in range(15)],
+                       "characteristics_ch1.1.treatment": labels,
+                       "characteristics_ch1.2.Sex": ["male"] * 15})
+    d = sc.design_from_samples(df)
+    assert d["status"] == "ok" and d["small_groups"] == {"Yoda1.2h": 2}, d
+    assert d["unlabelled_samples"] == 4 and d["sex_composition"] == "all_male", d
+    assert sc.series_flags(d) == ["sex:all_male", "small_groups:Yoda1.2h=2", "unlabelled_samples:4"]
+    # An exercise arm of 2 fails even next to a large control arm.
+    df["characteristics_ch1.1.treatment"] = ["SED"] * 6 + ["AEX"] * 2 + ["Vehicle"] * 3 + [""] * 4
+    assert sc.design_from_samples(df)["status"] == "group_too_small"
+    # Mixed sex: each sex needs its own arms of three.
+    df = pd.DataFrame({"geo_accession": [f"GSM{i}" for i in range(12)],
+                       "characteristics_ch1.1.group": ["sedentary"] * 6 + ["trained"] * 6,
+                       "characteristics_ch1.2.Sex": ["male", "female"] * 6})
+    d = sc.design_from_samples(df)
+    assert d["sex_composition"] == "mixed" and d["per_sex_groups"]["male"] == {"sedentary": 3, "trained": 3}, d
+    df["characteristics_ch1.2.Sex"] = ["male"] * 4 + ["female"] * 2 + ["male"] * 4 + ["female"] * 2
+    flags = sc.series_flags(sc.design_from_samples(df))
+    assert "sex:mixed" in flags and "female_arms_below_3" in flags and "male_arms_below_3" not in flags, flags
+
+
+def test_matrix_values_beyond_names():
+    """Mixed count blocks (GSE235174), Count columns (Novogene), salmon/kallisto members, 10x files."""
+    mixed = "gene\ta1\ta2\ta3\tlnc\tl1\tl2\tl3\n" + "".join(
+        f"G{i}\t{i}\t{i + 3}\t{2 * i}\tT{i}\t{i * 0.37:.4f}\t{i * 0.11:.4f}\t{i * 0.53:.4f}\n" for i in range(1, 80))
+    assert sc.sniff_matrix_file(mixed) == "mixed"
+    novogene = "Gene ID\tCount (S1)\tTPM (S1)\tCount (S2)\tTPM (S2)\n" + "".join(
+        f"G{i}\t{i * 3}\t{i * 0.31:.3f}\t{i * 5}\t{i * 0.47:.3f}\n" for i in range(1, 80))
+    assert sc.sniff_matrix_file(novogene) == "raw_counts"
+    salmon = "Name\tLength\tEffectiveLength\tTPM\tNumReads\n" + "".join(
+        f"T{i}\t900\t750.2\t{i * 0.9:.3f}\t{i * 1.5:.3f}\n" for i in range(200))
+    assert sc.sniff_count_file(salmon) == "raw_counts"
+    tenx = ["ftp://x/GSM1_barcodes.tsv.gz", "ftp://x/GSM1_features.tsv.gz", "ftp://x/GSM1_matrix.mtx.gz"]
+    assert sc.inspect_sample_files(tenx, FakeHttp({}))["status"] == "single_cell"
+    # A mostly-integer file stays counts though the processing text names FPKM.
+    files = {"raw": ["GSE1_counts.txt.gz"]}
+    routes = {"GSE1_counts.txt.gz": gzip.compress(mixed.replace("\t0.", "\t1").encode())}
+    vc = sc.check_raw_values("GSE1", files, FakeHttp(routes), processing="FPKM were computed with Cufflinks")
+    assert vc["status"] in ("raw_counts", "estimated_counts"), vc
 
 
 def main() -> int:
