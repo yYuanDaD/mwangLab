@@ -1,0 +1,150 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41118251",
+  "request": "Analyze GSE289569 for PMID 41118251 (A role for the transcriptional coregulator RIP140 in the control of muscle endurance fitness.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE289569",
+      "accession": "GSE289569",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12643488.paper.md"],
+        "metadata": "GSE289569/GSE289569_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41118251/prep/GSE289569_fpkm_by_gene_id.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41118251/prep/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE289569"],
+            "assay": "bulk RNA-seq (Salmon/tximport, mm10) of EDL muscle, male mice, n=3 per group (FIG4 A; S4.12.p1; S4.13.p1)",
+            "inclusion": "Male strNrip1-/- (MCK-Cre) and WT littermates, 8 wk voluntary wheel running vs sedentary from 8 wk of age; EDL from an independent cohort not subjected to additional testing; non-runners (<5 km/night) removed (S2.3.p1; S4.8.p1; S4.12.p1; S4.1.p1)",
+            "factors": {"genotype": ["WT control", "strNrip1-/-"], "training": ["sedentary", "voluntary wheel trained 8 wk"]},
+            "primary_estimand": "Paper's primary transcriptomic estimand is the genotype effect (KO vs WT) within sedentary and within trained EDL (S2.4.p1, FIG4 B/D). For this request the exercise estimand is the training effect (Trained vs Sedentary) within WT, and within KO; the authors computed these Train-Sed|WT and Train-Sed|KO DESeq2 contrasts and deposited them in GEO but report no counts in the text.",
+            "planned_contrasts": [
+              "Train vs Sed within WT (deposited GEO table column 'Train-Sed|WT'; not counted in the text)",
+              "Train vs Sed within KO (deposited 'Train-Sed|KO'; not counted in the text)",
+              "KO vs WT within Sed (S2.4.p1: 421 up / 288 down)",
+              "KO vs WT within Trained (S2.4.p1, FIG4B: 616 up / 506 down)"
+            ],
+            "repeated_measure_unit": "none (one EDL sample per mouse; independent groups)",
+            "paper_method": "DESeq2 v1.44.0 on tximport gene-level counts, pairwise group comparisons (S4.13.p1-p2; GEO data_processing)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.2630344, "inclusive": true, "source_locator": "S4.13.p2 (FDR <= 0.05 and |FC| >= 1.2); S2.4.p1/FIG4 state FC > 1.2 and FDR < 0.05"},
+            "paper_results": {"KO_vs_WT_Sed": "421 up / 288 down", "KO_vs_WT_Train": "616 up / 506 down", "physiology": "2-way ANOVA: significant training and genotype effects on VO2max, no interaction (S2.3.p1)"}
+          },
+          "reasoning": "S4.23.p1 names GSE289569 as the strNrip1-/- with training RNA-seq. S2.3.p1/S4.8.p1 define the 2x2 genotype x voluntary-wheel-training design; S4.13.p2 gives DESeq2 and FDR<=0.05, |FC|>=1.2. The text reports only KO-vs-WT DEG counts; the GEO supplementary table also carries the authors' DESeq2 Train-Sed|WT and Train-Sed|KO results, which define the exercise estimand the request asks for. Recomputing the deposited padj/log2FC at the paper threshold gives 421/288 and 616/506 exactly, so the deposited table is the authors' result.",
+          "locator": "S4.13.p2; S2.4.p1; S4.23.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.23.p1 names GSE289569 as the strNrip1-/- training RNA-seq", "GEO metadata: 12 EDL samples, Ctrl/Nrip1KO x Sedentary/Trained, 3 per cell, Mus musculus, matches FIG4A n=3 per group", "supplementary matrix columns WT/KO x S/TR x EDL x rep1-3 = 12 samples", "deposited DESeq2 columns reproduce the paper's 421/288 and 616/506 KO-vs-WT counts"]},
+          "reasoning": "Paper, GEO series, and matrix agree on the 12-sample 2x2 EDL design; deposited author results reproduce the text's counts exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^EDL_muscle, (Ctrl|Nrip1KO), (Sedentary|Trained), rep(\\d)$"]},
+          "patterns": {"geno": ["title", "^EDL_muscle, (Ctrl|Nrip1KO), "], "train": ["title", ", (Sedentary|Trained), rep"]},
+          "recode": {"geno": {"Ctrl": "WT", "Nrip1KO": "KO"}, "train": {"Sedentary": "SED", "Trained": "TR"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are the authors' labels (WT_S_EDL_1 ...). prep/prep_matrix.py renames them by decoding the label vocabulary (WT->Ctrl, KO->Nrip1KO, S->Sedentary, TR->Trained, replicate kept) to <genotype>_<training>_<rep>; key_patterns derives the same key from the GEO title. Exact match on that key, never by position. Derived formula-safe columns geno (WT/KO) and train (SED/TR).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "final": {"source": "GSE289569_fpkm_and_deseq2_results.tsv.gz (12 FPKM columns split out by prep_matrix.py)", "paper_input": "tximport gene-level counts from Salmon (S4.13.p1) - not deposited"},
+          "reasoning": "GEO data_processing: 'Tab-separated table with FPKM values for all samples and DESeq2-generated adjusted p-values and log2 fold changes'. Values are non-integer, non-negative in the sample columns, max ~2.4e5; consistent with FPKM. No raw or estimated counts are deposited (no _RAW.tar, sample supplementary files NONE).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "train"],
+          "references": {"geno": "WT", "train": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["train_TR_vs_SED_geno-WT", "train_TR_vs_SED_geno-KO", "geno_KO_vs_WT_train-SED", "geno_KO_vs_WT_train-TR"],
+          "final": {
+            "analysis_type": "factorial 2x2 (cell-means, one model on all 12 samples)",
+            "formula": "~ 0 + C(cell)  (cell = geno x train)",
+            "contrasts": [
+              {"name": "train_TR_vs_SED_geno-WT", "role": "primary", "note": "exercise effect in WT (deposited Train-Sed|WT)"},
+              {"name": "train_TR_vs_SED_geno-KO", "role": "secondary", "note": "exercise effect in KO (deposited Train-Sed|KO)"},
+              {"name": "geno_KO_vs_WT_train-SED", "role": "secondary", "note": "paper's reported genotype contrast, sedentary"},
+              {"name": "geno_KO_vs_WT_train-TR", "role": "secondary", "note": "paper's reported genotype contrast, trained"}
+            ],
+            "estimand_type": "causal (training assigned within genotype)"
+          },
+          "candidates": [
+            {"value": "pool genotypes for Trained vs Sedentary", "reason_rejected": "genotype strongly changes expression (709-1122 DEGs); the authors analyse training within genotype"},
+            {"value": "two separate two-group fits", "reason_rejected": "one model on all 12 samples shares the variance estimate; the authors' contrasts all come from the 4-group design"}
+          ],
+          "reasoning": "S2.3.p1 / FIG4: 2x2 genotype x training, n=3 per cell, independent mice. The exercise question is Trained vs Sedentary within genotype; the KO-vs-WT contrasts are the paper's reported results and run as secondary from the same model. Interaction is exploratory (paper reports no transcriptomic interaction test).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "One EDL sample per mouse, independent groups; GEO records no batch, lane, or date variable; all males (S4.1.p1). No blocking unit.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend on log2(FPKM+1), joint cell-means model)",
+            "formula": "~ 0 + C(cell)",
+            "paper_route": {"method": "DESeq2 on tximport counts", "status": "blocked", "reason": "only FPKM deposited; DESeq2 needs counts and FPKM cannot be converted back to counts"},
+            "deviations": ["limma on log2(FPKM+1) instead of DESeq2 on counts; counts will differ from the authors' deposited DESeq2 results"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix-method policy: FPKM goes to limma on a log scale. No extra expression filter: the deposited matrix already holds only 17,752 genes, each expressed in at least one sample.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.2630344, "inclusive": true},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.2630344, "inclusive": true},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper's FDR<=0.05 and |FC|>=1.2 (log2(1.2)=0.2630344) applied to limma BH-adjusted p and logFC."
+          },
+          "reasoning": "S4.13.p2: adjusted P (FDR) of 0.05 or less and absolute fold change of at least 1.2. The results text says FC > 1.2 and FDR < 0.05; on the deposited results both readings give identical counts.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["exercise contrast counts are not stated in the paper text; their reference counts come from the authors' deposited DESeq2 table at the paper threshold", "limma on FPKM vs authors' DESeq2 on counts", "n=3 per group"]},
+          "paper_counts": {
+            "joint/train_TR_vs_SED_geno-WT": 51,
+            "joint/train_TR_vs_SED_geno-KO": 128,
+            "joint/geno_KO_vs_WT_train-SED": 709,
+            "joint/geno_KO_vs_WT_train-TR": 1122
+          },
+          "paper_genes": {
+            "joint/geno_KO_vs_WT_train-SED": ["Musk", "Chrna4", "Chrna2", "Wnt16", "Vegfa", "Fgfbp1"],
+            "joint/geno_KO_vs_WT_train-TR": ["Musk", "Chrna4", "Wnt16", "Vegfa"]
+          },
+          "reasoning": "KO-vs-WT counts from S2.4.p1 (421+288, 616+506). Train-vs-Sed reference counts (39 up/12 down WT; 73 up/55 down KO) recomputed from the authors' deposited DESeq2 padj/log2FC at the paper threshold. Named genes from S2.4.p5-p6 (NMJ and angiogenic genes up in KO EDL).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix input", "paper": "DESeq2 on tximport counts (S4.13)", "data": "only FPKM deposited", "disposition": "declared_deviation"},
+        {"item": "exercise DEG counts", "paper": "not reported in text", "data": "authors' DESeq2 Train-Sed|WT and Train-Sed|KO in the GEO supplementary table", "disposition": "executable_without_change"},
+        {"item": "threshold wording", "paper": "Methods: FDR<=0.05, |FC|>=1.2; Results: FC>1.2, FDR<0.05", "data": "identical counts on deposited results", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "all"},
+          "role": "primary",
+          "reasoning": "One limma cell-means model on all 12 samples; planned exercise contrasts within genotype (primary WT), genotype contrasts as reported in the paper, interaction exploratory."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/train_TR_vs_SED_geno-WT", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Pathway view of the exercise effect in WT EDL; the paper discusses training-induced oxidative/mitochondrial programs."}
+      ]
+    }
+  ]
+}

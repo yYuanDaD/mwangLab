@@ -1,0 +1,448 @@
+{
+  "case_id": "GSE325919",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "grp",
+    "sex"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp",
+        "sex"
+      ],
+      "levels": {
+        "grp": {
+          "SED": 10,
+          "TR": 10,
+          "G6PD": 10
+        },
+        "sex": {
+          "F": 15,
+          "M": 15
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "sex",
+          "decision": "omit",
+          "reason": "same grouping as design factor sex (its source column)"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp) + C(sex)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 26,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": [
+        "grp_TR_vs_SED",
+        "grp_G6PD_vs_SED"
+      ]
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "sex",
+      "predicted": {
+        "female": 15,
+        "male": 15
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41911459\\GSE325919\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "grp_G6PD_vs_SED__sex-female_sex-F",
+            "grp_TR_vs_G6PD__sex-female_sex-F",
+            "grp_TR_vs_SED__sex-female_sex-F"
+          ],
+          "male": [
+            "grp_G6PD_vs_SED__sex-male_sex-M",
+            "grp_TR_vs_G6PD__sex-male_sex-M",
+            "grp_TR_vs_SED__sex-male_sex-M"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_G6PD_vs_SED_sex-F",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "G6PD",
+      "reference": "SED",
+      "within": {
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "G6PD"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_TR_vs_G6PD_sex-F",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TR",
+      "reference": "G6PD",
+      "within": {
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "TR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "G6PD"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_TR_vs_SED_sex-F",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TR",
+      "reference": "SED",
+      "within": {
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "TR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "grp": "SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_G6PD_vs_SED_sex-M",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "G6PD",
+      "reference": "SED",
+      "within": {
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "G6PD"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_TR_vs_G6PD_sex-M",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TR",
+      "reference": "G6PD",
+      "within": {
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "TR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "G6PD"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_TR_vs_SED_sex-M",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TR",
+      "reference": "SED",
+      "within": {
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "TR"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "grp": "SED"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_M_vs_F_grp-G6PD",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "M",
+      "reference": "F",
+      "within": {
+        "grp": "G6PD"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "G6PD",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "G6PD",
+            "sex": "F"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_M_vs_F_grp-SED",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "M",
+      "reference": "F",
+      "within": {
+        "grp": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "F"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_M_vs_F_grp-TR",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "M",
+      "reference": "F",
+      "within": {
+        "grp": "TR"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "TR",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "TR",
+            "sex": "F"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_sex_G6PD_M_vs_SED_F",
+      "kind": "interaction",
+      "factor": "grp:sex",
+      "test": "G6PD:M",
+      "reference": "SED:F",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "G6PD",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "G6PD",
+            "sex": "F"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "F"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_sex_TR_M_vs_SED_F",
+      "kind": "interaction",
+      "factor": "grp:sex",
+      "test": "TR:M",
+      "reference": "SED:F",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "TR",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "M"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "TR",
+            "sex": "F"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "grp": "SED",
+            "sex": "F"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

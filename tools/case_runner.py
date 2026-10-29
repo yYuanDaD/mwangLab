@@ -836,9 +836,13 @@ class CaseRun:
             self.result["paper_gene_check"] = genes
 
     def _finish(self) -> dict:
-        primary = next((n for n, e in ((e.name, e) for e in self.spec.executions) if e.role == "primary"), None)
-        hit = next((o for k, o in self.outputs.items() if primary and (k == primary or k.startswith(primary + "/"))),
-                   None)
+        primary = next((e.name for e in self.spec.executions if e.role == "primary"), None)
+        if primary is None and self.spec.executions:
+            primary = self.spec.executions[0].name
+        tables = {k: o for k, o in self.outputs.items() if primary and (k == primary or k.startswith(primary + "/"))}
+        # a joint model writes one table per comparison: report the first planned one, not file order
+        planned = list(self.spec.gates.design.planned) if self.spec.gates and self.spec.gates.design else []
+        hit = next((tables[f"{primary}/{p}"] for p in planned if f"{primary}/{p}" in tables), None) or             next(iter(tables.values()), None)
         applied = hit["applied"] if hit else None
         self.result["finish"] = self.case.finish(n_deg=applied["n_significant"] if applied else None,
                                                  deg_sanity=applied["deg_sanity"] if applied else None)

@@ -1,0 +1,186 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41911459",
+  "request": "Analyze GSE325919 for PMID 41911459 (Mitochondrial remodeling in skeletal muscle underlies exercise-induced reversal of age-associated functional decline in mice and humans.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE325919",
+      "accession": "GSE325919",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13056071.paper.md"],
+        "metadata": "GSE325919/GSE325919_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41911459/GSE325919_rsem_expected_counts.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41911459/prep_merge_rsem.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE325919", "PXD076192 (proteomics, not analysed here)"],
+            "assay": "bulk poly(A) RNA-seq, mouse gastrocnemius (S2.24.p1), RSEM expected counts on GRCm38 v91 (S2.24.p2)",
+            "sample_inclusion": "23-mo-old mice after a 10-wk HIMIT intervention started at 20 mo: WT untrained, WT trained, G6PD-Tg untrained; both sexes (S1.p1, S2.2.p1). GEO deposits 5 per group per sex = 30 samples (subset of the 61 mice phenotyped).",
+            "factors": {"group": ["WT untrained (reference)", "WT trained (HIMIT)", "G6PD-Tg untrained"], "sex": ["female", "male"]},
+            "primary_estimand": "Effect of 10-wk late-onset HIMIT exercise training on gastrocnemius gene expression in old (23 mo) WT mice: WT trained vs WT untrained (Fig. 2H comparison; S1.p7).",
+            "planned_contrasts": [
+              "WT trained vs WT untrained (exercise effect; S1.p7, Fig. 2H; paper gives no DEG count in the text, results in Dataset S2 / SI Fig. S2E)",
+              "G6PD-Tg untrained vs WT untrained (transgene/robustness effect, not exercise; S1.p7, Fig. 2I)"
+            ],
+            "repeated_measure_unit": "none; one gastrocnemius sample per independent mouse",
+            "normalization": "genes < 10 CPM filtered; expected counts TMM-normalised with edgeR (S2.24.p2)",
+            "paper_method": "limma v3.50.3 on TMM-normalised RSEM expected counts (S2.24.p2); GSEA (clusterProfiler/DOSE, MitoCarta 3.0) at FDR q < 0.25 (S2.26.p3)",
+            "sex_handling": "S2.26.p2: 'Sexes were analyzed separately' (general statistics statement; RNA-seq section does not say whether DE pooled sexes)",
+            "paper_threshold": null,
+            "paper_results": "No DEG count or named DEG list in the main text; RNA-seq reported as GSEA of OxPhos, cristae formation, ROS detoxification and glutathione metabolism upregulated in trained and G6PD-Tg groups (S1.p7)."
+          },
+          "reasoning": "Methods S2.24 define the RNA-seq route (RSEM expected counts -> CPM filter -> TMM (edgeR) -> limma). Results S1.p7 and Fig. 2H/I define the two comparisons against WT untrained. The paper states no DEG significance threshold; only the GSEA threshold FDR q < 0.25 (S2.26.p3). DEG counts live only in Dataset S2 (not available locally).",
+          "confidence": "high",
+          "locator": "S2.24.p2"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S7.p1 names GSE325919 as the paper's RNA-seq deposit",
+              "GEO: Mus musculus muscle, polyA RNA, RSEM v1.3.1 on GRCm38 build 91 matches S2.24.p2",
+              "30 GSM samples: WT non-trained, WT trained, G6PD-tg non-trained x female/male (5 each), matching the paper's three groups",
+              "RAW.tar holds 30 RSEM *.genes.results.gz members, one per GSM; merged by prep_merge_rsem.py (expected_count column)"
+            ]
+          },
+          "reasoning": "Data availability statement S7.p1 and matching processing description.",
+          "confidence": "high",
+          "locator": "S7.p1"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": ["title", "\\((Wild type|G6PD-tg), (non-trained|trained),"],
+            "sex": ["title", ", (female|male), muscle sample\\)$"]
+          },
+          "recode": {
+            "grp": {"Wild type_non-trained": "SED", "Wild type_trained": "TR", "G6PD-tg_non-trained": "G6PD"},
+            "sex": {"female": "F", "male": "M"}
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids written by the prep script from the tar member names; exact match to the metadata index. Group and sex parsed from the GEO title (genotype column agrees).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "limma on log2(CPM+1)",
+          "reasoning": "RSEM expected_count column (11% non-integer values), GEO data_processing: 'Expected expression counts ... Limma for normalization (using TMM method)'; paper S2.24.p2 uses the same expected counts as input. Not raw integer counts, so integer-only count methods are not used without a documented rounding recipe.",
+          "confidence": "high",
+          "locator": "S2.24.p2"
+        },
+        "design": {
+          "factors": ["grp", "sex"],
+          "references": {"grp": "SED", "sex": "F"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_TR_vs_SED", "grp_G6PD_vs_SED"],
+          "covariate_candidates": ["sex"],
+          "strata": [],
+          "final": {
+            "analysis_type": "multigroup (one control, two treatment levels) with sex adjustment",
+            "formula": "~ sex + grp",
+            "contrasts": [
+              {"name": "grp_TR_vs_SED", "control": "SED", "treatment": "TR", "role": "primary"},
+              {"name": "grp_G6PD_vs_SED", "control": "SED", "treatment": "G6PD", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Three groups sharing one control (WT untrained); one model with planned contrasts, never pooled levels. Exercise estimand = TR vs SED; G6PD-Tg vs SED is the paper's second planned comparison but is a genotype effect, not exercise. Sex is balanced (5F/5M per group) and the paper analyses sexes separately (S2.26.p2), so the pooled model includes sex, and per-sex TR vs SED fits are added as exploratory (n = 5 vs 5).",
+          "confidence": "medium",
+          "candidates": [
+            {"value": "grp only, sexes pooled without adjustment", "reason_rejected": "sex is a known major source of muscle expression variance and the paper treats sexes separately"},
+            {"value": "per-sex analyses only", "reason_rejected": "RNA-seq methods do not state sex splitting; pooled sex-adjusted model is primary, per-sex fits kept as exploratory"}
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [],
+            "covariates": [{"name": "sex", "disposition": "fixed effect in the pooled model; balanced across groups"}]
+          },
+          "confounding_candidates": ["sex"],
+          "reasoning": "Independent animals, one sample each; no batch or lane recorded in GEO. Sex is a design factor of the study (both sexes, S2.2.p1) and balanced 5/5 in every group, so it is adjusted, not confounded.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) on log2(CPM+1) of RSEM expected counts",
+            "formula": "~ sex + grp",
+            "paper_route": {"method": "edgeR TMM normalisation + limma on expected counts after <10 CPM filter", "status": "blocked", "reason": "runner has no TMM normalisation or CPM-based filter for limma; voom/edgeR require integers and the paper documents no rounding of expected counts"},
+            "deviations": [
+              "library-size CPM (no TMM factors) instead of TMM",
+              "low-expression filter = count >= 10 in >= 3 samples (preprocess_counts) instead of the paper's < 10 CPM filter",
+              "sex included as a covariate in the pooled model (paper RNA-seq handling of sex not stated)"
+            ]
+          },
+          "transform": "log2(CPM+1)",
+          "reasoning": "Paper used limma on TMM-normalised expected counts (S2.24.p2). The closest validated route for estimated counts without rounding is limma on log2(CPM+1); declared deviation.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": null,
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "The paper states no DEG threshold for RNA-seq (S2.24.p2, S2.26.p3 gives only GSEA FDR q < 0.25 and general P < 0.05 for physiological tests). Workflow default BH padj < 0.05, no fold-change rule; raw p < 0.05 kept as a labelled audit count.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "paper DEG counts are only in Dataset S2 (not available); no count comparison possible",
+              "GSEA in the paper used MitoCarta 3.0 sets; here MSigDB Hallmark GSEA is run as a qualitative check of the OxPhos direction",
+              "G6PD-Tg vs WT untrained is a genotype contrast, not an exercise effect"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Method deviates (no TMM, different filter); threshold is workflow default because the paper gives none.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample set", "paper": "WT untrained n = 21, WT trained n = 20, G6PD-Tg n = 20 phenotyped (S1.p1)", "data": "RNA-seq subset 5 per group per sex (30 samples)", "disposition": "executable_without_change"},
+        {"item": "normalisation", "paper": "<10 CPM filter + TMM (edgeR)", "data": "runner offers library-size log2(CPM+1) with count >= 10 in >= 3 samples filter", "disposition": "declared_deviation"},
+        {"item": "sex handling", "paper": "'Sexes were analyzed separately' (S2.26.p2, general)", "data": "pooled sex-adjusted model primary; per-sex exploratory fits added", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": ["sex"]},
+          "role": "primary",
+          "reasoning": "One limma model ~ sex + grp on all 30 samples; planned contrasts TR vs SED (exercise, primary) and G6PD vs SED (secondary)."
+        },
+        {
+          "name": "TR_vs_SED_female",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "TR"},
+          "subset": {"sex": ["F"], "grp": ["SED", "TR"]},
+          "role": "exploratory",
+          "reasoning": "Paper analyses sexes separately (S2.26.p2); female exercise effect, n = 5 vs 5."
+        },
+        {
+          "name": "TR_vs_SED_male",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "TR"},
+          "subset": {"sex": ["M"], "grp": ["SED", "TR"]},
+          "role": "exploratory",
+          "reasoning": "Male exercise effect, n = 5 vs 5."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_TR_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GSEA of OxPhos/mitochondrial programmes for trained vs untrained (S1.p7, S2.26.p3); Hallmark GSEA on the full ranking checks the direction."},
+        {"execution": "joint/grp_G6PD_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports the same OxPhos enrichment for G6PD-Tg vs WT untrained (S1.p7)."}
+      ]
+    }
+  ]
+}

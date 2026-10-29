@@ -415,3 +415,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 0efeba509681ac38012819324e7f12d6e307a4fe (GSE193771)
 
 - case_runner.py:304 _contained_keys needs >=half of all metadata rows, so inspect gave no alignment key for the 22/48-sample girls matrix (patched after this row) Details: `0efeba509681ac38012819324e7f12d6e307a4fe/HANDBACK.md`.
+
+## PMID40881686 (GSE272928)
+
+- case-spec.md says limma takes alpha but limma_tools.py:17 lacks it (TypeError); suitability says log2(x+1)/FPKM for rlog input Details: `PMID40881686/HANDBACK.md`.
+
+## PMID41118251 (GSE289569)
+
+- case_runner.py:838-843 n_deg takes 1st joint table, not primary (patched after this row); key_patterns cannot recode (:496); inspect counts DESeq2 result cols as samples Details: `PMID41118251/HANDBACK.md`.

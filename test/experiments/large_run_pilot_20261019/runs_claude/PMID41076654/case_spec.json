@@ -1,0 +1,204 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41076654",
+  "request": "Analyze GSE303983 for PMID 41076654 (Molecular responses in abdominal subcutaneous adipose tissue after a session of endurance exercise: effects of exercise intensity.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE303983_by_intensity",
+      "accession": "GSE303983",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12645526.paper.md"],
+        "metadata": "GSE303983/GSE303983_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41076654/GSE303983_counts_prepared.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41076654/prep_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE303983"],
+            "assay": "bulk RNA-seq (polyA, paired-end, NovaSeq 6000), abdominal subcutaneous adipose tissue, human",
+            "samples": "45 regular exercisers, one session each of LOW (n=15), MOD (n=15) or HIGH (n=15); aSAT biopsy Pre and 1.5 h post-exercise (90 libraries)",
+            "factors": {"group": ["LOW", "MOD", "HIGH"], "condition": ["pre", "post"], "ID": "subject, nested in group"},
+            "primary_estimand": "within-group paired Post vs Pre change in aSAT gene expression for each exercise intensity, and between-intensity differences in that change",
+            "planned_contrasts": [
+              "LOW post vs pre (S3.3.p1; paper: 1003 DEGs, 397 up / 606 down)",
+              "MOD post vs pre (S3.3.p1; paper: 1979 DEGs, 773 up / 1206 down)",
+              "HIGH post vs pre (S3.3.p1; paper: 759 DEGs, 452 up / 307 down)",
+              "HIGH vs MOD change (S3.3.p2; paper: 734 DEGs)",
+              "HIGH vs LOW change (S3.3.p2; paper: 183 DEGs)",
+              "MOD vs LOW change (S3.3.p2; paper: 0 DEGs)"
+            ],
+            "paper_method": "DESeq2, ~ group + group:ID + group:condition, Wald tests, median-of-ratios, genes kept with >=10 counts in >=15 samples (17,466 genes)",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S2.6.2.1.p1"},
+            "paper_enrichment": "CAMERA (limma) on GO/KEGG/Hallmark with signed log p, BH < 0.05"
+          },
+          "reasoning": "ABS.p1 and S2.3.p1: each participant was assigned to one of three intensities (between-subject factor). S2.6.2.1.p1 gives the DESeq2 nested-subject design, the Wald contrasts, the filter and the BH < 0.05 threshold with no fold-change rule. S3.3.p1-p2 give the counts.",
+          "locator": "S2.6.2.1.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE303983", "GEO: aSAT, Homo sapiens, 90 samples = 45 subjects x Pre/1.5 h post", "data_processing repeats the paper's design and filter", "filter applied to the deposited counts keeps exactly 17,466 genes as in S3.3.p1"]},
+          "reasoning": "DA.p1 names GSE303983; contact is the paper's lab (Horowitz, U Michigan); sample count and timepoints match S2.5."
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"subject": ["title", "^(3X-\\d+)_(?:PRE|POST)$"], "time": ["title", "^3X-\\d+_(PRE|POST)$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Deposited matrix columns are '<title>_S<n>.counts'; prep_counts.py strips the sequencer suffix so columns equal the GEO title exactly (90/90). Subject and time come from the title; time agrees with characteristics 'time' for all 90."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE303983_genes.counts.csv.gz (GEO supplementary)", "paper_input": "raw gene-level counts (rSeq), DESeq2 median-of-ratios (S2.6.2.1.p1)"},
+          "reasoning": "100% integers, max 2.4e6, median 0; data_processing: 'csv file includes raw counts for each Sample'; paper normalizes raw counts with DESeq2."
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [],
+          "final": {
+            "analysis_type": "multigroup paired (group x time with subject nested in group)",
+            "formula": "~ group + group:subject + group:time",
+            "contrasts": []
+          },
+          "decision_status": "manual_review",
+          "stop_reason": "The intensity group (LOW/MOD/HIGH) of each participant is not in GEO: characteristics 'treatment' is the constant 'Exercise(high, moderate, or low intensity)', titles are '3X-<id>_PRE/POST', and the participant IDs do not encode the group (assigned by manual counterbalancing, S2.3.p1). DA.p1 says the metadata is on GitHub (github.com/ahnchi/3X-Study); that file was not downloaded in this run (no download permission beyond GEO). Supplying the subject->group table unblocks all six planned contrasts.",
+          "confidence": "high",
+          "reasoning": "All six planned contrasts need the group factor. Without it the per-intensity Post vs Pre and between-intensity contrasts cannot be identified. Pooled Pre/Post is run as a separate exploratory case (GSE303983_pooled)."
+        }
+      },
+      "discrepancies": [
+        {"item": "intensity group labels", "paper": "LOW/MOD/HIGH, n=15 each (ABS.p1)", "data": "absent from GEO metadata; on GitHub per DA.p1", "disposition": "blocks_planned_contrasts"}
+      ]
+    },
+    {
+      "case_id": "GSE303983_pooled",
+      "accession": "GSE303983",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12645526.paper.md"],
+        "metadata": "GSE303983/GSE303983_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41076654/GSE303983_counts_prepared.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41076654/prep_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE303983"],
+            "primary_estimand": "paper: within-intensity paired Post vs Pre change (LOW, MOD, HIGH) and between-intensity differences; this case: the acute exercise effect averaged over the three intensities (paper hypothesis 1, S1.p3), paired within subject",
+            "planned_contrasts": [
+              "LOW post vs pre (S3.3.p1; 1003 DEGs)", "MOD post vs pre (1979)", "HIGH post vs pre (759)",
+              "HIGH vs MOD (S3.3.p2; 734)", "HIGH vs LOW (183)", "MOD vs LOW (0)"
+            ],
+            "paper_method": "DESeq2 ~ group + group:ID + group:condition, Wald, filter >=10 counts in >=15 samples",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S2.6.2.1.p1"},
+            "paper_named_results": "NR1D1 most downregulated in all groups; CIART, DBP, PER1 down; NAMPT up in all; BMAL1 (ARNTL) and CLOCK unchanged (S3.4.p1)"
+          },
+          "reasoning": "Same reconstruction as case GSE303983_by_intensity. The paper reports no pooled count; S1.p3 hypothesis (1) is that one session alters the aSAT transcriptome, and S3.4.p1 names genes changed in every group, which the pooled contrast can check.",
+          "locator": "S2.6.2.1.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE303983", "90 samples = 45 subjects x Pre/Post", "filter reproduces 17,466 genes"]},
+          "reasoning": "DA.p1 names GSE303983; samples and filter output match the paper."
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"subject": ["title", "^(3X-\\d+)_(?:PRE|POST)$"], "time": ["title", "^3X-\\d+_(PRE|POST)$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal GEO titles after prep_counts.py strips '_S<n>.counts'; 45 subjects with exactly one PRE and one POST each; time from title agrees with characteristics 'time'."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE303983_genes.counts.csv.gz", "paper_input": "raw gene-level counts, DESeq2 (S2.6.2.1.p1)"},
+          "reasoning": "100% integers, max 2.4e6; data_processing states raw counts; paper uses DESeq2 on them."
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_POST_vs_PRE"],
+          "final": {
+            "analysis_type": "paired two-level (Pre vs 1.5 h Post) with subject blocking",
+            "design_column": "time",
+            "control": "PRE",
+            "treatment": "POST",
+            "contrasts": [{"name": "time_POST_vs_PRE", "control": "PRE", "treatment": "POST", "role": "exploratory"}]
+          },
+          "confidence": "medium",
+          "candidates": [
+            {"value": "per-intensity group:time contrasts", "reason_rejected": "group labels not in GEO (see case GSE303983_by_intensity, manual_review)"},
+            {"value": "unpaired Pre vs Post", "reason_rejected": "ignores the repeated-measures unit the paper blocks on"}
+          ],
+          "reasoning": "Every subject contributes one Pre and one Post, so the paired time effect is identifiable without group. Subject is nested in group, so the subject term absorbs the group main effect; the time coefficient is the equal-weight average (n=15 per group) of the three intensity effects. This is an estimand the paper does not report: exploratory."
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking factor (paired Pre/Post biopsies)"}]},
+          "confounding_candidates": ["subject"],
+          "reasoning": "Paper blocks on subject (group:ID, S2.6.2.1.p1). No batch or sex column in GEO, so no other covariate is added. Group x time heterogeneity goes into the residual, which makes the pooled test conservative rather than biased."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "DESeq2 ~ group + group:ID + group:condition", "status": "blocked", "reason": "group labels missing from GEO"},
+            "deviations": [
+              "pooled time effect instead of per-group group:condition coefficients",
+              "paper's low-count filter (>=10 counts in >=15 samples, 17,466 genes) applied in prep_counts.py because the runner has no prefilter option",
+              "pydeseq2 instead of R DESeq2"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw counts support the paper's DESeq2 route; only the group terms are dropped."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "deviation_note": "Paper's BH < 0.05 rule on the pooled contrast; audit adds |log2FC| > 1 as used in S3.4.p1 to pick the most changed genes."
+          },
+          "reasoning": "S2.6.2.1.p1: adjusted P < 0.05, no fold-change rule."
+        },
+        "study": {
+          "final": {
+            "route": "exploratory",
+            "caveats": [
+              "paper reports no pooled count; per-intensity counts (1003/1979/759) and between-intensity counts (734/183/0) are not reproducible without the GitHub group table",
+              "pooled n=45 pairs has more power than any n=15 group, so its DEG count is not comparable to the per-group counts"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {"time_POST_vs_PRE": ["NR1D1", "CIART", "DBP", "PER1", "NAMPT", "ARNTL", "CLOCK"]},
+          "reasoning": "S3.4.p1 names clock genes changed in all three groups (NR1D1, CIART, DBP, PER1 down; NAMPT up) and BMAL1/CLOCK unchanged; these are the checks available for a pooled contrast."
+        }
+      },
+      "discrepancies": [
+        {"item": "intensity group labels", "paper": "LOW/MOD/HIGH n=15 each", "data": "absent from GEO", "disposition": "pooled exploratory contrast only"},
+        {"item": "matrix column names", "paper": "n/a", "data": "'3X-01_POST_S9.counts' vs GEO title '3X-01_POST'", "disposition": "suffix stripped in prep_counts.py"}
+      ],
+      "executions": [
+        {
+          "name": "time_POST_vs_PRE",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "time", "control_group": "PRE", "treatment_group": "POST", "covariate_columns": "subject", "alpha": 0.05},
+          "role": "exploratory",
+          "reasoning": "paired pooled Post vs Pre, subject blocking, DESeq2 as in the paper"
+        }
+      ],
+      "enrichment": [
+        {"execution": "time_POST_vs_PRE", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports pathway results per intensity (Fig. 4F-H); pooled pathways are exploratory"}
+      ]
+    }
+  ]
+}

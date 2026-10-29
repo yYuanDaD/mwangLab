@@ -1,0 +1,1329 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41076654",
+  "subject_id": "GSE303983_pooled",
+  "created_at": "2026-10-28T23:49:38",
+  "finished_at": null,
+  "status": null,
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12645526.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12645526.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T23:49:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "a5c4ebd3268bbd017b6ee135f57ef4e816ba753c11eeffa8b02d793d3f74d3d1",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE303983_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE303983\\GSE303983_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:49:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "10465320d15c635edbdf2203d28e0428b05cf9fc2d7734960dae0e1cfa37bd81",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\prep_counts.py",
+      "locator": null,
+      "captured_at": "2026-10-28T23:49:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1a5505748bc6d40904f3b7b768be6182d2a7dc4a67195f248cec504065cae023",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE303983_counts_prepared.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_counts_prepared.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:49:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e1834200ba8f2d39f5275272b9aced7ce81e214a068326c4c5fef37cbc5fafcf",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE303983"
+        ],
+        "primary_estimand": "paper: within-intensity paired Post vs Pre change (LOW, MOD, HIGH) and between-intensity differences; this case: the acute exercise effect averaged over the three intensities (paper hypothesis 1, S1.p3), paired within subject",
+        "planned_contrasts": [
+          "LOW post vs pre (S3.3.p1; 1003 DEGs)",
+          "MOD post vs pre (1979)",
+          "HIGH post vs pre (759)",
+          "HIGH vs MOD (S3.3.p2; 734)",
+          "HIGH vs LOW (183)",
+          "MOD vs LOW (0)"
+        ],
+        "paper_method": "DESeq2 ~ group + group:ID + group:condition, Wald, filter >=10 counts in >=15 samples",
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.6.2.1.p1"
+        },
+        "paper_named_results": "NR1D1 most downregulated in all groups; CIART, DBP, PER1 down; NAMPT up in all; BMAL1 (ARNTL) and CLOCK unchanged (S3.4.p1)"
+      },
+      "reason": "Same reconstruction as case GSE303983_by_intensity. The paper reports no pooled count; S1.p3 hypothesis (1) is that one session alters the aSAT transcriptome, and S3.4.p1 names genes changed in every group, which the pooled contrast can check.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:38"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_counts_prepared.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE303983",
+          "90 samples = 45 subjects x Pre/Post",
+          "filter reproduces 17,466 genes"
+        ],
+        "accession": "GSE303983",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE303983\\GSE303983_metadata.csv"
+      },
+      "reason": "DA.p1 names GSE303983; samples and filter output match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:38"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 90,
+        "n_metadata": 90,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "title",
+              "regex": "^(3X-\\d+)_(?:PRE|POST)$"
+            },
+            "time": {
+              "source": "title",
+              "regex": "^3X-\\d+_(PRE|POST)$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\design_metadata.csv",
+          "sha256": "e3b7fb8c544175754d0fc0f8d356ebf3e7291d0e553910751ed587cbd65a7703",
+          "levels": {
+            "subject": {
+              "3X-01": 2,
+              "3X-04": 2,
+              "3X-05": 2,
+              "3X-07": 2,
+              "3X-09": 2,
+              "3X-10": 2,
+              "3X-11": 2,
+              "3X-12": 2,
+              "3X-14": 2,
+              "3X-15": 2,
+              "3X-17": 2,
+              "3X-18": 2,
+              "3X-19": 2,
+              "3X-20": 2,
+              "3X-22": 2,
+              "3X-23": 2,
+              "3X-24": 2,
+              "3X-25": 2,
+              "3X-26": 2,
+              "3X-28": 2,
+              "3X-29": 2,
+              "3X-30": 2,
+              "3X-32": 2,
+              "3X-35": 2,
+              "3X-36": 2,
+              "3X-37": 2,
+              "3X-38": 2,
+              "3X-39": 2,
+              "3X-41": 2,
+              "3X-42": 2,
+              "3X-43": 2,
+              "3X-44": 2,
+              "3X-46": 2,
+              "3X-47": 2,
+              "3X-48": 2,
+              "3X-49": 2,
+              "3X-50": 2,
+              "3X-51": 2,
+              "3X-52": 2,
+              "3X-53": 2,
+              "3X-54": 2,
+              "3X-55": 2,
+              "3X-56": 2,
+              "3X-57": 2,
+              "3X-58": 2
+            },
+            "time": {
+              "PRE": 45,
+              "POST": 45
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal GEO titles after prep_counts.py strips '_S<n>.counts'; 45 subjects with exactly one PRE and one POST each; time from title agrees with characteristics 'time'.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:40"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE303983_genes.counts.csv.gz",
+        "paper_input": "raw gene-level counts, DESeq2 (S2.6.2.1.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_matrix.csv",
+          "sha256": "a71a6afd60769d54af12f339e6531d93c262cb713c2b84a48475743a263b1bcd",
+          "n_features": 17466,
+          "n_samples": 90,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 2426860.0,
+          "median": 159.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "100% integers, max 2.4e6; data_processing states raw counts; paper uses DESeq2 on them.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:41"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired two-level (Pre vs 1.5 h Post) with subject blocking",
+        "design_column": "time",
+        "control": "PRE",
+        "treatment": "POST",
+        "contrasts": [
+          {
+            "name": "time_POST_vs_PRE",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Every subject contributes one Pre and one Post, so the paired time effect is identifiable without group. Subject is nested in group, so the subject term absorbs the group main effect; the time coefficient is the equal-weight average (n=15 per group) of the three intensity effects. This is an estimand the paper does not report: exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:42"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "blocking factor (paired Pre/Post biopsies)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 90,
+          "n_columns": 46,
+          "columns": [
+            "Intercept",
+            "time_PRE",
+            "subject_3X-04",
+            "subject_3X-05",
+            "subject_3X-07",
+            "subject_3X-09",
+            "subject_3X-10",
+            "subject_3X-11",
+            "subject_3X-12",
+            "subject_3X-14",
+            "subject_3X-15",
+            "subject_3X-17",
+            "subject_3X-18",
+            "subject_3X-19",
+            "subject_3X-20",
+            "subject_3X-22",
+            "subject_3X-23",
+            "subject_3X-24",
+            "subject_3X-25",
+            "subject_3X-26",
+            "subject_3X-28",
+            "subject_3X-29",
+            "subject_3X-30",
+            "subject_3X-32",
+            "subject_3X-35",
+            "subject_3X-36",
+            "subject_3X-37",
+            "subject_3X-38",
+            "subject_3X-39",
+            "subject_3X-41",
+            "subject_3X-42",
+            "subject_3X-43",
+            "subject_3X-44",
+            "subject_3X-46",
+            "subject_3X-47",
+            "subject_3X-48",
+            "subject_3X-49",
+            "subject_3X-50",
+            "subject_3X-51",
+            "subject_3X-52",
+            "subject_3X-53",
+            "subject_3X-54",
+            "subject_3X-55",
+            "subject_3X-56",
+            "subject_3X-57",
+            "subject_3X-58"
+          ],
+          "rank": 46,
+          "full_rank": true,
+          "residual_df": 44,
+          "levels": {
+            "time": {
+              "PRE": 45,
+              "POST": 45
+            },
+            "subject": {
+              "3X-01": 2,
+              "3X-04": 2,
+              "3X-05": 2,
+              "3X-07": 2,
+              "3X-09": 2,
+              "3X-10": 2,
+              "3X-11": 2,
+              "3X-12": 2,
+              "3X-14": 2,
+              "3X-15": 2,
+              "3X-17": 2,
+              "3X-18": 2,
+              "3X-19": 2,
+              "3X-20": 2,
+              "3X-22": 2,
+              "3X-23": 2,
+              "3X-24": 2,
+              "3X-25": 2,
+              "3X-26": 2,
+              "3X-28": 2,
+              "3X-29": 2,
+              "3X-30": 2,
+              "3X-32": 2,
+              "3X-35": 2,
+              "3X-36": 2,
+              "3X-37": 2,
+              "3X-38": 2,
+              "3X-39": 2,
+              "3X-41": 2,
+              "3X-42": 2,
+              "3X-43": 2,
+              "3X-44": 2,
+              "3X-46": 2,
+              "3X-47": 2,
+              "3X-48": 2,
+              "3X-49": 2,
+              "3X-50": 2,
+              "3X-51": 2,
+              "3X-52": 2,
+              "3X-53": 2,
+              "3X-54": 2,
+              "3X-55": 2,
+              "3X-56": 2,
+              "3X-57": 2,
+              "3X-58": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "POST",
+                "3X-01"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-04"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-07"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-09"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-25"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-28"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-29"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-36"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-39"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-41"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-43"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-47"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-48"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-54"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-55"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "3X-58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-01"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-04"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-07"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-09"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-25"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-28"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-29"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-36"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-39"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-41"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-43"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-47"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-48"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-54"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-55"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "3X-58"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "subject",
+            "n_levels": 45,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "3X-01": 1,
+                "3X-04": 1,
+                "3X-05": 1,
+                "3X-07": 1,
+                "3X-09": 1,
+                "3X-10": 1,
+                "3X-11": 1,
+                "3X-12": 1,
+                "3X-14": 1,
+                "3X-15": 1,
+                "3X-17": 1,
+                "3X-18": 1,
+                "3X-19": 1,
+                "3X-20": 1,
+                "3X-22": 1,
+                "3X-23": 1,
+                "3X-24": 1,
+                "3X-25": 1,
+                "3X-26": 1,
+                "3X-28": 1,
+                "3X-29": 1,
+                "3X-30": 1,
+                "3X-32": 1,
+                "3X-35": 1,
+                "3X-36": 1,
+                "3X-37": 1,
+                "3X-38": 1,
+                "3X-39": 1,
+                "3X-41": 1,
+                "3X-42": 1,
+                "3X-43": 1,
+                "3X-44": 1,
+                "3X-46": 1,
+                "3X-47": 1,
+                "3X-48": 1,
+                "3X-49": 1,
+                "3X-50": 1,
+                "3X-51": 1,
+                "3X-52": 1,
+                "3X-53": 1,
+                "3X-54": 1,
+                "3X-55": 1,
+                "3X-56": 1,
+                "3X-57": 1,
+                "3X-58": 1
+              },
+              "PRE": {
+                "3X-01": 1,
+                "3X-04": 1,
+                "3X-05": 1,
+                "3X-07": 1,
+                "3X-09": 1,
+                "3X-10": 1,
+                "3X-11": 1,
+                "3X-12": 1,
+                "3X-14": 1,
+                "3X-15": 1,
+                "3X-17": 1,
+                "3X-18": 1,
+                "3X-19": 1,
+                "3X-20": 1,
+                "3X-22": 1,
+                "3X-23": 1,
+                "3X-24": 1,
+                "3X-25": 1,
+                "3X-26": 1,
+                "3X-28": 1,
+                "3X-29": 1,
+                "3X-30": 1,
+                "3X-32": 1,
+                "3X-35": 1,
+                "3X-36": 1,
+                "3X-37": 1,
+                "3X-38": 1,
+                "3X-39": 1,
+                "3X-41": 1,
+                "3X-42": 1,
+                "3X-43": 1,
+                "3X-44": 1,
+                "3X-46": 1,
+                "3X-47": 1,
+                "3X-48": 1,
+                "3X-49": 1,
+                "3X-50": 1,
+                "3X-51": 1,
+                "3X-52": 1,
+                "3X-53": 1,
+                "3X-54": 1,
+                "3X-55": 1,
+                "3X-56": 1,
+                "3X-57": 1,
+                "3X-58": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Paper blocks on subject (group:ID, S2.6.2.1.p1). No batch or sex column in GEO, so no other covariate is added. Group x time heterogeneity goes into the residual, which makes the pooled test conservative rather than biased.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:42"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "DESeq2 ~ group + group:ID + group:condition",
+          "status": "blocked",
+          "reason": "group labels missing from GEO"
+        },
+        "deviations": [
+          "pooled time effect instead of per-group group:condition coefficients",
+          "paper's low-count filter (>=10 counts in >=15 samples, 17,466 genes) applied in prep_counts.py because the runner has no prefilter option",
+          "pydeseq2 instead of R DESeq2"
+        ]
+      },
+      "reason": "Raw counts support the paper's DESeq2 route; only the group terms are dropped.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:42"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0
+        },
+        "deviation_note": "Paper's BH < 0.05 rule on the pooled contrast; audit adds |log2FC| > 1 as used in S3.4.p1 to pick the most changed genes."
+      },
+      "reason": "S2.6.2.1.p1: adjusted P < 0.05, no fold-change rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:49:42"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "979708a2847951bb10307c5776c6d661177ba3ad409676bd534ebe515a3d8442",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "98d189b6e46f1da6c82d113333327ad8f2c409657fd98220f4c9260dab7dc482",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a71a6afd60769d54af12f339e6531d93c262cb713c2b84a48475743a263b1bcd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e3b7fb8c544175754d0fc0f8d356ebf3e7291d0e553910751ed587cbd65a7703",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0a70493117b9c05ea499eb903c52fe29615a96e1d6c4435f0953fb881ee2ae74",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d83e3aae8f3dde9cdb1f1c31e63a2c8c20a29f6bc28de13fc55f18a70742894d",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
