@@ -1,0 +1,607 @@
+{
+  "schema_version": "1.0",
+  "run_id": "9157dc41bd8cc2f50bcac3d30ac629f68d25204f",
+  "subject_id": "GSE134698",
+  "created_at": "2026-10-20T17:24:44",
+  "finished_at": "2026-10-20T17:28:54",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "9157dc41bd8cc2f50bcac3d30ac629f68d25204f.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-20T17:24:44",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8968fe4ebf715707814688b1dc59fb6caef2d09c4338612971a47a42aa3342e2",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "9157dc41bd8cc2f50bcac3d30ac629f68d25204f.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-20T17:24:44",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3943f4700cf59d29681c94c2014195f290595bb7f86a8809b844060c669e897c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE134698_metadata.csv",
+      "uri": "data\\GSE134698\\GSE134698_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-20T17:24:44",
+      "sha256": null,
+      "attributes": {
+        "sha256": "68d0dcce36918bab26c78c3fd4f36fb23513d7690cdce0a858222799670ddce0",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE134698_featureCounts_matrix.txt.gz",
+      "uri": "data\\GSE134698\\GSE134698_featureCounts_matrix.txt.gz",
+      "locator": null,
+      "captured_at": "2026-10-20T17:24:44",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d77638d31e600a8a509e5dc1a95020f5cfae7a4d995806c1b526fd443080e938",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE134698"
+        ],
+        "assay": "3' mRNA-seq (Lexogen QuantSeq FWD), Illumina MiSeq single-end, STAR v2.5 GRCh38.p12 / GENCODE v28, featureCounts (S0.p44, S0.p45)",
+        "tissue": "skeletal muscle biopsy (GEO: gastrocnemius)",
+        "samples": "3 HF patients x (before, after 12-week personalized aerobic training) = 6 samples (S0.p43, S0.p47); sequenced donors match TAB1 HF1/HF4/HF5 by age/BMI (GEO P1/P4/P5)",
+        "sample_inclusion": "all 6 deposited samples; S0.p47 notes HF3 and HF6 low depth, HF2 low assigned genes (not sequenced/deposited here)",
+        "factors": {
+          "time": [
+            "before (0 weeks)",
+            "after (12 weeks training)"
+          ],
+          "subject": "patient (3)"
+        },
+        "primary_estimand": "within-patient change in skeletal-muscle gene expression after vs before 12-week exercise rehabilitation in HF patients",
+        "planned_contrasts": [
+          {
+            "name": "after_vs_before",
+            "numerator": "after",
+            "denominator": "before",
+            "paired_by": "patient",
+            "locator": "S0.p46"
+          }
+        ],
+        "repeated_measure_unit": "patient (normalized in pairs per patient, S0.p46)",
+        "normalization": "top 12,000 most expressed genes selected after quantile + log normalization, then DESeq2 (S0.p45-S0.p46)",
+        "method": "DESeq2 (R), pairs per patient; GSEA with fgsea on GO Biological Process, pathway FDR 0.1 (S0.p46)",
+        "paper_threshold": {
+          "metric": "padj",
+          "adjustment": "BH",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": "not_reported",
+          "source_locator": "S0.p46",
+          "note": "'p-values adjusted by Benjamini-Hochberg and filtered with FDR = 0.1'; Table 2 note S0.p63 'p-value adjusted = 0.1'; no fold-change cutoff stated"
+        },
+        "paper_reported_results": {
+          "deg_total": "not_reported",
+          "table2": "curated list of 28 DEGs relevant to muscle (24 up, 4 down) at padj<=0.1 (TAB2, S0.p49)",
+          "gsea": "26 GO BP processes significant (FDR 0.1, |NES|>1.7) (S0.p50, S0.p51)"
+        }
+      },
+      "reason": "Paired pre/post design in 3 HF patients; DESeq2 with per-patient pairing; BH FDR 0.1 with no FC cutoff; Table 2 is a curated subset, total DEG count not reported.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:24:44"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE134698",
+        "matrix_file": "data\\GSE134698\\GSE134698_featureCounts_matrix.txt.gz",
+        "metadata_file": "data\\GSE134698\\GSE134698_metadata.csv",
+        "owned": true,
+        "checks": "series_id GSE134698 in metadata; 6 samples = 3 patients x before/after as in S0.p43/S0.p44; age/BMI of P1,P4,P5 (56/27.07, 61/32.87, 56/26.77) match TAB1 HF1, HF4, HF5; data_processing names STAR/GENCODE v28/featureCounts/DESeq2/fGSEA as in S0.p45-46; matrix columns = sample titles"
+      },
+      "reason": "Paper deposits these 6 samples under GSE134698; GEO metadata matches donor characteristics in TAB1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:24:46"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 6,
+        "n_metadata": 6,
+        "coverage": 1.0,
+        "key_column": "title",
+        "derived_columns": {
+          "source": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "title",
+              "regex": "^(P\\d+)_(?:before|after)$"
+            },
+            "time": {
+              "source": "title",
+              "regex": "^P\\d+_(before|after)$"
+            }
+          },
+          "output": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\design_metadata.csv",
+          "sha256": "f22a1838e86356d1047ca96dc7197c6a888dff6f7a5c8c0abab689482d0833dc",
+          "levels": {
+            "subject": {
+              "P1": 2,
+              "P4": 2,
+              "P5": 2
+            },
+            "time": {
+              "before": 3,
+              "after": 3
+            }
+          }
+        },
+        "annotation_columns_removed": [
+          "Chr",
+          "Start",
+          "End",
+          "Strand",
+          "Length"
+        ]
+      },
+      "reason": "Exact match of matrix column names to GEO sample titles; subject/time parsed from title and cross-checked against 'training period' (0 vs 12 weeks).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0001",
+        "SRC-0003",
+        "ART-0002",
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:24:46"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "evidence_summary": "integer_fraction 1.0, no negatives, max 67406, median 0; library sums 0.72-1.09M match ~0.93M reads/sample (S0.p44); file is featureCounts output with Length column; no ERCC rows; GEO data_processing: featureCounts -> DESeq2",
+        "paper_input": "featureCounts counts into DESeq2 (S0.p45, S0.p46)"
+      },
+      "reason": "Values, file provenance and paper all indicate unnormalized featureCounts gene counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0002",
+        "ART-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:25:47"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired",
+        "design_column": "time",
+        "control": "before",
+        "treatment": "after",
+        "formula": "~ subject + time",
+        "contrasts": [
+          {
+            "name": "after_vs_before",
+            "numerator": "after",
+            "denominator": "before"
+          }
+        ],
+        "estimand_type": "within_subject_change"
+      },
+      "reason": "Three patients sampled before and after 12 weeks of training; paper compares two states within patient pairs.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:25:47"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "included"
+          },
+          {
+            "name": "age",
+            "disposition": "nested: subject-level constant, absorbed by subject block"
+          },
+          {
+            "name": "bmi",
+            "disposition": "nested: subject-level constant, absorbed by subject block"
+          }
+        ],
+        "residual_df": 2
+      },
+      "reason": "3 complete pairs; subject is crossed with time; ~ subject + time is full rank with 2 residual df.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0006",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:25:47"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "method": "DESeq2 (pydeseq2, Wald test, ~ subject + time)",
+        "matrix_type": "raw counts",
+        "formula": "~ subject + time",
+        "coefficient": "time after vs before",
+        "feature_selection": "top 12,000 genes by mean quantile-normalized log2(count+1) (paper S0.p45-46); DESeq2 run on raw counts of these genes",
+        "implementation_note": "paper used R DESeq2; pydeseq2 port used here"
+      },
+      "reason": "Paper route is DESeq2 with per-patient pairing on the 12k most expressed genes; data are raw counts, so the route is reproducible.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0002",
+        "ART-0007",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:25:47"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "adjustment": "BH",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false,
+          "source_locator": "S0.p46"
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "adjustment": "BH",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false,
+          "source_locator": "S0.p46"
+        },
+        "note": "paper writes 'FDR = 0.1'; strict < used (all TAB2 genes have padj < 0.1); no FC cutoff"
+      },
+      "reason": "BH FDR 0.1, no effect-size rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:25:47"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "DESeq2 (pydeseq2, Wald test, ~ subject + time)",
+        "formula": "~ subject + time",
+        "outputs": [
+          "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\deseq2\\DEG_results_after_vs_before.csv"
+        ],
+        "threshold_counts": {
+          "deg_csv": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\deseq2\\DEG_results_after_vs_before.csv",
+          "rule": "padj < 0.1",
+          "n_tested": 12000,
+          "n_significant": 1,
+          "n_up": 1,
+          "n_down": 0,
+          "deg_sanity": "ok"
+        }
+      },
+      "reason": "DESeq2 completed.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007",
+        "ART-0004",
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:26:24"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark (h.all 2024.1.Hs)",
+        "organism": "Human",
+        "feature_id_type": "ensembl_gene",
+        "ranking_metric": "stat (DESeq2 Wald)",
+        "paper_route": {
+          "method": "fgsea on GO Biological Process, FDR 0.1, |NES|>1.7",
+          "status": "blocked",
+          "reason": "repository GSEA executor supports only MSigDB Hallmark"
+        },
+        "significance_rule": "FDR q < 0.1 (paper's pathway FDR)",
+        "outputs": [
+          "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\gsea\\DEG_results_after_vs_before_GSEA_Hallmark.csv"
+        ]
+      },
+      "reason": "GSEA on full DESeq2 ranking; gene-set collection differs from paper (declared).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:28:54"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "exploratory": true,
+        "exploratory_reason": "3 subjects per arm; residual df = 2 (< 4) for ~ subject + time",
+        "paper_threshold_counts": {
+          "deg_csv": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\deseq2\\DEG_results_after_vs_before.csv",
+          "rule": "padj < 0.1",
+          "n_tested": 12000,
+          "n_significant": 1,
+          "n_up": 1,
+          "n_down": 0,
+          "deg_sanity": "ok"
+        },
+        "paper_table2_concordance": {
+          "n_table2": 28,
+          "n_found_in_top12k": 27,
+          "missing": [
+            "TUBA1C"
+          ],
+          "sign_agreement": 27,
+          "lfc_pearson_r": 0.9779480959968028,
+          "n_padj_lt_0.1_ours": 1,
+          "median_ours_padj": 0.811807403254818
+        },
+        "audit_limma_qnlog_counts": {
+          "deg_csv": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\audit_limma_qnlog\\DEG_results_after_vs_before.csv",
+          "rule": "padj < 0.1",
+          "n_tested": 12000,
+          "n_significant": 0,
+          "n_up": 0,
+          "n_down": 0,
+          "deg_sanity": "ok"
+        },
+        "deviations": [
+          "pydeseq2 instead of R DESeq2",
+          "GSEA on Hallmark instead of GO BP"
+        ]
+      },
+      "reason": "Paper route (paired DESeq2, top-12k genes, BH FDR 0.1) executed; effect sizes match TAB2 closely but only CYR61 passes FDR 0.1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008",
+        "ART-0010",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T17:28:54"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\featureCounts_counts_only.csv",
+      "role": "matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d51ca613846a26f2af0f331c1889b7c53d70449b6c0a3117caa7035cc8110857",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a18913532157b406b9efe1d3ec77af9d41270d832d222f7b4cfc18387f2158bd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\aligned_metadata.csv",
+      "role": "aligned_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "68d0dcce36918bab26c78c3fd4f36fb23513d7690cdce0a858222799670ddce0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f22a1838e86356d1047ca96dc7197c6a888dff6f7a5c8c0abab689482d0833dc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\matrix_profile.json",
+      "role": "tool_output",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e0d49672619a39ad6a807f62b2db709580dca5287c13e874f8cd4194c9b75aca",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\covariance_reports.json",
+      "role": "tool_output",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "98141822083adf4221d86fa1d1377fc5b29fedc1bc8d03e3a51cf59a4df0fb83",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\aligned\\counts_top12000.csv",
+      "role": "matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d88985b4e253efb196917f49acfc447fb19ac1a6555bf8296ccb052ada15fe4d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\deseq2\\DEG_results_after_vs_before.csv",
+      "role": "tool_output",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "26341e23a93378010dfc347e3d2081c506f8e8766e773ab0ce2bd26f8103b212",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\audit_limma_qnlog\\DEG_results_after_vs_before.csv",
+      "role": "audit_sensitivity",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1286efa30916afb86e25333578e5af7ded07b7c1c178a43362f6cc6647157bbf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\9157dc41bd8cc2f50bcac3d30ac629f68d25204f\\GSE134698\\results\\paper_table2_concordance.csv",
+      "role": "tool_output",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b45faecf3c82f9983a87ec39dee94f88183bfaee38e4575f487842bf7fd8a6ff",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

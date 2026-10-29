@@ -1,0 +1,121 @@
+{
+  "paper_id": "PMID39821584 / PMC11738645 (Physiol Rep 2025)",
+  "accessions": [
+    "GSE275818"
+  ],
+  "accession_locator": "S2.3.p1, DA.p1",
+  "assay": "bulk RNA-seq, gastrocnemius, Novogene: Hisat2 v2.0.5 + featureCounts v1.5.0-p3, HiSeq 4000 (S2.3.p1)",
+  "sample_inclusion": [
+    "male C57BL/6 mice, 12 weeks HFD (45% fat), 5 groups: HFD-C sedentary, HFD-25%, HFD-50%, HFD-75%, HFD-U wheel running; n = 6 per group with RQN > 6.3 (S2.2.p1, S2.3.p1, FIG3)"
+  ],
+  "sample_exclusion": [
+    "not_reported within HFD groups; GEO additionally deposits 6 NFD-C (normal-fat sedentary, 'CS_*') samples that the paper never analyses"
+  ],
+  "factors": [
+    {
+      "name": "running distance group (grp)",
+      "levels": [
+        "sed (HFD-C)",
+        "r25",
+        "r50",
+        "r75",
+        "rU"
+      ],
+      "type": "between-animal, randomised",
+      "locator": "S2.2.p1"
+    }
+  ],
+  "primary_estimand": "Effect of voluntary wheel running at each defined distance (25/50/75/100% of unrestricted) vs sedentary, all on HFD, on the gastrocnemius transcriptome: four exercise-group vs HFD-C contrasts (FIG2a, S3.p1).",
+  "planned_contrasts": [
+    {
+      "name": "grp_r25_vs_sed",
+      "definition": "HFD-25% (2.1 km/day) vs HFD-C sedentary",
+      "paper_label": "HFD-25%",
+      "reported_deg_p05": 1347,
+      "reported_fdr05_lfc1": 25
+    },
+    {
+      "name": "grp_r50_vs_sed",
+      "definition": "HFD-50% (4.2 km/day) vs HFD-C",
+      "paper_label": "HFD-50%",
+      "reported_deg_p05": 1823,
+      "reported_fdr05_lfc1": 78
+    },
+    {
+      "name": "grp_r75_vs_sed",
+      "definition": "HFD-75% (6.3 km/day) vs HFD-C",
+      "paper_label": "HFD-75%",
+      "reported_deg_p05": 1103,
+      "reported_fdr05_lfc1": 15
+    },
+    {
+      "name": "grp_rU_vs_sed",
+      "definition": "HFD-U unrestricted (8.3 km/day) vs HFD-C",
+      "paper_label": "HFD-U",
+      "reported_deg_p05": 1107,
+      "reported_fdr05_lfc1": 16
+    }
+  ],
+  "other_analyses_not_reproduced": [
+    "'HFD-C vs all exercise groups combined' = 1094 DEGs (S3.p1): pools four distinct levels; not run (skill: never pool levels)",
+    "DRomics dose-response (S3.p4): no executor; not reproduced",
+    "RT-qPCR (S3.p5): not data in GEO",
+    "KEGG ORA (clusterProfiler) of up/down lists (S3.p6, FIG6-7)"
+  ],
+  "blocking_or_covariance": {
+    "status": "not_required",
+    "reason": "one muscle sample per mouse, independent groups"
+  },
+  "matrix_scale": "featureCounts raw read counts (S2.3.p1; GEO data_processing)",
+  "paper_method": "DESeq2 (Novogene; DESeq2 1.20.0 per GEO), per comparison vs HFD-C; model details not reported",
+  "paper_formula": "not_reported",
+  "paper_threshold": {
+    "metric": "pvalue",
+    "adjustment": "none (raw DESeq2 p-value)",
+    "cutoff": 0.05,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": true,
+    "source_locator": "S2.5.p1; FIG2; S2.3.p1",
+    "note": "S2.3.p1 adds 'raw count average >= 25' for the enrichment gene list only; Fig 3 / S3.p3 report a second, stricter list at DESeq2 FDR <= 0.05 and |log2FC| >= 1 (25/78/15/16 genes); that rule is computed as a labelled secondary count."
+  },
+  "secondary_paper_rule": {
+    "metric": "padj",
+    "adjustment": "BH",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "inclusive": true,
+    "source_locator": "S3.p3; FIG3; S2.3.p1"
+  },
+  "reported_counts": {
+    "grp_r25_vs_sed": {
+      "p<=0.05": 1347,
+      "FDR<=0.05&|LFC|>=1": 25
+    },
+    "grp_r50_vs_sed": {
+      "p<=0.05": 1823,
+      "FDR<=0.05&|LFC|>=1": 78
+    },
+    "grp_r75_vs_sed": {
+      "p<=0.05": 1103,
+      "FDR<=0.05&|LFC|>=1": 15
+    },
+    "grp_rU_vs_sed": {
+      "p<=0.05": 1107,
+      "FDR<=0.05&|LFC|>=1": 16
+    }
+  },
+  "reported_unique_genes_venn": {
+    "r25": 107,
+    "r50": 169,
+    "r75": 67,
+    "rU": 89,
+    "all_four": 9729,
+    "note": "9729 'overlapping' in Venn exceeds every per-group DEG count - internally inconsistent"
+  },
+  "enrichment": {
+    "method": "KEGG ORA (clusterProfiler) on up- and down-regulated lists, p <= 0.05 & raw count avg >= 25",
+    "locator": "S2.3.p1, S3.p6"
+  }
+}

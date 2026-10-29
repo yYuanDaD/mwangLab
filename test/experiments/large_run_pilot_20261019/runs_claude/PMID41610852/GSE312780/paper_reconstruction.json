@@ -1,0 +1,63 @@
+{
+  "paper_id": "PMID41610852 / PMC13237580",
+  "accessions": [
+    "GSE312780"
+  ],
+  "assay": "bulk RNA-seq, human vastus lateralis biopsies (nf-core/rnaseq 3.20.0, STAR+Salmon, GENCODE v44)",
+  "sample_inclusion": [
+    "T2D participants randomized to BFRT or CREST, biopsy before (week 0) and ~72 h after 12 weeks of training (S8.3.4.p1, S2.4.p2)"
+  ],
+  "sample_exclusion": [
+    "One BFRT participant excluded after visual PCA/correlation inspection; identity not reported (S8.3.16.p2)",
+    "Resist19 excluded from analyses for elevated hsCRP (S8.3.1.p1); not in GEO"
+  ],
+  "factors": [
+    {
+      "name": "cohort",
+      "levels": [
+        "BFRT",
+        "CREST"
+      ]
+    },
+    {
+      "name": "timepoint",
+      "levels": [
+        "week 0 (before)",
+        "week 12 (after)"
+      ]
+    },
+    {
+      "name": "person_within_cohort",
+      "levels": "subject nested in cohort"
+    }
+  ],
+  "primary_estimand": "within-arm training effect on muscle gene expression (after vs before) in BFRT and in CREST, plus the difference between arms (interaction)",
+  "planned_contrasts": [
+    "BFRT week12 vs week0",
+    "CREST week12 vs week0",
+    "interaction: (BFRT after-before) - (CREST after-before)"
+  ],
+  "blocking_or_covariance": {
+    "status": "required",
+    "term": "cohort:person_within_cohort (subject nested in arm)"
+  },
+  "matrix_scale": "counts from tximport lengthScaledTPM of salmon quant.sf (S8.3.15.p1)",
+  "paper_method": "DESeq2 1.48.2 with apeglm LFC shrinkage; genes with < 10 total counts removed",
+  "paper_formula": "~ cohort + cohort:person_within_cohort + cohort:timepoint",
+  "paper_threshold": {
+    "metric": "padj",
+    "adjustment": "BH (DESeq2 default; method not named)",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC (apeglm-shrunken)",
+    "effect_cutoff": 0.585,
+    "effect_cutoff_original": "|log2FC| >= 0.585 (Methods); |FC| > 1.5 (FIG4 legend)",
+    "inclusive": "padj strict (<), effect inclusive (>=)",
+    "source_locator": "S8.3.15.p1; FIG4"
+  },
+  "paper_reported_deg": {
+    "BFRT week12 vs week0": 110,
+    "CREST week12 vs week0": 18,
+    "interaction": "not_reported"
+  },
+  "pathway": "KEGG GSEA (clusterProfiler gseKEGG, organism='mmu' as written although data are human)"
+}

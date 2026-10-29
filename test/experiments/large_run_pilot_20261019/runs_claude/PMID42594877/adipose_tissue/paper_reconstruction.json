@@ -1,0 +1,54 @@
+{
+  "paper_id": "PMID42594877 / PMC13589506 (Cell-press STAR Methods article)",
+  "accessions": [
+    "GSE308252"
+  ],
+  "accession_locator": "S4.3.p1",
+  "other_deposits": "PXD069170 (plasma proteomics), PR002719 (metabolomics); skeletal-muscle RNA-seq re-used from Botella et al. (not in GSE308252, S9.3.13.p1)",
+  "assay": "bulk RNA-seq, Illumina stranded mRNA, NextSeq 2000; Salmon v1.8.0 -> tximport -> DESeq2 (S9.3.14.p1, S9.3.15.p1)",
+  "sub_experiment": "adipose_tissue",
+  "sample_inclusion": [
+    "Cohort 3: 11 recruited, 9 with both biopsies sequenced (6 M, 3 F) (S9.2.1.3.p2)"
+  ],
+  "sample_exclusion": [
+    "1 male declined the second biopsy; 1 female sample compromised by room-temperature exposure (S9.2.1.3.p2)"
+  ],
+  "factors": [
+    {
+      "name": "time",
+      "levels": [
+        "pre",
+        "post"
+      ],
+      "type": "within-subject",
+      "locator": "S2.4.p4; S9.2.1.3.p1; S9.2.1.3.p2; S9.3.15.p1; FIG4"
+    }
+  ],
+  "primary_estimand": "Within-person change in subcutaneous abdominal adipose tissue gene expression 3 h after a maximal graded treadmill exercise test versus a resting biopsy 7-10 days before (paired, N=9).",
+  "planned_contrasts": [
+    {
+      "name": "post_vs_pre",
+      "definition": "adipose 3 h post-GXT vs pre, paired by participant, DESeq2 controlling for subject",
+      "reported": "2,600 DEGs (FDR < 0.05)",
+      "locator": "S2.4.p4; FIG4F; Table S4 O"
+    }
+  ],
+  "blocking_or_covariance": {
+    "status": "required",
+    "term": "subject (participant / plasma donor)",
+    "locator": "S9.3.15.p1 ('controlling for each subject in the linear model')"
+  },
+  "matrix_scale": "Salmon/tximport gene-level counts as stored in DESeq2 (GEO: 'raw counts from DESeq2')",
+  "paper_method": "DESeq2 v1.42.1/1.44.0, paired: ~ subject + time (S9.3.15.p1)",
+  "paper_formula": "~ subject + time (per experiment / per intensity; exact formula not printed)",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (DESeq2 default padj; method not named in paper)",
+    "cutoff": 0.05,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": false,
+    "source_locator": "S2.4.p2; S2.4.p4"
+  },
+  "enrichment": "GSEA (clusterProfiler, GO BP via msigdbr) ranked by DESeq2 Wald statistic (S9.3.15.p1)"
+}

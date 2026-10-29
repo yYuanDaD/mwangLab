@@ -1,0 +1,190 @@
+{
+  "case": "GSE292369",
+  "primary": {
+    "executor": "tools.deseq2_tools:run_deseq2_analysis",
+    "counts": "aligned/aligned_matrix_34_int.csv",
+    "metadata": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40960642\\GSE292369\\aligned\\design_metadata.csv",
+    "design_column": "time",
+    "control": "PRE",
+    "treatment": "POST",
+    "covariate_columns": "visit"
+  },
+  "secondary": {
+    "executor": "tools.joint_contrasts:run_joint_deseq2",
+    "counts": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40960642\\GSE292369\\aligned\\aligned_matrix_34.csv",
+    "metadata": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40960642\\GSE292369\\aligned\\design_metadata.csv",
+    "comparisons": [
+      {
+        "name": "cond_KME_vs_PLA_time-POST",
+        "kind": "simple",
+        "factor": "cond",
+        "test": "KME",
+        "reference": "PLA",
+        "within": {
+          "time": "POST"
+        },
+        "cells": [
+          {
+            "cell": {
+              "time": "POST",
+              "cond": "KME"
+            },
+            "n": 9
+          },
+          {
+            "cell": {
+              "time": "POST",
+              "cond": "PLA"
+            },
+            "n": 9
+          }
+        ],
+        "analyzable": true
+      },
+      {
+        "name": "cond_KME_vs_PLA_time-PRE",
+        "kind": "simple",
+        "factor": "cond",
+        "test": "KME",
+        "reference": "PLA",
+        "within": {
+          "time": "PRE"
+        },
+        "cells": [
+          {
+            "cell": {
+              "time": "PRE",
+              "cond": "KME"
+            },
+            "n": 8
+          },
+          {
+            "cell": {
+              "time": "PRE",
+              "cond": "PLA"
+            },
+            "n": 8
+          }
+        ],
+        "analyzable": true
+      },
+      {
+        "name": "time_POST_vs_PRE_cond-KME",
+        "kind": "simple",
+        "factor": "time",
+        "test": "POST",
+        "reference": "PRE",
+        "within": {
+          "cond": "KME"
+        },
+        "cells": [
+          {
+            "cell": {
+              "cond": "KME",
+              "time": "POST"
+            },
+            "n": 9
+          },
+          {
+            "cell": {
+              "cond": "KME",
+              "time": "PRE"
+            },
+            "n": 8
+          }
+        ],
+        "analyzable": true
+      },
+      {
+        "name": "time_POST_vs_PRE_cond-PLA",
+        "kind": "simple",
+        "factor": "time",
+        "test": "POST",
+        "reference": "PRE",
+        "within": {
+          "cond": "PLA"
+        },
+        "cells": [
+          {
+            "cell": {
+              "cond": "PLA",
+              "time": "POST"
+            },
+            "n": 9
+          },
+          {
+            "cell": {
+              "cond": "PLA",
+              "time": "PRE"
+            },
+            "n": 8
+          }
+        ],
+        "analyzable": true
+      },
+      {
+        "name": "cond_time_KME_POST_vs_PLA_PRE",
+        "kind": "interaction",
+        "factor": "cond:time",
+        "test": "KME:POST",
+        "reference": "PLA:PRE",
+        "within": {},
+        "cells": [
+          {
+            "cell": {
+              "cond": "KME",
+              "time": "POST"
+            },
+            "n": 9
+          },
+          {
+            "cell": {
+              "cond": "PLA",
+              "time": "POST"
+            },
+            "n": 9
+          },
+          {
+            "cell": {
+              "cond": "KME",
+              "time": "PRE"
+            },
+            "n": 8
+          },
+          {
+            "cell": {
+              "cond": "PLA",
+              "time": "PRE"
+            },
+            "n": 8
+          }
+        ],
+        "analyzable": true
+      }
+    ],
+    "covariates": [
+      "subject"
+    ],
+    "round_estimated_counts": true
+  },
+  "audit": "primary model on all 36 libraries (no outlier removal), audit only",
+  "roles": {
+    "time_POST_vs_PRE_pooled": "planned (primary)",
+    "cond_KME_vs_PLA_time-POST": "planned",
+    "cond_KME_vs_PLA_time-PRE": "exploratory",
+    "time_POST_vs_PRE_cond-KME": "planned",
+    "time_POST_vs_PRE_cond-PLA": "planned",
+    "cond_time_KME_POST_vs_PLA_PRE": "planned"
+  },
+  "threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (DESeq2 FDR step-up, Partek Flow)",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 0.5849625007211562,
+    "effect_cutoff_original": "fold change > 1.5 (either direction)",
+    "inclusive": false,
+    "source_locator": "S2.9.p3",
+    "note": "'significantly different ... when FDR q < 0.05 and fold change (FC) > 1.5' (S2.9.p3); ABS.p3 'q < 0.05 fold change > +/- 1.5'"
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "case_id": "mediaswap_3h",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "intensity",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "intensity",
+        "time"
+      ],
+      "levels": {
+        "intensity": {
+          "SIE": 12,
+          "MIE": 10
+        },
+        "time": {
+          "pre": 11,
+          "post": 11
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "intensity"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "intensity",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 12,
+        "full_rank": true,
+        "residual_df": 10,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre_intensity-SIE",
+        "time_post_vs_pre_intensity-MIE"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 22 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 22
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42594877\\mediaswap_3h\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "intensity_SIE_vs_MIE_time-post",
+      "kind": "simple",
+      "factor": "intensity",
+      "test": "SIE",
+      "reference": "MIE",
+      "within": {
+        "time": "post"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "post",
+            "intensity": "SIE"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "time": "post",
+            "intensity": "MIE"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "intensity_SIE_vs_MIE_time-pre",
+      "kind": "simple",
+      "factor": "intensity",
+      "test": "SIE",
+      "reference": "MIE",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "intensity": "SIE"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "intensity": "MIE"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_intensity-MIE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "intensity": "MIE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "intensity": "MIE",
+            "time": "post"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "intensity": "MIE",
+            "time": "pre"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_intensity-SIE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "intensity": "SIE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "intensity": "SIE",
+            "time": "post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "intensity": "SIE",
+            "time": "pre"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "intensity_time_SIE_post_vs_MIE_pre",
+      "kind": "interaction",
+      "factor": "intensity:time",
+      "test": "SIE:post",
+      "reference": "MIE:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "intensity": "SIE",
+            "time": "post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "intensity": "MIE",
+            "time": "post"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "intensity": "SIE",
+            "time": "pre"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "intensity": "MIE",
+            "time": "pre"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

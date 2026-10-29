@@ -28,6 +28,11 @@ _ORGANISM_GENE_SETS = {
         "KEGG_2021_Human",
     ],
 }
+# MSigDB and Enrichr have no rat collections. Rat genes are tested against the mouse
+# libraries by gene symbol: rat and mouse orthologs share symbols (same capitalisation)
+# for most genes, and the run reports the overlap so a poor match is visible.
+_ORGANISM_GENE_SETS["Rat"] = _ORGANISM_GENE_SETS["Mouse"]
+_LIBRARY_ORGANISM = {"Mouse": "Mouse", "Human": "Human", "Rat": "Mouse"}
 
 _ENSEMBL_PATTERN = re.compile(r"^ENS[A-Z]*G\d+(\.\d+)?$")
 
@@ -191,7 +196,7 @@ def run_enrichment_analysis(
 
     Args:
         deg_csv: Path to a DEG CSV file (must have 'padj' and 'log2FoldChange' columns; index = gene IDs).
-        organism: 'Mouse' or 'Human'. Determines which KEGG library is queried and which species is used for ID conversion.
+        organism: 'Mouse', 'Human' or 'Rat'. Determines which KEGG library is queried and which species is used for ID conversion. Rat uses the mouse libraries by gene symbol.
         padj_cutoff: Maximum adjusted p-value for a gene to be considered significant. Default 0.05.
         log2fc_cutoff: Minimum |log2 fold change| for a gene to be considered significant. Default 1.0.
         direction: 'up', 'down', or 'all'. Which DEGs to submit for enrichment.
@@ -200,7 +205,7 @@ def run_enrichment_analysis(
     """
     try:
         if organism not in _ORGANISM_GENE_SETS:
-            return f"Error: organism must be 'Mouse' or 'Human', got '{organism}'."
+            return f"Error: organism must be 'Mouse', 'Human' or 'Rat', got '{organism}'."
         if direction not in ("up", "down", "all"):
             return f"Error: direction must be 'up', 'down', or 'all', got '{direction}'."
 
@@ -247,7 +252,7 @@ def run_enrichment_analysis(
         enr = gp.enrichr(
             gene_list=gene_list,
             gene_sets=gene_sets,
-            organism=organism.lower(),
+            organism=_LIBRARY_ORGANISM[organism].lower(),
             outdir=None,
             no_plot=True,
         )
@@ -313,8 +318,9 @@ def run_gsea_analysis(
 
     Args:
         deg_csv: Path to a DEG CSV from run_deseq2_analysis (needs the ranking_metric column).
-        organism: 'Mouse' or 'Human'. Selects the species-specific Hallmark library
-            (mouse symbols vs. human symbols — no cross-species mapping needed).
+        organism: 'Mouse', 'Human' or 'Rat'. Selects the species-specific Hallmark library
+            (mouse symbols vs. human symbols). Rat has no MSigDB collection, so rat symbols
+            are matched to the mouse Hallmark sets by symbol; the overlap is reported.
         ranking_metric: Column to rank genes by. Default 'stat' (DESeq2 Wald statistic, recommended).
             Alternatives in the DEG file: 'log2FoldChange'.
         top_n: Number of top enriched terms per direction (up/down) to include in the summary.
@@ -326,8 +332,8 @@ def run_gsea_analysis(
             auto-discovered.
     """
     try:
-        if organism not in ("Mouse", "Human"):
-            return f"Error: organism must be 'Mouse' or 'Human', got '{organism}'."
+        if organism not in ("Mouse", "Human", "Rat"):
+            return f"Error: organism must be 'Mouse', 'Human' or 'Rat', got '{organism}'."
 
         df = pd.read_csv(deg_csv, index_col=0)
         if ranking_metric not in df.columns:
@@ -389,7 +395,7 @@ def run_gsea_analysis(
 
         # Mouse hallmark is 'mh.all' (mouse-symbol GMT); human is 'h.all'.
         # dbver names follow MSigDB releases (see Msigdb().list_dbver()).
-        if organism == "Mouse":
+        if organism in ("Mouse", "Rat"):
             category, dbver = "mh.all", "2024.1.Mm"
         else:
             category, dbver = "h.all", "2024.1.Hs"
@@ -401,6 +407,13 @@ def run_gsea_analysis(
         if not hallmark:
             return f"MSigDB Hallmark library ({category}, {dbver}) returned no gene sets."
 
+        overlap_note = ""
+        if organism == "Rat":
+            library_genes = {g for genes in hallmark.values() for g in genes}
+            hit = sum(1 for g in ranked.index if g in library_genes)
+            overlap_note = (f"Rat genes matched to mouse Hallmark by symbol: {hit}/{len(library_genes)} "
+                            f"Hallmark genes present in the ranking.")
+            print(overlap_note)
         print(f"Running GSEA prerank: {len(ranked)} ranked genes vs. {len(hallmark)} Hallmark sets...")
         pre_res = gp.prerank(
             rnk=rnk,
@@ -430,6 +443,7 @@ def run_gsea_analysis(
         lines = [
             f"GSEA complete on {len(ranked)} {organism} genes ranked by '{ranking_metric}'.",
             f"{len(hallmark)} Hallmark sets tested, {sig_count} significant at FDR q < 0.25.",
+            *([overlap_note] if overlap_note else []),
             "",
             f"### Top {len(up)} UP (NES > 0, enriched in treatment):",
         ]

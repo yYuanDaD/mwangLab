@@ -1,0 +1,277 @@
+{
+  "case_id": "GSE301564",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "frail",
+    "run"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "frail",
+        "run"
+      ],
+      "levels": {
+        "frail": {
+          "low": 8,
+          "high": 7
+        },
+        "run": {
+          "run": 8,
+          "sed": 7
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "animal",
+          "decision": "omit",
+          "reason": "one sample per subject per factor level set: an identifier, not a block"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(frail) + C(run)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "run_run_vs_sed_frail-low",
+        "run_run_vs_sed_frail-high",
+        "frail_run_high_run_vs_low_sed",
+        "frail_high_vs_low_run-sed",
+        "frail_high_vs_low_run-run"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 15 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 15
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40932577\\GSE301564\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "frail_high_vs_low_run-run",
+      "kind": "simple",
+      "factor": "frail",
+      "test": "high",
+      "reference": "low",
+      "within": {
+        "run": "run"
+      },
+      "cells": [
+        {
+          "cell": {
+            "run": "run",
+            "frail": "high"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "run": "run",
+            "frail": "low"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "frail_high_vs_low_run-sed",
+      "kind": "simple",
+      "factor": "frail",
+      "test": "high",
+      "reference": "low",
+      "within": {
+        "run": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "run": "sed",
+            "frail": "high"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "run": "sed",
+            "frail": "low"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "run_run_vs_sed_frail-high",
+      "kind": "simple",
+      "factor": "run",
+      "test": "run",
+      "reference": "sed",
+      "within": {
+        "frail": "high"
+      },
+      "cells": [
+        {
+          "cell": {
+            "frail": "high",
+            "run": "run"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "frail": "high",
+            "run": "sed"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "run_run_vs_sed_frail-low",
+      "kind": "simple",
+      "factor": "run",
+      "test": "run",
+      "reference": "sed",
+      "within": {
+        "frail": "low"
+      },
+      "cells": [
+        {
+          "cell": {
+            "frail": "low",
+            "run": "run"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "frail": "low",
+            "run": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "frail_run_high_run_vs_low_sed",
+      "kind": "interaction",
+      "factor": "frail:run",
+      "test": "high:run",
+      "reference": "low:sed",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "frail": "high",
+            "run": "run"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "frail": "low",
+            "run": "run"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "frail": "high",
+            "run": "sed"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "frail": "low",
+            "run": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

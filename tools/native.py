@@ -317,6 +317,7 @@ def align_to_metadata(matrix_path: str | Path, metadata_path: str | Path, out_di
 def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
                    aliases: dict[str, str] | None = None,
                    patterns: dict[str, tuple[str, str]] | None = None,
+                   combine: dict[str, Sequence[str]] | None = None,
                    recode: dict[str, dict[str, str]] | None = None) -> dict:
     """Write a metadata copy with short, formula-safe columns, and return the mapping.
 
@@ -325,8 +326,11 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
 
     - ``aliases``: ``{"subject": "characteristics_ch1.0.subject"}`` copies a column.
     - ``patterns``: ``{"grp": ("title", r"soleus_(.+)_rep")}`` extracts a regex group.
+    - ``combine``: ``{"tgrp": ["diet", "time"]}`` joins columns with ``_``, for a key
+      built from several fields. It joins the recoded values of its sources.
     - ``recode``: ``{"grp": {"sedentary_control": "sed", ...}}`` maps values of a new
-      column to safe labels; every value must be mapped.
+      column to safe labels; every value must be mapped. Source columns are recoded
+      before ``combine``; a combined column is recoded after it.
 
     Raises when a source column is missing, a pattern does not match every row,
     or a recode leaves a value unmapped. Never guesses a label.
@@ -347,14 +351,26 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
             raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")
         meta[new] = extracted
         record["columns"][new] = {"source": source, "regex": pattern}
-    for column, mapping in (recode or {}).items():
-        if column not in meta.columns:
-            raise NativeToolError(f"recode column {column!r} not in metadata")
-        unmapped = sorted(set(meta[column].astype(str)) - set(mapping))
-        if unmapped:
-            raise NativeToolError(f"recode for {column!r} leaves values unmapped: {unmapped}")
-        meta[column] = meta[column].astype(str).map(mapping)
-        record["columns"].setdefault(column, {})["recode"] = mapping
+    combine = combine or {}
+
+    def _recode(columns):
+        for column, mapping in columns:
+            if column not in meta.columns:
+                raise NativeToolError(f"recode column {column!r} not in metadata")
+            unmapped = sorted(set(meta[column].astype(str)) - set(mapping))
+            if unmapped:
+                raise NativeToolError(f"recode for {column!r} leaves values unmapped: {unmapped}")
+            meta[column] = meta[column].astype(str).map(mapping)
+            record["columns"].setdefault(column, {})["recode"] = mapping
+
+    _recode([(c, m) for c, m in (recode or {}).items() if c not in combine])
+    for new, sources in combine.items():
+        missing = [c for c in sources if c not in meta.columns]
+        if missing:
+            raise NativeToolError(f"combine sources for {new!r} not in metadata: {missing}")
+        meta[new] = meta[list(sources)].astype(str).agg("_".join, axis=1)
+        record["columns"][new] = {"combine": list(sources), "separator": "_", "of": "recoded values"}
+    _recode([(c, m) for c, m in (recode or {}).items() if c in combine])
     for new in record["columns"]:
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", new):
             raise NativeToolError(f"derived column name {new!r} is not formula-safe")
@@ -477,6 +493,23 @@ def pairing_report(metadata: pd.DataFrame | str | Path, subject_column: str, con
         "repeated_across_levels": bool(len(complete) > 0),
         "complete_and_unique": not incomplete and not duplicated and len(complete) > 0,
     }
+
+
+def merge_raw_tar(data_dir: str | Path) -> dict:
+    """Merge a GEO ``*_RAW.tar`` of per-sample count files in ``data_dir`` into one matrix.
+
+    Handles plain gene/count tables, featureCounts output and STAR ``ReadsPerGene.out.tab``
+    (one strand column for all samples, chosen from the forward/reverse totals and printed).
+    Writes ``<accession>_merged_from_tar.csv`` next to the tar. Unparseable members are
+    printed as possible dropped samples, so compare ``n_samples`` with the GEO sample count.
+    """
+    from tools.geo_tar import unpack_and_merge_geo_tar
+    out = unpack_and_merge_geo_tar(str(data_dir))
+    if not out:
+        raise NativeToolError(f"no mergeable per-sample count files in a _RAW.tar under {data_dir}")
+    merged = read_table(out)
+    return {"output": out, "sha256": sha256(out), "n_genes": int(merged.shape[0]),
+            "n_samples": int(merged.shape[1]), "samples": [str(c) for c in merged.columns]}
 
 
 def log_transform(matrix_csv: str | Path, out_csv: str | Path, *, pseudocount: float = 1.0) -> dict:
@@ -672,8 +705,17 @@ def find_outputs(output_dir: str | Path, pattern: str) -> list[str]:
 
 
 def deg_outputs(output_dir: str | Path) -> list[str]:
-    """Result tables written by the repository DE tools in output_dir, newest first."""
-    return find_outputs(output_dir, "DEG_results_*.csv")
+    """Result tables written by the repository DE tools in output_dir, newest first.
+
+    Enrichment outputs reuse the DEG file name as a prefix (``DEG_results_..._GSEA_Hallmark.csv``),
+    so a file counts only when its header has the DE tools' ``pvalue`` or ``padj`` column.
+    """
+    def is_deg_table(path: str) -> bool:
+        try:
+            return bool({"pvalue", "padj"} & set(pd.read_csv(path, nrows=0).columns))
+        except Exception:
+            return False
+    return [p for p in find_outputs(output_dir, "DEG_results_*.csv") if is_deg_table(p)]
 
 
 def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float = 0.05,
@@ -813,7 +855,8 @@ class RunRecorder:
         run = cls(run_dir, request=manifest.get("request", ""), platform_name=manifest.get("platform", ""),
                   decision_maker=manifest.get("decision_maker", ""), case_ids=manifest.get("case_ids", []),
                   _resume=True)
-        for case_dir in sorted(p for p in run_dir.iterdir() if (p / "decisions.json").exists()):
+        for case_dir in sorted(p for p in run_dir.iterdir()
+                               if (p / "decisions.json").exists() or (p / "case_state.json").exists()):
             run.cases[case_dir.name] = CaseRecorder._load(run, case_dir)
             if case_dir.name not in run._case_order:
                 run._case_order.append(case_dir.name)
@@ -837,6 +880,11 @@ class RunRecorder:
             index = self._case_order.index(case_id) + 1
             self.tracker.begin_study(accession or case_id, index, len(self._case_order))
             self.cases[case_id] = CaseRecorder(self, case_id, accession)
+            # Save now: a case with no record yet would otherwise reopen without its accession.
+            self.cases[case_id]._save_state()
+        elif accession and not self.cases[case_id].accession:
+            self.cases[case_id].accession = accession
+            self.cases[case_id]._save_state()
         return self.cases[case_id]
 
     def finish(self) -> dict:
@@ -892,7 +940,8 @@ class CaseRecorder:
         state_path = case_dir / "case_state.json"
         state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
         case = cls(run, case_dir.name, state.get("accession"))
-        case.records = json.loads((case_dir / "decisions.json").read_text(encoding="utf-8"))
+        decisions = case_dir / "decisions.json"
+        case.records = json.loads(decisions.read_text(encoding="utf-8")) if decisions.exists() else []
         evidence_path = case_dir / "evidence.json"
         if evidence_path.exists():
             case.evidence.bundle = EvidenceBundle.model_validate(
@@ -937,6 +986,23 @@ class CaseRecorder:
         path = Path(path)
         artifact_id = self.evidence.add_artifact(str(path), role=role)
         return self._evidence_item(path, "tool_output", artifact_id)
+
+    def suitability(self, **kwargs) -> tuple[dict, dict, dict]:
+        """Run the pre-analysis suitability report (``tools.suitability.report``) into
+        ``<case>/suitability/`` before the design gate.
+
+        Returns (report, evidence item, summary). Put the summary in the design record's
+        ``final.suitability`` and the evidence item in its evidence: a valid design needs
+        both, and cannot be valid when the verdict is ``not_analyzable``."""
+        from tools import suitability as su
+        out = self.dir / "suitability"
+        rep = su.report(case_id=self.case_id, out_dir=out, **kwargs)
+        item = self.add_output(out / "suitability.json", "suitability_report")
+        summary = {"verdict": rep["verdict"], "failed": rep["failed"], "warnings": rep["warnings"],
+                   "report": str(out / "suitability.md"),
+                   "n_comparisons": len(rep["comparisons"]),
+                   "n_analyzable": sum(c["analyzable"] for c in rep["comparisons"])}
+        return rep, item, summary
 
     def write_json(self, name: str, payload: Any, role: str | None = None) -> dict:
         path = self.dir / name

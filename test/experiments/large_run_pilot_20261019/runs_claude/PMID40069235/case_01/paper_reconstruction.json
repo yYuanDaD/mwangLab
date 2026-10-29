@@ -1,0 +1,87 @@
+{
+  "paper_id": "PMID40069235 / PMC11897176",
+  "accessions": [
+    "GSE273041"
+  ],
+  "accession_locator": "DA.p1",
+  "assay": "bulk polyA mRNA-seq (Illumina HiSeq 2500, PE100), vastus lateralis biopsies",
+  "sample_inclusion": [
+    "20 male elite ultra-endurance athletes (HC n=10, LC n=10) x 3 biopsies (BL, H0, H2) = 60 samples (S5.1.p1, S5.5.p1, TAB1)"
+  ],
+  "sample_exclusion": [
+    "not_reported"
+  ],
+  "factors": [
+    {
+      "name": "diet",
+      "levels": [
+        "HC",
+        "LC"
+      ],
+      "type": "between-subject (cross-sectional, habitual)",
+      "locator": "S5.1.p1"
+    },
+    {
+      "name": "time",
+      "levels": [
+        "BL",
+        "H0 (immediately post 180-min run)",
+        "H2 (120 min post)"
+      ],
+      "type": "within-subject repeated measure",
+      "locator": "S5.1.p3"
+    }
+  ],
+  "primary_estimand": "Exercise response: change from baseline (BL) within each diet group at H0 and at H2 (S2.3.p1, S2.3.p6, S5.6.p3); diet differences at each time point are a secondary, associational estimand (S2.2.p1) and are not the requested exercise question.",
+  "planned_contrasts": [
+    {
+      "name": "HC_H0_vs_BL",
+      "locator": "S5.6.p3; S2.3.p1-p3; FIG4"
+    },
+    {
+      "name": "HC_H2_vs_BL",
+      "locator": "S5.6.p3; S2.3.p6; FIG4"
+    },
+    {
+      "name": "LC_H0_vs_BL",
+      "locator": "S5.6.p3; S2.3.p1-p3; FIG4"
+    },
+    {
+      "name": "LC_H2_vs_BL",
+      "locator": "S5.6.p3; S2.3.p6; FIG4"
+    }
+  ],
+  "secondary_contrasts_not_run": [
+    "LC vs HC at BL/H0/H2 (diet, associational; S2.2.p1, TAB2)",
+    "diet, exercise, diet x exercise ANOVA omnibus effects (S2.1.p1; no omnibus F executor)",
+    "gene ~ metabolic-trait linear models (S2.4, S5.6.p4; exploratory, not exercise DE)"
+  ],
+  "blocking_or_covariance": {
+    "status": "required",
+    "unit": "athlete (3 biopsies each)",
+    "paper_model": "mixed-effect model, diet x exercise, Type I ANOVA via car, Tukey post-hoc (S5.6.p3)"
+  },
+  "matrix_scale": "RPKM (easyRNASeq), filtered at 50 mapped reads; values < 10 reads replaced by the RPKM equivalent of 10 reads (S5.6.p2)",
+  "paper_method": "mixed-effect ANOVA (car, R 3.0) + Tukey post-hoc, BH FDR (S5.6.p3)",
+  "paper_formula": "expression ~ diet * time + (1|subject) [described, not given as formula]",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "Benjamini-Hochberg",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "inclusive": false,
+    "source_locator": "S5.6.p3"
+  },
+  "reported_counts": {
+    "omnibus": "diet 653, exercise 8,413, interaction 312 transcripts (p<0.01, FDR<0.05) (S2.1.p1)",
+    "HC_only_vs_BL": "330 genes 'differentially expressed vs. baseline in HC only' (S2.3.p2; time point not stated, read with FIG4)",
+    "LC_H0_vs_BL": "161 genes 'different at H0 vs. baseline in LC' (S2.3.p2; unclear whether total or LC-unique)",
+    "shared_H0": "198 genes DE at H0 irrespective of diet (both HC and LC) (S2.3.p3)",
+    "HC_H2_vs_BL": "222 genes (S2.3.p6)",
+    "LC_H2_vs_BL": "193 genes, described as 'a separate group' (S2.3.p6)",
+    "shared_H2": "100 DEGs shared between diets at H2 (S2.3.p6)",
+    "direction": "up/down split not reported in text (only in FIG4 bars)"
+  },
+  "pathway_method": "ORA via WebGestaltR (GO) on DEG intersections; clusterProfiler GO (S5.6.p3, FIG5)"
+}

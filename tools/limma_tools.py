@@ -5,7 +5,7 @@ from inmoose.limma import lmFit, topTable
 from tools.limma_compat import ebayes as eBayes
 from tools.tooling import tool
 
-from tools.de_common import deg_filename, collapse_duplicate_genes
+from tools.de_common import deg_filename, collapse_duplicate_genes, limma_standard_error
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
@@ -169,9 +169,9 @@ def run_limma_analysis(
         top = topTable(fit, coef=coef, number=n_features, sort_by="P", adjust_method="fdr_bh")
 
         # inmoose's topTable already returns DESeq2-style column names (baseMean / log2FoldChange /
-        # pvalue / lfcSE / stat) — only adj_pvalue needs renaming to padj for downstream consistency.
+        # pvalue / lfcSE / stat) — adj_pvalue is renamed to padj, and lfcSE (an unscaled SD there) is replaced.
         # Cast to a plain DataFrame first to avoid DEResults' required-column validation on rename.
-        top = pd.DataFrame(top).rename(columns={"adj_pvalue": "padj"})
+        top = limma_standard_error(pd.DataFrame(top).rename(columns={"adj_pvalue": "padj"}))
 
         front = [c for c in ["baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj", "B"] if c in top.columns]
         rest = [c for c in top.columns if c not in front]

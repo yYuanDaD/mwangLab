@@ -12,8 +12,8 @@ consume it unchanged.
 Notes:
   - inmoose 0.9.1 exposes the full edgeR GLM path (DGEList, estimateGLMCommonDisp,
     estimateGLMTagwiseDisp, glmQLFit, glmQLFTest, topTags) BUT NOT calcNormFactors
-    (TMM). We therefore run with default library-size normalization (norm_factors=1);
-    TMM would refine normalization but the NB GLM is valid without it.
+    (TMM). TMM factors come from de_common.tmm_factors (edgeR's algorithm) and are
+    passed to DGEList as norm_factors.
   - inmoose's topTags already returns DESeq2-style names (log2FoldChange / lfcSE /
     stat / pvalue) plus FDR/adj_pvalue; we rename adj_pvalue -> padj.
   - DGEList expects counts as genes (rows) x samples (columns) — the native GEO
@@ -21,12 +21,13 @@ Notes:
 """
 
 import os
+import numpy as np
 import pandas as pd
 from patsy import dmatrix
 from inmoose.edgepy import DGEList, glmQLFTest, topTags
 from tools.tooling import tool
 
-from tools.de_common import deg_filename, collapse_duplicate_genes
+from tools.de_common import deg_filename, collapse_duplicate_genes, tmm_factors
 from tools.analysis_policy import (
     PolicyViolation, enforce_method_matrix_compatibility, numeric_matrix,
     select_valid_two_group_design,
@@ -115,7 +116,9 @@ def run_edger_analysis(
         design = dmatrix("~ Treatment", design_meta)
         group = metadata_df[design_column].astype(str).tolist()
 
-        y = DGEList(counts=counts_sub, group=group)
+        norm = tmm_factors(counts_sub)
+        print(f"TMM normalisation factors: {norm.min():.3f}-{norm.max():.3f}")
+        y = DGEList(counts=counts_sub, group=group, norm_factors=norm.to_numpy())
         y = y.estimateGLMCommonDisp(design)
         y = y.estimateGLMTagwiseDisp(design)
         fit = y.glmQLFit(design)
@@ -127,6 +130,11 @@ def run_edger_analysis(
         res = res.rename(columns={"adj_pvalue": "padj"})
         if "padj" not in res.columns and "FDR" in res.columns:
             res["padj"] = res["FDR"]
+        # The QL F statistic is unsigned; GSEA ranks on `stat`, so store sign(log2FC) * sqrt(F)
+        # there (as limma's t) and keep F itself in its own column.
+        if "stat" in res.columns and "log2FoldChange" in res.columns and (res["stat"].dropna() >= 0).all():
+            res["F"] = res["stat"]
+            res["stat"] = np.sign(res["log2FoldChange"]) * np.sqrt(res["F"].clip(lower=0))
         front = [c for c in ["baseMean", "logCPM", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj"] if c in res.columns]
         rest = [c for c in res.columns if c not in front]
         res = res[front + rest]
@@ -141,6 +149,7 @@ def run_edger_analysis(
 
         return (f"edgeR analysis completed successfully!\n"
                 f"Results saved to: {output_file}\n"
+                f"Normalisation: TMM (factors {norm.min():.3f}-{norm.max():.3f})\n"
                 f"Summary (padj < 0.05, |log2FC| > 1):\n"
                 f"- Up-regulated genes: {len(up)}\n"
                 f"- Down-regulated genes: {len(down)}")

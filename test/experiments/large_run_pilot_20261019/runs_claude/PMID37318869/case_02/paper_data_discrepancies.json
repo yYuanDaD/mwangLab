@@ -1,0 +1,37 @@
+[
+  {
+    "item": "normalization",
+    "paper": "edgeR (TMM default presumed; not stated)",
+    "data": "inmoose edgeR and preprocess_counts use library size only; median-of-ratios size factor / library size averages 0.88 (ctrl) vs 1.07 (pre) and 1.10 (post) -> composition shift ~0.27 log2 between controls and DM1 that TMM would remove; inflates BH counts in pre/post-vs-ctrl, cancels in \u0394log2FC",
+    "class": "requires_explicit_deviation",
+    "case": "case_02, case_03"
+  },
+  {
+    "item": "gene filter",
+    "paper": "'Genes with less than 10 counts in each samples were filtered out' (S4.4.p1)",
+    "data": "literal reading (>=10 in >=1 sample) keeps 20,852 (pre+ctrl) / 21,619 (post+ctrl); authors' sheets list 18,762 / 18,804 genes; no tested rule reproduces those counts",
+    "class": "executable_without_change",
+    "case": "all"
+  },
+  {
+    "item": "authors' DEG count, grouped pre vs ctrl",
+    "paper": "deposited edgeR sheet: 176 genes pass |logFC|>2 & P<0.05",
+    "data": "this run: 475; logFC Pearson r=0.926 over 17,136 shared genes",
+    "class": "executable_without_change",
+    "case": "case_02"
+  },
+  {
+    "item": "age covariate",
+    "paper": "controls mean 32 y vs DM1 48 y (S2.5.p2)",
+    "data": "age not in GEO metadata",
+    "class": "executable_without_change (affects only disease-vs-control contrasts)",
+    "case": "case_02, case_03"
+  },
+  {
+    "item": "deposited supplementary edgeR_output.xlsx",
+    "paper": "4 sheets (grouped pre, grouped post, individual pre, individual post)",
+    "data": "download_supplementary_files converted only sheet 1 and deleted the xlsx (tools/geo_tools.py:85 pd.read_excel(file_path) default sheet; :89 os.remove)",
+    "class": "executable_without_change (re-downloaded for concordance)",
+    "case": "case_02, case_03"
+  }
+]

@@ -188,10 +188,19 @@ class RunRecorderTests(unittest.TestCase):
                     case.decide("matrix", final={}, evidence=[aligned], reasoning="x", confidence="high")
                 case.decide("matrix", final={"matrix_type": "raw counts", "recommended_method": "DESeq2"},
                             evidence=[aligned], reasoning="integers", confidence="high")
+                _, suit, summary = case.suitability(matrix_type="raw counts", factors=["time"],
+                                                    metadata=pd.read_csv(paths["metadata"], index_col=0),
+                                                    subject="subject")
+                self.assertEqual(summary["verdict"], "analyzable", summary)
+                with self.assertRaises(native.NativeToolError):  # the report is part of a valid design
+                    case.decide("design", final={"analysis_type": "paired two-timepoint",
+                                                 "formula": "~ subject + time", "design_column": "time",
+                                                 "control": "pre", "treatment": "post"},
+                                evidence=[meta], reasoning="paper", confidence="high")
                 case.decide("design", final={"analysis_type": "paired two-timepoint",
                                              "formula": "~ subject + time", "design_column": "time",
-                                             "control": "pre", "treatment": "post"},
-                            evidence=[meta], reasoning="paper", confidence="high")
+                                             "control": "pre", "treatment": "post", "suitability": summary},
+                            evidence=[meta, suit], reasoning="paper", confidence="high")
                 case.decide("covariance", final={"status": "required", "blocking_terms": ["subject"],
                                                  "covariates": []},
                             evidence=[meta], reasoning="4 complete pairs", confidence="high")
@@ -315,6 +324,16 @@ class ModalityHelperTests(unittest.TestCase):
             self.assertEqual(result["status"], "partial")
             status = json.loads((Path(tmp) / "run" / "run_status.json").read_text(encoding="utf-8"))
             self.assertEqual(status["status"], "partial")
+
+    def test_accession_survives_reopen_before_first_record(self):
+        # Large run: a case created in one script and first recorded in the next lost its
+        # accession (summary.csv showed it empty).
+        native.enable_native_mode()
+        with tempfile.TemporaryDirectory() as tmp:
+            native.RunRecorder(Path(tmp) / "run", request="r", platform_name="test",
+                               decision_maker="test", case_ids=["c1"]).case("c1", "GSE1")
+            reopened = native.RunRecorder.open(Path(tmp) / "run")
+            self.assertEqual(reopened.case("c1").accession, "GSE1")
 
 
 class RoundThreeFixTests(unittest.TestCase):

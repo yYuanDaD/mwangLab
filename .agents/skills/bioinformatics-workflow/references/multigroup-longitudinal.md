@@ -7,7 +7,7 @@ Use this reference when a paper has more than one treatment level, more than one
 1. **One factor, several levels.**
    - Keep the factor as a k-level categorical variable.
    - Check replication at every level.
-   - Run only the planned contrasts.
+   - Run every analyzable comparison from the suitability report, not only one: the planned contrasts as the paper route, the rest as exploratory. Fit one model on all samples (`tools.joint_contrasts`); a two-arm executor refits on two groups and loses power.
    - If different animals were used at each level, there is no repeated measure: a unique animal ID per sample is an identifier, not a blocking term.
 2. **Factorial design.**
    - Keep each factor separate.

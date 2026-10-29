@@ -20,7 +20,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
-CONTRACT_VERSION = "2"
+CONTRACT_VERSION = "3"
+# v3: a valid design carries final.suitability, the pre-analysis report's verdict
+# (tools/suitability.py); records written under v2 are checked without it.
+SUITABILITY_VERDICTS = {"analyzable", "partially_analyzable", "not_analyzable"}
 STAGES = (
     "paper_reconstruction", "ownership", "alignment", "matrix", "design",
     "covariance", "method", "threshold", "execution", "enrichment", "study",
@@ -160,6 +163,14 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
             errors.append(f"{source}: valid design needs final.formula or final.design_column")
         if not (final.get("contrasts") or (final.get("control") and final.get("treatment"))):
             errors.append(f"{source}: valid design needs final.contrasts or final.control and final.treatment")
+        suit = final.get("suitability")
+        if int(record.get("contract_version") or CONTRACT_VERSION) >= 3 and not legacy:
+            if not isinstance(suit, dict) or suit.get("verdict") not in SUITABILITY_VERDICTS:
+                errors.append(f"{source}: valid design needs final.suitability with a verdict from "
+                              f"case.suitability(...) (one of {sorted(SUITABILITY_VERDICTS)})")
+            elif suit["verdict"] == "not_analyzable":
+                errors.append(f"{source}: the suitability report says not_analyzable "
+                              f"(failed: {suit.get('failed')}); the design cannot be valid")
     if stage == "alignment" and status == "valid":
         coverage = final.get("coverage")
         if not isinstance(coverage, (int, float)) or not 0 <= coverage <= 1:
@@ -192,7 +203,8 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
             and record["execution_status"] in {"completed", "failed"}:
         errors.append(f"{source}: decision gate {stage} keeps execution_status not_started; "
                       "only execution and enrichment records run something")
-    if stage == "enrichment" and status == "valid":
+    # A planned enrichment that was not run only needs reason_not_run (checked above).
+    if stage == "enrichment" and status == "valid" and record["execution_status"] != "not_run":
         errors.extend(_enrichment_errors(final, source))
     if stage == "study" and status == "valid" and final.get("route") not in STUDY_ROUTES:
         errors.append(f"{source}: study route must be one of {sorted(STUDY_ROUTES)}")
@@ -201,7 +213,10 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
 
 def _enrichment_errors(final: dict, source: str) -> list[str]:
     errors = []
-    id_type = str(final.get("feature_id_type", "")).lower()
+    # "gene symbol", "Gene-Symbol" and "symbol" all mean gene_symbol.
+    id_type = re.sub(r"[\s-]+", "_", str(final.get("feature_id_type", "")).strip().lower())
+    id_type = {"symbol": "gene_symbol", "symbols": "gene_symbol", "gene_symbols": "gene_symbol",
+               "ensembl": "ensembl_gene", "ensembl_gene_id": "ensembl_gene"}.get(id_type, id_type)
     if id_type and id_type not in GENE_SET_READY_IDS and not final.get("id_mapping"):
         errors.append(f"{source}: feature_id_type {id_type!r} needs final.id_mapping (for example a "
                       "platform annotation or ID-to-symbol table) before gene-set analysis")
@@ -298,6 +313,8 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
     # A transform declared in the method decision applies to the executed analysis too.
     case_transform = next((str((r.get("final") or {}).get("transform")) for r in valid("method")
                            if (r.get("final") or {}).get("transform")), "")
+    # So does documented rounding of estimated counts.
+    case_rounding = any((r.get("final") or {}).get("rounding_documented") for r in valid("method"))
     for record in valid("method") + [r for r in by_stage.get("execution", [])
                                      if r.get("execution_status") == "completed"]:
         final = record.get("final") or {}
@@ -306,7 +323,8 @@ def check_case(records: list[dict[str, Any]], case_id: str = "case") -> list[str
         transform = str(final.get("transform") or case_transform).lower()
         if family == "count" and types & {"linear_normalized", "log_scale", "methylation_beta"}:
             errors.append(f"{case_id}: count-based method {final.get('method')!r} on {sorted(types)} matrix")
-        if family == "count" and "estimated_counts" in types and not final.get("rounding_documented"):
+        if family == "count" and "estimated_counts" in types and not (final.get("rounding_documented")
+                                                                        or case_rounding):
             errors.append(f"{case_id}: count method on estimated counts needs final.rounding_documented")
         if family == "log_linear" and types & {"raw_counts", "linear_normalized", "methylation_beta",
                                                "estimated_counts"} and not transform:
