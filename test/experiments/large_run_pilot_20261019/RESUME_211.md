@@ -36,3 +36,7 @@ Rows 19–23 finished 2026-10-28 (21/211 done). Next: row 24. Unpatched 2+-paper
 include `covariate_columns` given as a list crashing DESeq2 (`deseq2_tools.py:105`; rows 19, 23).
 
 Round 3 started 2026-10-29 00:13 (owner: "继续跑5篇"): rows 24–28, after patching the list covariate crash.
+Rows 24–28 finished 2026-10-29 (26/211, all VALID).
+
+Owner 2026-10-29 03:35 (via the coordinator, verbatim "先继续用5h额度跑211篇吧"): run continuously, 5 at a
+time, until the 5-hour quota runs out; short report after each batch of 5. Started at row 29.

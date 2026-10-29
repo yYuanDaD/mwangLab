@@ -383,3 +383,23 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID28273480 (GSE97084)
 
 - case_runner.py:634 complete_pairs positional call crashes (native.py:688 kw-only, patched after row 23); covariate_columns list not rejected (deseq2_tools.py:105) Details: `PMID28273480/HANDBACK.md`.
+
+## PMID41835150 (GSE319603)
+
+- one inclusive flag covers both p and FC cutoffs, so paper's '<0.05 and >=0.5' cannot be expressed (tools/native.py:762-768); gene check rounds tiny padj to 0.0 (cosmetic) Details: `PMID41835150/HANDBACK.md`.
+
+## b06f79d81bb9463e3b902b4b8b96b865e96758a2 (GSE164890)
+
+- case_runner.py:422-434 _gene_lookup uses MyGene current symbols, not matrix Symbol column, so MARC1 (now MTARC1) returned null; DEG table drops Symbol annotation Details: `b06f79d81bb9463e3b902b4b8b96b865e96758a2/HANDBACK.md`.
+
+## PMID42019489 (GSE312393)
+
+- limma_tools.py:102-106 has no low-expression filter (prefiltered in a prep script); limma_tools.py:189-193 prints its own |LFC|>1 summary; exec record formula copied from spec Details: `PMID42019489/HANDBACK.md`.
+
+## PMID41979147 (GSE318937)
+
+- case_runner.py:709 comparisons 'all' ignores execution subset (no samples in cell); no executor for voomWithQualityWeights+duplicateCorrelation Details: `PMID41979147/HANDBACK.md`.
+
+## PMID41683811 (GSE315228)
+
+- case_runner.py:517 n_aligned ignores exclude_samples; decision_contract.py:338 pairing detected from analysis_type text; :163 design formula required, not in docs Details: `PMID41683811/HANDBACK.md`.

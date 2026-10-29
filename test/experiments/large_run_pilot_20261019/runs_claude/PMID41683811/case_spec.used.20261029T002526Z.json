@@ -1,0 +1,775 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811",
+ "request": "Analyze GSE315228 for PMID 41683811 (Molecular Indicators of Isometric Exercise Efficacy in Early Rehabilitation of Older Adults After Total Hip Arthroplasty.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE315228",
+   "accession": "GSE315228",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC12898363.paper.md"
+    ],
+    "metadata": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/GSE315228_metadata_by_biopsy.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/GSE315228_counts_by_biopsy.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/prep_collapse_techreps.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE315228"
+      ],
+      "assay": "bulk RNA-seq (Oxford Nanopore PromethION cDNA), rectus femoris of the operated leg (S4.3.p1, S4.4.p2)",
+      "subjects": "8 women aged 73-77 after THA; control = standard isometric-exercise (IE) protocol n=4, experimental = additional/longer IEs n=4, sequential non-randomized allocation (S4.1.p2)",
+      "factors": {
+       "grp": [
+        "ctr (standard IE)",
+        "exp (additional IE)"
+       ],
+       "time": [
+        "d0 (start of operation)",
+        "d1 (1 day post-THA)",
+        "d12 (12 days post-THA)"
+       ]
+      },
+      "repeated_measure_unit": "patient (biopsies at d0, d1, d12 from the same patient; S4.3.p1, S4.6.p2)",
+      "technical_replicates": "up to three sequencing runs per biopsy, all included in the paper's analysis (FIG3 legend)",
+      "primary_estimand": "Effect of the additional isometric-exercise rehabilitation on the rectus femoris transcriptome: the paper reads it from within-arm 12d-vs-preop changes (exp12vs0 vs ctr12vs0); the exercise-attributable contrast is the arm difference in that change (interaction), which the paper does not test directly",
+      "planned_contrasts": [
+       "1vs0: d1 vs d0, both arms pooled, paired on patient (S4.6.p2; paper 593 up / 1986 down)",
+       "ctr12vs0: control d12 vs d0 (S2.2.1.p3; paper 546 up / 190 down)",
+       "exp12vs0: experimental d12 vs d0 (S2.2.1.p3, S3.p7; paper 3989 up / 290 down)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true,
+       "source_locator": "S4.8.p1; FIG4"
+      },
+      "paper_method": "featureCounts counts, DESeq2 1.38.3 Wald test, BH FDR <= 0.05 (S4.5.p1, S4.8.p1); design formula and pairing not stated; technical runs included as samples (FIG3)",
+      "paper_results": {
+       "1vs0": {
+        "up": 593,
+        "down": 1986
+       },
+       "ctr12vs0": {
+        "up": 546,
+        "down": 190
+       },
+       "exp12vs0": {
+        "up": 3989,
+        "down": 290
+       }
+      },
+      "inclusion": "all 8 patients completed the protocol (S4.1.p2)",
+      "enrichment": "GSEA with GSEApy on MSigDB sets (S4.7.p1)"
+     },
+     "reasoning": "Study map from S4.1-S4.8 and FIG3/FIG4. Both arms exercise; the arms differ in IE dose and content (S4.1.p14). Time contrasts within an arm mix surgery recovery with rehabilitation, so only the between-arm difference in change isolates the added exercise.",
+     "confidence": "high",
+     "locator": "S4.1.p2; S4.6.p2; S4.8.p1; FIG3; FIG4"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.4.p3 and DA.p1 name GSE315228",
+       "72 GEO samples = 8 patients x 3 time points x 3 technical runs; treatment control/experiment 4 patients each, matching S4.1.p2",
+       "organism Homo sapiens, female, rectus femoris, PromethION, matching S4.4",
+       "data_processing repeats the paper's pipeline (minimap2, featureCounts, DESeq2)"
+      ]
+     },
+     "reasoning": "Series, sample design and processing all match the paper.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "aliases": {},
+     "patterns": {},
+     "recode": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix and metadata are the prep_collapse_techreps.py outputs: technical runs of one biopsy were summed (barcode parsed from description, patient and time from characteristics, cross-checked against titles). Exact match of the 24 biopsy IDs. Columns subject (P1..P8), grp (ctr/exp), time (d0/d1/d12). Three failed runs (<1000 reads: barcode01 P1_d0 rep1, barcode54 P8_d12 rep3, barcode67 P4_d1 rep1) were left out of the sums.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE315228_raw_counts_all_samples.csv.gz (supplementary)",
+      "paper_input": "featureCounts counts into DESeq2 (S4.5.p1)"
+     },
+     "reasoning": "integer_fraction 1.0, max 283922, median 0; GEO data_processing: 'csv file includes raw counts for each sample' from featureCounts. Matches the paper's DESeq2 input.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp",
+      "time"
+     ],
+     "references": {
+      "grp": "ctr",
+      "time": "d0"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "time_d12_vs_d0_grp-ctr",
+      "time_d12_vs_d0_grp-exp",
+      "grp_time_exp_d12_vs_ctr_d0"
+     ],
+     "covariate_candidates": [
+      "subject"
+     ],
+     "final": {
+      "analysis_type": "repeated measures, 2 arms x 3 time points, patient as blocking unit",
+      "formula": "~ subject + time within arm subsets; interaction on per-patient d12-d0 differences ~ grp",
+      "contrasts": [
+       {
+        "name": "d1_vs_d0_pooled",
+        "control": "d0",
+        "treatment": "d1",
+        "role": "secondary",
+        "note": "paper 1vs0; surgery effect, not exercise"
+       },
+       {
+        "name": "ctr_d12_vs_d0",
+        "control": "ctr:d0",
+        "treatment": "ctr:d12",
+        "role": "secondary"
+       },
+       {
+        "name": "exp_d12_vs_d0",
+        "control": "exp:d0",
+        "treatment": "exp:d12",
+        "role": "primary"
+       },
+       {
+        "name": "ixn_change_d12",
+        "control": "ctr change d12-d0",
+        "treatment": "exp change d12-d0",
+        "role": "exploratory",
+        "note": "exercise-attributable: arm difference in 12d change"
+       }
+      ]
+     },
+     "reasoning": "Paper's planned contrasts are within-patient time changes (S4.6.p2): pooled d1 vs d0, and d12 vs d0 within each arm. These estimate surgery plus rehabilitation over time in each arm, not the added-exercise effect; the paper infers the exercise effect by comparing the two arms' DEG lists (S2.2.1.p4). The direct test of that inference is the grp x time interaction (exp d12-d0 minus ctr d12-d0), run as an exploratory addition. Arms are non-randomized (S4.1.p2), so between-arm contrasts are associational with respect to allocation. n=4 patients per arm.",
+     "candidates": [
+      {
+       "value": "grp exp vs ctr at d12 (cross-sectional)",
+       "reason_rejected": "ignores each patient's baseline; paper never uses it; the interaction uses the baseline"
+      },
+      {
+       "value": "technical runs as independent samples",
+       "reason_rejected": "pseudoreplication: runs of one biopsy are not biological replicates"
+      }
+     ],
+     "confidence": "medium"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "subject"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "blocking term in every within-arm time contrast (paired biopsies); the interaction uses per-patient d12-d0 differences"
+       }
+      ]
+     },
+     "reasoning": "Each patient contributes d0, d1 and d12 biopsies (S4.3.p1) and the paper compares them 'relative to preoperative samples from the same patients' (S4.6.p2). Patient is nested in arm, so it cannot be a covariate in a model that also estimates arm; the interaction is therefore fitted on within-patient differences.",
+     "confidence": "high"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ subject + time within each arm subset (both arms for d1 vs d0)",
+      "paper_route": {
+       "method": "DESeq2 Wald, BH",
+       "status": "reproduced_with_change",
+       "reason": "same estimator; technical runs summed per biopsy and patient blocking stated explicitly (paper does not state its design formula)"
+      },
+      "deviations": [
+       "technical sequencing runs summed per biopsy (paper included each run as a sample, FIG3)",
+       "interaction (exploratory) uses limma on per-patient log2(CPM+1) d12-d0 differences, ~ grp, because a nested-subject DESeq2 interaction design is not available in the runner",
+       "one unpaired joint DESeq2 model ~ cell over all 24 biopsies lists every comparison as exploratory"
+      ]
+     },
+     "reasoning": "Raw featureCounts counts support DESeq2 as in the paper.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.8.p1: 'Findings were considered statistically significant at FDR <= 0.05'; FIG4: FDR = 0.05 line; no fold-change cutoff stated. Audit adds |log2FC| > 1 as a labelled comparison only.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "exploratory_reason": "n=4 patients per arm; interaction and joint-model comparisons are exploratory",
+      "caveats": [
+       "arms allocated sequentially, not randomized (S4.1.p2)",
+       "both arms exercise; within-arm time contrasts are surgery plus rehabilitation, not exercise alone",
+       "paper counts used technical runs as samples; ours are per biopsy, so smaller counts are expected",
+       "gene IDs are Ensembl; paper gene lookups by symbol may not resolve"
+      ]
+     },
+     "paper_counts": {
+      "d1_vs_d0_pooled": 2579,
+      "ctr_d12_vs_d0": 736,
+      "exp_d12_vs_d0": 4279
+     },
+     "paper_genes": {
+      "exp_d12_vs_d0": [
+       "BMP7",
+       "TGFB2",
+       "EGF",
+       "ANGPT1",
+       "FLT1",
+       "KDR",
+       "NRP2",
+       "TEK",
+       "VEGFA",
+       "VEGFC",
+       "EDNRA",
+       "PRKG1",
+       "BMP8A",
+       "ADORA2B"
+      ],
+      "ctr_d12_vs_d0": [
+       "FLT4",
+       "ENPP2",
+       "GRN",
+       "ADORA2B",
+       "CXCR1"
+      ]
+     },
+     "reasoning": "Paper contrasts reproduced with DESeq2 at the paper threshold after summing technical runs and blocking on patient; the exercise-attributable interaction added as exploratory."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "technical sequencing runs",
+     "paper": "up to three runs per biopsy, all included in the analysis (FIG3)",
+     "data": "72 GEO samples = 24 biopsies x 3 runs (3 failed runs <1000 reads)",
+     "disposition": "declared_deviation: runs summed per biopsy in the primary case; replicate-level case kept as sensitivity"
+    },
+    {
+     "item": "design formula / pairing",
+     "paper": "'relative to preoperative samples from the same patients' (S4.6.p2); formula not stated",
+     "data": "patient ID available for all samples",
+     "disposition": "executable_with_assumption: patient blocking in primary case"
+    },
+    {
+     "item": "exercise effect test",
+     "paper": "inferred by comparing exp12vs0 and ctr12vs0 DEG lists (S2.2.1.p4)",
+     "data": "interaction is estimable (4 vs 4 patients with d0 and d12)",
+     "disposition": "added exploratory interaction"
+    }
+   ],
+   "executions": [
+    {
+     "name": "d1_vs_d0_pooled",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d1",
+      "alpha": 0.05,
+      "covariate_columns": [
+       "subject"
+      ]
+     },
+     "subset": {
+      "time": [
+       "d0",
+       "d1"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "paper 1vs0: both arms, paired on patient (S4.6.p2)"
+    },
+    {
+     "name": "ctr_d12_vs_d0",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d12",
+      "alpha": 0.05,
+      "covariate_columns": [
+       "subject"
+      ]
+     },
+     "subset": {
+      "grp": [
+       "ctr"
+      ],
+      "time": [
+       "d0",
+       "d12"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "paper ctr12vs0, paired on patient"
+    },
+    {
+     "name": "exp_d12_vs_d0",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d12",
+      "alpha": 0.05,
+      "covariate_columns": [
+       "subject"
+      ]
+     },
+     "subset": {
+      "grp": [
+       "exp"
+      ],
+      "time": [
+       "d0",
+       "d12"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "paper exp12vs0 (headline DEG result), paired on patient"
+    },
+    {
+     "name": "ixn_change_d12",
+     "tool": "tools.multigroup_tools:run_multigroup_analysis",
+     "transform": "log2(CPM+1)",
+     "subset": {
+      "time": [
+       "d0",
+       "d12"
+      ]
+     },
+     "args": {
+      "plan": {
+       "analysis_type": "paired_change",
+       "subject_column": "subject",
+       "time_column": "time",
+       "baseline_level": "d0",
+       "followup_levels": [
+        "d12"
+       ],
+       "group_column": "grp",
+       "formula": "~ C(grp)",
+       "contrasts": [
+        {
+         "name": "exp_vs_ctr_change_d12",
+         "coefficients": {
+          "C(grp)[T.exp]": 1
+         }
+        }
+       ]
+      }
+     },
+     "role": "exploratory",
+     "reasoning": "exercise-attributable contrast: (exp d12-d0) - (ctr d12-d0), per-patient differences, limma"
+    },
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all",
+      "covariates": []
+     },
+     "role": "exploratory",
+     "reasoning": "skill rule: every analyzable comparison from one model on all biopsies; unpaired because patient is nested in arm"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "exp_d12_vs_d0",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper GSEA (S2.2.2, FIG6-7)"
+    },
+    {
+     "execution": "ctr_d12_vs_d0",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper GSEA (FIG6-7)"
+    },
+    {
+     "execution": "d1_vs_d0_pooled",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper GSEA (FIG5)"
+    },
+    {
+     "execution": "ixn_change_d12/exp_vs_ctr_change_d12",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "tests the paper's claim that inflammation resolved faster in exp"
+    }
+   ]
+  },
+  {
+   "case_id": "GSE315228_reps",
+   "accession": "GSE315228",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC12898363.paper.md"
+    ],
+    "metadata": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/GSE315228_metadata_reps.csv",
+    "matrix": "GSE315228/GSE315228_raw_counts_all_samples.csv.gz",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/prep_collapse_techreps.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE315228"
+      ],
+      "assay": "bulk RNA-seq (Oxford Nanopore PromethION cDNA), rectus femoris of the operated leg (S4.3.p1, S4.4.p2)",
+      "subjects": "8 women aged 73-77 after THA; control = standard isometric-exercise (IE) protocol n=4, experimental = additional/longer IEs n=4, sequential non-randomized allocation (S4.1.p2)",
+      "factors": {
+       "grp": [
+        "ctr (standard IE)",
+        "exp (additional IE)"
+       ],
+       "time": [
+        "d0 (start of operation)",
+        "d1 (1 day post-THA)",
+        "d12 (12 days post-THA)"
+       ]
+      },
+      "repeated_measure_unit": "patient (biopsies at d0, d1, d12 from the same patient; S4.3.p1, S4.6.p2)",
+      "technical_replicates": "up to three sequencing runs per biopsy, all included in the paper's analysis (FIG3 legend)",
+      "primary_estimand": "Effect of the additional isometric-exercise rehabilitation on the rectus femoris transcriptome: the paper reads it from within-arm 12d-vs-preop changes (exp12vs0 vs ctr12vs0); the exercise-attributable contrast is the arm difference in that change (interaction), which the paper does not test directly",
+      "planned_contrasts": [
+       "1vs0: d1 vs d0, both arms pooled, paired on patient (S4.6.p2; paper 593 up / 1986 down)",
+       "ctr12vs0: control d12 vs d0 (S2.2.1.p3; paper 546 up / 190 down)",
+       "exp12vs0: experimental d12 vs d0 (S2.2.1.p3, S3.p7; paper 3989 up / 290 down)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true,
+       "source_locator": "S4.8.p1; FIG4"
+      },
+      "paper_method": "featureCounts counts, DESeq2 1.38.3 Wald test, BH FDR <= 0.05 (S4.5.p1, S4.8.p1); design formula and pairing not stated; technical runs included as samples (FIG3)",
+      "paper_results": {
+       "1vs0": {
+        "up": 593,
+        "down": 1986
+       },
+       "ctr12vs0": {
+        "up": 546,
+        "down": 190
+       },
+       "exp12vs0": {
+        "up": 3989,
+        "down": 290
+       }
+      },
+      "inclusion": "all 8 patients completed the protocol (S4.1.p2)",
+      "enrichment": "GSEA with GSEApy on MSigDB sets (S4.7.p1)"
+     },
+     "reasoning": "Study map from S4.1-S4.8 and FIG3/FIG4. Both arms exercise; the arms differ in IE dose and content (S4.1.p14). Time contrasts within an arm mix surgery recovery with rehabilitation, so only the between-arm difference in change isolates the added exercise.",
+     "confidence": "high",
+     "locator": "S4.1.p2; S4.6.p2; S4.8.p1; FIG3; FIG4"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.4.p3 and DA.p1 name GSE315228",
+       "72 GEO samples = 8 patients x 3 time points x 3 technical runs; treatment control/experiment 4 patients each, matching S4.1.p2",
+       "organism Homo sapiens, female, rectus femoris, PromethION, matching S4.4",
+       "data_processing repeats the paper's pipeline (minimap2, featureCounts, DESeq2)"
+      ]
+     },
+     "reasoning": "Series, sample design and processing all match the paper.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "barcode",
+     "aliases": {},
+     "patterns": {},
+     "recode": {},
+     "exclude_samples": {
+      "GSM9423284": "failed library barcode01, 641 reads",
+      "GSM9423337": "failed library barcode54, 442 reads",
+      "GSM9423350": "failed library barcode67, 179 reads"
+     },
+     "reasoning": "Replicate-level case reproducing the paper's input (FIG3: all runs included). Metadata = GEO metadata plus barcode parsed from description ('Library name: barcodeNN') and subject/grp/time derived and cross-checked against titles in prep_collapse_techreps.py. Exact match on barcode.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE315228_raw_counts_all_samples.csv.gz (supplementary)",
+      "paper_input": "featureCounts counts into DESeq2 (S4.5.p1)"
+     },
+     "reasoning": "integer_fraction 1.0, max 283922, median 0; GEO data_processing: 'csv file includes raw counts for each sample' from featureCounts. Matches the paper's DESeq2 input.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp",
+      "time"
+     ],
+     "references": {
+      "grp": "ctr",
+      "time": "d0"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "time_d12_vs_d0_grp-ctr",
+      "time_d12_vs_d0_grp-exp"
+     ],
+     "covariate_candidates": [
+      "subject"
+     ],
+     "final": {
+      "analysis_type": "unpaired within-arm time contrasts with technical runs as samples (paper-input sensitivity; patient blocking deliberately omitted)",
+      "formula": "~ time within arm subsets",
+      "contrasts": [
+       {
+        "name": "d1_vs_d0_pooled",
+        "control": "d0",
+        "treatment": "d1",
+        "role": "secondary",
+        "note": "paper 1vs0; surgery effect, not exercise"
+       },
+       {
+        "name": "ctr_d12_vs_d0",
+        "control": "ctr:d0",
+        "treatment": "ctr:d12",
+        "role": "secondary"
+       },
+       {
+        "name": "exp_d12_vs_d0",
+        "control": "exp:d0",
+        "treatment": "exp:d12",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Paper's planned contrasts are within-patient time changes (S4.6.p2): pooled d1 vs d0, and d12 vs d0 within each arm. These estimate surgery plus rehabilitation over time in each arm, not the added-exercise effect; the paper infers the exercise effect by comparing the two arms' DEG lists (S2.2.1.p4). The direct test of that inference is the grp x time interaction (exp d12-d0 minus ctr d12-d0), run as an exploratory addition. Arms are non-randomized (S4.1.p2), so between-arm contrasts are associational with respect to allocation. n=4 patients per arm.",
+     "candidates": [
+      {
+       "value": "grp exp vs ctr at d12 (cross-sectional)",
+       "reason_rejected": "ignores each patient's baseline; paper never uses it; the interaction uses the baseline"
+      },
+      {
+       "value": "technical runs as independent samples",
+       "reason_rejected": "kept only in this replicate-level sensitivity case to reproduce the paper's input"
+      }
+     ],
+     "confidence": "medium"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "subject"
+     ],
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "not modelled: reproduces the paper's likely ~ time per contrast with runs as samples (sensitivity only)"
+       }
+      ]
+     },
+     "reasoning": "Sensitivity case only: mirrors the paper's input to show how its DEG counts arise. Not a valid primary analysis because technical runs inflate n.",
+     "confidence": "medium"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ time within each arm subset",
+      "paper_route": {
+       "method": "DESeq2 Wald, BH",
+       "status": "approximated",
+       "reason": "paper's formula unstated; runs as samples as in FIG3"
+      },
+      "deviations": [
+       "three failed libraries (<1000 reads) excluded"
+      ]
+     },
+     "reasoning": "Paper-input reproduction.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.8.p1: 'Findings were considered statistically significant at FDR <= 0.05'; FIG4: FDR = 0.05 line; no fold-change cutoff stated. Audit adds |log2FC| > 1 as a labelled comparison only.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "exploratory",
+      "exploratory_reason": "sensitivity reproduction of the paper's input",
+      "caveats": [
+       "technical runs treated as samples (pseudoreplication); sensitivity reproduction of the paper's input only"
+      ]
+     },
+     "paper_counts": {
+      "d1_vs_d0_pooled": 2579,
+      "ctr_d12_vs_d0": 736,
+      "exp_d12_vs_d0": 4279
+     },
+     "reasoning": "Shows how far the paper's counts depend on counting runs as samples."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "technical sequencing runs",
+     "paper": "up to three runs per biopsy, all included in the analysis (FIG3)",
+     "data": "72 GEO samples = 24 biopsies x 3 runs (3 failed runs <1000 reads)",
+     "disposition": "declared_deviation: runs summed per biopsy in the primary case; replicate-level case kept as sensitivity"
+    },
+    {
+     "item": "design formula / pairing",
+     "paper": "'relative to preoperative samples from the same patients' (S4.6.p2); formula not stated",
+     "data": "patient ID available for all samples",
+     "disposition": "executable_with_assumption: patient blocking in primary case"
+    }
+   ],
+   "executions": [
+    {
+     "name": "d1_vs_d0_pooled",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d1",
+      "alpha": 0.05
+     },
+     "subset": {
+      "time": [
+       "d0",
+       "d1"
+      ]
+     },
+     "role": "sensitivity",
+     "reasoning": "paper 1vs0 with runs as samples"
+    },
+    {
+     "name": "ctr_d12_vs_d0",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d12",
+      "alpha": 0.05
+     },
+     "subset": {
+      "grp": [
+       "ctr"
+      ],
+      "time": [
+       "d0",
+       "d12"
+      ]
+     },
+     "role": "sensitivity",
+     "reasoning": "paper ctr12vs0 with runs as samples"
+    },
+    {
+     "name": "exp_d12_vs_d0",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "d0",
+      "treatment_group": "d12",
+      "alpha": 0.05
+     },
+     "subset": {
+      "grp": [
+       "exp"
+      ],
+      "time": [
+       "d0",
+       "d12"
+      ]
+     },
+     "role": "sensitivity",
+     "reasoning": "paper exp12vs0 with runs as samples"
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}

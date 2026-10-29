@@ -1,0 +1,836 @@
+{
+  "schema_version": "1.0",
+  "run_id": "b06f79d81bb9463e3b902b4b8b96b865e96758a2",
+  "subject_id": "GSE164890",
+  "created_at": "2026-10-28T20:14:52",
+  "finished_at": "2026-10-28T20:17:02",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9027771.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC9027771.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T20:14:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "a997a26de1dffff88677b985cd6568c98c2f2ff22dbb6658951c09e768643d5d",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE164890_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE164890\\GSE164890_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T20:14:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c6c5af33a77985dc98829a1f541962e596c17534f836d87fa017e6740f879c0b",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE164890_rsem.genes.counts.tsv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE164890\\GSE164890_rsem.genes.counts.tsv.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T20:14:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c4caaefd3f73041ce87eeedfebd7c0cfbab949cc86dc9e2a654ead127bc24e87",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE164890"
+        ],
+        "assay": "bulk RNA-seq, globin-depleted whole blood, strand-specific polyA, HiSeq 4000 (S2.3.p1)",
+        "sample_inclusion": "7 elite female speed skaters, day 18 of altitude camp (1850 m), whole blood before and after one intense skating bout; 14 samples, none excluded (S2.1.p1, S2.1.p2, S2.3.p1)",
+        "factors": {
+          "time": [
+            "before exercise",
+            "after exercise"
+          ],
+          "subject": "7 donors, each sampled twice"
+        },
+        "primary_estimand": "Within-donor change in whole-blood gene expression after vs before an acute intense exercise bout at altitude (after - before)",
+        "planned_contrasts": [
+          "after vs before exercise, paired by donor (FIG1, S3.2.p2; paper: 2516 up, 1542 down = 4058 DEGs at FDR<0.1)"
+        ],
+        "repeated_measure_unit": "donor (skater) (S3.2.p1, FIG1 'donor + exercise' design)",
+        "normalization": "DESeq2 size factors on RSEM per-gene counts (S2.5.p1); rlog + ComBat only for plots",
+        "paper_method": "DESeq2 v1.18.1, design ~ donor + exercise, on RSEM gene-level counts (S2.5.p1, FIG1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.5.p1; FIG1 ('reported at 10% FDR')"
+        },
+        "paper_results": "2516 up, 1542 down (S3.2.p2); 104 up / 58 down >2-fold; named genes MARC1, PHOSPHO1 up (S3.5.p5-6), MYC and TP53 down (S3.3.p2), PPBP platelet marker up (S3.5.p4)"
+      },
+      "reason": "Single paired before/after design. S2.5.p1 states DESeq2 on RSEM per-gene table retaining FDR<0.1; FIG1 caption states 'donor + exercise' design and 10% FDR; S3.2.p1 justifies donor covariate. No fold-change cutoff for the headline DEG count (the |log2FC|>=0.5 and TPM>=10 filters in S3.5.p4 are a later prioritization of altitude-specific genes, not the DE threshold).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:52"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE164890\\GSE164890_rsem.genes.counts.tsv.gz",
+        "owned": true,
+        "checks": [
+          "S2.3.p1 and S10.p1 name GSE164890",
+          "14 samples = 7 skaters x before/after as in S2.3.p1",
+          "GEO tissue 'whole blood (globin-depleted)', Homo sapiens, RSEM v1.2.31 in data_processing matches S2.4.p1"
+        ],
+        "accession": "GSE164890",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE164890\\GSE164890_metadata.csv"
+      },
+      "reason": "Paper deposits its data under GSE164890 (S2.3.p1, S10.p1); GEO sample titles 'Skater N - before/after exercise' and RSEM processing match the methods.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:52"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 14,
+        "n_metadata": 14,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "description",
+              "regex": "^(\\d+)(?:before|after)$",
+              "recode": {
+                "1": "S1",
+                "2": "S2",
+                "3": "S3",
+                "4": "S4",
+                "5": "S5",
+                "6": "S6",
+                "7": "S7"
+              }
+            },
+            "time": {
+              "source": "description",
+              "regex": "^\\d+(before|after)$",
+              "recode": {
+                "before": "pre",
+                "after": "post"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\design_metadata.csv",
+          "sha256": "60fe617e1b25aa18cabf0a0f06e50b29aceb4a8e8f63da86136cddd36b5882dd",
+          "levels": {
+            "subject": {
+              "S1": 2,
+              "S2": 2,
+              "S3": 2,
+              "S4": 2,
+              "S5": 2,
+              "S6": 2,
+              "S7": 2
+            },
+            "time": {
+              "pre": 7,
+              "post": 7
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (1before, 1after, ...) equal the GEO 'description' field exactly for 14/14 samples (inspect alignment_keys). Subject number and time point parsed from that key; consistent with titles 'Skater N - before/after exercise' and the 'time point' characteristic.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:53"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE164890_rsem.genes.counts.tsv.gz",
+        "paper_input": "RSEM per-gene expression table (counts) into DESeq2 (S2.5.p1)",
+        "matrix_type": "estimated counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\aligned_matrix.csv",
+          "sha256": "070aa5aef5c871d3a68d76d37786a42d89f3d9ab6489c7039002a938bc1f715f",
+          "n_features": 58233,
+          "n_samples": 14,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 561674.74,
+          "median": 0.0,
+          "integer_fraction": 0.9451,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "File GSE164890_rsem.genes.counts.tsv.gz: RSEM expected counts (S2.4.p1; data_processing RSEM v1.2.31), 94.5% integer values with fractional remainder, max 5.6e5 - consistent with RSEM estimated counts, not TPM (separate TPM file exists). Paper fed this per-gene RSEM table to DESeq2 (S2.5.p1); rounding to integers is the standard way to use RSEM expected counts in DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:53"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired two-group (repeated measures)",
+        "design_column": "time",
+        "control": "pre",
+        "treatment": "post",
+        "contrasts": [
+          {
+            "name": "time_post_vs_pre",
+            "control": "pre",
+            "treatment": "post",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "One factor (time: before/after exercise) measured twice within each of 7 donors; the paper's estimand is the within-donor exercise effect (FIG1 'donor + exercise'). No other grouping column exists in GEO metadata.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:59"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "blocking factor (donor fixed effect), as in the paper's donor + exercise design"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 14,
+          "n_columns": 8,
+          "columns": [
+            "Intercept",
+            "time_pre",
+            "subject_S2",
+            "subject_S3",
+            "subject_S4",
+            "subject_S5",
+            "subject_S6",
+            "subject_S7"
+          ],
+          "rank": 8,
+          "full_rank": true,
+          "residual_df": 6,
+          "levels": {
+            "time": {
+              "pre": 7,
+              "post": 7
+            },
+            "subject": {
+              "S1": 2,
+              "S2": 2,
+              "S3": 2,
+              "S4": 2,
+              "S5": 2,
+              "S6": 2,
+              "S7": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "post",
+                "S1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "S7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "S7"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "subject",
+            "n_levels": 7,
+            "status": "crossed",
+            "crosstab": {
+              "post": {
+                "S1": 1,
+                "S2": 1,
+                "S3": 1,
+                "S4": 1,
+                "S5": 1,
+                "S6": 1,
+                "S7": 1
+              },
+              "pre": {
+                "S1": 1,
+                "S2": 1,
+                "S3": 1,
+                "S4": 1,
+                "S5": 1,
+                "S6": 1,
+                "S7": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "S3.2.p1 shows a strong donor effect on PCA and the paper models donor as a covariate (FIG1). Each donor contributes one pre and one post sample, so subject is crossed with, not confounded by, time.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:14:59"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "estimated counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ subject + time",
+        "rounding_documented": true,
+        "paper_route": {
+          "method": "DESeq2 ~ donor + exercise",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "RSEM expected counts rounded to integers before DESeq2 (paper does not state rounding; DESeq2 requires integers)",
+          "pydeseq2 instead of R DESeq2 v1.18.1"
+        ],
+        "transform": "round"
+      },
+      "reason": "Paper route DESeq2 ~ donor + exercise on RSEM counts is executable on the deposited count table after rounding (S2.5.p1, FIG1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:15:00"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        }
+      },
+      "reason": "S2.5.p1 'retaining genes with FDR < 0.1'; FIG1 'reported at 10% FDR'; no fold-change cutoff for the DEG list. Audit at padj<0.05 is a separate labelled comparison rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:15:00"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_post_vs_pre",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 14,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\transformed\\rounded_counts.csv",
+        "transform": "round",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "time_post_vs_pre": {
+            "applied": {
+              "rule": "padj < 0.1",
+              "n_tested": 15634,
+              "n_significant": 4243,
+              "n_up": 2588,
+              "n_down": 1655,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 15634,
+              "n_significant": 3238,
+              "n_up": 2114,
+              "n_down": 1124,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's DESeq2 ~ donor + exercise, post vs pre, FDR 0.1",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:15:39"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_post_vs_pre",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\enrichment_time_post_vs_pre\\ora\\DEG_results_post_vs_pre_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\enrichment_time_post_vs_pre\\ora\\DEG_results_post_vs_pre_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\enrichment_time_post_vs_pre\\ora\\DEG_results_post_vs_pre_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\enrichment_time_post_vs_pre\\ora\\DEG_results_post_vs_pre_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 4132 Human genes (direction=all, padj<0.1, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Phosphorylation (GO:0016310) | padj=1.19e-08 | overlap=150/429 | genes=DGKG;PANK2;PRAG1;MAML1;GMFG;PPP4R1;TBK1;GNPTAB;RPS6KA1;PDK3;PIM2;PRKACA;MAP3K5;A - Positive Regulation Of Intracellular Signal Transduction (GO:1902533) | padj=1.19e-08 | overlap=175/525 | genes=CD86;SLC35B2;PHB1;TFRC;NCF1;CD81;IFIT5;RPS15;TBK1;TNFSF10;TRIM25;EP300;PIM2;LGAL - Positive Regulation Of Cytokine Production (GO:0001819) | padj=1.96e-06 | overlap=112/320 | genes=CD86;FCN1;PHB1;SCAMP5;TBK1;DHX58;LGALS9;TRIM27;IL6R;IL1R1;SCRIB;CYBA;HLA-A;EREG; - Protein Modification Process (GO:0036211) | padj=1.96e-06 | overlap=213/711 | genes=MAML1;GMFG;PPP2R2A;UBE2L6;NAA80;UBE2L3;DCAF1;PPP4R1;TBK1;PPP4R2;PPP2R1A;RPS6KA1; - Protein Phosphorylation (GO:0006468) | padj=4.07e-06 | overlap=158/500 | genes=PRAG1;MAML1;GMFG;PPP4R1;TBK1;RPS6KA1;PDK3;PIM2;PRKACA;EPHB4;MAP3K5;ACVR1;PDGFRB; - Negative Regulation Of Cytokine Production (GO:0001818) | padj=7.20e-06 | overlap=70/178 | genes=OTUD5;ORM1;PPP1R11;TNFAIP3;GBA1;ARRB1;VSIR;ZFP36;C1QBP;TMSB4X;DHX58;NPTN;SIRPA;H - Negative Regulation Of Intracellular Signal Transduction (GO:1902532) | padj=7.20e-06 | overlap=85/231 | genes=DGKG;SPI1;DDX3X;PLEK;PEBP1;TNFAIP3;PTPRJ;ARRB2;PIK3CB;NOC2L;SLA2;HAPSTR1;DUSP16; - Apoptotic Process (GO:0006915) | padj=7.20e-06 | overlap=84/228 | genes=CSRNP1;HIP1;FASTKD2;ITGB2;PRF..."
+      },
+      "reason": "Paper reports Hallmark ORA and fGSEA (S3.3, FIG2); Hallmark only here (CP collection not available in runner).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:16:03"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "time_post_vs_pre",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\enrichment_time_post_vs_pre\\gsea\\DEG_results_post_vs_pre_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 23536 Human genes ranked by 'stat'. 50 Hallmark sets tested, 39 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=2.50 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.11 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.05 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.03 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TGF_BETA_SIGNALING | NES=2.03 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HYPOXIA | NES=1.99 | NOM p=0.00e+00 | FDR q=1.23e-04 - HALLMARK_PROTEIN_SECRETION | NES=1.96 | NOM p=0.00e+00 | FDR q=1.11e-04 ### Top 7 DOWN (NES < 0, depleted in treatment): - HALLMARK_MYC_TARGETS_V2 | NES=-2.45 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-1.41 | NOM p=0.00e+00 | FDR q=6.47e-02 - HALLMARK_E2F_TARGETS | NES=-1.33 | NOM p=1.40e-02 | FDR q=7.84e-02 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.22 | NOM p=3.47e-02 | FDR q=1.41e-01 - HALLMARK_DNA_REPAIR | NES=-1.11 | NOM p=1.73e-01 | FDR q=2.70e-01 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=-1.09 | NOM p=2.09e-01 | FDR q=2.65e-01 - HALLMARK_HEDGEHOG_SIGNALING | NES=-0.96 | NOM p=5.07e-01 | FDR q=5.53e-01 Full results saved ..."
+      },
+      "reason": "Paper reports Hallmark ORA and fGSEA (S3.3, FIG2); Hallmark only here (CP collection not available in runner).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:17:02"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "estimated counts rounded",
+          "pydeseq2 vs R DESeq2 1.18 independent filtering/dispersion details may shift counts",
+          "altitude-specific filtering against 7 microarray datasets (S3.5) not reproduced",
+          "no sea-level control: the estimand is exercise at altitude, not altitude itself (S3.5.p1)"
+        ],
+        "results": {
+          "time_post_vs_pre": {
+            "n_deg": 4243,
+            "up": 2588,
+            "down": 1655,
+            "rule": "padj < 0.1",
+            "audit_n": 3238
+          }
+        },
+        "paper_counts": {
+          "time_post_vs_pre": 4058
+        },
+        "comparison": {
+          "time_post_vs_pre": {
+            "ours": 4243,
+            "paper": 4058
+          }
+        },
+        "paper_gene_check": {
+          "time_post_vs_pre": {
+            "MARC1": null,
+            "PHOSPHO1": {
+              "baseMean": 12458.2771,
+              "log2FoldChange": 0.5397,
+              "padj": 0.0044,
+              "pvalue": 0.0004
+            },
+            "PPBP": {
+              "baseMean": 3678.0613,
+              "log2FoldChange": 0.5282,
+              "padj": 0.0001,
+              "pvalue": 0.0
+            },
+            "MYC": {
+              "baseMean": 1655.3698,
+              "log2FoldChange": -0.3623,
+              "padj": 0.0044,
+              "pvalue": 0.0004
+            },
+            "TP53": {
+              "baseMean": 1253.9198,
+              "log2FoldChange": -0.2684,
+              "padj": 0.0287,
+              "pvalue": 0.0048
+            }
+          }
+        }
+      },
+      "reason": "Paper reports 2516 up + 1542 down = 4058 DEGs at FDR<0.1 (S3.2.p2). Named genes: MARC1, PHOSPHO1 up (S3.5.p5-6), PPBP up (S3.5.p4), MYC and TP53 down (S3.3.p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:17:02"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1d09228dc7602c4ab2fae4204e259f992a335c649de41c1ffa3b328a1c33aff6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "3f928e32ba245acd09ddbee8bbe6b31e7f3acb2286389a84c088a3f66d20e593",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "070aa5aef5c871d3a68d76d37786a42d89f3d9ab6489c7039002a938bc1f715f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "60fe617e1b25aa18cabf0a0f06e50b29aceb4a8e8f63da86136cddd36b5882dd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "68ec7e9457d35edb7980993fc156820fb03cee96553a3a16b6e564cc89832623",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a4af4b416c0e84e80a663b1650d504f1438e3712107b6c7638ef0b3efd691544",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\transformed\\rounded_counts.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "38c2ee0826e0c43642a2b95930be386657f942a3ae35312f8c8b2ee3e8aaa891",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv",
+      "role": "deg_time_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "71b53dced7b3a2769c601dd84ad33eb1745c24941fc48308c8fbf510d1975ca3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\b06f79d81bb9463e3b902b4b8b96b865e96758a2\\GSE164890\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b49e42cfcb7f7cace7bcffaa171ec324e84cd5f38c60f59d21a518ba780ae363",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

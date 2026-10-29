@@ -1,0 +1,437 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41979147",
+ "request": "Analyze GSE318937 for PMID 41979147 (Oleuropein-based olive leaf extract enhances muscle mitochondrial bioenergetics response to moderate - but not maximal - intensity exercise in humans.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE318937",
+   "accession": "GSE318937",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13178539.paper.md"
+    ],
+    "metadata": "GSE318937/GSE318937_metadata.csv",
+    "matrix": "GSE318937/GSE318937_genePerSampleOrder_FortitudeUnil.csv.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE318937"
+      ],
+      "assay": "bulk mRNA-seq of vastus lateralis biopsies, human males (S2.5.5.2.p1)",
+      "design": "randomized double-blind 2x2 crossover of OLE (Active) vs placebo; between-subject exercise type MICE (n=10) or SIE (n=10); biopsies Pre, Post, 24h in each crossover period (S2.2.p1, S2.4.p1, S2.5.5.3.p1)",
+      "sample_inclusion": "all 119 available biopsies (19 subjects x 6, one subject x 5) in one model (S2.5.5.3.p1)",
+      "primary_estimand": "exercise effect on muscle mRNA within the placebo arm: Post vs Pre and 24h vs Pre, separately for MICE and SIE (S3.3.p1; FIG4 legend: response with placebo ingestion)",
+      "planned_contrasts": [
+       "MICE placebo Post vs Pre (S3.3.p1; 3883 DEGs)",
+       "MICE placebo 24h vs Pre (S3.3.p1; 3608)",
+       "SIE placebo Post vs Pre (S3.3.p1; 190)",
+       "SIE placebo 24h vs Pre (S3.3.p1; 2967)"
+      ],
+      "secondary_estimands": "OLE effect corrected for exercise at Post and 24h (S3.4.p1, FIG6) - not the exercise question; only exploratory comparisons",
+      "repeated_measure_unit": "participant (duplicateCorrelation on donor, S2.5.5.3.p2)",
+      "paper_method": "edgeR filterByExpr + TMM, limma voomWithQualityWeights, duplicateCorrelation (twice) on donor, BH (S2.5.5.3.p2)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "source_locator": "S3.3.p1"
+      },
+      "paper_results": {
+       "MICE_Post": 3883,
+       "MICE_24h": 3608,
+       "SIE_Post": 190,
+       "SIE_24h": 2967
+      }
+     },
+     "reasoning": "S3.3.p1 gives the exercise DEG counts at FDR<0.05 with no fold-change cutoff; FIG4 legend says these are the response with placebo ingestion, 10 participants per exercise group. S2.5.5.3.p1-p2 give inclusion and the limma-voom + duplicateCorrelation method.",
+     "locator": "S3.3.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 names GSE318937 as the RNA-seq deposit",
+       "119 samples = 119 biopsies stated in S2.5.5.3.p1",
+       "20 subjects, MICE/SIE 10/10 (59/60 samples), Active/Placebo, Pre/Post/Post24h match S2.4.p1",
+       "protocol 2021-00373 in titles matches CER-VD protocol in S2.1.p1",
+       "all male, matches S2.2.p1"
+      ]
+     },
+     "reasoning": "Metadata and the single deposited count matrix belong to this paper's trial."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "description",
+       "^Library name: (\\d+)$"
+      ]
+     },
+     "aliases": {
+      "ex": "characteristics_ch1.5.type of_exercise",
+      "trt": "characteristics_ch1.9.treatment",
+      "time": "characteristics_ch1.6.time of_the_biopsy_with_respect_to_the_end_of_exercise",
+      "subject": "characteristics_ch1.3.subject id",
+      "period": "characteristics_ch1.8.period for_the_2_by_2_cross-over_design",
+      "sequence": "characteristics_ch1.7.sequence for_the_2_by_2_cross-over_design"
+     },
+     "recode": {
+      "trt": {
+       "Active": "OLE",
+       "Placebo": "PLA"
+      },
+      "time": {
+       "Pre": "Pre",
+       "Post": "Post",
+       "Post24h": "H24"
+      },
+      "subject": {
+       "2": "S02",
+       "4": "S04",
+       "5": "S05",
+       "6": "S06",
+       "7": "S07",
+       "9": "S09",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25"
+      },
+      "period": {
+       "Period 1": "P1",
+       "Period 2": "P2"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns are library numbers; metadata description holds 'Library name: <n>' (inspect: 119/119 match). Exact match on the derived key. Short columns: ex (MICE/SIE), trt (OLE/PLA), time (Pre/Post/H24), subject (S##, recoded so it is categorical), period/sequence kept for the confounding check."
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE318937_genePerSampleOrder_FortitudeUnil.csv.gz",
+      "paper_input": "STAR-aligned gene counts filtered by filterByExpr and TMM-normalized inside edgeR/voom (S2.5.5.2.p1, S2.5.5.3.p2)"
+     },
+     "reasoning": "100% integer values, 0 to 3.3e6, Ensembl gene IDs, 62754 genes (unfiltered); data_processing says STAR alignment then edgeR filterByExpr/TMM, so the deposit is the raw count matrix. Raw counts support DESeq2 and voom."
+    },
+    "design": {
+     "factors": [
+      "time",
+      "trt"
+     ],
+     "references": {
+      "time": "Pre",
+      "trt": "PLA"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "strata": [
+      "ex"
+     ],
+     "covariate_candidates": [
+      "period",
+      "sequence"
+     ],
+     "planned": [
+      "time_Post_vs_Pre_ex-MICE_trt-PLA",
+      "time_H24_vs_Pre_ex-MICE_trt-PLA",
+      "time_Post_vs_Pre_ex-SIE_trt-PLA",
+      "time_H24_vs_Pre_ex-SIE_trt-PLA"
+     ],
+     "final": {
+      "analysis_type": "multi-factor repeated measures, stratified by exercise type",
+      "formula": "~ subject + cell (cell = time x trt) within each exercise stratum",
+      "contrasts": [
+       {
+        "name": "time_Post_vs_Pre_ex-MICE_trt-PLA",
+        "control": "Pre (PLA)",
+        "treatment": "Post (PLA)",
+        "role": "primary"
+       },
+       {
+        "name": "time_H24_vs_Pre_ex-MICE_trt-PLA",
+        "control": "Pre (PLA)",
+        "treatment": "H24 (PLA)",
+        "role": "primary"
+       },
+       {
+        "name": "time_Post_vs_Pre_ex-SIE_trt-PLA",
+        "control": "Pre (PLA)",
+        "treatment": "Post (PLA)",
+        "role": "primary"
+       },
+       {
+        "name": "time_H24_vs_Pre_ex-SIE_trt-PLA",
+        "control": "Pre (PLA)",
+        "treatment": "H24 (PLA)",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Exercise type is between-subject (each participant did only MICE or SIE), so a subject fixed effect is aliased with an exercise main effect in one model; each exercise group is fitted separately (strata=ex) with all 59/60 of its biopsies (both crossover arms, all times). Planned: time Post and H24 vs Pre within placebo (S3.3.p1, FIG4). Other comparisons the report lists (OLE-arm time effects, OLE vs PLA per time, time x trt interactions) run as exploratory.",
+     "candidates": [
+      {
+       "value": "one model on all 119 samples with ex x trt x time cells and a random subject effect",
+       "reason_rejected": "paper route; no executor supports duplicateCorrelation, and a fixed subject term is aliased with exercise type"
+      },
+      {
+       "value": "placebo-only subsets",
+       "reason_rejected": "discards the active-arm biopsies the paper kept for variance estimation"
+      }
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "blocking term (fixed effect) for repeated biopsies per participant"
+       },
+       {
+        "name": "period",
+        "disposition": "not adjusted: paper did not; the planned time contrasts compare biopsies of the same session/period"
+       },
+       {
+        "name": "sequence",
+        "disposition": "not adjusted: between-subject, absorbed by the subject term"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "period",
+      "sequence"
+     ],
+     "reasoning": "S2.5.5.3.p2 accounts for repeated measures per donor with duplicateCorrelation; we block on subject as a fixed effect instead (deviation recorded in the method gate)."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, joint cell-means model with subject blocking)",
+      "formula": "~ subject + cell",
+      "paper_route": {
+       "method": "limma voomWithQualityWeights + duplicateCorrelation on donor (edgeR filterByExpr, TMM)",
+       "status": "blocked",
+       "reason": "no executor implements voomWithQualityWeights or duplicateCorrelation in a multi-level model; run_limma_voom_analysis is two-arm without blocking"
+      },
+      "deviations": [
+       "DESeq2 with subject as fixed blocking effect instead of limma-voom with a subject correlation",
+       "each exercise group fitted separately instead of one 119-sample model",
+       "sensitivity: limma on log2(CPM+1) with subject fixed effect, planned contrasts only"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw counts; the DESeq2 joint model keeps all biopsies of the exercise group and blocks on subject. limma on log2(CPM+1) with subject blocking runs as a sensitivity closer to the paper's limma family."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper FDR<0.05 (BH) applied to DESeq2/limma results from the deviation route"
+     },
+     "reasoning": "S3.3.p1: FDR < 0.05, no fold-change rule."
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper used limma-voomWithQualityWeights + duplicateCorrelation; counts are expected to differ",
+       "exercise effects within the placebo arm only, as in the paper"
+      ]
+     },
+     "paper_counts": {
+      "joint_MICE/time_Post_vs_Pre_ex-MICE_trt-PLA": 3883,
+      "joint_MICE/time_H24_vs_Pre_ex-MICE_trt-PLA": 3608,
+      "joint_SIE/time_Post_vs_Pre_ex-SIE_trt-PLA": 190,
+      "joint_SIE/time_H24_vs_Pre_ex-SIE_trt-PLA": 2967
+     },
+     "paper_genes": {},
+     "reasoning": "Planned route is the paper's estimand on a declared-deviation method."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "DE method",
+     "paper": "limma voomWithQualityWeights + duplicateCorrelation",
+     "data": "raw counts allow it, but no executor",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "sample count",
+     "paper": "119 biopsies, 20 participants",
+     "data": "119 samples; subject 5 (MICE) lacks placebo Pre",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "joint_MICE",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "time_Post_vs_Pre_ex-MICE_trt-PLA",
+       "time_H24_vs_Pre_ex-MICE_trt-PLA",
+       "time_Post_vs_H24_ex-MICE_trt-PLA",
+       "time_Post_vs_Pre_ex-MICE_trt-OLE",
+       "time_H24_vs_Pre_ex-MICE_trt-OLE",
+       "time_Post_vs_H24_ex-MICE_trt-OLE",
+       "trt_OLE_vs_PLA_ex-MICE_time-Pre",
+       "trt_OLE_vs_PLA_ex-MICE_time-Post",
+       "trt_OLE_vs_PLA_ex-MICE_time-H24",
+       "time_trt_Post_OLE_vs_Pre_PLA_ex-MICE",
+       "time_trt_H24_OLE_vs_Pre_PLA_ex-MICE"
+      ],
+      "covariates": [
+       "subject"
+      ],
+      "alpha": 0.05
+     },
+     "subset": {
+      "ex": [
+       "MICE"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "one DESeq2 model on all 59 MICE biopsies; planned placebo time contrasts are primary, others exploratory"
+    },
+    {
+     "name": "joint_SIE",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "time_Post_vs_Pre_ex-SIE_trt-PLA",
+       "time_H24_vs_Pre_ex-SIE_trt-PLA",
+       "time_Post_vs_H24_ex-SIE_trt-PLA",
+       "time_Post_vs_Pre_ex-SIE_trt-OLE",
+       "time_H24_vs_Pre_ex-SIE_trt-OLE",
+       "time_Post_vs_H24_ex-SIE_trt-OLE",
+       "trt_OLE_vs_PLA_ex-SIE_time-Pre",
+       "trt_OLE_vs_PLA_ex-SIE_time-Post",
+       "trt_OLE_vs_PLA_ex-SIE_time-H24",
+       "time_trt_Post_OLE_vs_Pre_PLA_ex-SIE",
+       "time_trt_H24_OLE_vs_Pre_PLA_ex-SIE"
+      ],
+      "covariates": [
+       "subject"
+      ],
+      "alpha": 0.05
+     },
+     "subset": {
+      "ex": [
+       "SIE"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "one DESeq2 model on all 60 SIE biopsies"
+    },
+    {
+     "name": "limma_MICE",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "time_Post_vs_Pre_ex-MICE_trt-PLA",
+       "time_H24_vs_Pre_ex-MICE_trt-PLA"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "subset": {
+      "ex": [
+       "MICE"
+      ]
+     },
+     "transform": "log2(CPM+1)",
+     "role": "sensitivity",
+     "reasoning": "limma family like the paper, subject blocking as fixed effect"
+    },
+    {
+     "name": "limma_SIE",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "time_Post_vs_Pre_ex-SIE_trt-PLA",
+       "time_H24_vs_Pre_ex-SIE_trt-PLA"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "subset": {
+      "ex": [
+       "SIE"
+      ]
+     },
+     "transform": "log2(CPM+1)",
+     "role": "sensitivity",
+     "reasoning": "as limma_MICE"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "joint_MICE/time_Post_vs_Pre_ex-MICE_trt-PLA",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports Hallmark (CAMERA) results for the exercise effect, e.g. OXPHOS (S3.5.p1); GSEA Hallmark as the comparable check"
+    },
+    {
+     "execution": "joint_MICE/time_H24_vs_Pre_ex-MICE_trt-PLA",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports Hallmark (CAMERA) results for the exercise effect, e.g. OXPHOS (S3.5.p1); GSEA Hallmark as the comparable check"
+    },
+    {
+     "execution": "joint_SIE/time_Post_vs_Pre_ex-SIE_trt-PLA",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports Hallmark (CAMERA) results for the exercise effect, e.g. OXPHOS (S3.5.p1); GSEA Hallmark as the comparable check"
+    },
+    {
+     "execution": "joint_SIE/time_H24_vs_Pre_ex-SIE_trt-PLA",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports Hallmark (CAMERA) results for the exercise effect, e.g. OXPHOS (S3.5.p1); GSEA Hallmark as the comparable check"
+    }
+   ]
+  }
+ ]
+}

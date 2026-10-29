@@ -1,0 +1,826 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41683811",
+  "subject_id": "GSE315228_reps",
+  "created_at": "2026-10-28T20:30:02",
+  "finished_at": "2026-10-28T20:31:39",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12898363.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12898363.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T20:30:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "a82f8db79a0eebd00dbbf4d1ac9e1cb282cbaabbdb693c4d737a565114deb04a",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE315228_metadata_reps.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_metadata_reps.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T20:30:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7b67f4c167814ea036a52fd83d301b0a4a9205fb3f8cadd561b3a303d4193ac0",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_collapse_techreps.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\prep_collapse_techreps.py",
+      "locator": null,
+      "captured_at": "2026-10-28T20:30:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c4a9c00cd9d252d2e7ef67eb39add41e9257a2228fd94265910f097adb7c1a9e",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE315228_raw_counts_all_samples.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE315228\\GSE315228_raw_counts_all_samples.csv.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T20:30:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1cf4681259c61d9c0dc8e1dd0efd744b713e51ac5d0946f63169d6c777c1c43d",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE315228"
+        ],
+        "assay": "bulk RNA-seq (Oxford Nanopore PromethION cDNA), rectus femoris of the operated leg (S4.3.p1, S4.4.p2)",
+        "subjects": "8 women aged 73-77 after THA; control = standard isometric-exercise (IE) protocol n=4, experimental = additional/longer IEs n=4, sequential non-randomized allocation (S4.1.p2)",
+        "factors": {
+          "grp": [
+            "ctr (standard IE)",
+            "exp (additional IE)"
+          ],
+          "time": [
+            "d0 (start of operation)",
+            "d1 (1 day post-THA)",
+            "d12 (12 days post-THA)"
+          ]
+        },
+        "repeated_measure_unit": "patient (biopsies at d0, d1, d12 from the same patient; S4.3.p1, S4.6.p2)",
+        "technical_replicates": "up to three sequencing runs per biopsy, all included in the paper's analysis (FIG3 legend)",
+        "primary_estimand": "Effect of the additional isometric-exercise rehabilitation on the rectus femoris transcriptome: the paper reads it from within-arm 12d-vs-preop changes (exp12vs0 vs ctr12vs0); the exercise-attributable contrast is the arm difference in that change (interaction), which the paper does not test directly",
+        "planned_contrasts": [
+          "1vs0: d1 vs d0, both arms pooled, paired on patient (S4.6.p2; paper 593 up / 1986 down)",
+          "ctr12vs0: control d12 vs d0 (S2.2.1.p3; paper 546 up / 190 down)",
+          "exp12vs0: experimental d12 vs d0 (S2.2.1.p3, S3.p7; paper 3989 up / 290 down)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true,
+          "source_locator": "S4.8.p1; FIG4"
+        },
+        "paper_method": "featureCounts counts, DESeq2 1.38.3 Wald test, BH FDR <= 0.05 (S4.5.p1, S4.8.p1); design formula and pairing not stated; technical runs included as samples (FIG3)",
+        "paper_results": {
+          "1vs0": {
+            "up": 593,
+            "down": 1986
+          },
+          "ctr12vs0": {
+            "up": 546,
+            "down": 190
+          },
+          "exp12vs0": {
+            "up": 3989,
+            "down": 290
+          }
+        },
+        "inclusion": "all 8 patients completed the protocol (S4.1.p2)",
+        "enrichment": "GSEA with GSEApy on MSigDB sets (S4.7.p1)"
+      },
+      "reason": "Study map from S4.1-S4.8 and FIG3/FIG4. Both arms exercise; the arms differ in IE dose and content (S4.1.p14). Time contrasts within an arm mix surgery recovery with rehabilitation, so only the between-arm difference in change isolates the added exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:02"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE315228\\GSE315228_raw_counts_all_samples.csv.gz",
+        "owned": true,
+        "checks": [
+          "S4.4.p3 and DA.p1 name GSE315228",
+          "72 GEO samples = 8 patients x 3 time points x 3 technical runs; treatment control/experiment 4 patients each, matching S4.1.p2",
+          "organism Homo sapiens, female, rectus femoris, PromethION, matching S4.4",
+          "data_processing repeats the paper's pipeline (minimap2, featureCounts, DESeq2)"
+        ],
+        "accession": "GSE315228",
+        "metadata_file": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41683811/GSE315228_metadata_reps.csv"
+      },
+      "reason": "Series, sample design and processing all match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:02"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:barcode",
+        "n_aligned": 72,
+        "n_metadata": 72,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM9423284": "failed library barcode01, 641 reads",
+          "GSM9423337": "failed library barcode54, 442 reads",
+          "GSM9423350": "failed library barcode67, 179 reads"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\aligned_metadata_kept.csv",
+          "columns": {},
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\design_metadata.csv",
+          "sha256": "ca0b6afe84cd7f0fce82c0f9e5834f7744200a48084c49a73ba4c1e21d2befe7",
+          "levels": {}
+        }
+      },
+      "reason": "Replicate-level case reproducing the paper's input (FIG3: all runs included). Metadata = GEO metadata plus barcode parsed from description ('Library name: barcodeNN') and subject/grp/time derived and cross-checked against titles in prep_collapse_techreps.py. Exact match on barcode.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:05"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE315228_raw_counts_all_samples.csv.gz (supplementary)",
+        "paper_input": "featureCounts counts into DESeq2 (S4.5.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\aligned_matrix.csv",
+          "sha256": "d32dac18c7f8220a3bbbe2699403478bee2c2123f85980ecbcd4925d6511de10",
+          "n_features": 78932,
+          "n_samples": 69,
+          "annotation_columns_dropped": [
+            "GSM9423284",
+            "GSM9423337",
+            "GSM9423350"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 283922.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer_fraction 1.0, max 283922, median 0; GEO data_processing: 'csv file includes raw counts for each sample' from featureCounts. Matches the paper's DESeq2 input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:08"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "unpaired within-arm time contrasts with technical runs as samples (paper-input sensitivity; patient blocking deliberately omitted)",
+        "formula": "~ time within arm subsets",
+        "contrasts": [
+          {
+            "name": "d1_vs_d0_pooled",
+            "control": "d0",
+            "treatment": "d1",
+            "role": "secondary",
+            "note": "paper 1vs0; surgery effect, not exercise"
+          },
+          {
+            "name": "ctr_d12_vs_d0",
+            "control": "ctr:d0",
+            "treatment": "ctr:d12",
+            "role": "secondary"
+          },
+          {
+            "name": "exp_d12_vs_d0",
+            "control": "exp:d0",
+            "treatment": "exp:d12",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\suitability\\suitability.md",
+          "n_comparisons": 11,
+          "n_analyzable": 11
+        }
+      },
+      "reason": "Paper's planned contrasts are within-patient time changes (S4.6.p2): pooled d1 vs d0, and d12 vs d0 within each arm. These estimate surgery plus rehabilitation over time in each arm, not the added-exercise effect; the paper infers the exercise effect by comparing the two arms' DEG lists (S2.2.1.p4). The direct test of that inference is the grp x time interaction (exp d12-d0 minus ctr d12-d0), run as an exploratory addition. Arms are non-randomized (S4.1.p2), so between-arm contrasts are associational with respect to allocation. n=4 patients per arm.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:12"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "not modelled: reproduces the paper's likely ~ time per contrast with runs as samples (sensitivity only)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp) + C(time)",
+          "n_samples": 69,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_exp",
+            "time_d1",
+            "time_d12"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 65,
+          "levels": {
+            "grp": {
+              "exp": 35,
+              "ctr": 34
+            },
+            "time": {
+              "d0": 23,
+              "d1": 23,
+              "d12": 23
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "ctr",
+                "d0"
+              ],
+              "n": 11
+            },
+            {
+              "cell": [
+                "ctr",
+                "d1"
+              ],
+              "n": 12
+            },
+            {
+              "cell": [
+                "ctr",
+                "d12"
+              ],
+              "n": 11
+            },
+            {
+              "cell": [
+                "exp",
+                "d0"
+              ],
+              "n": 12
+            },
+            {
+              "cell": [
+                "exp",
+                "d1"
+              ],
+              "n": 11
+            },
+            {
+              "cell": [
+                "exp",
+                "d12"
+              ],
+              "n": 12
+            }
+          ],
+          "min_cell_size": 11,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "subject",
+            "n_levels": 8,
+            "status": "nested_in_primary",
+            "crosstab": {
+              "ctr": {
+                "P1": 8,
+                "P2": 0,
+                "P3": 0,
+                "P4": 0,
+                "P5": 9,
+                "P6": 9,
+                "P7": 0,
+                "P8": 8
+              },
+              "exp": {
+                "P1": 0,
+                "P2": 9,
+                "P3": 9,
+                "P4": 8,
+                "P5": 0,
+                "P6": 0,
+                "P7": 9,
+                "P8": 0
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Sensitivity case only: mirrors the paper's input to show how its DEG counts arise. Not a valid primary analysis because technical runs inflate n.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:12"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ time within each arm subset",
+        "paper_route": {
+          "method": "DESeq2 Wald, BH",
+          "status": "approximated",
+          "reason": "paper's formula unstated; runs as samples as in FIG3"
+        },
+        "deviations": [
+          "three failed libraries (<1000 reads) excluded"
+        ]
+      },
+      "reason": "Paper-input reproduction.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:12"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false
+        }
+      },
+      "reason": "S4.8.p1: 'Findings were considered statistically significant at FDR <= 0.05'; FIG4: FDR = 0.05 line; no fold-change cutoff stated. Audit adds |log2FC| > 1 as a labelled comparison only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:12"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "d1_vs_d0_pooled",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 46,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\d1_vs_d0_pooled\\input\\matrix.csv",
+        "formula": "~ time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\d1_vs_d0_pooled\\DEG_results_d1_vs_d0.csv"
+        ],
+        "counts": {
+          "d1_vs_d0_pooled": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 15474,
+              "n_significant": 510,
+              "n_up": 305,
+              "n_down": 205,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 15474,
+              "n_significant": 414,
+              "n_up": 242,
+              "n_down": 172,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper 1vs0 with runs as samples",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:30:45"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "ctr_d12_vs_d0",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 22,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\ctr_d12_vs_d0\\input\\matrix.csv",
+        "formula": "~ time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\ctr_d12_vs_d0\\DEG_results_d12_vs_d0.csv"
+        ],
+        "counts": {
+          "ctr_d12_vs_d0": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 9724,
+              "n_significant": 480,
+              "n_up": 341,
+              "n_down": 139,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 9724,
+              "n_significant": 460,
+              "n_up": 339,
+              "n_down": 121,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper ctr12vs0 with runs as samples",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:31:09"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "exp_d12_vs_d0",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 24,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\exp_d12_vs_d0\\input\\matrix.csv",
+        "formula": "~ time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\exp_d12_vs_d0\\DEG_results_d12_vs_d0.csv"
+        ],
+        "counts": {
+          "exp_d12_vs_d0": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 9164,
+              "n_significant": 189,
+              "n_up": 123,
+              "n_down": 66,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 9164,
+              "n_significant": 186,
+              "n_up": 122,
+              "n_down": 64,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper exp12vs0 with runs as samples",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:31:39"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "exploratory",
+        "exploratory_reason": "sensitivity reproduction of the paper's input",
+        "caveats": [
+          "technical runs treated as samples (pseudoreplication); sensitivity reproduction of the paper's input only"
+        ],
+        "results": {
+          "d1_vs_d0_pooled": {
+            "n_deg": 510,
+            "up": 305,
+            "down": 205,
+            "rule": "padj <= 0.05",
+            "audit_n": 414
+          },
+          "ctr_d12_vs_d0": {
+            "n_deg": 480,
+            "up": 341,
+            "down": 139,
+            "rule": "padj <= 0.05",
+            "audit_n": 460
+          },
+          "exp_d12_vs_d0": {
+            "n_deg": 189,
+            "up": 123,
+            "down": 66,
+            "rule": "padj <= 0.05",
+            "audit_n": 186
+          }
+        },
+        "paper_counts": {
+          "d1_vs_d0_pooled": 2579,
+          "ctr_d12_vs_d0": 736,
+          "exp_d12_vs_d0": 4279
+        },
+        "comparison": {
+          "d1_vs_d0_pooled": {
+            "ours": 510,
+            "paper": 2579
+          },
+          "ctr_d12_vs_d0": {
+            "ours": 480,
+            "paper": 736
+          },
+          "exp_d12_vs_d0": {
+            "ours": 189,
+            "paper": 4279
+          }
+        },
+        "paper_gene_check": {}
+      },
+      "reason": "Shows how far the paper's counts depend on counting runs as samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T20:31:39"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "87eb793603e28e2a07012fb3f2e43724c285a7fc6921877fadbd60655fa0cb14",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8260c50afd3e63be3cd7bff1c748ed63cd47ea842dfd0294a30aa3d48801fc36",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d32dac18c7f8220a3bbbe2699403478bee2c2123f85980ecbcd4925d6511de10",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ca0b6afe84cd7f0fce82c0f9e5834f7744200a48084c49a73ba4c1e21d2befe7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9947278252375312175f3a49fe3b36fa724afd17f846a0ac8c645293e776abfb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "792ec086285c25ca54c306c661f114417b816e25595be58b616cd20373d95e17",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\d1_vs_d0_pooled\\DEG_results_d1_vs_d0.csv",
+      "role": "deg_d1_vs_d0_pooled",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3ef2f23ed6473254e0d4a1b4a134b49b23d910d4e712db52cd2f9d7de61d60e5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\ctr_d12_vs_d0\\DEG_results_d12_vs_d0.csv",
+      "role": "deg_ctr_d12_vs_d0",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "cec3f39c3f24f48791dfd3e67fb90bc27ba9bc274cfc1ef89f374fe2a389e004",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\results\\exp_d12_vs_d0\\DEG_results_d12_vs_d0.csv",
+      "role": "deg_exp_d12_vs_d0",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "cc8c7536553e929e22f90fb2d0b5e6ac6f40b680a000238c1849f707ee78ed87",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41683811\\GSE315228_reps\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "882e85aeba36ed48efe56249abf2e6c4800514aee5c144be5c7c7f62e63a8009",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

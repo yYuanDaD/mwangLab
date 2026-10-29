@@ -1,0 +1,125 @@
+{
+  "case_id": "GSE312393_6wk",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "trt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "TPM",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "TPM",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "trt"
+      ],
+      "levels": {
+        "trt": {
+          "POST": 3,
+          "PRE": 3
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(trt) + C(subject)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 2,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "trt_POST_vs_PRE"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 6 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 6
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42019489\\GSE312393_6wk\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "trt_POST_vs_PRE",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "POST"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "PRE"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

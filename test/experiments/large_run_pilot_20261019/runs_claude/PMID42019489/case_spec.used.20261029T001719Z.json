@@ -1,0 +1,263 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42019489",
+  "request": "Analyze GSE312393 for PMID 42019489 (A skeletal muscle atlas shows neuromuscular junction adaptations to growth and atrophy.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE312393_24h",
+      "accession": "GSE312393",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13108521.paper.md"],
+        "metadata": "GSE312393/GSE312393_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42019489/prep/h24_tpm_filtered.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42019489/prep/prep_tpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE294765", "GSE311567", "GSE312393"],
+            "this_accession_role": "GSE312393 = human bulk RNA-seq of exercised vs resting vastus lateralis (24 h after eccentric downhill running) and pre vs post 6-week resistance training (S5.1.3.p1, S5.2.26.p1)",
+            "assay": "bulk RNA-seq, Salmon quantification (nf-core), GRCh38",
+            "factors": {"treatment": ["rest control", "24 h after eccentric exercise bout"]},
+            "sample_inclusion": "3 young healthy males 24 h after 40 min downhill running (-15%, 60% VO2max) and 3 healthy males at rest; no previous training (S5.1.3.p1; FIG6 legend J: n=3 exercised, n=3 control)",
+            "primary_estimand": "Expression change in human vastus lateralis 24 h after an acute eccentric exercise bout vs resting muscle (between-subject), focused on BMP-pathway genes and RFLNA (S2.5.p5, FIG6 J)",
+            "planned_contrasts": ["24h exercise vs rest control (S2.5.p5, FIG6 J; paper reports a heatmap of selected genes only, no DEG count)"],
+            "repeated_measure_unit": "none (different individuals per arm)",
+            "normalization": "tximport counts, DESeq2 variance-stabilizing transformation, gene-scaled for heatmaps (S5.2.27.p1)",
+            "paper_method": "No differential-expression test reported for the human exercise bulk data; DESeq2 VST values shown as heatmaps (S5.2.27.p1, FIG6 J)",
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S5.2.27.p1; S5.3.p1 states padj<0.05 & |log2FC|>0.15 & >=5% cells only for sc/snRNA-seq"},
+            "paper_results": "Upregulation of BMP1, BMPR2 and RFLNA (aSC2 marker homolog) 24 h after the bout (S2.5.p5)"
+          },
+          "reasoning": "The atlas is mouse sc/snRNA-seq (GSE294765/GSE311567); GSE312393 holds the human exercise bulk RNA-seq used for Figure 6J/K. S2.5.p5 describes upregulation of BMP1, BMPR2, RFLNA after the exercise bout as shown in a heatmap of VST expression (FIG6 J). No DE statistics, count of DEGs or threshold is given for this bulk dataset; the S5.3.p1 threshold applies to single-cell/nucleus DE.",
+          "locator": "S2.5.p5",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.3.p1 and key resources table list GSE312393", "GEO extract protocol (Watchmaker for 24 h, SMART-Seq for 6 weeks) and nf-core/Salmon processing match S5.2.26.p1/S5.2.27.p1", "24h matrix has control and Exercise24H columns matching the 24 h arm", "contact Munoz-Canoves = paper lab"]},
+          "reasoning": "Accession, library kits, processing pipeline and arm labels all match the paper's human exercise biopsies. GEO has 4 controls vs paper's n=3 (recorded as discrepancy).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: ([^,]+),"]},
+          "aliases": {"trt": "characteristics_ch1.1.treatment"},
+          "patterns": {},
+          "combine": {},
+          "recode": {"trt": {"Control": "CTR", "24h Exercise": "EX24", "post-6 weeks Exercise": "POST", "pre-6 weeks Exercise": "PRE"}},
+          "exclude_samples": {},
+          "reasoning": "GEO description field names the matrix column exactly ('Library name: CTR_RNA_S1, Column name in ...'); exact match on that derived key. Group from the treatment characteristic, recoded to formula-safe CTR/EX24.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma",
+          "reasoning": "File name and GEO data_processing state TPM; column sums are ~1e6 (997k after rounding); non-integers. Paper's input was tximport counts with DESeq2 VST, but counts were not deposited, so count models (DESeq2) cannot run. limma on log2(TPM+1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["trt"],
+          "references": {"trt": "CTR"},
+          "subject": null,
+          "organism": "Human",
+          "planned": ["trt_EX24_vs_CTR"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "trt",
+            "control": "CTR",
+            "treatment": "EX24",
+            "estimand_type": "between-subject intervention comparison (exercised vs resting individuals)",
+            "contrasts": [{"name": "trt_EX24_vs_CTR", "control": "CTR", "treatment": "EX24", "role": "primary"}]
+          },
+          "candidates": [{"value": "pool with the 6-week samples", "reason_rejected": "different study, sex, library kit and batch (batch 2); separate matrix file; analyzed as its own case"}],
+          "reasoning": "Two independent arms (S5.1.3.p1). All 4 deposited controls kept because the paper does not say which 3 were used.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "characteristics_ch1.2.batch", "disposition": "excluded: constant (batch 1) within this case"}]},
+          "confounding_candidates": null,
+          "reasoning": "Independent individuals, one biopsy each; batch and tissue constant within the 24 h set; all male per S5.1.3.p1.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (eBayes moderated t) on log2(TPM+1)",
+            "matrix_type": "TPM",
+            "formula": "~ trt",
+            "transform": "log2(x+1)",
+            "paper_route": {"method": "DESeq2 VST of tximport counts, heatmap display only (no DE test)", "status": "blocked", "reason": "only TPM deposited (no counts), and the paper reports no DE test for this dataset"},
+            "deviations": ["limma on log2(TPM+1) instead of the paper's descriptive VST heatmap", "label-blind prefilter: TPM >= 1 in >= 3 samples (11,874 of 62,703 Ensembl genes kept), prep/prep_tpm.py", "all 4 GEO controls used vs paper's n=3"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "TPM is linear-normalized; matrix policy routes TPM to limma after log2(x+1). Prefilter removes near-zero genes that would distort variance moderation; it uses no group labels.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.15, "inclusive": false, "label": "paper's sc/snRNA-seq rule (S5.3.p1) without the cell-fraction filter, for comparison only"}
+          },
+          "reasoning": "The paper gives no threshold for the human bulk data; workflow default BH padj<0.05 without effect-size cutoff. Audit rule borrows the paper's single-cell padj/|log2FC|>0.15 rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["paper shows only a heatmap (no DE statistics), so no DEG count to compare", "n = 3 exercised vs 4 controls; between-subject", "TPM input instead of counts"]},
+          "paper_counts": {},
+          "paper_genes": {"trt_EX24_vs_CTR": ["ENSG00000168487", "ENSG00000204217", "ENSG00000178882"]},
+          "reasoning": "Paper genes: BMP1 (ENSG00000168487), BMPR2 (ENSG00000204217), RFLNA (ENSG00000178882), reported up after the bout (S2.5.p5).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "control sample size", "paper": "n = 3 controls (FIG6 legend J, S5.1.3.p1)", "data": "4 control columns (CTR_RNA_S1-S4)", "disposition": "executable_without_change"},
+        {"item": "input data", "paper": "tximport counts + DESeq2 VST", "data": "TPM only", "disposition": "declared_deviation"},
+        {"item": "statistical test", "paper": "none reported (heatmap of selected genes)", "data": "limma test run here", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "trt_EX24_vs_CTR",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "trt", "control_group": "CTR", "treatment_group": "EX24"},
+          "role": "primary",
+          "reasoning": "two-arm limma on log2(TPM+1), exercised 24 h vs resting"
+        }
+      ],
+      "enrichment": [
+        {"execution": "trt_EX24_vs_CTR", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper discusses hypertrophy/BMP pathway programs (FIG6 J); Hallmark GSEA on the full ranking as supporting context"}
+      ]
+    },
+    {
+      "case_id": "GSE312393_6wk",
+      "accession": "GSE312393",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13108521.paper.md"],
+        "metadata": "GSE312393/GSE312393_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42019489/prep/w6_tpm_filtered.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42019489/prep/prep_tpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE294765", "GSE311567", "GSE312393"],
+            "this_accession_role": "GSE312393 6-week arm: vastus lateralis of 3 healthy young women before and after a 6-week resistance training program (S5.1.3.p1)",
+            "assay": "bulk RNA-seq (SMART-Seq mRNA LP), Salmon via nf-core, GRCh38",
+            "factors": {"time": ["pre-training", "post 6 weeks training"]},
+            "sample_inclusion": "3 women, biopsy pre and post 6 weeks of leg press/leg extension training (S5.1.3.p1; FIG6 legend K)",
+            "primary_estimand": "Within-subject expression change after 6 weeks of resistance training, focused on BMP-pathway genes and RFLNA (S2.5.p5, FIG6 K)",
+            "planned_contrasts": ["post-6 weeks vs pre-training (S2.5.p5, FIG6 K; heatmap only, no DEG count)"],
+            "repeated_measure_unit": "participant (Patient 9, 11, 16)",
+            "normalization": "tximport counts, DESeq2 VST, gene-scaled heatmaps (S5.2.27.p1)",
+            "paper_method": "No DE test reported; DESeq2 VST heatmaps (S5.2.27.p1, FIG6 K)",
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S5.2.27.p1"},
+            "paper_results": "BMP-related and RFLNA changes 'maintained at later stages of exercise training' (S2.5.p5)"
+          },
+          "reasoning": "Second exercise arm in the same GEO series. FIG6 legend says n=3 exercised and n=3 control; in GEO these are the same 3 participants pre and post, so the design is paired.",
+          "locator": "S2.5.p5",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GSE312393 listed in S4.3.p1", "SMART-Seq kit for 6-week samples per S5.2.26.p1 and GEO protocol", "3 participants pre/post matches S5.1.3.p1"]},
+          "reasoning": "Accession and sample structure match the paper's 6-week training arm.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: ([^,]+),"]},
+          "aliases": {"trt": "characteristics_ch1.1.treatment"},
+          "patterns": {"subject": ["title", "Patient (\\d+)$"]},
+          "combine": {},
+          "recode": {"trt": {"Control": "CTR", "24h Exercise": "EX24", "post-6 weeks Exercise": "POST", "pre-6 weeks Exercise": "PRE"}},
+          "exclude_samples": {},
+          "reasoning": "Exact match on library name from the description field. Time from the treatment characteristic (PRE/POST); subject from 'Patient N' in the title, consistent with PreP9/PostP9 column names.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma",
+          "reasoning": "File name and data_processing: TPM; non-integer values. No counts deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["trt"],
+          "references": {"trt": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["trt_POST_vs_PRE"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "paired",
+            "formula": "~ subject + trt",
+            "design_column": "trt",
+            "control": "PRE",
+            "treatment": "POST",
+            "contrasts": [{"name": "trt_POST_vs_PRE", "control": "PRE", "treatment": "POST", "role": "primary"}]
+          },
+          "candidates": [{"value": "unpaired POST vs PRE", "reason_rejected": "same 3 participants sampled twice; ignores pairing"}, {"value": "POST vs 24h-set controls", "reason_rejected": "different sex, kit, batch and study"}],
+          "reasoning": "Repeated measures on 3 participants: time as factor with participant blocking.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "included"}, {"name": "characteristics_ch1.2.batch", "disposition": "excluded: constant (batch 2) within this case"}]},
+          "confounding_candidates": null,
+          "reasoning": "Participant is the blocking unit (pre/post biopsies).",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (eBayes moderated t) on log2(TPM+1), paired by participant",
+            "matrix_type": "TPM",
+            "formula": "~ subject + trt",
+            "transform": "log2(x+1)",
+            "paper_route": {"method": "DESeq2 VST of tximport counts, heatmap display only (no DE test)", "status": "blocked", "reason": "only TPM deposited, and the paper reports no DE test for this dataset"},
+            "deviations": ["limma paired test instead of descriptive heatmap", "label-blind prefilter TPM >= 1 in >= 3 samples (12,827 of 62,703 genes kept), prep/prep_tpm.py"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "TPM -> log2(x+1) -> limma with participant as blocking factor.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.15, "inclusive": false, "label": "paper's sc/snRNA-seq rule (S5.3.p1), comparison only"}
+          },
+          "reasoning": "No paper threshold for the bulk data; workflow default.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "exploratory", "exploratory_reason": "3 participants paired: residual df = 6 - 4 = 2 < 4", "caveats": ["paper shows only a heatmap", "TPM input"]},
+          "paper_counts": {},
+          "paper_genes": {"trt_POST_vs_PRE": ["ENSG00000168487", "ENSG00000204217", "ENSG00000178882"]},
+          "reasoning": "Same genes as the 24 h arm (S2.5.p5: changes maintained after training).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "tissue label", "paper": "vastus lateralis (S5.1.3.p1)", "data": "GEO: quadriceps femoris muscle", "disposition": "executable_without_change"},
+        {"item": "design description", "paper": "FIG6 K legend: n=3 exercised and n=3 control", "data": "same 3 participants pre and post", "disposition": "executable_without_change"},
+        {"item": "input data", "paper": "counts + DESeq2 VST", "data": "TPM only", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "trt_POST_vs_PRE",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "trt", "control_group": "PRE", "treatment_group": "POST", "covariate_columns": "subject"},
+          "role": "primary",
+          "reasoning": "paired limma, participant blocking"
+        }
+      ],
+      "enrichment": [
+        {"execution": "trt_POST_vs_PRE", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "pathway-level context for FIG6 K"}
+      ]
+    }
+  ]
+}
