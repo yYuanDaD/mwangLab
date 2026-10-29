@@ -1307,5 +1307,226 @@
     "execution_status": "not_started",
     "stop_reason": null,
     "recorded_at": "2026-10-29T03:49:42+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE303983_pooled",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_matrix.csv",
+        "sha256": "a71a6afd60769d54af12f339e6531d93c262cb713c2b84a48475743a263b1bcd"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\design_metadata.csv",
+        "sha256": "e3b7fb8c544175754d0fc0f8d356ebf3e7291d0e553910751ed587cbd65a7703"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "time_POST_vs_PRE",
+      "role": "exploratory",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 90,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_matrix.csv",
+      "formula": "~ subject + time",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\time_POST_vs_PRE\\DEG_results_POST_vs_PRE.csv"
+      ],
+      "counts": {
+        "time_POST_vs_PRE": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 17466,
+            "n_significant": 2878,
+            "n_up": 1318,
+            "n_down": 1560,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 17466,
+            "n_significant": 39,
+            "n_up": 33,
+            "n_down": 6,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "paired pooled Post vs Pre, subject blocking, DESeq2 as in the paper",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-29T03:50:20+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE303983_pooled",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_POST_vs_PRE.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\time_POST_vs_PRE\\DEG_results_POST_vs_PRE.csv",
+        "sha256": "67a4b705ca7c64d0a0259bc3ab6c1eff3bf662bf9f183036e9873dc42152d967"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Human",
+      "subset": "time_POST_vs_PRE",
+      "feature_id_type": "gene_symbol",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null
+      },
+      "direction": "all",
+      "input_threshold_source": "applied",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\enrichment_time_POST_vs_PRE\\ora\\DEG_results_POST_vs_PRE_GO_Biological_Process_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\enrichment_time_POST_vs_PRE\\ora\\DEG_results_POST_vs_PRE_GO_Cellular_Component_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\enrichment_time_POST_vs_PRE\\ora\\DEG_results_POST_vs_PRE_GO_Molecular_Function_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\enrichment_time_POST_vs_PRE\\ora\\DEG_results_POST_vs_PRE_KEGG_2021_Human.csv"
+      ],
+      "summary": "Enrichment analysis complete for 2878 Human genes (direction=all, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Regulation Of Cold-Induced Thermogenesis (GO:0120161) | padj=3.11e-03 | overlap=44/146 | genes=KDM3A;NOTCH1;THRA;LAMA4;NPR3;DOCK7;ADRB2;ADIPOR2;GJA1;GRB10;FFAR4;CD36;ZNF423;SL - Sterol Biosynthetic Process (GO:0016126) | padj=3.11e-03 | overlap=15/28 | genes=MVK;FAXDC2;INSIG1;PRKAG2;DHCR24;HSD17B7;LSS;TM7SF2;ACLY;PLPP6;SQLE;DHCR7;LBR;FDF - Negative Regulation Of Cell Differentiation (GO:0045596) | padj=3.55e-03 | overlap=55/207 | genes=TRIO;PTEN;TMEM182;ACTB;TSKU;HOXA9;SPRED1;BCL7A;GPER1;TUNAR;ADAMTS7;EPHA4;WNT9A;P - Cellular Response To Ketone (GO:1901655) | padj=3.55e-03 | overlap=19/44 | genes=PTGER4;PTGFR;AKR1C3;ADCY3;AKR1B1;ADCY2;ADCY1;AHR;NR3C1;ADCY6;GNAI1;ADCY5;GNG2;LA - Regulation Of Cell Migration Involved In Sprouting Angiogenesis (GO:0090049) | padj=3.55e-03 | overlap=15/30 | genes=HDAC5;CARD10;NOTCH1;ANXA1;GATA2;MEOX2;PTGS2;HDAC9;THBS1;VEGFA;DLL4;TBXA2R;RHOJ;H - Regulation Of Cell Migration (GO:0030334) | padj=3.55e-03 | overlap=97/434 | genes=PLXND1;ZMYND8;FAM107A;ARID4B;ADARB1;FGF1;CCAR1;ACTG1;AMOT;FGF7;AKT2;DPYSL3;CYP1B - Negative Regulation Of Nucleic Acid-Templated Transcription (GO:1903507) | padj=5.15e-03 | overlap=100/456 | genes=SPI1;NAB1;ZBTB21;ENO1;AHR;NR3C1;IKZF4;ELK3;LOXL2;TRIM28;KMT5A;TNFRSF4;RBFOX2;TLE - Positive Regulation Of Cell Differentiation (GO:0045597) | padj=5.23e-03 | overlap..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "paper reports pathway results per intensity (Fig. 4F-H); pooled pathways are exploratory",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-29T03:50:29+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE303983_pooled",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_POST_vs_PRE.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\time_POST_vs_PRE\\DEG_results_POST_vs_PRE.csv",
+        "sha256": "67a4b705ca7c64d0a0259bc3ab6c1eff3bf662bf9f183036e9873dc42152d967"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Human",
+      "subset": "time_POST_vs_PRE",
+      "feature_id_type": "gene_symbol",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\results\\enrichment_time_POST_vs_PRE\\gsea\\DEG_results_POST_vs_PRE_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 17466 Human genes ranked by 'stat'. 50 Hallmark sets tested, 30 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.88 | NOM p=0.00e+00 | FDR q=1.94e-03 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.81 | NOM p=0.00e+00 | FDR q=3.45e-03 - HALLMARK_MYC_TARGETS_V1 | NES=1.78 | NOM p=0.00e+00 | FDR q=3.56e-03 - HALLMARK_ALLOGRAFT_REJECTION | NES=1.76 | NOM p=0.00e+00 | FDR q=3.62e-03 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.71 | NOM p=0.00e+00 | FDR q=5.39e-03 - HALLMARK_E2F_TARGETS | NES=1.60 | NOM p=0.00e+00 | FDR q=1.46e-02 - HALLMARK_G2M_CHECKPOINT | NES=1.58 | NOM p=0.00e+00 | FDR q=1.52e-02 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.44 | NOM p=2.69e-03 | FDR q=5.33e-02 - HALLMARK_APOPTOSIS | NES=1.40 | NOM p=1.13e-02 | FDR q=6.79e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_HEDGEHOG_SIGNALING | NES=-1.63 | NOM p=7.58e-03 | FDR q=6.55e-02 - HALLMARK_ADIPOGENESIS | NES=-1.62 | NOM p=1.68e-03 | FDR q=3.55e-02 - HALLMARK_UV_RESPONSE_DN | NES=-1.53 | NOM p=5.04e-03 | FDR q=5.71e-02 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-1.51 | NOM p=2.20e-02 | FDR q=5.25e-02 - HALLMARK_PEROXISOME | NES=-1.47 | NOM p=1.95e-02 | FDR q=6.19e-02 - HALLMARK_MYOGENESIS | NES=-1.44 | NOM p=5.04e-03 | FDR q=6.78e-02 - HALLMARK_MTORC1_SIGNALING | NES=-1.38 | NOM p=1.63e-02 | FDR q=1.05e-01 - HALLMARK_ANDROGEN_RESPONSE | N..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "paper reports pathway results per intensity (Fig. 4F-H); pooled pathways are exploratory",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-29T03:50:33+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE303983_pooled",
+    "stage": "study",
+    "evidence": [
+      {
+        "id": "paper:PMC12645526.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC12645526.paper.md",
+        "sha256": "a5c4ebd3268bbd017b6ee135f57ef4e816ba753c11eeffa8b02d793d3f74d3d1"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41076654\\GSE303983_pooled\\aligned\\aligned_matrix.csv",
+        "sha256": "a71a6afd60769d54af12f339e6531d93c262cb713c2b84a48475743a263b1bcd"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "route": "exploratory",
+      "caveats": [
+        "paper reports no pooled count; per-intensity counts (1003/1979/759) and between-intensity counts (734/183/0) are not reproducible without the GitHub group table",
+        "pooled n=45 pairs has more power than any n=15 group, so its DEG count is not comparable to the per-group counts"
+      ],
+      "results": {
+        "time_POST_vs_PRE": {
+          "n_deg": 2878,
+          "up": 1318,
+          "down": 1560,
+          "rule": "padj < 0.05",
+          "audit_n": 39
+        }
+      },
+      "paper_counts": {},
+      "comparison": {},
+      "paper_gene_check": {
+        "time_POST_vs_PRE": {
+          "NR1D1": {
+            "baseMean": 397.6562,
+            "log2FoldChange": -1.5591,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "CIART": {
+            "baseMean": 130.1742,
+            "log2FoldChange": -1.506,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "DBP": {
+            "baseMean": 335.0904,
+            "log2FoldChange": -0.9517,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "PER1": {
+            "baseMean": 1652.3048,
+            "log2FoldChange": -0.5969,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "NAMPT": {
+            "baseMean": 1399.5106,
+            "log2FoldChange": 0.4736,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "ARNTL": null,
+          "CLOCK": {
+            "baseMean": 433.4022,
+            "log2FoldChange": 0.0147,
+            "padj": 0.8496,
+            "pvalue": 0.6999
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S3.4.p1 names clock genes changed in all three groups (NR1D1, CIART, DBP, PER1 down; NAMPT up) and BMAL1/CLOCK unchanged; these are the checks available for a pooled contrast.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-10-29T03:50:33+00:00"
   }
 ]

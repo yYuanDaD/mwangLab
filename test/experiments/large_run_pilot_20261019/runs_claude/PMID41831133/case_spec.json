@@ -1,0 +1,109 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41831133",
+  "request": "Analyze GSE309619 for PMID 41831133 (Resistance-based exercise restores muscle health in dialysis patients.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE309619",
+      "accession": "GSE309619",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12989000.paper.md"],
+        "metadata": "GSE309619/GSE309619_metadata.csv",
+        "matrix": "GSE309619/GSE309619_AR_FPKM.xls.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE309619"],
+            "assay": "bulk polyA mRNA-seq, NovaSeq X Plus PE150, human forearm flexor skeletal muscle (S2.2.p1)",
+            "primary_estimand": "Within-patient change in skeletal-muscle gene expression after 12 months of personalized resistance-based muscle therapy versus baseline in dialysis patients (S2.1.p1, S2.2.p1)",
+            "factors": {"time": ["Visit-1 (baseline)", "Visit-2 (12 months post-exercise)"], "subject": "patients GHD28, GHD35, GHD42, GHD45, GHD58"},
+            "sample_inclusion": "Only patients who consented to the optional biopsy (S2.1.3.p1); RNA-seq n = 5 patients x 2 visits (FIG1, FIG4 legend)",
+            "repeated_measure_unit": "patient (pre/post paired biopsies); GEO deposits 2 libraries per patient-visit (B/C or A/C)",
+            "planned_contrasts": ["Visit-2 (post 12 mo exercise) vs Visit-1 (baseline), paired by patient (S3.1.p1, FIG1, FIG4; paper reports no DEG count)"],
+            "paper_threshold": {
+              "metric": null,
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "note": "No DEG threshold stated. RNA-seq was analysed on the vendor NovoMagic platform (S2.2.p1, S3.1.p1); the only stated rule is unpaired two-tailed Student's t-test p < 0.05 for IHC/IF quantification (S2.4.p1).",
+              "source_locator": "S2.4.p1"
+            },
+            "paper_method": "Vendor (NovoMagic) pipeline, method unstated; GO enrichment of upregulated genes (FIG1); per-gene display of 20 oxidation/energy genes (FIG4A)",
+            "paper_results": {
+              "deg_counts": "not reported",
+              "named_genes_up": ["NR4A3", "PRKAG3", "SLC25A25", "CBFA2T3", "ACO2", "TRAP1", "MT-CO3", "MT-ND1", "GBE1", "MT-ND2", "MT-ND4", "MT-CYB", "MT-ND4L", "MT-ND6", "MT-ND5", "ACTN3", "NR1D1", "PINK1", "PPP1R3D", "ETFRF1"],
+              "go_terms_up": ["I-band", "Z-disc", "sarcomere", "myofibril", "contractile fiber", "cellular respiration", "generation of precursor metabolites and energy", "energy derivation by oxidation of organic compounds"]
+            }
+          },
+          "reasoning": "Single-arm longitudinal design: 5 dialysis patients biopsied at baseline and after 12 months of resistance-based therapy (S2.1.p1, S2.2.p1, FIG4 legend lists EB_28/35/42/45/58 V1/V2). No control arm, so the estimand is a pre/post within-patient change. The paper gives no DEG count or DEG threshold; results are GO terms (FIG1) and a named-gene panel (FIG4A).",
+          "confidence": "high",
+          "locator": "S2.2.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S2.2.p1 and DA.p1 name GSE309619",
+              "GEO series summary matches the paper abstract; contact Ajay Rana (author AR), UIC Surgery",
+              "Sample titles Patient GHD28/35/42/45/58 Visit-1/Visit-2 match FIG4 legend (EB_28_V1 ... EB_58_V2)",
+              "GSE309619_AR_FPKM.xls.txt.gz is the only supplementary file; data_processing says 'analysis results; AR_FPKM.xls.txt'"
+            ]
+          },
+          "reasoning": "Accession, sample labels and contact all belong to this paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "\\[(EB_\\d+_V\\d[A-C])\\]"]},
+          "key_column": "key",
+          "patterns": {
+            "subject": ["title", "Patient (GHD\\d+)-"],
+            "time": ["title", "-Visit-(\\d)"]
+          },
+          "recode": {"time": {"1": "pre", "2": "post"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names sit inside the GEO title in brackets (inspect alignment_keys: 20/20 metadata samples matched). subject and time parsed from the title text 'Patient GHDxx-Visit-y'. Matrix has one extra column (EB_35_V2B) with no GSM record; it is left unmatched.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM (truncated: 4 genes only)",
+          "recommended_method": "none (blocked: matrix incomplete)",
+          "decision_status": "manual_review",
+          "stop_reason": "The only deposited expression file, GSE309619_AR_FPKM.xls.txt.gz (1,022 bytes on the GEO FTP, confirmed by HTTP Content-Length), contains just 4 genes (ACTA1, CKM, TNNC2, MT-TN) x 21 libraries. A genome-wide pre/post differential-expression analysis cannot be run on 4 features, and none of the paper's 20 named FIG4A genes are present. No raw counts or full FPKM table are deposited (sample supplementary_file = NONE). Unblock by obtaining the complete FPKM/count table from the authors or by re-quantifying the SRA reads (BioSample links in GEO) with an alignment/quantification pipeline, which this workflow does not provide.",
+          "reasoning": "Values are decimals 1e4-6e4 (FPKM per data_processing 'AR_FPKM'), so the scale is clear, but the file is a 4-row excerpt of the vendor result table, not a matrix. The design itself (5 patients x pre/post, 2 libraries each) would support a paired exercise comparison; the blocker is the missing full matrix, which a specific file could supply, hence manual_review rather than refused.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "Run limma on log2(FPKM+1) of the 4 deposited genes", "reason_rejected": "Four features is not a transcriptome; empirical-Bayes moderation and BH correction are meaningless, and the paper's genes are absent."}
+          ]
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "Deposited expression matrix",
+          "paper": "RNA-seq of muscle from 5 patients at baseline and 12 months, analysed genome-wide (GO enrichment FIG1; 20-gene panel FIG4A)",
+          "data": "GEO supplementary file holds only 4 genes x 21 libraries; no raw counts",
+          "disposition": "blocks_execution"
+        },
+        {
+          "item": "Libraries per patient-visit",
+          "paper": "n = 5 (one sample per patient per visit in FIG4 legend)",
+          "data": "2 libraries per patient-visit in GEO (20 GSMs); the matrix has a 21st column EB_35_V2B with no GSM",
+          "disposition": "would_need_decision_if_matrix_available"
+        },
+        {
+          "item": "Statistics",
+          "paper": "Student's t-test unpaired, two-tailed, p < 0.05 (S2.4.p1) for IHC/IF; RNA-seq method unstated (NovoMagic)",
+          "data": "pre/post biopsies from the same patients",
+          "disposition": "would_need_decision_if_matrix_available"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

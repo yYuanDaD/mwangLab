@@ -423,3 +423,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41118251 (GSE289569)
 
 - case_runner.py:838-843 n_deg takes 1st joint table, not primary (patched after this row); key_patterns cannot recode (:496); inspect counts DESeq2 result cols as samples Details: `PMID41118251/HANDBACK.md`.
+
+## PMID41911459 (GSE325919)
+
+- geo_tar.py:59 skips RSEM .genes.results.gz; case_runner.py:610 no TMM/CPM-filter option; decision_contract.py:158 rejects null paper_threshold Details: `PMID41911459/HANDBACK.md`.
+
+## PMID41076654 (GSE303983)
+
+- case_runner has no low-count prefilter option; paper-gene lookup does not map ARNTL to BMAL1; key_patterns cannot rename matrix columns (prep script needed) Details: `PMID41076654/HANDBACK.md`.
+
+## PMID41831133 (GSE309619)
+
+- case_runner.py:91 recommended_method cannot be null on a blocked gate; native.py:255-261 counts numeric annotation cols (gene_start/end) as samples Details: `PMID41831133/HANDBACK.md`.

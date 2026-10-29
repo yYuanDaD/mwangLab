@@ -122,6 +122,10 @@ class Execution(BaseModel):
     subset: dict[str, list[str]] = Field(default_factory=dict, description="column -> kept values")
     complete_pairs: Optional[dict[str, Any]] = Field(
         None, description="{subject, condition, levels}: keep subjects with one sample at every level")
+    filter_low_counts: Optional[dict[str, float]] = Field(
+        None, description="{min_cpm, min_samples}: keep genes with CPM >= min_cpm in at least min_samples "
+                          "of this execution's samples (edgeR filterByExpr style; raw counts only), "
+                          "applied after subset/pairs and before transform")
     role: str = "primary"
     reasoning: str = ""
     confidence: Confidence = "high"
@@ -626,7 +630,7 @@ class CaseRun:
     def _inputs_for(self, ex: Execution, out: Path) -> tuple[Path, Path, pd.DataFrame]:
         matrix = self.analysis_path if ex.matrix == "analysis" and not ex.transform else self.mat_path
         meta = self.dm
-        if not ex.subset and not ex.complete_pairs:
+        if not ex.subset and not ex.complete_pairs and not ex.filter_low_counts:
             return self._transform(matrix, ex.transform, out / "input"), self.dm_path, meta
         idir = out / "input"
         idir.mkdir(parents=True, exist_ok=True)
@@ -651,6 +655,15 @@ class CaseRun:
                                                                                  "excluded_subjects")}
             matrix_path, meta_path = Path(pairs["matrix"]), Path(pairs["metadata"])
             meta = pd.read_csv(meta_path, index_col=0)
+        if ex.filter_low_counts:
+            rule = ex.filter_low_counts
+            counts = numeric_matrix(native.read_table(matrix_path), label=str(matrix_path))
+            cpm = counts / counts.sum(axis=0) * 1e6
+            keep = (cpm >= float(rule.get("min_cpm", 1.0))).sum(axis=1) >= int(rule.get("min_samples", 3))
+            matrix_path = idir / "matrix_filtered.csv"
+            counts.loc[keep].to_csv(matrix_path)
+            self.result.setdefault("low_count_filter", {})[ex.name] = {
+                "rule": rule, "genes_before": int(len(keep)), "genes_kept": int(keep.sum())}
         return self._transform(matrix_path, ex.transform, idir), meta_path, meta
 
     def _execute(self, ex: Execution) -> None:
