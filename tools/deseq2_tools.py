@@ -99,6 +99,9 @@ def run_deseq2_analysis(
         enforce_method_matrix_compatibility(counts_df, method="deseq2")
 
         multifactor_plan = None
+        if isinstance(covariate_columns, (list, tuple)):  # case specs pass a list; the tool takes "a,b"
+            covariate_columns = ",".join(map(str, covariate_columns))
+        covariate_columns = covariate_columns or ""
         if interaction_terms.strip():
             return ("POLICY BLOCKED: DESeq2 interaction terms require an explicit interaction contrast; "
                     "use limma with coefficient='Treatment:...' or provide a precomputed contrast vector.")
