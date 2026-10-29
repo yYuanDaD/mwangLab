@@ -739,8 +739,14 @@ def deg_outputs(output_dir: str | Path) -> list[str]:
 
 def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float = 0.05,
                     effect_cutoff: float | None = None, effect_column: str | None = None,
-                    inclusive: bool = False, min_group_n: int | None = None) -> dict:
+                    inclusive: bool = False, min_group_n: int | None = None,
+                    effect_inclusive: bool | None = None, effect_cutoff_down: float | None = None) -> dict:
     """Apply a stated threshold to a full results table. Adds no unstated cutoff.
+
+    ``inclusive`` applies to the p cutoff and, unless ``effect_inclusive`` is given, to the
+    effect cutoff too (a paper's "P < 0.05 and |log2FC| >= 0.5" is inclusive=False,
+    effect_inclusive=True). ``effect_cutoff_down`` is the magnitude for down-regulated genes when
+    it differs from ``effect_cutoff`` (FC > 1.2 or < 0.83: 0.263, 0.269).
 
     Repository tools print their own ``n_deg`` summaries (some at
     ``|log2FC| > 1``). Use this function, not those summaries, for any count
@@ -765,7 +771,11 @@ def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float 
     if effect_cutoff is not None:
         if effect is None:
             raise NativeToolError("effect_cutoff given but no effect-size column found")
-        significant &= (effect.abs() >= effect_cutoff) if inclusive else (effect.abs() > effect_cutoff)
+        e_inc = inclusive if effect_inclusive is None else effect_inclusive
+        down = effect_cutoff if effect_cutoff_down is None else effect_cutoff_down
+        up_ok = (effect >= effect_cutoff) if e_inc else (effect > effect_cutoff)
+        down_ok = (effect <= -down) if e_inc else (effect < -down)
+        significant &= (up_ok | down_ok)
     significant = significant.fillna(False)
     n_tested = int(p.notna().sum())
     n_sig = int(significant.sum())
@@ -777,7 +787,10 @@ def apply_threshold(deg_csv: str | Path, *, metric: str = "padj", cutoff: float 
     op = "<=" if inclusive else "<"
     rule = f"{p_column} {op} {cutoff:g}"
     if effect_cutoff is not None:
-        rule += f" and |{e_column}| {'>=' if inclusive else '>'} {effect_cutoff:g}"
+        e_op = ">=" if (inclusive if effect_inclusive is None else effect_inclusive) else ">"
+        rule += (f" and |{e_column}| {e_op} {effect_cutoff:g}" if effect_cutoff_down is None else
+                 f" and ({e_column} {e_op} {effect_cutoff:g} or {e_column} {e_op.replace('>', '<')} "
+                 f"-{effect_cutoff_down:g})")
     return {
         "deg_csv": str(deg_csv),
         "rule": rule,

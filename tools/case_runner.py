@@ -403,7 +403,8 @@ def _group_n(meta: pd.DataFrame, args: dict) -> Optional[int]:
 def _threshold_kwargs(rule: dict) -> dict:
     metric = decision_contract._metric(rule.get("metric", "padj"))
     return {"metric": "pvalue" if metric == "pvalue" else "padj", "cutoff": float(rule.get("cutoff", 0.05)),
-            "effect_cutoff": rule.get("effect_cutoff"), "inclusive": bool(rule.get("inclusive", False))}
+            "effect_cutoff": rule.get("effect_cutoff"), "inclusive": bool(rule.get("inclusive", False)),
+            "effect_inclusive": rule.get("effect_inclusive"), "effect_cutoff_down": rule.get("effect_cutoff_down")}
 
 
 def _n_ora_input(deg_csv: str, cutoff: float, lfc: float, direction: str) -> Optional[int]:

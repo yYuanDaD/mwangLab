@@ -1,0 +1,174 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40881686",
+  "request": "Analyze GSE272928 for PMID 40881686 (Distinct NK cell function and gene expression in children with acute lymphoblastic leukemia in remission before and after acute exercise: an exploratory study.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE272928",
+      "accession": "GSE272928",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12380555.paper.md"],
+        "metadata": "GSE272928/GSE272928_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40881686/prep/GSE272928_rlog_renamed.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID40881686/prep/rename_columns.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE272928"],
+            "assay": "bulk RNA-seq of magnetically isolated circulating NK cells (Illumina HiSeq 2500, PE100), HTSeq raw counts + Cufflinks FPKM (S2.5.p2)",
+            "samples": "9 B-cell ALL children in remission + 9 age/sex-matched healthy controls, each sampled before (baseline) and immediately after (peak) one acute cycling session = 36 libraries (ABS.p2, S2.5)",
+            "factors": {"group": ["ALL", "CON"], "time": ["baseline (pre)", "peak exercise (post)"], "subject": "18 children, 2 samples each"},
+            "primary_estimand": "Difference between ALL-in-remission and control children in the within-subject NK-cell transcriptome response to an acute exercise bout (group x time interaction, paired by child) (S2.6.p2, S3.p3)",
+            "planned_contrasts": [
+              "group x time interaction: (ALL post-pre) - (CON post-pre), paired (S3.p3; paper: 179 genes, 163 negative / 16 positive, p<0.01, Suppl. Table S3)",
+              "baseline ALL vs CON (S3.p2; paper: 284 genes, 124 up / 160 down, p<0.01, Suppl. Table S1) - disease contrast, not an exercise effect",
+              "within-group post vs pre in ALL (Suppl. Table S6) and in CON (Suppl. Table S7) (S3.p3; counts not stated in the text)"
+            ],
+            "paper_method": "DESeq2 v1.38.3 on raw counts, paired design (subject), multifactor design with interaction terms (S2.6.p2)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.6.p2"},
+            "paper_results": {"interaction_n": 179, "interaction_up": 16, "interaction_down": 163, "baseline_n": 284, "baseline_up": 124, "baseline_down": 160,
+                              "named_genes": "IL1B down in ALL post vs pre (log2FC -1.68, p<0.001) but not in CON (-0.18, p=0.59) (S4.p6); TREM1, S100A8/A9/A12 down in ALL only (S4.p4-p5)"},
+            "pathway_method": "QIAGEN IPA canonical pathways, FDR<0.05 (S2.6.p2) - proprietary, not reproducible here"
+          },
+          "reasoning": "Methods S2.6.p2 define DESeq2 with paired design + interaction terms and raw p<0.01. Results S3.p2 (baseline 284 DEGs) and S3.p3 (interaction 179 genes) give the counts. The exercise question is the within-subject post-vs-pre change and its group difference.",
+          "locator": "S2.5.p2, S2.6.p2, S3.p2, S3.p3",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper S8.p1 and S2.5.p2 name GSE272928", "GEO Series_pubmed_id = 40881686", "36 GSMs = 18 children x 2 timepoints, 9 ALL + 9 CON, matches ABS.p2", "matrix columns ALL02..ALL12, CONT_51..59 x BASELINE/PEAK match GEO titles"]},
+          "reasoning": "The series is the paper's deposit (paper S8.p1, Series_pubmed_id 40881686); the only series supplementary file is GSE272928_transformed_RNA_seq_Data.xlsx (csv copy used), 36 sample columns matching the 36 GSM titles.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^(ALL|CONT)\\s*(\\d+)\\s+(BASELINE|PEAK)\\s*$"]},
+          "key_column": "key",
+          "patterns": {
+            "grp": ["title", "^(ALL|CONT)"],
+            "time": ["title", "(BASELINE|PEAK)\\s*$"],
+            "subject": ["title", "^(ALL|CONT)\\s*(\\d+)"]
+          },
+          "recode": {"grp": {"ALL": "ALL", "CONT": "CON"}, "time": {"BASELINE": "pre", "PEAK": "post"}},
+          "aliases": {"sex": "characteristics_ch1.4.Sex"},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names were renamed by name (prep/rename_columns.py, ALL02_BASELINE -> ALL_02_BASELINE) so that they equal a key derived from the GEO title (<GROUP>_<NN>_<TIME>; title 'ALL03  PEAK' has a double space, handled by \\s+). grp/time/subject come from the title; grp agrees with characteristics 'health status' and time with 'time 1/time 2' (BASELINE=time 1, PEAK=time 2) for all 36 samples.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "DESeq2 rlog-transformed (log2-scale, library-size normalized) expression",
+          "recommended_method": "limma",
+          "final": {"source": "GSE272928_transformed_RNA_seq_Data.xlsx (series supplementary; csv copy)", "paper_input": "DESeq2 on HTSeq raw counts (S2.5.p2, S2.6.p2)"},
+          "reasoning": "File is named 'transformed'; values are continuous (no non-zero integers), range -4.38..18.9, all-zero genes stored as exactly 0 and near-zero genes at a shared floor of about -4.375 with tiny between-sample spread - the signature of DESeq2 rlog (rlog returns 0 for all-zero rows and shrinks low-count rows to a common value). sum(2^x) per sample is 2.6e7-2.8e7 with SD 2%, consistent with size-factor-normalized counts on log2 scale. GEO data_processing says the submitter produced raw counts (all_merged.txt) but that file is not deposited (sample supplementary_file_1 = NONE; only the transformed xlsx in the series). Not raw counts, so DESeq2 cannot be run; log2-scale input supports limma.",
+          "candidates": [
+            {"value": "VST", "reason_rejected": "VST maps all-zero rows to a positive floor, not 0; the 0/-4.375 pattern fits rlog. Either way the matrix is log2-scale normalized and the method choice is unchanged."},
+            {"value": "raw counts", "reason_rejected": "non-integer, negative values"}
+          ],
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp", "time"],
+          "references": {"grp": "CON", "time": "pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_post_vs_pre", "grp_ALL_vs_CON"],
+          "covariate_candidates": ["sex"],
+          "final": {
+            "analysis_type": "paired_change (2x2 mixed: group between-subject, time within-subject)",
+            "formula": "per-subject delta = post - pre; ~ 0 + C(grp) on deltas; baseline: ~ grp on pre samples",
+            "contrasts": [
+              {"name": "interaction_ALLchange_vs_CONchange", "definition": "C(grp)[ALL] - C(grp)[CON] on post-pre deltas", "role": "primary"},
+              {"name": "ALL_post_vs_pre", "definition": "C(grp)[ALL] on deltas", "role": "secondary"},
+              {"name": "CON_post_vs_pre", "definition": "C(grp)[CON] on deltas", "role": "secondary"},
+              {"name": "baseline_ALL_vs_CON", "control": "CON", "treatment": "ALL", "role": "secondary"}
+            ]
+          },
+          "reasoning": "S2.6.p2: paired design + interaction terms. The exercise effect is the within-child post-vs-pre change; the paper's headline exercise result is the group x time interaction (S3.p3). Within-group changes (Suppl. S6/S7) are the paper's own secondary results and the direct 'exercise effect' per group. Baseline ALL vs CON (S3.p2) is a disease (associational) contrast reported by the paper; run as secondary. All 18 children have both timepoints.",
+          "candidates": [
+            {"value": "pooled post vs pre over both groups", "reason_rejected": "paper never reports a pooled exercise effect; it reports per-group changes and their difference"},
+            {"value": "unpaired post vs pre", "reason_rejected": "ignores the repeated-measure unit (S2.6.p2 paired design)"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"],
+                    "covariates": [{"name": "sex", "disposition": "not included: groups sex-matched (2 girls each, Table 1); paper model has no sex term"},
+                                   {"name": "age", "disposition": "not included: age-matched (Table 1, p=0.51); paper model has no age term"}]},
+          "confounding_candidates": ["sex"],
+          "reasoning": "Each child contributes a baseline and a peak sample: subject is the blocking unit, handled by within-subject post-pre differences (equivalent to subject fixed effects for time and group x time). Group is between-subject; the baseline contrast uses one sample per child so needs no blocking.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (inmoose lmFit + eBayes) on the deposited rlog log2 matrix",
+            "formula": "paired change: delta ~ 0 + C(grp) with contrasts; baseline: ~ grp on pre samples",
+            "paper_route": {"method": "DESeq2 v1.38.3 on HTSeq raw counts, paired + interaction design", "status": "blocked", "reason": "raw counts (all_merged.txt) not deposited in GSE272928; only the rlog-transformed matrix is available, and DESeq2 requires integer counts"},
+            "deviations": ["limma on rlog values instead of DESeq2 negative-binomial Wald tests on counts", "zero-variance genes (all-zero rows) dropped by the executor"]
+          },
+          "transform": null,
+          "reasoning": "Matrix-method policy: log-scale normalized input -> limma. The deposited values are already log2-scale; no further transform. Paired-change limma on deltas reproduces the paper's paired interaction structure.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "paper's raw p<0.01 applied to limma p-values from the deviation route; BH FDR<0.05 kept as a separate audit rule"
+          },
+          "reasoning": "S2.6.p2: 'a p-value cut-off of 0.01 was considered statistically significant' with no fold-change rule.",
+          "locator": "S2.6.p2",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["limma on rlog instead of DESeq2 on counts (raw counts not deposited)", "raw p<0.01 with no FDR control as in the paper; FDR audit reported separately", "n=9 per group, exploratory study by the authors' own description", "exercise changes in NK cells may reflect mobilization of NK subsets (paper S4.p6)"]},
+          "paper_counts": {"exercise_change/interaction_ALLchange_vs_CONchange": 179, "baseline_ALL_vs_CON": 284},
+          "paper_genes": {"exercise_change/ALL_post_vs_pre": ["ENSG00000125538", "ENSG00000124731", "ENSG00000143546", "ENSG00000163220", "ENSG00000163221"],
+                          "exercise_change/CON_post_vs_pre": ["ENSG00000125538"],
+                          "exercise_change/interaction_ALLchange_vs_CONchange": ["ENSG00000125538", "ENSG00000124731", "ENSG00000137462", "ENSG00000101916", "ENSG00000170458"],
+                          "baseline_ALL_vs_CON": ["ENSG00000185133", "ENSG00000113520", "ENSG00000196611", "ENSG00000185291", "ENSG00000185436", "ENSG00000169083"]},
+          "reasoning": "Genes are Ensembl IDs of IL1B, TREM1, S100A8, S100A9, S100A12 (ALL change, S4.p4-p6), IL1B (CON, unchanged in paper), IL1B/TREM1/TLR2/TLR8/CD14 (interaction pathways, Table 3), INPP5J/IL4/MMP1/IL3RA/IFNLR1/AR (baseline, Table 2).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "input matrix", "paper": "DESeq2 on HTSeq raw counts", "data": "only rlog-transformed matrix deposited; raw counts file all_merged.txt named in data_processing is absent", "disposition": "declared_deviation"},
+        {"item": "group sizes", "paper": "9 ALL + 9 CON", "data": "9 ALL + 9 CON, 2 timepoints each", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "exercise_change",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {
+            "analysis_type": "paired_change",
+            "subject_column": "subject", "time_column": "time", "baseline_level": "pre",
+            "followup_levels": ["post"], "group_column": "grp", "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "interaction_ALLchange_vs_CONchange", "coefficients": {"C(grp)[ALL]": 1, "C(grp)[CON]": -1}},
+              {"name": "ALL_post_vs_pre", "coefficients": {"C(grp)[ALL]": 1}},
+              {"name": "CON_post_vs_pre", "coefficients": {"C(grp)[CON]": 1}}
+            ]}},
+          "role": "primary",
+          "reasoning": "Paired within-child change (post - pre) per gene, one limma model on the 18 deltas with a group mean per arm: the ALL-CON difference is the paper's group x time interaction (S3.p3), and each arm's mean change is its within-group exercise effect (Suppl. S6/S7)."
+        },
+        {
+          "name": "baseline_ALL_vs_CON",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "CON", "treatment_group": "ALL", "alpha": 0.01},
+          "subset": {"time": ["pre"]},
+          "role": "secondary",
+          "reasoning": "Paper S3.p2 baseline disease comparison (one sample per child); associational, not an exercise effect."
+        }
+      ],
+      "enrichment": [
+        {"execution": "exercise_change/interaction_ALLchange_vs_CONchange", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "Paper reports pathways for the interaction genes (IPA, S3.p3); GSEA Hallmark + ORA as an open substitute, kept separate from DE."},
+        {"execution": "exercise_change/ALL_post_vs_pre", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "Within-ALL exercise response; paper discusses inflammatory pathway inhibition (S4.p3-p6)."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,655 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/0efeba509681ac38012819324e7f12d6e307a4fe",
+ "request": "Analyze GSE193771 for the paper (Effects of exercise on whole-blood transcriptome profile in children with overweight/obesity): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+ "platform": "claude-code",
+ "data_root": "data",
+ "cases": [
+  {
+   "case_id": "GSE193771_boys",
+   "accession": "GSE193771",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11482632.paper.md"
+    ],
+    "metadata": "GSE193771/GSE193771_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/0efeba509681ac38012819324e7f12d6e307a4fe/prep/GSE193771_voomQuantiles_boys_samples.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/0efeba509681ac38012819324e7f12d6e307a4fe/prep/prep_voomquantiles.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE193771"
+      ],
+      "primary_estimand": "Effect of a 20-week exercise program vs no-exercise control on whole-blood gene expression in boys with overweight/obesity: group (exercise vs control) x time (pre vs post) interaction, analysed in boys separately (S2.6.2.p1)",
+      "planned_contrasts": [
+       "boys: exercise vs control change from pre to post (group x time interaction); paper: 161 genes at unadjusted P<0.05, 0 at FDR<0.05 (S3.2.p1)"
+      ],
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S3.2.p1, FIG1, FIG2"
+      },
+      "paper_method": "Quantile normalization, then limma group x time interaction, boys and girls separately (S2.6.2.p1); GEO files are named voomQuantiles, so likely voom with quantile normalization; the OSF scripts were not available",
+      "sample_inclusion": "24 children with transcriptome data at both time points: boys 5 EX / 8 CON, girls 5 EX / 6 CON (S2.1.p1, TAB1)",
+      "factors": {
+       "group": [
+        "exercise",
+        "control"
+       ],
+       "time": [
+        "pre",
+        "post"
+       ],
+       "sex": "stratum (separate analyses)"
+      },
+      "repeated_measure_unit": "child (pre and post samples)",
+      "paper_results": {
+       "boys": "161 DEGs (71 up, 90 down), P<0.05; none FDR<0.05",
+       "girls": "121 DEGs (51 up, 70 down), P<0.05; none FDR<0.05"
+      }
+     },
+     "reasoning": "S2.6.2.p1 defines the estimand as the group x time interaction with limma on quantile-normalized data, by sex. S3.2.p1 and FIG1/FIG2 give the DEG counts at unadjusted P<0.05 and state no gene passes FDR<0.05. S2.1.p1 and TAB1 give the sample sizes.",
+     "confidence": "high",
+     "locator": "S2.6.2.p1; S3.2.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 and S2.5.2.p2 name GSE193771",
+       "metadata: 48 whole-blood samples of 24 children (26 male / 22 female), exercise / no exercise, t0 / t1, matching 13 boys (5/8) and 11 girls (5/6)",
+       "the boys voomQuantiles file holds exactly the 13 children (exercise 5 / control 8), 26 samples matching the metadata titles"
+      ]
+     },
+     "reasoning": "Accession named in the paper; sample counts and group sizes match TAB1.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^sample: (\\S+)$"
+      ]
+     },
+     "aliases": {
+      "time": "characteristics_ch1.4.time point"
+     },
+     "patterns": {
+      "subject": [
+       "title",
+       "^sample: ([CE]\\d+(?:_\\d)?)_[12]$"
+      ],
+      "grp": [
+       "characteristics_ch1.3.group",
+       "^(no exercise|exercise)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "no exercise": "CON",
+       "exercise": "EX"
+      }
+     },
+     "exclude_samples": {},
+     "final": {},
+     "reasoning": "Matrix columns equal the title after 'sample: ' (exact match on the derived key). Subject = title stem before the trailing _1/_2 time suffix (C74_1 and C74_2, E88_1 and E88_2 are distinct children, consistent with 13 boys / 11 girls). grp from the GEO group field, time from the time-point field (t0 = pre, t1 = post). Only the boys samples are in this matrix; the other sex's metadata rows stay unmatched by design.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "log2 quantile-normalized (voom logCPM)",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GSE193771_voomQuantiles_boys.txt.gz (author-deposited normalized matrix), summary columns removed by prep script",
+      "paper_input": "quantile-normalized expression (S2.6.2.p1)"
+     },
+     "reasoning": "Non-integer values from about -1.5 to 14.4 with median about 4.5, the range of voom log2-CPM; file name voomQuantiles and S2.6.2.p1 (quantile normalization before limma). Already filtered to expressed genes (3929 boys / 3715 girls). The raw-count files are the alternative input; rejected because the deposited normalized matrix is the paper's own limma input.",
+     "candidates": [
+      {
+       "value": "GSE193771_c_vs_e_rawPaired_red_mas1_boys.txt.gz (raw STRT counts, 13230 genes)",
+       "reason_rejected": "not the paper's normalized input; the case runner has no voom+quantile interaction executor"
+      }
+     ],
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp",
+      "time"
+     ],
+     "references": {
+      "grp": "CON",
+      "time": "t0"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "grp_time_EX_t1_vs_CON_t0"
+     ],
+     "covariate_candidates": [],
+     "strata": [],
+     "final": {
+      "analysis_type": "paired_change",
+      "formula": "~ C(grp) on within-subject (t1 - t0) differences",
+      "contrasts": [
+       {
+        "name": "grp_time_EX_t1_vs_CON_t0",
+        "control": "CON",
+        "treatment": "EX",
+        "role": "primary",
+        "estimand": "difference in pre-to-post change, exercise minus control (group x time interaction)"
+       }
+      ]
+     },
+     "reasoning": "S2.6.2.p1: group x time interaction, sexes separately. Each child has a pre and a post sample, so the interaction is estimated as the difference between arms in within-child change (paired_change), which blocks on child. Group is constant within child, so subject + grp cannot sit in one fixed model. Randomized trial (S2.1.p2), so the estimand is causal.",
+     "candidates": [
+      {
+       "value": "post-only EX vs CON",
+       "reason_rejected": "ignores baseline; paper analyses the interaction"
+      },
+      {
+       "value": "pooled boys + girls with sex covariate",
+       "reason_rejected": "paper analyses sexes separately and the deposited normalized matrices are per sex"
+      }
+     ],
+     "confidence": "high"
+    },
+    "covariance": {
+     "confounding_candidates": null,
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": []
+     },
+     "reasoning": "Pre and post samples come from the same child; blocking by child via within-child differences. No batch or covariate is described for the transcriptome model in the paper; sex is handled by stratification (separate case).",
+     "confidence": "medium"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "limma (paired_change: lmFit + eBayes on within-subject t1 - t0 differences of the voom-quantile log2 matrix)",
+      "formula": "~ C(grp)",
+      "paper_route": {
+       "method": "limma-voom (quantile) with group x time interaction on raw counts, voom precision weights",
+       "status": "blocked",
+       "reason": "the case runner's limma-voom executor is two-arm only and the paper's script (OSF) is not available; voom weights are not in the deposited matrix"
+      },
+      "deviations": [
+       "no voom precision weights (deposited log2 values used unweighted)",
+       "pairing handled by within-child differences; whether the paper blocked on child is not stated"
+      ]
+     },
+     "reasoning": "The matrix is the paper's normalized log2 input, so limma applies directly. The paper model's subject handling is not stated; paired_change is the within-subject estimate of the interaction. Sensitivity run: unpaired ~ grp*time limma interaction on the same matrix.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S3.2.p1, FIG1/FIG2: DEG counts use unadjusted P<0.05 with no fold-change rule; the paper also reports FDR<0.05 (none pass), recorded as the audit rule.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "the paper's DEG lists at raw P<0.05 are near the number expected by chance on ~3.9k genes (about 5%); none pass FDR",
+       "no voom weights; the paper's pairing handling is unknown",
+       "enrichment here is MSigDB Hallmark GSEA, not the paper's topKEGG on the DEG list"
+      ]
+     },
+     "paper_counts": {
+      "interaction_paired/grp_time_EX_t1_vs_CON_t0": 161
+     },
+     "paper_genes": {
+      "interaction_paired/grp_time_EX_t1_vs_CON_t0": [
+       "CD4",
+       "HLA-C",
+       "TNFRSF1A",
+       "MYD88",
+       "PTK2B",
+       "CD8B",
+       "CD6",
+       "CALR",
+       "NFKBIA",
+       "NFYB",
+       "ACTG1",
+       "FOS",
+       "RAB7A",
+       "TXNL4B",
+       "CKS1B",
+       "TPP1",
+       "CCN1",
+       "CYR61",
+       "EMD",
+       "LASP1"
+      ]
+     },
+     "reasoning": "Same matrix, estimand and threshold as the paper; the declared deviations are the missing voom weights and the explicit within-child pairing.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "model details",
+     "paper": "limma on quantile-normalized data, group x time interaction (S2.6.2.p1); scripts on OSF",
+     "data": "deposited voomQuantiles log2 matrix without weights; scripts not available here",
+     "disposition": "executable_with_declared_deviation"
+    },
+    {
+     "item": "gene IDs",
+     "paper": "gene symbols",
+     "data": "SYMBOL_<index> IDs; suffix stripped by prep script (symbols unique)",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "extra columns",
+     "paper": "26 boys samples",
+     "data": "boys voomQuantiles file has 4 summary columns (mediat0, mediat1, FC(t1/t0) x2) after the samples; removed by prep script",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "interaction_paired",
+     "tool": "tools.multigroup_tools:run_multigroup_analysis",
+     "args": {
+      "plan": {
+       "analysis_type": "paired_change",
+       "subject_column": "subject",
+       "time_column": "time",
+       "baseline_level": "t0",
+       "followup_levels": [
+        "t1"
+       ],
+       "group_column": "grp",
+       "formula": "~ C(grp)",
+       "contrasts": [
+        {
+         "name": "grp_time_EX_t1_vs_CON_t0",
+         "coefficients": {
+          "C(grp)[T.EX]": 1
+         }
+        }
+       ]
+      }
+     },
+     "role": "primary",
+     "reasoning": "Paper's group x time interaction, estimated within child (S2.6.2.p1)."
+    },
+    {
+     "name": "interaction_unpaired",
+     "tool": "tools.limma_tools:run_limma_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "CON",
+      "treatment_group": "EX",
+      "design_formula": "~ grp + time + grp:time",
+      "coefficient": "grp[T.EX]:time[T.t1]"
+     },
+     "role": "sensitivity",
+     "reasoning": "The paper may have fitted ~group*time without child blocking; same interaction ignoring pairing."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "interaction_paired/grp_time_EX_t1_vs_CON_t0",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Paper reports immune KEGG/GO enrichment (TAB2); Hallmark GSEA on the full interaction ranking, exploratory and not the paper's topKEGG."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE193771_girls",
+   "accession": "GSE193771",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11482632.paper.md"
+    ],
+    "metadata": "GSE193771/GSE193771_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/0efeba509681ac38012819324e7f12d6e307a4fe/prep/GSE193771_voomQuantiles_girls_samples.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/0efeba509681ac38012819324e7f12d6e307a4fe/prep/prep_voomquantiles.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE193771"
+      ],
+      "primary_estimand": "Effect of a 20-week exercise program vs no-exercise control on whole-blood gene expression in girls with overweight/obesity: group (exercise vs control) x time (pre vs post) interaction, analysed in girls separately (S2.6.2.p1)",
+      "planned_contrasts": [
+       "girls: exercise vs control change from pre to post (group x time interaction); paper: 121 genes at unadjusted P<0.05, 0 at FDR<0.05 (S3.2.p1)"
+      ],
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S3.2.p1, FIG1, FIG2"
+      },
+      "paper_method": "Quantile normalization, then limma group x time interaction, boys and girls separately (S2.6.2.p1); GEO files are named voomQuantiles, so likely voom with quantile normalization; the OSF scripts were not available",
+      "sample_inclusion": "24 children with transcriptome data at both time points: boys 5 EX / 8 CON, girls 5 EX / 6 CON (S2.1.p1, TAB1)",
+      "factors": {
+       "group": [
+        "exercise",
+        "control"
+       ],
+       "time": [
+        "pre",
+        "post"
+       ],
+       "sex": "stratum (separate analyses)"
+      },
+      "repeated_measure_unit": "child (pre and post samples)",
+      "paper_results": {
+       "boys": "161 DEGs (71 up, 90 down), P<0.05; none FDR<0.05",
+       "girls": "121 DEGs (51 up, 70 down), P<0.05; none FDR<0.05"
+      }
+     },
+     "reasoning": "S2.6.2.p1 defines the estimand as the group x time interaction with limma on quantile-normalized data, by sex. S3.2.p1 and FIG1/FIG2 give the DEG counts at unadjusted P<0.05 and state no gene passes FDR<0.05. S2.1.p1 and TAB1 give the sample sizes.",
+     "confidence": "high",
+     "locator": "S2.6.2.p1; S3.2.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 and S2.5.2.p2 name GSE193771",
+       "metadata: 48 whole-blood samples of 24 children (26 male / 22 female), exercise / no exercise, t0 / t1, matching 13 boys (5/8) and 11 girls (5/6)",
+       "the girls voomQuantiles file holds exactly the 11 children (exercise 5 / control 6), 22 samples matching the metadata titles"
+      ]
+     },
+     "reasoning": "Accession named in the paper; sample counts and group sizes match TAB1.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^sample: (\\S+)$"
+      ]
+     },
+     "aliases": {
+      "time": "characteristics_ch1.4.time point"
+     },
+     "patterns": {
+      "subject": [
+       "title",
+       "^sample: ([CE]\\d+(?:_\\d)?)_[12]$"
+      ],
+      "grp": [
+       "characteristics_ch1.3.group",
+       "^(no exercise|exercise)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "no exercise": "CON",
+       "exercise": "EX"
+      }
+     },
+     "exclude_samples": {},
+     "final": {},
+     "reasoning": "Matrix columns equal the title after 'sample: ' (exact match on the derived key). Subject = title stem before the trailing _1/_2 time suffix (C74_1 and C74_2, E88_1 and E88_2 are distinct children, consistent with 13 boys / 11 girls). grp from the GEO group field, time from the time-point field (t0 = pre, t1 = post). Only the girls samples are in this matrix; the other sex's metadata rows stay unmatched by design.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "log2 quantile-normalized (voom logCPM)",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GSE193771_voomQuantiles_girls.txt.gz (author-deposited normalized matrix), summary columns removed by prep script",
+      "paper_input": "quantile-normalized expression (S2.6.2.p1)"
+     },
+     "reasoning": "Non-integer values from about -1.5 to 14.4 with median about 4.5, the range of voom log2-CPM; file name voomQuantiles and S2.6.2.p1 (quantile normalization before limma). Already filtered to expressed genes (3929 boys / 3715 girls). The raw-count files are the alternative input; rejected because the deposited normalized matrix is the paper's own limma input.",
+     "candidates": [
+      {
+       "value": "GSE193771_c_vs_e_rawPaired_red_mas1_girls.txt.gz (raw STRT counts, 13230 genes)",
+       "reason_rejected": "not the paper's normalized input; the case runner has no voom+quantile interaction executor"
+      }
+     ],
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp",
+      "time"
+     ],
+     "references": {
+      "grp": "CON",
+      "time": "t0"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "grp_time_EX_t1_vs_CON_t0"
+     ],
+     "covariate_candidates": [],
+     "strata": [],
+     "final": {
+      "analysis_type": "paired_change",
+      "formula": "~ C(grp) on within-subject (t1 - t0) differences",
+      "contrasts": [
+       {
+        "name": "grp_time_EX_t1_vs_CON_t0",
+        "control": "CON",
+        "treatment": "EX",
+        "role": "primary",
+        "estimand": "difference in pre-to-post change, exercise minus control (group x time interaction)"
+       }
+      ]
+     },
+     "reasoning": "S2.6.2.p1: group x time interaction, sexes separately. Each child has a pre and a post sample, so the interaction is estimated as the difference between arms in within-child change (paired_change), which blocks on child. Group is constant within child, so subject + grp cannot sit in one fixed model. Randomized trial (S2.1.p2), so the estimand is causal.",
+     "candidates": [
+      {
+       "value": "post-only EX vs CON",
+       "reason_rejected": "ignores baseline; paper analyses the interaction"
+      },
+      {
+       "value": "pooled boys + girls with sex covariate",
+       "reason_rejected": "paper analyses sexes separately and the deposited normalized matrices are per sex"
+      }
+     ],
+     "confidence": "high"
+    },
+    "covariance": {
+     "confounding_candidates": null,
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": []
+     },
+     "reasoning": "Pre and post samples come from the same child; blocking by child via within-child differences. No batch or covariate is described for the transcriptome model in the paper; sex is handled by stratification (separate case).",
+     "confidence": "medium"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "limma (paired_change: lmFit + eBayes on within-subject t1 - t0 differences of the voom-quantile log2 matrix)",
+      "formula": "~ C(grp)",
+      "paper_route": {
+       "method": "limma-voom (quantile) with group x time interaction on raw counts, voom precision weights",
+       "status": "blocked",
+       "reason": "the case runner's limma-voom executor is two-arm only and the paper's script (OSF) is not available; voom weights are not in the deposited matrix"
+      },
+      "deviations": [
+       "no voom precision weights (deposited log2 values used unweighted)",
+       "pairing handled by within-child differences; whether the paper blocked on child is not stated"
+      ]
+     },
+     "reasoning": "The matrix is the paper's normalized log2 input, so limma applies directly. The paper model's subject handling is not stated; paired_change is the within-subject estimate of the interaction. Sensitivity run: unpaired ~ grp*time limma interaction on the same matrix.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S3.2.p1, FIG1/FIG2: DEG counts use unadjusted P<0.05 with no fold-change rule; the paper also reports FDR<0.05 (none pass), recorded as the audit rule.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "the paper's DEG lists at raw P<0.05 are near the number expected by chance on ~3.9k genes (about 5%); none pass FDR",
+       "no voom weights; the paper's pairing handling is unknown",
+       "enrichment here is MSigDB Hallmark GSEA, not the paper's topKEGG on the DEG list"
+      ]
+     },
+     "paper_counts": {
+      "interaction_paired/grp_time_EX_t1_vs_CON_t0": 121
+     },
+     "paper_genes": {
+      "interaction_paired/grp_time_EX_t1_vs_CON_t0": [
+       "RAC1",
+       "ITGA2B",
+       "FYN",
+       "INPP5D",
+       "PIK3CD",
+       "CALR",
+       "TAPBP",
+       "SPARC",
+       "ANXA6",
+       "ALOX5",
+       "RAB2A",
+       "TMED1",
+       "RAB7A",
+       "TXNL4B",
+       "CKS1B",
+       "TPP1",
+       "CCN1",
+       "CYR61",
+       "EMD",
+       "LASP1"
+      ]
+     },
+     "reasoning": "Same matrix, estimand and threshold as the paper; the declared deviations are the missing voom weights and the explicit within-child pairing.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "model details",
+     "paper": "limma on quantile-normalized data, group x time interaction (S2.6.2.p1); scripts on OSF",
+     "data": "deposited voomQuantiles log2 matrix without weights; scripts not available here",
+     "disposition": "executable_with_declared_deviation"
+    },
+    {
+     "item": "gene IDs",
+     "paper": "gene symbols",
+     "data": "SYMBOL_<index> IDs; suffix stripped by prep script (symbols unique)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "interaction_paired",
+     "tool": "tools.multigroup_tools:run_multigroup_analysis",
+     "args": {
+      "plan": {
+       "analysis_type": "paired_change",
+       "subject_column": "subject",
+       "time_column": "time",
+       "baseline_level": "t0",
+       "followup_levels": [
+        "t1"
+       ],
+       "group_column": "grp",
+       "formula": "~ C(grp)",
+       "contrasts": [
+        {
+         "name": "grp_time_EX_t1_vs_CON_t0",
+         "coefficients": {
+          "C(grp)[T.EX]": 1
+         }
+        }
+       ]
+      }
+     },
+     "role": "primary",
+     "reasoning": "Paper's group x time interaction, estimated within child (S2.6.2.p1)."
+    },
+    {
+     "name": "interaction_unpaired",
+     "tool": "tools.limma_tools:run_limma_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "CON",
+      "treatment_group": "EX",
+      "design_formula": "~ grp + time + grp:time",
+      "coefficient": "grp[T.EX]:time[T.t1]"
+     },
+     "role": "sensitivity",
+     "reasoning": "The paper may have fitted ~group*time without child blocking; same interaction ignoring pairing."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "interaction_paired/grp_time_EX_t1_vs_CON_t0",
+     "ora": false,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Paper reports immune KEGG/GO enrichment (TAB2); Hallmark GSEA on the full interaction ranking, exploratory and not the paper's topKEGG."
+    }
+   ]
+  }
+ ]
+}

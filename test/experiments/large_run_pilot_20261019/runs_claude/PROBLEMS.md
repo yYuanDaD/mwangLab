@@ -403,3 +403,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41683811 (GSE315228)
 
 - case_runner.py:517 n_aligned ignores exclude_samples; decision_contract.py:338 pairing detected from analysis_type text; :163 design formula required, not in docs Details: `PMID41683811/HANDBACK.md`.
+
+## PMID42168599 (GSE282166)
+
+- none blocking; metadata has typo treatment level IRISN; protocol text mojibake (UTF-8/GBK) in metadata CSV Details: `PMID42168599/HANDBACK.md`.
+
+## PMID39730655 (GSE280324)
+
+- case_runner threshold has only a symmetric effect_cutoff (tools/case_runner.py:406,775), so FC<0.83 cannot be expressed; runner count was 2047, exact count recomputed post hoc (patched after this row) Details: `PMID39730655/HANDBACK.md`.

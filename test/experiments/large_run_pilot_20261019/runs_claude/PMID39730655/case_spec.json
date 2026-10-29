@@ -1,0 +1,168 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39730655",
+  "request": "Analyze GSE280324 for PMID 39730655 (Effects of moderate intensity exercise on liver metabolism in mice based on multi-omics analysis.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE280324",
+      "accession": "GSE280324",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC11680863.paper.md"],
+        "metadata": "GSE280324/GSE280324_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID39730655/GSE280324_TPM.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID39730655/prep_tpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE280324"],
+            "assay": "bulk RNA-seq of mouse liver (BGISEQ-500), plus proteomics/lactylome (PXD057080) and metabolomics (MTBLS11477) not analysed here",
+            "sample_inclusion": "adult male C57BL/6J mice, liver; transcriptomics n=3 per group (S2.1.p1)",
+            "factors": {"group": ["Control (sedentary)", "Experimental (6-week moderate-intensity treadmill exercise)"]},
+            "primary_estimand": "effect of 6 weeks of moderate-intensity treadmill exercise vs sedentary control on liver gene expression, sampled within 24 h after the last bout (S2.1.p1)",
+            "planned_contrasts": ["Experimental (EX) vs Control (SED), liver (S8.1.p1; paper: 2034 DEGs, 1456 up / 578 down)"],
+            "repeated_measure_unit": "none (independent animals)",
+            "normalization": "counts -> TPM -> log2(TPM+1) (S3.p1)",
+            "paper_method": "limma v3.46.0 on log2(TPM+1), ~ group (S3.p1, S7.1.p1, TAB1)",
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.2630344,
+              "source_locator": "S3.p1; TAB1",
+              "note": "paper: raw p < 0.05 & (FC > 1.2 or FC < 0.83); the down cutoff 0.83 is log2 = -0.2688167, slightly stricter than 1/1.2"
+            },
+            "paper_results": "2034 DEGs (1456 up, 578 down); 82 intersection genes with Hallmark hypoxia/glycolysis/fatty-acid sets; hub genes Aldoa, Acsl1, Hadhb up in EX at mRNA level (S8.1.p1, S8.3.p1); Fasn up (S9.p3)"
+          },
+          "reasoning": "Single two-group transcriptomics comparison: S2.1.p1 (design, n=3/group), S3.p1 (TPM, log2(x+1), limma, p<0.05 & FC 1.2/0.83), S8.1.p1 (2034 DEGs). Other omics are outside GSE280324.",
+          "confidence": "high",
+          "locator": "S3.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 names GSE280324 as the transcriptomics deposit",
+              "GEO: Mus musculus liver, 6 samples, 3 Con + 3 treadmill-running, matching n=3 per group in S2.1.p1",
+              "contact Ting Zhang, Beijing Municipal Key Laboratory of Child Development and Nutriomics (Capital Institute of Pediatrics; TZ is an author)"
+            ]
+          },
+          "reasoning": "Paper data-availability statement and GEO sample structure agree.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["description", "^fpkm_(.+)$"]},
+          "key_column": "key",
+          "patterns": {"grp": ["description", "^fpkm_([CE])_"]},
+          "recode": {"grp": {"C": "SED", "E": "EX"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "GEO 'description' holds fpkm_<tag> (e.g. fpkm_C_48); prep_tpm.py renamed the tpm_<tag> matrix columns to <tag>, so the key is the tag. Group letter C/E in the tag agrees with title (Er C1..C3 vs E1..E3) and characteristics treatment (Con mice did not use treadmill vs running 22 km).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM (linear normalized)",
+          "recommended_method": "limma",
+          "reasoning": "Prepared from the tpm_* block of GSE280324_FPKM.txt.gz: non-integer, each column sums to 1e6 (true TPM). The deposited file also has FPKM, non-integer read_count and group-average columns, which were dropped. Paper input is TPM -> log2(TPM+1) (S3.p1), so this matches the paper.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_EX_vs_SED"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "EX",
+            "contrasts": [{"name": "grp_EX_vs_SED", "control": "SED", "treatment": "EX", "role": "primary"}]
+          },
+          "reasoning": "One factor, two levels, independent mice (S2.1.p1). n=3 per group is small but is the paper's design; contrast run as planned.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals randomized to groups (S2.1.p1); no batch, sex (all male) or pairing recorded in GEO.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) on log2(TPM+1)",
+            "formula": "~ grp",
+            "paper_route": {"method": "limma on log2(TPM+1)", "status": "reproduced"},
+            "deviations": ["inmoose limma port instead of R limma 3.46.0; no expression filter stated in the paper, none applied"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "S3.p1: TPM log2(x+1) then limma. TPM is supported by limma after log transform.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.2630344, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.2630344, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper rule is raw p < 0.05 & (FC > 1.2 or FC < 0.83). The runner applies a symmetric |log2FC| > log2(1.2) = 0.2630344; the exact asymmetric down cutoff log2(0.83) = -0.2688167 is recomputed post hoc in HANDBACK.md. Audit rule BH padj < 0.05 reported separately."
+          },
+          "reasoning": "S3.p1 and TAB1 state raw p < 0.05 and FC > 1.2 or < 0.83.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": ["n=3 per group", "raw p threshold (paper's) is permissive; BH audit count reported", "down FC cutoff asymmetry handled post hoc"]
+          },
+          "paper_counts": {"grp_EX_vs_SED": 2034},
+          "paper_genes": {"grp_EX_vs_SED": ["Aldoa", "Acsl1", "Hadhb", "Fasn"]},
+          "reasoning": "S8.1.p1: 2034 DEGs (1456 up, 578 down); S8.3.p1: Aldoa, Acsl1, Hadhb mRNA up in EX; S9.p3: Fasn mRNA up."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "matrix file name",
+          "paper": "TPM from counts (S3.p1)",
+          "data": "GSE280324_FPKM.txt.gz holds FPKM, TPM and read_count blocks; TPM block used",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "GEO data_processing threshold",
+          "paper": "p < 0.05 & FC 1.2/0.83 with limma",
+          "data": "GEO data_processing says p < 0.05 and |log2FC| > 1",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "down-regulation cutoff",
+          "paper": "FC < 0.83 (log2 -0.2688)",
+          "data": "runner applies symmetric |log2FC| > 0.2630",
+          "disposition": "executable_with_declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "grp_EX_vs_SED",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "EX"},
+          "role": "primary",
+          "reasoning": "paper's two-group limma on log2(TPM+1)"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "grp_EX_vs_SED",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper uses Hallmark hypoxia/glycolysis/fatty-acid sets and GO/KEGG enrichment (S3.p1, S8.1.p1)"
+        }
+      ]
+    }
+  ]
+}

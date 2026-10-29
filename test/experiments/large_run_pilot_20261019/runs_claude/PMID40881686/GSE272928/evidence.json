@@ -1,0 +1,1002 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID40881686",
+  "subject_id": "GSE272928",
+  "created_at": "2026-10-28T23:42:46",
+  "finished_at": "2026-10-28T23:43:11",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12380555.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12380555.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T23:42:46",
+      "sha256": null,
+      "attributes": {
+        "sha256": "cb31fff708ddaf4e9cfec1318c96fbc158b552ee4dab801d49b4ca34b4910892",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE272928_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE272928\\GSE272928_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:42:46",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d26b602e6b3db492c198aae157a0218bd3268575550b1d8a69773b960c1ffcb6",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script rename_columns.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\prep\\rename_columns.py",
+      "locator": null,
+      "captured_at": "2026-10-28T23:42:46",
+      "sha256": null,
+      "attributes": {
+        "sha256": "bc862b02c411bd0bd8d72205a40be8f25d01a8dec1ba5d75c105f3f953c718fe",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE272928_rlog_renamed.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\prep\\GSE272928_rlog_renamed.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:42:46",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5db7384a3ff8d49b480dd6ba4aff112177ff0d56de2a5b9080406a1d79001c6d",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE272928"
+        ],
+        "assay": "bulk RNA-seq of magnetically isolated circulating NK cells (Illumina HiSeq 2500, PE100), HTSeq raw counts + Cufflinks FPKM (S2.5.p2)",
+        "samples": "9 B-cell ALL children in remission + 9 age/sex-matched healthy controls, each sampled before (baseline) and immediately after (peak) one acute cycling session = 36 libraries (ABS.p2, S2.5)",
+        "factors": {
+          "group": [
+            "ALL",
+            "CON"
+          ],
+          "time": [
+            "baseline (pre)",
+            "peak exercise (post)"
+          ],
+          "subject": "18 children, 2 samples each"
+        },
+        "primary_estimand": "Difference between ALL-in-remission and control children in the within-subject NK-cell transcriptome response to an acute exercise bout (group x time interaction, paired by child) (S2.6.p2, S3.p3)",
+        "planned_contrasts": [
+          "group x time interaction: (ALL post-pre) - (CON post-pre), paired (S3.p3; paper: 179 genes, 163 negative / 16 positive, p<0.01, Suppl. Table S3)",
+          "baseline ALL vs CON (S3.p2; paper: 284 genes, 124 up / 160 down, p<0.01, Suppl. Table S1) - disease contrast, not an exercise effect",
+          "within-group post vs pre in ALL (Suppl. Table S6) and in CON (Suppl. Table S7) (S3.p3; counts not stated in the text)"
+        ],
+        "paper_method": "DESeq2 v1.38.3 on raw counts, paired design (subject), multifactor design with interaction terms (S2.6.p2)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.6.p2"
+        },
+        "paper_results": {
+          "interaction_n": 179,
+          "interaction_up": 16,
+          "interaction_down": 163,
+          "baseline_n": 284,
+          "baseline_up": 124,
+          "baseline_down": 160,
+          "named_genes": "IL1B down in ALL post vs pre (log2FC -1.68, p<0.001) but not in CON (-0.18, p=0.59) (S4.p6); TREM1, S100A8/A9/A12 down in ALL only (S4.p4-p5)"
+        },
+        "pathway_method": "QIAGEN IPA canonical pathways, FDR<0.05 (S2.6.p2) - proprietary, not reproducible here"
+      },
+      "reason": "Methods S2.6.p2 define DESeq2 with paired design + interaction terms and raw p<0.01. Results S3.p2 (baseline 284 DEGs) and S3.p3 (interaction 179 genes) give the counts. The exercise question is the within-subject post-vs-pre change and its group difference.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:47"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\prep\\GSE272928_rlog_renamed.csv",
+        "owned": true,
+        "checks": [
+          "paper S8.p1 and S2.5.p2 name GSE272928",
+          "GEO Series_pubmed_id = 40881686",
+          "36 GSMs = 18 children x 2 timepoints, 9 ALL + 9 CON, matches ABS.p2",
+          "matrix columns ALL02..ALL12, CONT_51..59 x BASELINE/PEAK match GEO titles"
+        ],
+        "accession": "GSE272928",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE272928\\GSE272928_metadata.csv"
+      },
+      "reason": "The series is the paper's deposit (paper S8.p1, Series_pubmed_id 40881686); the only series supplementary file is GSE272928_transformed_RNA_seq_Data.xlsx (csv copy used), 36 sample columns matching the 36 GSM titles.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:47"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 36,
+        "n_metadata": 36,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "sex": {
+              "alias_of": "characteristics_ch1.4.Sex"
+            },
+            "grp": {
+              "source": "title",
+              "regex": "^(ALL|CONT)",
+              "recode": {
+                "ALL": "ALL",
+                "CONT": "CON"
+              }
+            },
+            "time": {
+              "source": "title",
+              "regex": "(BASELINE|PEAK)\\s*$",
+              "recode": {
+                "BASELINE": "pre",
+                "PEAK": "post"
+              }
+            },
+            "subject": {
+              "source": "title",
+              "regex": "^(ALL|CONT)\\s*(\\d+)"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\design_metadata.csv",
+          "sha256": "a31977416f40f9504cba135e0c7f0bf175a83e6296d0482c04b6c7cee6622d61",
+          "levels": {
+            "sex": {
+              "male": 28,
+              "female": 8
+            },
+            "grp": {
+              "CON": 18,
+              "ALL": 18
+            },
+            "time": {
+              "pre": 18,
+              "post": 18
+            },
+            "subject": {
+              "CONT_51": 2,
+              "CONT_52": 2,
+              "CONT_53": 2,
+              "CONT_54": 2,
+              "CONT_55": 2,
+              "CONT_56": 2,
+              "CONT_57": 2,
+              "CONT_58": 2,
+              "CONT_59": 2,
+              "ALL_02": 2,
+              "ALL_03": 2,
+              "ALL_05": 2,
+              "ALL_07": 2,
+              "ALL_08": 2,
+              "ALL_09": 2,
+              "ALL_10": 2,
+              "ALL_11": 2,
+              "ALL_12": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix column names were renamed by name (prep/rename_columns.py, ALL02_BASELINE -> ALL_02_BASELINE) so that they equal a key derived from the GEO title (<GROUP>_<NN>_<TIME>; title 'ALL03  PEAK' has a double space, handled by \\s+). grp/time/subject come from the title; grp agrees with characteristics 'health status' and time with 'time 1/time 2' (BASELINE=time 1, PEAK=time 2) for all 36 samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:50"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE272928_transformed_RNA_seq_Data.xlsx (series supplementary; csv copy)",
+        "paper_input": "DESeq2 on HTSeq raw counts (S2.5.p2, S2.6.p2)",
+        "matrix_type": "DESeq2 rlog-transformed (log2-scale, library-size normalized) expression",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\aligned_matrix.csv",
+          "sha256": "42eb05bcd06b5b26063552a6dc744e0ed13906e96b97a771f0afd814b3448add",
+          "n_features": 63677,
+          "n_samples": 36,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 508685,
+          "negative_fraction": 0.221903,
+          "min": -4.38131194279289,
+          "max": 18.8892084007087,
+          "median": 0.0,
+          "integer_fraction": 0.4294,
+          "candidates": [
+            "signed_log_scale (log ratios, M-values, or centered data)"
+          ]
+        }
+      },
+      "reason": "File is named 'transformed'; values are continuous (no non-zero integers), range -4.38..18.9, all-zero genes stored as exactly 0 and near-zero genes at a shared floor of about -4.375 with tiny between-sample spread - the signature of DESeq2 rlog (rlog returns 0 for all-zero rows and shrinks low-count rows to a common value). sum(2^x) per sample is 2.6e7-2.8e7 with SD 2%, consistent with size-factor-normalized counts on log2 scale. GEO data_processing says the submitter produced raw counts (all_merged.txt) but that file is not deposited (sample supplementary_file_1 = NONE; only the transformed xlsx in the series). Not raw counts, so DESeq2 cannot be run; log2-scale input supports limma.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:51"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired_change (2x2 mixed: group between-subject, time within-subject)",
+        "formula": "per-subject delta = post - pre; ~ 0 + C(grp) on deltas; baseline: ~ grp on pre samples",
+        "contrasts": [
+          {
+            "name": "interaction_ALLchange_vs_CONchange",
+            "definition": "C(grp)[ALL] - C(grp)[CON] on post-pre deltas",
+            "role": "primary"
+          },
+          {
+            "name": "ALL_post_vs_pre",
+            "definition": "C(grp)[ALL] on deltas",
+            "role": "secondary"
+          },
+          {
+            "name": "CON_post_vs_pre",
+            "definition": "C(grp)[CON] on deltas",
+            "role": "secondary"
+          },
+          {
+            "name": "baseline_ALL_vs_CON",
+            "control": "CON",
+            "treatment": "ALL",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "partially_analyzable",
+          "failed": [],
+          "warnings": [
+            "sample_size"
+          ],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "S2.6.p2: paired design + interaction terms. The exercise effect is the within-child post-vs-pre change; the paper's headline exercise result is the group x time interaction (S3.p3). Within-group changes (Suppl. S6/S7) are the paper's own secondary results and the direct 'exercise effect' per group. Baseline ALL vs CON (S3.p2) is a disease (associational) contrast reported by the paper; run as secondary. All 18 children have both timepoints.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:59"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "not included: groups sex-matched (2 girls each, Table 1); paper model has no sex term"
+          },
+          {
+            "name": "age",
+            "disposition": "not included: age-matched (Table 1, p=0.51); paper model has no age term"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp) + C(time) + C(subject)",
+          "n_samples": 36,
+          "n_columns": 20,
+          "columns": [
+            "Intercept",
+            "grp_CON",
+            "time_pre",
+            "subject_ALL_03",
+            "subject_ALL_05",
+            "subject_ALL_07",
+            "subject_ALL_08",
+            "subject_ALL_09",
+            "subject_ALL_10",
+            "subject_ALL_11",
+            "subject_ALL_12",
+            "subject_CONT_51",
+            "subject_CONT_52",
+            "subject_CONT_53",
+            "subject_CONT_54",
+            "subject_CONT_55",
+            "subject_CONT_56",
+            "subject_CONT_57",
+            "subject_CONT_58",
+            "subject_CONT_59"
+          ],
+          "rank": 19,
+          "full_rank": false,
+          "residual_df": 17,
+          "levels": {
+            "grp": {
+              "CON": 18,
+              "ALL": 18
+            },
+            "time": {
+              "pre": 18,
+              "post": 18
+            },
+            "subject": {
+              "CONT_51": 2,
+              "CONT_52": 2,
+              "CONT_53": 2,
+              "CONT_54": 2,
+              "CONT_55": 2,
+              "CONT_56": 2,
+              "CONT_57": 2,
+              "CONT_58": 2,
+              "CONT_59": 2,
+              "ALL_02": 2,
+              "ALL_03": 2,
+              "ALL_05": 2,
+              "ALL_07": 2,
+              "ALL_08": 2,
+              "ALL_09": 2,
+              "ALL_10": 2,
+              "ALL_11": 2,
+              "ALL_12": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_02"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_03"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_07"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_08"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_09"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "post",
+                "ALL_12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_02"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_03"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_07"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_08"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_09"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_10"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "ALL",
+                "pre",
+                "ALL_12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_54"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_55"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "post",
+                "CONT_59"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_51"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_52"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_54"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_55"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "pre",
+                "CONT_59"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "sex",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "ALL": {
+                "female": 4,
+                "male": 14
+              },
+              "CON": {
+                "female": 4,
+                "male": 14
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Each child contributes a baseline and a peak sample: subject is the blocking unit, handled by within-subject post-pre differences (equivalent to subject fixed effects for time and group x time). Group is between-subject; the baseline contrast uses one sample per child so needs no blocking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:59"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "DESeq2 rlog-transformed (log2-scale, library-size normalized) expression",
+        "method": "limma (inmoose lmFit + eBayes) on the deposited rlog log2 matrix",
+        "formula": "paired change: delta ~ 0 + C(grp) with contrasts; baseline: ~ grp on pre samples",
+        "paper_route": {
+          "method": "DESeq2 v1.38.3 on HTSeq raw counts, paired + interaction design",
+          "status": "blocked",
+          "reason": "raw counts (all_merged.txt) not deposited in GSE272928; only the rlog-transformed matrix is available, and DESeq2 requires integer counts"
+        },
+        "deviations": [
+          "limma on rlog values instead of DESeq2 negative-binomial Wald tests on counts",
+          "zero-variance genes (all-zero rows) dropped by the executor"
+        ]
+      },
+      "reason": "Matrix-method policy: log-scale normalized input -> limma. The deposited values are already log2-scale; no further transform. Paired-change limma on deltas reproduces the paper's paired interaction structure.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:59"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "paper's raw p<0.01 applied to limma p-values from the deviation route; BH FDR<0.05 kept as a separate audit rule"
+      },
+      "reason": "S2.6.p2: 'a p-value cut-off of 0.01 was considered statistically significant' with no fold-change rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:42:59"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_multigroup_analysis",
+        "subset": "exercise_change",
+        "role": "primary",
+        "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "n_samples": 36,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\aligned_matrix.csv",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_interaction_ALLchange_vs_CONchange.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_ALL_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_CON_post_vs_pre.csv"
+        ],
+        "counts": {
+          "exercise_change/interaction_ALLchange_vs_CONchange": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 36336,
+              "n_significant": 194,
+              "n_up": 110,
+              "n_down": 84,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 36336,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "exercise_change/ALL_post_vs_pre": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 36336,
+              "n_significant": 5172,
+              "n_up": 2301,
+              "n_down": 2871,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 36336,
+              "n_significant": 4490,
+              "n_up": 2012,
+              "n_down": 2478,
+              "deg_sanity": "ok"
+            }
+          },
+          "exercise_change/CON_post_vs_pre": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 36336,
+              "n_significant": 4260,
+              "n_up": 2091,
+              "n_down": 2169,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 36336,
+              "n_significant": 3333,
+              "n_up": 1704,
+              "n_down": 1629,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paired within-child change (post - pre) per gene, one limma model on the 18 deltas with a group mean per arm: the ALL-CON difference is the paper's group x time interaction (S3.p3), and each arm's mean change is its within-group exercise effect (Suppl. S6/S7).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:08"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "76a8a48999c01c43a479b7677842f5d996f6096f926c2b1596c98e4fec7cee68",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1e3133207a6bfd764582eceed7d7214716f3157cab2184530c1dc446283cc2c4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "42eb05bcd06b5b26063552a6dc744e0ed13906e96b97a771f0afd814b3448add",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a31977416f40f9504cba135e0c7f0bf175a83e6296d0482c04b6c7cee6622d61",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "933e512ced0ca3b1a6cf31adde489edb741b2f583929fb020e4a0e19dd321581",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "eff5e7c5e6f6e69d2ad7ecbce42db6d8968a357cec36af6b79a4ac2c67b2b1ba",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_interaction_ALLchange_vs_CONchange.csv",
+      "role": "deg_exercise_change/interaction_ALLchange_vs_CONchange",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f610f234076a85fc84f21034a34d07f7b391418fd47f747a671b31c45399a9fd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_ALL_post_vs_pre.csv",
+      "role": "deg_exercise_change/ALL_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e34fbf4361ec383214c91e89592a2e564ea42f124c05e2a94bf497c2dede9c34",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40881686\\GSE272928\\results\\exercise_change\\followup_post\\DEG_results_CON_post_vs_pre.csv",
+      "role": "deg_exercise_change/CON_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b0c535ef2a68d2386f0c150c3436be7ee18af7dcdc8f7cf9b83c7235f3f0503b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -1,0 +1,1344 @@
+{
+  "schema_version": "1.0",
+  "run_id": "0efeba509681ac38012819324e7f12d6e307a4fe",
+  "subject_id": "GSE193771_boys",
+  "created_at": "2026-10-28T23:43:01",
+  "finished_at": "2026-10-28T23:43:17",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC11482632.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC11482632.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T23:43:01",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c2c9c166e497b418116dabdfaf1044cf096d893a53efabf00d977905a4789dbe",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE193771_metadata.csv",
+      "uri": "data\\GSE193771\\GSE193771_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:43:01",
+      "sha256": null,
+      "attributes": {
+        "sha256": "21a0862176c835f531840193e8754991bc6d1974698f58a0afd52a71aac96024",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_voomquantiles.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\prep\\prep_voomquantiles.py",
+      "locator": null,
+      "captured_at": "2026-10-28T23:43:01",
+      "sha256": null,
+      "attributes": {
+        "sha256": "35b2f5a637ed56905a7f41fd95dd7ff24c0a63e21097ddf66aeeec121d138f2a",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE193771_voomQuantiles_boys_samples.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\prep\\GSE193771_voomQuantiles_boys_samples.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:43:01",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9f638d764e8cbd896037c63bd1b71319a52266561cd983a63ea566254c48095a",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE193771"
+        ],
+        "primary_estimand": "Effect of a 20-week exercise program vs no-exercise control on whole-blood gene expression in boys with overweight/obesity: group (exercise vs control) x time (pre vs post) interaction, analysed in boys separately (S2.6.2.p1)",
+        "planned_contrasts": [
+          "boys: exercise vs control change from pre to post (group x time interaction); paper: 161 genes at unadjusted P<0.05, 0 at FDR<0.05 (S3.2.p1)"
+        ],
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S3.2.p1, FIG1, FIG2"
+        },
+        "paper_method": "Quantile normalization, then limma group x time interaction, boys and girls separately (S2.6.2.p1); GEO files are named voomQuantiles, so likely voom with quantile normalization; the OSF scripts were not available",
+        "sample_inclusion": "24 children with transcriptome data at both time points: boys 5 EX / 8 CON, girls 5 EX / 6 CON (S2.1.p1, TAB1)",
+        "factors": {
+          "group": [
+            "exercise",
+            "control"
+          ],
+          "time": [
+            "pre",
+            "post"
+          ],
+          "sex": "stratum (separate analyses)"
+        },
+        "repeated_measure_unit": "child (pre and post samples)",
+        "paper_results": {
+          "boys": "161 DEGs (71 up, 90 down), P<0.05; none FDR<0.05",
+          "girls": "121 DEGs (51 up, 70 down), P<0.05; none FDR<0.05"
+        }
+      },
+      "reason": "S2.6.2.p1 defines the estimand as the group x time interaction with limma on quantile-normalized data, by sex. S3.2.p1 and FIG1/FIG2 give the DEG counts at unadjusted P<0.05 and state no gene passes FDR<0.05. S2.1.p1 and TAB1 give the sample sizes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:01"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\prep\\GSE193771_voomQuantiles_boys_samples.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 and S2.5.2.p2 name GSE193771",
+          "metadata: 48 whole-blood samples of 24 children (26 male / 22 female), exercise / no exercise, t0 / t1, matching 13 boys (5/8) and 11 girls (5/6)",
+          "the boys voomQuantiles file holds exactly the 13 children (exercise 5 / control 8), 26 samples matching the metadata titles"
+        ],
+        "accession": "GSE193771",
+        "metadata_file": "data\\GSE193771\\GSE193771_metadata.csv"
+      },
+      "reason": "Accession named in the paper; sample counts and group sizes match TAB1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:01"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 26,
+        "n_metadata": 48,
+        "coverage": 0.5417,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [
+          "GSM5820760",
+          "GSM5820761",
+          "GSM5820762",
+          "GSM5820763",
+          "GSM5820764",
+          "GSM5820765",
+          "GSM5820766",
+          "GSM5820767",
+          "GSM5820768",
+          "GSM5820769",
+          "GSM5820770",
+          "GSM5820771",
+          "GSM5820772",
+          "GSM5820773",
+          "GSM5820774",
+          "GSM5820775",
+          "GSM5820776",
+          "GSM5820777",
+          "GSM5820778",
+          "GSM5820779",
+          "GSM5820780",
+          "GSM5820781"
+        ],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "time": {
+              "alias_of": "characteristics_ch1.4.time point"
+            },
+            "subject": {
+              "source": "title",
+              "regex": "^sample: ([CE]\\d+(?:_\\d)?)_[12]$"
+            },
+            "grp": {
+              "source": "characteristics_ch1.3.group",
+              "regex": "^(no exercise|exercise)$",
+              "recode": {
+                "no exercise": "CON",
+                "exercise": "EX"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\design_metadata.csv",
+          "sha256": "aa8d841469d3bc304eb120df22b1516895c8a1bab5d4b2bb39b311655cb7ca7a",
+          "levels": {
+            "time": {
+              "t0": 13,
+              "t1": 13
+            },
+            "subject": {
+              "C104": 2,
+              "C107": 2,
+              "C110": 2,
+              "C67": 2,
+              "C71": 2,
+              "C74_2": 2,
+              "C90": 2,
+              "C96": 2,
+              "E69": 2,
+              "E84": 2,
+              "E88_1": 2,
+              "E88_2": 2,
+              "E93": 2
+            },
+            "grp": {
+              "CON": 16,
+              "EX": 10
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal the title after 'sample: ' (exact match on the derived key). Subject = title stem before the trailing _1/_2 time suffix (C74_1 and C74_2, E88_1 and E88_2 are distinct children, consistent with 13 boys / 11 girls). grp from the GEO group field, time from the time-point field (t0 = pre, t1 = post). Only the boys samples are in this matrix; the other sex's metadata rows stay unmatched by design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:01"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE193771_voomQuantiles_boys.txt.gz (author-deposited normalized matrix), summary columns removed by prep script",
+        "paper_input": "quantile-normalized expression (S2.6.2.p1)",
+        "matrix_type": "log2 quantile-normalized (voom logCPM)",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\aligned_matrix.csv",
+          "sha256": "8c4f8d937955d33b5bd90cd4269ab0231affa8588dda7c04384d3d97786275e9",
+          "n_features": 3929,
+          "n_samples": 26,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 108,
+          "negative_fraction": 0.001057,
+          "min": -1.551282003,
+          "max": 14.37209397,
+          "median": 4.523260225,
+          "integer_fraction": 0.0,
+          "candidates": [
+            "log_scale (a few small negative values, as in RMA or background-corrected arrays)"
+          ]
+        }
+      },
+      "reason": "Non-integer values from about -1.5 to 14.4 with median about 4.5, the range of voom log2-CPM; file name voomQuantiles and S2.6.2.p1 (quantile normalization before limma). Already filtered to expressed genes (3929 boys / 3715 girls). The raw-count files are the alternative input; rejected because the deposited normalized matrix is the paper's own limma input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:02"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired_change",
+        "formula": "~ C(grp) on within-subject (t1 - t0) differences",
+        "contrasts": [
+          {
+            "name": "grp_time_EX_t1_vs_CON_t0",
+            "control": "CON",
+            "treatment": "EX",
+            "role": "primary",
+            "estimand": "difference in pre-to-post change, exercise minus control (group x time interaction)"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "S2.6.2.p1: group x time interaction, sexes separately. Each child has a pre and a post sample, so the interaction is estimated as the difference between arms in within-child change (paired_change), which blocks on child. Group is constant within child, so subject + grp cannot sit in one fixed model. Randomized trial (S2.1.p2), so the estimand is causal.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:05"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp) + C(time) + C(subject)",
+          "n_samples": 26,
+          "n_columns": 15,
+          "columns": [
+            "Intercept",
+            "grp_EX",
+            "time_t1",
+            "subject_C107",
+            "subject_C110",
+            "subject_C67",
+            "subject_C71",
+            "subject_C74_2",
+            "subject_C90",
+            "subject_C96",
+            "subject_E69",
+            "subject_E84",
+            "subject_E88_1",
+            "subject_E88_2",
+            "subject_E93"
+          ],
+          "rank": 14,
+          "full_rank": false,
+          "residual_df": 12,
+          "levels": {
+            "grp": {
+              "CON": 16,
+              "EX": 10
+            },
+            "time": {
+              "t0": 13,
+              "t1": 13
+            },
+            "subject": {
+              "C104": 2,
+              "C107": 2,
+              "C110": 2,
+              "C67": 2,
+              "C71": 2,
+              "C74_2": 2,
+              "C90": 2,
+              "C96": 2,
+              "E69": 2,
+              "E84": 2,
+              "E88_1": 2,
+              "E88_2": 2,
+              "E93": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C104"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C107"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C110"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C67"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C71"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C74_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C90"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t0",
+                "C96"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C104"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C107"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C110"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C67"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C71"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C74_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C90"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "CON",
+                "t1",
+                "C96"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t0",
+                "E69"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t0",
+                "E84"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t0",
+                "E88_1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t0",
+                "E88_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t0",
+                "E93"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t1",
+                "E69"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t1",
+                "E84"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t1",
+                "E88_1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t1",
+                "E88_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "EX",
+                "t1",
+                "E93"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 26,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 26,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.group",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "CON": {
+                "exercise": 0,
+                "no exercise": 16
+              },
+              "EX": {
+                "exercise": 10,
+                "no exercise": 0
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.4.time point",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "CON": {
+                "t0": 8,
+                "t1": 8
+              },
+              "EX": {
+                "t0": 5,
+                "t1": 5
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 26,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 26,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "time",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "CON": {
+                "t0": 8,
+                "t1": 8
+              },
+              "EX": {
+                "t0": 5,
+                "t1": 5
+              }
+            }
+          },
+          {
+            "column": "subject",
+            "n_levels": 13,
+            "status": "nested_in_primary",
+            "crosstab": {
+              "CON": {
+                "C104": 2,
+                "C107": 2,
+                "C110": 2,
+                "C67": 2,
+                "C71": 2,
+                "C74_2": 2,
+                "C90": 2,
+                "C96": 2,
+                "E69": 0,
+                "E84": 0,
+                "E88_1": 0,
+                "E88_2": 0,
+                "E93": 0
+              },
+              "EX": {
+                "C104": 0,
+                "C107": 0,
+                "C110": 0,
+                "C67": 0,
+                "C71": 0,
+                "C74_2": 0,
+                "C90": 0,
+                "C96": 0,
+                "E69": 2,
+                "E84": 2,
+                "E88_1": 2,
+                "E88_2": 2,
+                "E93": 2
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Pre and post samples come from the same child; blocking by child via within-child differences. No batch or covariate is described for the transcriptome model in the paper; sex is handled by stratification (separate case).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:05"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "log2 quantile-normalized (voom logCPM)",
+        "method": "limma (paired_change: lmFit + eBayes on within-subject t1 - t0 differences of the voom-quantile log2 matrix)",
+        "formula": "~ C(grp)",
+        "paper_route": {
+          "method": "limma-voom (quantile) with group x time interaction on raw counts, voom precision weights",
+          "status": "blocked",
+          "reason": "the case runner's limma-voom executor is two-arm only and the paper's script (OSF) is not available; voom weights are not in the deposited matrix"
+        },
+        "deviations": [
+          "no voom precision weights (deposited log2 values used unweighted)",
+          "pairing handled by within-child differences; whether the paper blocked on child is not stated"
+        ]
+      },
+      "reason": "The matrix is the paper's normalized log2 input, so limma applies directly. The paper model's subject handling is not stated; paired_change is the within-subject estimate of the interaction. Sensitivity run: unpaired ~ grp*time limma interaction on the same matrix.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:05"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "S3.2.p1, FIG1/FIG2: DEG counts use unadjusted P<0.05 with no fold-change rule; the paper also reports FDR<0.05 (none pass), recorded as the audit rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:05"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_multigroup_analysis",
+        "subset": "interaction_paired",
+        "role": "primary",
+        "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "n_samples": 26,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\aligned_matrix.csv",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\results\\interaction_paired\\followup_t1\\DEG_results_grp_time_EX_t1_vs_CON_t0.csv"
+        ],
+        "counts": {
+          "interaction_paired/grp_time_EX_t1_vs_CON_t0": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 3929,
+              "n_significant": 159,
+              "n_up": 74,
+              "n_down": 85,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 3929,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's group x time interaction, estimated within child (S2.6.2.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:14"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_limma_analysis",
+        "subset": "interaction_unpaired",
+        "role": "sensitivity",
+        "tool": "tools.limma_tools:run_limma_analysis",
+        "n_samples": 26,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp + time + grp:time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\results\\interaction_unpaired\\DEG_results_EX_vs_CON.csv"
+        ],
+        "counts": {
+          "interaction_unpaired": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 3929,
+              "n_significant": 94,
+              "n_up": 39,
+              "n_down": 55,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 3929,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "The paper may have fitted ~group*time without child blocking; same interaction ignoring pairing.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:15"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "interaction_paired/grp_time_EX_t1_vs_CON_t0",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\results\\enrichment_interaction_paired_grp_time_EX_t1_vs_CON_t0\\gsea\\DEG_results_grp_time_EX_t1_vs_CON_t0_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 3929 Human genes ranked by 'stat'. 50 Hallmark sets tested, 14 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.03 | NOM p=0.00e+00 | FDR q=3.02e-03 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.01 | NOM p=0.00e+00 | FDR q=1.51e-03 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.89 | NOM p=6.85e-03 | FDR q=8.06e-03 - HALLMARK_APOPTOSIS | NES=1.69 | NOM p=0.00e+00 | FDR q=2.87e-02 - HALLMARK_KRAS_SIGNALING_UP | NES=1.65 | NOM p=2.34e-03 | FDR q=3.24e-02 - HALLMARK_COMPLEMENT | NES=1.60 | NOM p=1.35e-02 | FDR q=4.51e-02 - HALLMARK_COAGULATION | NES=1.50 | NOM p=3.96e-02 | FDR q=8.51e-02 - HALLMARK_APICAL_JUNCTION | NES=1.36 | NOM p=7.64e-02 | FDR q=2.10e-01 - HALLMARK_BILE_ACID_METABOLISM | NES=1.35 | NOM p=1.07e-01 | FDR q=2.00e-01 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.34 | NOM p=1.07e-01 | FDR q=1.95e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_E2F_TARGETS | NES=-1.83 | NOM p=0.00e+00 | FDR q=2.21e-02 - HALLMARK_MYC_TARGETS_V1 | NES=-1.39 | NOM p=1.60e-02 | FDR q=4.17e-01 - HALLMARK_MYC_TARGETS_V2 | NES=-1.38 | NOM p=9.62e-02 | FDR q=3.14e-01 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.36 | NOM p=1.64e-02 | FDR q=2.51e-01 - HALLMARK_G2M_CHECKPOINT | NES=-1.11 | NOM p=3.05e-01 | FDR q=8.80e-01 - HALLMARK_DNA_REPAIR | NES=-1.10 | NOM p=2.65e-01 | FDR q=7.42e-01 - HALLMARK_UV_RESPONSE_DN | NES=-1.02 | NOM p=4.13e-01 | FDR q=8.99e-01 - HALLMARK_UNFOLDED_PROTEIN_RESPON..."
+      },
+      "reason": "Paper reports immune KEGG/GO enrichment (TAB2); Hallmark GSEA on the full interaction ranking, exploratory and not the paper's topKEGG.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:17"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "the paper's DEG lists at raw P<0.05 are near the number expected by chance on ~3.9k genes (about 5%); none pass FDR",
+          "no voom weights; the paper's pairing handling is unknown",
+          "enrichment here is MSigDB Hallmark GSEA, not the paper's topKEGG on the DEG list"
+        ],
+        "results": {
+          "interaction_paired/grp_time_EX_t1_vs_CON_t0": {
+            "n_deg": 159,
+            "up": 74,
+            "down": 85,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "interaction_unpaired": {
+            "n_deg": 94,
+            "up": 39,
+            "down": 55,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "interaction_paired/grp_time_EX_t1_vs_CON_t0": 161
+        },
+        "comparison": {
+          "interaction_paired/grp_time_EX_t1_vs_CON_t0": {
+            "ours": 159,
+            "paper": 161
+          }
+        },
+        "paper_gene_check": {
+          "interaction_paired/grp_time_EX_t1_vs_CON_t0": {
+            "CD4": {
+              "AveExpr": 0.2406,
+              "log2FoldChange": 0.7249,
+              "padj": 0.9876,
+              "pvalue": 0.1299
+            },
+            "HLA-C": {
+              "AveExpr": 0.1518,
+              "log2FoldChange": 0.542,
+              "padj": 0.9876,
+              "pvalue": 0.1224
+            },
+            "TNFRSF1A": {
+              "AveExpr": 0.2348,
+              "log2FoldChange": 1.4718,
+              "padj": 0.9876,
+              "pvalue": 0.0406
+            },
+            "MYD88": {
+              "AveExpr": -0.0113,
+              "log2FoldChange": 0.6887,
+              "padj": 0.9876,
+              "pvalue": 0.0446
+            },
+            "PTK2B": {
+              "AveExpr": -0.0533,
+              "log2FoldChange": 1.5038,
+              "padj": 0.9876,
+              "pvalue": 0.0089
+            },
+            "CD8B": {
+              "AveExpr": 0.1045,
+              "log2FoldChange": -0.6129,
+              "padj": 0.9876,
+              "pvalue": 0.0633
+            },
+            "CD6": {
+              "AveExpr": 0.144,
+              "log2FoldChange": -0.8189,
+              "padj": 0.9876,
+              "pvalue": 0.0078
+            },
+            "CALR": {
+              "AveExpr": 0.0138,
+              "log2FoldChange": -0.8062,
+              "padj": 0.9876,
+              "pvalue": 0.011
+            },
+            "NFKBIA": {
+              "AveExpr": 0.1965,
+              "log2FoldChange": -0.9826,
+              "padj": 0.9876,
+              "pvalue": 0.0443
+            },
+            "NFYB": {
+              "AveExpr": -0.1009,
+              "log2FoldChange": 0.5957,
+              "padj": 0.9876,
+              "pvalue": 0.0165
+            },
+            "ACTG1": {
+              "AveExpr": 0.2586,
+              "log2FoldChange": 0.844,
+              "padj": 0.9876,
+              "pvalue": 0.0482
+            },
+            "FOS": {
+              "AveExpr": -0.0092,
+              "log2FoldChange": 1.0006,
+              "padj": 0.9876,
+              "pvalue": 0.0274
+            },
+            "RAB7A": {
+              "AveExpr": -0.159,
+              "log2FoldChange": 0.9063,
+              "padj": 0.9876,
+              "pvalue": 0.0142
+            },
+            "TXNL4B": {
+              "AveExpr": -0.0281,
+              "log2FoldChange": 0.823,
+              "padj": 0.9876,
+              "pvalue": 0.0138
+            },
+            "CKS1B": {
+              "AveExpr": -0.0902,
+              "log2FoldChange": -0.7092,
+              "padj": 0.9876,
+              "pvalue": 0.008
+            },
+            "TPP1": {
+              "AveExpr": 0.2212,
+              "log2FoldChange": -0.599,
+              "padj": 0.9876,
+              "pvalue": 0.084
+            },
+            "CCN1": null,
+            "CYR61": null,
+            "EMD": {
+              "AveExpr": 0.1167,
+              "log2FoldChange": -0.973,
+              "padj": 0.9876,
+              "pvalue": 0.0768
+            },
+            "LASP1": {
+              "AveExpr": 0.2956,
+              "log2FoldChange": -1.0911,
+              "padj": 0.9876,
+              "pvalue": 0.0786
+            }
+          }
+        }
+      },
+      "reason": "Same matrix, estimand and threshold as the paper; the declared deviations are the missing voom weights and the explicit within-child pairing.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:43:17"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "2f05896f2f37841d6ebd1f0bdb7192b48eeee809800a1d321b9c239c5f252544",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f4890026d340f6130862e2757c6347ab3f17029bf4f1bf43545e701f09b93b05",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8c4f8d937955d33b5bd90cd4269ab0231affa8588dda7c04384d3d97786275e9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "aa8d841469d3bc304eb120df22b1516895c8a1bab5d4b2bb39b311655cb7ca7a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "109bf706b474148d95b6f1c02815bd9651fbdb5b7342d2fe945997b268692b0d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f2d957ed599e1ceb31b369be0d0d8f4cc66693d5eb0416504a5e52a90a63f63c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\results\\interaction_paired\\followup_t1\\DEG_results_grp_time_EX_t1_vs_CON_t0.csv",
+      "role": "deg_interaction_paired/grp_time_EX_t1_vs_CON_t0",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c569cb87d1d7343654da4d35aa4e23bb83b172b7693306c2f1d48f24befbf9d3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\results\\interaction_unpaired\\DEG_results_EX_vs_CON.csv",
+      "role": "deg_interaction_unpaired",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "632aeeb7bd88c4f667d0a2bb413aaac4dfd667c12761f856cd55e0f8d60162b9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\0efeba509681ac38012819324e7f12d6e307a4fe\\GSE193771_boys\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fc9fe7aeb61338d5e59fa3223504196c1a929646aae3ab6a277189faf29695ce",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

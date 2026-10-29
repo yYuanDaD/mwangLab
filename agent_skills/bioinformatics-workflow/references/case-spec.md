@@ -50,7 +50,7 @@ Every gate has `final` (your decision), `reasoning` (with paper locators), `conf
 
 Derived column names must be formula-safe (`grp`, `time`, `subject`); use them in every formula and argument.
 
-Thresholds: `{"metric": "padj"|"pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false}`. `effect_cutoff: null` means no fold-change rule. The applied rule must equal `paper_threshold` when the source is `paper` or `paper_on_deviation_route`.
+Thresholds: `{"metric": "padj"|"pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false}`. `effect_cutoff: null` means no fold-change rule. `inclusive` covers both cutoffs unless `effect_inclusive` is set ("P < 0.05 and |log2FC| >= 0.5": `inclusive: false, effect_inclusive: true`); an asymmetric rule ("FC > 1.2 or < 0.83") sets `effect_cutoff` for up and `effect_cutoff_down` (a positive magnitude) for down. The applied rule must equal `paper_threshold` when the source is `paper` or `paper_on_deviation_route`.
 
 ## 3. Executions
 

@@ -1,0 +1,358 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID42168599",
+  "subject_id": "GSE282166",
+  "created_at": "2026-10-28T23:40:41",
+  "finished_at": "2026-10-28T23:41:00",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13218937.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13218937.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T23:40:41",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9b4785bf35ffb3a41c67f2c7525339f1b84d01b573e1e7f690e6f22bef9aaa52",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE282166_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE282166\\GSE282166_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:40:41",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c18e97cd979c2484efd4a2bdeac9c72918a9e8bc52a3fa43ccd6158bfd449bbb",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE282166_raw_counts.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE282166\\GSE282166_raw_counts.csv.gz",
+      "locator": null,
+      "captured_at": "2026-10-28T23:40:41",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4b91de9fe5de4646bbf767860a2fc71a3339a5875f776dda6e26613dd384c002",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE282166"
+        ],
+        "assay": "bulk RNA-seq of FACS-sorted spinal cord nuclei (NeuN+ and NeuN- fractions), SMART-Seq HT, STAR + featureCounts (S9.16.p1, S9.18.p1, GEO data_processing)",
+        "sample_inclusion": "EAE mice at peak of disease; AAV8-GFP n=3 vs AAV8-irisin-Flag n=3; NeuN+ and NeuN- nuclei from each animal (FIG4 b,c; FIG10)",
+        "factors": {
+          "treatment": [
+            "AAV8-GFP (control)",
+            "AAV8-irisin-Flag"
+          ],
+          "fraction": [
+            "NeuN+",
+            "NeuN-"
+          ]
+        },
+        "primary_estimand": "Effect of peripheral irisin overexpression (AAV8-irisin-Flag vs AAV8-GFP, injected on the day of EAE induction) on nuclear gene expression within each sorted spinal cord fraction at peak EAE. No exercise (running vs sedentary) arm was sequenced; exercise was studied only by histology/qPCR (FIG1, FIG5) and the running transcriptome comparison uses external snRNA-seq data (Sun et al., CRA007207; S9.19.p1).",
+        "planned_contrasts": [
+          "NeuN+ nuclei: AAV8-irisin vs AAV8-GFP (S5.p1, FIG4b; paper: 1,017 DEGs)",
+          "NeuN- nuclei: AAV8-irisin vs AAV8-GFP (S5.p1, FIG4c; paper: 2 DEGs, Cd83 and Junb down)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": true,
+          "source_locator": "S9.18.p1"
+        },
+        "paper_method": "DESeq2 two-sided Wald test, BH correction, per fraction (S9.18.p1)",
+        "paper_results": {
+          "NeuN+": 1017,
+          "NeuN-": 2,
+          "named_genes_NeuNpos": [
+            "Rbfox3",
+            "Thy1",
+            "Nefl",
+            "Gria2",
+            "Syt7",
+            "Syt11",
+            "Atp5h",
+            "Cox4i1",
+            "Ndufa1"
+          ],
+          "named_genes_NeuNneg": [
+            "Cd83",
+            "Junb"
+          ]
+        }
+      },
+      "reason": "S5.p1 and FIG4 describe the only sequencing experiment in GSE282166: sorted NeuN+/NeuN- nuclei from AAV8-GFP vs AAV8-irisin-Flag EAE mice, n=3 per arm. S9.18.p1 gives DESeq2 Wald + BH, |log2FC| >= 1 ('minimal log2(FC) of |1|') and FDR < 0.05. Exercise vs sedentary mice (FIG1, FIG5b,f) were only assessed by histology, clinical scores and qPCR; S9.19.p1 compares irisin DEGs with a public running snRNA-seq dataset not deposited here. The paper treats irisin as an exercise-induced hormone, but the sequenced estimand is an irisin-overexpression effect.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:40:41"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE282166\\GSE282166_raw_counts.csv.gz",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE282166 as the dataset generated here",
+          "metadata: 12 samples, spinal cord, NeuNneg/NeuNpos x GFP/IRISIN = 6 animals x 2 fractions, matching n=3 per arm in FIG4/FIG10",
+          "treatment_protocol_ch1 matches the AAV8-GFP / AAV8-Irisin-FLAG regimen"
+        ],
+        "accession": "GSE282166",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE282166\\GSE282166_metadata.csv"
+      },
+      "reason": "DA.p1 deposits GSE282166; sample structure (3 GFP + 3 irisin animals, NeuN+/NeuN- each) matches FIG4 b,c and FIG10 legends.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:40:41"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "frac": {
+              "source": "description",
+              "regex": "^\\d+-(Neg|Pos)-(?:GFP|IRISIN)$",
+              "recode": {
+                "Neg": "NeuNneg",
+                "Pos": "NeuNpos"
+              }
+            },
+            "grp": {
+              "source": "description",
+              "regex": "^\\d+-(?:Neg|Pos)-(GFP|IRISIN)$",
+              "recode": {
+                "GFP": "GFP",
+                "IRISIN": "IRISIN"
+              }
+            },
+            "animal": {
+              "source": "description",
+              "regex": "^(\\d+)-"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\design_metadata.csv",
+          "sha256": "42a4d3d5a3216949bb7da57be3cf4333602376a8f71a88f8d9571754b09c5bce",
+          "levels": {
+            "frac": {
+              "NeuNneg": 6,
+              "NeuNpos": 6
+            },
+            "grp": {
+              "GFP": 6,
+              "IRISIN": 6
+            },
+            "animal": {
+              "12059": 2,
+              "12063": 2,
+              "12065": 2,
+              "12073": 2,
+              "12083": 2,
+              "12087": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (e.g. 12059-Neg-GFP) equal the metadata 'description' field for all 12 samples (inspect alignment_keys). Treatment taken from the description rather than characteristics_ch1.2.treatment, which carries a typo level 'IRISN' for one sample. The animal number links the two fractions of the same mouse.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:40:42"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\aligned_matrix.csv",
+          "sha256": "48ffb3a84ff85e7eb379c2c526e9b7339c8282a11eb1767b7348c37f5f39bed1",
+          "n_features": 49315,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 698490.0,
+          "median": 11.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "GSE282166_raw_counts.csv.gz: integer fraction 1.0, 49,315 Ensembl genes; GEO data_processing states featureCounts unique exon-mapped read counts. Matches the paper's DESeq2 input (S9.18.p1). The separate normalized_counts file is non-integer DESeq2-style normalized values and is not used.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:40:42"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\suitability\\suitability.md",
+          "n_comparisons": 2,
+          "n_analyzable": 2
+        }
+      },
+      "reason": "The only identifiable comparison is irisin vs GFP within each nuclear fraction (paper: 1,017 NeuN+ DEGs, 2 NeuN- DEGs). The paper frames irisin as an exercise-induced hormone (ABS.p1, S1.p2) and S5.p3 reports ~10% overlap with running DEGs from an external dataset, but that makes the irisin effect at most a proposed mediator of exercise, not an exercise effect. Treating it as 'exercise' would misstate the estimand, so the case is refused at design rather than relabelled.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast in the sequenced samples: GSE282166 contains only AAV8-irisin-Flag vs AAV8-GFP EAE mice (sorted NeuN+/NeuN- spinal cord nuclei). No running/sedentary animals were sequenced; the paper's exercise-vs-sedentary experiments (FIG1, FIG5) are histology/qPCR only and its running transcriptome comparison uses external data (Sun et al., CRA007207). Irisin overexpression is a hormone-delivery intervention, not exercise, so the requested estimand (how exercise affects gene expression) is not identifiable from these data."
+      },
+      "recorded_at": "2026-10-28T23:41:00"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9c371830b91528675eb1e94ae387f3932a49d1b0dbee031e78fffe7a735c9a88",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8b7dee79b8fa41e827584d2ba46926a619454b419c8cdafe64548dbb686c177d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "48ffb3a84ff85e7eb379c2c526e9b7339c8282a11eb1767b7348c37f5f39bed1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "42a4d3d5a3216949bb7da57be3cf4333602376a8f71a88f8d9571754b09c5bce",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f0c9a1a73077e9f6ad1f454bf9e596f3cdf5ab9c458730461fc12f64cb4331dd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42168599\\GSE282166\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b04fb14f6a23c229f13eb2e35e235d9f6b46ae2e8b11443b50cff464612b442a",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -279,7 +279,7 @@ def _adjustment(value: Any) -> str | None:
 
 
 def _same_threshold(applied: dict, paper: dict) -> bool:
-    keys = ("metric", "cutoff", "effect_metric", "effect_cutoff")
+    keys = ("metric", "cutoff", "effect_metric", "effect_cutoff", "effect_cutoff_down")
     if applied.get("effect_cutoff") is None and paper.get("effect_cutoff") is None:
         keys = ("metric", "cutoff")  # with no effect cutoff, the effect metric's name does not matter
     norm = lambda key, value: _metric(value) if key == "metric" else value  # noqa: E731
