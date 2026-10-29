@@ -98,3 +98,15 @@ case spec 路线（`tools/case_runner.py`）。每篇一个独立子代理，最
 | 14 | 2dc6a81416a9 | GSE195585 | finished | 9 paper contrasts+3 pooled; PLA 1/4/24h DEGs 2101/4869/3185, CP 2117/5675/2628, CPvsPLA 0/0/0; paper gives no DEG counts (KEGG NES only); ANGPT1/TGFB1 ns | 18.7 |
 | 15 | 87d00364413c | GSE244401 | finished | 3/3 exercise contrasts, P<0.01: SCA 1262 vs 524, CON 883 vs 623, interaction 114 vs 160 (exploratory); baseline 795 vs 2264 | 17.3 |
 | 18 | PMID34142717 | GSE178262 | finished | 6/6 contrasts; wheel DA vs CTRL 2257/369 vs paper 2094/368 (FDR<=0.05); 4 treadmill tables 1457/2335/912/2904, paper counts only in Fig5 Venns | 10.6 |
+
+## 211 篇运行：第二批（2026-10-28，第 19–23 号，共 21/211）
+
+这一轮按你的要求只跑 5 篇。5 篇全部跑完、全部 VALID。续跑前又修了 4 处工具（见 `../PATCHES_211.md`）：0 个 DEG 的 ORA 记为 not_run、多组正则键、输入路径、配对子集调用。第 24 号刚开始就停了，下次从它开始。
+
+| 队列号 | 文章 | 系列 | 状态 | 我们 vs 原文 | 用时（分钟） |
+|---|---|---|---|---|---:|
+| 19 | PMID28273480 | GSE97084 | finished | 6/6 paired contrasts + baseline; Old HIIT up 983 vs paper 553 (paper's 6 named MT genes all up); old RT/CT ratio matches; baseline 2063 vs 433 not reproduced | 25.9 |
+| 20 | PMID42310491 | GSE324036 | finished | 4/4 contrasts; DEGs WTex-vs-WTsed 61 vs paper 549, SCAsed-vs-WTsed 202 vs 76/79, SCAex-vs-SCAsed 1 (paper minimal); Calb1/Trpc3 log2FC match paper within 0.01 | 12.7 |
+| 21 | PMID38232699 | GSE214282;GSE236402 | finished | GSE214282 refused (post-CPET only); GSE236402 3 contrasts: dRNA 0 DEGs vs paper GSEA-only; BL 82 vs not stated; PC 16 vs paper 0 (padj<0.05, workflow default) | 20.9 |
+| 22 | 4671b217019c | GSE245594 | finished | 1/1 contrast (SW vs SED, limma on log2 FPKM, transcript level); 8 DE transcripts at padj<0.05 (audit P<0.05 & FC>2: 190); paper gives no count | 4.9 |
+| 23 | 917d28883ad5 | GSE235174 | finished | 3 classes, p<.05&/LFC/>=1, unpaired: mRNA 110 vs 86, lncRNA 573 vs 570, circRNA 18 vs 2064; paired run 89/624/1; 15/16 paper genes pass in the paired run | 16.5 |

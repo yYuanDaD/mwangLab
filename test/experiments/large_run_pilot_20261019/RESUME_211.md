@@ -32,3 +32,5 @@ Resumed 2026-10-28 20:40 at row 19 (owner: "继续"), after patching the ORA sta
 Owner 2026-10-28 20:57: "就跑5篇" — read as: this round runs rows 19–23 only, then stops. Row 24
 (PMID41835150) had just started and was stopped; its partial folder is in
 `runs_claude/_interrupted/` (not committed). Next time start at row 24.
+Rows 19–23 finished 2026-10-28 (21/211 done). Next: row 24. Unpatched 2+-paper candidates now also
+include `covariate_columns` given as a list crashing DESeq2 (`deseq2_tools.py:105`; rows 19, 23).

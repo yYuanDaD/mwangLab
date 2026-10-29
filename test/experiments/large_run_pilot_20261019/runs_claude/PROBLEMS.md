@@ -379,3 +379,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 917d28883ad57a66410a4fc20fd7e6dccd3695c6 (GSE235174)
 
 - case_runner.py:768-771 ORA forced to padj when applied rule is raw p (0 genes in); deseq2_tools.py:160 Cook's fixed, NaN p for ELANE/MPO; :105 list covariate crash Details: `917d28883ad57a66410a4fc20fd7e6dccd3695c6/HANDBACK.md`.
+
+## PMID28273480 (GSE97084)
+
+- case_runner.py:634 complete_pairs positional call crashes (native.py:688 kw-only, patched after row 23); covariate_columns list not rejected (deseq2_tools.py:105) Details: `PMID28273480/HANDBACK.md`.
