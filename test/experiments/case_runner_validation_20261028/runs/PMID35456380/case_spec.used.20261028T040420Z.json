@@ -1,0 +1,335 @@
+{
+ "run_dir": "E:\\agent\\mwangLab_tokens\\test\\experiments\\case_runner_validation_20261028\\runs\\PMID35456380",
+ "decision_maker": "validation: decisions copied from the 2026-10 large run",
+ "request": "Re-run PMID35456380 through tools/case_runner.py with its recorded decisions",
+ "platform": "case_runner_validation",
+ "cases": [
+  {
+   "case_id": "GSE164890",
+   "accession": "GSE164890",
+   "inputs": {
+    "paper": [
+     "E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC9027771.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/data/GSE164890/GSE164890_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/data/GSE164890/GSE164890_rsem.genes.counts.tsv.gz"
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "paper_id": "PMID35456380 / PMC9027771 / doi:10.3390/genes13040574",
+      "accessions": [
+       "GSE164890"
+      ],
+      "other_accessions_in_paper": {
+       "GSE149938": "public scRNA-seq used for cell-type signatures (S2.6.p1), not exercise DE",
+       "8 microarray studies": "sea-level exercise reanalysis (S2.7.p1), not this deposit"
+      },
+      "assay": "bulk RNA-seq, globin-depleted whole blood, stranded polyA, HiSeq 4000 PE150 (S2.3.p1)",
+      "organism": "Homo sapiens",
+      "sample_inclusion": "7 female elite speed skaters, day 18 of altitude camp (1850 m), whole blood before and after an intense 1 h skating bout; 14 samples (S2.1.p1, S2.1.p2, S2.3.p1)",
+      "sample_exclusion": "none reported",
+      "factors": [
+       {
+        "name": "exercise",
+        "levels": [
+         "before",
+         "after"
+        ]
+       },
+       {
+        "name": "donor",
+        "levels": "7 skaters (d1..d7), each sampled before and after"
+       }
+      ],
+      "primary_estimand": "Within-skater change in whole-blood gene expression after vs before an intense 1 h skating bout at altitude (S2.5.p1, FIG1)",
+      "planned_contrasts": [
+       "after vs before exercise, donor-blocked (DESeq2 ~ donor + exercise); 2516 up / 1542 down at 10% FDR (S3.2.p2)"
+      ],
+      "repeated_measure_unit": "donor (skater); paired pre/post (FIG1 'donor + exercise' design; S3.2.p1)",
+      "blocking_or_covariance": {
+       "status": "required",
+       "term": "donor"
+      },
+      "matrix_scale": "RSEM gene-level expected counts (S2.4.p1), rounded with round(x, 0) before DESeq2 (author script line 66)",
+      "normalization": "DESeq2 size factors; rlog + ComBat only for PCA/plots (S2.5.p1)",
+      "paper_method": "DESeq2 v1.18.1 (S2.5.p1)",
+      "paper_formula": "~ donor + exercise, contrast exercise after vs before (FIG1; author script lines 66-69)",
+      "gene_filter": "none before DESeq2 (author script line 66 uses the full table; DESeq2 independent filtering at default alpha 0.1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH (DESeq2 results() default)",
+       "cutoff": 0.1,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": true,
+       "source_locator": "S2.5.p1; FIG1 legend ('reported at 10% FDR'); author script all_analysis_and_figures.R:83-84 (padj <= 0.1)"
+      },
+      "paper_result": {
+       "up": 2516,
+       "down": 1542,
+       "total": 4058,
+       "more_than_twofold": {
+        "up": 104,
+        "down": 58
+       },
+       "locator": "S3.2.p2"
+      },
+      "enrichment_in_paper": "ORA (clusterProfiler) with MSigDB H and CP collections, plus fGSEA (S2.5.p1, S3.3.p1)",
+      "author_code": "https://github.com/apredeus/skater_rnaseq (cited in S2.7.p1 and S10.p1); all_analysis_and_figures.R and data/Conditions.txt saved in author_code/"
+     },
+     "reasoning": "S2.3.p1 and S10.p1 name GSE164890 as the paper's deposit (14 samples, 7 skaters before/after). S2.5.p1 and FIG1 give DESeq2 with a 'donor + exercise' design and 10% FDR; S3.2.p2 gives 2516 up / 1542 down. The authors' script, cited by the paper, confirms round(counts,0), no prefilter, relevel to 'before', results() with default alpha and padj <= 0.1.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.5.p1"
+    },
+    "ownership": {
+     "final": {
+      "accession": "GSE164890",
+      "matrix_file": "GSE164890_rsem.genes.counts.tsv.gz",
+      "metadata_file": "GSE164890_metadata.csv",
+      "owned": true,
+      "checks": {
+       "series_id": [
+        "GSE164890"
+       ],
+       "n_gsm": 14,
+       "time_point_counts": {
+        "before exercise": 7,
+        "after exercise": 7
+       },
+       "titles": "Skater 1..7 x before/after exercise",
+       "paper_design": "7 skaters x before/after = 14 samples (S2.3.p1)",
+       "author_repo_counts_file": "data/rsem.genes.counts.tsv.gz in the authors' repo has the same name stem; column names 1after..7before match Conditions.txt"
+      }
+     },
+     "reasoning": "GSE164890 is cited as the paper's deposit; 14 GSMs = 7 skaters x 2 time points, as in S2.3.p1. Matrix columns (1after..7before) equal the GEO description field and the authors' Conditions.txt sample names.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.3.p1"
+    },
+    "alignment": {
+     "final": {},
+     "reasoning": "Exact match of matrix columns to GEO 'description'. subject = skater number (d1..d7, as in the authors' Conditions.txt); time pre/post from the time point characteristic.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.1.p1",
+     "key_column": "description",
+     "aliases": {
+      "time": "characteristics_ch1.1.time point"
+     },
+     "patterns": {
+      "subject": [
+       "description",
+       "^(\\d)(?:before|after)$"
+      ]
+     },
+     "recode": {
+      "time": {
+       "before exercise": "pre",
+       "after exercise": "post"
+      },
+      "subject": {
+       "1": "d1",
+       "2": "d2",
+       "3": "d3",
+       "4": "d4",
+       "5": "d5",
+       "6": "d6",
+       "7": "d7"
+      }
+     }
+    },
+    "matrix": {
+     "final": {},
+     "reasoning": "Values are non-negative, mostly integer-valued but with fractional RSEM expected counts in ~5.9k genes; library sums 9.7-35 M match the reported 12-41 M reads with 68-83% assigned. These are estimated counts, not TPM (the TPM table is a separate file). The authors' published script rounds them to integers before DESeq2, which documents the rounding recipe.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.4.p1",
+     "matrix_type": "estimated counts (RSEM expected counts)",
+     "recommended_method": "DESeq2 on rounded counts"
+    },
+    "design": {
+     "final": {
+      "analysis_type": "paired (repeated measures, 2 time points)",
+      "design_column": "time",
+      "control": "pre",
+      "treatment": "post",
+      "formula": "~ subject + time",
+      "contrasts": [
+       "time_post_vs_pre"
+      ],
+      "estimand_type": "within-subject effect of the exercise bout",
+      "suitability_matrix_type_note": "suitability run with 'raw counts' route family; the matrix is RSEM estimated counts rounded per the authors' recipe (matrix gate)"
+     },
+     "reasoning": "Seven skaters each sampled before and after the bout. The paper's estimand is the after-vs-before change with donor in the model (FIG1, S3.2.p1). Suitability: analyzable, one comparison time_post_vs_pre with 7 per arm; metadata sex (female, paper) agrees with X/Y expression for all 14 samples.",
+     "confidence": "high",
+     "candidates": [
+      {
+       "value": "~ time (unpaired post vs pre)",
+       "reason_rejected": "ignores the 7 skaters sampled twice; the paper uses 'donor + exercise' (FIG1) and notes a strong donor effect (S3.2.p1)"
+      },
+      {
+       "value": "ComBat-corrected rlog then test",
+       "reason_rejected": "the paper uses ComBat only for PCA/plots (S2.5.p1); testing ComBat output inflates significance"
+      }
+     ],
+     "locator": "FIG1",
+     "factors": [
+      "time"
+     ],
+     "references": {
+      "time": "pre"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "time_post_vs_pre"
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "included (blocking, 7 levels)"
+       },
+       {
+        "name": "sex",
+        "disposition": "excluded: single level (all female)"
+       }
+      ],
+      "pairing": {
+       "subject_column": "subject",
+       "condition_column": "time",
+       "levels": [
+        "pre",
+        "post"
+       ],
+       "n_subjects": 7,
+       "n_complete": 7,
+       "complete_subjects": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "d5",
+        "d6",
+        "d7"
+       ],
+       "incomplete_subjects": [],
+       "duplicated_subjects": [],
+       "repeated_across_levels": true,
+       "complete_and_unique": true
+      }
+     },
+     "reasoning": "All 7 subjects have exactly one pre and one post sample. subject is crossed with time; ~ subject + time is full rank with residual df = 14 - 8 = 6. No batch or other covariate is recorded; sex is constant.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "FIG1"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2, Wald test, refit Cooks)",
+      "matrix_type": "estimated counts (RSEM expected counts)",
+      "formula": "~ subject + time",
+      "contrast": "time post vs pre",
+      "rounding_documented": true,
+      "transform": "round(x, 0), half to even, as in the authors' script (line 66); no gene prefilter beyond dropping all-zero genes",
+      "alpha": 0.1,
+      "paper_route": {
+       "method": "DESeq2 ~ donor + exercise on round(RSEM counts)",
+       "status": "reproduced"
+      }
+     },
+     "reasoning": "Paper and authors' script use DESeq2 on rounded RSEM gene counts with donor + exercise. The executor's alpha is set to the paper's FDR 0.1 so independent filtering matches R's results() default.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.5.p1",
+     "transform": "round"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH (DESeq2 results() default)",
+       "cutoff": 0.1,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": true,
+       "source_locator": "S2.5.p1; FIG1; author script lines 83-84"
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "adjustment": "BH (DESeq2 results() default)",
+       "cutoff": 0.1,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": true,
+       "source_locator": "S2.5.p1; FIG1; author script lines 83-84"
+      }
+     },
+     "reasoning": "Paper: genes retained at FDR < 0.1 (S2.5.p1), 'reported at 10% FDR' (FIG1); the script counts padj <= 0.1 with no fold-change cutoff. Applied exactly.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S2.5.p1"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "note": "DESeq2 ~ subject + time on round(RSEM counts) at padj <= 0.1 as in the paper and the authors' script; pydeseq2 instead of R DESeq2 1.18.1",
+      "n_deg": 4243,
+      "direction": {
+       "up": 2588,
+       "down": 1655,
+       "more_than_twofold_up": 131,
+       "more_than_twofold_down": 93,
+       "n_padj_na": 12583,
+       "n_rows": 28217
+      },
+      "paper_counts": {
+       "up": 2516,
+       "down": 1542,
+       "total": 4058
+      }
+     },
+     "reasoning": "All gates valid; the paper route ran unchanged (7 per arm, residual df 6, so no exploratory label).",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S3.2.p2",
+     "paper_counts": {
+      "time_post_vs_pre": 4058
+     }
+    }
+   },
+   "executions": [
+    {
+     "name": "time_post_vs_pre",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "time",
+      "control_group": "pre",
+      "treatment_group": "post",
+      "covariate_columns": "subject",
+      "alpha": 0.1
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ subject + time on rounded RSEM counts (author script)"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "time_post_vs_pre",
+     "ora": false,
+     "gsea": true,
+     "reasoning": "paper ran GSEA on the DESeq2 ranking"
+    }
+   ]
+  }
+ ]
+}

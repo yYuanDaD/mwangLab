@@ -451,21 +451,26 @@ def sex_split_plan(metadata: pd.DataFrame, factors: Sequence[str], sex_by_sample
 def report(*, case_id: str, matrix_type: str, metadata: pd.DataFrame, factors: Sequence[str],
            matrix_csv: str | Path | None = None, organism: str = "Mouse", subject: str | None = None,
            covariate_candidates: Sequence[str] | None = None, references: dict | None = None,
-           planned: Sequence[str] = (), out_dir: str | Path = ".") -> dict:
+           planned: Sequence[str] = (), strata: Sequence[str] = (), out_dir: str | Path = ".") -> dict:
     """Run every check and write ``suitability.json`` + ``suitability.md`` in ``out_dir``.
 
     verdict: ``analyzable`` (every check passes), ``partially_analyzable`` (some
     comparisons too small, or a sex mismatch to resolve), ``not_analyzable`` (data type,
-    grouping, covariance or sample size fails)."""
+    grouping, covariance or sample size fails). ``strata`` columns (a cell fraction, a
+    tissue) are analyzed separately: comparisons never cross them."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     checks: dict[str, Any] = {"data_type": check_data_type(matrix_type)}
     checks["grouping"] = check_grouping(metadata, factors)
+    absent = [c for c in strata if c not in metadata.columns]
+    if absent:
+        checks["grouping"]["problems"].append(f"strata not in metadata: {absent}")
+        checks["grouping"]["status"] = "fail"
     comps: list[dict] = []
     if checks["grouping"]["status"] == "pass":
         checks["covariance"] = check_covariance(metadata, factors, subject=subject,
                                                 candidates=covariate_candidates)
-        comps = enumerate_comparisons(metadata, factors, references=references)
+        comps = enumerate_comparisons(metadata, factors, references=references, strata=strata)
         checks["sample_size"] = check_sample_size(comps, planned)
     if matrix_csv is not None:
         checks["sex"] = check_sex(matrix_csv, metadata, organism=organism, out_dir=out_dir)

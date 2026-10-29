@@ -1,0 +1,169 @@
+{
+  "run_dir": "test/experiments/case_runner_trial_20261028/PMID42155766",
+  "request": "Analyze GSE304653 for PMID 42155766 (Exercise suppresses breast cancer and reprograms the immune tumor microenvironment, cancer cell intrinsic features, and their interaction): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+  "platform": "claude-code",
+  "cases": [
+    {
+      "case_id": "GSE304653",
+      "accession": "GSE304653",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC13319373.paper.md"],
+        "metadata": "E:/agent/mwangLab_pdf/data/GSE304653/GSE304653_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/data/GSE304653/GSE304653_CounTable.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE304653"],
+            "model": "Met1-iRFP orthotopic breast tumors in female FVB mice; voluntary wheel running vs sedentary (no wheel) from day 3 after implantation (S2.1.2.p1, S2.2.p1)",
+            "assay": "bulk RNA-seq (KAPA stranded mRNA, HiSeq 50bp PE), STAR mm10 + featureCounts gencode vM18 (S2.4.p1)",
+            "fractions": "tumors digested and flow-sorted into iRFP+ cancer cells and iRFP- TME cells from the same tumors (S2.4.p1, S3.p4)",
+            "sample_inclusion": "TME fraction: exercise n=4 vs sedentary n=4 (FIG2 C); cancer-cell fraction: exercise n=7 vs sedentary n=8 (FIG3 B)",
+            "factors": {"treatment": ["Sedentary (control)", "Exercise (voluntary wheel running)"], "cell_fraction": ["cancer cells iRFP+", "TME cells iRFP-"]},
+            "primary_estimand": "Effect of exercise (wheel running vs sedentary) on gene expression, estimated separately within each sorted fraction: (1) TME iRFP- cells, (2) cancer iRFP+ cells",
+            "planned_contrasts": [
+              "TME iRFP-: Exercise vs Sedentary, DESeq2 (S3.p2, FIG2 C; paper: 87 DEGs at padj < 0.1)",
+              "Cancer iRFP+: Exercise vs Sedentary, DESeq2 (S3.p4, FIG3 B; paper: 293 DEGs at padj < 0.1)"
+            ],
+            "repeated_measure_unit": "none within a fraction (one sample per mouse per fraction); the two fractions come from the same tumors but are analyzed separately",
+            "normalization": "DESeq2 size factors (S2.4.p1)",
+            "paper_method": "DESeq2 per fraction, Exercise vs control (S2.4.p1); GSEA on log2FC-ranked genes with mouse Hallmark via genekitr (S2.4.p1); Reactome on up/down DEGs and IPA (S3.p4)",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false, "source_locator": "S3.p2, S3.p4, FIG2, FIG3"},
+            "paper_results": {"TME_EX_vs_SED": 87, "cancer_EX_vs_SED": 293, "named_cancer_genes": "HMGB2 targets up: Iqgap3, Cenpe, Cenpf, Dlgap5, Kif23, Kif2c, Mki67, Ncaph (written 'Nacph'), Top2a, Tpx2, Anln, Hmmr; down: Hist3h2a (written 'Hist3ha'). CTF1 targets: down Etfb, Thrsp, Postn; up Plcb4, Med13, Fasn, Tgm2 (S3.p8, S4.p6)", "TME_hallmark_up": "interferon, IL6-JAK-STAT3, inflammatory response (S3.p2)"}
+          },
+          "reasoning": "Methods S2.4.p1 define the RNA-seq assay, sorting into iRFP+ and iRFP- fractions, featureCounts counts and DESeq2. Results S3.p2 (TME, 87 DEGs, padj < 0.1, n=4 vs 4 per FIG2 C) and S3.p4 (cancer cells, 293 DEGs, padj < 0.1, n=7 vs 8 per FIG3 B) give two separate exercise-vs-control contrasts. No fold-change cutoff is stated. GEO metadata sample counts match the figure legends exactly.",
+          "locator": "S2.4.p1; S3.p2; S3.p4; FIG2; FIG3",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S8.p1 names GSE304653", "23 GEO samples = 15 cancer (8 SED, 7 EX) + 8 TME (4 SED, 4 EX), matching FIG3 B and FIG2 C n", "matrix has 23 columns whose names equal the GEO 'Library name' in description", "GEO data_processing text is identical to S2.4.p1 (STAR AllBestScore, featureCounts, gencode vM18)"]},
+          "reasoning": "The paper's data availability statement S8.p1 deposits RNA-seq under GSE304653; sample counts and processing text match the paper.",
+          "locator": "S8.p1",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "lib",
+          "key_patterns": {"lib": ["description", "^Library name: (\\S+)$"]},
+          "patterns": {
+            "cell": ["title", "^Met1-iRFP (cancer|TME) cells"],
+            "grp": ["title", ", (Sendentary|Exercise), rep\\d+$"]
+          },
+          "combine": {"cgrp": ["cell", "grp"]},
+          "recode": {
+            "cell": {"cancer": "CC", "TME": "TME"},
+            "grp": {"Sendentary": "SED", "Exercise": "EX"},
+            "cgrp": {"cancer_Sendentary": "CCSED", "cancer_Exercise": "CCEX", "TME_Sendentary": "TMESED", "TME_Exercise": "TMEEX"}
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (CN2..SR10) are the GEO library names in the description column ('Library name: CN2'); exact match on the derived lib key. Fraction and treatment come from the title (GEO spells 'Sendentary'), cross-checked against characteristics cell type/treatment. Library prefixes agree: CN/CR = cancer sedentary/runner, SN/SR = stroma (TME) sedentary/runner. cgrp combines fraction and treatment so each fraction's contrast can be named.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "final": {"source": "GSE304653_CounTable.txt.gz (GEO supplementary)", "paper_input": "featureCounts gene counts into DESeq2 (S2.4.p1)"},
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer_fraction 1.0, max 1.9e6, many zeros; GEO data_processing: featureCounts gencode vM18, 'txt file contains raw gene counts for each sample'; paper feeds counts to DESeq2. Feature IDs are gene symbols.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["cgrp"],
+          "references": {"cgrp": "CCSED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["cgrp_CCEX_vs_CCSED", "cgrp_TMEEX_vs_TMESED"],
+          "final": {
+            "analysis_type": "two-group within each fraction (stratified, separate fits)",
+            "design_column": "cgrp",
+            "contrasts": [
+              {"name": "cgrp_CCEX_vs_CCSED", "control": "CCSED", "treatment": "CCEX", "role": "primary", "subset": {"cell": ["CC"]}},
+              {"name": "cgrp_TMEEX_vs_TMESED", "control": "TMESED", "treatment": "TMEEX", "role": "primary", "subset": {"cell": ["TME"]}}
+            ]
+          },
+          "candidates": [
+            {"value": "one joint model over 23 samples with ~ cell + grp + cell:grp", "reason_rejected": "the paper fits each sorted fraction separately (FIG2 C n=4/4, FIG3 B n=7/8); fractions have very different expression profiles and dispersions, and pairing of fractions within mouse would need a mouse block the paper does not use"},
+            {"value": "pooled Exercise vs Sedentary over both fractions", "reason_rejected": "mixes cell populations; not the paper's estimand"},
+            {"value": "cross-fraction comparisons (cancer vs TME)", "reason_rejected": "cell-type differences, not exercise effects"}
+          ],
+          "reasoning": "Paper reports two separate exercise-vs-control analyses, one per sorted fraction (S3.p2, S3.p4). Each is a two-arm comparison of independent mice. All mice are female (S2.1.2.p1); sex check is expected to agree.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "candidates": [
+            {"value": "mouse (group + rep number) as block", "reason_rejected": "within a fraction each mouse contributes one sample, so there is nothing to block; the cancer and TME samples of one mouse are never in the same fit"}
+          ],
+          "reasoning": "Independent animals randomized to wheel or sedentary (S2.1.2.p1); no batch, sequencing lane or sex variation is recorded in GEO, and the paper's DESeq2 uses treatment only.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ cgrp (within each fraction subset; equivalent to ~ treatment)",
+            "paper_route": {"method": "DESeq2 (R/Bioconductor)", "status": "reproduced", "reason": "pydeseq2 implements the same negative-binomial Wald test"},
+            "deviations": ["pydeseq2 port rather than R DESeq2; small numeric differences in dispersion fitting and independent filtering are possible"]
+          },
+          "transform": null,
+          "reasoning": "Raw featureCounts counts support DESeq2, the paper's stated method (S2.4.p1). alpha = 0.1 matches the paper's padj cutoff for independent filtering.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S3.p2 and S3.p4 (and FIG2 C, FIG3 B): 'p_adj < 0.1', no fold-change rule. Audit rule is the workflow default BH padj < 0.05, labelled separately.",
+          "locator": "S3.p2; S3.p4",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": ["pydeseq2 instead of R DESeq2", "GSEA via gseapy prerank (log2FC ranking, MSigDB mouse Hallmark) instead of genekitr", "paper's Reactome ORA and IPA are not reproduced; GO/KEGG ORA on up/down cancer DEGs is exploratory", "TME n=4 vs 4 is small"]
+          },
+          "paper_counts": {"cancer_EX_vs_SED": 293, "TME_EX_vs_SED": 87},
+          "paper_genes": {
+            "cancer_EX_vs_SED": ["Iqgap3", "Cenpe", "Cenpf", "Dlgap5", "Kif23", "Kif2c", "Mki67", "Ncaph", "Top2a", "Tpx2", "Anln", "Hmmr", "Hist3h2a", "Etfb", "Thrsp", "Plcb4", "Med13", "Fasn", "Tgm2", "Postn"]
+          },
+          "reasoning": "Both planned contrasts follow the paper's sample set, method and threshold. Named genes come from the NicheNet target lists of DEGs in cancer cells (S3.p8, S4.p6); the paper names no individual TME DEGs.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "treatment spelling", "paper": "sedentary control", "data": "GEO title spells 'Sendentary'; characteristics say 'Sedentary'", "disposition": "executable_without_change"},
+        {"item": "library kit", "paper": "KAPA Stranded mRNA-Seq (S2.4.p1)", "data": "GEO extract protocol says 'KAPA Standard mRNA-Seq'", "disposition": "executable_without_change"},
+        {"item": "Met1 cohort size", "paper": "growth study n=10 EX / 9 SED (S2.1.2.p1)", "data": "RNA-seq subsets: cancer 7 EX / 8 SED, TME 4 EX / 4 SED, matching FIG2 C and FIG3 B", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "cancer_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "cgrp", "control_group": "CCSED", "treatment_group": "CCEX", "alpha": 0.1},
+          "subset": {"cell": ["CC"]},
+          "role": "primary",
+          "reasoning": "S3.p4 / FIG3 B: cancer-cell (iRFP+) Exercise (n=7) vs Sedentary (n=8), DESeq2, padj < 0.1"
+        },
+        {
+          "name": "TME_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "cgrp", "control_group": "TMESED", "treatment_group": "TMEEX", "alpha": 0.1},
+          "subset": {"cell": ["TME"]},
+          "role": "primary",
+          "reasoning": "S3.p2 / FIG2 C: TME (iRFP-) Exercise (n=4) vs Sedentary (n=4), DESeq2, padj < 0.1"
+        }
+      ],
+      "enrichment": [
+        {"execution": "TME_EX_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "log2FoldChange", "reasoning": "S2.4.p1 / S3.p2: Hallmark GSEA of all genes ranked by log2FC in the TME fraction"},
+        {"execution": "cancer_EX_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "log2FoldChange", "reasoning": "S2.4.p1: Hallmark GSEA of all genes ranked by log2FC (paper shows Hallmark for TME; run for cancer cells too, same method)"},
+        {"execution": "cancer_EX_vs_SED", "ora": true, "gsea": false, "direction": "up", "reasoning": "S3.p4 analyzed up- and down-regulated cancer DEGs separately (Reactome); GO/KEGG ORA here is an exploratory substitute"},
+        {"execution": "cancer_EX_vs_SED", "ora": true, "gsea": false, "direction": "down", "reasoning": "S3.p4: downregulated cancer DEGs enriched for TCA cycle / ETC (Reactome); GO/KEGG ORA here is an exploratory substitute"}
+      ]
+    }
+  ]
+}
