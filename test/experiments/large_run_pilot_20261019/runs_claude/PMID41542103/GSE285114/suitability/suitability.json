@@ -1,0 +1,144 @@
+{
+  "case_id": "GSE285114",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "normalized counts (DESeq2-style size-factor normalized featureCounts)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "normalized counts (DESeq2-style size-factor normalized featureCounts)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "WT": 4,
+          "KO": 4
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 6,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 8 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 5,
+        "male": 3
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41542103\\GSE285114\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [],
+          "male": []
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_KO_vs_WT",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "KO",
+      "reference": "WT",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "KO"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "grp": "WT"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

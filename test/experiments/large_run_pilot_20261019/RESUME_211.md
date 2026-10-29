@@ -40,3 +40,7 @@ Rows 24–28 finished 2026-10-29 (26/211, all VALID).
 
 Owner 2026-10-29 03:35 (via the coordinator, verbatim "先继续用5h额度跑211篇吧"): run continuously, 5 at a
 time, until the 5-hour quota runs out; short report after each batch of 5. Started at row 29.
+
+Quota stop 2026-10-29 ~06:20: rows 35, 46, 49, 50 were cut off mid-run (their subagents were
+resumed with their context after the reset, not restarted). 40/211 recorded at that point.
+Resumed 2026-10-29 14:20 (coordinator nudge after reset).

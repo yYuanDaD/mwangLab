@@ -1,0 +1,1054 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41775886",
+  "subject_id": "GSE297515_EXT",
+  "created_at": "2026-10-29T00:13:35",
+  "finished_at": "2026-10-29T00:13:56",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13007780.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13007780.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-29T00:13:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8efcee4ed35c0854e0e08f71dc7229b7e356efe8bf35a7cd3cbb7607502113ed",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE297515_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE297515\\GSE297515_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-29T00:13:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "22a2d6cdefaac4e67602f85c6500ae4de7d18e232d30f94051564c56e771c39a",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script filter_low_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\prep\\filter_low_counts.py",
+      "locator": null,
+      "captured_at": "2026-10-29T00:13:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "b5df06c94796a3e1ab7f1f6b3026b7c67d9a32671fbcb47e335285d46700d5a0",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE297515_counts_filtered_EXT.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\prep\\GSE297515_counts_filtered_EXT.csv",
+      "locator": null,
+      "captured_at": "2026-10-29T00:13:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dfaab7bf110e1f798b0f7b804348118ed8fa37a50f7f0e7413d616c288e5307b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE297515"
+        ],
+        "primary_estimand": "effect of 2-week voluntary wheel running (EXT), MmSCs sorted 24h after washout, vs sedentary on MmSC gene expression (WT C57BL/6J mice)",
+        "planned_contrasts": [
+          "EXT vs SED, sorted MmSCs, n=3 vs 3 (Fig.1k); no DEG count given; highlighted genes Cxcl5, H19, Bdnf"
+        ],
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false,
+          "effect_inclusive": true,
+          "source_locator": "FIG7 (c,k): Padj < 0.05, |FC| >= 2; S2.1.p2 text: |FC| > 2"
+        },
+        "paper_method": "DESeq2 (median of ratios) + apeglm LFC shrinkage; DEG padj<0.05; volcano highlights |FC|>=2",
+        "factors": {
+          "grp": [
+            "SED",
+            "EXT"
+          ]
+        },
+        "sample_inclusion": "WT mice, sorted MmSCs, n=3 per arm; replicates with r<0.9 removed",
+        "other_sub_series": "CTX injury, Yoda1 culture, Piezo1 cKO, whole muscle, heart, liver: other estimands",
+        "paper_results": {
+          "Fig.1k": "volcano plot; no numeric DEG count in text or legend"
+        }
+      },
+      "reason": "S2.1.p4; FIG7 (k); S4.7.p1: STAR + featureCounts; DESeq2 median-of-ratios; replicates with Pearson r<0.9 removed; genes with <10 reads within any condition removed; DESeq2 + apeglm shrinkage; DEGs = adjusted P<0.05.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:35"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\prep\\GSE297515_counts_filtered_EXT.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE297515",
+          "series contact CBDM, Harvard Medical School (authors' lab)",
+          "sorted MmSC population RNA-seq, mouse, matches S4.7.p1"
+        ],
+        "accession": "GSE297515",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE297515\\GSE297515_metadata.csv"
+      },
+      "reason": "DA.p1 deposits sorted-MmSC transcriptomes in GSE297515; titles matching ^WT\\.(SED|EXT)#\\d$ are the Fig.1k MmSC samples (n=3 per arm, FIG7).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:35"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 90,
+        "n_metadata": 90,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM8993739": "title 'WT_sed#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993740": "title 'WT_sed#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993741": "title 'WT_sed#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993742": "title 'WT_exe#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993743": "title 'WT_exe#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993744": "title 'WT_exe#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993745": "title 'Pdgfra.CRE_Piezo1.WT_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993746": "title 'Pdgfra.CRE_Piezo1.WT_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993747": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993748": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993749": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993750": "title 'Pdgfra.CRE_Piezo1.FL_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993751": "title 'Pdgfra.CRE_Piezo1.FL_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993752": "title 'Pdgfra.CRE_Piezo1.FL_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993753": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993754": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993755": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993756": "title 'Pdgfra.CRE_Piezo1.WT_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993757": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993758": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993759": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993760": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993761": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993762": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993763": "title 'WT.MmSCs.Yoda1.0h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993764": "title 'WT.MmSCs.Yoda1.0h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993765": "title 'WT.MmSCs.Yoda1.0h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993769": "title 'WT.MmSCs.Yoda1.2h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993770": "title 'WT.MmSCs.Yoda1.2h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993780": "title 'Pdgfra.Cre_Piezo1.WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993781": "title 'Pdgfra.Cre_Piezo1.WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993782": "title 'Pdgfra.Cre_Piezo1.WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993783": "title 'Pdgfra.Cre_Piezo1.FL.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993784": "title 'Pdgfra.Cre_Piezo1.FL.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993785": "title 'Pdgfra.Cre_Piezo1.FL.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993786": "title 'Piezo1_WT_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993787": "title 'Piezo1_WT_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993788": "title 'Piezo1_WT_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993789": "title 'Piezo1_WT_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993790": "title 'Piezo1_WT_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993791": "title 'Piezo1_WT_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993792": "title 'Piezo1_WT_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993793": "title 'Piezo1_WT_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993794": "title 'Piezo1_WT_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993795": "title 'Piezo1_WT_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993796": "title 'Piezo1_KO_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993797": "title 'Piezo1_KO_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993798": "title 'Piezo1_KO_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993799": "title 'Piezo1_KO_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993800": "title 'Piezo1_KO_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993801": "title 'Piezo1_KO_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993802": "title 'Piezo1_KO_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993803": "title 'Piezo1_KO_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993804": "title 'Piezo1_KO_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993805": "title 'Piezo1_KO_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993806": "title 'Unstim#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993807": "title 'Unstim#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993808": "title 'Unstim#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993809": "title 'Yoda1_4h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993810": "title 'Yoda1_4h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993811": "title 'Yoda1_4h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993812": "title 'Yoda1_6h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993813": "title 'Yoda1_6h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM8993814": "title 'Yoda1_6h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442138": "title 'Piezo1_WT_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442139": "title 'Piezo1_WT_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442140": "title 'Piezo1_WT_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442141": "title 'Piezo1_FL_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442142": "title 'Piezo1_FL_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442143": "title 'Piezo1_FL_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442144": "title 'Piezo1_WT_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442145": "title 'Piezo1_WT_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442146": "title 'Piezo1_WT_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442147": "title 'Piezo1_WT_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442148": "title 'Piezo1_FL_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442149": "title 'Piezo1_FL_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442150": "title 'Piezo1_FL_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442151": "title 'Piezo1_FL_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442152": "title 'Piezo1_WT_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442153": "title 'Piezo1_WT_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442154": "title 'Piezo1_WT_CTX_d3_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442155": "title 'Piezo1_FL_CTX_d3_Heart#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442156": "title 'Piezo1_FL_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+          "GSM9442157": "title 'Piezo1_FL_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^WT\\.(SED|EXT)#\\d$",
+              "recode": {
+                "SED": "SED",
+                "EXT": "EXT"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\design_metadata.csv",
+          "sha256": "dc89622f2705ea8faebaba8a17b98528648a060a138841d7fe8544c87c89463e",
+          "levels": {
+            "grp": {
+              "EXT": 3,
+              "SED": 3
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal GEO titles (90/90). Keep only the Fig.1k samples; group from title. Replicate Pearson r on log2CPM >= 0.96, so the paper's r<0.9 QC removes none.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:36"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE297515_Genes_count_table.tsv.gz",
+        "paper_input": "featureCounts raw counts (S4.7.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\aligned_matrix.csv",
+          "sha256": "c722966d70b227f651b94c9b5146f56aec8488bebe745f1c5d13a65df194083e",
+          "n_features": 17480,
+          "n_samples": 6,
+          "annotation_columns_dropped": [
+            "GSM8993739",
+            "GSM8993740",
+            "GSM8993741",
+            "GSM8993742",
+            "GSM8993743",
+            "GSM8993744",
+            "GSM8993745",
+            "GSM8993746",
+            "GSM8993747",
+            "GSM8993748",
+            "GSM8993749",
+            "GSM8993750",
+            "GSM8993751",
+            "GSM8993752",
+            "GSM8993753",
+            "GSM8993754",
+            "GSM8993755",
+            "GSM8993756",
+            "GSM8993757",
+            "GSM8993758",
+            "GSM8993759",
+            "GSM8993760",
+            "GSM8993761",
+            "GSM8993762",
+            "GSM8993763",
+            "GSM8993764",
+            "GSM8993765",
+            "GSM8993769",
+            "GSM8993770",
+            "GSM8993780",
+            "GSM8993781",
+            "GSM8993782",
+            "GSM8993783",
+            "GSM8993784",
+            "GSM8993785",
+            "GSM8993786",
+            "GSM8993787",
+            "GSM8993788",
+            "GSM8993789",
+            "GSM8993790",
+            "GSM8993791",
+            "GSM8993792",
+            "GSM8993793",
+            "GSM8993794",
+            "GSM8993795",
+            "GSM8993796",
+            "GSM8993797",
+            "GSM8993798",
+            "GSM8993799",
+            "GSM8993800",
+            "GSM8993801",
+            "GSM8993802",
+            "GSM8993803",
+            "GSM8993804",
+            "GSM8993805",
+            "GSM8993806",
+            "GSM8993807",
+            "GSM8993808",
+            "GSM8993809",
+            "GSM8993810",
+            "GSM8993811",
+            "GSM8993812",
+            "GSM8993813",
+            "GSM8993814",
+            "GSM9442138",
+            "GSM9442139",
+            "GSM9442140",
+            "GSM9442141",
+            "GSM9442142",
+            "GSM9442143",
+            "GSM9442144",
+            "GSM9442145",
+            "GSM9442146",
+            "GSM9442147",
+            "GSM9442148",
+            "GSM9442149",
+            "GSM9442150",
+            "GSM9442151",
+            "GSM9442152",
+            "GSM9442153",
+            "GSM9442154",
+            "GSM9442155",
+            "GSM9442156",
+            "GSM9442157"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 842965.0,
+          "median": 46.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer fraction 1.0, max 3.07e6, median 0; GEO data_processing: featureCounts, 'raw read counts for each Sample'; paper S4.7.p1 runs DESeq2 on featureCounts counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:38"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group",
+        "design_column": "grp",
+        "control": "SED",
+        "treatment": "EXT",
+        "estimand_type": "causal (mice randomly assigned, S4.12.p1)",
+        "contrasts": [
+          {
+            "name": "grp_EXT_vs_SED",
+            "control": "SED",
+            "treatment": "EXT",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Fig.1k: EXT vs SED in independent mice, one factor.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:39"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 6,
+          "n_columns": 2,
+          "columns": [
+            "Intercept",
+            "grp_SED"
+          ],
+          "rank": 2,
+          "full_rank": true,
+          "residual_df": 4,
+          "levels": {
+            "grp": {
+              "EXT": 3,
+              "SED": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "EXT"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "SED"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 6,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 6,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.cell type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.treatment",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "EXT": {
+                "EXT": 3,
+                "SED": 0
+              },
+              "SED": {
+                "EXT": 0,
+                "SED": 3
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 6,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_laboratory",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 6,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.genotype",
+            "n_levels": 0,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.treatment",
+            "n_levels": 0,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.genotype",
+            "n_levels": 0,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Independent animals from one experiment, no pairing; paper fit ~ group.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:39"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, LFC shrinkage)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "DESeq2 + apeglm",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 instead of R DESeq2; pydeseq2 lfc_shrink stands in for apeglm",
+          "paper low-count rule implemented in prep/filter_low_counts.py (keep a gene when any condition sums to >= 10 reads)"
+        ]
+      },
+      "reason": "Raw featureCounts counts support the paper's DESeq2 route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:39"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "deviation_note": "Legends say |FC| >= 2 (applied); S2.1.p2 text says |FC| > 2. Audit: padj<0.05 alone (S4.7.p1 DEG definition)."
+      },
+      "reason": "FIG7 (c,k): DEGs highlighted at Padj<0.05 and |FC|>=2, i.e. |log2FC| >= 1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:39"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_EXT_vs_SED",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 6,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\grp_EXT_vs_SED\\DEG_results_EXT_vs_SED.csv"
+        ],
+        "counts": {
+          "grp_EXT_vs_SED": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 1",
+              "n_tested": 10023,
+              "n_significant": 53,
+              "n_up": 33,
+              "n_down": 20,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 10023,
+              "n_significant": 226,
+              "n_up": 141,
+              "n_down": 85,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Fig.1k two-group DESeq2 as in S4.7.p1",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:52"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_EXT_vs_SED",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\enrichment_grp_EXT_vs_SED\\ora\\DEG_results_EXT_vs_SED_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\enrichment_grp_EXT_vs_SED\\ora\\DEG_results_EXT_vs_SED_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\enrichment_grp_EXT_vs_SED\\ora\\DEG_results_EXT_vs_SED_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\enrichment_grp_EXT_vs_SED\\ora\\DEG_results_EXT_vs_SED_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 53 Mouse genes (direction=all, padj<0.05, |log2FC|>1.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Cellular Response To UV-A (GO:0071492) | padj=4.75e-02 | overlap=2/10 | genes=MMP3;TIMP1 - Chemokine-Mediated Signaling Pathway (GO:0070098) | padj=4.75e-02 | overlap=3/57 | genes=CXCL3;CXCL13;CXCL5 - Cellular Response To Chemokine (GO:1990869) | padj=4.75e-02 | overlap=3/59 | genes=CXCL3;CXCL13;CXCL5 - Response To UV-A (GO:0070141) | padj=4.75e-02 | overlap=2/13 | genes=MMP3;TIMP1 - Cytokine-Mediated Signaling Pathway (GO:0019221) | padj=4.75e-02 | overlap=5/257 | genes=IL1RL1;CXCL3;CXCL13;CXCL5;EREG - Antimicrobial Humoral Immune Response Mediated By Antimicrobial Peptide (GO:0061844) | padj=4.75e-02 | overlap=3/65 | genes=CXCL3;CXCL13;CXCL5 - Negative Regulation Of Signal Transduction (GO:0009968) | padj=4.75e-02 | overlap=5/267 | genes=PTPRE;TCIM;WIF1;BDNF;APCDD1 - Neutrophil Chemotaxis (GO:0030593) | padj=5.08e-02 | overlap=3/70 | genes=CXCL3;CXCL13;CXCL5 - Granulocyte Chemotaxis (GO:0071621) | padj=5.10e-02 | overlap=3/73 | genes=CXCL3;CXCL13;CXCL5 - Neutrophil Migration (GO:1990266) | padj=5.36e-02 | overlap=3/77 | genes=CXCL3;CXCL13;CXCL5 ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - CXCR Chemokine Receptor Binding (GO:0045236) | padj=8.26e-04 | overlap=3/16 | genes=CXCL13;CXCL3;CXCL5 - Receptor Ligand Activity (GO:0048018) | padj=8.69e-04 | overlap=7/319 | genes=BDNF;S100A4;TIMP1..."
+      },
+      "reason": "S2.1.p2 pathway analysis, S4.7.p2 fgsea; kept separate from DE.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:53"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_EXT_vs_SED",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\enrichment_grp_EXT_vs_SED\\gsea\\DEG_results_EXT_vs_SED_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 17480 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 30 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_MYC_TARGETS_V2 | NES=2.49 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.09 | NOM p=0.00e+00 | FDR q=4.38e-04 - HALLMARK_ANGIOGENESIS | NES=1.99 | NOM p=0.00e+00 | FDR q=5.84e-04 - HALLMARK_MYC_TARGETS_V1 | NES=1.91 | NOM p=0.00e+00 | FDR q=6.57e-04 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.86 | NOM p=0.00e+00 | FDR q=7.01e-04 - HALLMARK_COAGULATION | NES=1.77 | NOM p=0.00e+00 | FDR q=2.34e-03 - HALLMARK_HEME_METABOLISM | NES=1.42 | NOM p=1.13e-02 | FDR q=6.71e-02 - HALLMARK_COMPLEMENT | NES=1.35 | NOM p=2.20e-02 | FDR q=1.17e-01 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.31 | NOM p=2.66e-02 | FDR q=1.31e-01 - HALLMARK_P53_PATHWAY | NES=1.31 | NOM p=3.65e-02 | FDR q=1.26e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=-1.63 | NOM p=0.00e+00 | FDR q=7.54e-02 - HALLMARK_UV_RESPONSE_UP | NES=-1.56 | NOM p=3.85e-03 | FDR q=7.54e-02 - HALLMARK_HYPOXIA | NES=-1.55 | NOM p=0.00e+00 | FDR q=5.36e-02 - HALLMARK_TGF_BETA_SIGNALING | NES=-1.48 | NOM p=1.81e-02 | FDR q=9.09e-02 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-1.45 | NOM p=2.59e-02 | FDR q=9.30e-02 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=-1.45 | NOM p=8.30e-03 | FDR q=8.12e-02 - HALLMARK_MYOGENESIS | NES=-1.42 | NOM p=8.28e-03 | FDR q=8.78e-02 - HALLMARK_ESTROGEN_RESPONSE_LATE |..."
+      },
+      "reason": "S2.1.p2 pathway analysis, S4.7.p2 fgsea; kept separate from DE.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:56"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "paper reports no DEG count, only highlighted genes",
+          "FC cutoff applied to shrunken LFC, as in the paper",
+          "all male by Xist/Ddx3y"
+        ],
+        "results": {
+          "grp_EXT_vs_SED": {
+            "n_deg": 53,
+            "up": 33,
+            "down": 20,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 1",
+            "audit_n": 226
+          }
+        },
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {
+          "grp_EXT_vs_SED": {
+            "Cxcl5": {
+              "baseMean": 689.4404,
+              "log2FoldChange": 1.1965,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "H19": {
+              "baseMean": 88.2018,
+              "log2FoldChange": 1.4304,
+              "padj": 0.001,
+              "pvalue": 0.0
+            },
+            "Bdnf": {
+              "baseMean": 50.4535,
+              "log2FoldChange": 1.6295,
+              "padj": 0.0061,
+              "pvalue": 0.0
+            }
+          }
+        }
+      },
+      "reason": "Fig.1k reproduced with the paper's model and threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:13:56"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "beea1e2c0dd0dd0f038071cffe49375eefed539580cd986d7b44b1635132da0f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c635d01c6fd5719b5ecff72cadb86a0d76c4b039a8f71a5445e552d518cd88ce",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c722966d70b227f651b94c9b5146f56aec8488bebe745f1c5d13a65df194083e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dc89622f2705ea8faebaba8a17b98528648a060a138841d7fe8544c87c89463e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b171381843576a9a7d8ddd98f3d43f9e9846ab9eb406afe2d3211409aedea477",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b86d10e4eb79a49a2039d3868b9746968fb76b7eace8efc79a47d774bfa25010",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\results\\grp_EXT_vs_SED\\DEG_results_EXT_vs_SED.csv",
+      "role": "deg_grp_EXT_vs_SED",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f64678fb1b467a9c10cbd70ce38394f83bc1e97282008297afd7d13aea6dd29e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_EXT\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6aa3120489203bb30bffabb3ea2e5fcaf019a65669c3846433d7ebc0aa77255d",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

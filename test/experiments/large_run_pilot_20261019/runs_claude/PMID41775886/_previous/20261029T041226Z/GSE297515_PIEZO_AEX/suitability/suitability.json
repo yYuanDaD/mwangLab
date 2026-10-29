@@ -1,0 +1,270 @@
+{
+  "case_id": "GSE297515_PIEZO_AEX",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "cond",
+    "geno"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "cond",
+        "geno"
+      ],
+      "levels": {
+        "cond": {
+          "SED": 6,
+          "AEX": 6
+        },
+        "geno": {
+          "WT": 6,
+          "FL": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(cond) + C(geno)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "cond_AEX_vs_SED_geno-WT",
+        "cond_AEX_vs_SED_geno-FL"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41775886\\GSE297515_PIEZO_AEX\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "cond_AEX_vs_SED_geno-FL",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "AEX",
+      "reference": "SED",
+      "within": {
+        "geno": "FL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "FL",
+            "cond": "AEX"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "FL",
+            "cond": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_AEX_vs_SED_geno-WT",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "AEX",
+      "reference": "SED",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "AEX"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_FL_vs_WT_cond-AEX",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "FL",
+      "reference": "WT",
+      "within": {
+        "cond": "AEX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "AEX",
+            "geno": "FL"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "cond": "AEX",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_FL_vs_WT_cond-SED",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "FL",
+      "reference": "WT",
+      "within": {
+        "cond": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "SED",
+            "geno": "FL"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "cond": "SED",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_geno_AEX_FL_vs_SED_WT",
+      "kind": "interaction",
+      "factor": "cond:geno",
+      "test": "AEX:FL",
+      "reference": "SED:WT",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cond": "AEX",
+            "geno": "FL"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "cond": "SED",
+            "geno": "FL"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "cond": "AEX",
+            "geno": "WT"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "cond": "SED",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

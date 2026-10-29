@@ -451,3 +451,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## aeab5224f96cfdf3f06293d2da461bca07b26bfc (GSE129962)
 
 - edger_tools.py:107 no filterByExpr (30k-gene BH, ~5min/contrast); edger_tools.py:116 two-arm only, no interaction; ERCC NaN rows needed prep script Details: `aeab5224f96cfdf3f06293d2da461bca07b26bfc/HANDBACK.md`.
+
+## PMID38697122 (GSE242354)
+
+- GEO RSEM files corrupted (NUL bytes, 5 tissues; repaired); native.py:609 no sep sniff; no LRT/IHW executor; exclude_samples needs GSM ids (case_runner.py:505) Details: `PMID38697122/HANDBACK.md`.

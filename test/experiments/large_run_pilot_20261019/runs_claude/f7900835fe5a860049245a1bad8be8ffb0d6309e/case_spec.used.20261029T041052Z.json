@@ -1,0 +1,155 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/f7900835fe5a860049245a1bad8be8ffb0d6309e",
+  "request": "Analyze GSE128078 for the paper (Whole blood human transcriptome and virome analysis of ME/CFS patients experiencing post-exertional malaise following cardiopulmonary exercise testing; PMID 30897114): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE128078",
+      "accession": "GSE128078",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC6428308.paper.md"],
+        "metadata": "GSE128078/GSE128078_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/f7900835fe5a860049245a1bad8be8ffb0d6309e/prep/GSE128078_gene_FPKM.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/f7900835fe5a860049245a1bad8be8ffb0d6309e/prep/collapse_isoforms_to_genes.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE128078"],
+            "assay": "whole-blood total RNA-seq (Nugen Ovation rRNA/globin-depleted), HiSeq 2500 PE100 (S2.5.p1)",
+            "cohort": "14 female ME/CFS patients and 11 matched sedentary female controls; CPET on day 1 and day 2; blood drawn before each CPET (day 1, day 2) and at home on day 3 and day 7 (S2.4.p1, S2.5.p1, S3.1.p1)",
+            "factors": {"disease": ["ME/CFS", "Control"], "day": ["1 (pre-CPET1 baseline)", "2 (24 h after CPET1, pre-CPET2)", "3 (~24 h after CPET2)", "7 (recovery)"], "subject": "repeated-measure unit (4 samples per subject)"},
+            "inclusion": "100 libraries; the day 3 and day 7 samples of one subject removed for <40% genes detected (S3.3.p1, SUP1 Fig A)",
+            "primary_estimand": "Within-subject change in whole-blood gene expression after CPET (day 2, 3, 7 vs day 1) separately in ME/CFS and in controls (TAB3 lower block, S3.3.p2); secondary: ME/CFS-vs-control difference in the pre-to-post change (S3.3.p2)",
+            "planned_contrasts": [
+              "Day 1 vs Day 2 within CFS (TAB3; paper: 0 DEGs)",
+              "Day 1 vs Day 2 within HC (TAB3; paper: 0 DEGs)",
+              "Day 1 vs Day 3 within CFS (TAB3; paper: 0 DEGs)",
+              "Day 1 vs Day 3 within HC (TAB3; paper: 0 DEGs)",
+              "Day 1 vs Day 7 within CFS (TAB3; paper: 0 DEGs)",
+              "Day 1 vs Day 7 within HC (TAB3; paper: 0 DEGs)",
+              "pre (day 1,2) vs post (day 3,7) change in ME/CFS compared to controls, overall and per time point (S3.3.p2; paper: 0 DEGs)"
+            ],
+            "not_exercise_contrasts": "ME/CFS vs controls per day and pooled, and low-VO2 / test-retest subsets vs regular (TAB3 upper block) are disease/phenotype comparisons, not exercise effects; the subset labels are not in GEO",
+            "paper_method": "Partek Flow 5.0 gene-level FPKM (STAR/Cufflinks, hg38, RefSeq) with the Partek multimodel (GSA: normal, lognormal, lognormal-shrinkage, NB, Poisson chosen per gene by AICc) (S2.5.1.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": "fold change", "effect_cutoff": 1.5, "also": "p < 0.05", "literal_text": "fold change > +/-1.5, p-value < 0.05, and FDR < 0.1%", "interpretation": "FDR < 0.1 (10%); Table 4 lists DEGs with FDR 0.06-0.10, which a literal 0.1% (0.001) rule would exclude", "source_locator": "S2.5.1.p1"},
+            "paper_results": "No DEGs in any day-vs-day comparison in either group and none for the pre/post change in ME/CFS vs controls (S3.3.p2, TAB3, ABS.p1)"
+          },
+          "reasoning": "Methods S2.4/S2.5 define the longitudinal CPET design; TAB3 lower block lists the six within-group day comparisons (all 0 DEGs); S3.3.p2 also names the pre-vs-post change in ME/CFS compared with controls (0 DEGs). Threshold text in S2.5.1.p1 says 'FDR < 0.1%', contradicted by TAB4 FDR values up to 0.10, so FDR < 0.1 is taken as the paper's effective rule and the literal 0.001 is kept as an audit rule.",
+          "confidence": "high",
+          "locator": "S2.5.p1; S2.5.1.p1; S3.3.p2; TAB3"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["FN.p1 names GSE128078 / PRJNA526259", "GEO samples are whole blood, treatment 'Cardiopulmonary exercise', disease ME/CFS (55) vs Control (44), day 1/2/3/7, 25 individuals (14 ME/CFS G*/P*, 11 control K*/T*), matching S3.1.p1", "processed file FES_isoforms_FPKM.txt is the only matrix (FPKM, as FN.p1 states)"]},
+          "reasoning": "Data availability FN.p1 deposits FPKM values under GSE128078; the 25 subjects x 4 days match the paper's design.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"subject": "characteristics_ch1.4.individual identifier", "grp": "characteristics_ch1.1.disease state"},
+          "patterns": {"time": ["title", "^Sample_[A-Z]+\\d+-(\\d)$"]},
+          "recode": {"grp": {"ME/CFS": "ME", "Control": "HC"}, "time": {"1": "d1", "2": "d2", "3": "d3", "7": "d7"}},
+          "exclude_samples": {
+            "GSM3664608": "Sample_P14-3: 16% of transcripts with FPKM > 0.1 (cohort median 40%); paper S3.3.p1 removes the day 3 and day 7 samples of one subject with <40% genes detected",
+            "GSM3664609": "Sample_P14-7: 6% of transcripts with FPKM > 0.1; the second low-coverage sample removed by the paper (S3.3.p1)"
+          },
+          "reasoning": "Matrix columns equal metadata 'title' for 99/99 samples (exact). Subject from 'individual identifier', disease from 'disease state', day from the title suffix (identical to 'timepoint (day)'). Subject P14 days 3 and 7 are the clear low-detection outliers (next lowest 29%), matching the paper's exclusion of one subject's day 3/7 samples. G12 day 7 was not deposited (99 of 100 libraries), so 97 samples are analysed (paper: 98).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM (Cufflinks; gene-level sum of RefSeq isoform FPKM)",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "reasoning": "Deposited file is Cufflinks isoform FPKM (data_processing: 'FPKM were calculated using cufflinks 2'; FN.p1 'FPKM values'); values are non-integer with tiny fractional values (e.g. 0.000256) and 39% integer only because of zeros. Isoforms (unversioned NM_/NR_) were summed per HGNC symbol (Cufflinks gene FPKM definition; MyGene.info mapping, 40184/43497 transcripts mapped, 21507 non-zero genes) by the listed prep script, because the paper analysed and reports gene symbols. The paper's input was FPKM too (S2.5.1.p1), so the matrix type agrees; FPKM is not count data, so DESeq2/edgeR are excluded.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "estimated counts", "reason_rejected": "cufflinks FPKM by data_processing and FN.p1; sub-unit fractional values"},
+            {"value": "isoform-level analysis", "reason_rejected": "paper reports gene-level DEGs; isoform IDs cannot be compared to the paper or used for gene sets"}
+          ]
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "d1"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["grp"],
+          "planned": ["time_d2_vs_d1_grp-ME", "time_d3_vs_d1_grp-ME", "time_d7_vs_d1_grp-ME", "time_d2_vs_d1_grp-HC", "time_d3_vs_d1_grp-HC", "time_d7_vs_d1_grp-HC"],
+          "final": {
+            "analysis_type": "repeated-measures time series, analysed within each disease group (stratum grp), subject blocked; plus a between-group paired-change model for the disease x time interaction",
+            "formula": "~ 0 + C(time) + C(subject) within each grp stratum",
+            "contrasts": [
+              {"name": "time_d2_vs_d1_grp-ME", "control": "d1", "treatment": "d2", "role": "primary"},
+              {"name": "time_d3_vs_d1_grp-ME", "control": "d1", "treatment": "d3", "role": "primary"},
+              {"name": "time_d7_vs_d1_grp-ME", "control": "d1", "treatment": "d7", "role": "primary"},
+              {"name": "time_d2_vs_d1_grp-HC", "control": "d1", "treatment": "d2", "role": "primary"},
+              {"name": "time_d3_vs_d1_grp-HC", "control": "d1", "treatment": "d3", "role": "primary"},
+              {"name": "time_d7_vs_d1_grp-HC", "control": "d1", "treatment": "d7", "role": "primary"},
+              {"name": "post_vs_pre (mean d3,d7 minus mean d1,d2) per group", "role": "secondary"},
+              {"name": "ME_vs_HC change from d1 at d2/d3/d7 (interaction)", "role": "secondary"}
+            ]
+          },
+          "reasoning": "TAB3 compares days within each disease group (CFS, HC) and S3.3.p2 also asks whether the pre/post change differs between ME/CFS and controls. Day 1 is the only sample before any exercise (S2.5.p1: blood drawn before each CPET), so it is the reference. Subject is the repeated-measure unit. Disease is between-subject and nested with subject, so a single model with subject fixed effects and disease x time cells would be rank deficient; within-group fits (grp as stratum) give the paper's TAB3 contrasts, and the interaction is estimated on per-subject changes from day 1 (paired_change). ME/CFS-vs-control per-day contrasts and VO2/test-retest subsets are not exercise effects (subset labels are not in GEO) and are not run. Cohort is all female (S2.1.p1).",
+          "confidence": "high",
+          "candidates": [
+            {"value": "pooled ME+HC time effect", "reason_rejected": "paper analyses each group separately (TAB3) and the groups may respond differently (PEM)"},
+            {"value": "~ grp * time without subject", "reason_rejected": "ignores the repeated-measure unit"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking (fixed effect) in within-group time models; differenced out in the paired-change interaction model"}]},
+          "confounding_candidates": ["subject"],
+          "reasoning": "Four samples per subject (S2.5.p1); subject is the blocking unit. Library-prep batch is not recorded in GEO; the paper reports no batch effect by PCA (S2.5.p1, SUP1 Fig B) and randomized processing (S3.3.p1), so no batch covariate. Age/BMI matched by design (S3.1.p2); sex constant (female).",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend style moderated t on log2(FPKM+1), subject fixed effect)",
+            "formula": "~ 0 + C(time) + C(subject) per grp stratum; paired change ~ C(grp) on log2 differences from day 1",
+            "paper_route": {"method": "Partek Flow GSA multimodel (per-gene best of normal/lognormal/lognormal-shrinkage/NB/Poisson by AICc)", "status": "blocked", "reason": "proprietary Partek GSA is not available in this environment and there is no open re-implementation; the deposited data are FPKM (no counts), so NB/Poisson fits are not possible either"},
+            "deviations": ["limma on log2(FPKM+1) instead of Partek GSA multimodel", "gene FPKM built by summing deposited hg19/TopHat isoform FPKM (GEO data_processing) whereas the paper text describes hg38/STAR (S2.5.1.p1)", "97 samples instead of 98 (G12 day 7 not deposited)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "FPKM is a linear normalized scale; limma on log2(FPKM+1) is the validated route for FPKM in the matrix-method policy. Subject is a fixed blocking effect.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.001, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "deviation_note": "S2.5.1.p1 says 'fold change > +/-1.5, p < 0.05, FDR < 0.1%'. TAB4 lists DEGs with FDR 0.02-0.10, so the effective rule is FDR < 0.1; applied as BH padj < 0.1 and |log2FC| > log2(1.5) = 0.5849625. The raw p < 0.05 clause is implied in practice (padj >= p) and not applied separately. Audit rule = the literal 'FDR < 0.1%' (padj < 0.001) with the same fold change."
+          },
+          "reasoning": "Paper threshold kept on the limma deviation route; literal reading kept as audit.",
+          "confidence": "medium",
+          "locator": "S2.5.1.p1; TAB4"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["Partek GSA multimodel not reproducible; limma on log2(FPKM+1) instead", "paper FDR text '0.1%' interpreted as 0.1 from TAB4", "G12 day 7 missing from GEO; P14 day 3/7 excluded as in paper", "paper reports 0 DEGs for every exercise contrast; non-zero counts here would be a disagreement, not a success"]},
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Method deviates from the paper (Partek GSA); contrasts, samples, and threshold follow the paper."
+        }
+      },
+      "discrepancies": [
+        {"item": "FDR threshold", "paper": "text: FDR < 0.1% (S2.5.1.p1)", "data": "TAB4 lists DEGs with FDR up to 0.10", "disposition": "executable_without_change"},
+        {"item": "alignment pipeline", "paper": "STAR v2.4.1 + Cufflinks, hg38 (S2.5.1.p1)", "data": "GEO data_processing: TopHat2/Bowtie2 + cufflinks, hg19 RefSeq", "disposition": "executable_without_change"},
+        {"item": "sample count", "paper": "100 libraries, 2 removed -> 98 (S2.5.p1, S3.3.p1)", "data": "99 deposited (G12 day 7 absent); P14 day 3/7 excluded -> 97", "disposition": "executable_without_change"},
+        {"item": "feature level", "paper": "gene-level (gene symbols in TAB4)", "data": "isoform FPKM keyed by RefSeq transcript IDs; summed to gene symbols by prep script", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "time_ME", "tool": "tools.joint_contrasts:run_joint_limma", "args": {"comparisons": "all", "covariates": ["subject"]}, "subset": {"grp": ["ME"]}, "role": "primary", "reasoning": "TAB3 day comparisons within ME/CFS from one model on all ME/CFS samples, subject blocked; d2/d3/d7 vs d1 are planned, other day pairs exploratory"},
+        {"name": "time_HC", "tool": "tools.joint_contrasts:run_joint_limma", "args": {"comparisons": "all", "covariates": ["subject"]}, "subset": {"grp": ["HC"]}, "role": "primary", "reasoning": "TAB3 day comparisons within controls, subject blocked"},
+        {"name": "postpre_ME", "tool": "tools.multigroup_tools:run_multigroup_analysis", "subset": {"grp": ["ME"]}, "role": "secondary", "reasoning": "S3.3.p2 overall pre (d1,d2) vs post (d3,d7) within ME/CFS, subject blocked",
+         "args": {"plan": {"analysis_type": "multilevel", "formula": "~ 0 + C(time) + C(subject)", "contrasts": [{"name": "post_vs_pre", "coefficients": {"C(time)[d3]": 0.5, "C(time)[d7]": 0.5, "C(time)[d1]": -0.5, "C(time)[d2]": -0.5}}]}}},
+        {"name": "postpre_HC", "tool": "tools.multigroup_tools:run_multigroup_analysis", "subset": {"grp": ["HC"]}, "role": "secondary", "reasoning": "S3.3.p2 overall pre vs post within controls, subject blocked",
+         "args": {"plan": {"analysis_type": "multilevel", "formula": "~ 0 + C(time) + C(subject)", "contrasts": [{"name": "post_vs_pre", "coefficients": {"C(time)[d3]": 0.5, "C(time)[d7]": 0.5, "C(time)[d1]": -0.5, "C(time)[d2]": -0.5}}]}}},
+        {"name": "change_ME_vs_HC", "tool": "tools.multigroup_tools:run_multigroup_analysis", "role": "secondary", "reasoning": "S3.3.p2: change after exercise in ME/CFS compared with controls at each time point; per-subject log2 change from day 1, ~ C(grp)",
+         "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time", "baseline_level": "d1", "followup_levels": ["d2", "d3", "d7"], "group_column": "grp", "formula": "~ C(grp)", "contrasts": [{"name": "ME_vs_HC", "coefficients": {"C(grp)[T.ME]": 1}}]}}}
+      ],
+      "enrichment": []
+    }
+  ]
+}

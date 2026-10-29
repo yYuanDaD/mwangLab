@@ -1,0 +1,1091 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886",
+ "request": "Analyze GSE297515 for PMID 41775886 (Piezo1-dependent activation of stromal cells ignites muscle inflammation in exercise and injury and is associated with inflammaging.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE297515_AEX",
+   "accession": "GSE297515",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13007780.paper.md"
+    ],
+    "metadata": "GSE297515/GSE297515_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/GSE297515_counts_filtered_AEX.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/filter_low_counts.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE297515"
+      ],
+      "primary_estimand": "effect of a 90-min treadmill bout (AEX), MmSCs sorted from pooled hindlimb muscle 1 day later, vs sedentary on MmSC gene expression (WT C57BL/6J mice)",
+      "planned_contrasts": [
+       "AEX vs SED, sorted MmSCs, n=3 vs 3 (Fig.1c); no DEG count given; highlighted genes Tnc, Ccn4, Postn, Timp1, F2rl1, Ccl2, Ccl7"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true,
+       "source_locator": "FIG7 (c,k): Padj < 0.05, |FC| >= 2; S2.1.p2 text: |FC| > 2"
+      },
+      "paper_method": "DESeq2 (median of ratios) + apeglm LFC shrinkage; DEG padj<0.05; volcano highlights |FC|>=2",
+      "factors": {
+       "grp": [
+        "SED",
+        "AEX"
+       ]
+      },
+      "sample_inclusion": "WT mice, sorted MmSCs, n=3 per arm; replicates with r<0.9 removed",
+      "other_sub_series": "CTX injury, Yoda1 culture, Piezo1 cKO, whole muscle, heart, liver: other estimands",
+      "paper_results": {
+       "Fig.1c": "volcano plot; no numeric DEG count in text or legend"
+      }
+     },
+     "reasoning": "S2.1.p2; FIG7 (c); S4.7.p1: STAR + featureCounts; DESeq2 median-of-ratios; replicates with Pearson r<0.9 removed; genes with <10 reads within any condition removed; DESeq2 + apeglm shrinkage; DEGs = adjusted P<0.05.",
+     "confidence": "high",
+     "locator": "S2.1.p2; FIG7 (c)"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 names GSE297515",
+       "series contact CBDM, Harvard Medical School (authors' lab)",
+       "sorted MmSC population RNA-seq, mouse, matches S4.7.p1"
+      ]
+     },
+     "reasoning": "DA.p1 deposits sorted-MmSC transcriptomes in GSE297515; titles matching ^WT_(sed|exe)#\\d$ are the Fig.1c MmSC samples (n=3 per arm, FIG7).",
+     "confidence": "high",
+     "locator": "DA.p1"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE297515_Genes_count_table.tsv.gz",
+      "paper_input": "featureCounts raw counts (S4.7.p1)"
+     },
+     "reasoning": "integer fraction 1.0, max 3.07e6, median 0; GEO data_processing: featureCounts, 'raw read counts for each Sample'; paper S4.7.p1 runs DESeq2 on featureCounts counts.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "patterns": {
+      "grp": [
+       "title",
+       "^WT_(sed|exe)#\\d$"
+      ],
+      "sex": [
+       "title",
+       "^(WT_(?:sed|exe)#\\d)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "sed": "SED",
+       "exe": "AEX"
+      },
+      "sex": {
+       "WT_sed#1": "F",
+       "WT_sed#2": "F",
+       "WT_sed#3": "M",
+       "WT_exe#1": "F",
+       "WT_exe#2": "F",
+       "WT_exe#3": "M"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {
+      "GSM8993745": "title 'Pdgfra.CRE_Piezo1.WT_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993746": "title 'Pdgfra.CRE_Piezo1.WT_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993747": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993748": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993749": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993750": "title 'Pdgfra.CRE_Piezo1.FL_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993751": "title 'Pdgfra.CRE_Piezo1.FL_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993752": "title 'Pdgfra.CRE_Piezo1.FL_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993753": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993754": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993755": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993756": "title 'Pdgfra.CRE_Piezo1.WT_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993757": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993758": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993759": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993760": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993761": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993762": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993763": "title 'WT.MmSCs.Yoda1.0h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993764": "title 'WT.MmSCs.Yoda1.0h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993765": "title 'WT.MmSCs.Yoda1.0h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993769": "title 'WT.MmSCs.Yoda1.2h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993770": "title 'WT.MmSCs.Yoda1.2h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993774": "title 'WT.EXT#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993775": "title 'WT.EXT#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993776": "title 'WT.EXT#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993777": "title 'WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993778": "title 'WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993779": "title 'WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993780": "title 'Pdgfra.Cre_Piezo1.WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993781": "title 'Pdgfra.Cre_Piezo1.WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993782": "title 'Pdgfra.Cre_Piezo1.WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993783": "title 'Pdgfra.Cre_Piezo1.FL.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993784": "title 'Pdgfra.Cre_Piezo1.FL.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993785": "title 'Pdgfra.Cre_Piezo1.FL.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993786": "title 'Piezo1_WT_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993787": "title 'Piezo1_WT_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993788": "title 'Piezo1_WT_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993789": "title 'Piezo1_WT_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993790": "title 'Piezo1_WT_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993791": "title 'Piezo1_WT_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993792": "title 'Piezo1_WT_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993793": "title 'Piezo1_WT_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993794": "title 'Piezo1_WT_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993795": "title 'Piezo1_WT_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993796": "title 'Piezo1_KO_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993797": "title 'Piezo1_KO_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993798": "title 'Piezo1_KO_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993799": "title 'Piezo1_KO_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993800": "title 'Piezo1_KO_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993801": "title 'Piezo1_KO_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993802": "title 'Piezo1_KO_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993803": "title 'Piezo1_KO_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993804": "title 'Piezo1_KO_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993805": "title 'Piezo1_KO_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993806": "title 'Unstim#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993807": "title 'Unstim#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993808": "title 'Unstim#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993809": "title 'Yoda1_4h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993810": "title 'Yoda1_4h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993811": "title 'Yoda1_4h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993812": "title 'Yoda1_6h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993813": "title 'Yoda1_6h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993814": "title 'Yoda1_6h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442138": "title 'Piezo1_WT_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442139": "title 'Piezo1_WT_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442140": "title 'Piezo1_WT_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442141": "title 'Piezo1_FL_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442142": "title 'Piezo1_FL_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442143": "title 'Piezo1_FL_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442144": "title 'Piezo1_WT_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442145": "title 'Piezo1_WT_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442146": "title 'Piezo1_WT_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442147": "title 'Piezo1_WT_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442148": "title 'Piezo1_FL_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442149": "title 'Piezo1_FL_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442150": "title 'Piezo1_FL_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442151": "title 'Piezo1_FL_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442152": "title 'Piezo1_WT_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442153": "title 'Piezo1_WT_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442154": "title 'Piezo1_WT_CTX_d3_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442155": "title 'Piezo1_FL_CTX_d3_Heart#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442156": "title 'Piezo1_FL_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442157": "title 'Piezo1_FL_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)"
+     },
+     "reasoning": "Matrix columns equal GEO titles (90/90). Keep only the Fig.1c samples; group from title. Replicate Pearson r on log2CPM >= 0.96, so the paper's r<0.9 QC removes none. sex is not in GEO metadata; it is recoded per title from the suitability X/Y check (Xist vs Ddx3y/Y genes, all high confidence: #1,#2 female, #3 male in both arms).",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_AEX_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "AEX",
+      "estimand_type": "causal (mice randomly assigned, S4.12.p1)",
+      "contrasts": [
+       {
+        "name": "grp_AEX_vs_SED",
+        "control": "SED",
+        "treatment": "AEX",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Fig.1c: AEX vs SED in independent mice, one factor.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "sensitivity only: balanced 2F/1M per arm, not confounded; paper did not adjust"
+       }
+      ]
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent animals from one experiment, no pairing; paper fit ~ group. Inferred sex balanced across arms; primary keeps the paper model, a ~ sex + grp fit runs as sensitivity.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, LFC shrinkage)",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2 + apeglm",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2; pydeseq2 lfc_shrink stands in for apeglm",
+       "paper low-count rule implemented in prep/filter_low_counts.py (keep a gene when any condition sums to >= 10 reads)"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw featureCounts counts support the paper's DESeq2 route.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "Legends say |FC| >= 2 (applied); S2.1.p2 text says |FC| > 2. Audit: padj<0.05 alone (S4.7.p1 DEG definition)."
+     },
+     "reasoning": "FIG7 (c,k): DEGs highlighted at Padj<0.05 and |FC|>=2, i.e. |log2FC| >= 1.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "paper reports no DEG count, only highlighted genes",
+       "FC cutoff applied to shrunken LFC, as in the paper",
+       "mixed sex (2F/1M per arm by Xist/Ddx3y), balanced; paper did not adjust"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "grp_AEX_vs_SED": [
+       "Tnc",
+       "Ccn4",
+       "Postn",
+       "Timp1",
+       "F2rl1",
+       "Ccl2",
+       "Ccl7"
+      ]
+     },
+     "reasoning": "Fig.1c reproduced with the paper's model and threshold."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "fold-change cutoff wording",
+     "paper": "FIG7 legend |FC| >= 2; S2.1.p2 |FC| > 2",
+     "data": "not applicable",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_AEX_vs_SED",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "AEX",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "Fig.1c two-group DESeq2 as in S4.7.p1"
+    },
+    {
+     "name": "grp_AEX_vs_SED_sexadj",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "AEX",
+      "covariate_columns": "sex",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "Mixed sex (2F/1M per arm): additive sex term as sensitivity."
+    },
+    {
+     "name": "grp_AEX_vs_SED_female",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "subset": {
+      "sex": [
+       "F"
+      ]
+     },
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "AEX",
+      "alpha": 0.05
+     },
+     "role": "exploratory",
+     "reasoning": "Per-sex split (suitability split plan); females 2 vs 2, exploratory small n. Males 1 vs 1 have no residual df and are not run."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "grp_AEX_vs_SED",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "S2.1.p2 pathway analysis, S4.7.p2 fgsea; kept separate from DE."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE297515_EXT",
+   "accession": "GSE297515",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13007780.paper.md"
+    ],
+    "metadata": "GSE297515/GSE297515_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/GSE297515_counts_filtered_EXT.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/filter_low_counts.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE297515"
+      ],
+      "primary_estimand": "effect of 2-week voluntary wheel running (EXT), MmSCs sorted 24h after washout, vs sedentary on MmSC gene expression (WT C57BL/6J mice)",
+      "planned_contrasts": [
+       "EXT vs SED, sorted MmSCs, n=3 vs 3 (Fig.1k); no DEG count given; highlighted genes Cxcl5, H19, Bdnf"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true,
+       "source_locator": "FIG7 (c,k): Padj < 0.05, |FC| >= 2; S2.1.p2 text: |FC| > 2"
+      },
+      "paper_method": "DESeq2 (median of ratios) + apeglm LFC shrinkage; DEG padj<0.05; volcano highlights |FC|>=2",
+      "factors": {
+       "grp": [
+        "SED",
+        "EXT"
+       ]
+      },
+      "sample_inclusion": "WT mice, sorted MmSCs, n=3 per arm; replicates with r<0.9 removed",
+      "other_sub_series": "CTX injury, Yoda1 culture, Piezo1 cKO, whole muscle, heart, liver: other estimands",
+      "paper_results": {
+       "Fig.1k": "volcano plot; no numeric DEG count in text or legend"
+      }
+     },
+     "reasoning": "S2.1.p4; FIG7 (k); S4.7.p1: STAR + featureCounts; DESeq2 median-of-ratios; replicates with Pearson r<0.9 removed; genes with <10 reads within any condition removed; DESeq2 + apeglm shrinkage; DEGs = adjusted P<0.05.",
+     "confidence": "high",
+     "locator": "S2.1.p4; FIG7 (k)"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 names GSE297515",
+       "series contact CBDM, Harvard Medical School (authors' lab)",
+       "sorted MmSC population RNA-seq, mouse, matches S4.7.p1"
+      ]
+     },
+     "reasoning": "DA.p1 deposits sorted-MmSC transcriptomes in GSE297515; titles matching ^WT\\.(SED|EXT)#\\d$ are the Fig.1k MmSC samples (n=3 per arm, FIG7).",
+     "confidence": "high",
+     "locator": "DA.p1"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE297515_Genes_count_table.tsv.gz",
+      "paper_input": "featureCounts raw counts (S4.7.p1)"
+     },
+     "reasoning": "integer fraction 1.0, max 3.07e6, median 0; GEO data_processing: featureCounts, 'raw read counts for each Sample'; paper S4.7.p1 runs DESeq2 on featureCounts counts.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "patterns": {
+      "grp": [
+       "title",
+       "^WT\\.(SED|EXT)#\\d$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "SED": "SED",
+       "EXT": "EXT"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {
+      "GSM8993739": "title 'WT_sed#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993740": "title 'WT_sed#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993741": "title 'WT_sed#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993742": "title 'WT_exe#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993743": "title 'WT_exe#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993744": "title 'WT_exe#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993745": "title 'Pdgfra.CRE_Piezo1.WT_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993746": "title 'Pdgfra.CRE_Piezo1.WT_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993747": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993748": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993749": "title 'Pdgfra.CRE_Piezo1.WT_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993750": "title 'Pdgfra.CRE_Piezo1.FL_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993751": "title 'Pdgfra.CRE_Piezo1.FL_SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993752": "title 'Pdgfra.CRE_Piezo1.FL_SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993753": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993754": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993755": "title 'Pdgfra.CRE_Piezo1.FL_AEXd1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993756": "title 'Pdgfra.CRE_Piezo1.WT_SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993757": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993758": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993759": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993760": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993761": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993762": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993763": "title 'WT.MmSCs.Yoda1.0h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993764": "title 'WT.MmSCs.Yoda1.0h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993765": "title 'WT.MmSCs.Yoda1.0h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993769": "title 'WT.MmSCs.Yoda1.2h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993770": "title 'WT.MmSCs.Yoda1.2h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993780": "title 'Pdgfra.Cre_Piezo1.WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993781": "title 'Pdgfra.Cre_Piezo1.WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993782": "title 'Pdgfra.Cre_Piezo1.WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993783": "title 'Pdgfra.Cre_Piezo1.FL.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993784": "title 'Pdgfra.Cre_Piezo1.FL.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993785": "title 'Pdgfra.Cre_Piezo1.FL.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993786": "title 'Piezo1_WT_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993787": "title 'Piezo1_WT_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993788": "title 'Piezo1_WT_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993789": "title 'Piezo1_WT_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993790": "title 'Piezo1_WT_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993791": "title 'Piezo1_WT_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993792": "title 'Piezo1_WT_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993793": "title 'Piezo1_WT_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993794": "title 'Piezo1_WT_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993795": "title 'Piezo1_WT_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993796": "title 'Piezo1_KO_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993797": "title 'Piezo1_KO_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993798": "title 'Piezo1_KO_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993799": "title 'Piezo1_KO_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993800": "title 'Piezo1_KO_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993801": "title 'Piezo1_KO_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993802": "title 'Piezo1_KO_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993803": "title 'Piezo1_KO_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993804": "title 'Piezo1_KO_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993805": "title 'Piezo1_KO_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993806": "title 'Unstim#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993807": "title 'Unstim#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993808": "title 'Unstim#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993809": "title 'Yoda1_4h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993810": "title 'Yoda1_4h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993811": "title 'Yoda1_4h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993812": "title 'Yoda1_6h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993813": "title 'Yoda1_6h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993814": "title 'Yoda1_6h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442138": "title 'Piezo1_WT_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442139": "title 'Piezo1_WT_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442140": "title 'Piezo1_WT_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442141": "title 'Piezo1_FL_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442142": "title 'Piezo1_FL_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442143": "title 'Piezo1_FL_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442144": "title 'Piezo1_WT_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442145": "title 'Piezo1_WT_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442146": "title 'Piezo1_WT_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442147": "title 'Piezo1_WT_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442148": "title 'Piezo1_FL_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442149": "title 'Piezo1_FL_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442150": "title 'Piezo1_FL_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442151": "title 'Piezo1_FL_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442152": "title 'Piezo1_WT_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442153": "title 'Piezo1_WT_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442154": "title 'Piezo1_WT_CTX_d3_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442155": "title 'Piezo1_FL_CTX_d3_Heart#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442156": "title 'Piezo1_FL_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442157": "title 'Piezo1_FL_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)"
+     },
+     "reasoning": "Matrix columns equal GEO titles (90/90). Keep only the Fig.1k samples; group from title. Replicate Pearson r on log2CPM >= 0.96, so the paper's r<0.9 QC removes none.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_EXT_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "EXT",
+      "estimand_type": "causal (mice randomly assigned, S4.12.p1)",
+      "contrasts": [
+       {
+        "name": "grp_EXT_vs_SED",
+        "control": "SED",
+        "treatment": "EXT",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Fig.1k: EXT vs SED in independent mice, one factor.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent animals from one experiment, no pairing; paper fit ~ group.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, LFC shrinkage)",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2 + apeglm",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2; pydeseq2 lfc_shrink stands in for apeglm",
+       "paper low-count rule implemented in prep/filter_low_counts.py (keep a gene when any condition sums to >= 10 reads)"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw featureCounts counts support the paper's DESeq2 route.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "Legends say |FC| >= 2 (applied); S2.1.p2 text says |FC| > 2. Audit: padj<0.05 alone (S4.7.p1 DEG definition)."
+     },
+     "reasoning": "FIG7 (c,k): DEGs highlighted at Padj<0.05 and |FC|>=2, i.e. |log2FC| >= 1.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "paper reports no DEG count, only highlighted genes",
+       "FC cutoff applied to shrunken LFC, as in the paper",
+       "all male by Xist/Ddx3y"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "grp_EXT_vs_SED": [
+       "Cxcl5",
+       "H19",
+       "Bdnf"
+      ]
+     },
+     "reasoning": "Fig.1k reproduced with the paper's model and threshold."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "fold-change cutoff wording",
+     "paper": "FIG7 legend |FC| >= 2; S2.1.p2 |FC| > 2",
+     "data": "not applicable",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_EXT_vs_SED",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "EXT",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "Fig.1k two-group DESeq2 as in S4.7.p1"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "grp_EXT_vs_SED",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "S2.1.p2 pathway analysis, S4.7.p2 fgsea; kept separate from DE."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE297515_PIEZO_AEX",
+   "accession": "GSE297515",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13007780.paper.md"
+    ],
+    "metadata": "GSE297515/GSE297515_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/GSE297515_counts_filtered_PIEZO.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID41775886/prep/filter_low_counts.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE297515"
+      ],
+      "primary_estimand": "AEX (day 1) vs SED effect on MmSC expression within Pdgfra-Cre Piezo1 WT and within Piezo1 f/f (stromal cKO) mice; Piezo1 dependence read from the two responses",
+      "planned_contrasts": [
+       "AEX d1 vs SED in WT (Fig.4e)",
+       "AEX d1 vs SED in Piezo1 cKO (Fig.4e)",
+       "Fig.4e clusters = genes with Padj<0.05 in either; cluster sizes not in text"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false,
+       "source_locator": "FIG10 (e): differentially expressed (Padj < 0.05)"
+      },
+      "paper_method": "DESeq2 + apeglm (S4.7.p1); k-means clustering in Morpheus",
+      "factors": {
+       "geno": [
+        "WT",
+        "FL"
+       ],
+       "cond": [
+        "SED",
+        "AEX"
+       ]
+      },
+      "sample_inclusion": "Pdgfra-Cre+ Piezo1 WT vs f/f littermates, sorted MmSCs, n=3 per cell",
+      "paper_results": {
+       "Fig.4e": "k-means clusters; 'hundreds of genes' impaired in mutant (S2.4.p1); no counts in text"
+      }
+     },
+     "reasoning": "S2.4.p1; FIG10 (e). S4.7.p1: STAR + featureCounts; DESeq2 median-of-ratios; replicates with Pearson r<0.9 removed; genes with <10 reads within any condition removed; DESeq2 + apeglm shrinkage; DEGs = adjusted P<0.05.",
+     "confidence": "high",
+     "locator": "S2.4.p1; FIG10"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 names GSE297515",
+       "series contact CBDM, Harvard Medical School (authors' lab)",
+       "sorted MmSC population RNA-seq, mouse, matches S4.7.p1"
+      ]
+     },
+     "reasoning": "DA.p1; titles Pdgfra.CRE_Piezo1.{WT,FL}_{SED,AEXd1}#1-3 are the Fig.4e MmSC samples (n=3 per cell).",
+     "confidence": "high",
+     "locator": "DA.p1"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE297515_Genes_count_table.tsv.gz",
+      "paper_input": "featureCounts raw counts (S4.7.p1)"
+     },
+     "reasoning": "integer fraction 1.0, max 3.07e6, median 0; GEO data_processing: featureCounts, 'raw read counts for each Sample'; paper S4.7.p1 runs DESeq2 on featureCounts counts.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "patterns": {
+      "geno": [
+       "title",
+       "^Pdgfra\\.CRE_Piezo1\\.(WT|FL)_"
+      ],
+      "cond": [
+       "title",
+       "^Pdgfra\\.CRE_Piezo1\\.(?:WT|FL)_(SED|AEXd1)#\\d$"
+      ]
+     },
+     "recode": {
+      "geno": {
+       "WT": "WT",
+       "FL": "FL"
+      },
+      "cond": {
+       "SED": "SED",
+       "AEXd1": "AEX"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {
+      "GSM8993739": "title 'WT_sed#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993740": "title 'WT_sed#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993741": "title 'WT_sed#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993742": "title 'WT_exe#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993743": "title 'WT_exe#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993744": "title 'WT_exe#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993757": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993758": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993759": "title 'Pdgfra.CRE_Piezo1.WT_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993760": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993761": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993762": "title 'Pdgfra.CRE_Piezo1.FL_CTX.d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993763": "title 'WT.MmSCs.Yoda1.0h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993764": "title 'WT.MmSCs.Yoda1.0h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993765": "title 'WT.MmSCs.Yoda1.0h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993769": "title 'WT.MmSCs.Yoda1.2h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993770": "title 'WT.MmSCs.Yoda1.2h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993774": "title 'WT.EXT#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993775": "title 'WT.EXT#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993776": "title 'WT.EXT#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993777": "title 'WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993778": "title 'WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993779": "title 'WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993780": "title 'Pdgfra.Cre_Piezo1.WT.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993781": "title 'Pdgfra.Cre_Piezo1.WT.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993782": "title 'Pdgfra.Cre_Piezo1.WT.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993783": "title 'Pdgfra.Cre_Piezo1.FL.SED#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993784": "title 'Pdgfra.Cre_Piezo1.FL.SED#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993785": "title 'Pdgfra.Cre_Piezo1.FL.SED#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993786": "title 'Piezo1_WT_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993787": "title 'Piezo1_WT_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993788": "title 'Piezo1_WT_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993789": "title 'Piezo1_WT_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993790": "title 'Piezo1_WT_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993791": "title 'Piezo1_WT_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993792": "title 'Piezo1_WT_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993793": "title 'Piezo1_WT_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993794": "title 'Piezo1_WT_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993795": "title 'Piezo1_WT_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993796": "title 'Piezo1_KO_SKM_d7#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993797": "title 'Piezo1_KO_SKM_d7#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993798": "title 'Piezo1_KO_SKM_d7#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993799": "title 'Piezo1_KO_SKM_d3#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993800": "title 'Piezo1_KO_SKM_d3#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993801": "title 'Piezo1_KO_SKM_d3#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993802": "title 'Piezo1_KO_SKM_d1#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993803": "title 'Piezo1_KO_SKM_d1#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993804": "title 'Piezo1_KO_SKM_d1#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993805": "title 'Piezo1_KO_SKM_d1#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993806": "title 'Unstim#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993807": "title 'Unstim#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993808": "title 'Unstim#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993809": "title 'Yoda1_4h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993810": "title 'Yoda1_4h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993811": "title 'Yoda1_4h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993812": "title 'Yoda1_6h#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993813": "title 'Yoda1_6h#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM8993814": "title 'Yoda1_6h#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442138": "title 'Piezo1_WT_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442139": "title 'Piezo1_WT_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442140": "title 'Piezo1_WT_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442141": "title 'Piezo1_FL_CTX_d0_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442142": "title 'Piezo1_FL_CTX_d0_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442143": "title 'Piezo1_FL_CTX_d0_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442144": "title 'Piezo1_WT_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442145": "title 'Piezo1_WT_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442146": "title 'Piezo1_WT_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442147": "title 'Piezo1_WT_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442148": "title 'Piezo1_FL_CTX_d0_Liver#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442149": "title 'Piezo1_FL_CTX_d0_Liver#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442150": "title 'Piezo1_FL_CTX_d0_Liver#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442151": "title 'Piezo1_FL_CTX_d0_Liver#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442152": "title 'Piezo1_WT_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442153": "title 'Piezo1_WT_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442154": "title 'Piezo1_WT_CTX_d3_Heart#4': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442155": "title 'Piezo1_FL_CTX_d3_Heart#1': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442156": "title 'Piezo1_FL_CTX_d3_Heart#2': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)",
+      "GSM9442157": "title 'Piezo1_FL_CTX_d3_Heart#3': outside this exercise experiment (other sub-series: CTX injury, Yoda1 culture, other exercise batch, whole muscle, heart or liver)"
+     },
+     "reasoning": "Groups from titles (= matrix columns). GEO characteristics in this block are shifted by one sample relative to titles; titles agree with Tnc/Timp1 induction, so titles are used (see discrepancy). Replicate r >= 0.95; none removed.",
+     "confidence": "high",
+     "candidates": [
+      {
+       "value": "characteristics_ch1.2.genotype / characteristics_ch1.3.treatment",
+       "reason_rejected": "offset by one sample vs titles and contradicted by AEX marker expression"
+      }
+     ]
+    },
+    "design": {
+     "factors": [
+      "cond",
+      "geno"
+     ],
+     "references": {
+      "cond": "SED",
+      "geno": "WT"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "cond_AEX_vs_SED_geno-WT",
+      "cond_AEX_vs_SED_geno-FL"
+     ],
+     "final": {
+      "analysis_type": "factorial 2x2 (simple effects of AEX within genotype)",
+      "formula": "~ cond within each genotype; exploratory joint ~ cell",
+      "estimand_type": "causal (AEX randomly assigned within genotype, S4.12.p1)",
+      "contrasts": [
+       {
+        "name": "cond_AEX_vs_SED_geno-WT",
+        "control": "SED",
+        "treatment": "AEX",
+        "within": {
+         "geno": "WT"
+        },
+        "role": "primary"
+       },
+       {
+        "name": "cond_AEX_vs_SED_geno-FL",
+        "control": "SED",
+        "treatment": "AEX",
+        "within": {
+         "geno": "FL"
+        },
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Fig.4e is AEX vs SED within each genotype. Genotype effects (Fig.4b at SED) and the AEX x genotype interaction run as exploratory from one joint model.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent littermate mice, one sort experiment, no pairing; all male by Xist/Ddx3y.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, LFC shrinkage)",
+      "formula": "~ cond (per-genotype subset); exploratory ~ cell",
+      "paper_route": {
+       "method": "DESeq2 + apeglm",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2",
+       "paper does not say whether genotypes were fitted separately; separate fits for the planned contrasts, joint model as exploratory",
+       "paper low-count rule implemented in prep/filter_low_counts.py over the 4 conditions"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw counts; paper DESeq2.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "effect_inclusive": true
+      },
+      "deviation_note": "Fig.4e uses Padj<0.05 without FC cutoff; audit adds |log2FC|>=1 as in Fig.1."
+     },
+     "reasoning": "FIG10 (e): Padj < 0.05.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "paper gives cluster sizes only in the figure",
+       "named genes are 'impaired in mutant': expected induced in WT, weaker in FL"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "cond_AEX_vs_SED_geno-WT": [
+       "Cx3cl1",
+       "Cxcl5",
+       "Tnc",
+       "Timp1",
+       "Rplp0",
+       "Rps6",
+       "Eef1d",
+       "Eif3i",
+       "Gapdh",
+       "Pgam1",
+       "Eno1",
+       "Pkm",
+       "Cs",
+       "Mdh2"
+      ],
+      "cond_AEX_vs_SED_geno-FL": [
+       "Cx3cl1",
+       "Cxcl5",
+       "Tnc",
+       "Timp1",
+       "Rplp0",
+       "Rps6",
+       "Eef1d",
+       "Eif3i",
+       "Gapdh",
+       "Pgam1",
+       "Eno1",
+       "Pkm",
+       "Cs",
+       "Mdh2"
+      ]
+     },
+     "reasoning": "Fig.4e within-genotype AEX responses reproduced."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "GEO characteristics vs titles for GSM8993745-GSM8993756",
+     "paper": "Fig.4 design: Pdgfra-Cre Piezo1 WT/FL x SED/AEX d1, n=3 per cell",
+     "data": "characteristics_ch1.2.genotype/3.treatment are shifted by one sample relative to titles in this block (title WT_AEXd1#1 carries SED; FL_SED#1 carries WT/AEX.d1; WT_SED#1, listed last, carries FLOXED/AEX). Titles equal the matrix column names and agree with exercise-induced genes (Tnc, Timp1 high in every *AEXd1 title, low in every *SED title).",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "cond_AEX_vs_SED_geno-WT",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "subset": {
+      "geno": [
+       "WT"
+      ]
+     },
+     "args": {
+      "design_column": "cond",
+      "control_group": "SED",
+      "treatment_group": "AEX",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "Fig.4e AEX vs SED within WT"
+    },
+    {
+     "name": "cond_AEX_vs_SED_geno-FL",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "subset": {
+      "geno": [
+       "FL"
+      ]
+     },
+     "args": {
+      "design_column": "cond",
+      "control_group": "SED",
+      "treatment_group": "AEX",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "Fig.4e AEX vs SED within FL"
+    },
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all"
+     },
+     "role": "exploratory",
+     "reasoning": "All analyzable comparisons from one ~cell model, including genotype effects and the AEX x genotype interaction."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "cond_AEX_vs_SED_geno-WT",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Extended Data Fig.5a pathway analysis; kept separate from DE."
+    }
+   ]
+  }
+ ]
+}
