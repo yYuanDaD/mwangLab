@@ -1,0 +1,224 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/aeab5224f96cfdf3f06293d2da461bca07b26bfc",
+  "request": "Analyze GSE129962 for the paper (Exercise Restores Dysregulated Gene Expression in a Mouse Model of Arrhythmogenic Cardiomyopathy): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE129962",
+      "accession": "GSE129962",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC7177479.paper.md"],
+        "metadata": "GSE129962/GSE129962_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/aeab5224f96cfdf3f06293d2da461bca07b26bfc/prep/GSE129962_counts_noERCC.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/aeab5224f96cfdf3f06293d2da461bca07b26bfc/prep/prep_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE129962"],
+            "assay": "bulk total RNA-seq (rRNA-depleted, stranded, PE, HiSeq 4000) of isolated cardiac myocytes (S5.7.p1)",
+            "organism": "Mouse",
+            "groups": {
+              "3M": "WT vs Myh6-Cre:Dsp W/F (DH), regular activity, N=5 each (S6.1.p3)",
+              "6M_RA": "WT vs DH after 3 months regular activity, N=5 each (S6.1.p5)",
+              "6M_EX": "WT vs DH after 3 months daily treadmill exercise (60 min, 5.5 kJ), N=5 each (S5.5.p1, S6.4.p3, FIG2)"
+            },
+            "sample_inclusion": "all 5 DH-EX mice incl. one that stopped exercising at 2.5 months with heart failure (S6.4.p3, S6.4.p6; FIG2 volcano N=5 per group)",
+            "factors": {"geno": ["WT", "DH"], "act": ["RA", "EX"], "age": ["3M", "6M"]},
+            "primary_estimand": "Effect of 3 months treadmill exercise on the cardiac myocyte transcriptome in WT and Dsp-haploinsufficient mice, and its restoration ('rescue') of the DH-vs-WT dysregulation (title; S6.4.p4-p6, S6.4.p11)",
+            "planned_contrasts": [
+              "WT EX vs WT RA at 6M (S6.4.p4; paper 2529 DEGs, 1390 up / 1139 down)",
+              "DH EX vs DH RA at 6M (S6.4.p5; paper 2391 DEGs, 867 up / 1524 down)",
+              "genotype x exercise interaction at 6M (S6.4.p11; paper 65 genes, 19 up / 46 down)",
+              "DH vs WT at 6M RA (S6.1.p5; paper 781 DEGs, 614 up / 167 down)",
+              "DH vs WT at 3M (S6.1.p4; paper 56 DEGs, 21 up / 35 down; abstract says 57)",
+              "rescue: DH-EX vs WT not different for 492/781 genes (S6.4.p6)"
+            ],
+            "paper_method": "featureCounts counts; edgeR; q<0.05; RUVr normalization only for comparisons across time points (S5.7.p2)",
+            "normalization": "edgeR (TMM implied); RUVr for across-time comparisons (S5.7.p2)",
+            "paper_threshold": {"metric": "qvalue", "adjustment": "BH (edgeR FDR)", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S5.7.p2"},
+            "enrichment": "GSEA v2.2.3 Hallmark + canonical pathways, q<0.05 (S5.8.p1)",
+            "repeated_measure_unit": "none; independent animals"
+          },
+          "reasoning": "Methods S5.7.p2 give edgeR with q<0.05 and no fold-change rule; S5.5.p1/S6.4.p3 describe randomization of 3-month mice to regular activity or treadmill for 3 months; S6.4.p4-p5 give the within-genotype exercise DEG counts, S6.4.p11 the genotype-by-exercise interaction (65), S6.1.p4-p5 the genotype counts at 3M and 6M.",
+          "locator": "S5.7.p2",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S5.1.p1 names GSE129962", "30 samples = 6 groups x 5 (3M WT/DH, 6M RA WT/DH, 6M EX WT/DH) as in S6.1.p3 and FIG2", "cardiac myocytes, Myh6-Cre:DspW/F genotype in GEO characteristics", "featureCounts matrix as in S5.7.p2"]},
+          "reasoning": "Accession cited in the data-sharing statement; group structure and N=5 per group match the paper.",
+          "locator": "S5.1.p1",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^([^:]+):"]},
+          "aliases": {"geno": "characteristics_ch1.1.genotype/variation", "act": "characteristics_ch1.2.exercise"},
+          "patterns": {"age": ["title", "^(\\d)M-"]},
+          "combine": {"batch": ["age", "act"]},
+          "recode": {
+            "geno": {"Wildtype": "WT", "Myh6-Cre:DspW/F": "DH"},
+            "act": {"no": "RA", "yes": "EX"},
+            "age": {"3": "M3", "6": "M6"},
+            "batch": {"M3_RA": "b3M", "M6_RA": "b6RA", "M6_EX": "b6EX"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. 6M-EX-WT5) are the prefix of the GEO title before ':'; exact match on that key (30/30). geno/act from GEO characteristics, age from the title prefix. 'batch' is the inferred processing batch (see covariance): it equals age x act, i.e. 3M, 6M-RA and 6M-EX.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "final": {"source": "GSE129962_DSP.combined.RAW.featureCounts.txt.gz with 23 ERCC spike-in rows and 2 annotation columns removed by prep_counts.py", "paper_input": "featureCounts counts (S5.7.p2)"},
+          "reasoning": "All values integers, max 5.4e6, file named RAW.featureCounts, GEO data_processing: featureCounts. ERCC rows were dropped because they are NaN in the samples whose count table lacked them; they are not genes.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "act"],
+          "references": {"geno": "WT", "act": "RA"},
+          "strata": ["age"],
+          "organism": "Mouse",
+          "covariate_candidates": ["batch"],
+          "planned": ["geno_act_DH_EX_vs_WT_RA_age-M6", "geno_DH_vs_WT_age-M6_act-RA", "geno_DH_vs_WT_age-M6_act-EX", "geno_DH_vs_WT_age-M3_act-RA"],
+          "final": {
+            "analysis_type": "factorial (genotype x exercise) at 6 months, within-batch genotype contrasts",
+            "formula": "~ cell (cell = age_geno_act; contrasts extracted per comparison)",
+            "design_column": "geno",
+            "contrasts": [
+              {"name": "geno_act_DH_EX_vs_WT_RA_age-M6", "test": "(DH_EX - WT_EX) - (DH_RA - WT_RA)", "role": "primary", "meaning": "exercise modification of the Dsp-genotype effect (paper's rescue / interaction, S6.4.p11)"},
+              {"name": "geno_DH_vs_WT_age-M6_act-RA", "control": "WT", "treatment": "DH", "role": "secondary", "meaning": "dysregulation at 6M without exercise (S6.1.p5)"},
+              {"name": "geno_DH_vs_WT_age-M6_act-EX", "control": "WT", "treatment": "DH", "role": "secondary", "meaning": "residual dysregulation in exercised mice (rescue, S6.4.p6)"},
+              {"name": "geno_DH_vs_WT_age-M3_act-RA", "control": "WT", "treatment": "DH", "role": "exploratory", "meaning": "baseline genotype effect at 3M (S6.1.p4), not an exercise contrast"}
+            ]
+          },
+          "candidates": [
+            {"value": "act_EX_vs_RA within WT at 6M (paper S6.4.p4, 2529 DEGs)", "reason_rejected": "exercise is completely aliased with an inferred processing batch: the 6M-EX samples come from a separate count table (no ERCC rows at all) and differ from all 6M-RA samples in technical library composition (misc_RNA read fraction 0.35-0.66% vs 0.93-1.31%, non-overlapping; mt-rRNA 3.9-7.7% vs 1.4-6.2%); no batch annotation exists to separate them, so EX vs RA cannot be identified"},
+            {"value": "act_EX_vs_RA within DH at 6M (paper S6.4.p5, 2391 DEGs)", "reason_rejected": "same batch aliasing as above"},
+            {"value": "DH-EX vs WT-RA (cross-batch rescue comparison)", "reason_rejected": "crosses the EX/RA batch; the within-batch DH vs WT in EX mice answers the rescue question without the batch"},
+            {"value": "pooled 3M and 6M RA", "reason_rejected": "different age and processing batch (paper used RUVr for across-time comparisons, S5.7.p2)"}
+          ],
+          "reasoning": "The paper's within-genotype exercise contrasts (S6.4.p4-p5) cannot be separated from a processing batch that coincides exactly with the exercise arm. Each batch, however, holds 5 WT and 5 DH mice, so the genotype effect within a batch and the genotype x exercise interaction (difference of within-batch genotype effects) cancel an additive batch shift. The interaction is the paper's own test of exercise rescue (S6.4.p11) and is the identifiable exercise estimand; it is primary. The within-batch genotype contrasts are secondary (6M) and exploratory (3M). One model on all 30 samples with a cell factor.",
+          "locator": "S6.4.p11",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "batch", "disposition": "aliased: identical to age x act; absorbed by the cell factor, cancels in within-batch genotype contrasts and in the genotype x exercise interaction; it is why the simple EX vs RA contrasts were rejected at design"},
+              {"name": "sex", "disposition": "excluded: not in GEO metadata and not modelled by the paper; inferred from Xist/Ddx3y counts it is balanced across genotypes within every batch (3M 3F/2M each genotype, 6M-RA 2F/3M each, 6M-EX 1F/4M each)"}
+            ]
+          },
+          "confounding_candidates": ["batch", "age", "act"],
+          "reasoning": "Independent animals, no repeated measures. Batch inference: the deposited matrix is a combination of three count tables (ERCC rows: absent in 6M-EX, all-zero 3-row set in 3M, a different subset in 6M-RA); technical read fractions (misc_RNA, Mt_tRNA nonzero only in 3M) form three non-overlapping groups matching 3M, 6M-RA and 6M-EX. Paper says alignment by Tophat2, GEO says HISAT2, also consistent with mixed processing.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2, joint cell model) for the interaction and all within-batch contrasts; edgeR QL (inmoose, two-arm) for the paper-method genotype contrasts",
+            "formula": "~ cell",
+            "paper_route": {"method": "edgeR GLM with genotype x exercise interaction", "status": "blocked", "reason": "the runner's edgeR executor (tools/edger_tools.py) fits only two-arm ~ Treatment; no interaction contrast. The interaction runs on the validated joint DESeq2 count model instead."},
+            "deviations": ["interaction and joint contrasts by DESeq2 Wald instead of edgeR", "edgeR executor has no filterByExpr step, so its BH universe is all non-zero genes (~30k) instead of the paper's ~11k analysed genes"]
+          },
+          "transform": null,
+          "reasoning": "Raw counts support DESeq2/edgeR. edgeR reproduces the paper's method for the two-arm genotype contrasts; the interaction needs a multi-cell count model, which only the joint DESeq2 executor offers.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "qvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "paper's q<0.05 (edgeR BH FDR) applied unchanged to DESeq2 padj for the primary interaction and joint contrasts, and to edgeR padj for the two-arm runs"
+          },
+          "reasoning": "S5.7.p2: significance level q<0.05, no fold-change cutoff.",
+          "locator": "S5.7.p2",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "The paper's within-genotype exercise contrasts (WT EX vs RA 2529, DH EX vs RA 2391) were not run: exercise is aliased with a processing batch in the deposited data.",
+              "The exercise answer is the genotype x exercise interaction (rescue) and the residual DH vs WT difference among exercised mice, both within batch.",
+              "Interaction on DESeq2 instead of edgeR; edgeR runs test all non-zero genes.",
+              "One DH-EX mouse (6M-EX-DH4, heart failure: Nppa/Myh7 ~10x) included as in the paper; sensitivity run without it."
+            ]
+          },
+          "paper_counts": {
+            "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": 65,
+            "joint_all/geno_DH_vs_WT_age-M6_act-RA": 781,
+            "joint_all/geno_DH_vs_WT_age-M3_act-RA": 56,
+            "edger_geno_6M_RA": 781,
+            "edger_geno_3M": 56
+          },
+          "paper_genes": {
+            "joint_all/geno_DH_vs_WT_age-M6_act-RA": ["Sfrp1", "Frzb", "Apoe", "Lrp1", "Nupr1", "Twist1", "Hand2"],
+            "joint_all/geno_DH_vs_WT_age-M6_act-EX": ["Nupr1", "Twist1", "Hand2", "Sfrp1", "Apoe"],
+            "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": ["Sfrp1", "Frzb", "Apoe", "Lrp1", "Nupr1", "Twist1"],
+            "joint_all/geno_DH_vs_WT_age-M3_act-RA": ["Serinc2", "Ephb1"]
+          },
+          "reasoning": "Paper counts from S6.4.p11 (65 interaction), S6.1.p5 (781), S6.1.p4 (56). Genes: secreted WNT inhibitors rescued by exercise (S7.p3), regulators not rescued (S6.4.p7), top 3M genes (S6.1.p4).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise arm vs processing batch", "paper": "EX and RA mice compared directly at 6M with edgeR (S6.4.p4-p5); no batch mentioned", "data": "6M-EX samples form a separate count table and technical-composition group from 6M-RA", "disposition": "blocks the simple EX vs RA contrasts; interaction and within-batch genotype contrasts run instead"},
+        {"item": "aligner", "paper": "Tophat2 (S5.7.p2)", "data": "GEO data_processing: HISAT2", "disposition": "executable_without_change; recorded"},
+        {"item": "3M genotype DEG count", "paper": "56 in results (S6.1.p4)", "data": "57 in abstract (S2.p2)", "disposition": "56 used for comparison"},
+        {"item": "genes analysed", "paper": "11,122-11,582 genes (S6.1.p4-p5)", "data": "52,550 features after ERCC removal; filtering differs by executor", "disposition": "counts compared with caution"},
+        {"item": "heart-failure DH-EX mouse", "paper": "included in RNA-seq N=5 (FIG2, S6.4.p6)", "data": "6M-EX-DH4 has ~10x Nppa and Myh7", "disposition": "included; sensitivity without it"}
+      ],
+      "executions": [
+        {
+          "name": "joint_all",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["geno_act_DH_EX_vs_WT_RA_age-M6", "geno_DH_vs_WT_age-M6_act-RA", "geno_DH_vs_WT_age-M6_act-EX", "geno_DH_vs_WT_age-M3_act-RA"], "alpha": 0.05},
+          "role": "primary",
+          "reasoning": "One DESeq2 model on all 30 samples with the age x geno x act cell factor; the interaction (primary) and within-batch genotype contrasts are extracted from it."
+        },
+        {
+          "name": "edger_geno_6M_RA",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "DH"},
+          "subset": {"batch": ["b6RA"]},
+          "role": "secondary",
+          "reasoning": "Paper-method (edgeR) DH vs WT at 6M regular activity (paper 781)."
+        },
+        {
+          "name": "edger_geno_6M_EX",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "DH"},
+          "subset": {"batch": ["b6EX"]},
+          "role": "secondary",
+          "reasoning": "Paper-method (edgeR) DH vs WT among exercised mice: residual dysregulation after exercise (rescue question) within one batch."
+        },
+        {
+          "name": "edger_geno_3M",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "DH"},
+          "subset": {"batch": ["b3M"]},
+          "role": "exploratory",
+          "reasoning": "Paper-method (edgeR) DH vs WT at 3M (paper 56); context only, not an exercise contrast."
+        },
+        {
+          "name": "joint_6M_noDH4",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["geno_act_DH_EX_vs_WT_RA_age-M6", "geno_DH_vs_WT_age-M6_act-EX"], "alpha": 0.05},
+          "subset": {"key": ["6M-EX-WT5", "6M-EX-WT2", "6M-EX-WT3", "6M-EX-DH5", "6M-EX-WT1", "6M-EX-DH3", "6M-EX-DH1", "6M-EX-WT4", "6M-EX-DH2", "6M-Het1", "6M-WT4", "6M-Het7", "6M-Het6", "6M-WT2", "6M-Het2", "6M-WT3", "6M-Het8", "6M-WT1", "6M-WT5"]},
+          "role": "sensitivity",
+          "reasoning": "Interaction and exercised-mouse genotype contrast without 6M-EX-DH4, the mouse that stopped exercising at 2.5 months with heart failure (S6.4.p3, S6.4.p6); DH-EX n=4."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports Hallmark GSEA for exercise rescue (S5.8.p1, FIG3E); the interaction is the identifiable exercise estimand."},
+        {"execution": "joint_all/geno_DH_vs_WT_age-M6_act-RA", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper's Hallmark pathways for the 6M genotype effect (EMT, inflammation up, OXPHOS down; S6.1.p5) as the reference for rescue."},
+        {"execution": "joint_all/geno_DH_vs_WT_age-M6_act-EX", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Residual genotype pathways among exercised mice (rescue of EMT/inflammation, FIG3E)."}
+      ]
+    }
+  ]
+}

@@ -411,3 +411,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39730655 (GSE280324)
 
 - case_runner threshold has only a symmetric effect_cutoff (tools/case_runner.py:406,775), so FC<0.83 cannot be expressed; runner count was 2047, exact count recomputed post hoc (patched after this row) Details: `PMID39730655/HANDBACK.md`.
+
+## 0efeba509681ac38012819324e7f12d6e307a4fe (GSE193771)
+
+- case_runner.py:304 _contained_keys needs >=half of all metadata rows, so inspect gave no alignment key for the 22/48-sample girls matrix (patched after this row) Details: `0efeba509681ac38012819324e7f12d6e307a4fe/HANDBACK.md`.

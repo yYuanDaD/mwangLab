@@ -73,7 +73,7 @@
           "references": {"grp": "CON", "time": "pre"},
           "subject": "subject",
           "organism": "Human",
-          "planned": ["time_post_vs_pre", "grp_ALL_vs_CON"],
+          "planned": ["grp_time_ALL_post_vs_CON_pre", "time_post_vs_pre_grp-ALL", "time_post_vs_pre_grp-CON", "grp_ALL_vs_CON_time-pre"],
           "covariate_candidates": ["sex"],
           "final": {
             "analysis_type": "paired_change (2x2 mixed: group between-subject, time within-subject)",
@@ -157,14 +157,37 @@
         {
           "name": "baseline_ALL_vs_CON",
           "tool": "tools.limma_tools:run_limma_analysis",
-          "args": {"design_column": "grp", "control_group": "CON", "treatment_group": "ALL", "alpha": 0.01},
+          "args": {"design_column": "grp", "control_group": "CON", "treatment_group": "ALL"},
           "subset": {"time": ["pre"]},
           "role": "secondary",
           "reasoning": "Paper S3.p2 baseline disease comparison (one sample per child); associational, not an exercise effect."
+        },
+        {
+          "name": "postexercise_ALL_vs_CON",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "CON", "treatment_group": "ALL"},
+          "subset": {"time": ["post"]},
+          "role": "exploratory",
+          "reasoning": "Suitability lists grp_ALL_vs_CON_time-post as analyzable; the paper does not report it. Exploratory, associational."
+        },
+        {
+          "name": "exercise_change_male",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {
+            "analysis_type": "paired_change",
+            "subject_column": "subject", "time_column": "time", "baseline_level": "pre",
+            "followup_levels": ["post"], "group_column": "grp", "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {"name": "interaction_ALLchange_vs_CONchange", "coefficients": {"C(grp)[ALL]": 1, "C(grp)[CON]": -1}},
+              {"name": "ALL_post_vs_pre", "coefficients": {"C(grp)[ALL]": 1}},
+              {"name": "CON_post_vs_pre", "coefficients": {"C(grp)[CON]": 1}}
+            ]}},
+          "subset": {"sex": ["male"]},
+          "role": "exploratory",
+          "reasoning": "Per-sex split from the suitability split_plan (paper pooled sexes). Males: 7 ALL + 7 CON children; females (2 per group) are below n=3 per cell and are not analyzed separately."
         }
       ],
-      "enrichment": [
-        {"execution": "exercise_change/interaction_ALLchange_vs_CONchange", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+      "enrichment": [        {"execution": "exercise_change/interaction_ALLchange_vs_CONchange", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
          "reasoning": "Paper reports pathways for the interaction genes (IPA, S3.p3); GSEA Hallmark + ORA as an open substitute, kept separate from DE."},
         {"execution": "exercise_change/ALL_post_vs_pre", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat",
          "reasoning": "Within-ALL exercise response; paper discusses inflammatory pathway inhibition (S4.p3-p6)."}
@@ -172,3 +195,4 @@
     }
   ]
 }
+

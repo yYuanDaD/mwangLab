@@ -1,0 +1,326 @@
+{
+  "case_id": "GSE129962",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "act"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "act"
+      ],
+      "levels": {
+        "geno": {
+          "WT": 15,
+          "DH": 15
+        },
+        "act": {
+          "RA": 20,
+          "EX": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "batch",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "batch",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(act)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 27,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "geno_act_DH_EX_vs_WT_RA_age-M6",
+        "geno_DH_vs_WT_age-M6_act-RA",
+        "geno_DH_vs_WT_age-M6_act-EX",
+        "geno_DH_vs_WT_age-M3_act-RA"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 18,
+        "female": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "geno_DH_vs_WT__sex-female_act-RA"
+          ],
+          "male": [
+            "geno_DH_vs_WT__sex-male_act-EX",
+            "geno_DH_vs_WT__sex-male_act-RA",
+            "act_EX_vs_RA__sex-male_geno-DH",
+            "act_EX_vs_RA__sex-male_geno-WT",
+            "geno_act_DH_EX_vs_WT_RA__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_DH_vs_WT_age-M3_act-RA",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "age": "M3",
+        "act": "RA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M3",
+            "act": "RA",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M3",
+            "act": "RA",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_DH_vs_WT_age-M6_act-EX",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "age": "M6",
+        "act": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M6",
+            "act": "EX",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "act": "EX",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_DH_vs_WT_age-M6_act-RA",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "age": "M6",
+        "act": "RA"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M6",
+            "act": "RA",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "act": "RA",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_EX_vs_RA_age-M6_geno-DH",
+      "kind": "simple",
+      "factor": "act",
+      "test": "EX",
+      "reference": "RA",
+      "within": {
+        "age": "M6",
+        "geno": "DH"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "DH",
+            "act": "EX"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "DH",
+            "act": "RA"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_EX_vs_RA_age-M6_geno-WT",
+      "kind": "simple",
+      "factor": "act",
+      "test": "EX",
+      "reference": "RA",
+      "within": {
+        "age": "M6",
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "WT",
+            "act": "EX"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "WT",
+            "act": "RA"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_act_DH_EX_vs_WT_RA_age-M6",
+      "kind": "interaction",
+      "factor": "geno:act",
+      "test": "DH:EX",
+      "reference": "WT:RA",
+      "within": {
+        "age": "M6"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "DH",
+            "act": "EX"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "WT",
+            "act": "EX"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "DH",
+            "act": "RA"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "M6",
+            "geno": "WT",
+            "act": "RA"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

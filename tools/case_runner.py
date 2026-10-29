@@ -301,7 +301,9 @@ def _contained_keys(cols: set[str], meta: pd.DataFrame) -> list[dict]:
             hit = [c for c in names if re.search(rf"(?<![A-Za-z0-9]){re.escape(c)}(?![A-Za-z0-9])", text)]
             if len(hit) == 1:
                 found[idx] = hit[0]
-        if len(found) >= max(2, len(meta) // 2) and len(set(found.values())) == len(found):
+        # a series can deposit one matrix per subset (e.g. per sex): judge coverage against the
+        # smaller of metadata and matrix, not the whole metadata
+        if len(found) >= max(2, min(len(meta), len(cols)) // 2) and len(set(found.values())) == len(found):
             example = next(iter(found))
             out.append({"key": f"{column} (contains the name)", "matched": len(found),
                         "of_metadata": int(len(meta)), "of_matrix": len(cols),
