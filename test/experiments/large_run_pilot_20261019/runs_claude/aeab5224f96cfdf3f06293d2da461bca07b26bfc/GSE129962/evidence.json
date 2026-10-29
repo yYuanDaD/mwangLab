@@ -3,8 +3,8 @@
   "run_id": "aeab5224f96cfdf3f06293d2da461bca07b26bfc",
   "subject_id": "GSE129962",
   "created_at": "2026-10-28T23:44:24",
-  "finished_at": null,
-  "status": null,
+  "finished_at": "2026-10-29T00:03:08",
+  "status": "completed",
   "error": null,
   "sources": [
     {
@@ -716,6 +716,469 @@
         "stop_reason": null
       },
       "recorded_at": "2026-10-28T23:55:56"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_edger_analysis",
+        "subset": "edger_geno_3M",
+        "role": "exploratory",
+        "tool": "tools.edger_tools:run_edger_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\edger_geno_3M\\input\\matrix.csv",
+        "formula": "~ geno",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\edger_geno_3M\\DEG_results_DH_vs_WT.csv"
+        ],
+        "counts": {
+          "edger_geno_3M": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 27248,
+              "n_significant": 46,
+              "n_up": 39,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper-method (edgeR) DH vs WT at 3M (paper 56); context only, not an exercise contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:00:52"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint_6M_noDH4",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 19,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\joint_6M_noDH4\\input\\matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\joint_6M_noDH4\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\joint_6M_noDH4\\DEG_results_geno_DH_vs_WT_age-M6_act-EX.csv"
+        ],
+        "counts": {
+          "joint_6M_noDH4/geno_act_DH_EX_vs_WT_RA_age-M6": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18030,
+              "n_significant": 52,
+              "n_up": 28,
+              "n_down": 24,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_6M_noDH4/geno_DH_vs_WT_age-M6_act-EX": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 16203,
+              "n_significant": 145,
+              "n_up": 77,
+              "n_down": 68,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Interaction and exercised-mouse genotype contrast without 6M-EX-DH4, the mouse that stopped exercising at 2.5 months with heart failure (S6.4.p3, S6.4.p6); DH-EX n=4.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:26"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_act_DH_EX_vs_WT_RA_age-M6\\ora\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_act_DH_EX_vs_WT_RA_age-M6\\ora\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_act_DH_EX_vs_WT_RA_age-M6\\ora\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6_GO_Molecular_Function_2023.csv"
+        ],
+        "summary": "Enrichment analysis complete for 8 Mouse genes (direction=all, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Carbon Dioxide Transport (GO:0015670) | padj=2.42e-02 | overlap=1/11 | genes=AQP6 - Negative Regulation Of Platelet-Derived Growth Factor Receptor Signaling Pathway (GO:0010642) | padj=2.42e-02 | overlap=1/11 | genes=NDRG4 - Regulation Of Platelet-Derived Growth Factor Receptor Signaling Pathway (GO:0010640) | padj=2.42e-02 | overlap=1/12 | genes=NDRG4 - Renal Water Homeostasis (GO:0003091) | padj=2.42e-02 | overlap=1/14 | genes=AQP6 - Negative Regulation Of Smooth Muscle Cell Migration (GO:0014912) | padj=2.42e-02 | overlap=1/14 | genes=NDRG4 - Gas Transport (GO:0015669) | padj=2.42e-02 | overlap=1/15 | genes=AQP6 - Embryonic Heart Tube Development (GO:0035050) | padj=2.42e-02 | overlap=1/17 | genes=NDRG4 - Regulation Of Smooth Muscle Cell Migration (GO:0014910) | padj=2.42e-02 | overlap=1/19 | genes=NDRG4 - Water Transport (GO:0006833) | padj=2.42e-02 | overlap=1/19 | genes=AQP6 - Fluid Transport (GO:0042044) | padj=2.42e-02 | overlap=1/19 | genes=AQP6 ### GO_Molecular_Function_2023 — top 4 terms (sorted by adjusted p): - Water Channel Activity (GO:0015250) | padj=1.28e-02 | overlap=1/14 | genes=AQP6 - Water Transmembrane Transporter Activity (GO:0005372) | padj=1.28e-02 | overlap=1/16 | genes=AQP6 - Inorganic Anion Transmembrane Transporter Activity (GO:0015103) | padj=1.70e-02 | overlap=1/32 | genes=AQP6 - Chan..."
+      },
+      "reason": "Paper reports Hallmark GSEA for exercise rescue (S5.8.p1, FIG3E); the interaction is the identifiable exercise estimand.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:28"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_act_DH_EX_vs_WT_RA_age-M6\\gsea\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 31563 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 34 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_PROTEIN_SECRETION | NES=1.49 | NOM p=6.15e-03 | FDR q=9.85e-02 - HALLMARK_HEME_METABOLISM | NES=1.37 | NOM p=4.00e-03 | FDR q=1.73e-01 - HALLMARK_BILE_ACID_METABOLISM | NES=1.33 | NOM p=1.35e-02 | FDR q=1.56e-01 - HALLMARK_GLYCOLYSIS | NES=1.31 | NOM p=3.08e-02 | FDR q=1.43e-01 - HALLMARK_UV_RESPONSE_UP | NES=1.29 | NOM p=3.62e-02 | FDR q=1.27e-01 - HALLMARK_MYOGENESIS | NES=1.28 | NOM p=2.83e-02 | FDR q=1.19e-01 - HALLMARK_DNA_REPAIR | NES=1.22 | NOM p=5.36e-02 | FDR q=1.80e-01 - HALLMARK_MTORC1_SIGNALING | NES=1.15 | NOM p=8.05e-02 | FDR q=2.71e-01 - HALLMARK_WNT_BETA_CATENIN_SIGNALING | NES=1.13 | NOM p=2.24e-01 | FDR q=2.94e-01 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=1.09 | NOM p=2.32e-01 | FDR q=3.45e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=-2.32 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=-1.87 | NOM p=0.00e+00 | FDR q=9.85e-04 - HALLMARK_KRAS_SIGNALING_UP | NES=-1.83 | NOM p=0.00e+00 | FDR q=1.23e-03 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=-1.73 | NOM p=0.00e+00 | FDR q=1.97e-03 - HALLMARK_INFLAMMATORY_RESPONSE | NES=-1.72 | NOM p=0.00e+00 | FDR q=1.81e-03 - HALLMARK_HEDGEHOG_SIGNALING | NES=-1.72 | NOM p=0.00e+00 | FDR q=1.55e-03 - ..."
+      },
+      "reason": "Paper reports Hallmark GSEA for exercise rescue (S5.8.p1, FIG3E); the interaction is the identifiable exercise estimand.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:02:55"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint_all/geno_DH_vs_WT_age-M6_act-RA",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_DH_vs_WT_age-M6_act-RA\\gsea\\DEG_results_geno_DH_vs_WT_age-M6_act-RA_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 31563 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 43 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.38 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.33 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.15 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.07 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=2.05 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.00 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.92 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.86 | NOM p=0.00e+00 | FDR q=8.71e-05 - HALLMARK_COAGULATION | NES=1.84 | NOM p=0.00e+00 | FDR q=7.84e-05 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.80 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.24 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.93 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_PEROXISOME | NES=-1.92 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HEME_METABOLISM | NES=-1.80 | NOM p=0.00e+00 | FDR q=1.48e-03 - HALLMARK_GLYCOLYSIS | NES=-1.60 | NOM p=0.00e+00 | FDR q=9..."
+      },
+      "reason": "Paper's Hallmark pathways for the 6M genotype effect (EMT, inflammation up, OXPHOS down; S6.1.p5) as the reference for rescue.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:03:02"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint_all/geno_DH_vs_WT_age-M6_act-EX",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\enrichment_joint_all_geno_DH_vs_WT_age-M6_act-EX\\gsea\\DEG_results_geno_DH_vs_WT_age-M6_act-EX_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 31563 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 30 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.82 | NOM p=0.00e+00 | FDR q=9.37e-04 - HALLMARK_PROTEIN_SECRETION | NES=1.70 | NOM p=0.00e+00 | FDR q=6.09e-03 - HALLMARK_COMPLEMENT | NES=1.54 | NOM p=0.00e+00 | FDR q=3.25e-02 - HALLMARK_APICAL_JUNCTION | NES=1.49 | NOM p=0.00e+00 | FDR q=3.75e-02 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.35 | NOM p=7.94e-03 | FDR q=1.24e-01 - HALLMARK_P53_PATHWAY | NES=1.29 | NOM p=1.41e-02 | FDR q=1.81e-01 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.24 | NOM p=1.26e-01 | FDR q=2.45e-01 - HALLMARK_ALLOGRAFT_REJECTION | NES=1.22 | NOM p=5.29e-02 | FDR q=2.59e-01 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=1.22 | NOM p=5.53e-02 | FDR q=2.36e-01 - HALLMARK_KRAS_SIGNALING_UP | NES=1.19 | NOM p=7.96e-02 | FDR q=2.58e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.62 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-1.69 | NOM p=0.00e+00 | FDR q=6.10e-03 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-1.57 | NOM p=0.00e+00 | FDR q=1.76e-02 - HALLMARK_PEROXISOME | NES=-1.56 | NOM p=2.00e-03 | FDR q=1.47e-02 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=-1.51 | NOM p=0.00e+00 | FDR q=2.11e..."
+      },
+      "reason": "Residual genotype pathways among exercised mice (rescue of EMT/inflammation, FIG3E).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:03:08"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "The paper's within-genotype exercise contrasts (WT EX vs RA 2529, DH EX vs RA 2391) were not run: exercise is aliased with a processing batch in the deposited data.",
+          "The exercise answer is the genotype x exercise interaction (rescue) and the residual DH vs WT difference among exercised mice, both within batch.",
+          "Interaction on DESeq2 instead of edgeR; edgeR runs test all non-zero genes.",
+          "One DH-EX mouse (6M-EX-DH4, heart failure: Nppa/Myh7 ~10x) included as in the paper; sensitivity run without it."
+        ],
+        "results": {
+          "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": {
+            "n_deg": 8,
+            "up": 3,
+            "down": 5,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/geno_DH_vs_WT_age-M6_act-RA": {
+            "n_deg": 64,
+            "up": 23,
+            "down": 41,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/geno_DH_vs_WT_age-M6_act-EX": {
+            "n_deg": 203,
+            "up": 118,
+            "down": 85,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/geno_DH_vs_WT_age-M3_act-RA": {
+            "n_deg": 146,
+            "up": 107,
+            "down": 39,
+            "rule": "padj < 0.05"
+          },
+          "edger_geno_6M_RA": {
+            "n_deg": 337,
+            "up": 213,
+            "down": 124,
+            "rule": "padj < 0.05"
+          },
+          "edger_geno_6M_EX": {
+            "n_deg": 56,
+            "up": 25,
+            "down": 31,
+            "rule": "padj < 0.05"
+          },
+          "edger_geno_3M": {
+            "n_deg": 46,
+            "up": 39,
+            "down": 7,
+            "rule": "padj < 0.05"
+          },
+          "joint_6M_noDH4/geno_act_DH_EX_vs_WT_RA_age-M6": {
+            "n_deg": 52,
+            "up": 28,
+            "down": 24,
+            "rule": "padj < 0.05"
+          },
+          "joint_6M_noDH4/geno_DH_vs_WT_age-M6_act-EX": {
+            "n_deg": 145,
+            "up": 77,
+            "down": 68,
+            "rule": "padj < 0.05"
+          }
+        },
+        "paper_counts": {
+          "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": 65,
+          "joint_all/geno_DH_vs_WT_age-M6_act-RA": 781,
+          "joint_all/geno_DH_vs_WT_age-M3_act-RA": 56,
+          "edger_geno_6M_RA": 781,
+          "edger_geno_3M": 56
+        },
+        "comparison": {
+          "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": {
+            "ours": 8,
+            "paper": 65
+          },
+          "joint_all/geno_DH_vs_WT_age-M6_act-RA": {
+            "ours": 64,
+            "paper": 781
+          },
+          "joint_all/geno_DH_vs_WT_age-M3_act-RA": {
+            "ours": 146,
+            "paper": 56
+          },
+          "edger_geno_6M_RA": {
+            "ours": 337,
+            "paper": 781
+          },
+          "edger_geno_3M": {
+            "ours": 46,
+            "paper": 56
+          }
+        },
+        "paper_gene_check": {
+          "joint_all/geno_DH_vs_WT_age-M6_act-RA": {
+            "Sfrp1": {
+              "baseMean": 52.328,
+              "log2FoldChange": 0.9142,
+              "padj": 0.6332,
+              "pvalue": 0.0865
+            },
+            "Frzb": {
+              "baseMean": 38.1759,
+              "log2FoldChange": 0.6954,
+              "padj": 0.7796,
+              "pvalue": 0.2241
+            },
+            "Apoe": {
+              "baseMean": 714.5206,
+              "log2FoldChange": 0.8234,
+              "padj": 0.2251,
+              "pvalue": 0.0031
+            },
+            "Lrp1": {
+              "baseMean": 432.1407,
+              "log2FoldChange": 0.592,
+              "padj": 0.5431,
+              "pvalue": 0.0387
+            },
+            "Nupr1": {
+              "baseMean": 6.9443,
+              "log2FoldChange": 1.3106,
+              "padj": 0.686,
+              "pvalue": 0.1189
+            },
+            "Twist1": {
+              "baseMean": 3.1394,
+              "log2FoldChange": 0.6452,
+              "padj": null,
+              "pvalue": 0.518
+            },
+            "Hand2": {
+              "baseMean": 911.0577,
+              "log2FoldChange": -0.1255,
+              "padj": 0.9279,
+              "pvalue": 0.5695
+            }
+          },
+          "joint_all/geno_DH_vs_WT_age-M6_act-EX": {
+            "Nupr1": {
+              "baseMean": 6.9443,
+              "log2FoldChange": -0.491,
+              "padj": 0.918,
+              "pvalue": 0.5573
+            },
+            "Twist1": {
+              "baseMean": 3.1394,
+              "log2FoldChange": 0.176,
+              "padj": null,
+              "pvalue": 0.8614
+            },
+            "Hand2": {
+              "baseMean": 911.0577,
+              "log2FoldChange": 0.3085,
+              "padj": 0.6884,
+              "pvalue": 0.1643
+            },
+            "Sfrp1": {
+              "baseMean": 52.328,
+              "log2FoldChange": 1.36,
+              "padj": 0.243,
+              "pvalue": 0.0113
+            },
+            "Apoe": {
+              "baseMean": 714.5206,
+              "log2FoldChange": 0.1523,
+              "padj": 0.9238,
+              "pvalue": 0.5851
+            }
+          },
+          "joint_all/geno_act_DH_EX_vs_WT_RA_age-M6": {
+            "Sfrp1": {
+              "baseMean": 52.328,
+              "log2FoldChange": 0.4458,
+              "padj": 0.9992,
+              "pvalue": 0.5558
+            },
+            "Frzb": {
+              "baseMean": 38.1759,
+              "log2FoldChange": -0.3235,
+              "padj": 0.9992,
+              "pvalue": 0.6902
+            },
+            "Apoe": {
+              "baseMean": 714.5206,
+              "log2FoldChange": -0.6711,
+              "padj": 0.9992,
+              "pvalue": 0.0885
+            },
+            "Lrp1": {
+              "baseMean": 432.1407,
+              "log2FoldChange": -0.4138,
+              "padj": 0.9992,
+              "pvalue": 0.3085
+            },
+            "Nupr1": {
+              "baseMean": 6.9443,
+              "log2FoldChange": -1.8017,
+              "padj": 0.9992,
+              "pvalue": 0.1287
+            },
+            "Twist1": {
+              "baseMean": 3.1394,
+              "log2FoldChange": -0.4692,
+              "padj": 0.9992,
+              "pvalue": 0.7408
+            }
+          },
+          "joint_all/geno_DH_vs_WT_age-M3_act-RA": {
+            "Serinc2": {
+              "baseMean": 67.0311,
+              "log2FoldChange": 4.4958,
+              "padj": 0.0143,
+              "pvalue": 0.0001
+            },
+            "Ephb1": {
+              "baseMean": 185.1341,
+              "log2FoldChange": -1.8028,
+              "padj": 0.4166,
+              "pvalue": 0.0541
+            }
+          }
+        }
+      },
+      "reason": "Paper counts from S6.4.p11 (65 interaction), S6.1.p5 (781), S6.1.p4 (56). Genes: secreted WNT inhibitors rescued by exercise (S7.p3), regulators not rescued (S6.4.p7), top 3M genes (S6.1.p4).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:03:08"
     }
   ],
   "artifacts": [
@@ -836,6 +1299,46 @@
       "produced_by": null,
       "media_type": "text/csv",
       "sha256": "e01500111610601675412e9026179ec61a5f833acd0f6ba934df27493cb9b244",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\edger_geno_3M\\DEG_results_DH_vs_WT.csv",
+      "role": "deg_edger_geno_3M",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7f13463957ec3790dab3351e6de391c839db8ff5d47ee9a39629b5de76d170e9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\joint_6M_noDH4\\DEG_results_geno_act_DH_EX_vs_WT_RA_age-M6.csv",
+      "role": "deg_joint_6M_noDH4/geno_act_DH_EX_vs_WT_RA_age-M6",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e87eb65592de4a14499aab6879e1f1412fba62fc738c91dd182de38b1500224c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\results\\joint_6M_noDH4\\DEG_results_geno_DH_vs_WT_age-M6_act-EX.csv",
+      "role": "deg_joint_6M_noDH4/geno_DH_vs_WT_age-M6_act-EX",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a4f9b2f6009ebbb687dfa014964a2ee5f9f17820b6858354bfd6c402aecefe56",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\aeab5224f96cfdf3f06293d2da461bca07b26bfc\\GSE129962\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4b894bb5defe27a5877835c42f11a9c0826a27e459c2bb72c5b27944844e293f",
       "evidence_ids": [],
       "attributes": {}
     }

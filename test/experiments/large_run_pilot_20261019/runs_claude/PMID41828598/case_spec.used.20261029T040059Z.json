@@ -1,0 +1,251 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41828598",
+  "request": "Analyze GSE299413 for PMID 41828598 (Moderate Aerobic Training Causes Muscle Wasting in a DMBA-Induced Sarcoma Rat Model.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE299413_tibialis",
+      "accession": "GSE299413",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12985970.paper.md"],
+        "metadata": "GSE299413/GSE299413_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41828598/prep/GSE299413_Tibialis_normalized_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41828598/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE299413"],
+            "assay": "bulk RNA-seq (Illumina NovaSeq 6000, 100 bp PE), STAR to rn7, featureCounts, Partek Flow DESeq2 (S4.9.p1)",
+            "organism": "Rat (male Sprague-Dawley)",
+            "factors": {"group": ["Non-Cancer", "Cancer (DMBA, no training)", "Cancer + Ex (DMBA + 8 weeks moderate aerobic treadmill training)"], "tissue": ["tibialis anterior", "tumor"]},
+            "sample_inclusion": "four animals per group per tissue (S4.9.p1; Fig3 legend n=4/4/4; Fig4 legend tumor Cancer n=4, Cancer+Ex n=4)",
+            "primary_estimand": "Effect of 8-week moderate aerobic training in DMBA tumor-bearing rats on tibialis anterior gene expression: Cancer+Ex vs Cancer (S2.2.p1, Table S2); Cancer vs Non-Cancer and Cancer+Ex vs Non-Cancer are the paper's other planned tibialis contrasts",
+            "planned_contrasts": [
+              "Tibialis Cancer vs Non-Cancer (S2.2.p1; paper: 523 up / 30 down = 553)",
+              "Tibialis Cancer+Ex vs Non-Cancer (S2.2.p1; paper: 1276 up / 744 down = 2020)",
+              "Tibialis Cancer+Ex vs Cancer (S2.2.p1, Table S2; paper: 10 up / 16 down = 26)",
+              "Tumor Cancer+Ex vs Cancer (S2.3.p2, Fig4, Table S4; paper: 24 up / 132 down = 156) - separate case"
+            ],
+            "repeated_measure_unit": "none within a tissue; the same animals contribute tibialis and tumor (title numbers 2,3,4,7,31,33,38,39) but tissues are analyzed separately",
+            "normalization": "DESeq2 median ratio in Partek Flow; noise filter <=10 (GEO data_processing)",
+            "paper_method": "DESeq2 (Partek Flow v11.0), per tissue, three-group model for tibialis",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S4.9.p1 (fold change >|2| and FDR < 0.05); S2.2.p1 (fold change >|2| and adjusted p < 0.05)"}
+          },
+          "reasoning": "Paper S4.9.p1 describes RNA-seq of tibialis anterior and tumor from four animals per group, DESeq2 in Partek Flow, DEG rule FC>|2| and FDR<0.05. S2.2.p1 gives the three tibialis contrasts and counts; S2.3.p2 gives the tumor exercise contrast. The deposited Partek DESeq2 tables reproduce these counts at that rule (tibialis 523/30, 1278/747, 7/11; tumor 24/132), confirming the threshold interpretation.",
+          "confidence": "high",
+          "locator": "S4.9.p1; S2.2.p1; S2.3.p2; S10.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S10.p1 names GSE299413", "GEO organism Rattus norvegicus, male, matches S4.1.p1", "12 tibialis samples (4/4/4) and 8 tumor samples (4/4) match S4.9.p1 and figure legends", "data_processing: Partek Flow, STAR rn7, DESeq2 median ratio = S4.9.p1"]},
+          "reasoning": "Accession cited in Data Availability; group sizes, tissues and processing all match the paper. Matrix used: GSE299413_Tibialis_Normalized_counts.txt.gz (gene symbol index and sample columns kept by prep_matrix.py, values unchanged).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"grp": "characteristics_ch1.3.treatment"},
+          "patterns": {},
+          "combine": {},
+          "recode": {"grp": {"No cancer and no training": "NC", "DMBA-induced cancer and no training": "CA", "DMBA-induced cancer with 8 weeks of aerobic physical training": "CAEX"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal the GEO title exactly (inspect alignment_keys: title matched 12/12 tibialis columns). Group from characteristics_ch1.3.treatment recoded to NC/CA/CAEX. The 8 tumor GSMs are in the other case.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "DESeq2 median-ratio normalized counts (linear, non-integer)",
+          "recommended_method": "limma on log2(x+1)",
+          "final": {"source": "GSE299413_Tibialis_Normalized_counts.txt.gz", "paper_input": "raw featureCounts counts into DESeq2 (not deposited)"},
+          "reasoning": "Values are non-integer (integer fraction 0.28, e.g. 643.306, 9.59223), non-negative, linear scale; GEO data_processing states 'normalization was made using Median ratio (DESeq2)' and the supplementary files are 'Normalized counts and DESeq2'. No raw count matrix or RAW.tar is deposited. These are size-factor-scaled counts, not estimated counts with a documented rounding recipe, so integer count methods are not applicable; treat as linear normalized expression.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "NC"},
+          "subject": null,
+          "organism": "Rat",
+          "planned": ["grp_CA_vs_NC", "grp_CAEX_vs_NC", "grp_CAEX_vs_CA"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multi-group (one control, three planned pairwise contrasts from one model)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_CAEX_vs_CA", "control": "CA", "treatment": "CAEX", "role": "primary"},
+              {"name": "grp_CA_vs_NC", "control": "NC", "treatment": "CA", "role": "secondary"},
+              {"name": "grp_CAEX_vs_NC", "control": "NC", "treatment": "CAEX", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Three independent groups of 4 rats (S4.9.p1, Fig3 legend). The exercise effect within tumor-bearing rats is Cancer+Ex vs Cancer (S2.2.p1, Table S2); the paper also reports both groups vs Non-Cancer. All three come from one model on all 12 samples, matching the paper's single Partek DESeq2 model with three pairwise comparisons (deposited table). No Non-Cancer + Ex arm exists, so a pure exercise effect in healthy rats and an exercise x cancer interaction are not identifiable.",
+          "candidates": [{"value": "pool CA and CAEX vs NC", "reason_rejected": "pools levels; paper compares each separately"}, {"value": "cancer x exercise factorial", "reason_rejected": "no Non-Cancer + Ex arm"}],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one tibialis per rat; all male, wild type; no batch or lane variable in GEO metadata; paper model has group only.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (trend, empirical Bayes) on log2(x+1) of DESeq2-normalized counts",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on raw counts (Partek Flow)", "status": "blocked", "reason": "only DESeq2 median-ratio normalized (non-integer) counts are deposited; no raw count matrix"},
+            "deviations": ["limma on log2(normalized+1) instead of DESeq2 negative binomial on raw counts; low-expression genes are not filtered with Partek's noise filter (rule not fully specified)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Policy: linear normalized expression -> log2(x+1) then limma. Rounding normalized counts into DESeq2 is not a documented recipe and would discard size-factor information.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "paper rule applied to limma BH-adjusted p and log2FC"
+          },
+          "reasoning": "S4.9.p1: fold change >|2| and FDR < 0.05 -> padj < 0.05 and |log2FC| > 1 (strict).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["n=4 per group", "limma on log normalized counts instead of DESeq2 on raw counts", "paper notes Cancer+Ex vs Cancer heterogeneity yields few DEGs"]},
+          "paper_counts": {"tibialis/grp_CA_vs_NC": 553, "tibialis/grp_CAEX_vs_NC": 2020, "tibialis/grp_CAEX_vs_CA": 26},
+          "paper_genes": {"tibialis/grp_CA_vs_NC": ["Fbxo32", "Il6st"], "tibialis/grp_CAEX_vs_NC": ["Fbxo32", "Il6st", "Casp3"]},
+          "reasoning": "Counts from S2.2.p1; gene names from S2.1.p4 / Fig2d cachexia markers (as lookups).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "input matrix", "paper": "DESeq2 on raw featureCounts counts", "data": "only DESeq2 median-ratio normalized counts deposited", "disposition": "declared_deviation"},
+        {"item": "tibialis Cancer+Ex vs Cancer count", "paper": "10 up / 16 down (S2.2.p1)", "data": "deposited Partek DESeq2 table gives 7 up / 11 down at the same rule", "disposition": "recorded"}
+      ],
+      "executions": [
+        {
+          "name": "tibialis",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "reasoning": "one limma model on all 12 tibialis samples, three planned pairwise contrasts; CAEX vs CA is the exercise contrast"
+        }
+      ],
+      "enrichment": [
+        {"execution": "tibialis/grp_CAEX_vs_CA", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports pathway enrichment (Enrichr GO BP / Reactome); exercise contrast"}
+      ]
+    },
+    {
+      "case_id": "GSE299413_tumor",
+      "accession": "GSE299413",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12985970.paper.md"],
+        "metadata": "GSE299413/GSE299413_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41828598/prep/GSE299413_Tumor_normalized_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41828598/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE299413"],
+            "assay": "bulk RNA-seq of DMBA-induced tumors (rhabdomyosarcoma-like), Partek Flow DESeq2 (S4.9.p1)",
+            "sample_inclusion": "Cancer n=4, Cancer+Ex n=4 (Fig4 legend)",
+            "primary_estimand": "Effect of 8-week moderate aerobic training on tumor gene expression: Cancer+Ex vs Cancer (S2.3.p2)",
+            "planned_contrasts": ["Tumor Cancer+Ex vs Cancer (S2.3.p2, Table S4; paper: 24 up / 132 down = 156)"],
+            "paper_method": "DESeq2 (Partek Flow v11.0)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S4.9.p1 (FC >|2|, FDR < 0.05); Fig4 legend writes FC >= |2| and FDR <= 0.05"}
+          },
+          "reasoning": "S2.3.p2 and Fig4 give the tumor contrast and counts; deposited Partek table reproduces 24/132 at FDR<0.05 & |log2FC|>1.",
+          "confidence": "high",
+          "locator": "S2.3.p2; S4.9.p1; Fig4"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S10.p1 names GSE299413", "8 tumor samples 4/4 match Fig4 legend"]},
+          "reasoning": "Same series; tumor normalized counts file.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"grp": "characteristics_ch1.3.treatment"},
+          "patterns": {},
+          "combine": {},
+          "recode": {"grp": {"DMBA-induced cancer and no training": "CA", "DMBA-induced cancer with 8 weeks of aerobic physical training": "CAEX"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal GEO title exactly (8/8).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "DESeq2 median-ratio normalized counts (linear, non-integer)",
+          "recommended_method": "limma on log2(x+1)",
+          "final": {"source": "GSE299413_Tumor_Normalized_counts.txt.gz", "paper_input": "raw featureCounts counts into DESeq2 (not deposited)"},
+          "reasoning": "Non-integer linear values (integer fraction 0.31); data_processing states median-ratio DESeq2 normalization; no raw counts deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CA"},
+          "subject": null,
+          "organism": "Rat",
+          "planned": ["grp_CAEX_vs_CA"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {"analysis_type": "two-group", "design_column": "grp", "control": "CA", "treatment": "CAEX",
+                    "contrasts": [{"name": "grp_CAEX_vs_CA", "control": "CA", "treatment": "CAEX", "role": "primary"}]},
+          "reasoning": "Two independent groups of 4 tumors each; exercise vs sedentary tumor-bearing rats (S2.3.p2).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "One tumor per animal; no batch variable recorded.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (trend, empirical Bayes) on log2(x+1) of DESeq2-normalized counts",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on raw counts (Partek Flow)", "status": "blocked", "reason": "only DESeq2 median-ratio normalized (non-integer) counts are deposited"},
+            "deviations": ["limma on log2(normalized+1) instead of DESeq2 on raw counts"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Linear normalized expression -> log2(x+1) then limma.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "methods rule (strict) used; Fig4 legend's inclusive wording differs only at exact boundaries"
+          },
+          "reasoning": "S4.9.p1: FC >|2| and FDR < 0.05.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["n=4 per group", "limma on log normalized counts instead of DESeq2"]},
+          "paper_counts": {"tumor": 156},
+          "paper_genes": {"tumor": ["Tgfa", "Ccl19", "Ccl11", "Ccl21", "Cxcl14", "Dlk1"]},
+          "reasoning": "S2.3.p2: 132 down / 24 up; Tgfa up 10.6-fold; Ccl19, Ccl11, Ccl21, Cxcl14 down; Dlk1 DE.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "input matrix", "paper": "DESeq2 on raw counts", "data": "only normalized counts deposited", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "tumor",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "CA", "treatment_group": "CAEX"},
+          "role": "primary",
+          "reasoning": "two-group limma, exercise vs sedentary tumor-bearing rats"
+        }
+      ],
+      "enrichment": [
+        {"execution": "tumor", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports pathway enrichment of tumor DEGs"}
+      ]
+    }
+  ]
+}

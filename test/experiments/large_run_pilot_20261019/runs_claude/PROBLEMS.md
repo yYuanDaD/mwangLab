@@ -439,3 +439,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41027539 (GSE283691)
 
 - inspect strips GSM_ prefix but execute does not (case_runner.py:281 vs native.py:304); joint_limma vs-reference only; ORA falls back to padj (case_runner.py:786, patched after this row) Details: `PMID41027539/HANDBACK.md`.
+
+## 082a6f74bc23189c7e69bf6269a1995a3930db4f (GSE121868;GSE123865)
+
+- case_runner.py:503 calls align_to_metadata before honoring a refused alignment gate (raises native.py:304), so GSE121868 stopped at ownership; screen assigned the wrong GSE Details: `082a6f74bc23189c7e69bf6269a1995a3930db4f/HANDBACK.md`.
+
+## PMID41828598 (GSE299413)
+
+- case_runner.py:631/660 filter_low_counts computed CPM on log matrix when case transform set (patched); inspect counts Start/Stop/Length as samples (patched) Details: `PMID41828598/HANDBACK.md`.
+
+## aeab5224f96cfdf3f06293d2da461bca07b26bfc (GSE129962)
+
+- edger_tools.py:107 no filterByExpr (30k-gene BH, ~5min/contrast); edger_tools.py:116 two-arm only, no interaction; ERCC NaN rows needed prep script Details: `aeab5224f96cfdf3f06293d2da461bca07b26bfc/HANDBACK.md`.

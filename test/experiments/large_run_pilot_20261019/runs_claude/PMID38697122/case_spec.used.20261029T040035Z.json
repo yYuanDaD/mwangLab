@@ -1,0 +1,2933 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122",
+ "request": "Analyze GSE242354 for PMID 38697122 (Molecular adaptations in response to exercise training are associated with tissue-specific transcriptomic and epigenomic signatures.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "data",
+ "cases": [
+  {
+   "case_id": "GSE242354_HIPPOC",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t52-hippocampus_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "hippocampus",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat hippocampus (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, hippocampus (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; paper: 124 ERGs"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t52-hippocampus RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759767": "vial 80035995205: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759764": "vial 80034885205: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759768": "vial 80035995206: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759765": "vial 80034885206: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759769": "vial 80035995207: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759766": "vial 80034885207: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "paper_counts": {
+      "pooled/grp_W8_vs_SED": 124
+     },
+     "paper_genes": {
+      "pooled/grp_W8_vs_SED": [
+       "Gpr37l1"
+      ]
+     },
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE242354_SKMGN",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t55-gastrocnemius_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "SKM-GN",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat SKM-GN (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, SKM-GN (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t55-gastrocnemius RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759776": "vial 80001995510: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759770": "vial 80000885510: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759777": "vial 80001995528: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759773": "vial 80000885537: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759780": "vial 80001995540: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759781": "vial 80001995542: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759774": "vial 80000885540: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759775": "vial 80000885541: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759779": "vial 80001995533: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759778": "vial 80001995532: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759772": "vial 80000885533: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759771": "vial 80000885532: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "up",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    },
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "down",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE242354_HEART",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t58-heart_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "heart",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat heart (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, heart (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t58-heart RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file has 23 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 125 of 32,883 genes"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759783": "vial 80033995819: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759782": "vial 80032885819: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file has 23 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 125 of 32,883 genes"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "pooled/grp_W8_vs_SED": [
+       "Adra1b",
+       "Adra1d",
+       "Adra2b",
+       "Adrb1"
+      ]
+     },
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file has 23 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 125 of 32,883 genes",
+     "disposition": "repaired"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE242354_KIDNEY",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t59-kidney_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "kidney",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat kidney (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, kidney (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t59-kidney RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file has 5 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 31 of 32,883 genes"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759797": "vial 80029995909: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759796": "vial 80028885909: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file has 5 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 31 of 32,883 genes"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file has 5 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 31 of 32,883 genes",
+     "disposition": "repaired"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE242354_LUNG",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t66-lung_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "lung",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat lung (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, lung (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t66-lung RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 5 of 32,883 genes"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759786": "vial 80026886619: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759787": "vial 80027996619: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 5 of 32,883 genes"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 5 of 32,883 genes",
+     "disposition": "repaired"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "up",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    },
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "down",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE242354_LIVER",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t68-liver_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "liver",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat liver (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, liver (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t68-liver RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 6 of 32,883 genes"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759790": "vial 80003996808: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759788": "vial 80002886808: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759791": "vial 80003996809: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759789": "vial 80002886809: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 6 of 32,883 genes"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file has 1 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 6 of 32,883 genes",
+     "disposition": "repaired"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE242354_BAT",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t69-brown-adipose_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "BAT",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat BAT (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, BAT (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; paper: 1237 ERGs"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t69-brown-adipose RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759793": "vial 80031996905: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759792": "vial 80030886905: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7760555": "vial 90266016902: S2.1.p1: one female BAT sample clustered with WAT-SC and was excluded; our check (log2CPM correlation to the BAT vs WAT-SC median profile) singles out this female control (r_BAT 0.763 vs r_WAT 0.765; every other BAT sample r_BAT - r_WAT > 0.07)"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)"
+      ]
+     },
+     "paper_counts": {
+      "pooled/grp_W8_vs_SED": 1237
+     },
+     "paper_genes": {},
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file intact; prep/repair_matrix.py only converted it to CSV (no rows dropped)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "up",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    },
+    {
+     "execution": "pooled/grp_W8_vs_SED",
+     "ora": true,
+     "gsea": false,
+     "direction": "down",
+     "reasoning": "S2.7.p2/FIG6C: paper runs ORA (Metascape) on up- and down-regulated ERGs per tissue; run for the three tissues whose pathways the text names (BAT immune up / TCA down, lung immune down, SKM-GN mitochondrial up)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE242354_WATSC",
+   "accession": "GSE242354",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC11228891.paper.md"
+    ],
+    "metadata": "GSE242354/GSE242354_metadata.csv",
+    "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/t70-white-adipose_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID38697122/prep/repair_matrix.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE242358 (SuperSeries, S5.2.3.p1)",
+       "GSE242354 (RNA-seq SubSeries)"
+      ],
+      "tissue": "WAT-SC",
+      "primary_estimand": "Effect of 8 weeks of endurance exercise training (EET) vs sedentary control on gene expression in rat WAT-SC (F344, 6 months old, 5 M + 5 F per group)",
+      "planned_contrasts": [
+       "8-week EET vs control, WAT-SC (S2.7.p1, FIG6A); ERGs total 3,477 across 8 tissues; per-tissue count only in Figure 6A (not in text)"
+      ],
+      "factors": {
+       "training group": [
+        "control (8 w sedentary)",
+        "1 w",
+        "2 w",
+        "4 w",
+        "8 w"
+       ],
+       "sex": [
+        "male",
+        "female"
+       ]
+      },
+      "sample_inclusion": "5 animals per sex per group randomly selected for assays (S5.4.2.p1); one female BAT sample excluded (S2.1.p1)",
+      "paper_method": "DESeq2 LRT per sex: full ~ technical covariates + training group (control,1,2,4,8 w) vs reduced ~ technical covariates; Fisher sum-of-logs across sexes; IHW across tissues; 5% FDR; keep genes whose week-8 log2FC agrees in sign in both sexes (S5.4.3.p2)",
+      "low_count_filter": "remove genes with CPM <= 0.5 in all but one sample, per tissue (S5.4.3.p1)",
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "paper_results": "3,477 ERGs across 8 tissues; BAT 1,237 (largest), hippocampus 124 (smallest); lung ~2x more down than up (S2.7.p1)"
+     },
+     "reasoning": "S2.7.p1 and S5.4.3.p2 define ERGs; S5.4.2.p1 sample selection; S5.4.3.p1 filtering. The paper's estimand is EET vs control at 8 weeks, with the LRT including the 1/2/4 w groups.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.2.3.p1 deposits RNA-seq at GEO GSE242358; GSE242354 metadata series_id = 'GSE242354,GSE242358'",
+       "matrix is the MoTrPAC PASS1B t70-white-adipose RSEM gene-count file of GSE242354",
+       "10 animals per group (5 M, 5 F) for control-8w and 1/2/4/8 w training, matching S5.4.2.p1 / S5.4.10.p1",
+       "GEO file has 4 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 23 of 32,883 genes"
+      ]
+     },
+     "reasoning": "Series id, tissue, species (Rattus norvegicus) and group sizes match the paper.",
+     "confidence": "high",
+     "locator": "S5.2.3.p1"
+    },
+    "alignment": {
+     "key_column": "vial",
+     "key_patterns": {
+      "vial": [
+       "title",
+       "_vial_(\\d+)$"
+      ]
+     },
+     "patterns": {
+      "sex": [
+       "title",
+       "_(male|female)_"
+      ]
+     },
+     "aliases": {
+      "grp": "characteristics_ch1.1.treatment"
+     },
+     "recode": {
+      "grp": {
+       "Control - 8 weeks": "SED",
+       "Training - 1 week": "W1",
+       "Training - 2 weeks": "W2",
+       "Training - 4 weeks": "W4",
+       "Training - 8 weeks": "W8",
+       "Reference": "REF"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {
+      "GSM7759795": "vial 80005997012: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design",
+      "GSM7759794": "vial 80004887012: MoTrPAC pooled reference RNA (treatment 'Reference'), not an animal of the study design"
+     },
+     "reasoning": "Matrix columns are MoTrPAC vial labels, which end every GEO title ('..._vial_<label>'); exact match on that derived key. Sex and group from the title and the treatment field. Reference RNA vials are not study animals.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO file name 'rsem-genes-count'; data_processing names RSEM; ~92% integer values with fractional entries (RSEM expected counts)",
+      "paper_input": "RSEM gene counts, filtered, then DESeq2 (S5.4.3.p1)"
+     },
+     "reasoning": "RSEM expected counts: DESeq2 after rounding, as in the paper's pipeline (S5.4.3.p1).",
+     "confidence": "high",
+     "locator": "S5.4.3.p1"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Rat",
+     "covariate_candidates": [
+      "sex"
+     ],
+     "planned": [
+      "grp_W8_vs_SED"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, four training durations), independent animals",
+      "formula": "~ sex + grp",
+      "contrasts": [
+       {
+        "name": "grp_W8_vs_SED",
+        "control": "SED",
+        "treatment": "W8",
+        "role": "primary"
+       },
+       {
+        "name": "grp_W4_vs_SED",
+        "control": "SED",
+        "treatment": "W4",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W2_vs_SED",
+        "control": "SED",
+        "treatment": "W2",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_W1_vs_SED",
+        "control": "SED",
+        "treatment": "W1",
+        "role": "exploratory"
+       }
+      ],
+      "estimand_type": "causal (randomized to control or training, S5.4.1.p1)"
+     },
+     "candidates": [
+      {
+       "value": "LRT over all 5 groups per sex + Fisher + IHW (paper)",
+       "reason_rejected": "no LRT/Fisher/IHW executor in the runner; Wald W8 vs SED from the same all-group model is the closest available estimand"
+      },
+      {
+       "value": "W8 vs SED using only those 20 animals",
+       "reason_rejected": "the paper's model includes all training groups; one model on all samples is preferred"
+      }
+     ],
+     "reasoning": "One control (8-week sedentary) with four training durations: one model with planned contrasts vs control, never pooled levels. Sex kept as a covariate in the pooled model and analysed separately in per-sex models as the paper does.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "covariance": {
+     "confounding_candidates": [
+      "sex"
+     ],
+     "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "included"
+       },
+       {
+        "name": "technical covariates (RIN, UMI duplication, etc.)",
+        "disposition": "excluded: the paper does not list which technical covariates it used (S5.4.3.p2 cites ref 2); not chosen by column name"
+       }
+      ]
+     },
+     "reasoning": "Animals are independent (one sample per animal per tissue), no blocking. Sex balanced across groups; included as a covariate in the pooled model; per-sex models need none.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "method": {
+     "transform": null,
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ sex + grp; per-sex ~ grp)",
+      "formula": "~ sex + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 LRT per sex + Fisher combination + IHW + sign agreement",
+       "status": "blocked",
+       "reason": "runner has no LRT, Fisher meta-analysis or IHW executor"
+      },
+      "deviations": [
+       "Wald W8 vs SED instead of LRT over all groups",
+       "pooled-sex model with sex covariate instead of Fisher-combined per-sex tests (per-sex models run as secondary)",
+       "BH instead of IHW",
+       "technical covariates not included",
+       "RSEM expected counts rounded to integers",
+       "low-count filter: CPM >= 0.5 in >= 2 samples of the execution (paper: genes with CPM <= 0.5 in all but one sample removed)"
+      ]
+     },
+     "reasoning": "Paper used DESeq2 on filtered RSEM counts; same family here, with declared deviations.",
+     "confidence": "medium",
+     "locator": "S5.4.3.p2"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "IHW (tissue as covariate) on Fisher-combined male/female LRT p-values",
+       "cutoff": 0.05,
+       "effect_metric": null,
+       "effect_cutoff": null,
+       "inclusive": false,
+       "extra_rule": "direction of week-8 log2FC must agree between males and females",
+       "source_locator": "S5.4.3.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper: 5% IHW-FDR on Fisher-combined per-sex LRT p plus sex sign agreement at week 8; applied: BH padj < 0.05 on the pooled Wald W8 vs SED test, no fold-change rule (the paper has none). Sign agreement is computed afterwards in HANDBACK as a supplementary count."
+     },
+     "reasoning": "S5.4.3.p2: ERGs at 5% IHW FDR, no fold-change cutoff.",
+     "confidence": "high",
+     "locator": "S5.4.3.p2"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "paper ERGs are LRT-based (any training time point) with Fisher/IHW; ours are Wald week-8 vs control with BH, so counts are not expected to match exactly",
+       "technical covariates omitted",
+       "GEO file has 4 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 23 of 32,883 genes"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "pooled/grp_W8_vs_SED": [
+       "Adra1b",
+       "Adra1d",
+       "Adra2b",
+       "Adrb1"
+      ]
+     },
+     "reasoning": "Paper counts from S2.7.p1 text; other tissues' counts are only in Figure 6A.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "differential test",
+     "paper": "DESeq2 LRT per sex, Fisher, IHW, sign agreement",
+     "data": "runner offers Wald contrasts with BH",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "matrix integrity",
+     "paper": "-",
+     "data": "GEO file has 4 damaged lines (NUL-byte blocks, same bytes on the GEO FTP server); prep/repair_matrix.py drops them, losing 23 of 32,883 genes",
+     "disposition": "repaired"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pooled",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ],
+      "covariates": [
+       "sex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 fit on all 50 animals of the tissue (5 groups x 5 M + 5 F), ~ sex + grp. grp_W8_vs_SED is the paper's 8-week EET vs control estimand (S2.7.p1; S5.4.3.p2 week-8 log2FC); W1/W2/W4 vs SED come from the same fit and are exploratory (the paper's LRT used all groups)."
+    },
+    {
+     "name": "male",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "male"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S5.4.3.p2 tests males and females separately with all training groups in the model; male model ~ grp (25 animals); week-8 contrast feeds the sign-agreement rule."
+    },
+    {
+     "name": "female",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "round_estimated_counts": true,
+      "alpha": 0.05,
+      "comparisons": [
+       "grp_W1_vs_SED",
+       "grp_W2_vs_SED",
+       "grp_W4_vs_SED",
+       "grp_W8_vs_SED"
+      ]
+     },
+     "filter_low_counts": {
+      "min_cpm": 0.5,
+      "min_samples": 2
+     },
+     "subset": {
+      "sex": [
+       "female"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "Female model ~ grp, as for males (S5.4.3.p2)."
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}

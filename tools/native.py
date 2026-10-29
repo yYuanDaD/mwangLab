@@ -226,12 +226,23 @@ def _frame(metadata: pd.DataFrame | str | Path) -> pd.DataFrame:
     return frame
 
 
+# Numeric gene-annotation columns (featureCounts, DESeq2 result tables) that are not samples.
+_ANNOTATION_NAMES = {"start", "end", "stop", "length", "strand", "chr", "chrom", "chromosome", "width",
+                     "gene_start", "gene_end", "gene_length", "transcript_length", "effective_length",
+                     "efflength", "basemean", "log2foldchange", "lfcse", "stat", "pvalue", "padj", "logfc",
+                     "aveexpr", "p.value", "adj.p.val", "fdr", "gc", "gc_content", "entrez", "entrezid"}
+
+
 def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None) -> dict:
     """Describe the numeric profile of a matrix and list type candidates, without choosing."""
     raw = read_table(path)
     numeric = _numeric(raw, str(path))
     if sample_columns is not None:
         numeric = numeric.loc[:, [c for c in numeric.columns if str(c) in set(map(str, sample_columns))]]
+    else:
+        named = [c for c in numeric.columns if str(c).strip().lower() in _ANNOTATION_NAMES]
+        if named and len(named) < numeric.shape[1] - 1:
+            numeric = numeric.drop(columns=named)
     profile = _profile(numeric)
     values = numeric.to_numpy(dtype=float)
     finite = values[np.isfinite(values)]

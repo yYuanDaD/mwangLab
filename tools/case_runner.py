@@ -564,6 +564,7 @@ class CaseRun:
             return self._finish()
 
         me = g.method
+        self.case_transform = me.transform
         self.analysis_path = self._transform(self.mat_path, me.transform, case.dir / "transformed", me.pseudocount)
         method_final = {"matrix_type": m.matrix_type, **me.final}
         if me.transform:
@@ -629,6 +630,11 @@ class CaseRun:
 
     def _inputs_for(self, ex: Execution, out: Path) -> tuple[Path, Path, pd.DataFrame]:
         matrix = self.analysis_path if ex.matrix == "analysis" and not ex.transform else self.mat_path
+        transform = ex.transform
+        if ex.filter_low_counts:
+            # filter on the aligned counts, then apply this execution's (or the case's) transform
+            matrix = self.mat_path
+            transform = ex.transform or (self.case_transform if ex.matrix == "analysis" else None)
         meta = self.dm
         if not ex.subset and not ex.complete_pairs and not ex.filter_low_counts:
             return self._transform(matrix, ex.transform, out / "input"), self.dm_path, meta
@@ -664,7 +670,7 @@ class CaseRun:
             counts.loc[keep].to_csv(matrix_path)
             self.result.setdefault("low_count_filter", {})[ex.name] = {
                 "rule": rule, "genes_before": int(len(keep)), "genes_kept": int(keep.sum())}
-        return self._transform(matrix_path, ex.transform, idir), meta_path, meta
+        return self._transform(matrix_path, transform, idir), meta_path, meta
 
     def _execute(self, ex: Execution) -> None:
         out = self.case.dir / "results" / ex.name

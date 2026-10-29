@@ -1,0 +1,1006 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41828598",
+  "subject_id": "GSE299413_tibialis",
+  "created_at": "2026-10-29T00:00:59",
+  "finished_at": "2026-10-29T00:01:24",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12985970.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12985970.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-29T00:00:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7ca197f57d05371ab2676fc4408093f4a17842a4d498814473b4b47c99b2d8bf",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE299413_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE299413\\GSE299413_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-29T00:00:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "77803ceb573416a92204e32eedba96bee4fafa817e7602cb68d103fa2fced08a",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_matrix.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\prep_matrix.py",
+      "locator": null,
+      "captured_at": "2026-10-29T00:00:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "fa3b5372dee8979e7f0a953dab22a552af6fe66770b64049e197377b32151806",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE299413_Tibialis_normalized_clean.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\prep\\GSE299413_Tibialis_normalized_clean.csv",
+      "locator": null,
+      "captured_at": "2026-10-29T00:00:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0b758d470b2ec229c2d118c52417dc8afafc73a0477f9d31d12c4c3d9951f0be",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE299413"
+        ],
+        "assay": "bulk RNA-seq (Illumina NovaSeq 6000, 100 bp PE), STAR to rn7, featureCounts, Partek Flow DESeq2 (S4.9.p1)",
+        "organism": "Rat (male Sprague-Dawley)",
+        "factors": {
+          "group": [
+            "Non-Cancer",
+            "Cancer (DMBA, no training)",
+            "Cancer + Ex (DMBA + 8 weeks moderate aerobic treadmill training)"
+          ],
+          "tissue": [
+            "tibialis anterior",
+            "tumor"
+          ]
+        },
+        "sample_inclusion": "four animals per group per tissue (S4.9.p1; Fig3 legend n=4/4/4; Fig4 legend tumor Cancer n=4, Cancer+Ex n=4)",
+        "primary_estimand": "Effect of 8-week moderate aerobic training in DMBA tumor-bearing rats on tibialis anterior gene expression: Cancer+Ex vs Cancer (S2.2.p1, Table S2); Cancer vs Non-Cancer and Cancer+Ex vs Non-Cancer are the paper's other planned tibialis contrasts",
+        "planned_contrasts": [
+          "Tibialis Cancer vs Non-Cancer (S2.2.p1; paper: 523 up / 30 down = 553)",
+          "Tibialis Cancer+Ex vs Non-Cancer (S2.2.p1; paper: 1276 up / 744 down = 2020)",
+          "Tibialis Cancer+Ex vs Cancer (S2.2.p1, Table S2; paper: 10 up / 16 down = 26)",
+          "Tumor Cancer+Ex vs Cancer (S2.3.p2, Fig4, Table S4; paper: 24 up / 132 down = 156) - separate case"
+        ],
+        "repeated_measure_unit": "none within a tissue; the same animals contribute tibialis and tumor (title numbers 2,3,4,7,31,33,38,39) but tissues are analyzed separately",
+        "normalization": "DESeq2 median ratio in Partek Flow; noise filter <=10 (GEO data_processing)",
+        "paper_method": "DESeq2 (Partek Flow v11.0), per tissue, three-group model for tibialis",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "source_locator": "S4.9.p1 (fold change >|2| and FDR < 0.05); S2.2.p1 (fold change >|2| and adjusted p < 0.05)"
+        }
+      },
+      "reason": "Paper S4.9.p1 describes RNA-seq of tibialis anterior and tumor from four animals per group, DESeq2 in Partek Flow, DEG rule FC>|2| and FDR<0.05. S2.2.p1 gives the three tibialis contrasts and counts; S2.3.p2 gives the tumor exercise contrast. The deposited Partek DESeq2 tables reproduce these counts at that rule (tibialis 523/30, 1278/747, 7/11; tumor 24/132), confirming the threshold interpretation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:00:59"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\prep\\GSE299413_Tibialis_normalized_clean.csv",
+        "owned": true,
+        "checks": [
+          "S10.p1 names GSE299413",
+          "GEO organism Rattus norvegicus, male, matches S4.1.p1",
+          "12 tibialis samples (4/4/4) and 8 tumor samples (4/4) match S4.9.p1 and figure legends",
+          "data_processing: Partek Flow, STAR rn7, DESeq2 median ratio = S4.9.p1"
+        ],
+        "accession": "GSE299413",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE299413\\GSE299413_metadata.csv"
+      },
+      "reason": "Accession cited in Data Availability; group sizes, tissues and processing all match the paper. Matrix used: GSE299413_Tibialis_Normalized_counts.txt.gz (gene symbol index and sample columns kept by prep_matrix.py, values unchanged).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:00:59"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 12,
+        "n_metadata": 20,
+        "coverage": 0.6,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [
+          "GSM9038851",
+          "GSM9038852",
+          "GSM9038853",
+          "GSM9038854",
+          "GSM9038855",
+          "GSM9038856",
+          "GSM9038857",
+          "GSM9038858"
+        ],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.3.treatment",
+              "recode": {
+                "No cancer and no training": "NC",
+                "DMBA-induced cancer and no training": "CA",
+                "DMBA-induced cancer with 8 weeks of aerobic physical training": "CAEX"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\design_metadata.csv",
+          "sha256": "e74b309ba783864f3b7afdf580587121f04d82c0d46e67691b458e9452b38940",
+          "levels": {
+            "grp": {
+              "NC": 4,
+              "CA": 4,
+              "CAEX": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal the GEO title exactly (inspect alignment_keys: title matched 12/12 tibialis columns). Group from characteristics_ch1.3.treatment recoded to NC/CA/CAEX. The 8 tumor GSMs are in the other case.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:00:59"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE299413_Tibialis_Normalized_counts.txt.gz",
+        "paper_input": "raw featureCounts counts into DESeq2 (not deposited)",
+        "matrix_type": "DESeq2 median-ratio normalized counts (linear, non-integer)",
+        "recommended_method": "limma on log2(x+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\aligned_matrix.csv",
+          "sha256": "5f15453314a5776235abfe2edb43a4f60844f07c4f5971f4768af0e9dfb8c19b",
+          "n_features": 18939,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3593060.0,
+          "median": 176.663,
+          "integer_fraction": 0.1008,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Values are non-integer (integer fraction 0.28, e.g. 643.306, 9.59223), non-negative, linear scale; GEO data_processing states 'normalization was made using Median ratio (DESeq2)' and the supplementary files are 'Normalized counts and DESeq2'. No raw count matrix or RAW.tar is deposited. These are size-factor-scaled counts, not estimated counts with a documented rounding recipe, so integer count methods are not applicable; treat as linear normalized expression.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:00"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group (one control, three planned pairwise contrasts from one model)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_CAEX_vs_CA",
+            "control": "CA",
+            "treatment": "CAEX",
+            "role": "primary"
+          },
+          {
+            "name": "grp_CA_vs_NC",
+            "control": "NC",
+            "treatment": "CA",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_CAEX_vs_NC",
+            "control": "NC",
+            "treatment": "CAEX",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "Three independent groups of 4 rats (S4.9.p1, Fig3 legend). The exercise effect within tumor-bearing rats is Cancer+Ex vs Cancer (S2.2.p1, Table S2); the paper also reports both groups vs Non-Cancer. All three come from one model on all 12 samples, matching the paper's single Partek DESeq2 model with three pairwise comparisons (deposited table). No Non-Cancer + Ex arm exists, so a pure exercise effect in healthy rats and an exercise x cancer interaction are not identifiable.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:08"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 12,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "grp_CAEX",
+            "grp_NC"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 9,
+          "levels": {
+            "grp": {
+              "NC": 4,
+              "CA": 4,
+              "CAEX": 4
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "CA"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "CAEX"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "NC"
+              ],
+              "n": 4
+            }
+          ],
+          "min_cell_size": 4,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.genotype",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.treatment",
+            "n_levels": 3,
+            "status": "complete_confounding",
+            "crosstab": {
+              "CA": {
+                "DMBA-induced cancer and no training": 4,
+                "DMBA-induced cancer with 8 weeks of aerobic physical training": 0,
+                "No cancer and no training": 0
+              },
+              "CAEX": {
+                "DMBA-induced cancer and no training": 0,
+                "DMBA-induced cancer with 8 weeks of aerobic physical training": 4,
+                "No cancer and no training": 0
+              },
+              "NC": {
+                "DMBA-induced cancer and no training": 0,
+                "DMBA-induced cancer with 8 weeks of aerobic physical training": 0,
+                "No cancer and no training": 4
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Independent animals, one tibialis per rat; all male, wild type; no batch or lane variable in GEO metadata; paper model has group only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:08"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "DESeq2 median-ratio normalized counts (linear, non-integer)",
+        "method": "limma (trend, empirical Bayes) on log2(x+1) of DESeq2-normalized counts",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "DESeq2 on raw counts (Partek Flow)",
+          "status": "blocked",
+          "reason": "only DESeq2 median-ratio normalized (non-integer) counts are deposited; no raw count matrix"
+        },
+        "deviations": [
+          "limma on log2(normalized+1) instead of DESeq2 negative binomial on raw counts; low-expression genes are not filtered with Partek's noise filter (rule not fully specified)"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Policy: linear normalized expression -> log2(x+1) then limma. Rounding normalized counts into DESeq2 is not a documented recipe and would discard size-factor information.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:09"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "paper rule applied to limma BH-adjusted p and log2FC"
+      },
+      "reason": "S4.9.p1: fold change >|2| and FDR < 0.05 -> padj < 0.05 and |log2FC| > 1 (strict).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:09"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "tibialis",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\transformed\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CA_vs_NC.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CAEX_vs_NC.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CAEX_vs_CA.csv"
+        ],
+        "counts": {
+          "tibialis/grp_CA_vs_NC": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 18939,
+              "n_significant": 59,
+              "n_up": 56,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 18939,
+              "n_significant": 59,
+              "n_up": 56,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          },
+          "tibialis/grp_CAEX_vs_NC": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 18939,
+              "n_significant": 852,
+              "n_up": 471,
+              "n_down": 381,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 18939,
+              "n_significant": 1072,
+              "n_up": 516,
+              "n_down": 556,
+              "deg_sanity": "ok"
+            }
+          },
+          "tibialis/grp_CAEX_vs_CA": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 18939,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 18939,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "one limma model on all 12 tibialis samples, three planned pairwise contrasts; CAEX vs CA is the exercise contrast",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:18"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "tibialis/grp_CAEX_vs_CA",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "reason_not_run": "no gene passes the ORA input threshold"
+      },
+      "reason": "paper reports pathway enrichment (Enrichr GO BP / Reactome); exercise contrast",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0010"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:18"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "tibialis/grp_CAEX_vs_CA",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\enrichment_tibialis_grp_CAEX_vs_CA\\gsea\\DEG_results_grp_CAEX_vs_CA_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 18939 Rat genes ranked by 'stat'. 50 Hallmark sets tested, 28 significant at FDR q < 0.25. Rat genes matched to mouse Hallmark by symbol: 3959/4291 Hallmark genes present in the ranking. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_ALLOGRAFT_REJECTION | NES=2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_SPERMATOGENESIS | NES=2.03 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.91 | NOM p=0.00e+00 | FDR q=2.57e-04 - HALLMARK_E2F_TARGETS | NES=1.90 | NOM p=0.00e+00 | FDR q=1.93e-04 - HALLMARK_COAGULATION | NES=1.73 | NOM p=0.00e+00 | FDR q=4.17e-03 - HALLMARK_G2M_CHECKPOINT | NES=1.55 | NOM p=0.00e+00 | FDR q=2.42e-02 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.52 | NOM p=1.64e-03 | FDR q=2.65e-02 - HALLMARK_COMPLEMENT | NES=1.43 | NOM p=5.08e-03 | FDR q=5.63e-02 - HALLMARK_MYC_TARGETS_V2 | NES=1.32 | NOM p=8.96e-02 | FDR q=1.34e-01 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.28 | NOM p=5.29e-02 | FDR q=1.62e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-4.35 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYOGENESIS | NES=-2.92 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.80 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.79 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_PEROXISOME | NES=-1.89 | NOM p=0.00e+00 | FDR q=1.34e-03 - HALLMARK_UV_RESPONSE_DN | NES=-1.73 | NOM p=0.00e+00 | FDR q=6.91e-03 - HALLMARK_HYPOXIA | N..."
+      },
+      "reason": "paper reports pathway enrichment (Enrichr GO BP / Reactome); exercise contrast",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0010"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:24"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "n=4 per group",
+          "limma on log normalized counts instead of DESeq2 on raw counts",
+          "paper notes Cancer+Ex vs Cancer heterogeneity yields few DEGs"
+        ],
+        "results": {
+          "tibialis/grp_CA_vs_NC": {
+            "n_deg": 59,
+            "up": 56,
+            "down": 3,
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "audit_n": 59
+          },
+          "tibialis/grp_CAEX_vs_NC": {
+            "n_deg": 852,
+            "up": 471,
+            "down": 381,
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "audit_n": 1072
+          },
+          "tibialis/grp_CAEX_vs_CA": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05 and |log2FoldChange| > 1",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "tibialis/grp_CA_vs_NC": 553,
+          "tibialis/grp_CAEX_vs_NC": 2020,
+          "tibialis/grp_CAEX_vs_CA": 26
+        },
+        "comparison": {
+          "tibialis/grp_CA_vs_NC": {
+            "ours": 59,
+            "paper": 553
+          },
+          "tibialis/grp_CAEX_vs_NC": {
+            "ours": 852,
+            "paper": 2020
+          },
+          "tibialis/grp_CAEX_vs_CA": {
+            "ours": 0,
+            "paper": 26
+          }
+        },
+        "paper_gene_check": {
+          "tibialis/grp_CA_vs_NC": {
+            "Fbxo32": {
+              "AveExpr": 12.9261,
+              "log2FoldChange": 1.9347,
+              "padj": 0.2197,
+              "pvalue": 0.0051
+            },
+            "Il6st": {
+              "AveExpr": 13.0564,
+              "log2FoldChange": 1.0875,
+              "padj": 0.2732,
+              "pvalue": 0.0139
+            }
+          },
+          "tibialis/grp_CAEX_vs_NC": {
+            "Fbxo32": {
+              "AveExpr": 12.9261,
+              "log2FoldChange": 2.1688,
+              "padj": 0.0461,
+              "pvalue": 0.0025
+            },
+            "Il6st": {
+              "AveExpr": 13.0564,
+              "log2FoldChange": 1.4847,
+              "padj": 0.044,
+              "pvalue": 0.0022
+            },
+            "Casp3": {
+              "AveExpr": 7.4654,
+              "log2FoldChange": 1.1898,
+              "padj": 0.0439,
+              "pvalue": 0.0022
+            }
+          }
+        }
+      },
+      "reason": "Counts from S2.2.p1; gene names from S2.1.p4 / Fig2d cachexia markers (as lookups).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-29T00:01:24"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e94958fd7c9ab3ac4db909c7e1b392a21bc1e9fac967a10f01719260855c1b82",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "01ca696caeba83d5c9d8aee8f19a54b000b5b4943faeceadce58c9328c1eeee6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5f15453314a5776235abfe2edb43a4f60844f07c4f5971f4768af0e9dfb8c19b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e74b309ba783864f3b7afdf580587121f04d82c0d46e67691b458e9452b38940",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "676d5019a20c9c26940619ded204560d4810f22b6cf948f8a0e85a20c59f14ae",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6fac973198996a4e85bd1e13a7bdd9bc09ba7cbb4884529bada0f4fcc8fc754d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6e485e2aa92429019fe7ff6a9e93bcf87a4c2cf40b746ec6f486091cfb92522b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CA_vs_NC.csv",
+      "role": "deg_tibialis/grp_CA_vs_NC",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "929b13db0ba144a1b91017cd8d74ad912741b020cfdd9ef113e84ef71ab93828",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CAEX_vs_NC.csv",
+      "role": "deg_tibialis/grp_CAEX_vs_NC",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "53e20acc1b773a0f490c060b281747baff11bc89356c7203c4f34401b3fe10e4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\results\\tibialis\\DEG_results_grp_CAEX_vs_CA.csv",
+      "role": "deg_tibialis/grp_CAEX_vs_CA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3f32e9d6518c7b6babf2362727b2f481b08217298ad7a80502cde98f3188c364",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41828598\\GSE299413_tibialis\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fa17152fff1ac607cb11f50d150d05e10f41897ad16e829bb0fe74bd3d3618b9",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
