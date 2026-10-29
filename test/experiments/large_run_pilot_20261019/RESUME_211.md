@@ -44,3 +44,8 @@ time, until the 5-hour quota runs out; short report after each batch of 5. Start
 Quota stop 2026-10-29 ~06:20: rows 35, 46, 49, 50 were cut off mid-run (their subagents were
 resumed with their context after the reset, not restarted). 40/211 recorded at that point.
 Resumed 2026-10-29 14:20 (coordinator nudge after reset).
+
+Stopped 2026-10-29 14:22 at the owner's request ("先别跑了", via the coordinator). Row 49 finished
+after its resume; rows 35, 46, 50 (cut off by the quota, then resumed) and 51 (just started) were
+stopped. Their partial folders are in `runs_claude/_interrupted/` (51 had none yet). 41/211 done.
+Next time: rerun 35, 46, 50, 51, then continue in `run_order_211.txt` from 52.

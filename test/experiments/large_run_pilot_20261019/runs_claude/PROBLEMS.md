@@ -455,3 +455,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38697122 (GSE242354)
 
 - GEO RSEM files corrupted (NUL bytes, 5 tissues; repaired); native.py:609 no sep sniff; no LRT/IHW executor; exclude_samples needs GSM ids (case_runner.py:505) Details: `PMID38697122/HANDBACK.md`.
+
+## PMID41775886 (GSE297515)
+
+- GEO genotype/treatment shifted 1 sample vs titles (used titles); summary.csv design_col shows formula for factorial case; no sex column; paper low-count rule needed prep script Details: `PMID41775886/HANDBACK.md`.
