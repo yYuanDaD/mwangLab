@@ -413,12 +413,12 @@ def _threshold_kwargs(rule: dict) -> dict:
             "effect_inclusive": rule.get("effect_inclusive"), "effect_cutoff_down": rule.get("effect_cutoff_down")}
 
 
-def _n_ora_input(deg_csv: str, cutoff: float, lfc: float, direction: str) -> Optional[int]:
-    """Genes that pass the ORA input rule, or None when the table lacks padj/log2FoldChange."""
+def _n_ora_input(deg_csv: str, cutoff: float, lfc: float, direction: str, p_column: str = "padj") -> Optional[int]:
+    """Genes that pass the ORA input rule, or None when the table lacks the p column/log2FoldChange."""
     table = pd.read_csv(deg_csv, index_col=0)
-    if not {"padj", "log2FoldChange"} <= set(table.columns):
+    if not {p_column, "log2FoldChange"} <= set(table.columns):
         return None
-    hit = (table["padj"] < cutoff) & (table["log2FoldChange"].abs() > lfc)
+    hit = (table[p_column] < cutoff) & (table["log2FoldChange"].abs() > lfc)
     if direction == "up":
         hit &= table["log2FoldChange"] > 0
     elif direction == "down":
@@ -782,14 +782,15 @@ class CaseRun:
         runs = []
         if en.ora:
             ora_dir = "ora" if en.direction == "all" else f"ora_{en.direction}"  # up and down never share files
+            # ORA takes the applied rule's genes, raw-p rules included (p_column="pvalue")
             rule = _threshold_kwargs(self.applied)
-            as_applied = rule["metric"] == "padj"
-            input_threshold = (self.applied if as_applied else
-                               {"metric": "padj", "cutoff": 0.05, "effect_cutoff": self.applied.get("effect_cutoff")})
+            as_applied = True
+            input_threshold = self.applied
             runs.append(("ORA (Enrichr GO BP/MF/CC + KEGG)", "tools.enrichment_tools:run_enrichment_analysis",
                          {"deg_csv": deg, "organism": organism, "padj_cutoff": float(input_threshold.get("cutoff", 0.05)),
                           "log2fc_cutoff": float(input_threshold.get("effect_cutoff") or 0.0),
-                          "direction": en.direction, "output_dir": str(out / ora_dir)},
+                          "direction": en.direction, "output_dir": str(out / ora_dir),
+                          "p_column": "pvalue" if rule["metric"] == "pvalue" else "padj"},
                          {"gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, "
                                        "GO_Cellular_Component_2023, KEGG",
                           "input_threshold": input_threshold, "direction": en.direction,
@@ -804,7 +805,8 @@ class CaseRun:
             label = method.split()[0] + ("" if method.startswith("GSEA") or en.direction == "all"
                                          else f" {en.direction}")
             if method.startswith("ORA"):
-                n_in = _n_ora_input(deg, kwargs["padj_cutoff"], kwargs["log2fc_cutoff"], en.direction)
+                n_in = _n_ora_input(deg, kwargs["padj_cutoff"], kwargs["log2fc_cutoff"], en.direction,
+                                    kwargs.get("p_column", "padj"))
                 if n_in == 0:
                     final["reason_not_run"] = "no gene passes the ORA input threshold"
                     self.case.decide("enrichment", final=final, evidence=evidence,

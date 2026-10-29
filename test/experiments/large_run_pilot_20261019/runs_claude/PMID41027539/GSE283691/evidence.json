@@ -1,0 +1,1367 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41027539",
+  "subject_id": "GSE283691",
+  "created_at": "2026-10-28T23:55:35",
+  "finished_at": "2026-10-28T23:56:15",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13350570.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13350570.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-28T23:55:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "23f8b7dd0f4cc3a0b236ed164f59e5eff68f1da45dde5bcec12bb6161687f884",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE283691_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE283691\\GSE283691_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:55:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0983d66ccdb185ee2f5392fc24db4417d7ab73913b529ccba486fb82f41eaade",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-10-28T23:55:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1d0aed5aef374de77f25010dc1c28e10dbdb345eff73e8c43dd3f563e2fd29a9",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE283691"
+        ],
+        "assay": "bulk RNA-seq, male C57BL/6J mouse hippocampus, terminal (26 weeks of age)",
+        "factors": {
+          "group": [
+            "SD",
+            "HFD",
+            "KD",
+            "SDI",
+            "KDI",
+            "EXI",
+            "KDI-EXI"
+          ]
+        },
+        "inclusion": "All 7 groups sequenced; GEO has 7 mice per group (6 for KDI_EX), a subset of the 15-16 per group phenotyped (S2.1.p1).",
+        "primary_estimand": "Effect of an 8-week voluntary wheel-running intervention (EXI, kept on HFD) on the hippocampal transcriptome of HFD-induced MetS mice, versus continued sedentary HFD. Secondary: combined KD + exercise intervention (KDI-EXI) versus HFD.",
+        "planned_contrasts": [
+          "EXI vs HFD (S3.4.p2; paper: 397 DEGs)",
+          "KDI-EXI vs HFD (S3.4.p2; paper: 721 DEGs)",
+          "HFD vs SD, KD vs HFD, KD vs SD, SDI vs HFD, KDI vs HFD (S3.4.p2; non-exercise diet contrasts: 236, 240, 138, 174, 206 DEGs)",
+          "EXI vs SD, KDI-EXI vs SD (S3.5.p3; pathways only, DEG counts only in Supplementary Table S1, not available)"
+        ],
+        "repeated_measure_unit": "none; one hippocampus per independent singly-housed mouse",
+        "normalization": "STAR + RSEM count estimates; DESeq2 (S2.7.1.p1, S2.7.2.p1)",
+        "paper_method": "DESeq2 in R, pairwise group comparisons (S2.7.2.p1)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.7.2.p1"
+        },
+        "paper_results": "EXI vs HFD 397 DEGs, KDI-EXI vs HFD 721 DEGs, 147 shared; Rpl7a-ps11 up in EXI and KDI-EXI vs HFD; Lep, Ces1d, Ifi27l2a, Hp down after EXI vs HFD (S3.4.p2)"
+      },
+      "reason": "S2.1.p1 defines the preventative (SD/HFD/KD) and intervention (HFD/SDI/KDI/EXI/KDI-EXI) arms. The only exercise-only contrast is EXI vs HFD (both on HFD; EXI adds a running wheel from week 18). KDI-EXI vs HFD confounds the diet switch with exercise. S2.7.2.p1: DESeq2, unadjusted p < 0.01, no fold-change rule. S3.4.p2 gives the DEG counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:49"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "GEO contact Junguk Hur (U North Dakota) = hurlab richR group cited in S2.7.2.p1",
+          "hippocampus, male C57BL/6 from Jackson at 11 weeks matches S2.1.p1/S2.5.p1",
+          "treatment levels SD/HFD/KD/DR/KDI/EX/KDI_EX map onto the 7 paper groups",
+          "data_processing STAR 2.7.8a + RSEM 1.3.3 + DESeq2 matches S2.7.1.p1"
+        ],
+        "accession": "GSE283691",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE283691\\GSE283691_metadata.csv"
+      },
+      "reason": "Accession, tissue, strain, sex, pipeline and group structure all match the paper. GEO lists HiSeq 4000 while S2.5.p1 says NovaSeq 6000 (recorded as a discrepancy; does not change ownership).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:49"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 48,
+        "n_metadata": 48,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "characteristics_ch1.2.treatment",
+              "regex": "^(SD|HFD|KD|DR|KDI|EX|KDI_EX)$",
+              "recode": {
+                "SD": "SD",
+                "HFD": "HFD",
+                "KD": "KD",
+                "DR": "SDI",
+                "KDI": "KDI",
+                "EX": "EXI",
+                "KDI_EX": "KDIEXI"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\design_metadata.csv",
+          "sha256": "5a67721b486fae21255c930c5092834bf9d3dd8d3f09309f648d6924710047f6",
+          "levels": {
+            "grp": {
+              "KD": 7,
+              "EXI": 7,
+              "KDI": 7,
+              "HFD": 7,
+              "SDI": 7,
+              "SD": 7,
+              "KDIEXI": 6
+            }
+          }
+        }
+      },
+      "reason": "Merged tar columns are GSM ids; inspect shows the metadata index matches 48/48. grp from the treatment column; DR (diet reversal HFD->SD) = paper SDI, EX = EXI, KDI_EX = KDI-EXI (S2.1.p1); group sizes 7/7/7/7/7/7/6 consistent.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:51"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "log-scale (DESeq2 rlog-transformed values)",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\aligned_matrix.csv",
+          "sha256": "1d0aed5aef374de77f25010dc1c28e10dbdb345eff73e8c43dd3f563e2fd29a9",
+          "n_features": 23832,
+          "n_samples": 48,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.222248978920589,
+          "max": 19.4773582018257,
+          "median": 7.20621021028294,
+          "integer_fraction": 0.0,
+          "candidates": [
+            "log_scale"
+          ]
+        }
+      },
+      "reason": "Values 0.22-19.48, 0% integers; GEO data_processing: Normalized by DESeq2 with rlogTransformed; supplementary files include rlogTransformed values for each sample. No raw or RSEM count files are deposited, so the paper's DESeq2 input (counts) is unavailable.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:52"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multigroup (7 levels, one model, pairwise contrasts)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_EXI_vs_HFD",
+            "control": "HFD",
+            "treatment": "EXI",
+            "role": "primary"
+          },
+          {
+            "name": "grp_KDIEXI_vs_HFD",
+            "control": "HFD",
+            "treatment": "KDIEXI",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_KDIEXI_vs_KDI",
+            "control": "KDI",
+            "treatment": "KDIEXI",
+            "role": "exploratory"
+          },
+          {
+            "name": "grp_EXI_vs_SD",
+            "control": "SD",
+            "treatment": "EXI",
+            "role": "exploratory"
+          },
+          {
+            "name": "grp_KDIEXI_vs_SD",
+            "control": "SD",
+            "treatment": "KDIEXI",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "One 7-level group factor with HFD (MetS, sedentary) as reference per S3.2.p1. EXI vs HFD is the exercise-only estimand (diet held at HFD). KDI-EXI vs HFD is the paper's second exercise contrast but confounds the KD switch with exercise; KDI-EXI vs KDI (exercise on a KD background) is not reported by the paper and is exploratory. EXI/KDI-EXI vs SD are discussed for pathways only (S3.5.p3). The non-exercise diet contrasts run from the same model only to calibrate the deviation route against the paper's counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:57"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 48,
+          "n_columns": 7,
+          "columns": [
+            "Intercept",
+            "grp_HFD",
+            "grp_KD",
+            "grp_KDI",
+            "grp_KDIEXI",
+            "grp_SD",
+            "grp_SDI"
+          ],
+          "rank": 7,
+          "full_rank": true,
+          "residual_df": 41,
+          "levels": {
+            "grp": {
+              "KD": 7,
+              "EXI": 7,
+              "KDI": 7,
+              "HFD": 7,
+              "SDI": 7,
+              "SD": 7,
+              "KDIEXI": 6
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "EXI"
+              ],
+              "n": 7
+            },
+            {
+              "cell": [
+                "HFD"
+              ],
+              "n": 7
+            },
+            {
+              "cell": [
+                "KD"
+              ],
+              "n": 7
+            },
+            {
+              "cell": [
+                "KDI"
+              ],
+              "n": 7
+            },
+            {
+              "cell": [
+                "KDIEXI"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "SD"
+              ],
+              "n": 7
+            },
+            {
+              "cell": [
+                "SDI"
+              ],
+              "n": 7
+            }
+          ],
+          "min_cell_size": 6,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 48,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 48,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.genotype",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.treatment",
+            "n_levels": 7,
+            "status": "complete_confounding",
+            "crosstab": {
+              "EXI": {
+                "DR": 0,
+                "EX": 7,
+                "HFD": 0,
+                "KD": 0,
+                "KDI": 0,
+                "KDI_EX": 0,
+                "SD": 0
+              },
+              "HFD": {
+                "DR": 0,
+                "EX": 0,
+                "HFD": 7,
+                "KD": 0,
+                "KDI": 0,
+                "KDI_EX": 0,
+                "SD": 0
+              },
+              "KD": {
+                "DR": 0,
+                "EX": 0,
+                "HFD": 0,
+                "KD": 7,
+                "KDI": 0,
+                "KDI_EX": 0,
+                "SD": 0
+              },
+              "KDI": {
+                "DR": 0,
+                "EX": 0,
+                "HFD": 0,
+                "KD": 0,
+                "KDI": 7,
+                "KDI_EX": 0,
+                "SD": 0
+              },
+              "KDIEXI": {
+                "DR": 0,
+                "EX": 0,
+                "HFD": 0,
+                "KD": 0,
+                "KDI": 0,
+                "KDI_EX": 6,
+                "SD": 0
+              },
+              "SD": {
+                "DR": 0,
+                "EX": 0,
+                "HFD": 0,
+                "KD": 0,
+                "KDI": 0,
+                "KDI_EX": 0,
+                "SD": 7
+              },
+              "SDI": {
+                "DR": 7,
+                "EX": 0,
+                "HFD": 0,
+                "KD": 0,
+                "KDI": 0,
+                "KDI_EX": 0,
+                "SD": 0
+              }
+            }
+          },
+          {
+            "column": "growth_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 48,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 48,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 48,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Independent, singly housed mice randomised to groups (S2.1.p1); one sample per mouse; GEO records no batch, lane or sex variable (all male).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:57"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "log-scale (DESeq2 rlog-transformed values)",
+        "method": "limma (moderated t on rlog values, one 7-group model)",
+        "formula": "~ 0 + C(grp)",
+        "paper_route": {
+          "method": "DESeq2 on RSEM count estimates",
+          "status": "blocked",
+          "reason": "Only DESeq2 rlog-transformed values are deposited (GEO data_processing); no counts to fit a negative-binomial model."
+        },
+        "deviations": [
+          "limma on deposited rlog values instead of DESeq2 on counts",
+          "one joint model across all 7 groups; the paper's per-comparison model scope is not stated",
+          "GEO sample set: 7 mice per group (6 KDI-EXI)"
+        ]
+      },
+      "reason": "rlog values are log2-scale, so limma's linear model is the validated route for log-scale input (matrix-method policy). No further transform.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:57"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "deviation_note": "Paper rule (unadjusted p < 0.01, no fold-change cutoff) applied to limma p-values; BH padj < 0.05 reported as audit."
+      },
+      "reason": "S2.7.2.p1 and S3.4.p2: nominal p < 0.01 in this exploratory analysis.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:55:57"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_multigroup_analysis",
+        "subset": "joint",
+        "role": "primary",
+        "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "n_samples": 48,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\aligned_matrix.csv",
+        "formula": "~ 0 + C(grp)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_EXI_vs_HFD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_HFD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_KDI.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_EXI_vs_SD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_SD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_HFD_vs_SD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KD_vs_HFD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KD_vs_SD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_SDI_vs_HFD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDI_vs_HFD.csv"
+        ],
+        "counts": {
+          "joint/grp_EXI_vs_HFD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 391,
+              "n_up": 208,
+              "n_down": 183,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KDIEXI_vs_HFD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 742,
+              "n_up": 397,
+              "n_down": 345,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KDIEXI_vs_KDI": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 130,
+              "n_up": 101,
+              "n_down": 29,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_EXI_vs_SD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 191,
+              "n_up": 74,
+              "n_down": 117,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KDIEXI_vs_SD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 383,
+              "n_up": 144,
+              "n_down": 239,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 1,
+              "n_up": 0,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_HFD_vs_SD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 227,
+              "n_up": 128,
+              "n_down": 99,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KD_vs_HFD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 230,
+              "n_up": 112,
+              "n_down": 118,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KD_vs_SD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 159,
+              "n_up": 60,
+              "n_down": 99,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_SDI_vs_HFD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 174,
+              "n_up": 82,
+              "n_down": 92,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_KDI_vs_HFD": {
+            "applied": {
+              "rule": "pvalue < 0.01",
+              "n_tested": 23832,
+              "n_significant": 189,
+              "n_up": 77,
+              "n_down": 112,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23832,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One limma cell-means model on all 48 samples; pairwise contrasts for the exercise estimands plus the paper's diet contrasts for calibration (joint_limma only offers contrasts against the single reference level).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:56:09"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint/grp_EXI_vs_HFD",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "direction": "all",
+        "input_threshold_source": "audit",
+        "execution_error": "Only 1 valid genes after filtering / ID conversion. Enrichment requires at least ~5 genes for meaningful results."
+      },
+      "reason": "Paper reports KEGG pathways for EXI vs HFD (S3.5.p3); exercise-only contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:56:09"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint/grp_EXI_vs_HFD",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\enrichment_joint_grp_EXI_vs_HFD\\gsea\\DEG_results_grp_EXI_vs_HFD_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 23832 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 25 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_UV_RESPONSE_DN | NES=1.98 | NOM p=0.00e+00 | FDR q=1.87e-03 - HALLMARK_PROTEIN_SECRETION | NES=1.90 | NOM p=0.00e+00 | FDR q=2.80e-03 - HALLMARK_MITOTIC_SPINDLE | NES=1.69 | NOM p=0.00e+00 | FDR q=9.97e-03 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.65 | NOM p=0.00e+00 | FDR q=1.47e-02 - HALLMARK_TGF_BETA_SIGNALING | NES=1.64 | NOM p=8.05e-03 | FDR q=1.22e-02 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.58 | NOM p=3.94e-03 | FDR q=2.04e-02 - HALLMARK_ALLOGRAFT_REJECTION | NES=1.58 | NOM p=0.00e+00 | FDR q=1.79e-02 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=1.46 | NOM p=1.56e-02 | FDR q=4.34e-02 - HALLMARK_ANDROGEN_RESPONSE | NES=1.43 | NOM p=2.39e-02 | FDR q=5.64e-02 - HALLMARK_G2M_CHECKPOINT | NES=1.38 | NOM p=1.38e-02 | FDR q=7.51e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.42 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_DNA_REPAIR | NES=-1.92 | NOM p=0.00e+00 | FDR q=1.60e-03 - HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY | NES=-1.79 | NOM p=2.04e-03 | FDR q=3.92e-03 - HALLMARK_MYC_TARGETS_V1 | NES=-1.77 | NOM p=0.00e+00 | FDR q=4.27e-03 - HALLMARK_ADIPOGENESIS | NES=-1.69 | NOM p=0.00e+00 | FDR q=5.98e-03 - HALLMARK_HYPOXIA | NES=-1.38 | NOM p=2.20e-02 | FDR q=1.21e-01 - HALLMARK_P53_PATHWAY | NES=-1.37 | NOM p=1.02e-02 | FDR q=1.11e-01 - HALLMARK_MYC_TAR..."
+      },
+      "reason": "Paper reports KEGG pathways for EXI vs HFD (S3.5.p3); exercise-only contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:56:15"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "limma on rlog instead of DESeq2 on counts",
+          "nominal p threshold; most DEGs are not FDR-significant",
+          "KDI-EXI vs HFD confounds diet and exercise"
+        ],
+        "results": {
+          "joint/grp_EXI_vs_HFD": {
+            "n_deg": 391,
+            "up": 208,
+            "down": 183,
+            "rule": "pvalue < 0.01",
+            "audit_n": 1
+          },
+          "joint/grp_KDIEXI_vs_HFD": {
+            "n_deg": 742,
+            "up": 397,
+            "down": 345,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_KDIEXI_vs_KDI": {
+            "n_deg": 130,
+            "up": 101,
+            "down": 29,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_EXI_vs_SD": {
+            "n_deg": 191,
+            "up": 74,
+            "down": 117,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_KDIEXI_vs_SD": {
+            "n_deg": 383,
+            "up": 144,
+            "down": 239,
+            "rule": "pvalue < 0.01",
+            "audit_n": 1
+          },
+          "joint/grp_HFD_vs_SD": {
+            "n_deg": 227,
+            "up": 128,
+            "down": 99,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_KD_vs_HFD": {
+            "n_deg": 230,
+            "up": 112,
+            "down": 118,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_KD_vs_SD": {
+            "n_deg": 159,
+            "up": 60,
+            "down": 99,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_SDI_vs_HFD": {
+            "n_deg": 174,
+            "up": 82,
+            "down": 92,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          },
+          "joint/grp_KDI_vs_HFD": {
+            "n_deg": 189,
+            "up": 77,
+            "down": 112,
+            "rule": "pvalue < 0.01",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "joint/grp_EXI_vs_HFD": 397,
+          "joint/grp_KDIEXI_vs_HFD": 721,
+          "joint/grp_HFD_vs_SD": 236,
+          "joint/grp_KD_vs_HFD": 240,
+          "joint/grp_KD_vs_SD": 138,
+          "joint/grp_SDI_vs_HFD": 174,
+          "joint/grp_KDI_vs_HFD": 206
+        },
+        "comparison": {
+          "joint/grp_EXI_vs_HFD": {
+            "ours": 391,
+            "paper": 397
+          },
+          "joint/grp_KDIEXI_vs_HFD": {
+            "ours": 742,
+            "paper": 721
+          },
+          "joint/grp_HFD_vs_SD": {
+            "ours": 227,
+            "paper": 236
+          },
+          "joint/grp_KD_vs_HFD": {
+            "ours": 230,
+            "paper": 240
+          },
+          "joint/grp_KD_vs_SD": {
+            "ours": 159,
+            "paper": 138
+          },
+          "joint/grp_SDI_vs_HFD": {
+            "ours": 174,
+            "paper": 174
+          },
+          "joint/grp_KDI_vs_HFD": {
+            "ours": 189,
+            "paper": 206
+          }
+        },
+        "paper_gene_check": {
+          "joint/grp_EXI_vs_HFD": {
+            "Rpl7a-ps11": {
+              "AveExpr": 3.2086,
+              "log2FoldChange": 0.1687,
+              "padj": 0.8816,
+              "pvalue": 0.4181
+            },
+            "Lep": {
+              "AveExpr": 0.8071,
+              "log2FoldChange": -0.1104,
+              "padj": 0.7045,
+              "pvalue": 0.0598
+            },
+            "Ces1d": {
+              "AveExpr": 3.2185,
+              "log2FoldChange": -0.2385,
+              "padj": 0.6193,
+              "pvalue": 0.0148
+            },
+            "Ifi27l2a": {
+              "AveExpr": 4.1343,
+              "log2FoldChange": -0.1795,
+              "padj": 0.8201,
+              "pvalue": 0.2374
+            },
+            "Hp": {
+              "AveExpr": 3.0594,
+              "log2FoldChange": -0.2122,
+              "padj": 0.7045,
+              "pvalue": 0.0638
+            }
+          },
+          "joint/grp_KDIEXI_vs_HFD": {
+            "Rpl7a-ps11": {
+              "AveExpr": 3.2086,
+              "log2FoldChange": 0.1695,
+              "padj": 0.8125,
+              "pvalue": 0.4342
+            },
+            "Ikbkg": {
+              "AveExpr": 10.6021,
+              "log2FoldChange": 0.0753,
+              "padj": 0.2712,
+              "pvalue": 0.0044
+            },
+            "C3": {
+              "AveExpr": 6.1644,
+              "log2FoldChange": -0.2829,
+              "padj": 0.2534,
+              "pvalue": 0.003
+            }
+          }
+        }
+      },
+      "reason": "Counts and named genes from S3.4.p2 and S3.5.p3.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-28T23:56:15"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "20f5eec816a1636d8d82bc4d60805e08202afa86e22ddfd93735c742f96655a6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d469340e2d90d3cbef3c0069ba87beeff03dac3504f6c59b6203abfc10a11765",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1d0aed5aef374de77f25010dc1c28e10dbdb345eff73e8c43dd3f563e2fd29a9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5a67721b486fae21255c930c5092834bf9d3dd8d3f09309f648d6924710047f6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "91845ca21d6e8019071f94f0fe1f19853d5d3944add9202179c2d219d726444e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4bf5c17771db33d7ab6be9b84d59b41392622669655dee5a752a43f0b790af98",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_EXI_vs_HFD.csv",
+      "role": "deg_joint/grp_EXI_vs_HFD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8ab1081fa8cd46b003de4c4dba58ac734db84984c1ec019e3a369b05ace02586",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_HFD.csv",
+      "role": "deg_joint/grp_KDIEXI_vs_HFD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3983723e397e46e336e992d79de4758bd1c7108bf91e5986d6b748d8b7b7108b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_KDI.csv",
+      "role": "deg_joint/grp_KDIEXI_vs_KDI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d57eb36c6bd9d6960be803b7ffca0768ce841d781990e16558df4344bd15401d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_EXI_vs_SD.csv",
+      "role": "deg_joint/grp_EXI_vs_SD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9788443a8887819bc59b88b900f92946f9755b79010416f233fb31ef163bbd97",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDIEXI_vs_SD.csv",
+      "role": "deg_joint/grp_KDIEXI_vs_SD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c78e19a31c4b9a554b372c28e6a5230ce81d952ead8edbea6e0842c39a468130",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_HFD_vs_SD.csv",
+      "role": "deg_joint/grp_HFD_vs_SD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f29df37c289ba8fa13fb9c35d0faf0bd0231c9faf51d80358d5168156c52cfcd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KD_vs_HFD.csv",
+      "role": "deg_joint/grp_KD_vs_HFD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "977eab6c7fee430378d350d9335f061a1fcbc5cc3cc0b06e462898680335022b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KD_vs_SD.csv",
+      "role": "deg_joint/grp_KD_vs_SD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c3b1610c8656e5d89a18bcd71cc56750c1e684c8e53157e8737610452d77e50b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_SDI_vs_HFD.csv",
+      "role": "deg_joint/grp_SDI_vs_HFD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0f0a351d28dc3e49b4e7528e4941f64b0e5d52e6f777b42706d71b0bfaaa6d0f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\results\\joint\\DEG_results_grp_KDI_vs_HFD.csv",
+      "role": "deg_joint/grp_KDI_vs_HFD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c3eef1a381fff7870c626fc8c1495ea5df4dd427becd0614075189eb32ccea6b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41027539\\GSE283691\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "15cc08d3006ff923dd23f8b23ce299d866f8e876add61600d3f7bd790b631d93",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -190,6 +190,7 @@ def run_enrichment_analysis(
     direction: str = "all",
     top_n: int = 10,
     output_dir: str = "./output",
+    p_column: str = "padj",
 ) -> str:
     """
     Run GO (BP/MF/CC) and KEGG enrichment on a DEG result file produced by run_deseq2_analysis.
@@ -202,6 +203,8 @@ def run_enrichment_analysis(
         direction: 'up', 'down', or 'all'. Which DEGs to submit for enrichment.
         top_n: Number of top enriched terms per library to include in the returned summary.
         output_dir: Directory where per-library result CSVs are written.
+        p_column: 'padj' (default) or 'pvalue', for a paper whose DEG rule uses raw p;
+            ``padj_cutoff`` is then the raw-p cutoff.
     """
     try:
         if organism not in _ORGANISM_GENE_SETS:
@@ -210,12 +213,14 @@ def run_enrichment_analysis(
             return f"Error: direction must be 'up', 'down', or 'all', got '{direction}'."
 
         df = pd.read_csv(deg_csv, index_col=0)
-        for col in ("padj", "log2FoldChange"):
+        if p_column not in ("padj", "pvalue"):
+            return f"Error: p_column must be 'padj' or 'pvalue', got '{p_column}'."
+        for col in (p_column, "log2FoldChange"):
             if col not in df.columns:
                 return f"Error: DEG file is missing required column '{col}'."
 
-        sig = df.dropna(subset=["padj", "log2FoldChange"])
-        sig = sig[sig["padj"] < padj_cutoff]
+        sig = df.dropna(subset=[p_column, "log2FoldChange"])
+        sig = sig[sig[p_column] < padj_cutoff]
         if direction == "up":
             sig = sig[sig["log2FoldChange"] > log2fc_cutoff]
         elif direction == "down":
@@ -224,7 +229,7 @@ def run_enrichment_analysis(
             sig = sig[sig["log2FoldChange"].abs() > log2fc_cutoff]
 
         if sig.empty:
-            return (f"No significant DEGs found with padj < {padj_cutoff} and "
+            return (f"No significant DEGs found with {p_column} < {padj_cutoff} and "
                     f"|log2FC| > {log2fc_cutoff} (direction={direction}). "
                     f"Cannot run enrichment.")
 
@@ -263,7 +268,7 @@ def run_enrichment_analysis(
 
         summary_lines = [
             f"Enrichment analysis complete for {len(gene_list)} {organism} genes "
-            f"(direction={direction}, padj<{padj_cutoff}, |log2FC|>{log2fc_cutoff}).",
+            f"(direction={direction}, {p_column}<{padj_cutoff}, |log2FC|>{log2fc_cutoff}).",
             "",
         ]
         saved_files = []

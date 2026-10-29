@@ -435,3 +435,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41831133 (GSE309619)
 
 - case_runner.py:91 recommended_method cannot be null on a blocked gate; native.py:255-261 counts numeric annotation cols (gene_start/end) as samples Details: `PMID41831133/HANDBACK.md`.
+
+## PMID41027539 (GSE283691)
+
+- inspect strips GSM_ prefix but execute does not (case_runner.py:281 vs native.py:304); joint_limma vs-reference only; ORA falls back to padj (case_runner.py:786, patched after this row) Details: `PMID41027539/HANDBACK.md`.

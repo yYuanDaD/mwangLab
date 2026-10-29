@@ -1,0 +1,158 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41027539",
+  "request": "Analyze GSE283691 for PMID 41027539 (Dietary and exercise interventions improve cognition and alter hippocampal transcriptomics in a mouse model of the metabolic syndrome.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE283691",
+      "accession": "GSE283691",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC13350570.paper.md"],
+        "metadata": "GSE283691/GSE283691_metadata.csv",
+        "matrix": null,
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE283691"],
+            "assay": "bulk RNA-seq, male C57BL/6J mouse hippocampus, terminal (26 weeks of age)",
+            "factors": {"group": ["SD", "HFD", "KD", "SDI", "KDI", "EXI", "KDI-EXI"]},
+            "inclusion": "All 7 groups sequenced; GEO has 7 mice per group (6 for KDI_EX), a subset of the 15-16 per group phenotyped (S2.1.p1).",
+            "primary_estimand": "Effect of an 8-week voluntary wheel-running intervention (EXI, kept on HFD) on the hippocampal transcriptome of HFD-induced MetS mice, versus continued sedentary HFD. Secondary: combined KD + exercise intervention (KDI-EXI) versus HFD.",
+            "planned_contrasts": [
+              "EXI vs HFD (S3.4.p2; paper: 397 DEGs)",
+              "KDI-EXI vs HFD (S3.4.p2; paper: 721 DEGs)",
+              "HFD vs SD, KD vs HFD, KD vs SD, SDI vs HFD, KDI vs HFD (S3.4.p2; non-exercise diet contrasts: 236, 240, 138, 174, 206 DEGs)",
+              "EXI vs SD, KDI-EXI vs SD (S3.5.p3; pathways only, DEG counts only in Supplementary Table S1, not available)"
+            ],
+            "repeated_measure_unit": "none; one hippocampus per independent singly-housed mouse",
+            "normalization": "STAR + RSEM count estimates; DESeq2 (S2.7.1.p1, S2.7.2.p1)",
+            "paper_method": "DESeq2 in R, pairwise group comparisons (S2.7.2.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.7.2.p1"},
+            "paper_results": "EXI vs HFD 397 DEGs, KDI-EXI vs HFD 721 DEGs, 147 shared; Rpl7a-ps11 up in EXI and KDI-EXI vs HFD; Lep, Ces1d, Ifi27l2a, Hp down after EXI vs HFD (S3.4.p2)"
+          },
+          "reasoning": "S2.1.p1 defines the preventative (SD/HFD/KD) and intervention (HFD/SDI/KDI/EXI/KDI-EXI) arms. The only exercise-only contrast is EXI vs HFD (both on HFD; EXI adds a running wheel from week 18). KDI-EXI vs HFD confounds the diet switch with exercise. S2.7.2.p1: DESeq2, unadjusted p < 0.01, no fold-change rule. S3.4.p2 gives the DEG counts.",
+          "confidence": "high",
+          "locator": "S2.1.p1; S2.7.2.p1; S3.4.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO contact Junguk Hur (U North Dakota) = hurlab richR group cited in S2.7.2.p1", "hippocampus, male C57BL/6 from Jackson at 11 weeks matches S2.1.p1/S2.5.p1", "treatment levels SD/HFD/KD/DR/KDI/EX/KDI_EX map onto the 7 paper groups", "data_processing STAR 2.7.8a + RSEM 1.3.3 + DESeq2 matches S2.7.1.p1"]},
+          "reasoning": "Accession, tissue, strain, sex, pipeline and group structure all match the paper. GEO lists HiSeq 4000 while S2.5.p1 says NovaSeq 6000 (recorded as a discrepancy; does not change ownership).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {},
+          "patterns": {"grp": ["characteristics_ch1.2.treatment", "^(SD|HFD|KD|DR|KDI|EX|KDI_EX)$"]},
+          "combine": {},
+          "recode": {"grp": {"SD": "SD", "HFD": "HFD", "KD": "KD", "DR": "SDI", "KDI": "KDI", "EX": "EXI", "KDI_EX": "KDIEXI"}},
+          "exclude_samples": {},
+          "reasoning": "Merged tar columns are GSM ids; inspect shows the metadata index matches 48/48. grp from the treatment column; DR (diet reversal HFD->SD) = paper SDI, EX = EXI, KDI_EX = KDI-EXI (S2.1.p1); group sizes 7/7/7/7/7/7/6 consistent.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "log-scale (DESeq2 rlog-transformed values)",
+          "recommended_method": "limma",
+          "reasoning": "Values 0.22-19.48, 0% integers; GEO data_processing: Normalized by DESeq2 with rlogTransformed; supplementary files include rlogTransformed values for each sample. No raw or RSEM count files are deposited, so the paper's DESeq2 input (counts) is unavailable.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "HFD"},
+          "organism": "Mouse",
+          "planned": ["grp_EXI_vs_HFD", "grp_KDIEXI_vs_HFD"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multigroup (7 levels, one model, pairwise contrasts)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_EXI_vs_HFD", "control": "HFD", "treatment": "EXI", "role": "primary"},
+              {"name": "grp_KDIEXI_vs_HFD", "control": "HFD", "treatment": "KDIEXI", "role": "secondary"},
+              {"name": "grp_KDIEXI_vs_KDI", "control": "KDI", "treatment": "KDIEXI", "role": "exploratory"},
+              {"name": "grp_EXI_vs_SD", "control": "SD", "treatment": "EXI", "role": "exploratory"},
+              {"name": "grp_KDIEXI_vs_SD", "control": "SD", "treatment": "KDIEXI", "role": "exploratory"}
+            ]
+          },
+          "reasoning": "One 7-level group factor with HFD (MetS, sedentary) as reference per S3.2.p1. EXI vs HFD is the exercise-only estimand (diet held at HFD). KDI-EXI vs HFD is the paper's second exercise contrast but confounds the KD switch with exercise; KDI-EXI vs KDI (exercise on a KD background) is not reported by the paper and is exploratory. EXI/KDI-EXI vs SD are discussed for pathways only (S3.5.p3). The non-exercise diet contrasts run from the same model only to calibrate the deviation route against the paper's counts.",
+          "candidates": [
+            {"value": "pool EXI and KDI-EXI as exercise vs pooled non-exercise groups", "reason_rejected": "mixes diets; paper keeps groups separate"},
+            {"value": "KDI-EXI vs HFD as primary", "reason_rejected": "diet and exercise both change; not an exercise-only effect"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent, singly housed mice randomised to groups (S2.1.p1); one sample per mouse; GEO records no batch, lane or sex variable (all male).",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t on rlog values, one 7-group model)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on RSEM count estimates", "status": "blocked", "reason": "Only DESeq2 rlog-transformed values are deposited (GEO data_processing); no counts to fit a negative-binomial model."},
+            "deviations": ["limma on deposited rlog values instead of DESeq2 on counts", "one joint model across all 7 groups; the paper's per-comparison model scope is not stated", "GEO sample set: 7 mice per group (6 KDI-EXI)"]
+          },
+          "transform": null,
+          "reasoning": "rlog values are log2-scale, so limma's linear model is the validated route for log-scale input (matrix-method policy). No further transform.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper rule (unadjusted p < 0.01, no fold-change cutoff) applied to limma p-values; BH padj < 0.05 reported as audit."
+          },
+          "reasoning": "S2.7.2.p1 and S3.4.p2: nominal p < 0.01 in this exploratory analysis.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["limma on rlog instead of DESeq2 on counts", "nominal p threshold; most DEGs are not FDR-significant", "KDI-EXI vs HFD confounds diet and exercise"]
+          },
+          "paper_counts": {
+            "joint/grp_EXI_vs_HFD": 397,
+            "joint/grp_KDIEXI_vs_HFD": 721,
+            "joint/grp_HFD_vs_SD": 236,
+            "joint/grp_KD_vs_HFD": 240,
+            "joint/grp_KD_vs_SD": 138,
+            "joint/grp_SDI_vs_HFD": 174,
+            "joint/grp_KDI_vs_HFD": 206
+          },
+          "paper_genes": {
+            "joint/grp_EXI_vs_HFD": ["Rpl7a-ps11", "Lep", "Ces1d", "Ifi27l2a", "Hp"],
+            "joint/grp_KDIEXI_vs_HFD": ["Rpl7a-ps11", "Ikbkg", "C3"]
+          },
+          "reasoning": "Counts and named genes from S3.4.p2 and S3.5.p3.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix", "paper": "DESeq2 on RSEM count estimates", "data": "only rlog-transformed values deposited", "disposition": "declared_deviation"},
+        {"item": "sample size", "paper": "n = 15-16 mice per group phenotyped", "data": "7 per group sequenced (6 KDI_EX)", "disposition": "executable_without_change"},
+        {"item": "group labels", "paper": "SDI, EXI, KDI-EXI", "data": "DR, EX, KDI_EX", "disposition": "executable_without_change"},
+        {"item": "sequencer", "paper": "NovaSeq 6000 (S2.5.p1)", "data": "GEO instrument HiSeq 4000", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_EXI_vs_HFD", "grp_KDIEXI_vs_HFD", "grp_KDIEXI_vs_KDI", "grp_EXI_vs_SD", "grp_KDIEXI_vs_SD", "grp_HFD_vs_SD", "grp_KD_vs_HFD", "grp_KD_vs_SD", "grp_SDI_vs_HFD", "grp_KDI_vs_HFD"], "covariates": []},
+          "role": "primary",
+          "reasoning": "One limma model on all 48 samples; exercise contrasts plus the paper's diet contrasts for calibration."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_EXI_vs_HFD", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports KEGG pathways for EXI vs HFD (S3.5.p3); exercise-only contrast."}
+      ]
+    }
+  ]
+}
