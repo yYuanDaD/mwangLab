@@ -66,7 +66,7 @@ def match_paper(prompt, papers):
 def describe(tool, inp):
     if not isinstance(inp, dict):
         return ""
-    if tool == "Bash":
+    if tool in ("Bash", "PowerShell"):
         return (inp.get("command") or "")[:300]
     for key in ("file_path", "notebook_path", "path", "pattern", "skill", "url", "description"):
         if inp.get(key):

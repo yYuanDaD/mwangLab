@@ -57,11 +57,15 @@ def category(r) -> str:
     runs = [x for x in re.findall(r"runs_claude/+([a-z0-9]+)", dl) if x != str(r.paper_id).lower()]
     if runs or "problems.md" in dl or "case_runner_validation" in dl or "large_run_pilot" in dl and "runs_claude" not in dl:
         return "read earlier runs/logs"
-    if re.search(r"tools/[a-z_]+\.py", dl) and (tool == "Read" or re.search(r"\b(sed|cat|grep|head)\b", dl)):
+    if tool == "Grep" and re.search(r"tools|case_runner|native|decision_contract|suitability", dl):
+        return "read library code"
+    if re.search(r"tools/[a-z_]+\.py", dl) and (tool == "Read" or re.search(r"\b(sed|cat|grep|head|select-string|get-content)\b", dl)):
         return "read library code"
     if re.search(r"suitability\.md|decisions\.json|deg_results|/results/|summary\.csv|evidence\.json|case_runner\.log", dl):
         return "check own results"
-    if tool == "Bash":
+    if tool in ("Bash", "PowerShell"):
+        if "prompt_for" in dl:
+            return "baseline"
         if re.search(r"python\S*\s+\S*\.py", dl) and "-c" not in d and "<<" not in d:
             return "run script"
         if re.search(r"\bgeo|data/gse|metadata|\.csv|\.tsv|\.gz|\.tar", dl) or "python" in dl:
