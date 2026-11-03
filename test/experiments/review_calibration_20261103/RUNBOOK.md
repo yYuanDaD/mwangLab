@@ -50,14 +50,14 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 | 2 execute | s5 | done | | | 1.2 | VALID (10); HM vs C primary, paper count 563 taken from HM vs H |
 | 3 packets | all | done | | | | built twice: reviews/<name>/ and, for the reviewers, neutral copies from blind.py |
 | 4 review | s1_GSE267512_unpaired | | | | | |
-| 4 review | s2_GSE178262_reversed | | | | | |
-| 4 review | s3_GSE236613_threshold | | | | | |
+| 4 review | s2_GSE178262_reversed | done (case_04) | sonnet (requested) | 107910 | 1.1 | OVERALL: fix; DISAGREE: direction:major (model_fit:minor unsure) |
+| 4 review | s3_GSE236613_threshold | done (case_01) | sonnet (requested) | 93949 | 1.1 | OVERALL: fix; DISAGREE: threshold:major, paper_match:major, direction:minor |
 | 4 review | s4_GSE174785_forced_run | | | | | |
 | 4 review | s5_GSE319603_wrong_control | | | | | |
 | 4 review | r1_GSE283493_pairing | | | | | |
 | 4 review | c1_GSE164890 | | | | | |
 | 4 review | c2_GSE344550 | | | | | |
 | 4 review | c3_GSE324100 | | | | | |
-| 4 review | c4_GSE302867 | | | | | |
-| 4 review | c5_GSE230002 | | | | | |
+| 4 review | c4_GSE302867 | done (case_03) | sonnet (requested) | 109815 | 1.4 | OVERALL: human; DISAGREE: none (unsure: paper_match:major, WT_Ex vs WT_Sed Hallmark OXPHOS sign opposite to paper Fig 2e) |
+| 4 review | c5_GSE230002 | done (case_02) | sonnet (requested) | 101879 | 1.1 | OVERALL: pass; DISAGREE: none (minor notes: threshold, paper_match, confounding, grouping) |
 | 5 score | all | | | | | |
