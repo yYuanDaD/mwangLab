@@ -1,0 +1,808 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41835150",
+  "subject_id": "PMID41835150",
+  "created_at": "2026-11-03T00:25:45",
+  "finished_at": "2026-11-03T00:27:45",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12982024.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC12982024.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-03T00:25:45",
+      "sha256": null,
+      "attributes": {
+        "sha256": "850d779267db3d89eab98f84d662d1a17b7ba45d74abe7e49c6fd90b5776e704",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE319603_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:25:45",
+      "sha256": null,
+      "attributes": {
+        "sha256": "73e741c868cbe47e81f7f1d6891756833fda091f064dde50ad1fa5d325bcce77",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE319603_All_gene_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_All_gene_counts.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:25:45",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d5df07ad0b084bc8a3fadcf4cc3ec7c2f32436da0e292af01224e028a6e34254",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE319603"
+        ],
+        "assay": "bulk RNA-seq, mouse gastrocnemius, 21 weeks, male C57BL/6J",
+        "factors": [
+          {
+            "name": "diet",
+            "levels": [
+              "chow",
+              "HFD"
+            ]
+          },
+          {
+            "name": "exercise (MICT)",
+            "levels": [
+              "sedentary",
+              "MICT 8 weeks"
+            ]
+          }
+        ],
+        "groups": {
+          "C": "chow sedentary",
+          "CM": "chow + MICT (not RNA-sequenced per Fig 3A / GEO)",
+          "H": "HFD sedentary",
+          "HM": "HFD + MICT"
+        },
+        "sample_inclusion": [
+          "RNA-seq n = 6 per group (S2.7.p1); C, H and HM are analysed (S3.2.p1, FIG3)"
+        ],
+        "primary_estimand": "Effect of 8-week moderate-intensity continuous treadmill training on gastrocnemius gene expression within high-fat-diet-fed mice (HM vs H); H vs C is the diet effect, not an exercise effect",
+        "planned_contrasts": [
+          "HM vs H (exercise within HFD; paper 563 DEGs: 213 up, 350 down; S3.2.p1)",
+          "H vs C (diet effect, reference only; paper 458 DEGs: 295 up, 163 down; S3.2.p1)"
+        ],
+        "blocking_or_covariance": {
+          "status": "not_required",
+          "note": "independent animals, no batch or pairing reported"
+        },
+        "matrix_scale": "raw counts (featureCounts)",
+        "paper_method": "DESeq2 v1.22.2 on raw counts, BH FDR (pairwise, formula not reported)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "effect_inclusive": true,
+          "source_locator": "S3.2.p1"
+        }
+      },
+      "reason": "S2.1.p1/S2.2.p1: 4 groups C, CM, H, HM; MICT started at week 13 on top of continuous diet. S2.7.p1: RNA-seq n=6/group, DESeq2 on raw counts, BH FDR<0.05. S3.2.p1: DEGs by adjusted P<0.05 and |log2FC|>=0.5; H vs C 458 DEGs, HM vs H 563 DEGs. The exercise question is HM vs H, because both arms are on HFD and differ only by MICT. CM was not sequenced (PCA and DEGs use C, H, HM only, FIG3).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:25:45"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_All_gene_counts.csv",
+        "owned": true,
+        "checks": [
+          "S8.p1 names GSE319603 as the deposit of this paper",
+          "GEO series PubMed ID 41835150 and title match the paper",
+          "18 samples = 3 groups x 6, matching n=6 per group (S2.7.p1)",
+          "titles control/high-fat diet/high-fat diet with MICT intervention and Library names C/H/HM map to paper groups C/H/HM",
+          "gastrocnemius, male, C57BL/6J, 25 weeks, featureCounts and STAR on GRCm38.p6 as in S2.7.p1"
+        ],
+        "accession": "GSE319603",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv"
+      },
+      "reason": "Accession, PMID, tissue, sex, strain, pipeline and sample counts all agree with the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:25:45"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "Library name: ([A-Z]+)\\d+"
+            }
+          },
+          "output": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\design_metadata.csv",
+          "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+          "levels": {
+            "grp": {
+              "C": 6,
+              "H": 6,
+              "HM": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (HM1..HM6, C1..C6, H1..H6) equal the GEO 'Library name' in the description field (exact match, 18/18); titles differ from column names so they are not used as key. grp (C, H, HM) is read from the same field and agrees with the title text. No positional matching.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:25:45"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\aligned_matrix.csv",
+          "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+          "n_features": 26166,
+          "n_samples": 18,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3346023.0,
+          "median": 31.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values non-negative integers, no missing values, 26166 genes, max 3.3e6; GEO data_processing says featureCounts and the supplementary file 'includes raw counts for each sample'. Matches the paper's DESeq2-on-raw-counts input (S2.7.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:25:46"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group",
+        "design_column": "grp",
+        "control": "H",
+        "treatment": "HM",
+        "contrasts": [
+          {
+            "name": "grp_HM_vs_H",
+            "control": "H",
+            "treatment": "HM",
+            "role": "primary"
+          },
+          {
+            "name": "grp_H_vs_C",
+            "control": "C",
+            "treatment": "H",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\suitability\\suitability.md",
+          "n_comparisons": 4,
+          "n_analyzable": 4
+        }
+      },
+      "reason": "Exercise estimand = HM vs H (S3.2.p1), the only contrast that isolates MICT. H vs C is run as a secondary non-exercise reference (diet effect) because the paper reports it and it checks the pipeline against Table 1. Each contrast is a separate two-arm DESeq2 fit on its own two groups, as the paper's pairwise DESeq2 (formula not reported).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:10"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 18,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "grp_H",
+            "grp_HM"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 15,
+          "levels": {
+            "grp": {
+              "C": 6,
+              "H": 6,
+              "HM": 6
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "C"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "H"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "HM"
+              ],
+              "n": 6
+            }
+          ],
+          "min_cell_size": 6,
+          "missing_values": {}
+        },
+        "confounding": []
+      },
+      "reason": "Each sample is a distinct animal (n=6/group), no repeated measures. Sex, strain, tissue, age (25 weeks) are constant in GEO metadata; no batch or library-prep variable is deposited, so no covariate is added.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:10"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ grp"
+      },
+      "reason": "Paper: DESeq2 on raw counts with BH adjustment. pydeseq2 is the available executor (R DESeq2 v1.22.2 not used); small numeric differences from the R version are expected. Run per contrast with the paper alpha 0.05.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:10"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        }
+      },
+      "reason": "S3.2.p1: adjusted P < 0.05 and |log2FC| >= 0.5; S2.7.p1: BH. Applied as stated (padj strict <0.05, |log2FC| inclusive >=0.5). Audit rule without an effect cutoff reported separately.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:10"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_HM_vs_H",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_HM_vs_H\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_HM_vs_H\\DEG_results_HM_vs_H.csv"
+        ],
+        "counts": {
+          "grp_HM_vs_H": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 13564,
+              "n_significant": 534,
+              "n_up": 191,
+              "n_down": 343,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13564,
+              "n_significant": 1231,
+              "n_up": 530,
+              "n_down": 701,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Exercise effect within HFD (HM vs H), the paper's primary exercise contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:36"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_H_vs_C",
+        "role": "secondary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_H_vs_C\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_H_vs_C\\DEG_results_H_vs_C.csv"
+        ],
+        "counts": {
+          "grp_H_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 14973,
+              "n_significant": 476,
+              "n_up": 296,
+              "n_down": 180,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 14973,
+              "n_significant": 991,
+              "n_up": 599,
+              "n_down": 392,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Diet reference contrast (not exercise); reported in the paper, used to check the pipeline against Table 1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:53"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_HM_vs_H",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\enrichment_grp_HM_vs_H\\ora\\DEG_results_HM_vs_H_GO_Biological_Process_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\enrichment_grp_HM_vs_H\\ora\\DEG_results_HM_vs_H_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\enrichment_grp_HM_vs_H\\ora\\DEG_results_HM_vs_H_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\enrichment_grp_HM_vs_H\\ora\\DEG_results_HM_vs_H_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 500 Mouse genes (direction=all, padj<0.05, |log2FC|>0.5). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Transmembrane Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169) | padj=1.81e-03 | overlap=23/284 | genes=RET;SHC2;MUSK;IRS1;PDGFA;VEGFC;PIK3R1;SORBS1;SULF1;FGF1;BAIAP2;MERTK;FOXO1;SOCS2 - Cellular Response To Peptide Hormone Stimulus (GO:0071375) | padj=1.81e-03 | overlap=12/89 | genes=NR4A1;NR4A3;IRS1;TRIB3;INHBB;PIK3R1;SORBS1;HDAC9;CPEB2;FOXO1;GCK;PCK2 - Negative Regulation Of Insulin Secretion (GO:0046676) | padj=1.81e-03 | overlap=6/17 | genes=REST;IRS1;BMP8A;INHBB;PIM3;FOXO1 - Cellular Response To Insulin Stimulus (GO:0032869) | padj=3.94e-03 | overlap=12/99 | genes=IRS1;PDK4;TRIB3;INHBB;PIK3R1;SORBS1;BAIAP2;CPEB2;HDAC9;FOXO1;GCK;PCK2 - Regulation Of Insulin Secretion (GO:0050796) | padj=5.06e-03 | overlap=11/87 | genes=PER2;REST;NOS2;IRS1;LRP5;BMP8A;INHBB;DOC2B;MYRIP;FOXO1;GCK - Response To Insulin (GO:0032868) | padj=1.05e-02 | overlap=10/79 | genes=IRS1;TRIB3;INHBB;PIK3R1;SORBS1;HDAC9;CPEB2;FOXO1;GCK;PCK2 - Cellular Response To Glucocorticoid Stimulus (GO:0071385) | padj=1.47e-02 | overlap=5/17 | genes=REST;KLF9;FAM107A;ZFP36L2;PCK2 - Positive Regulation Of Vasculature Development (GO:1904018) | padj=1.47e-02 | overlap=11/104 | genes=RAMP2;HYAL1;FGF18;APLNR;CYP1B1;VEGFC;PRKD1;ANGPTL4;FGF1;GATA2;HIPK1 - Cellular Response To Fibroblast Growth Factor Stimulus (GO:0044344) | padj=1.47e-02 | over..."
+      },
+      "reason": "Paper runs GO/KEGG over-representation on the HM vs H DEGs (S3.3, S3.4); ORA uses the applied threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:26:58"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "results": {
+          "grp_HM_vs_H": {
+            "n_deg": 534,
+            "up": 191,
+            "down": 343,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+            "audit_n": 1231
+          },
+          "grp_H_vs_C": {
+            "n_deg": 476,
+            "up": 296,
+            "down": 180,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+            "audit_n": 991
+          }
+        },
+        "paper_counts": {
+          "grp_HM_vs_H": 563,
+          "grp_H_vs_C": 458
+        },
+        "comparison": {
+          "grp_HM_vs_H": {
+            "ours": 534,
+            "paper": 563
+          },
+          "grp_H_vs_C": {
+            "ours": 476,
+            "paper": 458
+          }
+        },
+        "paper_gene_check": {
+          "grp_HM_vs_H": {
+            "Fbxo32": {
+              "baseMean": 11884.9648,
+              "log2FoldChange": -1.1381,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Trim63": {
+              "baseMean": 11719.3566,
+              "log2FoldChange": -1.29,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Foxo1": {
+              "baseMean": 3086.368,
+              "log2FoldChange": -1.3666,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Angptl7": {
+              "baseMean": 3504.3049,
+              "log2FoldChange": -1.358,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Txnip": {
+              "baseMean": 32075.644,
+              "log2FoldChange": -0.778,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Pdk4": {
+              "baseMean": 57765.6356,
+              "log2FoldChange": -1.308,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cited4": {
+              "baseMean": 657.5659,
+              "log2FoldChange": 1.2921,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Pax7": {
+              "baseMean": 93.439,
+              "log2FoldChange": 0.119,
+              "padj": 0.7651,
+              "pvalue": 0.5367
+            },
+            "Myod1": {
+              "baseMean": 788.0517,
+              "log2FoldChange": 0.2832,
+              "padj": 0.1269,
+              "pvalue": 0.0191
+            },
+            "Myog": {
+              "baseMean": 186.3364,
+              "log2FoldChange": 0.4507,
+              "padj": 0.1408,
+              "pvalue": 0.023
+            }
+          },
+          "grp_H_vs_C": {
+            "Cd36": {
+              "baseMean": 36437.839,
+              "log2FoldChange": 0.7172,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fabp3": {
+              "baseMean": 41047.6173,
+              "log2FoldChange": 1.7412,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plin2": {
+              "baseMean": 1606.0921,
+              "log2FoldChange": 0.6917,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plin5": {
+              "baseMean": 2623.229,
+              "log2FoldChange": 1.2293,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cpt2": {
+              "baseMean": 4478.1367,
+              "log2FoldChange": 0.7702,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acadl": {
+              "baseMean": 18775.6924,
+              "log2FoldChange": 0.9387,
+              "padj": 0.0,
+              "pvalue": 0.0
+            }
+          }
+        }
+      },
+      "reason": "Same samples (C/H/HM, n=6), raw counts, DESeq2 Wald with BH, threshold as in S3.2.p1; implementation differs (pydeseq2 vs R DESeq2) and is declared as a discrepancy.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:27:45"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "44c5f065e0ec1531e9fd4419fd1b4f940a4f63ad7ee47573a818eb0e0f115d52",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e0e61891142616de4950d6aacbb512c5d6f8def025ba396009d60684b53c57dc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5cdb6ffecf97bf2c08aea95b29f4916d9debec1c21f44bae8be428b25978cb8e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "aed2fd0011833c5b887c46d54d5c5c8d72d566ffd191792149bd1173d67196e0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_HM_vs_H\\DEG_results_HM_vs_H.csv",
+      "role": "deg_grp_HM_vs_H",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3e4c92ec3009a4840439653f6e5a287c868d7b3690cc2eb57fdf60784c279be7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\results\\grp_H_vs_C\\DEG_results_H_vs_C.csv",
+      "role": "deg_grp_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fa85e197ab3658c9e88665dae914d73a5994fbefb9c1a1a3a3957d780a5f8e0b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID41835150\\PMID41835150\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "bf984546cc386f2006037b657b4ececf8009bed016615bd80de847cf720c4625",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

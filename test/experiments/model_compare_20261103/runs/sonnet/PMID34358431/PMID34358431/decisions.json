@@ -1,0 +1,311 @@
+[
+  {
+    "contract_version": "3",
+    "case_id": "PMID34358431",
+    "stage": "paper_reconstruction",
+    "evidence": [
+      {
+        "id": "paper:PMC8432967.paper.md",
+        "kind": "paper",
+        "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC8432967.paper.md",
+        "sha256": "b742ccc470bf903a0bd4a6e8a490795c7a35d625649101a26d376a29d326d6f1"
+      },
+      {
+        "id": "metadata:GSE174785_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accessions": [
+        "GSE174785 (bulk RNA-seq, this paper)",
+        "GSE158984 (scRNA-seq, this paper)"
+      ],
+      "assay": "bulk RNA-seq of sorted CD31+CD45- muscle ECs (Methods: Smart-seq II; GEO: TruSeq stranded mRNA SE100); kallisto + DESeq2",
+      "sample_inclusion": "20 samples: 5 reps each of WT and Atf4 dEC (Pdgfb-CreERT2 x Atf4 loxP, tamoxifen) x RmEC (soleus, oxidative) x WmEC (EDL, glycolytic)",
+      "sample_exclusion": "not_reported",
+      "factors": [
+        {
+          "name": "muscle_type",
+          "levels": [
+            "RmEC (soleus)",
+            "WmEC (EDL)"
+          ]
+        },
+        {
+          "name": "genotype",
+          "levels": [
+            "WT",
+            "Atf4 dEC"
+          ]
+        }
+      ],
+      "primary_estimand": "Paper's bulk RNA-seq estimand: transcriptional difference between oxidative (red, soleus) and glycolytic (white, EDL) muscle ECs in WT, and its dependence on endothelial Atf4. Exercise (14 d voluntary wheel running) enters the paper only via scRNA-seq (GSE158984, sedentary vs exercised GAS ECs) and histology, not via GSE174785.",
+      "planned_contrasts": [
+        "WT RmEC vs WT WmEC (782 DEGs, S2.2.p2)",
+        "Atf4 dEC RmEC vs Atf4 dEC WmEC (S2.6.p1)"
+      ],
+      "blocking_or_covariance": {
+        "status": "not_reported"
+      },
+      "matrix_scale": "kallisto counts (raw counts into DESeq2)",
+      "paper_method": "DESeq2 (size factors, dispersion, GLM); genes with <=1 count filtered; VST for PCA",
+      "paper_formula": "not_reported",
+      "paper_threshold": {
+        "metric": "padj",
+        "adjustment": "DESeq2 default (BH)",
+        "cutoff": 0.05,
+        "inclusive": false,
+        "effect_metric": "log2FC",
+        "effect_cutoff": 1,
+        "effect_rule": "paper says 'log fold change > 1' without stating the base; log2 assumed",
+        "source_locator": "S4.4.3.p2, S2.6.p1"
+      },
+      "paper_deg_counts": {
+        "WT_RmEC_vs_WmEC": 782,
+        "second_set_stated": 140,
+        "remaining_after_Atf4_KO": [
+          211,
+          126
+        ]
+      },
+      "exercise_in_bulk_dataset": "none: no sedentary/exercised label; GEO treatment_protocol only describes tamoxifen"
+    },
+    "paper": {
+      "locator": "S2.2.p2"
+    },
+    "confidence": "high",
+    "reasoning": "GSE174785 is listed in TAB1 (RNA-seq raw data for RmECs versus WmECs, WT and Atf4 dEC) and DA.p1. Methods S4.4.3 describe bulk RNA-seq with DESeq2. Exercise (voluntary wheel running) appears only in S2.5/S2.6 histology and scRNA-seq of GAS ECs; the bulk comparison is muscle bed (oxidative vs glycolytic) by genotype.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-03T05:30:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "PMID34358431",
+    "stage": "ownership",
+    "evidence": [
+      {
+        "id": "metadata:GSE174785_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625"
+      },
+      {
+        "id": "matrix:GSE174785_merged_from_tar.csv",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_merged_from_tar.csv",
+        "sha256": "53bc0a0f8c0eec8acba6f8d0ce72baae1bc83ef08679cf2dcad7ba2d1582ca8f"
+      },
+      {
+        "id": "paper:PMC8432967.paper.md",
+        "kind": "paper",
+        "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC8432967.paper.md",
+        "sha256": "b742ccc470bf903a0bd4a6e8a490795c7a35d625649101a26d376a29d326d6f1"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accession": "GSE174785",
+      "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_merged_from_tar.csv",
+      "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+      "owned": true,
+      "checks": [
+        "series_id GSE174785 in metadata",
+        "20 samples GSM5328123-142 = 5 reps x 2 genotypes x 2 muscles, matching TAB1 description",
+        "EC sorted from soleus/EDL matches S4.4.3.p1 and S2.6.p1",
+        "matrix is merged kallisto est_counts from GSE174785_RAW.tar"
+      ]
+    },
+    "paper": {
+      "locator": "TAB1"
+    },
+    "confidence": "high",
+    "reasoning": "Accession is the paper's own deposit; sample count, tissue and genotype labels match the paper's description.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-03T05:30:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "PMID34358431",
+    "stage": "alignment",
+    "evidence": [
+      {
+        "id": "metadata:GSE174785_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625"
+      },
+      {
+        "id": "matrix:GSE174785_merged_from_tar.csv",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_merged_from_tar.csv",
+        "sha256": "53bc0a0f8c0eec8acba6f8d0ce72baae1bc83ef08679cf2dcad7ba2d1582ca8f"
+      },
+      {
+        "id": "tool_output:metadata_with_matrix_id.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\aligned\\metadata_with_matrix_id.csv",
+        "sha256": "dd6a6ebe3788623013edb7ff4744a9f875e312a9477b56617f8acc316bc39b6d"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\aligned\\aligned_matrix.csv",
+        "sha256": "34e990ca8bcb71e62f2d5b097f68b9581d94da5e47b63ae5d66f3b8f8bf228e3"
+      },
+      {
+        "id": "tool_output:alignment_map.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\aligned\\alignment_map.csv",
+        "sha256": "95236ea92ee5981379bf69f5b2b50a20d759f24f406f3f2014bcdcd56baaf779"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "exact:matrix_id (matrix_id regex-derived from metadata supplementary_file_1 file name; exact match, no position)",
+      "n_aligned": 20,
+      "n_metadata": 20,
+      "coverage": 1.0,
+      "unmatched_matrix_columns": [],
+      "unmatched_metadata_samples": [],
+      "derived": {
+        "source": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "columns": {
+          "matrix_id": {
+            "source": "supplementary_file_1",
+            "regex": ".*/(GSM\\d+_\\w+)\\.txt\\.gz$"
+          }
+        },
+        "output": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\aligned\\metadata_with_matrix_id.csv",
+        "sha256": "dd6a6ebe3788623013edb7ff4744a9f875e312a9477b56617f8acc316bc39b6d",
+        "levels": {
+          "matrix_id": {
+            "GSM5328123_koR1": 1,
+            "GSM5328124_koR2": 1,
+            "GSM5328125_koR3": 1,
+            "GSM5328126_koR4": 1,
+            "GSM5328127_koR5": 1,
+            "GSM5328128_koW1": 1,
+            "GSM5328129_koW2": 1,
+            "GSM5328130_koW3": 1,
+            "GSM5328131_koW4": 1,
+            "GSM5328132_koW5": 1,
+            "GSM5328133_wtR1": 1,
+            "GSM5328134_wtR2": 1,
+            "GSM5328135_wtR3": 1,
+            "GSM5328136_wtR4": 1,
+            "GSM5328137_wtR5": 1,
+            "GSM5328138_wtW1": 1,
+            "GSM5328139_wtW2": 1,
+            "GSM5328140_wtW3": 1,
+            "GSM5328141_wtW4": 1,
+            "GSM5328142_wtW5": 1
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Matrix columns are GSM_label; the exact label is the supplementary file name in metadata. Full 20/20 exact coverage.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-03T05:30:41+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "PMID34358431",
+    "stage": "matrix",
+    "evidence": [
+      {
+        "id": "tool_output:matrix_profile.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\matrix_profile.json",
+        "sha256": "975a306918da2adb3a0b71536ca5fd76034a4d83d293bd99653c5659c9e6d359"
+      },
+      {
+        "id": "matrix:GSE174785_merged_from_tar.csv",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_merged_from_tar.csv",
+        "sha256": "53bc0a0f8c0eec8acba6f8d0ce72baae1bc83ef08679cf2dcad7ba2d1582ca8f"
+      },
+      {
+        "id": "metadata:GSE174785_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "estimated counts (kallisto est_counts, transcript-level ENSMUST ids)",
+      "recommended_method": "DESeq2 on rounded est_counts after summarising transcripts to genes (paper used DESeq2 on kallisto counts)",
+      "evidence": "integer_fraction=0.6186, non-negative, column sums 8.5-16M equal est_counts sums of per-sample files (tpm sums 1e6); max 2263230.0",
+      "feature_level": "transcript (ENSMUST); gene collapse needed before gene-level DE"
+    },
+    "paper": {
+      "locator": "S4.4.3.p1"
+    },
+    "confidence": "high",
+    "reasoning": "Matrix is count scale (est_counts), consistent with the paper's input to DESeq2. Not the blocking issue.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-03T05:30:42+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "PMID34358431",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "metadata:GSE174785_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE174785\\GSE174785_metadata.csv",
+        "sha256": "48c24dc9dd452d059e2095439ffa97e36a9baed573c2eeecb0f0a7f3faa82625"
+      },
+      {
+        "id": "paper:PMC8432967.paper.md",
+        "kind": "paper",
+        "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC8432967.paper.md",
+        "sha256": "b742ccc470bf903a0bd4a6e8a490795c7a35d625649101a26d376a29d326d6f1"
+      },
+      {
+        "id": "tool_output:design_cells.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID34358431\\PMID34358431\\design_cells.json",
+        "sha256": "4ae559fde3a6dd2bd836120f39e5e6d01bfe0518a61e2ba047c6d0d470f9d92a"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "WT oxidative (soleus) vs WT glycolytic (EDL)",
+        "reason_rejected": "muscle bed difference, not exercise"
+      },
+      {
+        "value": "Atf4 dEC vs WT within muscle",
+        "reason_rejected": "genotype effect, not exercise"
+      },
+      {
+        "value": "genotype x muscle interaction",
+        "reason_rejected": "ATF4 dependence of bed difference, not exercise"
+      }
+    ],
+    "final": {},
+    "paper": {
+      "locator": "S2.5.p1"
+    },
+    "confidence": "high",
+    "reasoning": "Candidates rejected: (1) RmEC vs WmEC in WT = baseline muscle-bed difference (paper's 782 DEGs), not exercise; (2) WT vs Atf4 dEC = genotype effect; (3) genotype x muscle interaction = ATF4 dependence of the bed difference. None estimates an exercise effect. Metadata and paper agree that no sample was labelled exercised vs sedentary.",
+    "decision_status": "refused",
+    "execution_status": "not_run",
+    "stop_reason": "No exercise contrast exists in GSE174785: the 20 samples differ only by muscle bed (soleus/oxidative vs EDL/glycolytic) and EC-specific Atf4 genotype (WT vs Atf4 dEC); there is no sedentary vs exercised (wheel running) label, no pre/post or time factor, and GEO treatment_protocol mentions only tamoxifen. The paper's exercise comparison is the scRNA-seq dataset GSE158984 (S2.5.p1), not this one. RmEC vs WmEC is a muscle-type comparison, not an exercise effect, so analysing it would answer a different estimand than 'how exercise affects gene expression'.",
+    "recorded_at": "2026-11-03T05:30:42+00:00"
+  }
+]

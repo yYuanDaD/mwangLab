@@ -1,0 +1,204 @@
+{
+  "run_dir": "test/experiments/model_compare_20261103/runs/sonnet/PMID41835150",
+  "request": "Analyze GSE319603 for PMID 41835150 (Transcriptomic insights into aerobic exercise-mediated attenuation of high-fat diet-induced muscle wasting.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Sonnet 5.5 (claude-sonnet-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "PMID41835150",
+      "accession": "GSE319603",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12982024.paper.md"],
+        "metadata": "GSE319603/GSE319603_metadata.csv",
+        "matrix": "GSE319603/GSE319603_All_gene_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE319603"],
+            "assay": "bulk RNA-seq, mouse gastrocnemius, 21 weeks, male C57BL/6J",
+            "factors": [{"name": "diet", "levels": ["chow", "HFD"]}, {"name": "exercise (MICT)", "levels": ["sedentary", "MICT 8 weeks"]}],
+            "groups": {"C": "chow sedentary", "CM": "chow + MICT (not RNA-sequenced per Fig 3A / GEO)", "H": "HFD sedentary", "HM": "HFD + MICT"},
+            "sample_inclusion": ["RNA-seq n = 6 per group (S2.7.p1); C, H and HM are analysed (S3.2.p1, FIG3)"],
+            "primary_estimand": "Effect of 8-week moderate-intensity continuous treadmill training on gastrocnemius gene expression within high-fat-diet-fed mice (HM vs H); H vs C is the diet effect, not an exercise effect",
+            "planned_contrasts": [
+              "HM vs H (exercise within HFD; paper 563 DEGs: 213 up, 350 down; S3.2.p1)",
+              "H vs C (diet effect, reference only; paper 458 DEGs: 295 up, 163 down; S3.2.p1)"
+            ],
+            "blocking_or_covariance": {"status": "not_required", "note": "independent animals, no batch or pairing reported"},
+            "matrix_scale": "raw counts (featureCounts)",
+            "paper_method": "DESeq2 v1.22.2 on raw counts, BH FDR (pairwise, formula not reported)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "BH",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "inclusive": false,
+              "effect_inclusive": true,
+              "source_locator": "S3.2.p1"
+            }
+          },
+          "reasoning": "S2.1.p1/S2.2.p1: 4 groups C, CM, H, HM; MICT started at week 13 on top of continuous diet. S2.7.p1: RNA-seq n=6/group, DESeq2 on raw counts, BH FDR<0.05. S3.2.p1: DEGs by adjusted P<0.05 and |log2FC|>=0.5; H vs C 458 DEGs, HM vs H 563 DEGs. The exercise question is HM vs H, because both arms are on HFD and differ only by MICT. CM was not sequenced (PCA and DEGs use C, H, HM only, FIG3).",
+          "confidence": "high",
+          "locator": "S3.2.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S8.p1 names GSE319603 as the deposit of this paper",
+              "GEO series PubMed ID 41835150 and title match the paper",
+              "18 samples = 3 groups x 6, matching n=6 per group (S2.7.p1)",
+              "titles control/high-fat diet/high-fat diet with MICT intervention and Library names C/H/HM map to paper groups C/H/HM",
+              "gastrocnemius, male, C57BL/6J, 25 weeks, featureCounts and STAR on GRCm38.p6 as in S2.7.p1"
+            ]
+          },
+          "reasoning": "Accession, PMID, tissue, sex, strain, pipeline and sample counts all agree with the paper.",
+          "confidence": "high",
+          "locator": "S8.p1"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: (\\w+)"]},
+          "patterns": {"grp": ["description", "Library name: ([A-Z]+)\\d+"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (HM1..HM6, C1..C6, H1..H6) equal the GEO 'Library name' in the description field (exact match, 18/18); titles differ from column names so they are not used as key. grp (C, H, HM) is read from the same field and agrees with the title text. No positional matching."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values non-negative integers, no missing values, 26166 genes, max 3.3e6; GEO data_processing says featureCounts and the supplementary file 'includes raw counts for each sample'. Matches the paper's DESeq2-on-raw-counts input (S2.7.p1)."
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "H"},
+          "organism": "Mouse",
+          "planned": ["grp_HM_vs_H", "grp_H_vs_C"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "H",
+            "treatment": "HM",
+            "contrasts": [
+              {"name": "grp_HM_vs_H", "control": "H", "treatment": "HM", "role": "primary"},
+              {"name": "grp_H_vs_C", "control": "C", "treatment": "H", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "HM vs C", "reason_rejected": "confounds diet and exercise; not a paper contrast"},
+            {"value": "pooled exercise (HM) vs pooled non-exercise (C+H)", "reason_rejected": "pools biologically distinct diets; the paper reports per-diet contrasts"},
+            {"value": "CM vs C", "reason_rejected": "CM mice were not RNA-sequenced; no such samples in GSE319603"}
+          ],
+          "reasoning": "Exercise estimand = HM vs H (S3.2.p1), the only contrast that isolates MICT. H vs C is run as a secondary non-exercise reference (diet effect) because the paper reports it and it checks the pipeline against Table 1. Each contrast is a separate two-arm DESeq2 fit on its own two groups, as the paper's pairwise DESeq2 (formula not reported)."
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": [],
+          "reasoning": "Each sample is a distinct animal (n=6/group), no repeated measures. Sex, strain, tissue, age (25 weeks) are constant in GEO metadata; no batch or library-prep variable is deposited, so no covariate is added."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp"
+          },
+          "reasoning": "Paper: DESeq2 on raw counts with BH adjustment. pydeseq2 is the available executor (R DESeq2 v1.22.2 not used); small numeric differences from the R version are expected. Run per contrast with the paper alpha 0.05."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "BH",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "inclusive": false,
+              "effect_inclusive": true
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "inclusive": false,
+              "effect_inclusive": true
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_cutoff": null
+            }
+          },
+          "reasoning": "S3.2.p1: adjusted P < 0.05 and |log2FC| >= 0.5; S2.7.p1: BH. Applied as stated (padj strict <0.05, |log2FC| inclusive >=0.5). Audit rule without an effect cutoff reported separately."
+        },
+        "study": {
+          "final": {"route": "paper_aligned"},
+          "paper_counts": {"grp_HM_vs_H": 563, "grp_H_vs_C": 458},
+          "paper_genes": {
+            "grp_HM_vs_H": ["Fbxo32", "Trim63", "Foxo1", "Angptl7", "Txnip", "Pdk4", "Cited4", "Pax7", "Myod1", "Myog"],
+            "grp_H_vs_C": ["Cd36", "Fabp3", "Plin2", "Plin5", "Cpt2", "Acadl"]
+          },
+          "reasoning": "Same samples (C/H/HM, n=6), raw counts, DESeq2 Wald with BH, threshold as in S3.2.p1; implementation differs (pydeseq2 vs R DESeq2) and is declared as a discrepancy."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "sample key",
+          "paper": "groups C, H, HM, CM",
+          "data": "matrix columns HM/C/H 1-6 do not equal GEO titles; matched via description Library name; CM absent from GEO",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "DESeq2 implementation",
+          "paper": "R DESeq2 v1.22.2",
+          "data": "pydeseq2 executor",
+          "disposition": "requires_explicit_deviation"
+        },
+        {
+          "item": "low-count filtering / model formula",
+          "paper": "not reported",
+          "data": "default handling in the tool",
+          "disposition": "requires_explicit_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "grp_HM_vs_H",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "H", "treatment_group": "HM", "alpha": 0.05},
+          "subset": {"grp": ["H", "HM"]},
+          "role": "primary",
+          "reasoning": "Exercise effect within HFD (HM vs H), the paper's primary exercise contrast."
+        },
+        {
+          "name": "grp_H_vs_C",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "C", "treatment_group": "H", "alpha": 0.05},
+          "subset": {"grp": ["C", "H"]},
+          "role": "secondary",
+          "reasoning": "Diet reference contrast (not exercise); reported in the paper, used to check the pipeline against Table 1."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "grp_HM_vs_H",
+          "ora": true,
+          "gsea": false,
+          "direction": "all",
+          "reasoning": "Paper runs GO/KEGG over-representation on the HM vs H DEGs (S3.3, S3.4); ORA uses the applied threshold."
+        }
+      ]
+    }
+  ]
+}

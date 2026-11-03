@@ -1,0 +1,289 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID42679010",
+  "subject_id": "PMID42679010",
+  "created_at": "2026-11-03T00:31:22",
+  "finished_at": "2026-11-03T00:31:32",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13557500.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC13557500.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-03T00:31:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5b35b2928eed40a8952d7bcc63fa423b6650c03a5ed86a752dbf05fbc475e252",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE344550_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE344550\\GSE344550_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:31:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8bca8fb6ffc528129d1f6332581aebcfdfddb5f3c0a9495c132ee8f678ba2684",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE344550_macrophage_counts_rpkm.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE344550\\GSE344550_macrophage_counts_rpkm.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-03T00:31:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "485458f64ac21c48228283c895d3e6f31b487d53967256610f4d010dbaf6bd0b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE344550",
+          "GSE312575",
+          "PRJNA1363747"
+        ],
+        "primary_estimand": "Not an exercise study. Paper compares low-biofilm-producing (LBP: 29T, 49B) vs biofilm-producing (BP: 1T, 35B) C. parapsilosis isolates; GSE344550 is human macrophage RNA-seq after infection with these isolates (control, 3 h, 24 h): BP vs LBP-infected macrophages at 3 and 24 h.",
+        "planned_contrasts": [
+          "macrophage response BP-infected vs LBP-infected at 3 h (S4.13.p1)",
+          "macrophage response BP-infected vs LBP-infected at 24 h (S4.13.p1)"
+        ],
+        "paper_threshold": {
+          "metric": "none",
+          "cutoff": null,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "source_locator": "S4.13.p1"
+        },
+        "paper_method": "edgeR on raw counts, ~0 + group:time, |log2FC| > 1 (no stated FDR); fgsea on log2FC ranks",
+        "exercise_content": "none: no exercise, physical activity, or training factor anywhere in the paper (fungal pathogen evolution / immune evasion)",
+        "paper_results": "No DEG counts reported in text (S6-S9 Tables not in the paper text)."
+      },
+      "reason": "ABS.p1, S2.7.p1-p3 and S4.13.p1: GSE344550 (FN.p1 'macrophage') profiles human macrophages infected with C. parapsilosis BP/LBP strains at 3 and 24 h versus uninfected controls. No exercise question exists in the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:22"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE344550\\GSE344550_macrophage_counts_rpkm.txt.gz",
+        "owned": true,
+        "accession": "GSE344550",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE344550\\GSE344550_metadata.csv"
+      },
+      "reason": "FN.p1 names GSE344550 (macrophage) as this paper's data; metadata contact is Nobile lab; strains 1T/29T/35B/49B and 3 h/24 h/control match S2.7.p1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:22"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 30,
+        "n_metadata": 30,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\aligned_metadata.csv",
+          "columns": {},
+          "output": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\design_metadata.csv",
+          "sha256": "31d8388248bf559711b27848280851fb58558b4ab8b79a22c0b0f22d8c784616",
+          "levels": {}
+        }
+      },
+      "reason": "30 matrix columns (AM*) match the metadata description 'Library name: AM*' exactly after regex extraction (inspect alignment_keys 30/30). No position alignment.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:24"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "RPKM",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\aligned_matrix.csv",
+          "sha256": "385f6ae6e43b5d4830dff4941ee09eb5d100434d2f1e2874f896a07993893a8c",
+          "n_features": 36591,
+          "n_samples": 30,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 26872.2,
+          "median": 0.0,
+          "integer_fraction": 0.5515,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Deposited file GSE344550_macrophage_counts_rpkm.txt.gz: 55% integer, non-integer values, GEO data_processing says 'RPKM normalized transcripts'. The paper used raw counts in edgeR (S4.13.p1) which are not deposited here; the available matrix would need limma-trend on log2 values.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:25"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "covariance",
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\suitability\\suitability.md",
+          "n_comparisons": 57,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "Metadata columns are only strain and time (post-infection). Nothing maps to exercise; manufacturing a contrast would answer a different question.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: samples are human macrophages infected with C. parapsilosis isolates (control/1T/35B/29T/49B at 3 h and 24 h). There is no exercise, training, or physical-activity factor in the paper or metadata, so the requested estimand (effect of exercise on gene expression) cannot be identified. Paper's own contrast (BP vs LBP-infected macrophages) is a different question."
+      },
+      "recorded_at": "2026-11-03T00:31:32"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fe9de7d9d275a066d502e93db49ffb45ecbfaccb2797bab494b711739d921720",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fd1a10f04e78cf9d7c2dcad96aa855aa0976557405c23eebf6f38c1665a16d7b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "385f6ae6e43b5d4830dff4941ee09eb5d100434d2f1e2874f896a07993893a8c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "31d8388248bf559711b27848280851fb58558b4ab8b79a22c0b0f22d8c784616",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a5eef05606ee33bf74db17691dc023320cf54e0fcb4244de7693aea911317cca",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\sonnet\\PMID42679010\\PMID42679010\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "5bee1835522f17fb21534930515757b2d6b74402d10e53b47a6b2781deeadddb",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

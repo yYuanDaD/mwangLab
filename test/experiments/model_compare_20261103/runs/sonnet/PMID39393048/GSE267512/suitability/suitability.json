@@ -1,0 +1,140 @@
+{
+  "case_id": "GSE267512",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "PRE": 31,
+          "POST": 26
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 34,
+        "full_rank": true,
+        "residual_df": 23,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_POST_vs_PRE"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Human') or lack sex chromosomes.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_POST_vs_PRE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "POST"
+          },
+          "n": 26
+        },
+        {
+          "cell": {
+            "time": "PRE"
+          },
+          "n": 31
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
