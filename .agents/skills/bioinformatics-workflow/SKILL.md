@@ -73,6 +73,8 @@ Decide them in this order for every case. Each maps to one gate of the case spec
 
 `execute` finishes the run and validates the decision contract. If the evaluator skill is installed, audit with `evaluate-bioinformatics-agent`.
 
+When the run is part of a batch or the user asks for review, a separate read-only reviewer checks the key decisions afterwards: [Decision review](references/decision-review.md). The analysis agent does not review itself.
+
 ## When to stop
 
 Use `refused` when the available data cannot identify the estimand, such as no exercise contrast or treatment aliased with batch. Use `manual_review` when a specific fact or executor could unblock it, such as unknown pairing, an ambiguous matrix scale, or a missing file.
@@ -105,5 +107,6 @@ Do not summarize success by DEG or p-value counts.
 - [Paper reconstruction](references/paper-reconstruction.md): study maps, discrepancies, thresholds.
 - [Explicit multifactor designs](references/multifactor-design.md) and [Multigroup and longitudinal designs](references/multigroup-longitudinal.md).
 - [Matrix and method policy](references/matrix-method-policy.md).
+- [Decision review](references/decision-review.md): the post-run reviewer's checks, packet and output.
 - [Evaluation protocol](references/evaluation-protocol.md): blind paired tests of this skill.
 - [Tool map](references/tool-map.md).
