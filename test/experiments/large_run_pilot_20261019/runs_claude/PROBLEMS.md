@@ -459,3 +459,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41775886 (GSE297515)
 
 - GEO genotype/treatment shifted 1 sample vs titles (used titles); summary.csv design_col shows formula for factorial case; no sex column; paper low-count rule needed prep script Details: `PMID41775886/HANDBACK.md`.
+
+## PMID42003465 (GSE315915)
+
+- native.py:609 no tab sep (patched after this row); inspect omits ID type; ENSMUST gene lookup null (case_runner.py:438); no transcript-sum route; geo_tools.py:29 encoding Details: `PMID42003465/HANDBACK.md`.

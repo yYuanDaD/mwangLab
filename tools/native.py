@@ -606,7 +606,10 @@ def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
     (converted through MyGene.info, which needs network). Transcript, probe,
     protein, CpG, region, Entrez, and RefSeq IDs need a recorded mapping first.
     """
-    index = pd.read_csv(path, index_col=0, usecols=[0]).index.astype(str)
+    if str(path).lower().endswith((".xlsx", ".xls")):
+        index = read_table(path).index.astype(str)
+    else:
+        index = pd.read_csv(path, index_col=0, usecols=[0], sep=None, engine="python").index.astype(str)
     ids = list(index[:sample])
     counts: dict[str, int] = {}
     for value in ids:
