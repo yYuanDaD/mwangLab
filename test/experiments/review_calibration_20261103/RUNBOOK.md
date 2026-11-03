@@ -43,12 +43,12 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 | step | case | status | model | tokens | minutes | reply |
 |---|---|---|---|---|---|---|
 | 1 seed | all | done | | | | 5 specs written |
-| 2 execute | s1 | | | | | |
-| 2 execute | s2 | | | | | |
-| 2 execute | s3 | | | | | |
-| 2 execute | s4 | | | | | |
-| 2 execute | s5 | | | | | |
-| 3 packets | all | | | | | |
+| 2 execute | s1 | done | | | 1.2 | VALID (11 records); formula ~ time, no subject term; 79 DEG vs paper 214 |
+| 2 execute | s2 | done | | | 0.6 | VALID (10); CTRL vs DA, log2FC corr -1.0 with the original run |
+| 2 execute | s3 | done | | | 1.1 | VALID (12); padj < 0.05 stated; RE vs NE 5 vs paper 4423 |
+| 2 execute | s4 | done | | | 1.6 | VALID (10); soleus vs EDL run, route paper_aligned |
+| 2 execute | s5 | done | | | 1.2 | VALID (10); HM vs C primary, paper count 563 taken from HM vs H |
+| 3 packets | all | done | | | | built twice: reviews/<name>/ and, for the reviewers, neutral copies from blind.py |
 | 4 review | s1_GSE267512_unpaired | | | | | |
 | 4 review | s2_GSE178262_reversed | | | | | |
 | 4 review | s3_GSE236613_threshold | | | | | |
