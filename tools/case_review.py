@@ -1,7 +1,7 @@
 """Deterministic review packet for one finished case (no LLM calls).
 
     python -m tools.case_review packet <case_dir> --out <dir> [--paper <paper.md>] [--metadata <csv>]
-                                       [--spec <case_spec.json>] [--no-expr]
+                                       [--spec <case_spec.json>] [--root <repo>] [--no-expr]
 
 <case_dir> is one case folder of a run (the one holding decisions.json). The packet is what a
 reviewer subagent reads after the analysis (see agent_skills/bioinformatics-workflow/references/
@@ -428,6 +428,8 @@ def build(case_dir: Path, out: Path, *, paper: str | None = None, metadata: str 
         for c in s.get("cases", []):
             if (c.get("case_id") or "") == case_dir.name and (c.get("inputs") or {}).get("paper"):
                 paper_path = _path(c["inputs"]["paper"][0])
+    if paper_path is not None and not paper_path.is_absolute():
+        paper_path = root / paper_path
     out.mkdir(parents=True, exist_ok=True)
 
     # ---- facts
@@ -476,8 +478,7 @@ def build(case_dir: Path, out: Path, *, paper: str | None = None, metadata: str 
     a = [f"# Review packet A (facts only): {case_dir.name}", "",
          "Answer the blind questions from this file and the paper before opening packet B.", ""]
     a += [f"Paper: `{paper_path}`" if paper_path else "Paper: not found (use the abstract or GEO description)."]
-    outline = paper_outline(paper_path if paper_path and paper_path.is_absolute() else
-                            (root / paper_path if paper_path else None))
+    outline = paper_outline(paper_path)
     if outline:
         a += ["", "## Paper outline", ""] + [f"- {h}" for h in outline]
     if facts:
@@ -581,10 +582,11 @@ def main(argv=None) -> int:
     p.add_argument("--paper")
     p.add_argument("--metadata")
     p.add_argument("--spec")
+    p.add_argument("--root", help="folder that relative paths in the records start from (default: current folder)")
     p.add_argument("--no-expr", action="store_true", help="skip the expression check of the pairing key")
     args = ap.parse_args(argv)
     s = build(Path(args.case_dir), Path(args.out), paper=args.paper, metadata=args.metadata, spec=args.spec,
-              expr=not args.no_expr)
+              root=Path(args.root) if args.root else None, expr=not args.no_expr)
     print(json.dumps({"flags": [f["flag"] for f in s["flags"]], "stop_claims": [c["kinds"] for c in s["stop_claims"]],
                       "packet_A": s["packet_A"], "packet_B": s["packet_B"]}, ensure_ascii=False))
     return 0
