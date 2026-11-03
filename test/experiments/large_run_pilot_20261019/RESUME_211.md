@@ -49,3 +49,6 @@ Stopped 2026-10-29 14:22 at the owner's request ("先别跑了", via the coordin
 after its resume; rows 35, 46, 50 (cut off by the quota, then resumed) and 51 (just started) were
 stopped. Their partial folders are in `runs_claude/_interrupted/` (51 had none yet). 41/211 done.
 Next time: rerun 35, 46, 50, 51, then continue in `run_order_211.txt` from 52.
+
+Resumed 2026-11-03 01:19 local (owner shares one 5-hour window across three threads; this run has the
+lowest priority): 2 papers at a time instead of 5. Order: rows 35, 46, 50, 51, then 52 onward.
