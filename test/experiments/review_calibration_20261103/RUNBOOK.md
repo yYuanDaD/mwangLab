@@ -42,7 +42,7 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 
 | step | case | status | model | tokens | minutes | reply |
 |---|---|---|---|---|---|---|
-| 1 seed | all | | | | | |
+| 1 seed | all | done | | | | 5 specs written |
 | 2 execute | s1 | | | | | |
 | 2 execute | s2 | | | | | |
 | 2 execute | s3 | | | | | |

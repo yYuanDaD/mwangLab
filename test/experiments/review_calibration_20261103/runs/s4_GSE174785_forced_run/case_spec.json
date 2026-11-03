@@ -1,0 +1,221 @@
+{
+ "run_dir": "E:\\agent\\mwangLab_review\\test\\experiments\\review_calibration_20261103\\runs\\s4_GSE174785_forced_run",
+ "request": "Analyze GSE174785 for PMID 34358431 (Exercise-induced angiogenesis is dependent on metabolically primed ATF3/4(+) endothelial cells.): how exercise affects gene expression as the paper intends. [review calibration: seeded case]",
+ "decision_maker": "Claude Opus 5.5 (Claude Code subagent) session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE174785",
+   "accession": "GSE174785",
+   "inputs": {
+    "paper": [
+     "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC8432967.paper.md"
+    ],
+    "metadata": "GSE174785/GSE174785_metadata.csv",
+    "raw_tar": true,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE174785"
+      ],
+      "assay": "bulk RNA-seq (Smart-seq2 / TruSeq per GEO), kallisto quantification, FACS-sorted muscle endothelial cells (S4.4.3.p1)",
+      "samples": "20 samples: RmECs (soleus, oxidative) and WmECs (EDL, glycolytic) from WT and Atf4 EC-knockout (Atf4^dEC/dEC) mice, n=5 per group (GEO titles; S2.6.p1, Fig6B-D)",
+      "factors": {
+       "muscle_ec": [
+        "RmEC (soleus)",
+        "WmEC (EDL)"
+       ],
+       "genotype": [
+        "WT",
+        "Atf4 EC-KO"
+       ]
+      },
+      "primary_estimand": "Exercise-primed (oxidative, soleus RmEC) vs non-primed (glycolytic, EDL WmEC) capillary ECs, the transcriptional basis of exercise-induced angiogenesis (S2.2.p2).",
+      "planned_contrasts": [
+       "WT RmEC vs WT WmEC (S2.2.p2, Fig2G, S2.6.p1; paper: 782 DEGs)",
+       "Atf4-KO RmEC vs Atf4-KO WmEC (S2.6.p1, Fig6B; paper: 211 remaining of WT DEGs)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "source_locator": "S2.6.p1; Fig6C legend; S4.4.3.p2 ('log fold change > 1 and adjusted p-value < 0.05')"
+      },
+      "paper_method": "DESeq2 on kallisto counts, genes with <=1 count across all samples removed (S4.4.3.p1)"
+     },
+     "reasoning": "The paper links exercise-induced angiogenesis to metabolically primed ATF3/4+ ECs that are enriched in oxidative muscle; GSE174785 compares these ECs (soleus) with EDL ECs in WT and Atf4-KO mice.",
+     "confidence": "high",
+     "locator": "S2.2.p2; S2.5.p1; S2.6.p1; S4.4.3.p1; DA.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 and key resources table name GSE174785 as the bulk RNA-seq of RmECs vs WmECs, WT and Atf4 dEC/dEC",
+       "20 GSM samples = 2 muscles x 2 genotypes x 5 reps, matching Fig6D design",
+       "data_processing: kallisto + DESeq2, matching S4.4.3.p1"
+      ]
+     },
+     "reasoning": "Paper data-availability statement and GEO metadata agree.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "aliases": {
+      "muscle": "source_name_ch1",
+      "genotype": "characteristics_ch1.2.genotype"
+     },
+     "patterns": {},
+     "recode": {
+      "muscle": {
+       "Soleus muscle": "R",
+       "Extensor digitorum longus muscle": "W"
+      },
+      "genotype": {
+       "Wild type": "WT",
+       "EC specific Atf4-/-": "KO"
+      }
+     },
+     "combine": {},
+     "exclude_samples": {},
+     "final": {},
+     "reasoning": "Merged-tar columns are GSM ids that equal the metadata index exactly (inspect: 20/20). Muscle (source_name_ch1) and genotype define the groups.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "feature_level": "transcript (ENSMUST), kallisto est_counts column per sample (sums 8.5e6-1.6e7, not TPM which sums to 1e6)",
+      "paper_input": "kallisto counts to DESeq2 (S4.4.3.p1)"
+     },
+     "reasoning": "Per-sample kallisto abundance files have est_counts and tpm; the merged matrix holds est_counts (column sum of GSM5328123 = 1.411e7 equals its est_counts sum). Fractional estimated counts at transcript level; a gene-level summary would be needed before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "muscle",
+      "genotype"
+     ],
+     "references": {
+      "muscle": "W",
+      "genotype": "WT"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "muscle_R_vs_W_genotype-WT",
+      "muscle_R_vs_W_genotype-KO"
+     ],
+     "final": {
+      "analysis_type": "two factors, muscle contrast within each genotype",
+      "formula": "~ cell",
+      "contrasts": [
+       {
+        "name": "muscle_R_vs_W_genotype-WT",
+        "control": "W",
+        "treatment": "R",
+        "role": "primary",
+        "note": "exercise-primed vs non-primed ECs, WT"
+       },
+       {
+        "name": "muscle_R_vs_W_genotype-KO",
+        "control": "W",
+        "treatment": "R",
+        "role": "secondary",
+        "note": "same in Atf4 EC-KO"
+       }
+      ]
+     },
+     "reasoning": "The exercise question of the paper is carried by the oxidative (exercise-primed) vs glycolytic EC comparison; run it within each genotype (S2.2.p2, S2.6.p1).",
+     "confidence": "medium"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "reasoning": "One sample per sorted EC pool; no batch column.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ cell",
+      "paper_route": {
+       "method": "DESeq2 on kallisto counts",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2"
+      ],
+      "rounding_documented": true
+     },
+     "transform": null,
+     "reasoning": "kallisto estimated counts rounded for DESeq2 (S4.4.3.p1).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.3.p2: log fold change > 1 and adjusted p-value < 0.05.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "exercise priming inferred from muscle type"
+      ]
+     },
+     "paper_counts": {
+      "joint/muscle_R_vs_W_genotype-WT": 782
+     },
+     "reasoning": "Paper reports 782 DEGs for WT RmEC vs WmEC (S2.6.p1)."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "library protocol",
+     "paper": "Smart-seq2 (S4.4.3.p1)",
+     "data": "GEO extract_protocol says Illumina TruSeq stranded mRNA",
+     "disposition": "recorded_not_blocking"
+    }
+   ],
+   "executions": [
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "planned",
+      "covariates": [],
+      "round_estimated_counts": true
+     },
+     "role": "primary",
+     "reasoning": "one model, planned muscle contrasts within genotype"
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}
