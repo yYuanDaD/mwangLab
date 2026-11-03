@@ -25,8 +25,8 @@ Agent metrics and three-line replies are in `results.csv`.
 
 ## Notes on checkpoint 1 (Sonnet)
 
-- Row 18 was first launched with a title the coordinator typed from memory instead of the saved prompt. It was stopped before it wrote anything and rerun with the exact prompt; only the rerun is recorded. All six recorded runs match `prompts/`.
+- Row 18 was first launched with a title typed from memory instead of the saved prompt. It was stopped before it wrote anything and rerun with the exact prompt; only the rerun is recorded. All six recorded runs match `prompts/`.
 - Rows 27 and 8 did not use `case_runner` (no `case_spec.json`). `score.py` reads those from `decisions.json` and `summary.csv`, and reports the route. Up/down counts for row 27 come from its HANDBACK.
-- Row 8 rewrote `data/GSE174785/GSE174785_merged_from_tar.csv` in the shared data root (git-ignored cache, tool behaviour during tar handling).
+- Row 8 wrote `data/GSE174785/GSE174785_merged_from_tar.csv` in the shared data root (git-ignored cache, tool behaviour during tar handling).
 - Opus tokens and minutes come from `runs_claude/progress.csv`. Rows 2 and 18 were rerun there, so those figures may not cover the earlier passes. The Opus runs used earlier code than the pinned commit.
 - `transcripts.csv` paths are local to this machine; the transcripts are not committed. `runs/.gitignore` keeps matrices and result tables out of git, so `score.py` needs the local run directories.
