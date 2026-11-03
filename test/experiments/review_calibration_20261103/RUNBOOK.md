@@ -49,12 +49,12 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 | 2 execute | s4 | done | | | 1.6 | VALID (10); soleus vs EDL run, route paper_aligned |
 | 2 execute | s5 | done | | | 1.2 | VALID (10); HM vs C primary, paper count 563 taken from HM vs H |
 | 3 packets | all | done | | | | built twice: reviews/<name>/ and, for the reviewers, neutral copies from blind.py |
-| 4 review | s1_GSE267512_unpaired | | | | | |
+| 4 review | s1_GSE267512_unpaired | done (case_08) | sonnet (requested) | 92819 | 0.9 | OVERALL: fix; DISAGREE: pairing:blocking, model_fit:major, paper_match:major |
 | 4 review | s2_GSE178262_reversed | done (case_04) | sonnet (requested) | 107910 | 1.1 | OVERALL: fix; DISAGREE: direction:major (model_fit:minor unsure) |
 | 4 review | s3_GSE236613_threshold | done (case_01) | sonnet (requested) | 93949 | 1.1 | OVERALL: fix; DISAGREE: threshold:major, paper_match:major, direction:minor |
-| 4 review | s4_GSE174785_forced_run | | | | | |
-| 4 review | s5_GSE319603_wrong_control | | | | | |
-| 4 review | r1_GSE283493_pairing | | | | | |
+| 4 review | s4_GSE174785_forced_run | done (case_07) | sonnet (requested) | 97365 | 1.4 | OVERALL: fix; DISAGREE: run_or_refuse:major, matrix_method:major, paper_match:major (pairing:unsure minor) |
+| 4 review | s5_GSE319603_wrong_control | done (case_06) | sonnet (requested) | 93152 | 0.9 | OVERALL: fix; DISAGREE: direction:blocking, paper_match:blocking (model_fit:unsure/minor) |
+| 4 review | r1_GSE283493_pairing | done (case_05) | sonnet (requested) | 110899 | 1.5 | OVERALL: fix; DISAGREE: pairing:major, stop_reason:major |
 | 4 review | c1_GSE164890 | | | | | |
 | 4 review | c2_GSE344550 | | | | | |
 | 4 review | c3_GSE324100 | | | | | |

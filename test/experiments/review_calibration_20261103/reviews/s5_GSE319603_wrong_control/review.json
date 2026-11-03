@@ -1,0 +1,48 @@
+{
+  "case": "GSE319603",
+  "reviewer": "Claude Sonnet 5.5 (read-only decision reviewer)",
+  "blind": {
+    "B1": "Yes. PMC12982024 is an in-vivo study: male C57BL/6J mice, chow (C) vs high-fat diet (H) vs HFD + 8-week moderate-intensity continuous treadmill training (HM; S2.1.p1, S2.2.p1). The exercise factor is carried by HM vs H. Four groups were randomized (n=12 each, including chow+MICT, CM), but RNA-seq was done on n=6 per group for C, H, HM only (S2.7.p1, S3.2.p1/FIG3). The 18 GEO samples (C1-6, H1-6, HM1-6) are all sequenced; CM is not deposited.",
+    "B2": "S3.2.p1/FIG3B: H vs C = 458 DEGs (295 up, 163 down), a diet contrast; HM vs H = 563 DEGs (213 up, 350 down), the exercise contrast. n=6 vs 6 in each. There is no HM vs C comparison in the paper.",
+    "B3": "No repeated measures: one gastrocnemius sample per mouse, independent animals randomized to groups, 18 samples from 18 mice. Packet A lists no candidate pairing keys (sample titles/library names are one-per-sample). No pairing unit is needed.",
+    "B4": "The paper does not say whether the two-group comparisons were fitted on all samples or on pairs (S2.7.p1 only gives DESeq2 v1.22.2 on raw counts, BH FDR). Nothing to quote.",
+    "B5": "S2.7.p1 (Methods): BH-adjusted P < 0.05 (FDR) only. S3.2.p1 (Results): 'adjusted P-value <0.05 and |log2FC| >= 0.5'; H vs C 458 DEGs (295/163), HM vs H 563 DEGs (213/350). The Results rule is the one that produced the counts."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none",
+     "evidence": "Run decision matches B1: HM (HFD + MICT) vs H is an in-vivo exercise contrast; the missing CM arm is recorded in paper_data_discrepancies (S2.7.p1, FIG3).",
+     "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none",
+     "evidence": "grp derived from 'Library name: <letter><n>' gives C=6, H=6, HM=6, matching n=6 per group (S2.7.p1); titles agree; no exclusions; alignment coverage 18/18.",
+     "fix": ""},
+    {"id": "direction", "verdict": "disagree", "severity": "blocking",
+     "evidence": "The paper's exercise contrast is HM vs H (control H, treatment HM; S3.2.p1). decisions.json design sets control=C for both contrasts and labels grp_HM_vs_C 'exercise effect: exercised mice vs control mice'. The exercise arm is therefore compared against the chow group, not its HFD control, so the exercise effect is confounded with diet. H vs C (control C, treatment H) is signed correctly: ours 295 up / 163 down equals the paper's 295/163. study-level reasoning also says 'C vs H ... reference H', which is stale and contradicts the executed contrast.",
+     "fix": "In design.contrasts set primary = {name: grp_HM_vs_H, control: H, treatment: HM} (exercise under HFD) and keep grp_H_vs_C {control: C, treatment: H} as secondary. Remove or relabel grp_HM_vs_C as exploratory only. Rerun execute and correct the stale 'reference H' sentence in the study reasoning."},
+    {"id": "pairing", "verdict": "agree", "severity": "none",
+     "evidence": "One sample per mouse (S2.1.p1); packet A candidate pairing keys: none; covariance not_required with full-rank ~ grp design (residual df 15).",
+     "fix": ""},
+    {"id": "model_fit", "verdict": "unsure", "severity": "minor",
+     "evidence": "Paper is silent (B4). The joint 18-sample fit reproduces H vs C exactly (458; 295/163), which supports it, but the method record promises pairwise two-group sensitivity fits and only results/deseq2_joint exists. HM vs H has not been fitted at all, so the joint-versus-pairwise question cannot yet be settled for the exercise contrast.",
+     "fix": "After adding HM vs H, report it from the joint fit; run the HM vs H pairwise (H and HM only, n=6+6) fit as a sensitivity if counts differ markedly from 563, or drop the 'pairwise sensitivity' wording from the method deviations."},
+    {"id": "confounding", "verdict": "agree", "severity": "none",
+     "evidence": "All male, same tissue, same time point, same strain; no batch, lane or housing variable in GEO or the paper; covariance.confounding lists only sample identifiers and constants.",
+     "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none",
+     "evidence": "Integer featureCounts matrix (integer_fraction 1.0, median 31, max 3.3e6), 26166 features, no duplicates; DESeq2 (pydeseq2) matches S2.7.p1. The H vs C count matches the paper exactly. p-value histogram for H vs C is normal (frac_p<0.05 = 0.125).",
+     "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "minor",
+     "evidence": "Applied rule padj < 0.05 and |log2FC| > 0.5 matches S3.2.p1 (the Results rule that generated the counts) with Methods FDR-only kept as audit; the strict-versus-inclusive 0.5 difference is recorded in deviation_note. H vs C reproduces 458 exactly. The mechanical flag 'other_rule_matches_paper' (pvalue<0.05 & |lfc|>1 = 542 vs 563) is spurious: it compares the HM vs C table with the paper's HM vs H count, and is a symptom of the wrong contrast, not of a threshold problem.",
+     "fix": ""},
+    {"id": "paper_match", "verdict": "disagree", "severity": "blocking",
+     "evidence": "study.comparison pairs deseq2_joint/grp_HM_vs_C (ours 1182) with the paper's 563, which is the HM vs H count. Different contrast (HM vs C vs HM vs H); the 1182 vs 563 gap is not a real discrepancy and carries no information. Only H vs C (458 vs 458) is a valid pair. paper_gene_check for the HM contrast also reports signs against C, not H.",
+     "fix": "After adding grp_HM_vs_H, set the comparison to ours(HM vs H) vs paper 563 (213 up / 350 down) and re-run the paper_gene_check on that table (e.g. Angptl7, Txnip, Fbxo32, Trim63 should be down in HM vs H). Remove the 563 pairing from HM vs C."},
+    {"id": "stop_reason", "verdict": "na", "severity": "none",
+     "evidence": "No stop or refusal claims (flags.json stop_claims is empty).",
+     "fix": ""}
+  ],
+  "overall": "fix",
+  "human_items": [
+    "Open policy item only: the paper's Results rule (|log2FC| >= 0.5, inclusive) cannot be expressed exactly by the runner's single inclusive flag; > 0.5 was applied and reproduces the H vs C count exactly, so no action is needed unless the HM vs H count differs."
+  ],
+  "summary": "该案例的数据归属、分组（C/H/HM 各 6 例）、原始计数矩阵、DESeq2 方法和阈值（padj<0.05 且 |log2FC|>0.5）都正确，H vs C 的 458（295 上调/163 下调）与论文完全一致。但论文的运动对比是 HM vs H（563 个 DEG），分析却把运动组 HM 与普通饮食组 C 比较（grp_HM_vs_C），把饮食与运动混在一起，并且拿它去和论文的 563 对比（1182 vs 563 没有意义），HM vs H 根本没有跑。需要补跑 HM vs H（对照 H）作为主要对比，并更正论文对照。"
+}
