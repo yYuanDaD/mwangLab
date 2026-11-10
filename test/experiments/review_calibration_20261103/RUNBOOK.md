@@ -55,9 +55,9 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 | 4 review | s4_GSE174785_forced_run | done (case_07) | sonnet (requested) | 97365 | 1.4 | OVERALL: fix; DISAGREE: run_or_refuse:major, matrix_method:major, paper_match:major (pairing:unsure minor) |
 | 4 review | s5_GSE319603_wrong_control | done (case_06) | sonnet (requested) | 93152 | 0.9 | OVERALL: fix; DISAGREE: direction:blocking, paper_match:blocking (model_fit:unsure/minor) |
 | 4 review | r1_GSE283493_pairing | done (case_05) | sonnet (requested) | 110899 | 1.5 | OVERALL: fix; DISAGREE: pairing:major, stop_reason:major |
-| 4 review | c1_GSE164890 | | | | | |
-| 4 review | c2_GSE344550 | | | | | |
-| 4 review | c3_GSE324100 | | | | | |
+| 4 review | c1_GSE164890 | done (case_11) | sonnet (requested) | 89898 | 0.4 | OVERALL: pass; DISAGREE: none |
+| 4 review | c2_GSE344550 | done (case_09; first try stopped by quota before writing, rerun 2026-11-10) | sonnet (requested) | 86464 | 0.5 | OVERALL: pass; DISAGREE: none |
+| 4 review | c3_GSE324100 | done (case_10; first try stopped by quota before writing, rerun 2026-11-10) | sonnet (requested) | 103932 | 0.8 | OVERALL: pass; DISAGREE: none (unsure only: model_fit:minor, confounding:minor) |
 | 4 review | c4_GSE302867 | done (case_03) | sonnet (requested) | 109815 | 1.4 | OVERALL: human; DISAGREE: none (unsure: paper_match:major, WT_Ex vs WT_Sed Hallmark OXPHOS sign opposite to paper Fig 2e) |
 | 4 review | c5_GSE230002 | done (case_02) | sonnet (requested) | 101879 | 1.1 | OVERALL: pass; DISAGREE: none (minor notes: threshold, paper_match, confounding, grouping) |
 | 5 score | all | | | | | |
