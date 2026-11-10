@@ -1,0 +1,88 @@
+{
+ "case": "GSE97718",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. 2x2 diet (CON/HFD 10 wk) x acute maximal treadmill exercise (pre = basal, post = 3 h after exercise); all 16 sequenced quadriceps samples carry the design (S4.4.p1, S2.2.p1, FIG3).",
+  "B2": "CON-post vs CON-pre (292 up/109 down = 401), HFD-post vs HFD-pre (208/115 = 323), HFD-pre vs CON-pre (119/93 = 212), CON-post vs HFD-post (234); n = 4 muscles per group (FIG2/FIG3/FIG4 legends).",
+  "B3": "No repeated measures: muscle is a terminal tissue and 'a group of CON and HFD mice under basal conditions was used as pre-exercise control' (S4.4.p1), so pre and post are different mice. Title suffix 1-4 is a candidate key but pairing_check says not_supported (r -0.03, p 0.79).",
+  "B4": "The paper does not say; S4.6.p1 only says comparisons were done with cufflinks (pairwise Cuffdiff presumably).",
+  "B5": "Not stated. S4.6.p1 gives no DEG rule; S4.9.p1 (p < 0.05, t-test/ANOVA) covers physiology. Counts reported: 401, 323, 212, 234 (S2.1.p2, S2.2.p1, S2.2.p3)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise arm present (post vs pre); analyzed as designed (S2.2.p1).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "4 groups x 4 match paper n = 4 per group (FIG3 legend); grp parsed from title, no exclusions; each contrast uses the same-diet pre as control.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Treatment = post (or HFD), control = pre (or CON); HANDBACK says direction agrees with the paper.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S4.4.p1: pre is a separate basal cohort; title-suffix key not supported by expression (permutation p 0.79). Decision 'each sample a different mouse' is correct; no blocking needed.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on joint vs pairwise (Cuffdiff). Joint ~0+grp on 16 samples is declared as a deviation; this is an open policy question, not an error.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No batch/lane/housing variable in GEO; only one sex; nothing aliased with exercise recorded or findable.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Cufflinks FPKM, 38% integer fraction, correctly routed to limma on log2(FPKM+1), not counts methods.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper states no rule (B5); workflow default BH FDR<0.05 labelled workflow_default with raw p<0.01 audit; recorded in paper_data_discrepancies.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ours vs paper pairs compare the same contrast; HANDBACK states counts are 3-25x lower and the method is a deviation, not a reproduction.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: joint vs pairwise fit when the paper is silent; FPKM limma vs Cuffdiff count gap (3-25x) is a declared deviation."
+ ],
+ "summary": "该案例设计、分组、方向、方法路线均与论文一致，pre 与 post 为不同小鼠，无需配对。论文未给出 DEG 阈值，已按工作流默认 FDR<0.05 并记录为偏离。总体通过。"
+}

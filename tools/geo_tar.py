@@ -57,7 +57,10 @@ def unpack_and_merge_geo_tar(data_dir):
         with tarfile.open(tar_path) as t:
             members = [m for m in t.getmembers() if m.isfile() and
                        m.name.lower().endswith((".txt", ".tsv", ".csv", ".tab",
-                                                ".txt.gz", ".tsv.gz", ".csv.gz", ".tab.gz"))]
+                                                ".txt.gz", ".tsv.gz", ".csv.gz", ".tab.gz",
+                                                # RSEM *.genes.results, Salmon quant(.genes).sf:
+                                                # choose_count_column picks expected_count / NumReads
+                                                ".results", ".results.gz", ".sf", ".sf.gz"))]
             if not members:
                 return None
             try:   # members come from GEO uploads: refuse absolute paths and links

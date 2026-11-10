@@ -523,3 +523,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## b39292ba0ee11c97d2e351716ebbb6029eeee400 (GSE97718)
 
 - inspect misses Excel date-serial gene IDs (case_runner.py ~366); filter_low_counts raw-counts-only so FPKM filter needed prep matrix (patched after this row); GBK mojibake in contact_name Details: `b39292ba0ee11c97d2e351716ebbb6029eeee400/HANDBACK.md`.
+
+## PMID41126185 (GSE289091)
+
+- geo_tar merge cannot read Salmon/DRAGEN quant.genes.sf (patched after this row), needed prep script; case_runner.py:877/801 wrong table-name keys silently gave null counts / enrichment not_run Details: `PMID41126185/HANDBACK.md`.

@@ -1,0 +1,202 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/ef574c2d9b2d7f168faeb39ddc5cb09258575c41",
+  "request": "Analyze GSE60833 for the paper (The Impact of Endurance Training on Human Skeletal Muscle Memory, Global Isoform Expression and Novel Transcripts, PMC5033478): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE60833",
+      "accession": "GSE60833",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC5033478.paper.md"],
+        "metadata": "GSE60833/GSE60833_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/ef574c2d9b2d7f168faeb39ddc5cb09258575c41/GSE60833_gene_fpkm_merged.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/ef574c2d9b2d7f168faeb39ddc5cb09258575c41/prep_merge_fpkm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE58608", "GSE60590", "GSE60833"],
+            "this_accession_holds": "U2 (untrained leg after Period 1, n=21), T3/U3 (both legs before Period 2, n=13/12), T4/U4 (both legs after Period 2, n=10/12); T1/T2 (Period 1 trained-leg pre/post) are deposited in GSE58608/GSE60590, not here",
+            "assay": "bulk RNA-seq, human vastus lateralis, Illumina HiSeq 2000 paired-end; TopHat/Cufflinks FPKM and HTSeq gene counts (S4.5.p1)",
+            "design": "one-legged endurance training: Period 1 trains one leg (T), other leg untrained (U); after 9-month break Period 2 trains both legs (S2.1.p1, S4.2.p1-p2, FIG1)",
+            "factors": {"leg": ["T (trained in Period 1)", "U (untrained in Period 1)"], "time": ["1 pre-P1", "2 post-P1", "3 pre-P2", "4 post-P2"]},
+            "repeated_measure_unit": "subject (both legs and all time points from the same individual)",
+            "primary_estimand": "within-subject effect of 3-month one-legged endurance training on skeletal muscle gene expression; in this accession: Period 2 training response in the previously trained leg (T4 vs T3) and in the previously untrained leg (U4 vs U3)",
+            "planned_contrasts": [
+              "T4 vs T3 (Period 2, previously trained leg; S2.4.p2: 852 genes, n=10 individuals FIG2c)",
+              "U4 vs U3 (Period 2, previously untrained leg; S2.4.p2: 928 genes, n=11 individuals FIG2d)",
+              "T3 vs U3 (memory, before Period 2; S2.4.p1: no specific genes differed)",
+              "T4 vs U4 (after Period 2; S2.4.p2: OPLS no statistical difference)",
+              "T2 vs T1 and U2 vs T1 (Period 1; need GSE58608/GSE60590, out of this accession)"
+            ],
+            "sample_inclusion": "S1 Table marks samples failing RNA-seq QC (not available here); paper per-comparison n: T3vsT4 20 samples, U3vsU4 22 samples (TAB1)",
+            "normalization": "Cufflinks FPKM, ComBat batch-corrected, genes with mean FPKM > 1 (12,848 genes) (S2.1.p2, S4.5.p1, S4.6.p1)",
+            "paper_method": "OPLS (Simca p+13) on mean-centred, UV-scaled batch-corrected FPKM; significance = |loading| - |jack-knife CI| > 0 at 99% confidence (S4.6.p1-p2). Limma on HTSeq counts is named in S4.5.p1 and used for novel transcripts (S4.8.p1, adj p <= 0.05, TAB3)",
+            "paper_threshold": {"metric": "OPLS_jackknife_loading", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "rule": "|loading| - |jack-knife 99% CI| > 0", "source_locator": "S4.6.p2"},
+            "paper_results": {"T4_vs_T3_genes": 852, "U4_vs_U3_genes": 928, "shared": 180, "T2_vs_T1_genes": 2394, "T3_vs_U3": "no specific genes", "T4_vs_U4": "no OPLS difference"}
+          },
+          "reasoning": "Study map from S2.1, S2.4, S4.2, S4.5, S4.6. Gene-level DEG counts for Period 2 come from the OPLS loading/jack-knife rule (S2.2.p1 'From the loading values of the OPLS models, we identified significant differentially expressed isoforms and genes'; S2.4.p2 852/928). GSE60833 holds only U2/T3/T4/U3/U4, so the Period 1 primary contrast is outside this accession.",
+          "confidence": "high",
+          "locator": "S2.4.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.10.p1 and S7.p1 list GSE60833", "metadata original sample ids encode subject+leg+timepoint (e.g. 12T3) matching the paper's T/U x 2/3/4 scheme", "Homo sapiens skeletal muscle, HiSeq 2000, TopHat 2.0.4 / Cufflinks, hg19 ENSEMBL v71 as in S4.5.p1", "68 samples = 21 U2 + 13 T3 + 10 T4 + 12 U3 + 12 U4"]},
+          "reasoning": "The paper names GSE60833 in its data-availability statements; the sample naming and processing match. Matrix = per-sample Cufflinks gene FPKM files from GSE60833_RAW.tar merged by prep_merge_fpkm.py (columns are GSM ids).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "subject": ["characteristics_ch1.5.original sample id", "^(\\d+)[TU]\\d$"],
+            "grp": ["characteristics_ch1.5.original sample id", "^\\d+([TU]\\d)$"]
+          },
+          "aliases": {"sex": "characteristics_ch1.1.gender", "location": "characteristics_ch1.2.biopsy location"},
+          "recode": {
+            "subject": {"1": "S1", "2": "S2", "3": "S3", "4": "S4", "5": "S5", "7": "S7", "9": "S9", "11": "S11", "12": "S12", "13": "S13", "14": "S14", "15": "S15", "16": "S16", "18": "S18", "19": "S19", "20": "S20", "21": "S21", "22": "S22", "23": "S23", "24": "S24", "26": "S26", "27": "S27", "28": "S28"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids (prep script names them from the tar member names) and equal the metadata index exactly. subject and grp (leg+timepoint, T3/T4/U2/U3/U4) are parsed from 'original sample id' (e.g. 12T3); subject recoded to S<n> so it is a categorical factor. The metadata 'exercise status' column (trained/untrained) describes training state at the biopsy, not the leg, so it is not used; the leg is the T/U letter. Each subject-leg maps to one biopsy side and each subject to one sex (checked).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "fpkm_or_tpm",
+          "recommended_method": "limma",
+          "reasoning": "Per-sample files are Cufflinks genes.fpkm_tracking (columns FPKM, FPKM_conf_lo/hi); data_processing names Cufflinks; non-integer values. The paper's gene-level DE input was batch-corrected FPKM (S4.5.p1), so FPKM is the paper's input type, but without ComBat correction (batch labels are not in GEO). HTSeq counts mentioned in S4.5.p1 are not deposited. 131 duplicated Cufflinks tracking_ids (genes split over loci) were summed per gene in prep.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "T3"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["grp_T4_vs_T3", "grp_U4_vs_U3"],
+          "covariate_candidates": ["sex", "location"],
+          "final": {
+            "analysis_type": "paired two-group (within-subject pre vs post), one fit per leg",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_T4_vs_T3", "control": "T3", "treatment": "T4", "role": "primary"},
+              {"name": "grp_U4_vs_U3", "control": "U3", "treatment": "U4", "role": "primary"},
+              {"name": "grp_T3_vs_U3", "control": "U3", "treatment": "T3", "role": "exploratory"},
+              {"name": "grp_T4_vs_U4", "control": "U4", "treatment": "T4", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "exercise status (trained vs untrained) as design column", "reason_rejected": "mixes U2/T3/U3 (all 'untrained') against T4/U4 and confounds time with training state; not a paper contrast"},
+            {"value": "U2 vs T1 / T2 vs T1 (Period 1)", "reason_rejected": "T1 and T2 are not in GSE60833"},
+            {"value": "U3 vs U2", "reason_rejected": "detraining time effect in an untrained leg, not an exercise contrast and not analysed in the paper"}
+          ],
+          "reasoning": "S2.4.p2 compares pre vs post Period 2 within each leg (T3 vs T4, U3 vs U4) on paired individuals (FIG2c n=10, FIG2d n=11). These are the exercise contrasts this accession supports. T3 vs U3 and T4 vs U4 (S2.4.p1-p2) are leg comparisons (memory), kept exploratory and associational to prior training.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [
+              {"name": "subject", "disposition": "blocking (paired pre/post within subject)"},
+              {"name": "sex", "disposition": "not added: constant within subject, absorbed by subject blocking"},
+              {"name": "location", "disposition": "not added: left/right leg is constant within subject-leg, absorbed by subject in the per-leg fits"},
+              {"name": "sequencing batch", "disposition": "not available in GEO; paper used ComBat; recorded as caveat"}
+            ]
+          },
+          "confounding_candidates": ["sex", "location"],
+          "reasoning": "Repeated biopsies from the same individuals (S2.1.p1); pre/post pairs blocked by subject. Sex and biopsy side do not vary within a subject-leg, so subject blocking removes them. Paper ComBat batch correction cannot be reproduced because batch labels are absent.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, ~ subject + grp) on log2(FPKM+1), genes with mean FPKM >= 1 in the fitted samples",
+            "formula": "~ subject + grp",
+            "paper_route": {"method": "OPLS (Simca) jack-knife loading significance on ComBat-corrected FPKM", "status": "blocked", "reason": "proprietary Simca OPLS with jack-knife loading CI has no executor in this repository, and ComBat batch labels are not deposited"},
+            "deviations": ["limma paired moderated t replaces OPLS loading significance", "no ComBat batch correction (batches unknown)", "gene filter mean FPKM >= 1 per fit instead of > 1 over the paper's sample set"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "FPKM supports limma on log2(FPKM+1) (matrix-method policy). The paper's own univariate tool is limma (S4.5.p1, S4.8.p1); the gene-level OPLS route is blocked. Paired by subject as in the repeated-measures design.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "OPLS_jackknife_loading", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "The paper's gene rule (|OPLS loading| - |jack-knife 99% CI| > 0, S4.6.p2) has no p-value equivalent; BH-adjusted p < 0.05 with no fold-change rule is the workflow default (and matches the paper's limma rule for novel transcripts, TAB3 adj p <= 0.05)."
+          },
+          "reasoning": "S4.6.p2 defines significance by OPLS loadings; not convertible to padj, so workflow default is used and labelled.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Period 1 (T1/T2, paper 2,394 genes) is not in GSE60833 and was not analysed",
+              "paper counts come from OPLS on ComBat-corrected FPKM; ours are limma padj < 0.05 on uncorrected FPKM, so counts are not directly comparable",
+              "T3 vs U3 and T4 vs U4 are leg comparisons (associational to prior training), exploratory"
+            ]
+          },
+          "paper_counts": {"P2_trained_leg_T4_vs_T3": 852, "P2_untrained_leg_U4_vs_U3": 928, "leg_T3_vs_U3": 0},
+          "paper_genes": {
+            "P2_trained_leg_T4_vs_T3": ["ENSG00000187498", "ENSG00000134871", "ENSG00000138029", "ENSG00000131828", "ENSG00000131143", "ENSG00000178741", "ENSG00000136521", "ENSG00000117118", "ENSG00000140740"],
+            "P2_untrained_leg_U4_vs_U3": ["ENSG00000187498", "ENSG00000134871", "ENSG00000138029", "ENSG00000131828", "ENSG00000131143", "ENSG00000178741", "ENSG00000136521", "ENSG00000117118", "ENSG00000140740"]
+          },
+          "reasoning": "Genes named in S2.2.p3 as changed in Period 1 and both legs in Period 2 (isoform level): COL4A1, COL4A2, HADHB, PDHA1, COX4I1, COX5A, NDUFB5, SDHB, UQCRC2 (Ensembl IDs; NDUFA3 omitted because Cufflinks reports several Ensembl IDs for it).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "Period 1 samples", "paper": "T1/T2 central to the paper (2,394 genes)", "data": "GSE60833 holds U2, T3, T4, U3, U4 only", "disposition": "out_of_scope_for_this_accession"},
+        {"item": "DE method", "paper": "OPLS jack-knife loadings on ComBat-corrected FPKM", "data": "per-sample uncorrected Cufflinks FPKM, no batch labels", "disposition": "declared_deviation"},
+        {"item": "Sample sizes", "paper": "T3vsT4 n=10 individuals, U3vsU4 n=11", "data": "complete pairs T3/T4 = 10, U3/U4 = 11", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "P2_trained_leg_T4_vs_T3",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "T3", "treatment_group": "T4", "covariate_columns": "subject"},
+          "subset": {"grp": ["T3", "T4"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["T3", "T4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "primary",
+          "reasoning": "S2.4.p2 T3 vs T4, paired by subject (FIG2c n=10); mean FPKM >= 1 filter mirrors S4.6.p1."
+        },
+        {
+          "name": "P2_untrained_leg_U4_vs_U3",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "U3", "treatment_group": "U4", "covariate_columns": "subject"},
+          "subset": {"grp": ["U3", "U4"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["U3", "U4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "primary",
+          "reasoning": "S2.4.p2 U3 vs U4, paired by subject (FIG2d n=11)."
+        },
+        {
+          "name": "leg_T3_vs_U3",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "U3", "treatment_group": "T3", "covariate_columns": "subject"},
+          "subset": {"grp": ["T3", "U3"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["U3", "T3"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "S2.4.p1 memory test: previously trained vs untrained leg before Period 2, paired by subject; paper found no specific genes."
+        },
+        {
+          "name": "leg_T4_vs_U4",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "U4", "treatment_group": "T4", "covariate_columns": "subject"},
+          "subset": {"grp": ["T4", "U4"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["U4", "T4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "S2.4.p2: legs after Period 2; paper OPLS found no difference."
+        }
+      ],
+      "enrichment": [
+        {"execution": "P2_trained_leg_T4_vs_T3", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GO/KEGG/IPA for Period 2 (S2.5.p1, oxidative phosphorylation)"},
+        {"execution": "P2_untrained_leg_U4_vs_U3", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports enrichment for both Period 2 legs (S2.5.p1)"}
+      ]
+    }
+  ]
+}

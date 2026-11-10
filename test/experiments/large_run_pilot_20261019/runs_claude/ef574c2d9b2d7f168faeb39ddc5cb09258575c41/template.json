@@ -1,0 +1,181 @@
+{
+  "run_dir": "test/experiments/<run>/<paper_id>",
+  "request": "Analyze GSE000000 for PMID 0 (<title>): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "<model> session",
+  "platform": "claude-code",
+  "data_root": "data",
+  "cases": [
+    {
+      "case_id": "GSE000000",
+      "accession": "GSE000000",
+      "inputs": {
+        "paper": [
+          "<papers>/PMC0.paper.md"
+        ],
+        "metadata": "GSE000000/GSE000000_metadata.csv",
+        "matrix": "GSE000000/GSE000000_counts.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE000000"
+            ],
+            "primary_estimand": "...",
+            "planned_contrasts": [
+              "EX vs SED (S2.1.p1; paper: 120 DEGs)"
+            ],
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "source_locator": "S4.5.p1"
+            },
+            "paper_method": "DESeq2 ~ group"
+          },
+          "reasoning": "...",
+          "locator": "S4.5.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true
+          },
+          "reasoning": "DA.p1 names GSE000000; ..."
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": [
+              "title",
+              "^(SED|EX)_\\d+$"
+            ]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "..."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer counts; GEO data_processing: featureCounts"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "SED"
+          },
+          "organism": "Mouse",
+          "planned": [
+            "grp_EX_vs_SED"
+          ],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "EX",
+            "contrasts": [
+              {
+                "name": "grp_EX_vs_SED",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              }
+            ]
+          },
+          "reasoning": "..."
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "independent animals; no batch recorded"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp"
+          },
+          "transform": null,
+          "reasoning": "..."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_cutoff": null
+            }
+          },
+          "reasoning": "S4.5.p1: FDR < 0.05 and |log2FC| > 1"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned"
+          },
+          "paper_counts": {
+            "grp_EX_vs_SED": 120
+          },
+          "paper_genes": {
+            "grp_EX_vs_SED": [
+              "Ppargc1a",
+              "Nr4a3"
+            ]
+          },
+          "reasoning": "..."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "...",
+          "paper": "...",
+          "data": "...",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "grp_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "SED",
+            "treatment_group": "EX",
+            "alpha": 0.05
+          },
+          "role": "primary",
+          "reasoning": "paper's two-group DESeq2"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "grp_EX_vs_SED",
+          "ora": true,
+          "gsea": true,
+          "reasoning": "paper reports GO terms"
+        }
+      ]
+    }
+  ]
+}

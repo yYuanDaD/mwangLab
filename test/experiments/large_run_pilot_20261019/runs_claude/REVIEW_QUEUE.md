@@ -55,3 +55,11 @@ One section per case; newest last.
 ## e6da17ec35146322588e4f22850014a7def00cc7 / GSE217155 (2026-11-10)
 
 - policy: Joint vs pairwise fit when the paper is silent (open policy question); pairwise fit of EXE vs NASH alone would be a cheap sensitivity check but not required.
+
+## b39292ba0ee11c97d2e351716ebbb6029eeee400 / GSE97718 (2026-11-10)
+
+- policy: Open policy: joint vs pairwise fit when the paper is silent; FPKM limma vs Cuffdiff count gap (3-25x) is a declared deviation.
+
+## b39292ba0ee11c97d2e351716ebbb6029eeee400 / GSE97718_expressed (2026-11-10)
+
+- policy: Open policy: joint vs pairwise fit when the paper is silent; FPKM limma vs Cuffdiff count gap (3-25x) is a declared deviation.
