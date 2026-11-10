@@ -38,3 +38,8 @@ One section per case; newest last.
 ## PMID41078024 / GSE302532 (2026-11-10)
 
 - policy: Open policy: report the padj<0.05 default (0 DEGs) or the paper-implied raw-P/FC>=3 rule (21 DEGs) as the headline when the paper states no rule and its 27 rest on uncorrected P.
+
+## PMID39609254 / GSE281849 (2026-11-10)
+
+- policy: Open policy: report the paper-stated rule (padj<0.05, |log2FC|>0.25: 76/45/134) or the authors' code rule (padj<=0.05, |log2FC|>=0.27: 71/41/126) as headline; the run reports both, with the paper rule applied.
+- policy: Optional: joint model AR vs SED has only 1990 tested genes, check whether this is independent filtering or an outlier artefact (sensitivity only).

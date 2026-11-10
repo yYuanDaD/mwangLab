@@ -507,3 +507,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39609254 (GSE281849)
 
 - none (pydeseq2 overflow RuntimeWarning at utils.py:1088, harmless) Details: `PMID39609254/HANDBACK.md`.
+
+## PMID40832111 (GSE296683)
+
+- none (cosmetic: execute output's matrix_column_keys echo truncated to 10 of 12 columns) Details: `PMID40832111/HANDBACK.md`.
