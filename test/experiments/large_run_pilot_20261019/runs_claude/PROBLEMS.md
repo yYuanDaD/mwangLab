@@ -619,3 +619,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37059838 (GSE228901)
 
 - none blocking; metadata protocol text shows GBK mojibake (cosmetic) Details: `PMID37059838/HANDBACK.md`.
+
+## PMID42318351 (GSE277623)
+
+- none blocking; series matrix columns have no metadata key (used GSM-keyed RAW.tar); raw_tar merge writes into shared data cache Details: `PMID42318351/HANDBACK.md`.

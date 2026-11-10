@@ -134,3 +134,7 @@ One section per case; newest last.
 ## PMID40789206 / GSE297842 (2026-11-10)
 
 - policy: Open policy: joint vs pairwise fit when paper is silent (counts differ 29 vs 93); paper's counts are closer to the joint fit but do not fully match either.
+
+## PMID37059838 / GSE228901 (2026-11-10)
+
+- policy: Open policy question only: whether a series with exercise-performance readouts but no exercise intervention should be reported as an associational analysis; the skill's current rule (refuse) is followed.

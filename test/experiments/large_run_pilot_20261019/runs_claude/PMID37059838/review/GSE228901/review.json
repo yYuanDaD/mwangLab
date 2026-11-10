@@ -1,0 +1,21 @@
+{"case":"GSE228901","reviewer":"Claude Sonnet 5.5 (read-only reviewer)",
+"blind":{
+"B1":"No. The paper (PMC10651819) is an aging and Protectin DX (PDX) drug study in female mouse liver. The words exercise, training and sedentary do not occur in it. Treadmill and voluntary wheel are physical-performance tests given to every mouse (S2.2.p1). No sequenced sample carries an exercise factor.",
+"B2":"Old vs Adult (aging) and PDX vs Old (drug), 5 livers per group, 15 female mice (S3.7.p1-p2).",
+"B3":"No repeated measures for RNA-seq: one liver per animal, one sample per animal (S3.7.p1). Packet A's candidate pairing keys link only 2/15 samples and are built from phenotype values, so they are not an animal ID.",
+"B4":"Pairwise group comparisons: 'Differential gene expression was then assessed between pairs of experimental groups' (S3.7.p2); DESeq2 Wald test (S2.9.p2).",
+"B5":"BH FDR; Old vs Adult 1,621 genes at FDR q < 0.05; PDX vs Old 0 genes at FDR q < 0.25; no fold-change cutoff (S3.7.p2, S2.9.p2)."},
+"checks":[
+{"id":"run_or_refuse","verdict":"agree","severity":"none","evidence":"No exercise arm (B1); refusal at design matches. Not an in-vitro mediator design.","fix":""},
+{"id":"grouping","verdict":"agree","severity":"none","evidence":"grp Adult/Old/PDX = 5/5/5 matches S3.7.p1; title letter agrees with age and treatment fields.","fix":""},
+{"id":"direction","verdict":"na","severity":"none","evidence":"No contrast was run.","fix":""},
+{"id":"pairing","verdict":"agree","severity":"none","evidence":"One liver per animal (S3.7.p1); the unused-column flag (sum of positive frailty criteria, 5 values) is a phenotype score, not an animal ID.","fix":""},
+{"id":"model_fit","verdict":"na","severity":"none","evidence":"Nothing fitted; the paper used pairwise fits (S3.7.p2) and the record lists the right contrasts.","fix":""},
+{"id":"confounding","verdict":"na","severity":"none","evidence":"No exercise estimand. Treadmill/wheel readouts are confounded with age, as the record notes.","fix":""},
+{"id":"matrix_method","verdict":"agree","severity":"none","evidence":"Integer featureCounts counts, integer_fraction 1.0, S2.9.p1; VST file correctly not used.","fix":""},
+{"id":"threshold","verdict":"agree","severity":"none","evidence":"Recorded FDR 0.05, no fold-change cutoff (S3.7.p2); the second rule (FDR 0.25 for PDX vs Old) is also stated in the record.","fix":""},
+{"id":"paper_match","verdict":"na","severity":"none","evidence":"Nothing run; HANDBACK claims no match and states paper counts correctly (1,621 and 0).","fix":""},
+{"id":"stop_reason","verdict":"agree","severity":"none","evidence":"Claim 'no exercise arm' was checked against S2.2.p1, S2.4 and the whole paper has no exercise/training/sedentary words; metadata exercise-word flag only hit RNA extraction text.","fix":""}],
+"overall":"pass",
+"human_items":["Open policy question only: whether a series with exercise-performance readouts but no exercise intervention should be reported as an associational analysis; the skill's current rule (refuse) is followed."],
+"summary":"该系列是衰老与 Protectin DX 药物研究，没有运动干预组，跑台和转轮只是所有小鼠的体能测试，因此在设计阶段拒绝是正确的。分组、矩阵类型、阈值记录和停止理由都与论文一致，两个机械标记（未使用的类受试者列、拒绝与运动词）均为误报。"}
