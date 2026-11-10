@@ -76,3 +76,6 @@ lowest priority): 2 papers at a time instead of 5. Order: rows 35, 46, 50, 51, t
 Quota stop 2026-11-03 ~05:10: row 35 had finished (42/211); rows 46 and 50 were cut off. PR #8 (review
 step) merged; resumed 2026-11-10 00:20 local (owner: "对的"): rows 46, 50 rerun (folders moved to
 `_interrupted/`), 51, then 52 onward, 3 analyses at a time plus their reviews.
+
+Quota stop 2026-11-10 ~06:00 local at 59/211: rows 67, 68 and the review of row 66 were cut off and
+resumed with their context after the reset (not restarted).
