@@ -1,0 +1,185 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38348322",
+  "request": "Analyze GSE237950 for PMID 38348322 (Data of RNA-seq transcriptomes of gastrocnemius muscle, epididymal adipose tissue in obese rats under normoxia/hypoxic exercise environments.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE237950",
+      "accession": "GSE237950",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC10859296.paper.md"],
+        "metadata": "GSE237950/GSE237950_metadata.csv",
+        "matrix": "GSE237950/GSE237950_gene_expression.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE237950"],
+            "assay": "bulk RNA-seq (Illumina HiSeq), HISAT2 to Ensembl release-99 rat genome (S4.2.p2-p4)",
+            "organism": "Rat (male Sprague Dawley, high-fat diet obese model; S4.1.p1)",
+            "tissues": ["epididymal adipose tissue (F)", "gastrocnemius muscle (M)"],
+            "factors": {"oxygen": ["normoxia (21% O2)", "hypoxia (13.6% O2)"], "exercise": ["quiet", "treadmill 1 h/d, 5 d/wk, 4 wk"]},
+            "groups": "FC 3, FCE 3, FH 2, FHE 2, MC 3, MCE 3, MH 3, MHE 3 (TAB1, S3.p1, TAB2)",
+            "sample_inclusion": "22 samples; two adipose samples excluded for RNA quality (S4.1.p1); FH2 and FHE1 absent (TAB2)",
+            "primary_estimand": "Effect of 4-week treadmill exercise on gene expression within each tissue, under normoxia (CE vs C) and under hypoxia (HE vs H)",
+            "planned_contrasts": [
+              "Adipose: FCE vs FC (normoxia exercise effect; no DEG count reported)",
+              "Adipose: FHE vs FH (hypoxia exercise effect; no DEG count reported)",
+              "Muscle: MCE vs MC (normoxia exercise effect; no DEG count reported)",
+              "Muscle: MHE vs MH (hypoxia exercise effect; no DEG count reported)"
+            ],
+            "repeated_measure_unit": "none within a tissue; muscle and adipose may come from the same rats but pairing is not given",
+            "paper_method": "DESeq on read counts (ABS.p1); comparisons not enumerated",
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "none (data article: ABS.p1, S3.p1 name DE analysis but give no rule)"},
+            "paper_results": "No DEG counts, gene lists or pathways reported; only correlation heatmap, TPM density and Venn of expressed genes (S3.p2, FIG1-4)"
+          },
+          "reasoning": "Data in Brief article. ABS.p1 says differential expression used DESeq on raw data; S4.1.p1/S4.1.p2 define a 2x2 oxygen x exercise design in obese rats; TAB2 maps GSM ids to sample names. The paper does not list contrasts, a threshold or results, so the exercise contrasts within oxygen level and tissue are the natural reading of 'how exercise affects gene expression' (S1.p1 bullets 2-3).",
+          "locator": "ABS.p1; S4.1.p1; S4.1.p2; TAB2",
+          "confidence": "medium"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["ABS.p1/TAB1/S3.p1 name GSE237950", "TAB2 GSM7656816-GSM7656837 equal the 22 metadata rows", "matrix columns Count (FC1)...Count (MHE3) carry the 22 TAB2 sample names"]},
+          "reasoning": "The series and its only supplementary matrix (gene_expression.xlsx/csv) belong to the paper; sample names match TAB2 exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"sid": ["title", "^(\\S+) \\("]},
+          "key_column": "sid",
+          "matrix_column_pattern": "^Count \\((.+)\\)$",
+          "patterns": {"grp": ["title", "^[FM](CE|HE|C|H)\\d"], "tissue": ["title", "^([FM])"]},
+          "recode": {"tissue": {"F": "fat", "M": "muscle"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "The matrix holds Count/TPM/FPKM per sample; only the 'Count (X)' columns are used. Sample key = sample name before the parenthesis in title (e.g. FCE1), matched exactly to the Count column name. grp = C/CE/H/HE from the name (S3.p2 defines C, CE, H, HE); tissue from the F/M prefix, cross-checked against characteristics tissue.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "The 22 'Count (...)' columns are all integers with library sums 27-44 M, consistent with exon read numbers in TAB3; TPM and FPKM columns are separate and ignored. ABS.p1 and S4.2.p4 state read-count based DE (DESeq).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "C"},
+          "strata": ["tissue"],
+          "organism": "Rat",
+          "planned": ["grp_CE_vs_C_tissue-fat", "grp_HE_vs_H_tissue-fat", "grp_CE_vs_C_tissue-muscle", "grp_HE_vs_H_tissue-muscle"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group within tissue strata (4 oxygen x exercise groups), planned exercise contrasts",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "fat_CE_vs_C", "control": "C", "treatment": "CE", "stratum": "fat", "role": "primary"},
+              {"name": "fat_HE_vs_H", "control": "H", "treatment": "HE", "stratum": "fat", "role": "primary"},
+              {"name": "muscle_CE_vs_C", "control": "C", "treatment": "CE", "stratum": "muscle", "role": "primary"},
+              {"name": "muscle_HE_vs_H", "control": "H", "treatment": "HE", "stratum": "muscle", "role": "primary"},
+              {"name": "fat_H_vs_C / fat_HE_vs_CE / muscle_H_vs_C / muscle_HE_vs_CE", "role": "exploratory"}
+            ]
+          },
+          "reasoning": "The estimand is the exercise effect; the paper's four groups per tissue are kept as one 4-level factor fitted per tissue (tissues are different biology and possibly the same rats, so comparisons never cross tissue). Exercise is compared with the quiet group at the same oxygen level. Adipose hypoxia arms have n=2 (FH, FHE), so those contrasts are small-n and labelled exploratory-strength evidence. Oxygen effects and HE vs CE are exploratory. A 2x2 interaction model was rejected because the paper poses no interaction question and the adipose hypoxia cells have n=2.",
+          "candidates": [
+            {"value": "pool tissues with tissue as covariate", "reason_rejected": "tissue differences dominate and adipose/muscle may be the same animals (unrecorded pairing); per-tissue fits match the paper's tissue-specific framing"},
+            {"value": "exercise main effect pooled over oxygen", "reason_rejected": "the paper treats normoxia and hypoxia exercise as separate interventions to compare (S1.p1)"}
+          ],
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Within a tissue each sample is a different rat (randomized to groups, S4.1.p1); no batch, sex (all male) or other covariate recorded. Cross-tissue pairing is irrelevant because tissues are fitted separately.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq (R, original package) nbinomTest",
+            "formula": "nbinomTest by grp, fitted per tissue (4 groups)",
+            "paper_route": {"method": "DESeq", "status": "reproduced", "reason": "ABS.p1 names DESeq; the original package (1.38.0) runs here. Dispersion settings and whether all four groups were fitted together are not stated; package defaults (pooled, maximum, parametric) on the four groups of one tissue."},
+            "deviations": ["DESeq dispersion options and fitting set not stated by the paper; defaults used", "DESeq2 joint model per tissue run as sensitivity"]
+          },
+          "transform": null,
+          "reasoning": "Raw integer counts support the paper's named method. DESeq2 (pydeseq2) per tissue is a sensitivity analysis because many vendors say 'DESeq' when running DESeq2.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "deviation_note": "The paper gives no DEG rule; workflow default BH padj < 0.05 without fold-change cutoff; audit adds |log2FC| > 1."
+          },
+          "reasoning": "No threshold anywhere in the paper (ABS.p1, S3, S4).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "The paper reports no DEG counts, genes or pathways, so nothing can be compared with its results.",
+              "Adipose hypoxia arms (FH, FHE) have n=2; fat_HE_vs_H has little power.",
+              "Threshold is the workflow default, not the paper's (none stated)."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Method and contrasts follow the paper's stated DESeq analysis of its four-group design; the result side has no paper benchmark.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "fat group sizes", "paper": "S4.1.p1 says 40 rats randomized, 24 met criteria, 22 sequenced", "data": "22 samples are 10 adipose + 12 muscle, not 22 rats; FH2 and FHE1 missing", "disposition": "executable_without_change"},
+        {"item": "contrasts and threshold", "paper": "DESeq named, no contrasts/threshold/results", "data": "4 groups per tissue", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "fat_deseq1",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {"engine": "deseq1", "design": "~ grp", "condition": "grp", "levels": {"grp": ["C", "CE", "H", "HE"]},
+                   "contrasts": [{"name": "fat_CE_vs_C", "factor": "grp", "test": "CE", "ref": "C"},
+                                 {"name": "fat_HE_vs_H", "factor": "grp", "test": "HE", "ref": "H"},
+                                 {"name": "fat_H_vs_C", "factor": "grp", "test": "H", "ref": "C"},
+                                 {"name": "fat_HE_vs_CE", "factor": "grp", "test": "HE", "ref": "CE"}],
+                   "label": "fat_deseq1"},
+          "subset": {"tissue": ["fat"]},
+          "role": "primary",
+          "reasoning": "Paper's DESeq on adipose samples; CE vs C and HE vs H are the planned exercise contrasts, H vs C and HE vs CE exploratory."
+        },
+        {
+          "name": "muscle_deseq1",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {"engine": "deseq1", "design": "~ grp", "condition": "grp", "levels": {"grp": ["C", "CE", "H", "HE"]},
+                   "contrasts": [{"name": "muscle_CE_vs_C", "factor": "grp", "test": "CE", "ref": "C"},
+                                 {"name": "muscle_HE_vs_H", "factor": "grp", "test": "HE", "ref": "H"},
+                                 {"name": "muscle_H_vs_C", "factor": "grp", "test": "H", "ref": "C"},
+                                 {"name": "muscle_HE_vs_CE", "factor": "grp", "test": "HE", "ref": "CE"}],
+                   "label": "muscle_deseq1"},
+          "subset": {"tissue": ["muscle"]},
+          "role": "primary",
+          "reasoning": "Paper's DESeq on gastrocnemius samples; same contrasts."
+        },
+        {
+          "name": "fat_deseq2",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_CE_vs_C_tissue-fat", "grp_HE_vs_H_tissue-fat", "grp_H_vs_C_tissue-fat", "grp_HE_vs_CE_tissue-fat"], "include": ["grp_HE_vs_H_tissue-fat", "grp_H_vs_C_tissue-fat", "grp_HE_vs_CE_tissue-fat"]},
+          "subset": {"tissue": ["fat"]},
+          "role": "sensitivity",
+          "reasoning": "DESeq2 Wald on all four adipose groups as a sensitivity check of the DESeq route."
+        },
+        {
+          "name": "muscle_deseq2",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_CE_vs_C_tissue-muscle", "grp_HE_vs_H_tissue-muscle", "grp_H_vs_C_tissue-muscle", "grp_HE_vs_CE_tissue-muscle"]},
+          "subset": {"tissue": ["muscle"]},
+          "role": "sensitivity",
+          "reasoning": "DESeq2 Wald on all four muscle groups as a sensitivity check."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}

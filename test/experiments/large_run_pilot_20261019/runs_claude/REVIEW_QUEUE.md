@@ -104,3 +104,7 @@ One section per case; newest last.
 
 - policy: Primary fit choice: the joint ~grp model gives 32 EX DEGs (count equals the paper's, but Lipe/Plin1/Slc7a10 get padj NA because the heterogeneous PHAM arm drives Cook flags), while the two-arm CON+EX fit recovers all five paper-named exercise genes but calls 385 DEGs. The paper is silent on joint vs pairwise dispersion, so which to label primary is the open policy question.
 - policy: PHAM vs CON gives 3694 DEGs vs the paper's 176 because two of three PHAM tumors are transcriptionally distinct; whether to treat this as a sample or tissue-content issue is for a person.
+
+## 2148e268704227111378324e8a4175163d2e8e5f / GSE110507 (2026-11-10)
+
+- policy: Open policy: whether a VDR-OE vs control run is wanted as a non-exercise sensitivity/reference result (paired edgeR, P<0.05, paper 3,330 genes). Not required: the case is correctly refused for the exercise question. The paper's exercise data (GSE47881 human RET microarray) would need a separate case.

@@ -19,7 +19,8 @@ class CountColumnDecision:
 
 
 _COUNT_HINTS = ("count", "counts", "read", "reads", "featurecount", "raw")
-_NONCOUNT_HINTS = ("length", "start", "end", "strand", "fpkm", "tpm", "rpkm", "coverage", "score")
+_NONCOUNT_HINTS = ("length", "start", "end", "strand", "fpkm", "tpm", "rpkm", "coverage", "score",
+                   "entrez", "geneid", "gene_id", "_id", "chrom")  # integer ID columns are not counts
 
 
 def choose_count_column(df: pd.DataFrame, sample_columns: list[str] | None = None) -> CountColumnDecision:

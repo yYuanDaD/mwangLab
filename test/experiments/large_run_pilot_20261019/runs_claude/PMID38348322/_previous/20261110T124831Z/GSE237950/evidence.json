@@ -1,0 +1,1250 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38348322",
+  "subject_id": "GSE237950",
+  "created_at": "2026-11-10T07:33:49",
+  "finished_at": "2026-11-10T07:47:53",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10859296.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10859296.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T07:33:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4b051db9eebe834cfe00cd2aea3191ba084df9d6e222b46043f5d3bf5c46d9b0",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE237950_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE237950\\GSE237950_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:33:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "89f16e06d8bbe6f7beb7da0d34fd1b6a9216ab598040ba1a93930aef11bd7b98",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE237950_gene_expression.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE237950\\GSE237950_gene_expression.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:33:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1150ad27e80b4869126cf3c2b91ad77dc1ddf178f9a98197e5a3593ee9a9e4f9",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE237950"
+        ],
+        "assay": "bulk RNA-seq (Illumina HiSeq), HISAT2 to Ensembl release-99 rat genome (S4.2.p2-p4)",
+        "organism": "Rat (male Sprague Dawley, high-fat diet obese model; S4.1.p1)",
+        "tissues": [
+          "epididymal adipose tissue (F)",
+          "gastrocnemius muscle (M)"
+        ],
+        "factors": {
+          "oxygen": [
+            "normoxia (21% O2)",
+            "hypoxia (13.6% O2)"
+          ],
+          "exercise": [
+            "quiet",
+            "treadmill 1 h/d, 5 d/wk, 4 wk"
+          ]
+        },
+        "groups": "FC 3, FCE 3, FH 2, FHE 2, MC 3, MCE 3, MH 3, MHE 3 (TAB1, S3.p1, TAB2)",
+        "sample_inclusion": "22 samples; two adipose samples excluded for RNA quality (S4.1.p1); FH2 and FHE1 absent (TAB2)",
+        "primary_estimand": "Effect of 4-week treadmill exercise on gene expression within each tissue, under normoxia (CE vs C) and under hypoxia (HE vs H)",
+        "planned_contrasts": [
+          "Adipose: FCE vs FC (normoxia exercise effect; no DEG count reported)",
+          "Adipose: FHE vs FH (hypoxia exercise effect; no DEG count reported)",
+          "Muscle: MCE vs MC (normoxia exercise effect; no DEG count reported)",
+          "Muscle: MHE vs MH (hypoxia exercise effect; no DEG count reported)"
+        ],
+        "repeated_measure_unit": "none within a tissue; muscle and adipose may come from the same rats but pairing is not given",
+        "paper_method": "DESeq on read counts (ABS.p1); comparisons not enumerated",
+        "paper_threshold": {
+          "metric": "not stated",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "none (data article: ABS.p1, S3.p1 name DE analysis but give no rule)"
+        },
+        "paper_results": "No DEG counts, gene lists or pathways reported; only correlation heatmap, TPM density and Venn of expressed genes (S3.p2, FIG1-4)"
+      },
+      "reason": "Data in Brief article. ABS.p1 says differential expression used DESeq on raw data; S4.1.p1/S4.1.p2 define a 2x2 oxygen x exercise design in obese rats; TAB2 maps GSM ids to sample names. The paper does not list contrasts, a threshold or results, so the exercise contrasts within oxygen level and tissue are the natural reading of 'how exercise affects gene expression' (S1.p1 bullets 2-3).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:49"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE237950\\GSE237950_gene_expression.csv",
+        "owned": true,
+        "checks": [
+          "ABS.p1/TAB1/S3.p1 name GSE237950",
+          "TAB2 GSM7656816-GSM7656837 equal the 22 metadata rows",
+          "matrix columns Count (FC1)...Count (MHE3) carry the 22 TAB2 sample names"
+        ],
+        "accession": "GSE237950",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE237950\\GSE237950_metadata.csv"
+      },
+      "reason": "The series and its only supplementary matrix (gene_expression.xlsx/csv) belong to the paper; sample names match TAB2 exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:49"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:sid",
+        "n_aligned": 22,
+        "n_metadata": 22,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^[FM](CE|HE|C|H)\\d"
+            },
+            "tissue": {
+              "source": "title",
+              "regex": "^([FM])",
+              "recode": {
+                "F": "fat",
+                "M": "muscle"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\design_metadata.csv",
+          "sha256": "33d114b2c4189181b80bd20ba9c7e67eddc1f09d3f735163f0d21f4aebaeadbb",
+          "levels": {
+            "grp": {
+              "CE": 6,
+              "C": 6,
+              "HE": 5,
+              "H": 5
+            },
+            "tissue": {
+              "muscle": 12,
+              "fat": 10
+            }
+          }
+        }
+      },
+      "reason": "The matrix holds Count/TPM/FPKM per sample; only the 'Count (X)' columns are used. Sample key = sample name before the parenthesis in title (e.g. FCE1), matched exactly to the Count column name. grp = C/CE/H/HE from the name (S3.p2 defines C, CE, H, HE); tissue from the F/M prefix, cross-checked against characteristics tissue.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:50"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\aligned_matrix.csv",
+          "sha256": "92dbbea547ec9da79103e477cf96aa64bc56c249a948c8e726d6bd9e0b1c3655",
+          "n_features": 32623,
+          "n_samples": 22,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 15590411.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "The 22 'Count (...)' columns are all integers with library sums 27-44 M, consistent with exon read numbers in TAB3; TPM and FPKM columns are separate and ignored. ABS.p1 and S4.2.p4 state read-count based DE (DESeq).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:51"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group within tissue strata (4 oxygen x exercise groups), planned exercise contrasts",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "fat_CE_vs_C",
+            "control": "C",
+            "treatment": "CE",
+            "stratum": "fat",
+            "role": "primary"
+          },
+          {
+            "name": "fat_HE_vs_H",
+            "control": "H",
+            "treatment": "HE",
+            "stratum": "fat",
+            "role": "primary"
+          },
+          {
+            "name": "muscle_CE_vs_C",
+            "control": "C",
+            "treatment": "CE",
+            "stratum": "muscle",
+            "role": "primary"
+          },
+          {
+            "name": "muscle_HE_vs_H",
+            "control": "H",
+            "treatment": "HE",
+            "stratum": "muscle",
+            "role": "primary"
+          },
+          {
+            "name": "fat_H_vs_C / fat_HE_vs_CE / muscle_H_vs_C / muscle_HE_vs_CE",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "partially_analyzable",
+          "failed": [],
+          "warnings": [
+            "sample_size"
+          ],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\suitability\\suitability.md",
+          "n_comparisons": 12,
+          "n_analyzable": 7
+        }
+      },
+      "reason": "The estimand is the exercise effect; the paper's four groups per tissue are kept as one 4-level factor fitted per tissue (tissues are different biology and possibly the same rats, so comparisons never cross tissue). Exercise is compared with the quiet group at the same oxygen level. Adipose hypoxia arms have n=2 (FH, FHE), so those contrasts are small-n and labelled exploratory-strength evidence. Oxygen effects and HE vs CE are exploratory. A 2x2 interaction model was rejected because the paper poses no interaction question and the adipose hypoxia cells have n=2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:55"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 22,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_CE",
+            "grp_H",
+            "grp_HE"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 18,
+          "levels": {
+            "grp": {
+              "CE": 6,
+              "C": 6,
+              "HE": 5,
+              "H": 5
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "C"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "CE"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "H"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "HE"
+              ],
+              "n": 5
+            }
+          ],
+          "min_cell_size": 5,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 22,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 22,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "C": {
+                "epididymal adipose tissue": 3,
+                "gastrocnemius muscle": 3
+              },
+              "CE": {
+                "epididymal adipose tissue": 3,
+                "gastrocnemius muscle": 3
+              },
+              "H": {
+                "epididymal adipose tissue": 2,
+                "gastrocnemius muscle": 3
+              },
+              "HE": {
+                "epididymal adipose tissue": 2,
+                "gastrocnemius muscle": 3
+              }
+            }
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.condition",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.tissue",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "C": {
+                "epididymal adipose tissue": 3,
+                "gastrocnemius muscle": 3
+              },
+              "CE": {
+                "epididymal adipose tissue": 3,
+                "gastrocnemius muscle": 3
+              },
+              "H": {
+                "epididymal adipose tissue": 2,
+                "gastrocnemius muscle": 3
+              },
+              "HE": {
+                "epididymal adipose tissue": 2,
+                "gastrocnemius muscle": 3
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.4.treatment",
+            "n_levels": 4,
+            "status": "complete_confounding",
+            "crosstab": {
+              "C": {
+                "hypoxia exercise training": 0,
+                "hypoxic quiet training": 0,
+                "normoxia exercise training": 0,
+                "normoxia quiet training": 6
+              },
+              "CE": {
+                "hypoxia exercise training": 0,
+                "hypoxic quiet training": 0,
+                "normoxia exercise training": 6,
+                "normoxia quiet training": 0
+              },
+              "H": {
+                "hypoxia exercise training": 0,
+                "hypoxic quiet training": 5,
+                "normoxia exercise training": 0,
+                "normoxia quiet training": 0
+              },
+              "HE": {
+                "hypoxia exercise training": 5,
+                "hypoxic quiet training": 0,
+                "normoxia exercise training": 0,
+                "normoxia quiet training": 0
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "growth_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 22,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "sid",
+            "n_levels": 22,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "tissue",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "C": {
+                "fat": 3,
+                "muscle": 3
+              },
+              "CE": {
+                "fat": 3,
+                "muscle": 3
+              },
+              "H": {
+                "fat": 2,
+                "muscle": 3
+              },
+              "HE": {
+                "fat": 2,
+                "muscle": 3
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Within a tissue each sample is a different rat (randomized to groups, S4.1.p1); no batch, sex (all male) or other covariate recorded. Cross-tissue pairing is irrelevant because tissues are fitted separately.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:55"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq (R, original package) nbinomTest",
+        "formula": "nbinomTest by grp, fitted per tissue (4 groups)",
+        "paper_route": {
+          "method": "DESeq",
+          "status": "reproduced",
+          "reason": "ABS.p1 names DESeq; the original package (1.38.0) runs here. Dispersion settings and whether all four groups were fitted together are not stated; package defaults (pooled, maximum, parametric) on the four groups of one tissue."
+        },
+        "deviations": [
+          "DESeq dispersion options and fitting set not stated by the paper; defaults used",
+          "DESeq2 joint model per tissue run as sensitivity"
+        ]
+      },
+      "reason": "Raw integer counts support the paper's named method. DESeq2 (pydeseq2) per tissue is a sensitivity analysis because many vendors say 'DESeq' when running DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:55"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "not stated",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "threshold_source": "workflow_default",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false
+        },
+        "deviation_note": "The paper gives no DEG rule; workflow default BH padj < 0.05 without fold-change cutoff; audit adds |log2FC| > 1."
+      },
+      "reason": "No threshold anywhere in the paper (ABS.p1, S3, S4).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:33:55"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_r_de",
+        "subset": "fat_deseq1",
+        "role": "primary",
+        "tool": "tools.r_de_tools:run_r_de",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\input\\matrix.csv",
+        "formula": "nbinomTest by grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_CE_vs_C.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_HE_vs_H.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_H_vs_C.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_HE_vs_CE.csv"
+        ],
+        "counts": {
+          "fat_deseq1/fat_CE_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 21556,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 21556,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "fat_deseq1/fat_HE_vs_H": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 20948,
+              "n_significant": 31,
+              "n_up": 20,
+              "n_down": 11,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 20948,
+              "n_significant": 31,
+              "n_up": 20,
+              "n_down": 11,
+              "deg_sanity": "ok"
+            }
+          },
+          "fat_deseq1/fat_H_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 21376,
+              "n_significant": 8,
+              "n_up": 5,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 21376,
+              "n_significant": 8,
+              "n_up": 5,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          },
+          "fat_deseq1/fat_HE_vs_CE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 21040,
+              "n_significant": 26,
+              "n_up": 16,
+              "n_down": 10,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 21040,
+              "n_significant": 26,
+              "n_up": 16,
+              "n_down": 10,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's DESeq on adipose samples; CE vs C and HE vs H are the planned exercise contrasts, H vs C and HE vs CE exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:39:37"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_r_de",
+        "subset": "muscle_deseq1",
+        "role": "primary",
+        "tool": "tools.r_de_tools:run_r_de",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\input\\matrix.csv",
+        "formula": "nbinomTest by grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_CE_vs_C.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_HE_vs_H.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_H_vs_C.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_HE_vs_CE.csv"
+        ],
+        "counts": {
+          "muscle_deseq1/muscle_CE_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17198,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 17198,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "muscle_deseq1/muscle_HE_vs_H": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17573,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 17573,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "muscle_deseq1/muscle_H_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17349,
+              "n_significant": 8,
+              "n_up": 6,
+              "n_down": 2,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 17349,
+              "n_significant": 8,
+              "n_up": 6,
+              "n_down": 2,
+              "deg_sanity": "ok"
+            }
+          },
+          "muscle_deseq1/muscle_HE_vs_CE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17466,
+              "n_significant": 3,
+              "n_up": 0,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 17466,
+              "n_significant": 3,
+              "n_up": 0,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's DESeq on gastrocnemius samples; same contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:47:25"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "fat_deseq2",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq2\\input\\matrix.csv",
+        "execution_error": "NativeToolError: POLICY BLOCKED: no samples in cell {'tissue': 'muscle', 'grp': 'CE'}"
+      },
+      "reason": "DESeq2 Wald on all four adipose groups as a sensitivity check of the DESeq route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:47:44"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "muscle_deseq2",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq2\\input\\matrix.csv",
+        "execution_error": "NativeToolError: POLICY BLOCKED: no samples in cell {'tissue': 'fat', 'grp': 'CE'}"
+      },
+      "reason": "DESeq2 Wald on all four muscle groups as a sensitivity check.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:47:53"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "The paper reports no DEG counts, genes or pathways, so nothing can be compared with its results.",
+          "Adipose hypoxia arms (FH, FHE) have n=2; fat_HE_vs_H has little power.",
+          "Threshold is the workflow default, not the paper's (none stated)."
+        ],
+        "results": {
+          "fat_deseq1/fat_CE_vs_C": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 1
+          },
+          "fat_deseq1/fat_HE_vs_H": {
+            "n_deg": 31,
+            "up": 20,
+            "down": 11,
+            "rule": "padj < 0.05",
+            "audit_n": 31
+          },
+          "fat_deseq1/fat_H_vs_C": {
+            "n_deg": 8,
+            "up": 5,
+            "down": 3,
+            "rule": "padj < 0.05",
+            "audit_n": 8
+          },
+          "fat_deseq1/fat_HE_vs_CE": {
+            "n_deg": 26,
+            "up": 16,
+            "down": 10,
+            "rule": "padj < 0.05",
+            "audit_n": 26
+          },
+          "muscle_deseq1/muscle_CE_vs_C": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 1
+          },
+          "muscle_deseq1/muscle_HE_vs_H": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 1
+          },
+          "muscle_deseq1/muscle_H_vs_C": {
+            "n_deg": 8,
+            "up": 6,
+            "down": 2,
+            "rule": "padj < 0.05",
+            "audit_n": 8
+          },
+          "muscle_deseq1/muscle_HE_vs_CE": {
+            "n_deg": 3,
+            "up": 0,
+            "down": 3,
+            "rule": "padj < 0.05",
+            "audit_n": 3
+          }
+        },
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {}
+      },
+      "reason": "Method and contrasts follow the paper's stated DESeq analysis of its four-group design; the result side has no paper benchmark.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:47:53"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e0bea5b8bc130aee6e268d57f005acfaa36a19fef47a3e7ebb3c11e634d2cd91",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "610e3c0b2b166b86560291be3d86f34222fa537134952eae1895fb180984501f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "92dbbea547ec9da79103e477cf96aa64bc56c249a948c8e726d6bd9e0b1c3655",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "33d114b2c4189181b80bd20ba9c7e67eddc1f09d3f735163f0d21f4aebaeadbb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "253523515b1031004db4f72812affc9aab47524eda5c8cfb8998bfd1fed956fc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "50741ba88bd17cb854f375535c85c0ba1aa511f964fe8e958d7e62aec29a04ee",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_CE_vs_C.csv",
+      "role": "deg_fat_deseq1/fat_CE_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8ceeb7e3b705dd2a849281377bb81861da0422a082522268e423f9b092a68853",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_HE_vs_H.csv",
+      "role": "deg_fat_deseq1/fat_HE_vs_H",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f6213763fe5cbe6db05803e814e27528826ce00843b545e3519bf91b1033434c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_H_vs_C.csv",
+      "role": "deg_fat_deseq1/fat_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6dcf2a188f50447287424b08e68fb1cf2758254538c2095cbd5c11976b83e946",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\fat_deseq1\\DEG_results_fat_HE_vs_CE.csv",
+      "role": "deg_fat_deseq1/fat_HE_vs_CE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6be168506b0dda18875943e7a97b3336ea1ed2e887e5f21dab5cf4c9767688aa",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_CE_vs_C.csv",
+      "role": "deg_muscle_deseq1/muscle_CE_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "581343fb2065ef691b8584ad94e2328e008925fd78c9141f8b1e5ff0499a1206",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_HE_vs_H.csv",
+      "role": "deg_muscle_deseq1/muscle_HE_vs_H",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9bd033edb6651e1ce3f58e8ee473d0ad1e59e25b256eecf68db92650b67ae98e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_H_vs_C.csv",
+      "role": "deg_muscle_deseq1/muscle_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "867a92bacd1ec301590fafbea9dd6b306d5c25bd91021ec768c2f8838241ea87",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\results\\muscle_deseq1\\DEG_results_muscle_HE_vs_CE.csv",
+      "role": "deg_muscle_deseq1/muscle_HE_vs_CE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9c15b35194b740147c17566fa12e366273a838b4d2c3708d6f6c6684b875acc5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38348322\\GSE237950\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8d354e50dac9bcc888fddec55feb79fa67749d3a2e407ea9167edf8f34da26c3",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

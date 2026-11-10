@@ -84,6 +84,9 @@ class AlignmentGate(Gate):
     key_patterns: dict[str, tuple[str, str]] = Field(
         default_factory=dict, description="derive the key_column itself from metadata before aligning")
     exclude_samples: dict[str, str] = Field(default_factory=dict, description="sample id -> reason")
+    normalize_keys: bool = Field(
+        False, description="compare keys case-insensitively and ignoring - _ . and spaces (WT-1 = wt_1); "
+                           "both sides must stay unique after normalizing")
     matrix_column_pattern: Optional[str] = Field(
         None, description="regex applied to matrix column names before aligning: the key is its group(s) "
                           "joined with _ (e.g. '^(.+)_Count$' turns PBS1_Count into PBS1); columns it does not "
@@ -293,8 +296,19 @@ def _key_matches(columns: list[str], meta: pd.DataFrame) -> list[dict]:
         if hits:
             out.append({"key": name, "matched": hits, "of_metadata": int(len(meta)), "of_matrix": len(cols)})
     if not any(d["matched"] == len(cols) for d in out):
+        normed = {_norm_key(c) for c in cols}
+        for name, values in candidates.items():
+            hits = int(values.map(_norm_key).isin(normed).sum())
+            if hits and hits > max((d["matched"] for d in out if d["key"] == name), default=0):
+                out.append({"key": f"{name} (case/separator differences)", "matched": hits,
+                            "of_metadata": int(len(meta)), "of_matrix": len(cols),
+                            "use": "alignment.normalize_keys true"})
         out += _contained_keys(cols, meta)
     return sorted(out, key=lambda d: -d["matched"])
+
+
+def _norm_key(value: Any) -> str:
+    return re.sub(r"[-_.\s]+", "", str(value)).lower()
 
 
 def _contained_keys(cols: set[str], meta: pd.DataFrame) -> list[dict]:
@@ -527,7 +541,23 @@ class CaseRun:
             matrix_path = adir / "matrix_renamed.csv"
             table.to_csv(matrix_path)
             self.result["matrix_column_keys"] = dict(list(keys.items())[:10])
-        aln = native.align_to_metadata(matrix_path, metadata, adir, key_column=a.key_column)
+        key_column = a.key_column
+        if a.normalize_keys:
+            adir.mkdir(parents=True, exist_ok=True)
+            table = native.read_table(matrix_path)
+            renamed = [_norm_key(c) for c in table.columns]
+            meta_df = pd.read_csv(metadata, index_col=0)
+            keys = (meta_df.index.to_series() if not key_column else meta_df[key_column]).map(_norm_key)
+            if len(set(renamed)) != len(renamed) or keys.duplicated().any():
+                raise native.NativeToolError("alignment.normalize_keys makes matrix columns or metadata keys collide")
+            table.columns = renamed
+            matrix_path = adir / "matrix_normalized_keys.csv"
+            table.to_csv(matrix_path)
+            meta_df["_norm_key"] = keys.values
+            metadata = adir / "metadata_normalized_keys.csv"
+            meta_df.to_csv(metadata)
+            key_column = "_norm_key"
+        aln = native.align_to_metadata(matrix_path, metadata, adir, key_column=key_column)
         aligned_meta = Path(aln["outputs"]["aligned_metadata"]["path"])
         if a.exclude_samples:
             kept = pd.read_csv(aligned_meta, index_col=0)

@@ -1,0 +1,139 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/be59c707b58c7328d0828ad5b9b2975ab6940ac8",
+  "request": "Analyze GSE229755 for the paper (Multi-omics analysis explores the effect of chronic exercise on liver metabolic reprogramming in mice; PMID 37408533): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE229755",
+      "accession": "GSE229755",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC10318136.paper.md"],
+        "metadata": "GSE229755/GSE229755_metadata.csv",
+        "matrix": "GSE229755/GSE229755_fpkm_merged.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/be59c707b58c7328d0828ad5b9b2975ab6940ac8/prep_merge_fpkm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE229755"],
+            "other_accessions": ["PXD041538 (proteomics/acetylome, not analyzed here)", "MTBLS7609 (metabolomics, not analyzed here)"],
+            "assay": "bulk RNA-seq of liver, DNBseq PE150, HISAT2 to GRCm39",
+            "organism": "Mouse (C57BL/6J male, 8 weeks)",
+            "factors": {"group": ["Con (sedentary)", "Exe (6-week moderate treadmill running)"]},
+            "sample_inclusion": "12 mice for transcriptomics, n = 6 per group (S2.3.p1); PCA was used to exclude outliers but none are reported excluded from the n = 6 + 6",
+            "primary_estimand": "Effect of 6 weeks of chronic moderate-intensity treadmill exercise on the mouse liver transcriptome (Exe vs Con, independent animals)",
+            "planned_contrasts": ["Exe vs Con (S3.1.p1; paper: 88 DEGs, 28 up / 60 down)"],
+            "repeated_measure_unit": "none (one liver per mouse)",
+            "paper_method": "DESeq (S2.4.p1) on read counts",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": false, "source_locator": "S2.4.p1"},
+            "paper_results": "88 DEGs (28 up, 60 down); Cyp4a10, Cyp4a14 up at mRNA and protein; Cyp1a1 in retinol metabolism (S3.1.p1, S3.3.p1)"
+          },
+          "reasoning": "S2.1.p1: two randomized groups Exe and Con; S2.3.p1: n = 6 per group for transcriptomics; S2.4.p1: DESeq, |log2FC| > 1 and Q-value <= 0.05; S3.1.p1: 88 DEGs (28 up, 60 down); S3.3.p1 and S4.p2: Cyp4a10 and Cyp4a14 upregulated.",
+          "locator": "S2.4.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S6.p1 names GSE229755 as the transcriptomics deposit", "GEO: liver, Mus musculus, 12 samples Con_L1-6 and Exe_L1-6, treatment sedentary vs chronic exercise running 6 weeks", "extract_protocol and data_processing match S2.4.p1 (TRIzol, DNBseq PE150, HISAT to GCF_000001635.27_GRCm39)", "sample counts 6 + 6 match S2.3.p1"]},
+          "reasoning": "Data availability statement S6.p1 names GSE229755; the 12 GEO samples and processing text match the paper's transcriptomics methods.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["title", "^(Con|Exe)_L\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "The merged matrix columns are GSM ids taken from the _RAW.tar member names (GSM7177389_Con_L1.txt.gz ...), which equal the metadata index. Group derived from title (Con_L# / Exe_L#), consistent with characteristics treatment (sedentary / chronic exercise).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "reasoning": "The only deposited expression data are per-sample files with a single value column named fpkm_<title> holding non-integer values (median 2.3, max 3.8e4) indexed by Entrez gene_id and gene_symbol; no read-count file exists in GEO. The paper's DESeq input (raw counts) was not deposited. Merged by prep_merge_fpkm.py (16,821 genes, duplicated symbols resolved by highest mean).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Con"},
+          "organism": "Mouse",
+          "planned": ["grp_Exe_vs_Con"],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "Con",
+            "treatment": "Exe",
+            "contrasts": [{"name": "grp_Exe_vs_Con", "control": "Con", "treatment": "Exe", "role": "primary"}]
+          },
+          "candidates": [{"value": "description column", "reason_rejected": "identical split to title/treatment; title gives short formula-safe levels"}],
+          "reasoning": "S2.1.p1 randomizes mice to Exe and Con; S3.1.p1 compares Exe with Con. One two-level factor, independent animals, all male.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one sample each; no batch, sex (all male, S2.1.p1) or lane covariate recorded in GEO; the paper models group only.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend on log2(FPKM+1))",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq on read counts", "status": "blocked", "reason": "GEO GSE229755 deposits only per-sample FPKM; no raw counts are available, and FPKM must not be rounded into counts"},
+            "deviations": ["limma on log2(FPKM+1) instead of DESeq on counts", "genes with FPKM < 1 in more than 9 of 12 samples removed (FPKM >= 1 in at least 3 samples) before limma, replacing DESeq's independent filtering; unfiltered run kept as sensitivity"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: FPKM -> log2(x+1) -> limma. DESeq is blocked because counts are not deposited; run limma as a declared deviation with the paper's threshold.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper's Q-value <= 0.05 and |log2FC| > 1 applied to limma BH-adjusted p and log2FC of log2(FPKM+1) instead of DESeq on counts."
+          },
+          "reasoning": "S2.4.p1 and S3.1.p1: |log2FC| > 1 and Q-value <= 0.05 (Q-value read as BH-adjusted p). Audit rule: BH < 0.05 with no fold-change cutoff.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["Counts not deposited: limma-trend on log2(FPKM+1) replaces DESeq on counts, so DEG numbers are not directly comparable", "Fold changes on log2(FPKM+1) are shrunk toward zero for low-expressed genes compared with DESeq count fold changes"]
+          },
+          "paper_counts": {"grp_Exe_vs_Con": 88},
+          "paper_genes": {"grp_Exe_vs_Con": ["Cyp4a10", "Cyp4a14", "Cyp1a1"]},
+          "reasoning": "Paper reports 88 DEGs (28 up, 60 down) and names Cyp4a10/Cyp4a14 (up) and Cyp1a1 among retinol metabolism DEGs.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE input", "paper": "DESeq on read counts (S2.4.p1)", "data": "GEO deposits only per-sample FPKM", "disposition": "declared_deviation"},
+        {"item": "reference genome", "paper": "GRCm39 (S2.4.p1)", "data": "GEO data_processing also says 'Assembly: mm10' and mentions Bowtie2 to reference gene sequences", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_Exe_vs_Con",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "Con", "treatment_group": "Exe"},
+          "filter_low_counts": {"min_value": 1, "min_samples": 3},
+          "role": "primary",
+          "reasoning": "Paper's Exe vs Con contrast on the deviation route (limma on log2(FPKM+1)); unexpressed genes removed (FPKM >= 1 in at least 3 of 12 samples, the smallest group size being 6)."
+        },
+        {
+          "name": "grp_Exe_vs_Con_unfiltered",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "Con", "treatment_group": "Exe"},
+          "role": "sensitivity",
+          "reasoning": "Same contrast without the expression filter, to show the filter's effect on counts."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_Exe_vs_Con", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO/KEGG enrichment of the DEGs (S2.4.p1, S3.1.p1)."}
+      ]
+    }
+  ]
+}

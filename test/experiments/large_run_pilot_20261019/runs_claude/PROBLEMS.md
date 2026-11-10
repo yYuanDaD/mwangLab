@@ -571,3 +571,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 2148e268704227111378324e8a4175163d2e8e5f (GSE110507)
 
 - none (screen assigned the non-exercise series; the exercise data is GSE47881) Details: `2148e268704227111378324e8a4175163d2e8e5f/HANDBACK.md`.
+
+## be59c707b58c7328d0828ad5b9b2975ab6940ac8 (GSE229755)
+
+- omics_semantics.py:33-49 counts integer ID columns as value candidates (patched after this row); tar merge could not read per-sample FPKM files, so a prep script was needed Details: `be59c707b58c7328d0828ad5b9b2975ab6940ac8/HANDBACK.md`.
+
+## PMID40169574 (GSE269020)
+
+- none blocking; inspect gave alignment_keys [] for title WT-1 vs column WT_1 (separator-only difference; patched after this row), fixed via key_patterns Details: `PMID40169574/HANDBACK.md`.
