@@ -1,0 +1,147 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38370171",
+  "request": "Analyze GSE240131 for PMID 38370171 (Low-intensity exercise training improves systolic function of heart during metastatic melanoma-induced cachexia in mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE240131",
+      "accession": "GSE240131",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC10874746.paper.md"],
+        "metadata": "GSE240131/GSE240131_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID38370171/GSE240131_counts_by_symbol.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID38370171/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE240131"],
+            "assay": "bulk RNA-seq, whole heart, DNBSEQ-T7 PE150, HISAT2 + featureCounts (S2.4.p1)",
+            "organism": "Mouse (male C57BL/6J, 8 weeks; S2.2.p1)",
+            "factors": {"tumor": ["saline", "B16F10 i.v."], "exercise": ["sedentary", "treadmill low-intensity 4 wk"]},
+            "groups": "2x2: C (saline), E (exercise), T (B16F10), TE (B16F10 + exercise); n=3 libraries per group, each pooling hearts of two mice (FIG3 legend)",
+            "inclusion": "all 12 heart libraries",
+            "primary_estimand": "Effect of low-intensity exercise training on the heart transcriptome of tumor-bearing (B16F10 cachectic) mice: TE vs T (S3.3.p1, FIG4)",
+            "planned_contrasts": [
+              "T vs C (tumor effect; S3.3.p1: 2020 up, 741 genes in the heart-contraction set, stated as 'upregulated' but the named genes (Myh7b) are tumor-decreased)",
+              "TE vs T (exercise effect in tumor-bearing mice; S3.3.p1: 318 of the 741 and 1447 of the 2020 reversed by exercise)",
+              "E vs C (exercise effect in tumor-free mice; implied by FIG3 clusters and PCA, S3.2.p5; no DEG count)"
+            ],
+            "repeated_measure_unit": "none; independent pooled libraries",
+            "paper_method": "edgeR (S2.4.p1); test type and filtering not stated",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true, "source_locator": "S2.4.p1", "text": "fold change >= 1.5 and p-value < 0.05"},
+            "paper_results": "T vs C: 2020 up, 741 (heart-contraction overlap set base); TE vs T reverses 318 and 1447; named reversed genes Myh7b, Pde4d, Rnf207, Tmem65, Kcnj5 (S3.3.p1), Cacnb2 (S4.p3)"
+          },
+          "reasoning": "S2.2.p1 design (4 wk treadmill, B16F10 i.v. from week 2), S2.4.p1 edgeR FC>=1.5 & p<0.05, S3.3.p1 DEG counts, FIG3 n=3 pooled libraries. Primary estimand is exercise within tumor-bearing mice, as in the title and S3.3.",
+          "confidence": "high",
+          "locator": "S2.4.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S7.p1 names GSE240131", "GEO samples: heart, male C57BL/6J, Saline/Exercise/B16F10 cells/B16F10 cells+Exercise, 3 each, matching the paper's 2x2 design and n=3", "contact Binbin Liu, Xiamen University = corresponding author/institution"]},
+          "reasoning": "Accession, tissue, groups and n all match the paper. GEO extract_protocol says 'livers' and data_processing says 'Assembly: mm10' vs paper GRCm39; recorded as discrepancies, not ownership failures.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^Heart, ([A-Z]+\\d)$"]},
+          "patterns": {"grp": ["title", "^Heart, ([A-Z]+)\\d$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns C1..TE3 equal the suffix of the GEO title 'Heart, C1'; exact match on the derived key. grp = C/E/T/TE agrees with characteristics treatment (Saline/Exercise/B16F10 cells/B16F10 cells+Exercise).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "edgeR",
+          "reasoning": "GEO data_processing: featureCounts, 'raw counts'. Library sizes 8.8-13.3 M, median 96-213, about 7% of cells are non-integer (e.g. Ccna2 19.47): featureCounts fractional multi-mapping counts, i.e. estimated counts on the count scale, not FPKM/TPM. Paper input is the same featureCounts table (S2.4.p1). Rounded to integers before edgeR.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "C"},
+          "organism": "Mouse",
+          "planned": ["grp_T_vs_C", "grp_TE_vs_T", "grp_E_vs_C"],
+          "final": {
+            "analysis_type": "multi-group pairwise",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_TE_vs_T", "control": "T", "treatment": "TE", "role": "primary"},
+              {"name": "grp_E_vs_C", "control": "C", "treatment": "E", "role": "secondary"},
+              {"name": "grp_T_vs_C", "control": "C", "treatment": "T", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled exercise (E+TE) vs sedentary (C+T)", "reason_rejected": "pools tumor levels; the paper compares exercise within tumor status"},
+            {"value": "2x2 factorial with tumor:exercise interaction as primary", "reason_rejected": "paper reports pairwise edgeR DEG sets and their overlaps, not an interaction test"}
+          ],
+          "reasoning": "Paper (S3.3.p1, FIG4) uses T vs C and TE vs T DEG sets; E vs C is the exercise effect in tumor-free mice (FIG3, S3.2.p5). TE vs T is primary. Data check: melanoma markers (Pmel, Tyrp1, Dct, Mlana, plus Mki67/Top2a) are 10^3-10^4-fold higher in T1 and T2 than in all other libraries and absent from all TE libraries, so T1/T2 contain metastatic tumor tissue; the TE vs T and T vs C contrasts mix cardiac change with tumor-cell content. The contrast remains identifiable (no batch aliasing), so it is run with this caveat rather than refused; E vs C is unaffected.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent pooled libraries, one tissue, one sex, no batch or lane recorded. Tumor-tissue content in T1/T2 cannot be modelled as a covariate with n=3 (it is nearly a group property); recorded as a caveat instead.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR (TMM, GLM quasi-likelihood F-test, inmoose), pairwise two-group fits",
+            "formula": "~ grp (two levels per fit)",
+            "rounding_documented": true,
+            "deviations": [
+              "featureCounts fractional counts rounded to integers before edgeR (the executor requires integers)",
+              "paper does not state its edgeR test (exactTest vs QL) or filtering; QL F-test on all non-zero genes, each pair fitted on its own 6 samples"
+            ]
+          },
+          "transform": "round",
+          "reasoning": "Paper used edgeR (S2.4.p1); edgeR runs on these count-scale data. Two-group executor per pair keeps the paper's pairwise DEG sets.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.4.p1: FC >= 1.5 and p-value < 0.05 (raw p) -> p < 0.05 and |log2FC| >= log2(1.5) = 0.5849625. Audit: BH FDR < 0.05, no FC rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "T1 and T2 heart libraries contain melanoma tumor tissue (Pmel, Tyrp1, Dct, Mlana 10^3-10^4-fold above all other libraries; none in TE). TE vs T and T vs C therefore mix exercise/tumor effects on the heart with tumor-cell content; the paper's 'cell cycle and DNA replication' genes up by tumor and reversed by exercise (S3.3.p1) are consistent with this contamination.",
+              "Paper text says the tumor 'upregulated 741 genes' later reversed by exercise, but the named genes (Myh7b, Rnf207, Tmem65) are tumor-decreased; we read 741 as tumor-down genes.",
+              "n=3 pooled libraries per group; raw p threshold without FDR control."
+            ]
+          },
+          "paper_counts": {"grp_T_vs_C": 2761},
+          "paper_genes": {"grp_TE_vs_T": ["Myh7b", "Pde4d", "Rnf207", "Tmem65", "Kcnj5", "Cacnb2"], "grp_T_vs_C": ["Myh7b", "Pde4d", "Rnf207", "Tmem65", "Kcnj5", "Cacnb2"]},
+          "reasoning": "paper_counts T vs C = 2020 up + 741 down (S3.3.p1; 741 read as tumor-down). No total DEG count is given for TE vs T or E vs C; only overlaps 318/1447, computed post hoc from our tables.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "direction of the 741-gene set", "paper": "S3.3.p1 'tumor significantly upregulated 741 genes ... repressed by exercise'", "data": "named genes Myh7b/Rnf207/Tmem65 are lower in T than C and higher in TE", "disposition": "executable_without_change"},
+        {"item": "tissue in GEO extract protocol", "paper": "whole heart (S2.4.p1)", "data": "GEO extract_protocol says 'livers'; title/source say heart", "disposition": "executable_without_change"},
+        {"item": "genome assembly", "paper": "GRCm39 (S2.4.p1)", "data": "GEO data_processing 'Assembly: mm10'", "disposition": "executable_without_change"},
+        {"item": "tumor tissue in T libraries", "paper": "heart transcriptome; no mention of cardiac metastasis", "data": "T1/T2 dominated by melanocyte/proliferation genes", "disposition": "executable_with_caveat"},
+        {"item": "non-integer counts", "paper": "featureCounts read counts", "data": "~7% fractional values", "disposition": "executable_with_rounding"}
+      ],
+      "executions": [
+        {"name": "grp_TE_vs_T", "tool": "tools.edger_tools:run_edger_analysis", "args": {"design_column": "grp", "control_group": "T", "treatment_group": "TE"}, "subset": {"grp": ["T", "TE"]}, "role": "primary", "reasoning": "exercise effect in tumor-bearing mice (S3.3.p1, FIG4); paper's edgeR"},
+        {"name": "grp_E_vs_C", "tool": "tools.edger_tools:run_edger_analysis", "args": {"design_column": "grp", "control_group": "C", "treatment_group": "E"}, "subset": {"grp": ["C", "E"]}, "role": "secondary", "reasoning": "exercise effect in tumor-free mice (FIG3, S3.2.p5)"},
+        {"name": "grp_T_vs_C", "tool": "tools.edger_tools:run_edger_analysis", "args": {"design_column": "grp", "control_group": "C", "treatment_group": "T"}, "subset": {"grp": ["C", "T"]}, "role": "secondary", "reasoning": "tumor effect; base set for the paper's reversal overlaps (S3.3.p1)"}
+      ],
+      "enrichment": [
+        {"execution": "grp_TE_vs_T", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GO enrichment of exercise-reversed genes (FIG4B/F)"},
+        {"execution": "grp_E_vs_C", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "exercise effect in tumor-free hearts; exploratory pathway view"}
+      ]
+    }
+  ]
+}

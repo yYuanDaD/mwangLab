@@ -600,6 +600,10 @@ _ID_PATTERNS = (
 )
 
 
+_EXCEL_DATE = re.compile(r"^(\d{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+                         r"|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{1,2})$", re.I)
+
+
 def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
     """Classify the feature IDs of a matrix or result table before gene-set analysis.
 
@@ -627,6 +631,9 @@ def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
         "dominant_type": dominant,
         "dominant_fraction": fraction,
         "duplicated_ids": int(index.duplicated().sum()),
+        # Excel turns MARCH1/SEPT2/DEC1 into 1-Mar, 2-Sep, 1-Dec (or serial dates); those IDs collide
+        # and lose their gene, so they need a recorded mapping or removal before analysis
+        "excel_date_ids": [v for v in index if _EXCEL_DATE.match(v)][:10],
         "gene_set_ready": ready,
         "note": ("Ensembl gene IDs are mapped to symbols through MyGene.info (network)."
                  if dominant == "ensembl_gene" else

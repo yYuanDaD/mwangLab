@@ -547,3 +547,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40000838 (GSE280656)
 
 - suitability.py:259-277/502-505 + decision_contract.py:172 hard-stop n=2 vs skill 'small n not a stop'; all-NaN RSEM rows needed prep (joint_contrasts.py:106) Details: `PMID40000838/HANDBACK.md`.
+
+## PMID36839405 (GSE222163)
+
+- inspect alignment keys miss case-only mismatch Ctrl/ctrl (case_runner.py:300-323); dup IDs 1-Mar/2-Mar needed a prep script (inspect flag added after this row); pydeseq2 overflow warnings Details: `PMID36839405/HANDBACK.md`.

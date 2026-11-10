@@ -368,7 +368,11 @@ def inspect_series(accession: str, *, data_root: str = "data", merge_tar: bool =
                                                 "candidates")})
             entry["annotation_columns"] = prof["annotation_columns_dropped"][:8]
             entry["sample_columns"] = prof["sample_columns"][:6] + (["..."] if prof["n_samples"] > 6 else [])
-            entry["feature_examples"] = native.feature_id_report(path)["examples"]
+            ids = native.feature_id_report(path)
+            entry["feature_examples"] = ids["examples"]
+            entry["feature_id_type"] = ids["dominant_type"]
+            if ids.get("excel_date_ids"):
+                entry["excel_date_ids"] = ids["excel_date_ids"]
             entry["alignment_keys"] = _key_matches(prof["sample_columns"], meta)
         except Exception as exc:  # an unreadable file is a fact to report, not a crash
             entry["error"] = _short(f"{type(exc).__name__}: {exc}", 300)

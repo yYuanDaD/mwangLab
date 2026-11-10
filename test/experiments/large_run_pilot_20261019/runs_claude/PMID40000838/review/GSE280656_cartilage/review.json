@@ -1,0 +1,89 @@
+{
+ "case": "GSE280656_cartilage",
+ "reviewer": "Claude (Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Overloading treadmill exercise (20 g weight) vs non-running control in mice; S1/S4/S24 (single bout, 1/4/24 h) and R24 (4 days, 24 h after last bout) carry the exercise factor; control = 1 day no running (S2.1.p1, Fig 1a legend). Packet A samples are all cartilage, in vivo.",
+  "B2": "Paper compares S1 vs control, S4 vs S1, S24 vs S4, S4 vs control, S24 vs control, R24 vs control (S2.3-S2.5, Fig 3-5), R24 vs S24 (Fig 2a/8b). n per group from packet A: Control 3, S1 2, S4 2, S24 2, R24 2. Each pool = 6 knees (synovium) or 9 knees (cartilage) (S4.4.p1).",
+  "B3": "No repeated measures: separate mice per time point, tissues pooled from several knees into one sample; no animal ID in metadata and packet A lists no candidate pairing key. The two tissues may share mice but are separate matrices and analysed separately in the paper (Fig 3 vs Fig 4).",
+  "B4": "Paper does not state joint vs pairwise fit. S4.4.p2: 'Differential gene expression analysis was conducted using the web application iDEP, comparing data across different time points'; S4.4.p3: 'Gene counts were normalized using DESeq2'. iDEP default fits one model over all groups, but the paper is silent.",
+  "B5": "S4.4.p2: 'DEGs were identified using the default iDEP thresholds (FDR < 0.1, fold change > 2)'. A second gene-selection rule for heatmaps (S4.4.p3): FDR < 0.1 and FC > 1.5 or < 0.67 vs control at any time point (5,114 synovium, 4,904 cartilage genes); GO/heatmap sub-filters use FC 2, 3, 1.5. Per-comparison DEG counts only in Fig 2b (not in text)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Paper analysed cartilage RNA-seq with the same groups (Fig 4, Fig 5, S2.4); packet A metadata carry control/S1/S4/S24/R24. The case was refused at design only because of n=2 per exercise arm.",
+   "fix": "Run the planned cartilage contrasts as exploratory instead of refusing."
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp parsed from title: Control 3, S1 2, S4 2, S24 2, R24 2 matches GEO; no exclusions; control is the paper's non-running control.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts recorded as treatment vs control (S1/S4/S24/R24 vs Control; S4 vs S1, S24 vs S4, R24 vs S24), as in the paper. Nothing ran, so no signs to check.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B3: pooled samples from different mice, no pairing key in packet A; design reasoning says the same.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Nothing executed. Planned structure (one joint model, pairwise contrasts) is the open policy question, same as the synovium case.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Not evaluated because no run; all male (S4.1.p2), no batch field.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM expected counts with decimals; plan rounds then DESeq2, as in the paper. Matrix was not run.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Recorded rule FDR<0.1 and FC>2 (log2FC>1, strict) matches B5 (S4.4.p2).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No results; paper counts are only in Fig 2b.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Stop reason 'n=2 per exercise arm, sample_size hard fail' is true as a fact about the data, but SKILL.md line 84 and decision-contract.md line 78 say 'Small n alone is not a stop': run and label exploratory (fewer than 3 replicates in an arm). The paper itself ran iDEP DESeq2 at n=2 vs 3. The design record itself notes the conflict with tools/suitability.py and tools/decision_contract.py:172-173.",
+   "fix": "Record design as valid with the planned contrasts (S1/S4/S24/R24 vs Control, S4 vs S1, S24 vs S4, R24 vs S24); run tools.joint_contrasts:run_joint_deseq2 with include for the small-n planned contrasts and exploratory_reason 'arm n=2 < 3'; label every cartilage result exploratory; enrich S1 and R24 vs Control as for synovium."
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Code vs skill conflict: suitability.py hard-fails sample_size and decision_contract.py rejects a valid design under that verdict, against the skill rule 'small n alone is not a stop'. The gate may need changing, or the case must go through the contract's exploratory path.",
+  "Joint versus pairwise fit when the paper is silent (open policy question)."
+ ],
+ "summary": "关节软骨(cartilage)病例因每个运动组仅有 n=2 而在 design 阶段停止,没有产出任何结果。但论文本身在 n=2 下用 iDEP/DESeq2 做了分析,且技能规则明确写明“小样本本身不是停止理由,应运行并标记为探索性”,所以停止理由与规则相矛盾(重大)。建议按计划对比以探索性方式运行并标注 n=2;分组、方向、阈值(FDR<0.1,FC>2)记录均正确。"
+}

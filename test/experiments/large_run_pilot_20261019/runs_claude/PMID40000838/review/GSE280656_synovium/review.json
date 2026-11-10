@@ -1,0 +1,88 @@
+{
+ "case": "GSE280656_synovium",
+ "reviewer": "Claude (Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Overloading treadmill exercise (20 g weight) vs non-running control in mice; S1/S4/S24 (single bout, 1/4/24 h) and R24 (4 days, 24 h after last bout) carry the exercise factor; control = 1 day no running (S2.1.p1, Fig 1a legend). Packet A samples are all synovium, in vivo.",
+  "B2": "Paper compares S1 vs control, S4 vs S1, S24 vs S4, S4 vs control, S24 vs control, R24 vs control (S2.3-S2.5, Fig 3-5), R24 vs S24 (Fig 2a/8b). n per group from packet A: Control 3, S1 3, S4 3, S24 3, R24 3. Each pool = 6 knees (synovium) or 9 knees (cartilage) (S4.4.p1).",
+  "B3": "No repeated measures: separate mice per time point, tissues pooled from several knees into one sample; no animal ID in metadata and packet A lists no candidate pairing key. The two tissues may share mice but are separate matrices and analysed separately in the paper (Fig 3 vs Fig 4).",
+  "B4": "Paper does not state joint vs pairwise fit. S4.4.p2: 'Differential gene expression analysis was conducted using the web application iDEP, comparing data across different time points'; S4.4.p3: 'Gene counts were normalized using DESeq2'. iDEP default fits one model over all groups, but the paper is silent.",
+  "B5": "S4.4.p2: 'DEGs were identified using the default iDEP thresholds (FDR < 0.1, fold change > 2)'. A second gene-selection rule for heatmaps (S4.4.p3): FDR < 0.1 and FC > 1.5 or < 0.67 vs control at any time point (5,114 synovium, 4,904 cartilage genes); GO/heatmap sub-filters use FC 2, 3, 1.5. Per-comparison DEG counts only in Fig 2b (not in text)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B1: in-vivo overloading exercise vs non-running control; synovium run with all 5 groups (n=3).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp from title: 3/3/3/3/3 matches packet A and the paper pools (S4.4.p1). No exclusions; control is the paper's non-running control. There is no running-without-weight control (S3.p6), so the estimand is overloading, as primary_estimand states.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts ordered treatment vs control; adjacent ones S4 vs S1 (control=S1), S24 vs S4, R24 vs S24 as the paper writes them. Nr4a3 and Inhba up at S1 and R24, consistent with S2.3.p2 and S2.6.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B3: separate pooled mice per group, no animal key; one-way ~grp is appropriate.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "unsure",
+   "severity": "none",
+   "evidence": "Paper silent on joint vs pairwise (S4.4.p2); joint ~grp fit follows the iDEP default and is recorded as an approximation. Open policy item, not an error.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All male, 10-13 weeks (S4.1.p2); no batch/housing field in GEO; covariance record states none recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM expected counts (decimals), rounded then DESeq2, as the paper (DESeq2 in iDEP); 57 all-NaN rows dropped; filtered gene count 17,315 vs paper 17,316 (S4.4.p3) supports the route.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Applied padj<0.1 and |log2FC|>1 strict = FDR<0.1, FC>2 (S4.4.p2); the FC 1.5 rule (S4.4.p3) is for heatmap gene selection, not the DEG rule. Audit rule padj<0.05 recorded separately.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper counts are only in Fig 2b, so paper_counts is empty and no count comparison is claimed; HANDBACK claims only the qualitative pattern (S24 fewest, R24 >> S24; S2.2.p1, S2.5.p1) and gene directions. S4.4.p3 gives 5,114 selected synovium genes that could be compared.",
+   "fix": "Optional: compute genes with padj<0.1 and FC>1.5 or <0.67 vs control (protein-coding) and compare with 5,114."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Joint versus pairwise fits when the paper is silent (open policy question); the joint fit follows the iDEP default."
+ ],
+ "summary": "滑膜(synovium)病例每组 n=3,分组、对比方向、基质类型(RSEM 期望计数取整后 DESeq2)和阈值(FDR<0.1,FC>2,严格不等号)均与论文一致,无重复测量或混杂问题。论文的 DEG 数只在 Fig 2b 图中,所以只做了定性比较,没有夸大。结论:通过,仅有一个可选的次要比较(5,114 个筛选基因)。"
+}

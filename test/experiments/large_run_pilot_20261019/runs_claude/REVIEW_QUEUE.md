@@ -82,3 +82,12 @@ One section per case; newest last.
 
 - direction (unsure, major): Ours (treatment/Tnm) up/down: swim 73/138, cur 110/54, union 286/237; paper 79/55, 28/79, 154/291. In all three contrasts the dominant direction is opposite to the paper's; a single global sign flip (Tnm over treatment) reproduces the dominant direction in all three (flipped: swim 138/73, cur 54/110, union 237/286). The study caveat 'no single sign flip reconciles all three' is therefore not supported. The paper does not state the sign convention; Fig 3C gene directions are not available in the text.
 - policy: Sign convention of the paper's up/down counts is not stated. Ours is the reverse in dominant direction for all three contrasts; the pattern is consistent with the paper using Tnm over treatment, but this cannot be settled from the paper text. Decide whether to report with a confirmed or flagged sign (Fig 3C / author query).
+
+## PMID40000838 / GSE280656_cartilage (2026-11-10)
+
+- policy: Code vs skill conflict: suitability.py hard-fails sample_size and decision_contract.py rejects a valid design under that verdict, against the skill rule 'small n alone is not a stop'. The gate may need changing, or the case must go through the contract's exploratory path.
+- policy: Joint versus pairwise fit when the paper is silent (open policy question).
+
+## PMID40000838 / GSE280656_synovium (2026-11-10)
+
+- policy: Joint versus pairwise fits when the paper is silent (open policy question); the joint fit follows the iDEP default.
