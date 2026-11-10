@@ -142,3 +142,11 @@ One section per case; newest last.
 ## PMID42318351 / GSE277623 (2026-11-10)
 
 - policy: Policy question only: whether a drug-vs-vehicle HFpEF series with an exercise-tolerance endpoint should be refused or run as a non-exercise record is outside this review; the refusal follows the skill's no-exercise-arm rule.
+
+## PMID33598660 / GSE117161 (2026-11-10)
+
+- policy: What the A/B/C letter in the GEO titles denotes (expression check supports same-letter pairing); optional sensitivity run if confirmed.
+
+## PMID34039988 / GSE132520 (2026-11-10)
+
+- policy: Joint versus pairwise fits when the paper is silent (open policy question): the record uses one joint model; the paper's tool (Cuffdiff via GEO field) fits pairs.

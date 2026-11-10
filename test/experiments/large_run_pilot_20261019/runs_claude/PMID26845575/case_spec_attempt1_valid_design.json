@@ -1,0 +1,147 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID26845575",
+  "request": "Analyze GSE69699 for PMID 26845575 (Genome-Wide Analysis of Acute Endurance Exercise-Induced Translational Regulation in Mouse Skeletal Muscle.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE69699",
+      "accession": "GSE69699",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC4742069.paper.md"],
+        "metadata": "GSE69699/GSE69699_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID26845575/prep/GSE69699_counts_reconstructed_125RPM.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID26845575/prep_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE69699"],
+            "assay": "mRNA-Seq (transcription) and ribosome profiling / Ribo-Seq (translation), Ion PGM, mouse gastrocnemius",
+            "primary_estimand": "Effect of a single 60-min treadmill run (20 m/min), sampled immediately after exercise, versus no exercise on (a) mRNA abundance and (b) ribosome-protected-fragment (translation) abundance, analysed separately per assay",
+            "factors": {"protocol": ["no exercise (control)", "immediately after exercise (Ex0min)"], "assay": ["mRNA-Seq", "Ribo-Seq"]},
+            "sample_inclusion": "Sequencing used only no-exercise and immediately-after-exercise groups; each biological replicate = pooled lysate of 3 mice; 2 replicates per condition per assay (S2.3.p1, S4.p1). The 1h/2h/4h groups were used only for qPCR/western blot.",
+            "planned_contrasts": [
+              "exercise vs no exercise, transcription level (mRNA-Seq) (S3.p4; paper: 26 DEGs at P < 0.01)",
+              "exercise vs no exercise, translation level (RPF) (S3.p4; paper: 37 DEGs at P < 0.01)"
+            ],
+            "repeated_measure_unit": "none; replicates are independent 3-mouse pools; mRNA and RPF of one replicate share a lysate but are analysed separately",
+            "normalization": "edgeR TMM (S2.7.p1); genes filtered to > 125 RPM, n = 1011 (S2.6.p2, S2.7.p1, FIG3)",
+            "paper_method": "edgeR with TMM normalization, exercise vs no exercise per assay on the 1011 genes > 125 RPM; test type not stated",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.p4, SUP3"},
+            "paper_results": {"mRNA_DEGs": 26, "RPF_DEGs": 37, "named_genes": {"Slc25a25": "up ~4 fold mRNA, ~18 fold RPF (S3.p5, FIG4)"}}
+          },
+          "reasoning": "S2.2.p1 describes 5 groups (n=6 mice) but S2.3.p1 and S4.p1 state that sequencing covered only no exercise vs immediately after exercise, with 2 pooled replicates (3 mice each). S2.7.p1: edgeR with TMM on the 1011 genes > 125 RPM. S3.p4 and SUP3: DEGs at P < 0.01 (raw p, no fold-change rule): 26 transcription, 37 translation. S3.p5/FIG4: Slc25a25 ~4x mRNA, ~18x RPF.",
+          "confidence": "high",
+          "locator": "S2.3.p1, S2.7.p1, S3.p4"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.1.p1 and S7.p1 name GSE69699", "8 GSMs: mRNA-Seq and Ribo-Seq x no exercise / exercise x rep1/rep2, gastrocnemius, C57BL/6, 9-10 weeks, Ion Torrent PGM, matching S2.2-S2.5", "treatment_protocol_ch1: 60 min treadmill at 20 m/min, as S2.2.p1"]},
+          "reasoning": "Paper cites GSE69699 as its deposit; sample design, tissue, platform and protocol match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"grp": "characteristics_ch1.4.protocol", "assay": "characteristics_ch1.5.profiling"},
+          "recode": {"grp": {"control": "ctrl", "acute endurance exercise": "ex"}, "assay": {"mRNA-Seq": "mRNA", "Ribo-Seq": "RPF"}},
+          "patterns": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns were renamed to GSM ids by prep_counts.py (from the GSM prefix of each per-sample file name); they equal the metadata index exactly. grp from the protocol characteristic and assay from the profiling characteristic; titles confirm (e.g. 'Ribosome profiling exercise rep1').",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "final": {"source": "GSE69699_RAW.tar per-sample RPM files; read counts reconstructed as round(RPM / smallest non-zero RPM) by prep_counts.py", "paper_input": "aligned read counts normalised with edgeR TMM (S2.6.p1, S2.7.p1)"},
+          "reasoning": "data_processing: 'Read counts were converted to RPM'; column sums are 1e6 and integer fraction 0.30, so the deposited values are RPM, not counts. Every RPM value is an exact multiple (to 6 significant digits) of the sample's smallest non-zero value (one read), so counts = RPM / min_nonzero_RPM; reconstructed column sums equal the implied library sizes (324k-1.15M reads) within 4 reads and the largest rounding residual is 0.31 read. The reconstructed matrix is genuine integer read counts, the input edgeR expects and the paper used. Prep also applies the paper's gene filter (mean RPM > 125 in at least one assay x condition group), which reproduces exactly the paper's 1011 genes.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "ctrl"},
+          "subject": null,
+          "organism": "Mouse",
+          "strata": ["assay"],
+          "planned": ["grp_ex_vs_ctrl_assay-mRNA", "grp_ex_vs_ctrl_assay-RPF"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group per stratum",
+            "design_column": "grp",
+            "control": "ctrl",
+            "treatment": "ex",
+            "contrasts": [
+              {"name": "grp_ex_vs_ctrl_assay-mRNA", "control": "ctrl", "treatment": "ex", "role": "primary", "stratum": {"assay": "mRNA"}},
+              {"name": "grp_ex_vs_ctrl_assay-RPF", "control": "ctrl", "treatment": "ex", "role": "primary", "stratum": {"assay": "RPF"}}
+            ]
+          },
+          "reasoning": "S3.p4: expression compared with and without exercise separately at transcriptional and translational levels; assay is therefore a stratum, never crossed. Translational efficiency (assay x exercise interaction) was assessed only descriptively with a KS test on TOP genes (S2.7.p1, FIG5), so no interaction model is planned. n = 2 pooled replicates per arm: run as planned, labelled exploratory.",
+          "confidence": "high",
+          "candidates": [{"value": "joint model ~ assay * grp (translational efficiency)", "reason_rejected": "paper did not test TE per gene with edgeR; would be an extra exploratory analysis on n=2"}]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Within each assay the 4 samples are independent 3-mouse pools; rep1/rep2 labels are not paired across conditions (mice randomly allocated, S2.2.p1). mRNA and RPF of one replicate share a lysate, but assays are analysed separately, so that link does not enter any model. No batch or sex variable (all male).",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR (TMM, NB GLM quasi-likelihood F-test, inmoose)",
+            "formula": "~ grp (within each assay)",
+            "paper_route": {"method": "edgeR with TMM normalization (test unspecified)", "status": "reproduced_with_deviation", "reason": "paper does not name the edgeR test (classic exactTest likely in 2015); the available executor uses glmQLFit/glmQLFTest"},
+            "deviations": [
+              "counts reconstructed from deposited RPM (exact back-calculation, rounding <= 0.31 read)",
+              "125 RPM gene filter applied in the prep script (runner filters cannot express 'group mean RPM > 125 in any of 4 groups'); edgeR library sizes are therefore sums over the 1011 retained genes, TMM-adjusted",
+              "QL F-test instead of an unstated (likely classic exact) edgeR test"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Paper used edgeR + TMM on counts (S2.7.p1); reconstructed counts allow the same family. The 1011-gene universe matches the paper's analysis set.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper rule is raw P < 0.01 with no fold-change cutoff (S3.p4, SUP3); applied unchanged. BH FDR < 0.05 reported as audit."
+          },
+          "reasoning": "S3.p4 and SUP3: differentially expressed genes (P < 0.01) determined by edgeR.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "exploratory_reason": "n = 2 biological replicates (each a pool of 3 mice) per arm per assay (< 3 per arm); residual df = 2",
+            "caveats": [
+              "raw-p threshold on n=2 per arm; counts not multiplicity-controlled",
+              "counts reconstructed from RPM; QL F-test may differ from the paper's edgeR test",
+              "1h/2h/4h exercise groups were never sequenced; only the immediately-after-exercise time point is analysable"
+            ]
+          },
+          "paper_counts": {"edgeR_mRNA": 26, "edgeR_RPF": 37},
+          "paper_genes": {"edgeR_mRNA": ["ENSMUSG00000026819"], "edgeR_RPF": ["ENSMUSG00000026819"]},
+          "reasoning": "Slc25a25 = ENSMUSG00000026819 (up ~4x mRNA, ~18x RPF per FIG4; S3.p5 names it among the most differentially translated genes).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "groups sequenced", "paper": "5 groups of 6 mice (S2.2.p1)", "data": "GEO holds only no exercise and immediately after exercise, 2 pooled replicates each per assay", "disposition": "executable_without_change"},
+        {"item": "matrix scale", "paper": "edgeR on read counts", "data": "deposited RPM; counts reconstructed exactly from RPM quantization", "disposition": "executable_with_declared_deviation"}
+      ],
+      "executions": [
+        {"name": "edgeR_mRNA", "tool": "tools.edger_tools:run_edger_analysis", "args": {"design_column": "grp", "control_group": "ctrl", "treatment_group": "ex"}, "subset": {"assay": ["mRNA"]}, "role": "primary", "reasoning": "paper's edgeR TMM, exercise vs no exercise at transcription level (S3.p4)"},
+        {"name": "edgeR_RPF", "tool": "tools.edger_tools:run_edger_analysis", "args": {"design_column": "grp", "control_group": "ctrl", "treatment_group": "ex"}, "subset": {"assay": ["RPF"]}, "role": "primary", "reasoning": "paper's edgeR TMM, exercise vs no exercise at translation level (S3.p4)"},
+        {"name": "DESeq2_mRNA", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "ctrl", "treatment_group": "ex", "alpha": 0.05}, "subset": {"assay": ["mRNA"]}, "role": "sensitivity", "reasoning": "cross-method check of the NB route at n=2"},
+        {"name": "DESeq2_RPF", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "ctrl", "treatment_group": "ex", "alpha": 0.05}, "subset": {"assay": ["RPF"]}, "role": "sensitivity", "reasoning": "cross-method check of the NB route at n=2"}
+      ],
+      "enrichment": [
+        {"execution": "edgeR_mRNA", "ora": true, "gsea": false, "direction": "all", "reasoning": "paper ran KEGG ORA on the DEGs (S2.7.p1, S2/S3 Tables)"},
+        {"execution": "edgeR_RPF", "ora": true, "gsea": false, "direction": "all", "reasoning": "paper ran KEGG ORA on the DEGs (S2.7.p1, S2/S3 Tables)"}
+      ]
+    }
+  ]
+}

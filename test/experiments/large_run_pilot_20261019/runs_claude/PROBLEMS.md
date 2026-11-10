@@ -631,3 +631,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34039988 (GSE132520)
 
 - case_runner.py:823 rejected reversed comparison names not in design.planned (patched after this row); finish says completed when primary execution failed Details: `PMID34039988/HANDBACK.md`.
+
+## PMID35440516 (GSE198266)
+
+- no per-gene t-test executor for the paper's genefilter test (tools/r_de_tools.py:47 LOG_ENGINES); no quantile-normalization transform Details: `PMID35440516/HANDBACK.md`.
+
+## PMID26845575 (GSE69699)
+
+- suitability.py:259 hard-fails n<3 and decision_contract.py:172 rejects the design though the skill says small n is not a stop (open policy question); filter_low_counts cannot express group-mean RPM rule Details: `PMID26845575/HANDBACK.md`.

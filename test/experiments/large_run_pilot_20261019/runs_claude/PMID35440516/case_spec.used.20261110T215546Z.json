@@ -1,0 +1,187 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35440516",
+  "request": "Analyze GSE198266 for PMID 35440516 (Muscle fiber type-dependence effect of exercise on genomic networks in aged mice models.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE198266",
+      "accession": "GSE198266",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC9085230.paper.md"],
+        "metadata": "GSE198266/GSE198266_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35440516/GSE198266_N_log2qn_symbol.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35440516/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE198266"],
+            "assay": "bulk RNA-seq (Illumina NovaSeq, TruSeq stranded mRNA), HISAT2 alignment, FPKM (S5.4.p1, GEO data_processing)",
+            "samples": "male C57BL/6 mice, young (9 wk) and old (84 wk), control or 4 weeks treadmill exercise; n=3 mice per group; soleus (SOL) and gastrocnemius (GAS) from each mouse; 24 libraries (S5.1.p1)",
+            "factors": {"tissue": ["SOL", "GAS"], "age": ["young", "old"], "intervention": ["control", "exercise"]},
+            "primary_estimand": "Effect of 4 weeks of treadmill exercise on gene expression within each muscle (SOL, GAS) and age group: YE vs YC and OE vs OC, separately in SOL and GAS",
+            "planned_contrasts": [
+              "SOL YE/YC (S2.3.p1; paper: 31 DEGs, 11 up / 20 down)",
+              "GAS YE/YC (S2.3.p1; paper: 13 DEGs, 7 up / 6 down)",
+              "SOL OE/OC (S2.4.p1; paper: 20 DEGs, 10 up / 10 down)",
+              "GAS OE/OC (S2.4.p1; paper: 13 DEGs, 6 up / 7 down)"
+            ],
+            "non_exercise_contrasts_in_paper": "OC/YC per tissue (aging, S2.2.p1: 196 SOL, 119 GAS) and SOL vs GAS per group (S2.5.p1, p<0.05 & FC>2); not part of the exercise estimand",
+            "normalization": "FPKM -> +1, log2, quantile normalization with preprocessCore (S5.5.p1)",
+            "paper_method": "independent t-test per gene on the pre-processed data, Bioconductor genefilter (S5.6.2.p1); each comparison uses only its two groups",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "source_locator": "S5.6.2.p1"},
+            "repeated_measure_unit": "mouse (SOL and GAS from the same animal; sample suffixes match across tissues); not relevant within a tissue",
+            "paper_results": "Tables 2-3 named genes: Nr1d1 down in SOL and GAS YE/YC; Pik3r1 up SOL / down GAS YE/YC; Pnpla3 up in both OE/OC; Hbb-b1 up SOL / down GAS OE/OC; Chtop down SOL / up GAS OE/OC. GSEA Hallmark (Tables 9, 11-13)."
+          },
+          "reasoning": "Methods S5.5.p1 and S5.6.2.p1 give the preprocessing, test and threshold (p < 0.05, FC > 1.5 for within-tissue comparisons). Results S2.3.p1 and S2.4.p1 give the exercise DEG counts. The aging and SOL-vs-GAS comparisons are not exercise effects and are left out.",
+          "confidence": "high",
+          "locator": "S5.6.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper S4.p3 names GSE198266", "GEO series has 24 samples = 2 tissues x 4 groups x 3 mice, matching S5.1.p1", "matrix N_* columns match metadata description 24/24"]},
+          "reasoning": "S4.p3 deposits GSE198266. The supplementary file GSE198266_preprocessed_data2.csv carries 24 FPKM columns and 24 N_* pre-processed columns whose names equal the metadata description field.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {
+            "tissue": ["description", "^N_(SOL|GAS)_[YO][CE]-\\d$"],
+            "grp": ["description", "^N_(?:SOL|GAS)_([YO][CE])-\\d$"],
+            "mouse": ["description", "^N_(?:SOL|GAS)_([YO][CE])-(\\d)$"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Exact match of matrix column names to the metadata description (N_SOL_YC-1 ...), as inspect reported 24/24. tissue, group (YC/YE/OC/OE) and mouse id are parsed from the description; groups agree with source_name_ch1 (e.g. 'soleus of young control').",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "log-transformed (log2(FPKM+1), quantile-normalized)",
+          "recommended_method": "limma",
+          "final": {"source": "GSE198266_preprocessed_data2.csv, N_* columns, re-indexed by repaired gene symbol (prep_matrix.py)", "paper_input": "pre-processed data: FPKM +1, log2, quantile normalized (S5.5.p1)"},
+          "reasoning": "N_* values range 0-14.7, every column has the same sorted distribution (quantile normalization; max spread 0.03 from ties), and the deposited group .mean columns equal means of the N_* columns. They are the paper's pre-processed input to the t-test. The raw *_FPKM columns in the same file are not used because the repository has no quantile-normalization transform and the authors' normalized values are deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "YC"},
+          "subject": "mouse",
+          "organism": "Mouse",
+          "strata": ["tissue"],
+          "planned": [
+            "grp_YE_vs_YC_tissue-SOL",
+            "grp_OE_vs_OC_tissue-SOL",
+            "grp_YE_vs_YC_tissue-GAS",
+            "grp_OE_vs_OC_tissue-GAS"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group within strata (tissue), planned exercise contrasts per age",
+            "design_column": "grp",
+            "formula": "~ 0 + grp (fitted separately within SOL and within GAS)",
+            "contrasts": [
+              {"name": "grp_YE_vs_YC_tissue-SOL", "control": "YC", "treatment": "YE", "stratum": "SOL", "role": "primary"},
+              {"name": "grp_OE_vs_OC_tissue-SOL", "control": "OC", "treatment": "OE", "stratum": "SOL", "role": "primary"},
+              {"name": "grp_YE_vs_YC_tissue-GAS", "control": "YC", "treatment": "YE", "stratum": "GAS", "role": "primary"},
+              {"name": "grp_OE_vs_OC_tissue-GAS", "control": "OC", "treatment": "OE", "stratum": "GAS", "role": "primary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool young and old (exercise vs control per tissue)", "reason_rejected": "paper analyses age groups separately (S2.3, S2.4); pooling changes the estimand"},
+            {"value": "one model on all 24 samples with tissue x grp cells", "reason_rejected": "SOL and GAS come from the same mice; fitting each tissue separately keeps one sample per mouse per fit and matches the paper's within-tissue comparisons"},
+            {"value": "age x exercise interaction", "reason_rejected": "paper does not test it; not planned"}
+          ],
+          "reasoning": "The paper's exercise question is YE vs YC and OE vs OC within each muscle (S2.3.p1, S2.4.p1). grp has four levels within a tissue; one limma model per tissue with planned contrasts uses all 12 samples of that tissue for variance estimation, never pooling levels. Tissue is a stratum. n = 3 per group.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Within a tissue every mouse contributes one sample, so there is no repeated measure to block; the mouse key only links SOL and GAS, which are never compared here. No batch, sex (all male) or other covariate is recorded; the paper adjusts for none.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on the authors' log2(FPKM+1) quantile-normalized values, one fit per tissue",
+            "formula": "~ 0 + grp",
+            "paper_route": {"method": "independent two-sample t-test per gene (genefilter) on the 6 samples of each comparison", "status": "blocked", "reason": "the repository has no per-gene t-test executor; limma on the same log-scale input is the validated alternative"},
+            "deviations": ["limma moderated t instead of an ordinary t-test (variance shrinkage, residual variance from all 12 samples of the tissue in the primary runs)", "sensitivity runs use only the two compared groups (6 samples), closer to the paper's per-comparison t-test"]
+          },
+          "transform": null,
+          "reasoning": "Matrix is already log-scale (matrix-method policy: limma as-is). The paper's ordinary t-test cannot be run by a repository executor; the moderated t on identical input is the closest validated route and is declared as a deviation.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "paper rule (raw p < 0.05 and FC > 1.5) applied to limma moderated-t p-values; FDR < 0.05 reported as a separate audit rule"
+          },
+          "reasoning": "S5.6.2.p1: p-value < 0.05 and fold change > 1.5 for within-tissue comparisons; FC 1.5 = |log2FC| > 0.5849625.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["paper used an ordinary t-test; counts from limma's moderated t on the same input are not expected to match exactly", "raw-p threshold without multiple-testing control, n = 3 per group: the paper-rule DEG lists are expected to contain many false positives", "fold change taken as the difference of group means on the log2 quantile-normalized scale", "direction vs paper: HALLMARK_MYOGENESIS in SOL OE/OC has NES +0.95 (p = 0.59, not significant) whereas the paper reports it enriched in SOL OC (Table 13); all paper-named genes keep the paper direction"]
+          },
+          "paper_counts": {
+            "tissue_SOL/grp_YE_vs_YC_tissue-SOL": 31,
+            "tissue_SOL/grp_OE_vs_OC_tissue-SOL": 20,
+            "tissue_GAS/grp_YE_vs_YC_tissue-GAS": 13,
+            "tissue_GAS/grp_OE_vs_OC_tissue-GAS": 13
+          },
+          "paper_genes": {
+            "tissue_SOL/grp_YE_vs_YC_tissue-SOL": ["Nr1d1", "Pik3r1"],
+            "tissue_GAS/grp_YE_vs_YC_tissue-GAS": ["Nr1d1", "Pik3r1"],
+            "tissue_SOL/grp_OE_vs_OC_tissue-SOL": ["Pnpla3", "Hbb-b1", "Chtop"],
+            "tissue_GAS/grp_OE_vs_OC_tissue-GAS": ["Pnpla3", "Hbb-b1", "Chtop"]
+          },
+          "reasoning": "Method deviation (limma vs t-test) with the paper's threshold on the paper's own pre-processed matrix.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE test", "paper": "independent t-test (genefilter), S5.6.2.p1", "data": "no t-test executor; limma moderated t used", "disposition": "declared_deviation"},
+        {"item": "matrix", "paper": "pre-processed FPKM (log2 +1, quantile)", "data": "deposited N_* columns are those values; gene symbols Excel-mangled for 25 genes, repaired from Description", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "tissue_SOL", "tool": "tools.joint_contrasts:run_joint_limma",
+         "args": {"comparisons": ["grp_YE_vs_YC_tissue-SOL", "grp_OE_vs_OC_tissue-SOL"], "covariates": []},
+         "subset": {"tissue": ["SOL"]}, "role": "primary",
+         "reasoning": "one limma fit on the 12 SOL samples (~0+grp), planned exercise contrasts per age"},
+        {"name": "tissue_GAS", "tool": "tools.joint_contrasts:run_joint_limma",
+         "args": {"comparisons": ["grp_YE_vs_YC_tissue-GAS", "grp_OE_vs_OC_tissue-GAS"], "covariates": []},
+         "subset": {"tissue": ["GAS"]}, "role": "primary",
+         "reasoning": "one limma fit on the 12 GAS samples (~0+grp), planned exercise contrasts per age"},
+        {"name": "SOL_YE_vs_YC_2grp", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "YC", "treatment_group": "YE"},
+         "subset": {"tissue": ["SOL"], "grp": ["YC", "YE"]}, "role": "sensitivity",
+         "reasoning": "two-group fit on only the 6 compared samples, as the paper's per-comparison t-test"},
+        {"name": "SOL_OE_vs_OC_2grp", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "OC", "treatment_group": "OE"},
+         "subset": {"tissue": ["SOL"], "grp": ["OC", "OE"]}, "role": "sensitivity",
+         "reasoning": "two-group fit on only the 6 compared samples"},
+        {"name": "GAS_YE_vs_YC_2grp", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "YC", "treatment_group": "YE"},
+         "subset": {"tissue": ["GAS"], "grp": ["YC", "YE"]}, "role": "sensitivity",
+         "reasoning": "two-group fit on only the 6 compared samples"},
+        {"name": "GAS_OE_vs_OC_2grp", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "OC", "treatment_group": "OE"},
+         "subset": {"tissue": ["GAS"], "grp": ["OC", "OE"]}, "role": "sensitivity",
+         "reasoning": "two-group fit on only the 6 compared samples"}
+      ],
+      "enrichment": [
+        {"execution": "tissue_SOL/grp_YE_vs_YC_tissue-SOL", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper runs Hallmark GSEA for SOL YE/YC (Table 12)"},
+        {"execution": "tissue_SOL/grp_OE_vs_OC_tissue-SOL", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper runs Hallmark GSEA for SOL OE/OC (Table 13)"},
+        {"execution": "tissue_GAS/grp_YE_vs_YC_tissue-GAS", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper runs Hallmark GSEA for GAS YE/YC (Table 11)"},
+        {"execution": "tissue_GAS/grp_OE_vs_OC_tissue-GAS", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper runs Hallmark GSEA for GAS OE/OC (Table 9)"}
+      ]
+    }
+  ]
+}
