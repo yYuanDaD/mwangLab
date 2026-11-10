@@ -25,3 +25,12 @@ One section per case; newest last.
 ## PMID40695537 / GSE293163 (2026-11-10)
 
 - policy: Which threshold to report when the paper's numbers fit the post-hoc mean-log2FC subset better than the stated FDR rule (open policy question).
+
+## d446594d1ade71b3541cb0f6a971599e29ccdf5a / GSE124819 (2026-11-10)
+
+- policy: Open policy: joint per-set fit vs pairwise fits when the paper is silent.
+- policy: Paper says exercised animals collected at 13.5 wk but GEO says 11.5 wk; exercise may be inseparable from time (already recorded as a caveat).
+
+## 86991572b4ea250a7e68eadebb3fa005f4fe2282 / GSE86338 (2026-11-10)
+
+- policy: Open policy question: whether to allow a labelled exploratory sensitivity run (limma ~grp on 8 iWAT samples, SWIM vs CNT, n=2 vs 2 pools) next to the refused record, since the paper itself reports 673/826 DEGs from n=2 pools.
