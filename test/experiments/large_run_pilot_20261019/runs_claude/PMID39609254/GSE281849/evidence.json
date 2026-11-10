@@ -3,8 +3,8 @@
   "run_id": "PMID39609254",
   "subject_id": "GSE281849",
   "created_at": "2026-11-10T02:15:49",
-  "finished_at": null,
-  "status": null,
+  "finished_at": "2026-11-10T02:17:30",
+  "status": "completed",
   "error": null,
   "sources": [
     {
@@ -745,6 +745,451 @@
         "stop_reason": null
       },
       "recorded_at": "2026-11-10T02:16:58"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 21,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\aligned\\aligned_matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_ACT_vs_SED.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_AR_vs_SED.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_AR_vs_ACT.csv"
+        ],
+        "counts": {
+          "joint/grp_ACT_vs_SED": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+              "n_tested": 11997,
+              "n_significant": 61,
+              "n_up": 43,
+              "n_down": 18,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.05 and |log2FoldChange| >= 0.27",
+              "n_tested": 11997,
+              "n_significant": 56,
+              "n_up": 41,
+              "n_down": 15,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_AR_vs_SED": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+              "n_tested": 1990,
+              "n_significant": 15,
+              "n_up": 10,
+              "n_down": 5,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.05 and |log2FoldChange| >= 0.27",
+              "n_tested": 1990,
+              "n_significant": 10,
+              "n_up": 7,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/grp_AR_vs_ACT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+              "n_tested": 14220,
+              "n_significant": 115,
+              "n_up": 27,
+              "n_down": 88,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.05 and |log2FoldChange| >= 0.27",
+              "n_tested": 14220,
+              "n_significant": 108,
+              "n_up": 21,
+              "n_down": 87,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "one 3-group DESeq2 model on all 21 samples, to check robustness of the pairwise fits",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:17:17"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_ACT_vs_SED",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\enrichment_grp_ACT_vs_SED\\gsea\\DEG_results_ACT_vs_SED_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 27684 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 46 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_COAGULATION | NES=2.75 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.68 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.59 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.46 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.45 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_XENOBIOTIC_METABOLISM | NES=2.42 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=2.26 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_BILE_ACID_METABOLISM | NES=2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ESTROGEN_RESPONSE_LATE | NES=2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_MYC_TARGETS_V2 | NES=-2.61 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.53 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_DNA_REPAIR | NES=-1.99 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=-1.83 | NOM p=0.00e+00 | FDR q=5.27e-04 - HALLMARK_PROTEIN_SECRETION | NES=-1.75 | NOM p=0.00e+00 | FDR q=1.26e-03 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.61 | NOM p=0.00e+00 | FDR q=4.74e-03 - HALLMARK_E2F_TARGETS | NES=-1.40 | NOM p=6.59e-03 | ..."
+      },
+      "reason": "paper reports GSEA for Active vs Inactive (S3.7.p2)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:17:22"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_AR_vs_ACT",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\enrichment_grp_AR_vs_ACT\\gsea\\DEG_results_AR_vs_ACT_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 27620 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 44 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_MYC_TARGETS_V1 | NES=2.63 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=2.36 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=2.09 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_DNA_REPAIR | NES=1.81 | NOM p=0.00e+00 | FDR q=1.12e-03 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=1.76 | NOM p=0.00e+00 | FDR q=1.34e-03 - HALLMARK_HEME_METABOLISM | NES=1.68 | NOM p=0.00e+00 | FDR q=2.98e-03 - HALLMARK_MYOGENESIS | NES=1.54 | NOM p=0.00e+00 | FDR q=9.48e-03 - HALLMARK_TGF_BETA_SIGNALING | NES=1.48 | NOM p=1.81e-02 | FDR q=1.69e-02 - HALLMARK_PROTEIN_SECRETION | NES=1.41 | NOM p=2.73e-02 | FDR q=2.93e-02 - HALLMARK_UV_RESPONSE_UP | NES=1.37 | NOM p=9.71e-03 | FDR q=3.97e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_COAGULATION | NES=-2.70 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=-2.65 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-2.39 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_XENOBIOTIC_METABOLISM | NES=-2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=-2.35 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UV_RESPONSE_DN | NES=-2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=-2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HAL..."
+      },
+      "reason": "paper reports GSEA for Activity Reduction vs Active (S3.7.p2)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:17:26"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_AR_vs_SED",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\enrichment_grp_AR_vs_SED\\gsea\\DEG_results_AR_vs_SED_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 27629 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 21 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_MYOGENESIS | NES=1.83 | NOM p=0.00e+00 | FDR q=9.75e-03 - HALLMARK_TGF_BETA_SIGNALING | NES=1.78 | NOM p=0.00e+00 | FDR q=6.50e-03 - HALLMARK_NOTCH_SIGNALING | NES=1.75 | NOM p=8.33e-03 | FDR q=4.70e-03 - HALLMARK_UV_RESPONSE_UP | NES=1.73 | NOM p=0.00e+00 | FDR q=4.61e-03 - HALLMARK_HYPOXIA | NES=1.63 | NOM p=0.00e+00 | FDR q=1.19e-02 - HALLMARK_HEME_METABOLISM | NES=1.59 | NOM p=4.02e-03 | FDR q=1.30e-02 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=1.59 | NOM p=0.00e+00 | FDR q=1.16e-02 - HALLMARK_APICAL_JUNCTION | NES=1.50 | NOM p=2.07e-03 | FDR q=2.56e-02 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.44 | NOM p=2.06e-03 | FDR q=4.12e-02 - HALLMARK_KRAS_SIGNALING_DN | NES=1.39 | NOM p=1.89e-02 | FDR q=6.19e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.60 | NOM p=0.00e+00 | FDR q=6.64e-02 - HALLMARK_E2F_TARGETS | NES=-1.50 | NOM p=1.87e-03 | FDR q=9.27e-02 - HALLMARK_UV_RESPONSE_DN | NES=-1.46 | NOM p=9.80e-03 | FDR q=9.26e-02 - HALLMARK_IL2_STAT5_SIGNALING | NES=-1.38 | NOM p=1.92e-02 | FDR q=1.67e-01 - HALLMARK_PROTEIN_SECRETION | NES=-1.29 | NOM p=6.72e-02 | FDR q=2.88e-01 - HALLMARK_MITOTIC_SPINDLE | NES=-1.24 | NOM p=7.34e-02 | FDR q=3.68e-01 - HALLMARK_ADIPOGENESIS | NES=-1.23 | NOM p=4.97e-02 | FDR q=3.26e-01 - HALLMARK_ANGIOGENESIS | NES=-1.23 | NOM p=1..."
+      },
+      "reason": "paper reports no enrichment for AR vs Inactive (S3.7.p2); checked",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:17:30"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Female mice only; the effect of exercise in males is not assessed by this dataset.",
+          "Paper's GSEA used GO BP with fgsea; this run's GSEA uses MSigDB Hallmark, so pathway results are not directly comparable."
+        ],
+        "results": {
+          "grp_ACT_vs_SED": {
+            "n_deg": 76,
+            "up": 54,
+            "down": 22,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 71
+          },
+          "grp_AR_vs_SED": {
+            "n_deg": 45,
+            "up": 27,
+            "down": 18,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 41
+          },
+          "grp_AR_vs_ACT": {
+            "n_deg": 134,
+            "up": 29,
+            "down": 105,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 126
+          },
+          "joint/grp_ACT_vs_SED": {
+            "n_deg": 61,
+            "up": 43,
+            "down": 18,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 56
+          },
+          "joint/grp_AR_vs_SED": {
+            "n_deg": 15,
+            "up": 10,
+            "down": 5,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 10
+          },
+          "joint/grp_AR_vs_ACT": {
+            "n_deg": 115,
+            "up": 27,
+            "down": 88,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.25",
+            "audit_n": 108
+          }
+        },
+        "paper_counts": {
+          "grp_ACT_vs_SED": 71,
+          "grp_AR_vs_SED": 40,
+          "grp_AR_vs_ACT": 124
+        },
+        "comparison": {
+          "grp_ACT_vs_SED": {
+            "ours": 76,
+            "paper": 71
+          },
+          "grp_AR_vs_SED": {
+            "ours": 45,
+            "paper": 40
+          },
+          "grp_AR_vs_ACT": {
+            "ours": 134,
+            "paper": 124
+          }
+        },
+        "paper_gene_check": {
+          "grp_ACT_vs_SED": {
+            "Igfbp5": {
+              "baseMean": 18205.1475,
+              "log2FoldChange": -0.5793,
+              "padj": 0.0106,
+              "pvalue": 0.0
+            },
+            "Acly": {
+              "baseMean": 1019.5176,
+              "log2FoldChange": 0.5342,
+              "padj": 0.0103,
+              "pvalue": 0.0
+            },
+            "Elovl6": {
+              "baseMean": 112.8351,
+              "log2FoldChange": 1.1073,
+              "padj": 0.0182,
+              "pvalue": 0.0001
+            },
+            "F13a1": {
+              "baseMean": 191.4037,
+              "log2FoldChange": 0.6649,
+              "padj": 0.0155,
+              "pvalue": 0.0001
+            },
+            "Folr2": {
+              "baseMean": 69.2949,
+              "log2FoldChange": 1.108,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Gfpt2": {
+              "baseMean": 154.3143,
+              "log2FoldChange": 0.6082,
+              "padj": 0.013,
+              "pvalue": 0.0001
+            },
+            "Il1r1": {
+              "baseMean": 202.0753,
+              "log2FoldChange": 0.4601,
+              "padj": 0.013,
+              "pvalue": 0.0001
+            },
+            "Lama4": {
+              "baseMean": 709.2191,
+              "log2FoldChange": 0.4287,
+              "padj": 0.0103,
+              "pvalue": 0.0
+            },
+            "Nrp2": {
+              "baseMean": 501.8583,
+              "log2FoldChange": 0.3256,
+              "padj": 0.0128,
+              "pvalue": 0.0001
+            },
+            "Ctxn3": {
+              "baseMean": 1127.3132,
+              "log2FoldChange": -0.4669,
+              "padj": 0.0106,
+              "pvalue": 0.0
+            },
+            "Dglucy": {
+              "baseMean": 939.45,
+              "log2FoldChange": -0.3711,
+              "padj": 0.0103,
+              "pvalue": 0.0
+            },
+            "Gstp2": {
+              "baseMean": 1744.2226,
+              "log2FoldChange": -0.3455,
+              "padj": 0.0103,
+              "pvalue": 0.0
+            }
+          },
+          "grp_AR_vs_SED": {
+            "Igfbp5": {
+              "baseMean": 17612.4399,
+              "log2FoldChange": -0.926,
+              "padj": 0.0027,
+              "pvalue": 0.0
+            },
+            "Smyd2": {
+              "baseMean": 10282.6053,
+              "log2FoldChange": 0.4375,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "En1": {
+              "baseMean": 312.6474,
+              "log2FoldChange": 0.3769,
+              "padj": 0.0287,
+              "pvalue": 0.0
+            },
+            "Hoxa11os": {
+              "baseMean": 114.1522,
+              "log2FoldChange": 1.056,
+              "padj": 0.0035,
+              "pvalue": 0.0
+            },
+            "Ostn": {
+              "baseMean": 2623.3687,
+              "log2FoldChange": -0.535,
+              "padj": 0.0063,
+              "pvalue": 0.0
+            },
+            "Ak4": {
+              "baseMean": 758.089,
+              "log2FoldChange": -0.6286,
+              "padj": 0.0016,
+              "pvalue": 0.0
+            },
+            "Srrm4os": {
+              "baseMean": 132.1551,
+              "log2FoldChange": -0.7452,
+              "padj": 0.0035,
+              "pvalue": 0.0
+            },
+            "Zfhx4": {
+              "baseMean": 527.5363,
+              "log2FoldChange": -0.3383,
+              "padj": 0.0266,
+              "pvalue": 0.0
+            }
+          },
+          "grp_AR_vs_ACT": {
+            "Smyd2": {
+              "baseMean": 9682.4571,
+              "log2FoldChange": 0.3324,
+              "padj": 0.0113,
+              "pvalue": 0.0
+            },
+            "En1": {
+              "baseMean": 277.1815,
+              "log2FoldChange": 0.4717,
+              "padj": 0.0139,
+              "pvalue": 0.0001
+            },
+            "Hoxa11os": {
+              "baseMean": 100.5749,
+              "log2FoldChange": 1.2178,
+              "padj": 0.0113,
+              "pvalue": 0.0
+            },
+            "Ostn": {
+              "baseMean": 2290.0912,
+              "log2FoldChange": -0.4254,
+              "padj": 0.0101,
+              "pvalue": 0.0
+            },
+            "Ak4": {
+              "baseMean": 673.3583,
+              "log2FoldChange": -0.5643,
+              "padj": 0.0101,
+              "pvalue": 0.0
+            },
+            "Srrm4os": {
+              "baseMean": 114.0118,
+              "log2FoldChange": -0.6145,
+              "padj": 0.0307,
+              "pvalue": 0.0003
+            },
+            "Zfhx4": {
+              "baseMean": 482.3996,
+              "log2FoldChange": -0.3445,
+              "padj": 0.0052,
+              "pvalue": 0.0
+            },
+            "Acly": {
+              "baseMean": 971.8429,
+              "log2FoldChange": -0.5763,
+              "padj": 0.0018,
+              "pvalue": 0.0
+            },
+            "Elovl6": {
+              "baseMean": 109.2286,
+              "log2FoldChange": -1.0919,
+              "padj": 0.01,
+              "pvalue": 0.0
+            }
+          }
+        }
+      },
+      "reason": "Paper-aligned DESeq2 pairwise route on the deposited raw counts; compare counts and named genes from S3.7.p1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:17:30"
     }
   ],
   "artifacts": [
@@ -835,6 +1280,46 @@
       "produced_by": null,
       "media_type": "text/csv",
       "sha256": "0ee31d5b205c28609a09696a14b223e99149ab383bad8924bce947d7ed321aca",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_ACT_vs_SED.csv",
+      "role": "deg_joint/grp_ACT_vs_SED",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b4691afd5cf0626accb8fe2cd496e2c15ffaea9a4b6ea9e9933b6bd1b57dea78",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_AR_vs_SED.csv",
+      "role": "deg_joint/grp_AR_vs_SED",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "81b2d87571d05e31cce27acb779cc2683584d7a655f683f02030a31dabb2a9c1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\results\\joint\\DEG_results_grp_AR_vs_ACT.csv",
+      "role": "deg_joint/grp_AR_vs_ACT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f7957fa365070cd706aaecb02d3e6ab7e9acb8470189890e830b9682fcb3e3b1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39609254\\GSE281849\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d5d8b0ebfc1d6d2e23e3980d6cc9aa81bb31e993865f34ebad47e9c2e811e41d",
       "evidence_ids": [],
       "attributes": {}
     }

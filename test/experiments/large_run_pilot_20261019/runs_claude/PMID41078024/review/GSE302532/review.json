@@ -1,0 +1,22 @@
+{"case": "GSE302532", "reviewer": "claude-sonnet-5-5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Cohort 2 (non-PD, age-matched male SD rats) was treadmill-exercised 1 month vs sedentary and plasma exosome RNA was sequenced (S2.1.p1, S2.5.p1, S2.14.p1, S10.p1). Exercise factor: 4 Exercised vs 4 Sedentary plasma samples; cohort 1 (PFF histology) has no sequencing.",
+  "B2": "One comparison: Exercise vs Sedentary exosomal RNA, n=4 per group (S2.5.p1 'n = 4 ... Two groups'); S4.4.p1 says 5 per group (inconsistency). 27 upregulated RNAs (S3.4.p1, TAB2).",
+  "B3": "No repeated measures: rats randomized to exercise or sedentary, housed individually, one terminal blood draw each (S2.1.p1, S2.4.p1, S2.5.p1). Title suffix a-d is only a within-group replicate letter; the expression check does not support it as a unit (r -0.08 vs 0.03, p 0.81).",
+  "B4": "Paper does not say how the DE was fitted; with two groups only a single pairwise fit exists.",
+  "B5": "No rule stated verbatim. Table 2 lists only upregulated RNAs with raw P 3.76E-04 to 0.05 and FC 3.09-142 ('fold change ranging from 3 to 142', S3.4.p1, 'significantly upregulated'); implies raw P <= 0.05 and FC >= 3, up only; count 27."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run on cohort-2 exercise vs sedentary matches B1 (S2.1.p1, S2.5.p1).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp EX 4 / SED 4 matches S2.5.p1; alignment exact on library name 8/8; no exclusions. n=5 in S4.4.p1 recorded as discrepancy.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "control SED, treatment EX (grp_EX_vs_SED); Table 2 reports exercisers vs sedentary (FIG5).", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Candidate key a-d is a replicate letter; paper says independent randomized rats (S2.5.p1); pairing_check not_supported (p=0.81). repeated_measure_unit none is correct.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Two groups, single ~grp limma fit; paper silent.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch/sex/housing field; all male, individually housed (S2.1.p1). Library names differ by group order but no run info recorded; blood drawn within 30 min of last exercise is a design feature (S2.4.p1).", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "TPM (columns sum to 1e6) -> limma on log2(TPM+1); counts not deposited. p-value histogram sane (frac p<0.05 0.034, frac p>0.9 0.062).", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states no rule (B5); recorded as not_reported, workflow default padj<0.05 applied, Table 2 implied rule (raw P<=0.05, FC>=3) kept as labelled audit (21 vs 27). Which to headline is an open policy question.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Comparison is the same contrast; paper count 27 noted as up-only; HANDBACK does not overclaim (0 applied, 11/27 pass audit, LOC120098346 sign contradiction disclosed).", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal claims (flags.json stop_claims empty).", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Open policy: report the padj<0.05 default (0 DEGs) or the paper-implied raw-P/FC>=3 rule (21 DEGs) as the headline when the paper states no rule and its 27 rest on uncorrected P."],
+ "summary": "该系列为外泌体RNA的运动组对久坐组（各4只独立大鼠），分组、方向、方法（TPM用limma）与论文一致。pairing_key_candidate 标志只是组内重复字母（a-d），论文说明动物独立且表达检验不支持，不需要配对。阈值论文未给出，已如实记录并保留隐含规则作审计，属于开放的政策问题。"}

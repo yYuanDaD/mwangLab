@@ -503,3 +503,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41078024 (GSE302532)
 
 - case_runner.py:504 align_to_metadata cannot match keys embedded in matrix column names (patched after this row); prep rename script needed; inspect gave no hint Details: `PMID41078024/HANDBACK.md`.
+
+## PMID39609254 (GSE281849)
+
+- none (pydeseq2 overflow RuntimeWarning at utils.py:1088, harmless) Details: `PMID39609254/HANDBACK.md`.

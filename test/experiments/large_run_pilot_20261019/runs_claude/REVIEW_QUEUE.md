@@ -34,3 +34,7 @@ One section per case; newest last.
 ## 86991572b4ea250a7e68eadebb3fa005f4fe2282 / GSE86338 (2026-11-10)
 
 - policy: Open policy question: whether to allow a labelled exploratory sensitivity run (limma ~grp on 8 iWAT samples, SWIM vs CNT, n=2 vs 2 pools) next to the refused record, since the paper itself reports 673/826 DEGs from n=2 pools.
+
+## PMID41078024 / GSE302532 (2026-11-10)
+
+- policy: Open policy: report the padj<0.05 default (0 DEGs) or the paper-implied raw-P/FC>=3 rule (21 DEGs) as the headline when the paper states no rule and its 27 rest on uncorrected P.

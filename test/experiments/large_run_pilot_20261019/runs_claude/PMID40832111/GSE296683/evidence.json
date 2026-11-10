@@ -1,0 +1,331 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID40832111",
+  "subject_id": "GSE296683",
+  "created_at": "2026-11-10T02:19:28",
+  "finished_at": "2026-11-10T02:19:34",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12360297.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12360297.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T02:19:28",
+      "sha256": null,
+      "attributes": {
+        "sha256": "efb5da42430b9f54f448701e8cc74071ca7caf9d1366e9d4fed5fb2379063a27",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE296683_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE296683\\GSE296683_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T02:19:28",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e2c90d8431b54325bfc4c4c147a015105aadcd3354387a6fcd2bc9b34a750d14",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE296683_GE6461.genes.fpkm.tsv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE296683\\GSE296683_GE6461.genes.fpkm.tsv.gz",
+      "locator": null,
+      "captured_at": "2026-11-10T02:19:28",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d6187a78846dd8cabfdfd429c38dfafeda211ffb6bb6f822fd301eb2082b9e1e",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE296683"
+        ],
+        "assay": "bulk RNA-seq (Illumina, STAR + RSEM) of 3D donor-derived human myobundles (S2.6.p1)",
+        "sample_inclusion": "12 myobundle chips, all electrically stimulated (E-Stim, 3 V/mm, 2 ms, 2 Hz, 2x30 min/day, days 14-21): Young active (YA) vehicle n=3, YA tomatidine n=3, Old sedentary (OS) vehicle n=3, OS tomatidine n=3 (Table 1; S2.5.p1; S3.1.p1)",
+        "factors": {
+          "cohort": [
+            "YA",
+            "OS"
+          ],
+          "treatment": [
+            "vehicle (EtOH)",
+            "tomatidine 5 uM"
+          ],
+          "stimulation": [
+            "E-Stim only; no unstimulated RNA-seq arm"
+          ]
+        },
+        "primary_estimand": "Effect of tomatidine vs vehicle on gene expression in E-Stim myobundles, separately within YA- and OS-derived myobundles (S2.7.p1; S3.2.p1). The paper's RNA-seq does not estimate the effect of exercise-like stimulation itself: every sequenced sample was stimulated.",
+        "planned_contrasts": [
+          "YA tomatidine vs YA vehicle, both E-Stim (S3.2.p1; paper: 215 up / 219 down = 434 DEGs)",
+          "OS tomatidine vs OS vehicle, both E-Stim (S3.2.p1; paper: 12 up / 2 down = 14 DEGs)"
+        ],
+        "repeated_measure_unit": "none; each chip is one independent myobundle; donor cell lines pooled per cohort (one YA and one OS donor source)",
+        "normalization": "RSEM gene quantification; low average counts excluded (S2.6.p1)",
+        "paper_method": "DESeq2 on RSEM counts, tomatidine vs matched control per cohort (S2.6.p1; S2.7.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "source_locator": "S2.6.p1"
+        },
+        "paper_results": "YA 215 up / 219 down; OS 12 up / 2 down; GSEA KEGG JAK/STAT; IL6 ~5-fold and CXCL8 ~1.6-fold up in YA tomatidine (S3.2.p1, S3.2.p3)"
+      },
+      "reason": "S2.6.p1 gives the pipeline (STAR, RSEM, DESeq2, FDR 0.05 and 2.0-fold change). S2.7.p1 and S3.2.p1 define the DE contrasts as tomatidine vs matched E-Stim control within each cohort. Table 1 lists 12 samples, all 'Young E-Stim' or 'Old E-Stim'. S3.1.p2 mentions unstimulated myotubes only for contractility displacement, not for RNA-seq.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:19:28"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE296683\\GSE296683_GE6461.genes.fpkm.tsv.gz",
+        "owned": true,
+        "checks": [
+          "S2.9.p1 names GSE296683",
+          "GEO series has 12 samples matching Table 1 (4 groups x 3)",
+          "organism Homo sapiens, tissue muscle, CD56+ myoblasts",
+          "matrix has 12 sample columns whose names equal the GEO library names"
+        ],
+        "accession": "GSE296683",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE296683\\GSE296683_metadata.csv"
+      },
+      "reason": "Data availability statement S2.9.p1 names GSE296683; sample count and group structure match Table 1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:19:28"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:libkey",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "cohort": {
+              "source": "characteristics_ch1.3.treatment",
+              "regex": "^(YA|OS) "
+            },
+            "trt": {
+              "source": "characteristics_ch1.3.treatment",
+              "regex": "^(?:YA|OS) (control|treated) ",
+              "recode": {
+                "control": "vehicle",
+                "treated": "tomatidine"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\design_metadata.csv",
+          "sha256": "d4295da2c7187bcd33e54bbcf32d0a1b445fdfcc3b09e076409837dbec1cea43",
+          "levels": {
+            "cohort": {
+              "YA": 6,
+              "OS": 6
+            },
+            "trt": {
+              "vehicle": 6,
+              "tomatidine": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are '<library name>.genes.results'; GEO description holds 'Library name: <library name>'. Exact match after stripping the suffix and prefix. cohort and trt come from the treatment characteristic ('YA control ( EStim)' etc.).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:19:29"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "FPKM",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\aligned_matrix.csv",
+          "sha256": "586abc22d24c8592bf949b4b167ed5dbc138b1992d670ac9e5946994c602e5e1",
+          "n_features": 60504,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 48780.03,
+          "median": 0.0,
+          "integer_fraction": 0.686,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "GEO data_processing: 'tab-delimited matrix file, containing non-normalized FPKM values for all genes'; file name genes.fpkm.tsv.gz; values non-integer in 31% of cells. The paper ran DESeq2 on RSEM counts, which are not deposited, so the paper's method could not be reproduced exactly on this matrix (DESeq2 on FPKM is invalid).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:19:30"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none (refused)",
+        "design_column": null,
+        "contrasts": [],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "The request asks how exercise affects gene expression. The paper's RNA-seq estimand is tomatidine vs vehicle within stimulated myobundles (S2.7.p1, S3.2.p1); stimulation is held constant. Candidate alternatives rejected: (1) trt tomatidine vs vehicle within cohort: analyzable but a pharmacological contrast, not exercise; (2) cohort OS vs YA: donor age/activity status confounded with the single donor cell source, not an exercise intervention, and not a paper DE contrast; (3) tomatidine x cohort interaction: not exercise. Small n is not the reason for stopping.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast is identifiable. All 12 sequenced myobundles received exercise-like E-Stim (Table 1; GEO treatment field '( EStim)' on every sample); there is no unstimulated or pre-stimulation arm. The data support only tomatidine vs vehicle under E-Stim (a drug effect) and YA vs OS (donor age/activity, one donor source per cohort, aliased with donor), neither of which is an effect of exercise."
+      },
+      "recorded_at": "2026-11-10T02:19:34"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "dd063e43358d412a57071ef42007266fc3fee2b87fa06fd55832c503c50e6e78",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f395a40fc28b7439234895e7f00d56a95bf3ec66f593d812a02d54b44032a04a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "586abc22d24c8592bf949b4b167ed5dbc138b1992d670ac9e5946994c602e5e1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d4295da2c7187bcd33e54bbcf32d0a1b445fdfcc3b09e076409837dbec1cea43",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a29dc8e249e57f4e7d95843f4890049d8d8893f5aac5eba103702674aa82af76",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40832111\\GSE296683\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b72a1169034e56660571413e9edfe58b65fa31d6a36d1514b6fbc4e95d620706",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

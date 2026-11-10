@@ -1,0 +1,92 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40832111",
+  "request": "Analyze GSE296683 for PMID 40832111 (Tomatidine Attenuates Inflammatory Responses to Exercise-Like Stimulation in Donor-derived Skeletal Muscle Myobundles.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE296683",
+      "accession": "GSE296683",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12360297.paper.md"],
+        "metadata": "GSE296683/GSE296683_metadata.csv",
+        "matrix": "GSE296683/GSE296683_GE6461.genes.fpkm.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE296683"],
+            "assay": "bulk RNA-seq (Illumina, STAR + RSEM) of 3D donor-derived human myobundles (S2.6.p1)",
+            "sample_inclusion": "12 myobundle chips, all electrically stimulated (E-Stim, 3 V/mm, 2 ms, 2 Hz, 2x30 min/day, days 14-21): Young active (YA) vehicle n=3, YA tomatidine n=3, Old sedentary (OS) vehicle n=3, OS tomatidine n=3 (Table 1; S2.5.p1; S3.1.p1)",
+            "factors": {"cohort": ["YA", "OS"], "treatment": ["vehicle (EtOH)", "tomatidine 5 uM"], "stimulation": ["E-Stim only; no unstimulated RNA-seq arm"]},
+            "primary_estimand": "Effect of tomatidine vs vehicle on gene expression in E-Stim myobundles, separately within YA- and OS-derived myobundles (S2.7.p1; S3.2.p1). The paper's RNA-seq does not estimate the effect of exercise-like stimulation itself: every sequenced sample was stimulated.",
+            "planned_contrasts": [
+              "YA tomatidine vs YA vehicle, both E-Stim (S3.2.p1; paper: 215 up / 219 down = 434 DEGs)",
+              "OS tomatidine vs OS vehicle, both E-Stim (S3.2.p1; paper: 12 up / 2 down = 14 DEGs)"
+            ],
+            "repeated_measure_unit": "none; each chip is one independent myobundle; donor cell lines pooled per cohort (one YA and one OS donor source)",
+            "normalization": "RSEM gene quantification; low average counts excluded (S2.6.p1)",
+            "paper_method": "DESeq2 on RSEM counts, tomatidine vs matched control per cohort (S2.6.p1; S2.7.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S2.6.p1"},
+            "paper_results": "YA 215 up / 219 down; OS 12 up / 2 down; GSEA KEGG JAK/STAT; IL6 ~5-fold and CXCL8 ~1.6-fold up in YA tomatidine (S3.2.p1, S3.2.p3)"
+          },
+          "reasoning": "S2.6.p1 gives the pipeline (STAR, RSEM, DESeq2, FDR 0.05 and 2.0-fold change). S2.7.p1 and S3.2.p1 define the DE contrasts as tomatidine vs matched E-Stim control within each cohort. Table 1 lists 12 samples, all 'Young E-Stim' or 'Old E-Stim'. S3.1.p2 mentions unstimulated myotubes only for contractility displacement, not for RNA-seq.",
+          "confidence": "high",
+          "locator": "S2.6.p1; S2.7.p1; S3.2.p1; Table 1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.9.p1 names GSE296683", "GEO series has 12 samples matching Table 1 (4 groups x 3)", "organism Homo sapiens, tissue muscle, CD56+ myoblasts", "matrix has 12 sample columns whose names equal the GEO library names"]},
+          "reasoning": "Data availability statement S2.9.p1 names GSE296683; sample count and group structure match Table 1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "libkey",
+          "key_patterns": {"libkey": ["description", "^Library name: (.+)$"]},
+          "matrix_column_pattern": "^(.+)\\.genes\\.results$",
+          "patterns": {"cohort": ["characteristics_ch1.3.treatment", "^(YA|OS) "], "trt": ["characteristics_ch1.3.treatment", "^(?:YA|OS) (control|treated) "]},
+          "recode": {"trt": {"control": "vehicle", "treated": "tomatidine"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are '<library name>.genes.results'; GEO description holds 'Library name: <library name>'. Exact match after stripping the suffix and prefix. cohort and trt come from the treatment characteristic ('YA control ( EStim)' etc.).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "reasoning": "GEO data_processing: 'tab-delimited matrix file, containing non-normalized FPKM values for all genes'; file name genes.fpkm.tsv.gz; values non-integer in 31% of cells. The paper ran DESeq2 on RSEM counts, which are not deposited, so the paper's method could not be reproduced exactly on this matrix (DESeq2 on FPKM is invalid).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["cohort", "trt"],
+          "references": {"cohort": "YA", "trt": "vehicle"},
+          "organism": "Human",
+          "planned": [],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "none (refused)",
+            "design_column": null,
+            "contrasts": []
+          },
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast is identifiable. All 12 sequenced myobundles received exercise-like E-Stim (Table 1; GEO treatment field '( EStim)' on every sample); there is no unstimulated or pre-stimulation arm. The data support only tomatidine vs vehicle under E-Stim (a drug effect) and YA vs OS (donor age/activity, one donor source per cohort, aliased with donor), neither of which is an effect of exercise.",
+          "reasoning": "The request asks how exercise affects gene expression. The paper's RNA-seq estimand is tomatidine vs vehicle within stimulated myobundles (S2.7.p1, S3.2.p1); stimulation is held constant. Candidate alternatives rejected: (1) trt tomatidine vs vehicle within cohort: analyzable but a pharmacological contrast, not exercise; (2) cohort OS vs YA: donor age/activity status confounded with the single donor cell source, not an exercise intervention, and not a paper DE contrast; (3) tomatidine x cohort interaction: not exercise. Small n is not the reason for stopping.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "trt_tomatidine_vs_vehicle within cohort (paper's DE contrasts)", "reason_rejected": "drug effect under constant E-Stim, not an exercise effect"},
+            {"value": "cohort_OS_vs_YA", "reason_rejected": "donor age/activity, aliased with donor cell source; not an exercise contrast and not reported by the paper"},
+            {"value": "E-Stim vs unstimulated", "reason_rejected": "no unstimulated samples were sequenced"}
+          ]
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix input", "paper": "DESeq2 on RSEM expected counts (S2.6.p1)", "data": "only an FPKM matrix is deposited", "disposition": "would require a declared deviation (limma on log2(FPKM+1)); moot because the case is refused at design"},
+        {"item": "exercise estimand", "paper": "exercise-like E-Stim applied to every sequenced sample; DE contrasts are tomatidine vs vehicle", "data": "12/12 samples E-Stim", "disposition": "refused: no exercise contrast"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
