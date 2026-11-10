@@ -1,0 +1,255 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38982049",
+  "request": "Analyze GSE266883 for PMID 38982049 (Self-powered triboelectric-responsive microneedles with controllable release of optogenetically engineered extracellular vesicles for intervertebral disc degeneration repair.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE266883",
+      "accession": "GSE266883",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC11233569.paper.md"
+        ],
+        "metadata": "GSE266883/GSE266883_metadata.csv",
+        "matrix": "GSE266883/GSE266883_Sham_LSI_LSI_E_RPKM.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE266883"
+            ],
+            "assay": "bulk RNA-seq of nucleus pulposus (NP) tissue/cells; rat L4-L5 IVDs (Sham, LSI, LSI-E; n=3 each) plus a separate human normal vs degenerated NP series (n=3 each) in the same GEO series",
+            "organism": "Rattus norvegicus (male SD rats, S4.20.p1)",
+            "factors": {
+              "grp": [
+                "Sham (sham operation)",
+                "LSI (lumbar spinous process resection, no exercise)",
+                "LSI-E (LSI + treadmill running, 8 weeks)"
+              ]
+            },
+            "sample_inclusion": "rat samples only (9) for the exercise question; the 6 human IVDD/Normal samples address degeneration, not exercise, and are on a different matrix/organism",
+            "primary_estimand": "effect of treadmill exercise on NP transcriptome in lumbar-instability rats: LSI-E vs LSI (Fig. 2G-J, S2.1.p2)",
+            "planned_contrasts": [
+              "LSI-E vs LSI (primary; S2.1.p2, Fig. 2G-J; paper reports GO/GSEA, no DEG count)",
+              "LSI-E vs Sham (secondary; S2.1.p2, Supplementary Fig. 2A; no DEG count)"
+            ],
+            "repeated_measure_unit": "none; one sample per rat",
+            "normalization": "RPKM (GEO data_processing)",
+            "paper_method": "not stated (DEG method unreported; GSEA 4.2.3 with NES |>1|, p<0.05, FDR q<0.25 - S4.3.p2, S4.21.p1)",
+            "paper_threshold": {
+              "metric": null,
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "stated": false,
+              "source_locator": "not stated for DEGs; S4.3.p2 gives only GSEA cutoffs"
+            },
+            "paper_results": "LSI-E vs LSI DEGs enriched for immune/inflammatory GO terms; GSEA: cytosolic DNA-sensing pathway, inflammatory response, NF-kB signaling up in LSI-E (Fig. 2G-J, S2.1.p2)"
+          },
+          "reasoning": "S2.1.p2: L4-L5 IVDs from sham, LSI and LSI-E rats were RNA-sequenced; DEGs LSI-E vs Sham and LSI-E vs LSI analysed by GO/KEGG/GSEA. Fig 2 legend: n=3 per group for RNA-seq. S4.20.2.p1 describes treadmill exercise. No DEG test or threshold is reported anywhere (S4.21.p1, S4.25.p1).",
+          "confidence": "high",
+          "locator": "S2.1.p2; FIG2; S4.20.2.p1; S4.21.p1; S10.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": "S10.p1 names GSE266883; GEO samples GSM8255521-29 are Sham/LSI/LSI-E rat NP RNA-seq matching Fig 2A design (n=3 each); matrix GSE266883_Sham_LSI_LSI_E_RPKM.txt.gz columns Sham_1-3, LSI_1-3, LSI_E_1-3 match metadata description field"
+          },
+          "reasoning": "Data availability statement S10.p1 deposits GSE266883; contact institute Wuhan Union Hospital matches authors.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {
+            "key": [
+              "description",
+              "^([^,]+),"
+            ]
+          },
+          "patterns": {
+            "grp": [
+              "description",
+              "^(Sham|LSI_E|LSI)_\\d+,"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "Sham": "Sham",
+              "LSI": "LSI",
+              "LSI_E": "LSIE"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal the token before the comma in metadata 'description' (e.g. 'LSI_E_1,Sham_LSI_LSI_E_RPKM.txt'); group derived from the same token and cross-checked with characteristics_ch1.2.treatment (Sham operation/LSI/LSI-E). Human samples excluded. The 6 human samples (GSM8255515-20) have no column in this rat matrix and drop out at alignment; not part of the exercise question.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "RPKM",
+          "recommended_method": "limma",
+          "reasoning": "File name says RPKM; GEO data_processing: 'Read Per Kilobase of exon per Megabase of library size (RPKM) were calculated'; values are non-integer (integer fraction 0.16) with median 1.8. No raw counts deposited. Paper does not state its DE input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "Sham"
+          },
+          "organism": "Rat",
+          "planned": [
+            "grp_LSIE_vs_LSI",
+            "grp_LSIE_vs_Sham"
+          ],
+          "final": {
+            "analysis_type": "multi-group (3 levels), one model, planned pairwise contrasts",
+            "design_column": "grp",
+            "contrasts": [
+              {
+                "name": "grp_LSIE_vs_LSI",
+                "control": "LSI",
+                "treatment": "LSIE",
+                "role": "primary"
+              },
+              {
+                "name": "grp_LSIE_vs_Sham",
+                "control": "Sham",
+                "treatment": "LSIE",
+                "role": "secondary"
+              }
+            ]
+          },
+          "reasoning": "Primary estimand is exercise within LSI rats (LSI-E vs LSI, Fig 2G-J). Paper also compares LSI-E vs Sham (Supp Fig 2A), which confounds surgery and exercise and is secondary. LSI vs Sham (surgery effect) is not exercise and only exploratory. One limma model on all 9 rat samples. All three pairwise comparisons are fitted from the same model; grp_LSI_vs_Sham (surgery effect) is exploratory, not an exercise estimand.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "pool LSI and Sham as non-exercise control",
+              "reason_rejected": "pools distinct levels; Sham did not undergo surgery"
+            },
+            {
+              "value": "include human IVDD vs Normal",
+              "reason_rejected": "degeneration, not exercise; different organism"
+            }
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent male rats, one sample each; no batch, sex or lane annotation in GEO; all rat samples on one platform (GPL24688) and one matrix.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(RPKM+1)",
+            "formula": "~ grp",
+            "paper_route": {
+              "method": "not stated",
+              "status": "not_reported",
+              "reason": "paper reports no DEG method; only RPKM deposited"
+            },
+            "deviations": [
+              "limma on log2(RPKM+1) chosen by policy because only RPKM is deposited and the paper names no DE method"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized RPKM -> log2(x+1) then limma. Count methods would need raw counts, not deposited; RPKM is not rounded.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": null,
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "stated": false
+            },
+            "threshold_source": "workflow_default",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            }
+          },
+          "reasoning": "Paper states no DEG threshold (only GSEA NES/p/FDR q cutoffs in S4.3.p2), so the workflow default BH-adjusted p < 0.05 with no fold-change rule is used and marked as fallback.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Paper reports no DEG method, threshold or DEG counts; the DE route (limma on log2 RPKM) and threshold (workflow default) are not reproductions of a stated paper rule.",
+              "n=3 rats per arm.",
+              "About 10-20 gene IDs in the deposited matrix are Excel-date-mangled (e.g. 1-Mar, 15-Sep); left as deposited."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Contrast and sample set match the paper; comparison to the paper is at the pathway level (inflammatory response, NF-kB, cytosolic DNA sensing up in LSI-E).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "DEG method and threshold",
+          "paper": "not reported",
+          "data": "RPKM only",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "GEO series contains human IVDD/Normal samples",
+          "paper": "human NP RNA-seq used for degeneration correlation (S2.1.p3), not exercise",
+          "data": "separate human RPKM file, 6 samples",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": "all"
+          },
+          "role": "primary",
+          "reasoning": "one limma model (~ grp) on all 9 rat samples, log2(RPKM+1); grp_LSIE_vs_LSI is the exercise estimand, grp_LSIE_vs_Sham secondary per paper, grp_LSI_vs_Sham exploratory"
+        },
+        {
+          "name": "joint_tpm_filt",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": "all"
+          },
+          "role": "sensitivity",
+          "transform": "log2(CPM+1)",
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 3
+          },
+          "reasoning": "sensitivity: RPKM column sums differ by group (LSI carries a few genes up to 33k RPKM, shifting the median); rescaling each column to sum 1e6 (TPM-equivalent) before log2 and dropping genes with RPKM<1 in fewer than 3 samples tests whether the skewed up/down balance is a composition artefact"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "joint/grp_LSIE_vs_LSI",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper claims GO/KEGG/GSEA inflammatory, NF-kB and cytosolic DNA-sensing activation in LSI-E vs LSI (Fig 2G-I); rat symbols on mouse sets"
+        }
+      ]
+    }
+  ]
+}

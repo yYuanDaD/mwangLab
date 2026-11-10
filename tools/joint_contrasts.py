@@ -68,9 +68,20 @@ def _safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", name).strip("_") or "contrast"
 
 
+_BLOCK_TOKENS = {"subject", "donor", "patient", "participant", "individual", "animal", "mouse", "rat", "pair",
+                 "batch", "litter", "lane", "run", "cage", "id", "subjectid", "animalid", "pairid"}
+
+
+def _is_block_name(name: str) -> bool:
+    return any(t in _BLOCK_TOKENS for t in re.split(r"[^a-z0-9]+", str(name).lower()))
+
+
 def _numeric_covariates(meta: pd.DataFrame, covariates: Sequence[str]) -> list[str]:
-    """Covariates whose values are all numbers (RIN, age): fitted as continuous, not as factors."""
-    return [c for c in covariates if pd.to_numeric(meta[c], errors="coerce").notna().all()]
+    """Covariates whose values are all numbers (RIN, age): fitted as continuous, not as factors.
+
+    Blocking units numbered 1..n (subject, animal, batch) are labels, not quantities: kept as factors."""
+    return [c for c in covariates if not _is_block_name(c)
+            and pd.to_numeric(meta[c], errors="coerce").notna().all()]
 
 
 def run_joint_deseq2(counts_csv: str, metadata_csv: str, comparisons: Sequence[dict], output_dir: str, *,

@@ -578,7 +578,8 @@ class CaseRun:
             kept = pd.read_csv(aligned_meta, index_col=0)
             unknown = sorted(set(a.exclude_samples) - set(kept.index.astype(str)))
             if unknown:
-                raise native.NativeToolError(f"alignment.exclude_samples not in the aligned metadata: {unknown}")
+                # already absent after alignment (no matrix column): record it instead of stopping
+                self.result["exclude_samples_not_aligned"] = unknown
             kept = kept.loc[[i for i in kept.index.astype(str) if i not in a.exclude_samples]]
             aligned_meta = adir / "aligned_metadata_kept.csv"
             kept.to_csv(aligned_meta)

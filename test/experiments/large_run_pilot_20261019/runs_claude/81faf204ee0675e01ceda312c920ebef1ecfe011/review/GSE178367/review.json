@@ -1,0 +1,21 @@
+{"case": "GSE178367", "reviewer": "claude (Sonnet 5.5), read-only decision review",
+ "blind": {
+  "B1": "No. PMC8348158 studies SCA3 (ATXN3 15Q vs 84Q) transgenic mice with weekly i.p. IGF-1 (S4.1.p1, S2.2.p1). No exercise or training intervention anywhere; 'exercise behavior' (ABS.p1) is a behavioral outcome of prior GH work. No sequenced sample carries an exercise factor.",
+  "B2": "84Q vs 15Q (521 DEGs, 62 up/459 down), 84Q+IGF-1 vs 15Q (588; 45 up/543 down), 84Q+IGF-1 vs 84Q (6; 1 up/5 down) (S2.2.p1). GEO groups 15Q n=3, 84Q n=3, 84Q+IGF1 n=3 (packet A).",
+  "B3": "No repeated measures: one cerebellum per mouse at 18 months, each mouse in one group (S4.1.p1, growth_protocol). Candidate keys in packet A link 0/9 samples and nothing indicates an animal sampled twice. Lab-id prefixes (e.g. 22_2_4, 22_2_1) may reflect litter/cage but are undocumented.",
+  "B4": "Paper does not say whether the three pairs were fitted jointly or separately; only 'DESeq2 ... Wald test, BH' (S4.7.p1).",
+  "B5": "S4.7.p1: 'Genes with >=log2 (1.5) absolute log2-fold changes and adjusted p-values < 0.1 were considered significantly differentially expressed.' S2.2.p1 states counts at 'adjusted p-value < 0.05' (internal inconsistency). Counts: 521/588/6 as in B2."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Refusal matches B1: no exercise arm (ABS.p1, S4.1.p1); genotype and IGF-1 pharmacology only, not an in-vitro exercise mediator design either.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "alignment gate: grp Q15=3, Q84=3, Q84IGF=3, 9/9 exact match, no exclusions; matches paper groups.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast executed (refused at design).", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Paper_reconstruction says independent animals; packet A keys link 0/9; the two unused_subject_like_column flags (source_name_ch1, grp) are group labels, not animal IDs.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Nothing fitted; paper silent on joint vs pairwise (S4.7.p1).", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "No exercise factor to be aliased; no batch/housing info in paper or GEO.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer_fraction 1.0, featureCounts raw counts, DESeq2 recommended, matches S4.5.p2/S4.7.p1.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Transcribed exactly: padj<0.1, |log2FC|>=log2(1.5) (S4.7.p1); Results/Methods conflict (0.05 vs 0.1) recorded in paper_data_discrepancies.json as recorded_not_executed.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK reports paper counts only for reference and states none were computed; claims no more than the files show.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise arm' was checked against the full paper (no exercise/training/wheel intervention) and GEO metadata (packet A: no exercise words in any column).", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该研究是SCA3转基因小鼠的基因型与IGF-1注射实验，论文和GEO元数据中均没有运动干预，因此在设计阶段拒绝运行是正确的。分组、矩阵类型、阈值（padj<0.1且|log2FC|>=log2(1.5)）转录无误，Results与Methods的阈值矛盾已被记录。没有发现需要修改的项目。"}

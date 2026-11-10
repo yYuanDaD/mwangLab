@@ -1,0 +1,245 @@
+{
+  "case_id": "GSE320360",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "pre": 30,
+          "mid": 29,
+          "post": 28,
+          "post75": 28
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "subject",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 111,
+        "min_cell_size": 28
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_mid_vs_pre",
+        "time_post_vs_pre",
+        "time_post75_vs_pre"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Human') or lack sex chromosomes.",
+      "metadata_sex_column": "",
+      "sexes": [],
+      "split_plan": {
+        "split": false,
+        "sexes": [],
+        "reason": "sex unknown for every sample"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_post_vs_mid",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "mid",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post"
+          },
+          "n": 28
+        },
+        {
+          "cell": {
+            "time": "mid"
+          },
+          "n": 29
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post75_vs_mid",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post75",
+      "reference": "mid",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post75"
+          },
+          "n": 28
+        },
+        {
+          "cell": {
+            "time": "mid"
+          },
+          "n": 29
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_mid_vs_pre",
+      "kind": "simple",
+      "factor": "time",
+      "test": "mid",
+      "reference": "pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "mid"
+          },
+          "n": 29
+        },
+        {
+          "cell": {
+            "time": "pre"
+          },
+          "n": 30
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post75_vs_post",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post75",
+      "reference": "post",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post75"
+          },
+          "n": 28
+        },
+        {
+          "cell": {
+            "time": "post"
+          },
+          "n": 28
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post"
+          },
+          "n": 28
+        },
+        {
+          "cell": {
+            "time": "pre"
+          },
+          "n": 30
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post75_vs_pre",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post75",
+      "reference": "pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post75"
+          },
+          "n": 28
+        },
+        {
+          "cell": {
+            "time": "pre"
+          },
+          "n": 30
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

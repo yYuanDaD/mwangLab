@@ -1,0 +1,21 @@
+{"case": "GSE269016", "reviewer": "Claude Sonnet 5.5 (read-only decision reviewer)",
+ "blind": {
+  "B1": "Yes. S4.16.p1 names GSE269016 as the liver RNA-seq of this exercise paper; GEO has 12 WT male-mouse liver samples, 6 Sedentary + 6 Exercise (postprandial single bout, S4.3.p2). All 12 carry the exercise factor (6 exercised, 6 sedentary controls); not an in-vitro design.",
+  "B2": "Main transcriptome comparison: liver Exercise vs Sedentary, postprandial, n = 6 vs 6 (FIG3/FIG4 legends: n = 6 males/group; S2.3.p1 Supp Fig 3A). The paper reports no DEG count, only KEGG (insulin signaling) and named genes (Angptl8 down, Cebpa regulated, Angptl4 up in liver, Supp Fig 4C).",
+  "B3": "No repeated measures: one liver per mouse, half the mice exercised and half left sedentary (S4.3.p2). Packet A candidate pairing keys link 0/12 samples; no animal ID in metadata. No pairing unit needed.",
+  "B4": "Paper does not say how RNA-seq DE was fitted (S4.13.p1: 'RNA-Seq was performed as described previously (27)'). With one two-level factor, joint vs pairwise is the same model.",
+  "B5": "Paper states no DEG rule for the transcriptome and no DEG count. Only 'P values of less than 0.05 were considered significant' for t tests on bench data (S4.14.p1); KEGG via BGI Dr.Tom (S4.13.p1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Ran; matches B1 (S4.16.p1, 6 SED + 6 EX liver).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp SED 6 / EX 6 from title, cross-checked against treatment column; matches n = 6/group (FIG3); no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "EX vs SED, control SED. Angptl8 log2FC -2.65 (paper: suppressed), Angptl4 +1.64 (paper: increased, Supp Fig 4C).", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "No repeated unit (S4.3.p2; packet A keys link 0/12).", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent; ~ grp on 12 samples is the only sensible fit.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch, sex, housing recorded; all male, same tissue and genotype; sampled at the same time (S4.3.p2).", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "RSEM expected counts (68% integer, non-integer values) rounded then DESeq2, documented; FPKM columns dropped.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states none (S4.13.p1, S4.14.p1); recorded as workflow_default padj < 0.05 with an audit |log2FC| > 1; matches B5.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "paper_counts empty, comparison not claimed. Minor: reconstruction says 'sedentary littermates' but the paper does not say littermates in S4.3.p2.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该案例设计正确：肝脏 RNA-seq，6 只运动 vs 6 只久坐，独立动物，无重复测量，方向、分组、矩阵处理均与论文一致。论文未给出 DEG 阈值和数量，已作为 workflow 默认并如实记录。仅有一处次要措辞问题（论文未说 littermates）。"}

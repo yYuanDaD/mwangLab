@@ -591,3 +591,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39171527 (GSE269016)
 
 - no spec option to pick an annotation column as feature ID or a subset of sample columns, so a prep script was needed (case_runner.py:383); inspect mixes read_count+fpkm columns (inspect hint added after this row) Details: `PMID39171527/HANDBACK.md`.
+
+## PMID38982049 (GSE266883)
+
+- case_runner.py:581 exclude_samples errors on IDs already dropped by alignment (patched after this row); design-vs-execution contrast name mismatch not warned Details: `PMID38982049/HANDBACK.md`.
+
+## PMID42812173 (GSE320360)
+
+- joint_contrasts.py:71 numeric subject IDs become continuous covariate (patched after this row); case_runner.py:740 no normalized-count filter; suitability.py:356 duplicate subject 'omit' msg Details: `PMID42812173/HANDBACK.md`.
