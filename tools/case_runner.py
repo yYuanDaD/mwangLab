@@ -817,6 +817,9 @@ class CaseRun:
                     if all(str(cell["cell"].get(k, next(iter(vals)))) in vals
                            for cell in c.get("cells", []) for k, vals in keep.items() if k in cell["cell"])]
         names = self.spec.gates.design.planned if choice == "planned" else list(choice)
+        # an execution may name a pair in the reverse of the enumerated direction (planned or not)
+        from tools.suitability import add_reversed_planned
+        self.comparisons = add_reversed_planned(self.comparisons, names)
         by_name = {c["name"]: c for c in self.comparisons}
         missing = [n for n in names if n not in by_name]
         if missing:

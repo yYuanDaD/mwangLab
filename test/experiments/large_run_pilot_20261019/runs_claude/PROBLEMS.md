@@ -623,3 +623,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42318351 (GSE277623)
 
 - none blocking; series matrix columns have no metadata key (used GSM-keyed RAW.tar); raw_tar merge writes into shared data cache Details: `PMID42318351/HANDBACK.md`.
+
+## PMID33598660 (GSE117161)
+
+- none blocking; Excel-mangled Mar/Sep symbols needed a prep script (4 ambiguous rows dropped); joint 'all' duplicates planned tables Details: `PMID33598660/HANDBACK.md`.
+
+## PMID34039988 (GSE132520)
+
+- case_runner.py:823 rejected reversed comparison names not in design.planned (patched after this row); finish says completed when primary execution failed Details: `PMID34039988/HANDBACK.md`.
