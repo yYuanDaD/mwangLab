@@ -69,7 +69,7 @@ Decide them in this order for every case. Each maps to one gate of the case spec
     - GSEA uses the full ranking; an ORA gene list uses the applied threshold.
     - It runs only after a completed execution. Without one, record the plan as `valid` + `not_run` with `reason_not_run`.
     - A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).
-11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed, with the paper's counts and named genes to compare.
+11. `study`: record the planned route (`paper_aligned`, `declared_deviation`, or `exploratory`) even when execution failed, with the paper's counts and named genes to compare. A result whose direction contradicts the paper (a gene, a pathway sign) goes into the study `caveats`, not only into HANDBACK.md.
 
 `execute` finishes the run and validates the decision contract. If the evaluator skill is installed, audit with `evaluate-bioinformatics-agent`.
 

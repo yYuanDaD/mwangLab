@@ -123,8 +123,20 @@ def exercise_hits(meta: pd.DataFrame) -> dict:
 
 
 def _strip_levels(value: str, drop: set[str]) -> str:
-    toks = [t for t in SPLIT.split(str(value)) if t and t.lower() not in drop]
-    return "_".join(toks)
+    """Remove the across levels from a name: as whole tokens (SAT_AM_Cont_a) or glued on (ALORPRE)."""
+    out = []
+    for t in SPLIT.split(str(value)):
+        if not t or t.lower() in drop:
+            continue
+        for d in sorted((d for d in drop if len(d) >= 2), key=len, reverse=True):
+            if len(t) > len(d) + 1 and t.lower().endswith(d):
+                t = t[:-len(d)]
+                break
+            if len(t) > len(d) + 1 and t.lower().startswith(d):
+                t = t[len(d):]
+                break
+        out.append(t)
+    return "_".join(out)
 
 
 def _suffix(value: str) -> str | None:
@@ -180,8 +192,12 @@ def pairing_search(meta: pd.DataFrame, max_across_levels: int = 4) -> list[dict]
                     gv = meta[g].fillna("").astype(str).map(lambda v: _strip_levels(v, drop))
                     if gv.nunique() >= 2 and not (gv == acr).all():
                         cands[f"{g} (without {across}) + suffix of {c}"] = gv + "|" + suf.fillna("")
-        for g, lv in grouping.items():
-            if g != across and len(lv) > max_across_levels and max(lv.values()) <= 2 * len(acr.unique()):
+        n_across = len(acr.unique())
+        for g in [*grouping, *facts["other_columns"]]:
+            if g == across:
+                continue
+            counts = meta[g].fillna("").astype(str).value_counts()
+            if counts.size > max_across_levels and counts.max() <= 2 * n_across:
                 cands[g] = meta[g].fillna("").astype(str)
         for name, keys in cands.items():
             st = _key_stats(keys, acr)
@@ -248,8 +264,9 @@ def flag_unused_subject(design: pd.DataFrame | None, full: pd.DataFrame | None, 
         repeated = 2 <= k <= n / 2 and counts.min() >= 2 and counts.max() <= 6 and k >= 3
         if named and k < n or repeated and (named or k >= n / 4):
             flags.append({"flag": "unused_subject_like_column", "column": c, "n_values": int(k),
-                          "max_repeat": int(counts.max()),
+                          "max_repeat": int(counts.max()), "named_like_subject": named,
                           "note": "repeated per-sample key not in the model; check whether it is the animal/person"})
+    flags.sort(key=lambda f: not f["named_like_subject"])
     return flags
 
 

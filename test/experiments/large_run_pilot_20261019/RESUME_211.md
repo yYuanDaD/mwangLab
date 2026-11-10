@@ -12,6 +12,26 @@ Branch `claude/project-thread-5415h4` = `claude/project-thread-s8u35g` + the cas
 - After each paper: `finish_paper.py` appends a row to `runs_claude/progress.csv` (with the
   decision-contract validator result) and a section to `runs_claude/PROBLEMS.md`.
 
+## Review step (from 2026-11-10, owner: "接入")
+
+After `finish_paper.py`, every paper gets a read-only review of its key decisions
+(`agent_skills/bioinformatics-workflow/references/decision-review.md`; calibration 6/6 caught, 0/5 false
+alarms, ~99k tokens and ~1 min per review on Sonnet: `../review_calibration_20261103/REPORT.md`):
+
+1. `python test/experiments/large_run_pilot_20261019/review_paper.py prepare <paper_id>` builds the packets
+   (no model call) and prints the reviewer prompt (`REVIEW_PROMPT_211.md`).
+2. Send that prompt to one fresh subagent with model **sonnet** (one per paper, all its cases). It may run
+   while the next paper's analysis runs; it counts toward the same parallel limit.
+3. `review_paper.py record <paper_id> <minutes> <tokens>` appends to `runs_claude/reviews.csv`, puts
+   unsure/human/policy items in `runs_claude/REVIEW_QUEUE.md`, and prints FIX ITEMS when the verdict is `fix`.
+4. FIX ITEMS go once to the paper's analysis subagent (SendMessage to it, so it keeps its context): apply them
+   and run `execute` again, or answer in writing why not; update HANDBACK.md. Then
+   `review_paper.py resolve <paper_id> applied|rebutted|skipped "<one line>"`; after `applied`, rerun
+   `finish_paper.py`'s validator line by hand if the run changed (`record_run.py` appends a new row; the
+   newest row counts). No second review round: a rebuttal goes to the owner's queue.
+
+Papers already done before 2026-11-10 are not reviewed unless the owner asks.
+
 ## Resuming
 
 A paper counts as done when its `paper_id` is in `runs_claude/progress.csv`. A paper whose folder

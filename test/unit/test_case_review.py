@@ -135,6 +135,16 @@ def test_expression_check_supports_true_key():
         assert s["pairing_expression_check"]["status"] == "supported", s["pairing_expression_check"]
 
 
+def test_pairing_search_finds_glued_names_and_many_subjects():
+    """GSE267512-like: titles ALORPRE / ALORPOST, 30 subjects (more levels than a grouping column)."""
+    subs = [f"S{chr(65 + i // 26)}{chr(65 + i % 26)}X" for i in range(30)]
+    rows = [{"title": f"{s}{t}", "time": t, "subject": s} for s in subs for t in ("PRE", "POST")]
+    meta = pd.DataFrame(rows, index=[f"GSM{i}" for i in range(len(rows))])
+    cands = {c["key"]: c for c in case_review.pairing_search(meta) if c["across"] == "time"}
+    assert cands["title without the time level"]["keys_in_every_level_once"] == 30
+    assert cands["subject"]["keys_in_every_level_once"] == 30
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_") and callable(fn):
