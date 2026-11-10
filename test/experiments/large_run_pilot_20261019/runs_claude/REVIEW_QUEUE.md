@@ -43,3 +43,7 @@ One section per case; newest last.
 
 - policy: Open policy: report the paper-stated rule (padj<0.05, |log2FC|>0.25: 76/45/134) or the authors' code rule (padj<=0.05, |log2FC|>=0.27: 71/41/126) as headline; the run reports both, with the paper rule applied.
 - policy: Optional: joint model AR vs SED has only 1990 tested genes, check whether this is independent filtering or an outlier artefact (sensitivity only).
+
+## PMID40832111 / GSE296683 (2026-11-10)
+
+- policy: Open policy: whether an in-vitro exercise-like (electrical pulse) stimulation series with the drug as the only varied factor counts as an exercise study; the refusal is consistent with the skill rule but the person may want the tomatidine-vs-vehicle contrasts run and labelled as a drug effect under E-Stim.

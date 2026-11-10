@@ -511,3 +511,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40832111 (GSE296683)
 
 - none (cosmetic: execute output's matrix_column_keys echo truncated to 10 of 12 columns) Details: `PMID40832111/HANDBACK.md`.
+
+## 9eef7b263d48ceff706cefc035f28c278d2d060d (GSE124676)
+
+- minor: tools/limma_tools.py:106-107 silently drops zero-variance genes (26111->21248), not recorded in method record Details: `9eef7b263d48ceff706cefc035f28c278d2d060d/HANDBACK.md`.
+
+## e6da17ec35146322588e4f22850014a7def00cc7 (GSE217155)
+
+- tools/geo_tar.py:111-114 drops multi-sample tar member GSM6705777 (9->8 samples), warning not in inspect notes; Entrez IDs need prep symbol mapping Details: `e6da17ec35146322588e4f22850014a7def00cc7/HANDBACK.md`.

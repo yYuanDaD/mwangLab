@@ -1,0 +1,142 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/9eef7b263d48ceff706cefc035f28c278d2d060d",
+  "request": "Analyze GSE124676 for the paper (Exercise Reverses Dysregulation of T-Cell-Related Function in Blood Leukocytes of Patients With Parkinson's Disease, PMC6997272): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE124676",
+      "accession": "GSE124676",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC6997272.paper.md"],
+        "metadata": "GSE124676/GSE124676_metadata.csv",
+        "matrix": "GSE124676/GSE124676_genes.fpkm_table.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE124676"],
+            "assay": "Ion Proton total RNA-seq (globin-depleted) of blood leukocytes; Tophat2/bowtie2 to hg19; Cuffquant + Cuffnorm normalized FPKM (S2.3.p1, S2.4.p1)",
+            "sample_inclusion": "Group 1 only: 21 PD patients (10 tai chi, 11 MET), each sampled before and 48-72 h after a 12-week exercise program = 42 RNA-seq samples (S3.1.p1, S3.3.p1). Group 2 (19 patients) is qPCR/immunoassay validation only, not in GEO.",
+            "factors": {"time": ["before", "after"], "exercise_type": ["Tai chi", "MET"], "subject": "21 patients"},
+            "primary_estimand": "Within-patient change in leukocyte gene expression after 12 weeks of exercise (after vs before), tai chi and MET pooled (S3.3.p1: exercise type gave no transcriptomic difference, so groups combined)",
+            "planned_contrasts": ["time after vs before, paired by patient, both exercise types pooled (S2.4.p1, S3.3.p1; paper: 1,873 DEGs, 417 higher after, 1,453 higher before)"],
+            "repeated_measure_unit": "patient (before/after pair)",
+            "normalization": "Cuffnorm normalized FPKM",
+            "paper_method": "paired Student t-test on Cuffnorm FPKM, before vs after (S2.4.p1); scale of the tested values (linear or log) not stated",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.4.p1"},
+            "paper_results": "1,873 DEGs (S3.3.p1; 1,453 + 417 = 1,870, internal mismatch of 3). Down after: ODC1 (most down), CD3E, GRAP2, FOS, ZAP70, IL2RA/B, TNFRSF18, RTP5, CCL5, CD28; up after: TRAF3, TNF, AGAP2 (S3.3.p2-p3, S3.4.p1-p3, S3.5.p2). KEGG: TCR signaling down, osteoclast differentiation up (S3.4.p1)."
+          },
+          "reasoning": "Methods S2.4.p1 define a paired t-test before vs after exercise with raw P < 0.05 and no fold-change cutoff; S3.3.p1 pools tai chi and MET. No sedentary control arm exists: the estimand is a within-subject pre/post change in PD patients.",
+          "confidence": "high",
+          "locator": "S2.4.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S6.p1 names GSE124676", "42 samples = 21 patients x before/after (S3.3.p1)", "metadata exercise counts at baseline 11 MET / 10 tai chi match S3.1.p1", "data_processing matches S2.4.p1 (Cuffquant [-b,-u] + Cuffnorm FPKM, RefGene 2015 Feb, hg19)"]},
+          "reasoning": "Accession, sample count, arm sizes and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {"subject": ["title", "^(a\\d+)f?_(?:before|after)$"]},
+          "aliases": {"time": "characteristics_ch1.2.time", "extype": "characteristics_ch1.1.exercise"},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns q1_*/q2_* equal metadata 'description' exactly (42/42, inspect alignment_keys). Subject = patient code in title (a19_before / a19f_after); 'f' suffix marks follow-up. time copied from characteristics time. extype kept as annotation only (subject a22 is labelled MET before but Tai chi after, a metadata inconsistency).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "final": {"source": "GSE124676_genes.fpkm_table.txt.gz; data_processing: Cuffnorm normalized FPKM", "paper_input": "Cuffnorm FPKM (S2.4.p1)"},
+          "reasoning": "File name, data_processing and paper all say normalized FPKM; values non-integer (integer fraction 0.40 driven by zeros), max 84,329 = linear scale. Not counts, so count methods are invalid.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "before"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_after_vs_before"],
+          "covariate_candidates": ["extype"],
+          "final": {
+            "analysis_type": "paired two-group (repeated measures)",
+            "design_column": "time",
+            "control": "before",
+            "treatment": "after",
+            "contrasts": [{"name": "time_after_vs_before", "control": "before", "treatment": "after", "role": "primary"}]
+          },
+          "reasoning": "Paper's estimand is the paired pre/post change pooling both exercise modes (S3.3.p1). Exercise type is not a factor of the paper's DE analysis; tai chi vs MET is a between-subject comparison the paper reports as non-different and does not test for DEGs.",
+          "candidates": [
+            {"value": "extype (MET vs Tai chi) as factor", "reason_rejected": "Not the paper's estimand; paper pooled the modes (S3.3.p1); a22 has conflicting labels across time points."},
+            {"value": "time within each exercise type separately", "reason_rejected": "Paper did not do it; would require resolving a22's conflicting label; ~10-11 pairs per arm."}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "extype", "disposition": "not_included: constant within subject (except a22 label error), absorbed by subject block; paper pooled modes"}]},
+          "confounding_candidates": ["extype"],
+          "reasoning": "Each patient contributes one before and one after sample; paper used a paired test to remove individual differences (S2.4.p1). Subject enters the model as a blocking factor.",
+          "confidence": "high"
+        },
+        "method": {
+          "transform": "log2(x+1)",
+          "final": {
+            "method": "limma (moderated t, ~ C(subject) + time) on log2(FPKM+1)",
+            "formula": "~ C(subject) + Treatment",
+            "paper_route": {"method": "paired Student t-test on Cuffnorm FPKM", "status": "blocked", "reason": "No validated paired-t executor in the repository and the paper does not state whether FPKM was log-transformed; a hand-written t-test is not allowed. limma with a subject block is the validated paired equivalent (adds variance moderation)."},
+            "deviations": ["limma moderated paired t (subject block) instead of ordinary paired t-test", "log2(FPKM+1) scale (paper scale unstated)", "no expression filter (paper states none)"]
+          },
+          "reasoning": "FPKM -> log2(x+1) -> limma is the policy route; subject as a block reproduces the pairing.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper's raw P < 0.05, no fold change, applied to the limma paired route; BH FDR < 0.05 reported as audit."
+          },
+          "reasoning": "S2.4.p1: 'Significantly differentially expressed genes (DEGs, P < 0.05)'; no multiple-testing correction or FC cutoff stated.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Pre/post design without a non-exercise control: changes include season, time and medication drift (paper S4.p7 notes climate).",
+              "Raw P < 0.05 threshold without multiple-testing correction, as in the paper.",
+              "Subject a22 exercise label differs between before (MET) and after (Tai chi) samples in GEO; irrelevant to the pooled contrast."
+            ]
+          },
+          "paper_counts": {"time_after_vs_before": 1873},
+          "paper_genes": {"time_after_vs_before": ["ODC1", "CD3E", "GRAP2", "FOS", "ZAP70", "IL2RA", "IL2RB", "TNFRSF18", "RTP5", "CCL5", "CD28", "TRAF3", "TNF", "AGAP2"]},
+          "reasoning": "Paper direction: ODC1, CD3E, GRAP2, FOS, ZAP70, IL2RA/B, TNFRSF18, RTP5, CCL5, CD28 down after; TRAF3, TNF, AGAP2 up after.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise label of subject a22", "paper": "arm fixed per randomized patient (S2.1.p2)", "data": "a22_before = MET, a22f_after = Tai chi", "disposition": "executable_without_change"},
+        {"item": "DEG direction totals", "paper": "1,873 DEGs but 1,453 + 417 = 1,870 (S3.3.p1)", "data": "n/a", "disposition": "executable_without_change"},
+        {"item": "test", "paper": "ordinary paired t-test on FPKM (scale unstated)", "data": "FPKM deposited", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "time_after_vs_before",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "time", "control_group": "before", "treatment_group": "after", "covariate_columns": "subject"},
+          "role": "primary",
+          "reasoning": "Paired after vs before, subject block, log2(FPKM+1)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "time_after_vs_before", "ora": true, "gsea": false, "direction": "up", "reasoning": "Paper ran KEGG/GO (DAVID) on up- and down-regulated DEGs separately (S3.4.p1, S3.4.p3)."},
+        {"execution": "time_after_vs_before", "ora": true, "gsea": true, "direction": "down", "ranking_metric": "stat", "reasoning": "Down-regulated ORA (paper: TCR signaling down) plus Hallmark GSEA on the full ranking."}
+      ]
+    }
+  ]
+}
