@@ -29,7 +29,7 @@ python -m tools.case_review packet <run_dir>/<case_id> --out <review_dir> --pape
 | id | Question | Typical error |
 |---|---|---|
 | `run_or_refuse` | Does the decision to run or refuse match B1? Are in-vitro "exercise mediator" designs labelled as such? | A series with no exercise arm analyzed; or refused although the metadata carry exercise groups |
-| `grouping` | Are the samples in each level the paper's group, with the paper's n? Is every exclusion named with a reason? | GEO field mislabelled or shifted by one sample; exclusion inferred without saying so |
+| `grouping` | Are the samples in each level the paper's group, with the paper's n? Is every exclusion named with a reason? Is the control the paper's control for this contrast? | GEO field mislabelled or shifted by one sample; exclusion inferred without saying so; the exercise arm compared with the control of another condition (HFD + exercise vs chow instead of vs HFD), which confounds a second factor: report it under `grouping` |
 | `direction` | Is each contrast exercise (or treatment) versus its control, as the paper reports it? | Non-reference pair ordered alphabetically, so signs flip |
 | `pairing` | When B3 finds repeated samples, does the model block on the unit (or does the record say why it cannot)? Are numeric IDs treated as categories? | Subject left out; two tissues of one rat treated as independent; numeric IDs fitted as a slope |
 | `model_fit` | Does the fit structure follow B4? When the paper is silent and counts differ a lot, are both fits reported? | Joint model where the paper fitted pairs, or the reverse |
@@ -52,6 +52,8 @@ python -m tools.case_review packet <run_dir>/<case_id> --out <review_dir> --pape
 ## Severity and the overall verdict
 
 - `blocking`: the reported result answers a different question or is statistically invalid (wrong samples, reversed sign, no exercise arm, unpaired repeated measures).
+  - A reversed sign of a reported contrast is blocking even when the DEG set and counts are unchanged: every direction-dependent statement (up, down, pathway sign) is wrong.
+  - A series without an exercise arm reported as an exercise result is blocking; a caveat does not lower it.
 - `major`: the result stands but a stated decision, reason or number is wrong and changes interpretation (threshold transcribed wrongly, wrong stop reason, missing confound note).
 - `minor`: wording, a missing locator, a cosmetic mismatch.
 
