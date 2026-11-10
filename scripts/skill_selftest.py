@@ -488,7 +488,8 @@ def main(argv=None) -> int:
 
     native.enable_native_mode()
     run = native.RunRecorder(run_dir, request="skill self-test", platform_name="selftest",
-                             decision_maker="scripts/skill_selftest.py (fixed plans)")
+                             decision_maker="scripts/skill_selftest.py (fixed plans)",
+                             scripted_reason="self-test: drives each executor directly on synthetic data")
     rng = np.random.default_rng(20261011)
     routes = []
     for check in (route_deseq2_paired, route_limma_fpkm, route_multilevel, route_methylation,

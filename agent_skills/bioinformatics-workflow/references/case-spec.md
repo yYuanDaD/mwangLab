@@ -41,7 +41,7 @@ Every gate has `final` (your decision), `reasoning` (with paper locators), `conf
 | `paper_reconstruction` | | `accessions`, `primary_estimand`, `planned_contrasts`, `paper_threshold` (object), plus factors, inclusion, method, paper results | |
 | `ownership` | | `owned` (true/false), checks | accession, files |
 | `alignment` | `key_column` (null = metadata index), `aliases`, `patterns` (`{"grp": ["title", "regex"]}`; several groups are joined with `_`), `combine` (`{"tgrp": ["diet", "time"]}`, joins the recoded source values with `_`), `recode` (every value mapped; a combined column is recoded after it is built, so its keys use the recoded source values, e.g. `HC_BL`), `key_patterns` (derive the key column itself first), `exclude_samples` (`{id: reason}`) | | method, coverage, unmatched IDs, derived columns and levels |
-| `matrix` | `matrix_type`, `recommended_method` | source, paper input | profile |
+| `matrix` | `matrix_type`, `recommended_method`, `feature_ids` (`"entrez"` when the rows are NCBI Entrez gene IDs) | source, paper input | profile |
 | `design` | `factors`, `references`, `subject`, `organism` (`Mouse`/`Human`/`Rat`), `planned` (suitability names `<factor>_<test>_vs_<ref>`, plus `_<stratum>-<level>` per stratum), `covariate_candidates`, `strata` (columns analyzed separately, such as sorted fractions or tissues: comparisons never cross them) | `analysis_type`, `design_column` or `formula`, `contrasts` or `control`+`treatment` | suitability verdict |
 | `covariance` | `confounding_candidates` | `status` (`required`/`not_required`), `blocking_terms`, `covariates` (`{"name", "disposition"}`) | design check, confounding report |
 | `method` | `transform` (`log2(x+1)`, `log2(CPM+1)`, `beta_to_m`, `round`) | `method` (named first: `DESeq2`, `limma`, `edgeR`, ...), `formula`, `paper_route`, `deviations`; `rounding_documented: true` for estimated counts | `matrix_type` |
@@ -55,6 +55,8 @@ Thresholds: `{"metric": "padj"|"pvalue", "cutoff": 0.05, "effect_metric": "log2F
 ## 3. Executions
 
 Each execution: `name` (also the result-table name), `tool`, `args`, `role` (`primary` for the main contrast, `secondary`, `sensitivity`, `exploratory`), `reasoning`. The runner passes the matrix, `metadata_csv` and `output_dir` itself.
+
+**Fit scope.** When the design has more than two groups (levels of one factor, or cells of several), a `primary` or `secondary` result comes from one model on all groups: `run_joint_deseq2`, `run_joint_limma`, or an R executor with the full design and contrasts. A two-arm executor fits only its two groups, so it is a per-pair fit; keep it as `sensitivity`, or set `fit_scope_locator` to the paper's statement that each comparison was fitted on its own samples. `subset` on a column that is not a design factor (tissue, sex, fraction) only chooses the stratum. The runner stops a primary or secondary per-pair fit without the locator before any record past `ownership`, and records each execution's `fit_scope`.
 
 | Route | `tool` | `args` |
 |---|---|---|
@@ -74,14 +76,14 @@ Joint and multigroup executions return one table per comparison, named `<executi
 
 ## 4. Enrichment
 
-`{"execution": "<table name>", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "..."}`. ORA uses the applied threshold (recorded as an audit rule when the applied metric is raw p); GSEA uses the full ranking. Up and down ORA for one table are two entries (`"direction": "up"` / `"down"`); each writes to its own folder. IDs that are not gene symbols or Ensembl genes are recorded as `not_run`. Rat runs on mouse gene sets by symbol.
+`{"execution": "<table name>", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "..."}`. Required: every case that runs lists at least one entry per `primary` execution (`<execution>/<comparison>` for a joint model, normally the primary exercise contrast), and each entry runs both ORA and GSEA; `"ora": false` or `"gsea": false` needs `skip_reason`, which is recorded as the method's `not_run` reason. ORA uses the applied threshold (recorded as an audit rule when the applied metric is raw p); GSEA uses the full ranking. Up and down ORA for one table are two entries (`"direction": "up"` / `"down"`); each writes to its own folder. Gene symbols and Ensembl genes run directly; with `matrix.feature_ids: "entrez"`, Entrez IDs are mapped to symbols through MyGene.info for enrichment and the paper gene lookups. Other IDs are recorded as `not_run`. Rat runs on mouse gene sets by symbol.
 
 ## 5. Execute and fix
 
 `execute` prints, per case: alignment, levels, suitability verdict, each table's counts (`n`, `up`, `down`, `audit_n`), enrichment status, our counts vs the paper's, the gene lookups, and the contract validator's errors.
 
 - `spec_error`: a field is missing or malformed; fix the spec.
-- `cases[i].error`: a step raised (for example a regex that does not match every row, an unmapped recode value, a `not_analyzable` suitability verdict on a valid design). Fix the spec and run `execute` again. The previous attempt moves to `<run_dir>/_previous/`; nothing is deleted.
+- `cases[i].error`: a step raised (for example a regex that does not match every row, an unmapped recode value, a `not_analyzable` suitability verdict on a valid design, or a `SpecError` for a primary per-pair fit). Fix the spec and run `execute` again. The previous attempt moves to `<run_dir>/_previous/`; nothing is deleted.
 - A failed executor is recorded as `valid` + `failed` with its error; that is an acceptable outcome, not a reason to write your own model.
 
 When the runner cannot express the analysis (single-cell, proteomics, methylation pipelines, an extra analysis such as DEG-set overlaps), use the scripted route in [Native execution](native-execution.md) for that case.

@@ -52,6 +52,15 @@ MATRIX_KWARGS = ("counts_csv", "normalized_csv", "expression_csv")
 Transform = Literal["log2(x+1)", "log2(CPM+1)", "beta_to_m", "round"]
 RECORD_FILES = ("run_manifest.json", "run_status.json", "summary.csv", "workflow.log")
 _EXTENSIONS = (".csv", ".tsv", ".txt", ".csv.gz", ".tsv.gz", ".txt.gz", ".xlsx")
+# Roles that are not the analysis of record: a per-pair fit is free under these.
+SUPPORTING_ROLES = ("sensitivity", "exploratory")
+JOINT_EXECUTORS = ("tools.joint_contrasts:run_joint_deseq2 (counts)",
+                   "tools.joint_contrasts:run_joint_limma (log scale)",
+                   "tools.r_de_tools:run_r_de / run_r_log_de with the full design and contrasts")
+
+
+class SpecError(ValueError):
+    """A spec that breaks a workflow rule; fix the spec and rerun execute."""
 
 
 # ---------------------------------------------------------------- spec
@@ -89,6 +98,9 @@ class AlignmentGate(Gate):
 class MatrixGate(Gate):
     matrix_type: str
     recommended_method: str
+    feature_ids: Optional[Literal["entrez"]] = Field(
+        None, description="'entrez' when the rows are NCBI Entrez gene IDs: enrichment and paper gene "
+                          "lookups then map them to symbols through MyGene.info")
 
 
 class DesignGate(Gate):
@@ -127,6 +139,9 @@ class Execution(BaseModel):
                           "of this execution's samples (edgeR filterByExpr style; raw counts only), "
                           "applied after subset/pairs and before transform")
     role: str = "primary"
+    fit_scope_locator: Optional[str] = Field(
+        None, description="paper locator stating that each comparison was fitted on its own samples; "
+                          "needed when a primary or secondary execution fits a subset of the design's groups")
     reasoning: str = ""
     confidence: Confidence = "high"
 
@@ -140,6 +155,8 @@ class Enrichment(BaseModel):
     ranking_metric: str = "stat"
     reasoning: str = ""
     ortholog_mapping: Optional[str] = None
+    skip_reason: Optional[str] = Field(
+        None, description="why ORA or GSEA is turned off for this entry; both run by default")
 
 
 class StudyGate(Gate):
@@ -207,6 +224,19 @@ class Case(BaseModel):
         names = [e.name for e in self.executions]
         if len(names) != len(set(names)):
             raise ValueError(f"case {self.case_id}: execution names must be unique")
+        for en in self.enrichment:
+            if not (en.ora and en.gsea) and not en.skip_reason:
+                raise ValueError(f"case {self.case_id}: enrichment {en.execution!r} turns off "
+                                 f"{'ORA' if not en.ora else 'GSEA'}; both run unless skip_reason says why")
+        if not stopped:
+            for ex in self.executions:
+                if ex.role == "primary" and not any(en.execution == ex.name or en.execution.startswith(ex.name + "/")
+                                                    for en in self.enrichment):
+                    raise ValueError(
+                        f"case {self.case_id}: primary execution {ex.name!r} has no enrichment entry. Every "
+                        f"completed case runs ORA and GSEA on its primary comparison: add "
+                        f"{{\"execution\": \"{ex.name}\"}} (or \"{ex.name}/<comparison>\" for a joint model) "
+                        "to enrichment, with skip_reason if one method cannot run")
         return self
 
 
@@ -426,14 +456,26 @@ def _n_ora_input(deg_csv: str, cutoff: float, lfc: float, direction: str, p_colu
     return int(hit.sum())
 
 
-def _gene_lookup(deg_csv: str, genes: list[str], organism: str = "Mouse") -> dict:
+def _gene_lookup(deg_csv: str, genes: list[str], organism: str = "Mouse",
+                 feature_ids: Optional[str] = None) -> dict:
     table = pd.read_csv(deg_csv, index_col=0)
     upper = {str(i).upper(): i for i in table.index}
-    if genes and not any(g.upper() in upper for g in genes) and             str(table.index[0]).upper().startswith("ENS"):
+    species = "rat" if organism.lower() == "rat" else ("human" if organism.lower() == "human" else "mouse")
+    if genes and feature_ids == "entrez" and not any(g.upper() in upper for g in genes):
+        from tools import enrichment_tools
+        by_text = {str(i): i for i in table.index}
+        try:
+            symbols = enrichment_tools._entrez_to_symbol_map(list(by_text), species)
+        except Exception:
+            symbols = {}
+        for entrez, sym in symbols.items():
+            if sym and str(sym).upper() not in upper:
+                upper[str(sym).upper()] = by_text[entrez]
+    if genes and not any(g.upper() in upper for g in genes) and \
+            str(table.index[0]).upper().startswith("ENS"):
         # Ensembl-indexed table: paper genes are symbols, so map the index to symbols first.
         from tools import enrichment_tools
         stripped = {str(i).split(".")[0]: i for i in table.index}
-        species = "rat" if organism.lower() == "rat" else ("human" if organism.lower() == "human" else "mouse")
         try:
             symbols = enrichment_tools._query_symbols(list(stripped), species)
         except Exception:
@@ -516,6 +558,7 @@ class CaseRun:
         self.mat_path = Path(aln["outputs"]["aligned_matrix"]["path"])
         self.dm = pd.read_csv(self.dm_path, index_col=0)
         self.dm.index = self.dm.index.astype(str)
+        self._check_fit_scope()
         mat_item = case.add_output(self.mat_path, "aligned_matrix")
         dm_item = case.add_output(self.dm_path, "design_metadata")
         map_item = case.add_output(aln["outputs"]["alignment_map"]["path"], "alignment_map")
@@ -584,6 +627,52 @@ class CaseRun:
             self._enrich(enrichment)
         self._study(g.study, paper_ev, mat_item)
         return self._finish()
+
+    # -- fit scope
+    def _fit_scope(self, ex: Execution) -> tuple[str, int, int]:
+        """('joint' | 'per_pair' | 'all_groups', groups fitted, groups in the design).
+
+        A per-pair fit keeps fewer design cells (combinations of the design factors) than
+        the stratum it belongs to; subset columns that are not design factors (tissue, sex,
+        fraction) choose the stratum."""
+        d = self.spec.gates.design
+        factors = [f for f in (d.factors if d else []) if f in self.dm.columns]
+        if ex.tool.startswith("tools.joint_contrasts:"):
+            return "joint", 0, 0
+        universe = kept = self.dm
+        tool_subset = ex.args.get("subset")  # the R executors take their own subset argument
+        subset = {**(tool_subset if isinstance(tool_subset, dict) else {}), **ex.subset}
+        for column, values in subset.items():
+            if column not in self.dm.columns:
+                continue  # _inputs_for reports it
+            values = [str(v) for v in (values if isinstance(values, list) else [values])]
+            if column not in factors:
+                universe = universe[universe[column].astype(str).isin(values)]
+            kept = kept[kept[column].astype(str).isin(values)]
+        col, ctrl, trt = (ex.args.get(k) for k in ("design_column", "control_group", "treatment_group"))
+        if col in kept.columns and ctrl is not None and trt is not None:
+            kept = kept[kept[col].astype(str).isin([str(ctrl), str(trt)])]
+        if not factors:
+            return "all_groups", 0, 0
+        n_kept = len(kept[factors].astype(str).drop_duplicates())
+        n_all = len(universe[factors].astype(str).drop_duplicates())
+        if ex.args.get("pairwise_fit") or n_kept < n_all:
+            return "per_pair", n_kept, n_all
+        return "all_groups", n_kept, n_all
+
+    def _check_fit_scope(self) -> None:
+        """A primary or secondary result comes from one model on all groups, unless the paper says
+        each comparison was fitted on its own samples (fit_scope_locator)."""
+        for ex in self.spec.executions:
+            scope, n_kept, n_all = self._fit_scope(ex)
+            if scope == "per_pair" and ex.role not in SUPPORTING_ROLES and not ex.fit_scope_locator:
+                raise SpecError(
+                    f"execution {ex.name!r} (role {ex.role}) fits {n_kept} of the design's {n_all} groups "
+                    f"({', '.join(self.spec.gates.design.factors)}). When the paper does not state that each "
+                    "comparison was fitted on its own samples, the analysis of record is one model on all "
+                    f"groups with planned contrasts: {'; '.join(JOINT_EXECUTORS)}. Keep this fit as role "
+                    "'sensitivity', or give fit_scope_locator (the paper's statement) to keep it as "
+                    f"{ex.role}.")
 
     # -- steps
     def _matrix_input(self) -> Path:
@@ -676,6 +765,9 @@ class CaseRun:
         out = self.case.dir / "results" / ex.name
         final: dict[str, Any] = {"method": ex.args.get("method_label") or ex.tool.split(":")[1], "subset": ex.name,
                                  "role": ex.role, "tool": ex.tool}
+        scope, n_kept, n_all = self._fit_scope(ex)
+        final["fit_scope"] = {"scope": scope, **({"groups": n_kept, "design_groups": n_all} if n_all else {}),
+                              **({"paper_locator": ex.fit_scope_locator} if ex.fit_scope_locator else {})}
         try:
             matrix, meta_path, meta = self._inputs_for(ex, out)
             params = _signature(ex.tool)
@@ -764,6 +856,12 @@ class CaseRun:
                 "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); "
                 "overlap reported by the tool")
         evidence = [self.items["matrix"]]
+        for method, on in (("ORA (Enrichr GO + KEGG)", en.ora), ("GSEA preranked", en.gsea)):
+            if not on:
+                self.case.decide("enrichment", final={**base, "method": method, "gene_sets": "not run",
+                                 "feature_id_type": "unknown", "reason_not_run": en.skip_reason},
+                                 evidence=evidence, reasoning=en.reasoning or "planned enrichment",
+                                 confidence="high", execution_status="not_run")
         if source is None:
             for method in (["ORA (Enrichr GO + KEGG)"] if en.ora else []) + (["GSEA preranked"] if en.gsea else []):
                 self.case.decide("enrichment", final={**base, "method": method, "gene_sets": "not run",
@@ -775,9 +873,12 @@ class CaseRun:
         evidence = [self.case.add_output(deg, "deg_for_enrichment")]
         ids = native.feature_id_report(deg)
         base["feature_id_type"] = ids["dominant_type"]
+        entrez = self.spec.gates.matrix.feature_ids == "entrez" and ids["dominant_type"] == "entrez"
+        if entrez:
+            base["id_mapping"] = "NCBI Entrez gene ID -> symbol via MyGene.info (entrezgene scope)"
         out = self.case.dir / "results" / ("enrichment_" + re.sub(r"[^A-Za-z0-9._-]+", "_", en.execution))
         status = self.result.setdefault("enrichment", {})
-        if not ids["gene_set_ready"]:
+        if not ids["gene_set_ready"] and not entrez:
             for method in (["ORA (Enrichr GO + KEGG)"] if en.ora else []) + (["GSEA preranked"] if en.gsea else []):
                 self.case.decide("enrichment", final={**base, "method": method, "gene_sets": "not run",
                                  "reason_not_run": f"feature IDs are {ids['dominant_type']}, not gene-set ready"},
@@ -796,7 +897,8 @@ class CaseRun:
                          {"deg_csv": deg, "organism": organism, "padj_cutoff": float(input_threshold.get("cutoff", 0.05)),
                           "log2fc_cutoff": float(input_threshold.get("effect_cutoff") or 0.0),
                           "direction": en.direction, "output_dir": str(out / ora_dir),
-                          "p_column": "pvalue" if rule["metric"] == "pvalue" else "padj"},
+                          "p_column": "pvalue" if rule["metric"] == "pvalue" else "padj",
+                          **({"id_type": "entrez"} if entrez else {})},
                          {"gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, "
                                        "GO_Cellular_Component_2023, KEGG",
                           "input_threshold": input_threshold, "direction": en.direction,
@@ -804,7 +906,7 @@ class CaseRun:
         if en.gsea:
             runs.append(("GSEA preranked (gseapy prerank)", "tools.enrichment_tools:run_gsea_analysis",
                          {"deg_csv": deg, "organism": organism, "ranking_metric": en.ranking_metric,
-                          "output_dir": str(out / "gsea")},
+                          "output_dir": str(out / "gsea"), **({"id_type": "entrez"} if entrez else {})},
                          {"gene_sets": "MSigDB Hallmark", "ranking_metric": en.ranking_metric}, out / "gsea"))
         for method, tool, kwargs, extra, odir in runs:
             final = {**base, "method": method, **extra}
@@ -838,7 +940,7 @@ class CaseRun:
         for name, wanted in st.paper_genes.items():
             if name in self.outputs:
                 genes[name] = _gene_lookup(self.outputs[name]["deg_csv"], wanted,
-                                             self.spec.gates.design.organism)
+                                             self.spec.gates.design.organism, self.spec.gates.matrix.feature_ids)
         results = {name: {"n_deg": o["applied"]["n_significant"], "up": o["applied"]["n_up"],
                           "down": o["applied"]["n_down"], "rule": o["applied"]["rule"],
                           **({"audit_n": o["audit"]["n_significant"]} if "audit" in o else {})}
@@ -876,7 +978,8 @@ def execute(spec_path: str | Path) -> dict:
     run_dir = Path(spec.run_dir)
     moved = _move_previous_attempt(run_dir, [c.case_id for c in spec.cases])
     run = native.RunRecorder(run_dir, request=spec.request, platform_name=spec.platform,
-                             decision_maker=spec.decision_maker, case_ids=[c.case_id for c in spec.cases])
+                             decision_maker=spec.decision_maker, case_ids=[c.case_id for c in spec.cases],
+                             _route="case_spec")
     # Keep the exact spec of this attempt next to its records.
     shutil.copy(spec_path, run_dir / f"case_spec.used.{_now()}.json")
     results = []

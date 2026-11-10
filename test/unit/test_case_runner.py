@@ -82,7 +82,7 @@ def case_spec(acc, *, refuse_design=False):
     executions = [] if refuse_design else [
         {"name": "grp_EX_vs_SED", "tool": "tools.deseq2_tools:run_deseq2_analysis",
          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "EX", "alpha": 0.05},
-         "role": "primary"},
+         "role": "primary", "fit_scope_locator": "synthetic: each pair fitted on its own samples"},
         {"name": "joint", "tool": "tools.joint_contrasts:run_joint_deseq2", "args": {"comparisons": "planned"},
          "role": "sensitivity"},
         {"name": "limma_EX_SED", "tool": "tools.limma_tools:run_limma_analysis", "transform": "log2(CPM+1)",
@@ -150,6 +150,36 @@ result2 = case_runner.execute(spec_path)
 prev = result2["previous_attempt"]
 check(prev and os.path.exists(os.path.join(prev, "GSE900001", "decisions.json")), f"rerun keeps previous attempt: {prev}")
 check(not result2["validator"]["errors"], "rerun validates")
+
+# fit scope: a primary two-group fit on a three-arm design needs the paper's statement
+records = json.load(open(os.path.join(run_dir, "GSE900001", "decisions.json"), encoding="utf-8"))
+scopes = {r["final"]["subset"]: r["final"].get("fit_scope", {}).get("scope")
+          for r in records if r["stage"] == "execution"}
+check(scopes == {"grp_EX_vs_SED": "per_pair", "joint": "joint", "limma_EX_SED": "per_pair"},
+      f"execution records carry the fit scope: {scopes}")
+noloc = json.loads(json.dumps(spec))
+noloc["cases"] = [noloc["cases"][0]]
+noloc["cases"][0]["executions"][0].pop("fit_scope_locator")
+with open(os.path.join(run_dir, "no_locator.json"), "w") as fh:
+    json.dump(noloc, fh)
+r_noloc = case_runner.execute(os.path.join(run_dir, "no_locator.json"))
+err = r_noloc["cases"][0].get("error", {})
+check(err.get("type") == "SpecError" and "fits 2 of the design's 3 groups" in err.get("message", ""),
+      f"primary per-pair fit without fit_scope_locator is refused: {err.get('message', '')[:100]}")
+
+# enrichment: every completed case runs ORA and GSEA on its primary execution
+for label, change in (("no enrichment entry", lambda c: c.update(enrichment=[])),
+                      ("GSEA off without skip_reason", lambda c: c["enrichment"][0].update(gsea=False))):
+    bad_en = json.loads(json.dumps(spec))
+    change(bad_en["cases"][0])
+    with open(os.path.join(run_dir, "bad_enrichment.json"), "w") as fh:
+        json.dump(bad_en, fh)
+    check(case_runner.main(["execute", os.path.join(run_dir, "bad_enrichment.json")]) == 2,
+          f"{label} is a spec error (exit 2)")
+skipped = json.loads(json.dumps(spec))
+skipped["cases"][0]["enrichment"][0].update(gsea=False, skip_reason="synthetic: no ranking")
+case_runner.Spec.model_validate(skipped)
+check(True, "GSEA off with skip_reason validates")
 
 # a broken spec is reported, not run
 bad = json.loads(json.dumps(spec))

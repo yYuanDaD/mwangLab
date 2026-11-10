@@ -2,6 +2,8 @@
 
 In a native run, the agent session makes the decisions and calls repository code directly. Everything below is in `tools/native.py`, plus the executors it calls.
 
+Bulk data (counts, FPKM/TPM, log-scale arrays) runs on the [case spec route](case-spec.md). `CaseRecorder.decide("matrix", ...)` raises for a bulk `matrix_type` unless the run was opened with `RunRecorder(..., scripted_reason="<what the runner cannot express>")`; the reason is kept in `run_manifest.json` (`route`). Single-cell, proteomics, and methylation matrix types need no reason.
+
 ## External LLM calls are blocked
 
 Several repository paths call an external model (DeepSeek or Claude) when they run without a decision:

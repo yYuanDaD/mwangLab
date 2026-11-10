@@ -18,7 +18,7 @@ The agent session running this skill is the scientific decision-maker. It reads 
    - If the repository is not found or packages are missing, follow [Setup](references/setup.md).
    - Each capability (`deseq2`, `limma_two_group`, `limma_multigroup`, `methylation`, `proteomics_preprocess`, `single_cell_aggregation`, `gsea_and_ora`, ...) says whether its route can run here.
    - If no differential-analysis capability is available (`de_capable: false`), tell the user the run will be decision-only. Each valid plan is then recorded with its `execution_error`. Never replace a missing executor with a hand-written statistical model.
-3. Bulk data (raw or estimated counts, FPKM/TPM/RPKM, log-scale arrays) goes through the **case spec route**: read [Case spec](references/case-spec.md) and nothing else about execution. You decide every gate in one JSON spec; `python -m tools.case_runner execute <spec>` aligns, checks, runs the executors, applies thresholds, runs enrichment, writes the run layout, and validates the records. Do not write driver scripts for steps the runner covers, and do not read `tools/native.py` or earlier runs' scripts to learn the API.
+3. Bulk data (raw or estimated counts, FPKM/TPM/RPKM, log-scale arrays) goes through the **case spec route**, refusals included: read [Case spec](references/case-spec.md) and nothing else about execution. You decide every gate in one JSON spec; `python -m tools.case_runner execute <spec>` aligns, checks, runs the executors, applies thresholds, runs enrichment, writes the run layout, and validates the records. Do not write driver scripts for steps the runner covers, and do not read `tools/native.py` or earlier runs' scripts to learn the API. The scripted recorder rejects a bulk `matrix` decision unless the run is opened with a `scripted_reason` saying what the runner cannot express.
 4. Single-cell, proteomics, and methylation pipelines, or an analysis the runner cannot express, use the scripted route: read [Native execution](references/native-execution.md) and [Modalities](references/modalities.md).
 
 Do not use `main.py`, `run_batch_geo_pipeline`, or the validators in `tools/llm_helpers.py` for decisions unless the user asks for that external-agent backend.
@@ -52,6 +52,7 @@ Decide them in this order for every case. Each maps to one gate of the case spec
    - A sex mismatch is a labelling problem: fix or exclude the samples (record which) before any model. When both sexes are present, add per-sex analyses as exploratory even if the paper pooled them (the report's `split_plan`).
    - Time series and multi-factor designs: run every analyzable comparison the report lists, from one model fitted on all samples (`tools.joint_contrasts`). The paper's planned contrasts keep their route; the others are exploratory.
    - One control with several levels: one model with planned contrasts, never pooled levels.
+   - Fit scope: with more than two groups, the primary and secondary results come from one model on all groups. Fit a comparison on its own samples only when the paper says so (`fit_scope_locator`); otherwise a per-pair fit is a `sensitivity` run. The runner refuses a primary per-pair fit without the locator.
    - Factorial: keep every factor and the interaction the question needs.
    - Repeated measures: time as a factor plus the subject key.
    - Clustering, prognostic, or validation-only studies get no manufactured contrast.
@@ -64,8 +65,8 @@ Decide them in this order for every case. Each maps to one gate of the case spec
 7. `method`: choose a route the matrix supports ([Matrix and method policy](references/matrix-method-policy.md)). Reproduce the paper's method when the data allow it. Otherwise the method decision stays `valid`, carries `paper_route: {"method": ..., "status": "blocked", "reason": ...}`, and names the validated alternative that runs as a declared deviation.
 8. `threshold`: record `paper_threshold`, `threshold_source`, and the `applied_threshold`.
 9. `execution`: list the approved executor calls; a failure is recorded as `valid` + `failed` with its error. Never replace a missing executor with your own model.
-10. `enrichment` (optional): only when the request or paper calls for pathway results.
-    - IDs that are not gene symbols or Ensembl genes are recorded as not run. Map probes or proteins to genes first (scripted route, `native.collapse_to_genes`).
+10. `enrichment`: every completed case runs ORA and GSEA on its primary comparison (the runner refuses a spec without them). Turning one method off needs `skip_reason`.
+    - Gene symbols and Ensembl genes run directly. Declare NCBI Entrez gene IDs with `matrix.feature_ids: "entrez"`; they are mapped to symbols through MyGene.info. Other IDs are recorded as not run: map probes or proteins to genes first (scripted route, `native.collapse_to_genes`).
     - GSEA uses the full ranking; an ORA gene list uses the applied threshold.
     - It runs only after a completed execution. Without one, record the plan as `valid` + `not_run` with `reason_not_run`.
     - A refused or failed enrichment does not stop the case. Details: [Modalities](references/modalities.md).

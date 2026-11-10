@@ -49,6 +49,17 @@ _FAILURE_PATTERNS = (
     re.compile(r"^\s*(only \d+ |no pseudobulk|this file looks like|no obvious grouping)", re.I),
 )
 GATES = decision_contract.STAGES
+BULK_FAMILIES = {"raw_counts", "estimated_counts", "linear_normalized", "log_scale"}
+# Matrix types of the modalities that keep the scripted route (single-cell, proteomics, methylation).
+SCRIPTED_MODALITY = re.compile(
+    r"single[- ]?cell|scrna|snrna|pseudo-?bulk|\bumi\b|proteom|\blfq\b|\btmt\b|itraq|peptide|protein|"
+    r"spectral|methyl|\bbeta\b|cpg|\bm[-_ ]?values?\b", re.I)
+
+
+def is_bulk_matrix(matrix_type: Any) -> bool:
+    """Bulk expression (counts, FPKM/TPM, log-scale arrays): the case spec route's data."""
+    return (decision_contract.matrix_family(matrix_type) in BULK_FAMILIES
+            and not SCRIPTED_MODALITY.search(str(matrix_type or "")))
 SUMMARY_COLUMNS = (
     "case_id", "accession", "status", "decision_status", "execution_status", "stop_stage",
     "stop_reason", "route", "matrix_type", "da_method", "design_col", "formula", "control",
@@ -840,7 +851,10 @@ class RunRecorder:
     """
 
     def __init__(self, run_dir: str | Path, *, request: str, platform_name: str,
-                 decision_maker: str, case_ids: Sequence[str] = (), _resume: bool = False):
+                 decision_maker: str, case_ids: Sequence[str] = (), scripted_reason: str | None = None,
+                 _resume: bool = False, _route: str = "scripted"):
+        """``scripted_reason`` lets a scripted run record bulk data, which otherwise goes through
+        ``tools.case_runner``; say what the runner cannot express. It is kept in run_manifest.json."""
         from tools.run_status import RunStatus, RunStatusTracker
 
         self.run_dir = Path(run_dir)
@@ -852,9 +866,10 @@ class RunRecorder:
         self.run_id = self.run_dir.name
         self.cases: dict[str, CaseRecorder] = {}
         self._case_order = list(case_ids)
+        self.route = {"name": _route, "scripted_reason": scripted_reason}
         status_path = self.run_dir / "run_status.json"
         previous_status = json.loads(status_path.read_text(encoding="utf-8")) if _resume and status_path.exists() else None
-        # enrichment is optional, so it is not counted as an expected stage
+        # enrichment is not a gate of every case (stopped cases have none), so it is not counted
         self.tracker = RunStatusTracker(str(status_path), run_id=self.run_id, profile="native-skill",
                                         stages=tuple(g for g in GATES if g != "enrichment"),
                                         study_total=len(self._case_order))
@@ -865,6 +880,7 @@ class RunRecorder:
         self.tracker.start("native skill run resumed" if _resume else "native skill run started")
         if _resume:
             self.manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.route = self.manifest.get("route") or {"name": "scripted", "scripted_reason": None}
             self._llm_baseline = len(external_llm_status()["blocked_attempts"])
             self._previous_attempts = list(self.manifest.get("external_llm", {}).get("blocked_attempts", []))
             self.log("run resumed")
@@ -882,6 +898,7 @@ class RunRecorder:
             "packages": package_versions(),
             "started_at": _now(),
             "external_llm": external_llm_status(),
+            "route": self.route,
         }
         # The blocked-attempt ledger is process-wide; count only this run's attempts.
         self._llm_baseline = len(self.manifest["external_llm"]["blocked_attempts"])
@@ -1061,6 +1078,15 @@ class CaseRecorder:
                paper: dict | None = None) -> dict:
         if self.finished:
             raise NativeToolError(f"case {self.case_id} is already finished")
+        route = self.run.route
+        if stage == "matrix" and route["name"] != "case_spec" and not route.get("scripted_reason") \
+                and is_bulk_matrix(final.get("matrix_type")):
+            raise NativeToolError(
+                f"{final.get('matrix_type')!r} is bulk data, which goes through the case spec route: write "
+                "one case spec and run `python -m tools.case_runner execute <spec>` (skill reference "
+                "case-spec.md), refusals included. Only an analysis the runner cannot express keeps the "
+                "scripted route: open the run with RunRecorder(..., scripted_reason='<what the runner "
+                "cannot express>'), which is recorded in run_manifest.json.")
         record = {
             "contract_version": decision_contract.CONTRACT_VERSION,
             "case_id": self.case_id,

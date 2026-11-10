@@ -87,9 +87,9 @@ It writes `<base>_preprocessed.csv`. The steps are log2(x+1), a missingness filt
 - Record any coverage or missing-value filter. RRBS often has sites with missing calls.
 - Feature IDs are CpG probes or regions. Enrichment needs a recorded probe-to-gene mapping and a note on probe-count bias; otherwise refuse the enrichment gate.
 
-## Enrichment gate (optional)
+## Enrichment gate
 
-Run it only after a completed `execution` and only when the request or paper calls for pathway results. A paper reports pathway results when it names a gene-set method (GSEA, ORA, GO or KEGG enrichment); a sentence such as "mitochondrial proteins increased" is a finding to compare, not a request for enrichment. It never repairs or validates a DE decision.
+Run ORA and GSEA on the primary comparison of every completed case (on the case spec route the runner requires it). Without gene-ready IDs or a supported organism, record the gate as `not_run` with the reason. It never repairs or validates a DE decision.
 
 1. Run `native.feature_id_report(deg_csv)`.
    - Gene symbols, or Ensembl gene IDs (converted through MyGene.info), are ready.

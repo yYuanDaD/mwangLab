@@ -160,6 +160,20 @@ class PolicyGuardTests(unittest.TestCase):
 
 
 class RunRecorderTests(unittest.TestCase):
+    def test_bulk_matrix_needs_the_case_spec_route(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run = native.RunRecorder(Path(tmp) / "run", request="r", platform_name="test",
+                                     decision_maker="t", case_ids=["c1"])
+            case = run.case("c1", accession="GSE1")
+            for matrix_type in ("raw counts", "FPKM", "log2 RMA intensity", "estimated counts"):
+                with self.assertRaisesRegex(native.NativeToolError, "case spec route"):
+                    case.decide("matrix", final={"matrix_type": matrix_type, "recommended_method": "limma"},
+                                evidence=[], reasoning="x", confidence="high")
+            self.assertEqual(run.manifest["route"], {"name": "scripted", "scripted_reason": None})
+        for matrix_type in ("single-cell raw UMI counts", "linear LFQ intensity", "methylation beta"):
+            self.assertFalse(native.is_bulk_matrix(matrix_type), matrix_type)
+        self.assertTrue(native.is_bulk_matrix("TPM values"))
+
     def test_layout_validates_and_audits(self):
         previous = os.environ.get(native.NATIVE_ENV)
         native.enable_native_mode()
@@ -168,7 +182,8 @@ class RunRecorderTests(unittest.TestCase):
                 tmp = Path(tmp)
                 paths = _write_case(tmp)
                 run = native.RunRecorder(tmp / "run", request="test", platform_name="unit-test",
-                                         decision_maker="unit test", case_ids=["c1", "c2"])
+                                         decision_maker="unit test", case_ids=["c1", "c2"],
+                                         scripted_reason="unit test of the scripted recorder")
                 case = run.case("c1", accession="GSE1")
                 paper = case.add_input(paths["paper"], "paper")
                 meta = case.add_input(paths["metadata"], "metadata")

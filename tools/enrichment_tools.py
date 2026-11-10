@@ -1,7 +1,8 @@
 """GO and KEGG enrichment analysis on a DESeq2 DEG result file.
 
 Uses gseapy.enrichr (queries the Enrichr API, no local DB needed). Ensembl
-gene IDs are converted to gene symbols via mygene before submission.
+gene IDs, and NCBI Entrez gene IDs when the caller says so (``id_type="entrez"``),
+are converted to gene symbols via mygene before submission.
 """
 
 import os
@@ -101,7 +102,7 @@ def _get_hallmark_gmt(category: str, dbver: str) -> dict:
     return gmt
 
 
-_SYMBOL_CACHE: dict = {}               # (ensembl_no_version, species_lower) -> symbol or None
+_SYMBOL_CACHE: dict = {}               # (id, species_lower[, scope]) -> symbol or None
 
 # mygene.py intentionally disables HTTP timeouts by default.  That is unsafe for a
 # long-running cohort: one stalled annotation request can prevent GSEA from ever
@@ -111,12 +112,17 @@ _MYGENE_REQUEST_TIMEOUT_S = float(os.getenv("BIOAGENT_MYGENE_REQUEST_TIMEOUT_S",
 _MYGENE_TOTAL_TIMEOUT_S = float(os.getenv("BIOAGENT_MYGENE_TOTAL_TIMEOUT_S", "120"))
 
 
-def _query_symbols(cleaned: list[str], species: str) -> dict:
+def _query_symbols(cleaned: list[str], species: str, scope: str = "ensembl.gene") -> dict:
     """{version-stripped Ensembl id -> symbol} via MyGene, cached per (id, species). Only the
     IDs not already cached are sent to MyGene; misses are cached as None so notfound IDs aren't
-    re-queried. Deterministic mapping -> safe to memoize across studies in a cohort."""
+    re-queried. Deterministic mapping -> safe to memoize across studies in a cohort.
+    ``scope="entrezgene"`` maps NCBI Entrez gene IDs instead."""
     sp = species.lower()
-    miss = [c for c in dict.fromkeys(cleaned) if (c, sp) not in _SYMBOL_CACHE]
+
+    def key(c):
+        return (c, sp) if scope == "ensembl.gene" else (c, sp, scope)
+
+    miss = [c for c in dict.fromkeys(cleaned) if key(c) not in _SYMBOL_CACHE]
     if miss:
         client = mygene.MyGeneInfo()
         # mygene.py creates an httpx client lazily. Replace it before the first
@@ -143,7 +149,7 @@ def _query_symbols(cleaned: list[str], species: str) -> dict:
                 batch = miss[offset:offset + _MYGENE_BATCH_SIZE]
                 try:
                     res = client.querymany(
-                        batch, scopes="ensembl.gene", fields="symbol", species=sp,
+                        batch, scopes=scope, fields="symbol", species=sp,
                         as_dataframe=False, verbose=False)
                 except Exception as exc:
                     print(
@@ -162,8 +168,13 @@ def _query_symbols(cleaned: list[str], species: str) -> dict:
                 except Exception:
                     pass
         for c in miss:
-            _SYMBOL_CACHE[(c, sp)] = got.get(c)
-    return {c: _SYMBOL_CACHE[(c, sp)] for c in cleaned if _SYMBOL_CACHE.get((c, sp))}
+            _SYMBOL_CACHE[key(c)] = got.get(c)
+    return {c: _SYMBOL_CACHE[key(c)] for c in cleaned if _SYMBOL_CACHE.get(key(c))}
+
+
+def _entrez_to_symbol_map(entrez_ids: list[str], species: str) -> dict[str, str]:
+    """Map NCBI Entrez gene IDs to gene symbols (cached)."""
+    return _query_symbols([str(i).strip() for i in entrez_ids], species, scope="entrezgene")
 
 
 def _ensembl_to_symbol(ensembl_ids: list[str], species: str) -> list[str]:
@@ -191,6 +202,7 @@ def run_enrichment_analysis(
     top_n: int = 10,
     output_dir: str = "./output",
     p_column: str = "padj",
+    id_type: str = "auto",
 ) -> str:
     """
     Run GO (BP/MF/CC) and KEGG enrichment on a DEG result file produced by run_deseq2_analysis.
@@ -198,6 +210,8 @@ def run_enrichment_analysis(
     Args:
         deg_csv: Path to a DEG CSV file (must have 'padj' and 'log2FoldChange' columns; index = gene IDs).
         organism: 'Mouse', 'Human' or 'Rat'. Determines which KEGG library is queried and which species is used for ID conversion. Rat uses the mouse libraries by gene symbol.
+        id_type: 'auto' (gene symbols, or Ensembl gene IDs detected and converted) or 'entrez'
+            (the index holds NCBI Entrez gene IDs; converted to symbols via MyGene.info).
         padj_cutoff: Maximum adjusted p-value for a gene to be considered significant. Default 0.05.
         log2fc_cutoff: Minimum |log2 fold change| for a gene to be considered significant. Default 1.0.
         direction: 'up', 'down', or 'all'. Which DEGs to submit for enrichment.
@@ -235,12 +249,25 @@ def run_enrichment_analysis(
 
         gene_ids = sig.index.astype(str).tolist()
 
-        if _looks_ensembl(gene_ids):
+        if id_type == "entrez":
+            print(f"Entrez gene IDs ({len(gene_ids)} genes), converting to symbols via MyGene.info...")
+            mapped = _entrez_to_symbol_map(gene_ids, species=organism)
+            gene_list = list(dict.fromkeys(mapped[i] for i in gene_ids if i in mapped))
+            if not gene_list:
+                return "Error: failed to convert any Entrez IDs to gene symbols. Check organism setting."
+            print(f"Converted to {len(gene_list)} unique symbols.")
+        elif id_type != "auto":
+            return f"Error: id_type must be 'auto' or 'entrez', got '{id_type}'."
+        elif _looks_ensembl(gene_ids):
             print(f"Detected Ensembl IDs ({len(gene_ids)} genes), converting to symbols via MyGene.info...")
             gene_list = _ensembl_to_symbol(gene_ids, species=organism)
             if not gene_list:
                 return "Error: failed to convert any Ensembl IDs to gene symbols. Check organism setting."
             print(f"Converted to {len(gene_list)} unique symbols.")
+        elif _looks_numeric_ids(gene_ids):
+            return ("Error: DEG index looks like bare integer IDs, not gene symbols or Ensembl IDs. "
+                    "If they are NCBI Entrez gene IDs, pass id_type='entrez'; otherwise map them "
+                    "to symbols first.")
         else:
             gene_list = list(dict.fromkeys(gene_ids))
             print(f"Using {len(gene_list)} gene IDs as-is (do not look like Ensembl).")
@@ -313,6 +340,7 @@ def run_gsea_analysis(
     top_n: int = 10,
     output_dir: str = "./output",
     id_symbol_map_csv: str = "",
+    id_type: str = "auto",
 ) -> str:
     """
     Run GSEA (preranked) on a DESeq2 DEG result file against the MSigDB Hallmark gene sets.
@@ -335,6 +363,8 @@ def run_gsea_analysis(
             the DEG index is bare integer feature IDs (e.g. TALON gene_IDs) rather than symbols
             or Ensembl IDs. If left empty, an '*_id2symbol.csv' in the DEG file's directory is
             auto-discovered.
+        id_type: 'auto' (symbols, Ensembl, or integer IDs with a sidecar) or 'entrez' (the
+            index holds NCBI Entrez gene IDs; converted to symbols via MyGene.info).
     """
     try:
         if organism not in ("Mouse", "Human", "Rat"):
@@ -349,7 +379,20 @@ def run_gsea_analysis(
         ranked.index = ranked.index.astype(str)
 
         gene_ids = ranked.index.tolist()
-        if _looks_ensembl(gene_ids):
+        if id_type not in ("auto", "entrez"):
+            return f"Error: id_type must be 'auto' or 'entrez', got '{id_type}'."
+        if id_type == "entrez":
+            print(f"Entrez gene IDs ({len(gene_ids)} genes), converting to symbols via MyGene.info...")
+            ent_to_sym = _entrez_to_symbol_map(gene_ids, species=organism)
+            if not ent_to_sym:
+                return "Error: failed to convert any Entrez IDs to gene symbols. Check organism setting."
+            ranked["_symbol"] = [ent_to_sym.get(i.strip()) for i in ranked.index]
+            ranked = ranked.dropna(subset=["_symbol"])
+            ranked["_abs"] = ranked[ranking_metric].abs()
+            ranked = ranked.sort_values("_abs", ascending=False).drop_duplicates("_symbol")
+            ranked = ranked.set_index("_symbol")[[ranking_metric]]
+            print(f"Converted to {len(ranked)} unique gene symbols.")
+        elif _looks_ensembl(gene_ids):
             print(f"Detected Ensembl IDs ({len(gene_ids)} genes), converting to symbols via MyGene.info...")
             ens_to_sym = _ensembl_to_symbol_map(gene_ids, species=organism)
             if not ens_to_sym:
@@ -372,7 +415,8 @@ def run_gsea_analysis(
                         "gene_IDs), not gene symbols or Ensembl IDs, and no id->symbol sidecar "
                         "('*_id2symbol.csv') was found next to the DEG file. GSEA cannot map "
                         "these to the symbol-keyed Hallmark library. Re-run preprocess_counts on "
-                        "a matrix that includes a gene-name column, or pass id_symbol_map_csv.")
+                        "a matrix that includes a gene-name column, or pass id_symbol_map_csv, or "
+                        "id_type='entrez' if they are NCBI Entrez gene IDs.")
             id2sym = _load_id_symbol_map(map_csv)
             if not id2sym:
                 return f"Error: id->symbol sidecar '{map_csv}' was empty or unreadable."
