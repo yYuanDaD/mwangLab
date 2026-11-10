@@ -1,0 +1,798 @@
+{
+  "case_id": "GSE282641",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "zt",
+    "trt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "zt",
+        "trt"
+      ],
+      "levels": {
+        "geno": {
+          "WT": 32,
+          "KO": 31
+        },
+        "zt": {
+          "ZT15": 32,
+          "ZT3": 31
+        },
+        "trt": {
+          "SED": 32,
+          "EX": 31
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "sex"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(zt) + C(trt) + C(sex)",
+        "rank": 5,
+        "full_rank": true,
+        "residual_df": 58,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 18,
+      "n_analyzable": 18,
+      "too_small": [],
+      "planned_analyzable": [
+        "geno_KO_vs_WT_zt-ZT3_trt-EX",
+        "geno_KO_vs_WT_zt-ZT15_trt-EX",
+        "geno_KO_vs_WT_zt-ZT3_trt-SED",
+        "geno_KO_vs_WT_zt-ZT15_trt-SED",
+        "zt_ZT15_vs_ZT3_geno-WT_trt-SED",
+        "zt_ZT15_vs_ZT3_geno-WT_trt-EX",
+        "zt_ZT15_vs_ZT3_geno-KO_trt-SED",
+        "zt_ZT15_vs_ZT3_geno-KO_trt-EX"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 63 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "female": 32,
+        "male": 31
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40627397\\GSE282641\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "geno_KO_vs_WT__sex-female_zt-ZT15_trt-EX",
+            "geno_KO_vs_WT__sex-female_zt-ZT15_trt-SED",
+            "geno_KO_vs_WT__sex-female_zt-ZT3_trt-EX",
+            "geno_KO_vs_WT__sex-female_zt-ZT3_trt-SED",
+            "zt_ZT15_vs_ZT3__sex-female_geno-KO_trt-EX",
+            "zt_ZT15_vs_ZT3__sex-female_geno-KO_trt-SED",
+            "zt_ZT15_vs_ZT3__sex-female_geno-WT_trt-EX",
+            "zt_ZT15_vs_ZT3__sex-female_geno-WT_trt-SED",
+            "trt_EX_vs_SED__sex-female_geno-KO_zt-ZT15",
+            "trt_EX_vs_SED__sex-female_geno-KO_zt-ZT3",
+            "trt_EX_vs_SED__sex-female_geno-WT_zt-ZT15",
+            "trt_EX_vs_SED__sex-female_geno-WT_zt-ZT3",
+            "geno_zt_KO_ZT15_vs_WT_ZT3__sex-female_trt-EX",
+            "geno_zt_KO_ZT15_vs_WT_ZT3__sex-female_trt-SED",
+            "geno_trt_KO_EX_vs_WT_SED__sex-female_zt-ZT15",
+            "geno_trt_KO_EX_vs_WT_SED__sex-female_zt-ZT3",
+            "zt_trt_ZT15_EX_vs_ZT3_SED__sex-female_geno-KO",
+            "zt_trt_ZT15_EX_vs_ZT3_SED__sex-female_geno-WT"
+          ],
+          "male": [
+            "geno_KO_vs_WT__sex-male_zt-ZT15_trt-EX",
+            "geno_KO_vs_WT__sex-male_zt-ZT15_trt-SED",
+            "geno_KO_vs_WT__sex-male_zt-ZT3_trt-EX",
+            "geno_KO_vs_WT__sex-male_zt-ZT3_trt-SED",
+            "zt_ZT15_vs_ZT3__sex-male_geno-KO_trt-EX",
+            "zt_ZT15_vs_ZT3__sex-male_geno-KO_trt-SED",
+            "zt_ZT15_vs_ZT3__sex-male_geno-WT_trt-EX",
+            "zt_ZT15_vs_ZT3__sex-male_geno-WT_trt-SED",
+            "trt_EX_vs_SED__sex-male_geno-KO_zt-ZT15",
+            "trt_EX_vs_SED__sex-male_geno-KO_zt-ZT3",
+            "trt_EX_vs_SED__sex-male_geno-WT_zt-ZT15",
+            "trt_EX_vs_SED__sex-male_geno-WT_zt-ZT3",
+            "geno_zt_KO_ZT15_vs_WT_ZT3__sex-male_trt-EX",
+            "geno_zt_KO_ZT15_vs_WT_ZT3__sex-male_trt-SED",
+            "geno_trt_KO_EX_vs_WT_SED__sex-male_zt-ZT15",
+            "geno_trt_KO_EX_vs_WT_SED__sex-male_zt-ZT3",
+            "zt_trt_ZT15_EX_vs_ZT3_SED__sex-male_geno-KO",
+            "zt_trt_ZT15_EX_vs_ZT3_SED__sex-male_geno-WT"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_KO_vs_WT_zt-ZT15_trt-EX",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "zt": "ZT15",
+        "trt": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT15",
+            "trt": "EX",
+            "geno": "KO"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT15",
+            "trt": "EX",
+            "geno": "WT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_zt-ZT15_trt-SED",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "zt": "ZT15",
+        "trt": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT15",
+            "trt": "SED",
+            "geno": "KO"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT15",
+            "trt": "SED",
+            "geno": "WT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_zt-ZT3_trt-EX",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "zt": "ZT3",
+        "trt": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT3",
+            "trt": "EX",
+            "geno": "KO"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "zt": "ZT3",
+            "trt": "EX",
+            "geno": "WT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_zt-ZT3_trt-SED",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "zt": "ZT3",
+        "trt": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT3",
+            "trt": "SED",
+            "geno": "KO"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT3",
+            "trt": "SED",
+            "geno": "WT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_ZT15_vs_ZT3_geno-KO_trt-EX",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "ZT15",
+      "reference": "ZT3",
+      "within": {
+        "geno": "KO",
+        "trt": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "trt": "EX",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "trt": "EX",
+            "zt": "ZT3"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_ZT15_vs_ZT3_geno-KO_trt-SED",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "ZT15",
+      "reference": "ZT3",
+      "within": {
+        "geno": "KO",
+        "trt": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "trt": "SED",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "trt": "SED",
+            "zt": "ZT3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_ZT15_vs_ZT3_geno-WT_trt-EX",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "ZT15",
+      "reference": "ZT3",
+      "within": {
+        "geno": "WT",
+        "trt": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "trt": "EX",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "trt": "EX",
+            "zt": "ZT3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_ZT15_vs_ZT3_geno-WT_trt-SED",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "ZT15",
+      "reference": "ZT3",
+      "within": {
+        "geno": "WT",
+        "trt": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "trt": "SED",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "trt": "SED",
+            "zt": "ZT3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_EX_vs_SED_geno-KO_zt-ZT15",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "EX",
+      "reference": "SED",
+      "within": {
+        "geno": "KO",
+        "zt": "ZT15"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT15",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT15",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_EX_vs_SED_geno-KO_zt-ZT3",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "EX",
+      "reference": "SED",
+      "within": {
+        "geno": "KO",
+        "zt": "ZT3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT3",
+            "trt": "EX"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT3",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_EX_vs_SED_geno-WT_zt-ZT15",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "EX",
+      "reference": "SED",
+      "within": {
+        "geno": "WT",
+        "zt": "ZT15"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT15",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT15",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_EX_vs_SED_geno-WT_zt-ZT3",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "EX",
+      "reference": "SED",
+      "within": {
+        "geno": "WT",
+        "zt": "ZT3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT3",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT3",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_zt_KO_ZT15_vs_WT_ZT3_trt-EX",
+      "kind": "interaction",
+      "factor": "geno:zt",
+      "test": "KO:ZT15",
+      "reference": "WT:ZT3",
+      "within": {
+        "trt": "EX"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "EX",
+            "geno": "KO",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "trt": "EX",
+            "geno": "WT",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "trt": "EX",
+            "geno": "KO",
+            "zt": "ZT3"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "trt": "EX",
+            "geno": "WT",
+            "zt": "ZT3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_zt_KO_ZT15_vs_WT_ZT3_trt-SED",
+      "kind": "interaction",
+      "factor": "geno:zt",
+      "test": "KO:ZT15",
+      "reference": "WT:ZT3",
+      "within": {
+        "trt": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "SED",
+            "geno": "KO",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "trt": "SED",
+            "geno": "WT",
+            "zt": "ZT15"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "trt": "SED",
+            "geno": "KO",
+            "zt": "ZT3"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "trt": "SED",
+            "geno": "WT",
+            "zt": "ZT3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_trt_KO_EX_vs_WT_SED_zt-ZT15",
+      "kind": "interaction",
+      "factor": "geno:trt",
+      "test": "KO:EX",
+      "reference": "WT:SED",
+      "within": {
+        "zt": "ZT15"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT15",
+            "geno": "KO",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT15",
+            "geno": "WT",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT15",
+            "geno": "KO",
+            "trt": "SED"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT15",
+            "geno": "WT",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_trt_KO_EX_vs_WT_SED_zt-ZT3",
+      "kind": "interaction",
+      "factor": "geno:trt",
+      "test": "KO:EX",
+      "reference": "WT:SED",
+      "within": {
+        "zt": "ZT3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "ZT3",
+            "geno": "KO",
+            "trt": "EX"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "zt": "ZT3",
+            "geno": "WT",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT3",
+            "geno": "KO",
+            "trt": "SED"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "zt": "ZT3",
+            "geno": "WT",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_trt_ZT15_EX_vs_ZT3_SED_geno-KO",
+      "kind": "interaction",
+      "factor": "zt:trt",
+      "test": "ZT15:EX",
+      "reference": "ZT3:SED",
+      "within": {
+        "geno": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT15",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT3",
+            "trt": "EX"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT15",
+            "trt": "SED"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "zt": "ZT3",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_trt_ZT15_EX_vs_ZT3_SED_geno-WT",
+      "kind": "interaction",
+      "factor": "zt:trt",
+      "test": "ZT15:EX",
+      "reference": "ZT3:SED",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT15",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT3",
+            "trt": "EX"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT15",
+            "trt": "SED"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "zt": "ZT3",
+            "trt": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

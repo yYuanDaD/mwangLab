@@ -1,0 +1,216 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40627397",
+  "request": "Analyze GSE282641 for PMID 40627397 (HIF1a mediates circadian regulation of skeletal muscle metabolism and substrate preference in response to time-of-day exercise.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE282641",
+      "accession": "GSE282641",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC12280960.paper.md"],
+        "metadata": "GSE282641/GSE282641_metadata.csv",
+        "matrix": "GSE282641/GSE282641_rawCounts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE282641"],
+            "assay": "bulk RNA-seq (TruSeq stranded mRNA, NovaSeq 6000), gastrocnemius muscle (S4.13.p1)",
+            "design_factors": {
+              "genotype": ["fl/fl (WT, reference)", "HSA-cre;Hif1a fl/fl (KO)"],
+              "time_of_day": ["ZT3 (early rest)", "ZT15 (early active)"],
+              "exercise": ["sedentary (mock treadmill)", "60 min acute treadmill run at 16 m/min"],
+              "sex": ["female", "male"]
+            },
+            "sample_inclusion": "64 libraries, 8 per genotype x ZT x exercise cell (4F/4M); one sample excluded for low coverage (group HIF1a-mKO, exercise, ZT3) (S4.14.p1); tissue collected immediately after the 60 min bout (S1.6.p1)",
+            "primary_estimand": "How HIF1a loss and time of day modify the skeletal muscle transcriptional response to acute exercise: KO vs fl/fl within exercised (and sedentary) mice at ZT3 and ZT15, and ZT15 vs ZT3 within each genotype x exercise state (S1.6.p1-p2, Fig. 5)",
+            "planned_contrasts": [
+              "KO vs fl/fl, exercised, ZT3 (S1.6.p2; paper: 516 DEGs)",
+              "KO vs fl/fl, exercised, ZT15 (S1.6.p2; paper: 91 DEGs)",
+              "KO vs fl/fl, sedentary, ZT3 and ZT15 (S1.6.p2, Fig. 5D; counts only in figure, 'similar profiles')",
+              "ZT15 vs ZT3 within fl/fl sedentary (451), fl/fl exercise (273), KO sedentary (101), KO exercise (191) (S1.6.p1)",
+              "KO vs fl/fl overall (724 up / 749 down = 1473) (S1.6.p1, SI Fig. S7A; exact contrast not stated)"
+            ],
+            "repeated_measure_unit": "none: one gastrocnemius per animal, independent animals",
+            "normalization": "DESeq2 size factors; independent filtering on mean of normalized counts (20,224 genes passed) (S4.14.p1)",
+            "paper_method": "DESeq2 negative binomial GLM, design ~ 0 + group + sex (S4.14.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.14.p1"},
+            "paper_results": "Exercise ZT3 KO vs fl/fl 516, ZT15 91; ZT15 vs ZT3: fl/fl sed 451, fl/fl ex 273, KO sed 101, KO ex 191; KO vs fl/fl overall 724 up / 749 down; GSEA GO: oxidative phosphorylation / respiration positively enriched in KO vs fl/fl after exercise at ZT3 not ZT15; Mpi elevated in KO (Fig. 4G)",
+            "not_reported": "The paper reports no direct exercise vs sedentary DEG counts."
+          },
+          "reasoning": "Methods S4.14.p1 give DESeq2 with ~0 + group + sex and FDR alpha 0.1, no fold-change rule; S1.6.p1-p2 give the contrasts and counts. Group = genotype x ZT x exercise cell. The paper's exercise-related estimands are genotype and time-of-day differences within exercise state; exercise vs sedentary contrasts are not reported and will run exploratory from the same model.",
+          "confidence": "high",
+          "locator": "S4.14.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S4.14.p1 and DA.p1 name GSE282641",
+              "GEO: gastrocnemius, Mus musculus, HIF1a KO/WT, ZT3/ZT15, ex/sed, 60 min treadmill 16 m/min - matches S4.3.p1",
+              "64 samples = 2 x 2 x 2 x 8, 4F/4M per cell, matching 'male and female mice utilized equally' (S4.2.p1)",
+              "data_processing: STAR mm10 + featureCounts, as S4.14.p1"
+            ]
+          },
+          "reasoning": "Accession, tissue, factors, and processing match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["description", "^Library name: (\\S+)$"]},
+          "key_column": "key",
+          "aliases": {"sex": "characteristics_ch1.1.Sex", "geno": "characteristics_ch1.3.genotype",
+                      "zt": "characteristics_ch1.2.zt", "trt": "characteristics_ch1.4.treatment"},
+          "patterns": {},
+          "combine": {},
+          "recode": {"geno": {"ko": "KO", "wt": "WT"}, "zt": {"3": "ZT3", "15": "ZT15"},
+                     "trt": {"sed": "SED", "ex": "EX"}, "sex": {"f": "F", "m": "M"}},
+          "exclude_samples": {
+            "GSM8647977": "library 0156_44 (ko_3_ex_44) has 382 total reads vs median 16 M; the paper excluded one KO exercise ZT3 sample for low coverage (S4.14.p1) - this is it"
+          },
+          "reasoning": "Matrix columns are library names (0156_N) that sit in the metadata description field 'Library name: 0156_N'; exact match after extraction (64/64). Factor columns derived from GEO characteristics (genotype, zt, treatment, Sex).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE282641_rawCounts.txt.gz", "paper_input": "featureCounts gene counts into DESeq2 (S4.14.p1)"},
+          "reasoning": "All values integer, max 6.6e6, median 0; GEO data_processing says 'text file with raw counts per sample' from featureCounts; paper fits DESeq2 on these counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "zt", "trt"],
+          "references": {"geno": "WT", "zt": "ZT3", "trt": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "covariate_candidates": ["sex"],
+          "planned": [
+            "geno_KO_vs_WT_zt-ZT3_trt-EX",
+            "geno_KO_vs_WT_zt-ZT15_trt-EX",
+            "geno_KO_vs_WT_zt-ZT3_trt-SED",
+            "geno_KO_vs_WT_zt-ZT15_trt-SED",
+            "zt_ZT15_vs_ZT3_geno-WT_trt-SED",
+            "zt_ZT15_vs_ZT3_geno-WT_trt-EX",
+            "zt_ZT15_vs_ZT3_geno-KO_trt-SED",
+            "zt_ZT15_vs_ZT3_geno-KO_trt-EX"
+          ],
+          "final": {
+            "analysis_type": "factorial (2x2x2 cell-means)",
+            "formula": "~ sex + cell(geno x zt x trt)",
+            "contrasts": [
+              {"name": "geno_KO_vs_WT_zt-ZT3_trt-EX", "control": "WT ZT3 EX", "treatment": "KO ZT3 EX", "role": "primary"},
+              {"name": "geno_KO_vs_WT_zt-ZT15_trt-EX", "control": "WT ZT15 EX", "treatment": "KO ZT15 EX", "role": "primary"},
+              {"name": "geno_KO_vs_WT_zt-ZT3_trt-SED", "control": "WT ZT3 SED", "treatment": "KO ZT3 SED", "role": "secondary"},
+              {"name": "geno_KO_vs_WT_zt-ZT15_trt-SED", "control": "WT ZT15 SED", "treatment": "KO ZT15 SED", "role": "secondary"},
+              {"name": "zt_ZT15_vs_ZT3_geno-WT_trt-SED", "control": "WT ZT3 SED", "treatment": "WT ZT15 SED", "role": "secondary"},
+              {"name": "zt_ZT15_vs_ZT3_geno-WT_trt-EX", "control": "WT ZT3 EX", "treatment": "WT ZT15 EX", "role": "secondary"},
+              {"name": "zt_ZT15_vs_ZT3_geno-KO_trt-SED", "control": "KO ZT3 SED", "treatment": "KO ZT15 SED", "role": "secondary"},
+              {"name": "zt_ZT15_vs_ZT3_geno-KO_trt-EX", "control": "KO ZT3 EX", "treatment": "KO ZT15 EX", "role": "secondary"}
+            ],
+            "exploratory": "exercise vs sedentary within each genotype x ZT cell and the 2x2 interactions, from the same model (not reported in the paper)"
+          },
+          "candidates": [
+            {"value": "pooled exercise vs sedentary across genotype and ZT", "reason_rejected": "paper's group design keeps all three factors; pooling levels would mix genotype and time-of-day effects"},
+            {"value": "sex-stratified analyses as primary", "reason_rejected": "paper pooled sexes with sex as covariate; S3.p1 says n insufficient for sex-specific effects"}
+          ],
+          "reasoning": "Paper's DESeq2 design is ~0 + group + sex with group = genotype x ZT x exercise (S4.14.p1); its reported DEG sets are simple effects between cells (S1.6.p1-p2). One cell-means model on all 63 retained samples with sex covariate reproduces this. Exercise vs sedentary simple effects run exploratory.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [],
+            "covariates": [{"name": "sex", "disposition": "included as additive covariate, as in the paper's ~0 + group + sex (S4.14.p1)"}]
+          },
+          "confounding_candidates": ["sex"],
+          "reasoning": "Independent animals (one muscle each), no repeated measures. Sex is balanced 4F/4M within each cell (3F/4M in KO ZT3 EX after exclusion or 4F/3M), so not confounded; the paper includes it as covariate. No batch or cage variable recorded in GEO; none added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, joint cell-means model)",
+            "formula": "~ sex + cell",
+            "paper_route": {"method": "DESeq2 ~ 0 + group + sex", "status": "reproduced"},
+            "deviations": ["pydeseq2 rather than R DESeq2; independent filtering applied by pydeseq2 with alpha 0.1"]
+          },
+          "transform": null,
+          "reasoning": "Raw featureCounts counts support DESeq2; the cell-means joint model with sex covariate is the paper's parameterization.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S4.14.p1: P-values FDR-corrected and alpha set to 0.1; no fold-change cutoff stated. Audit at padj < 0.05 for comparability with workflow default.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "The paper reports no exercise vs sedentary DEG counts; those contrasts are exploratory.",
+              "KO vs fl/fl overall (724 up/749 down) contrast is not defined in the paper; approximated by an additive genotype main-effect model (declared deviation, secondary).",
+              "Direction check against the paper: Hif1a is not reduced at gene level in KO (log2FC +0.12 at ZT3 EX, -0.01 overall; padj > 0.4) whereas the paper's Fig. 1B qPCR shows reduced Hif1a transcripts. The floxed allele deletes exon 2 only, so featureCounts gene-level counts over the whole locus need not drop; genotype labels are otherwise supported (paper DEG counts reproduced, Mpi higher in KO as in Fig. 4G, Hallmark OXPHOS NES +3.1 at ZT3 EX and n.s. at ZT15 as in S1.6.p2).",
+              "Exploratory interaction zt_trt_ZT15_EX_vs_ZT3_SED_geno-WT: 490 genes at padj < 0.1 but only 6 at padj < 0.05, because pydeseq2 independent filtering kept 7,257 of 35,337 genes for that contrast and BH produced a plateau just below 0.1; treat it as unstable. The other five interactions have no gene at padj < 0.1."
+            ]
+          },
+          "paper_counts": {
+            "joint/geno_KO_vs_WT_zt-ZT3_trt-EX": 516,
+            "joint/geno_KO_vs_WT_zt-ZT15_trt-EX": 91,
+            "joint/zt_ZT15_vs_ZT3_geno-WT_trt-SED": 451,
+            "joint/zt_ZT15_vs_ZT3_geno-WT_trt-EX": 273,
+            "joint/zt_ZT15_vs_ZT3_geno-KO_trt-SED": 101,
+            "joint/zt_ZT15_vs_ZT3_geno-KO_trt-EX": 191,
+            "geno_KO_vs_WT_overall": 1473
+          },
+          "paper_genes": {
+            "joint/geno_KO_vs_WT_zt-ZT3_trt-EX": ["Hif1a", "Mpi"],
+            "geno_KO_vs_WT_overall": ["Hif1a"]
+          },
+          "reasoning": "Planned contrasts reproduce the paper's model and threshold; overall genotype effect is a declared deviation because its contrast is unstated.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "sample count",
+          "paper": "one sample excluded for low coverage (KO, exercise, ZT3)",
+          "data": "GEO deposits all 64 libraries; 0156_44 (ko_3_ex_44) has 382 reads",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "overall KO vs fl/fl contrast",
+          "paper": "724 up / 749 down without stating the contrast from the ~0+group+sex model",
+          "data": "cell-means model cannot express an averaged main effect in the runner",
+          "disposition": "declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "all", "covariates": ["sex"], "alpha": 0.1},
+          "role": "primary",
+          "reasoning": "One DESeq2 cell-means model ~ sex + cell on all 63 samples (paper's ~0 + group + sex); planned contrasts are the paper's, the exercise vs sedentary and interaction contrasts are exploratory."
+        },
+        {
+          "name": "geno_KO_vs_WT_overall",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "KO", "covariate_columns": "sex,zt,trt", "alpha": 0.1},
+          "role": "secondary",
+          "reasoning": "Additive genotype main effect ~ sex + zt + trt + geno to approximate the paper's overall KO vs fl/fl count (contrast unstated in the paper)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/geno_KO_vs_WT_zt-ZT3_trt-EX", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GSEA GO oxidative metabolism positively enriched in KO vs fl/fl after exercise at ZT3 (S1.6.p2)."},
+        {"execution": "joint/geno_KO_vs_WT_zt-ZT15_trt-EX", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports this enrichment absent at ZT15 (S1.6.p2)."}
+      ]
+    }
+  ]
+}

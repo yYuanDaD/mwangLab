@@ -1,0 +1,146 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39317751",
+  "request": "Analyze GSE227516 for PMID 39317751 (Exercise activates AMPK in mouse and human pancreatic islets to decrease senescence.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE227516",
+      "accession": "GSE227516",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC12005094.paper.md"],
+        "metadata": "GSE227516/GSE227516_metadata.csv",
+        "matrix": "GSE227516/GSE227516_counts_table.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE227516"],
+            "assay": "bulk RNA-seq (TruSeq stranded mRNA, NovaSeq 6000) of isolated pancreatic islets",
+            "samples": "male C57BL/6 mice, 6-9 months old, n = 5 sedentary and n = 5 treadmill-trained (1 h/day, 10 days) (Fig. 2j,k legend; Fig. 4c,d legend)",
+            "inclusion": "all 10 deposited samples; no exclusions stated",
+            "factors": {"treatment": ["sedentary", "trained"]},
+            "primary_estimand": "effect of 10-day treadmill endurance training versus sedentary on islet gene expression in male C57BL/6 mice (causal, randomized intervention between independent animals)",
+            "planned_contrasts": ["trained vs sedentary (S1.3.p1, Fig. 2j,k; S1.5.p2, Fig. 4c,d; paper reports no DEG count)"],
+            "repeated_measure_unit": "none (one islet sample per animal)",
+            "paper_threshold": {
+              "metric": "not stated for RNA-seq",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S3.15.1.p1 (analysis done by Joslin core, no method or threshold); S3.23.p1 (P < 0.05 is for GraphPad physiology/qPCR statistics, not RNA-seq)"
+            },
+            "paper_method": "not stated (Joslin Bioinformatics and Biostatistics Core; GEO data_processing: kallisto + tximport gene counts)",
+            "paper_results": "gene-set level only: SenMayo senescence set reduced (violin + heatmap, Fig. 2j,k); glucagon signalling / GCGR-activation genes a top upregulated pathway (Fig. 4c,d, S1.5.p2). No DEG list or count in the text."
+          },
+          "reasoning": "Results S1.3.p1 and the Fig. 2j,k and Fig. 4c,d legends define the RNA-seq comparison: islets from sedentary vs treadmill-trained 6-9-month-old male C57BL/6 mice, n = 5 per group. Methods S3.15.1.p1 gives no DE method or threshold; the only stated threshold (S3.23.p1, P < 0.05) belongs to the Prism analyses of physiology and qPCR. DA.p1 names GSE227516.",
+          "confidence": "high",
+          "locator": "S1.3.p1; S1.5.p2; S3.15.1.p1; S3.23.p1; DA.p1; FIG7; FIG9"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 and S3.15.1.p1 name GSE227516", "GEO: pancreatic islet, Mus musculus, C57Bl/6, male, 5 SEDENTARY + 5 EXERCISE, matching the paper's n = 5 per group", "contact is the Joslin Bioinformatics and Biostatistics Core, the group the paper names as doing the analysis"]},
+          "reasoning": "The accession, tissue, strain, sex and group sizes all match the paper's RNA-seq cohort.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(P\\d+) "]},
+          "patterns": {"grp": ["title", "^P\\d+ (SEDENTARY|EXERCISE)$"]},
+          "recode": {"grp": {"SEDENTARY": "SED", "EXERCISE": "EX"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns P1..P10 are the first token of the GEO title (inspect alignment_keys: title contains the name, 10/10). Group is the second title token, identical to characteristics treatment.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2 on rounded estimated counts",
+          "final": {"source": "GEO data_processing: kallisto (Ensembl 104) transcript counts converted to gene counts with tximport", "paper_input": "not stated"},
+          "reasoning": "87% integer values, max 2.7e6, library sums 15-23 M, Ensembl gene IDs; data_processing states kallisto + tximport gene counts, so these are estimated counts (non-integer), not TPM. Rounding before a count model is the standard tximport recipe (DESeqDataSetFromMatrix on round(counts)).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_EX_vs_SED"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "EX",
+            "estimand_type": "causal",
+            "contrasts": [{"name": "grp_EX_vs_SED", "control": "SED", "treatment": "EX", "role": "primary"}]
+          },
+          "reasoning": "One factor with two levels, independent animals, n = 5 per arm; the paper compares trained with sedentary (S1.3.p1). Only male samples, so no sex split.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "One islet sample per animal; no batch, litter or sequencing-run column in GEO; all samples male and the same strain and age range.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp",
+            "rounding_documented": true,
+            "paper_route": {"method": "not stated", "status": "unknown", "reason": "paper gives no RNA-seq DE method (S3.15.1.p1)"},
+            "deviations": ["DE method chosen by the workflow because the paper states none; estimated counts rounded to integers before DESeq2"]
+          },
+          "transform": "round",
+          "reasoning": "Estimated counts from tximport support a negative-binomial count model after rounding (the tximport/DESeq2 recipe). The paper names no method, so DESeq2 ~ grp is the workflow choice.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "No RNA-seq threshold in the paper; workflow default BH padj < 0.05, no fold-change rule. Raw p < 0.05 is reported only as a labelled audit count."
+          },
+          "reasoning": "S3.15.1.p1 states no threshold; S3.23.p1's P < 0.05 applies to Prism statistics, not RNA-seq.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper reports RNA-seq only at gene-set level (SenMayo down, glucagon/GCGR signalling up); no DEG count to compare.",
+              "Gene lookups Cdkn1a/Cdkn2a come from qPCR in other cohorts of the paper (Fig. 1-2), not from this RNA-seq; Gcgr is from Fig. 4c heatmap.",
+              "Direction contradiction: Cdkn1a (p21Cip1) is UP in our RNA-seq result (log2FC +0.70, padj 0.042), whereas the paper reports exercise lowering p21Cip1 by qPCR in other cohorts (Fig. 2d, Fig. 4b). Cdkn2a is down but not significant (padj 0.33).",
+              "Glucagon signalling: Gcgr log2FC +0.97 is in the paper's direction but not significant (padj 0.24); KEGG Glucagon signaling pathway is not enriched by ORA (adj P 0.35), so the paper's 'top upregulated pathway' claim (S1.5.p2) is not reproduced with this threshold and gene-set library.",
+              "SenMayo gene set (paper Fig. 2j) is not in the workflow libraries and was not tested; KEGG Cellular senescence is over-represented among DEGs (adj P 0.001) without direction."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {"grp_EX_vs_SED": ["Cdkn1a", "Cdkn2a", "Gcgr", "Trp53", "Hmgb1", "Prkaa1", "Stk11"]},
+          "reasoning": "Method and threshold are workflow choices because the paper states neither; the contrast and sample set match the paper.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method and threshold", "paper": "not stated (core facility analysis)", "data": "kallisto/tximport estimated counts", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "EX", "alpha": 0.05},
+          "role": "primary",
+          "reasoning": "trained vs sedentary, DESeq2 ~ grp on rounded estimated counts"
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_EX_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports pathway-level results (glucagon signalling up, senescence set down, S1.5.p2, Fig. 2j)"}
+      ]
+    }
+  ]
+}

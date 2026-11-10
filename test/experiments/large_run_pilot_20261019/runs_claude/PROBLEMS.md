@@ -607,3 +607,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40789206 (GSE297842)
 
 - case_runner.py:489 rounds gene-check p-values to 0.0 (patched after this row); DEG tables have no symbol column; no total-count filter option (mean used); protein-coding-only filter impossible (no biotype) Details: `PMID40789206/HANDBACK.md`.
+
+## PMID39317751 (GSE227516)
+
+- none blocking; gseapy warned 17.91% tied preranked stats Details: `PMID39317751/HANDBACK.md`.
+
+## PMID40627397 (GSE282641)
+
+- none blocking; joint_contrasts.py:150 logs n at fixed 0.05 instead of alpha 0.1; per-contrast filtering makes a padj plateau at 0.1; Hif1a not reduced at gene level Details: `PMID40627397/HANDBACK.md`.

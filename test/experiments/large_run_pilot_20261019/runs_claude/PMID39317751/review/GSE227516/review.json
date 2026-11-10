@@ -1,0 +1,21 @@
+{"case": "GSE227516", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Islets from sedentary vs 10-day treadmill-trained 6-9 month male C57BL/6 mice (S1.3.p1; Fig. 2j,k and Fig. 4c,d legends). Exercise is an in-vivo factor; all 10 deposited samples (5 SEDENTARY, 5 EXERCISE) carry it (S3.15.1.p1, DA.p1).",
+  "B2": "One comparison: trained vs sedentary, n = 5 per group (Fig. 2j,k legend; Fig. 4c,d legend).",
+  "B3": "No repeated measures: one islet RNA sample per animal; titles P1-P10 are unique; packet A candidate pairing keys link 0/10 samples.",
+  "B4": "The paper does not say; S3.15.1.p1 only says analysis was done by the Joslin Bioinformatics and Biostatistics Core. Two groups only, so joint vs pairwise is moot.",
+  "B5": "No RNA-seq DEG rule or count is stated. S3.23.p1 (P < 0.05, Prism, Welch t test) covers physiology/qPCR, not RNA-seq. Results are gene-set level only (SenMayo down, Fig. 2j,k; GCGR-activation genes up, Fig. 4c,d, S1.5.p2)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run decision matches B1; in-vivo exercise arm present (S1.3.p1).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp SED 5 / EX 5 from title, equal to characteristics treatment; matches n = 5 per group (Fig. 2j,k legend); no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "control SED, treatment EX; contrast grp_EX_vs_SED = trained vs sedentary.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per animal; no pairing key in packet A (0/10 linked); design ~ grp.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent (B4); single two-group fit, so no joint/pairwise ambiguity.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Sex, strain, tissue constant; no batch or run column in GEO; recorded in covariance gate.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "kallisto+tximport estimated counts (87% integer, library sums 15-23M); rounded then DESeq2, the standard tximport recipe; rounding documented.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states no RNA-seq threshold (B5); workflow default padj < 0.05 is labelled workflow_default and raw p < 0.05 is a labelled audit count.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "HANDBACK does not claim a DEG-count match (paper reports none) and states Cdkn1a up / glucagon signalling / SenMayo not reproduced or not tested. Minor: SenMayo set could be tested by GSEA with a custom set; Cdkn1a qPCR comes from other cohorts.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal in this case.", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该系列确为运动干预(跑台训练 vs 久坐,各5只雄性小鼠胰岛),分组、方向、n、独立样本设计均与论文一致。论文未给出RNA-seq方法和阈值,工作流默认DESeq2 + padj<0.05并已如实标注为偏离。未发现blocking或major问题。"}

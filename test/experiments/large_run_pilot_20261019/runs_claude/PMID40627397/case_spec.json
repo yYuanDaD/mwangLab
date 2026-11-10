@@ -62,11 +62,12 @@
         "alignment": {
           "key_patterns": {"key": ["description", "^Library name: (\\S+)$"]},
           "key_column": "key",
-          "aliases": {"sex": "characteristics_ch1.1.Sex"},
+          "aliases": {"sex": "characteristics_ch1.1.Sex", "geno": "characteristics_ch1.3.genotype",
+                      "zt": "characteristics_ch1.2.zt", "trt": "characteristics_ch1.4.treatment"},
           "patterns": {},
           "combine": {},
-          "recode": {},
-          "derive_note": "geno, zt, trt are built below from the characteristics columns",
+          "recode": {"geno": {"ko": "KO", "wt": "WT"}, "zt": {"3": "ZT3", "15": "ZT15"},
+                     "trt": {"sed": "SED", "ex": "EX"}, "sex": {"f": "F", "m": "M"}},
           "exclude_samples": {
             "GSM8647977": "library 0156_44 (ko_3_ex_44) has 382 total reads vs median 16 M; the paper excluded one KO exercise ZT3 sample for low coverage (S4.14.p1) - this is it"
           },
@@ -154,7 +155,9 @@
             "route": "paper_aligned",
             "caveats": [
               "The paper reports no exercise vs sedentary DEG counts; those contrasts are exploratory.",
-              "KO vs fl/fl overall (724 up/749 down) contrast is not defined in the paper; approximated by an additive genotype main-effect model (declared deviation, secondary)."
+              "KO vs fl/fl overall (724 up/749 down) contrast is not defined in the paper; approximated by an additive genotype main-effect model (declared deviation, secondary).",
+              "Direction check against the paper: Hif1a is not reduced at gene level in KO (log2FC +0.12 at ZT3 EX, -0.01 overall; padj > 0.4) whereas the paper's Fig. 1B qPCR shows reduced Hif1a transcripts. The floxed allele deletes exon 2 only, so featureCounts gene-level counts over the whole locus need not drop; genotype labels are otherwise supported (paper DEG counts reproduced, Mpi higher in KO as in Fig. 4G, Hallmark OXPHOS NES +3.1 at ZT3 EX and n.s. at ZT15 as in S1.6.p2).",
+              "Exploratory interaction zt_trt_ZT15_EX_vs_ZT3_SED_geno-WT: 490 genes at padj < 0.1 but only 6 at padj < 0.05, because pydeseq2 independent filtering kept 7,257 of 35,337 genes for that contrast and BH produced a plateau just below 0.1; treat it as unstable. The other five interactions have no gene at padj < 0.1."
             ]
           },
           "paper_counts": {
