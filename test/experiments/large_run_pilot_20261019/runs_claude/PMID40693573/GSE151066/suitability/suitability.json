@@ -1,0 +1,445 @@
+{
+  "case_id": "GSE151066",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "cohort",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "cohort",
+        "time"
+      ],
+      "levels": {
+        "cohort": {
+          "act": 24,
+          "sed": 21
+        },
+        "time": {
+          "pre": 15,
+          "ip": 15,
+          "h3": 15
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [
+        "pool"
+      ],
+      "stopping_columns": [],
+      "between_subject_factors": [
+        "cohort"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "pool",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "cohort",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject) + C(pool)",
+        "rank": 18,
+        "full_rank": true,
+        "residual_df": 27,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_h3_vs_pre_cohort-sed",
+        "time_h3_vs_pre_cohort-act"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 45 samples.",
+      "metadata_sex_column": "characteristics_ch1.3.gender",
+      "predicted": {
+        "male": 45
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40693573\\GSE151066\\suitability\\aligned_matrix_sexmarkers_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "cohort_act_vs_sed_time-h3",
+      "kind": "simple",
+      "factor": "cohort",
+      "test": "act",
+      "reference": "sed",
+      "within": {
+        "time": "h3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h3",
+            "cohort": "act"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "h3",
+            "cohort": "sed"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cohort_act_vs_sed_time-ip",
+      "kind": "simple",
+      "factor": "cohort",
+      "test": "act",
+      "reference": "sed",
+      "within": {
+        "time": "ip"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "ip",
+            "cohort": "act"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "ip",
+            "cohort": "sed"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cohort_act_vs_sed_time-pre",
+      "kind": "simple",
+      "factor": "cohort",
+      "test": "act",
+      "reference": "sed",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "cohort": "act"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "cohort": "sed"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_ip_vs_h3_cohort-act",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ip",
+      "reference": "h3",
+      "within": {
+        "cohort": "act"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "ip"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "h3"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_pre_cohort-act",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "pre",
+      "within": {
+        "cohort": "act"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "h3"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_ip_vs_pre_cohort-act",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ip",
+      "reference": "pre",
+      "within": {
+        "cohort": "act"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "ip"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_ip_vs_h3_cohort-sed",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ip",
+      "reference": "h3",
+      "within": {
+        "cohort": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "ip"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "h3"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_pre_cohort-sed",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "pre",
+      "within": {
+        "cohort": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "h3"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_ip_vs_pre_cohort-sed",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ip",
+      "reference": "pre",
+      "within": {
+        "cohort": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "ip"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cohort_time_act_h3_vs_sed_pre",
+      "kind": "interaction",
+      "factor": "cohort:time",
+      "test": "act:h3",
+      "reference": "sed:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "h3"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "h3"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "pre"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cohort_time_act_ip_vs_sed_pre",
+      "kind": "interaction",
+      "factor": "cohort:time",
+      "test": "act:ip",
+      "reference": "sed:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "ip"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "ip"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "cohort": "act",
+            "time": "pre"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cohort": "sed",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "case_id": "TES",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "trt",
+    "zt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "trt",
+        "zt"
+      ],
+      "levels": {
+        "trt": {
+          "ctrl": 6,
+          "def": 6
+        },
+        "zt": {
+          "zt05": 6,
+          "zt17": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "libstyle",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(trt) + C(zt)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "trt_def_vs_ctrl_zt-zt05",
+        "trt_def_vs_ctrl_zt-zt17"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "predicted": {
+        "male": 12
+      },
+      "mismatched": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39232281\\TES\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "trt_def_vs_ctrl_zt-zt05",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "def",
+      "reference": "ctrl",
+      "within": {
+        "zt": "zt05"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "zt05",
+            "trt": "def"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "zt": "zt05",
+            "trt": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_def_vs_ctrl_zt-zt17",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "def",
+      "reference": "ctrl",
+      "within": {
+        "zt": "zt17"
+      },
+      "cells": [
+        {
+          "cell": {
+            "zt": "zt17",
+            "trt": "def"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "zt": "zt17",
+            "trt": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_zt17_vs_zt05_trt-ctrl",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "zt17",
+      "reference": "zt05",
+      "within": {
+        "trt": "ctrl"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "ctrl",
+            "zt": "zt17"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "ctrl",
+            "zt": "zt05"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "zt_zt17_vs_zt05_trt-def",
+      "kind": "simple",
+      "factor": "zt",
+      "test": "zt17",
+      "reference": "zt05",
+      "within": {
+        "trt": "def"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "def",
+            "zt": "zt17"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "def",
+            "zt": "zt05"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_zt_def_zt17_vs_ctrl_zt05",
+      "kind": "interaction",
+      "factor": "trt:zt",
+      "test": "def:zt17",
+      "reference": "ctrl:zt05",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "def",
+            "zt": "zt17"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "ctrl",
+            "zt": "zt17"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "def",
+            "zt": "zt05"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "trt": "ctrl",
+            "zt": "zt05"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

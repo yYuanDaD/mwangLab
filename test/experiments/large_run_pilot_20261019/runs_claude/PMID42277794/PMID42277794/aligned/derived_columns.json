@@ -1,0 +1,78 @@
+{
+  "key": {
+    "source": "data/GSE263186/GSE263186_metadata.csv",
+    "columns": {
+      "mkey": {
+        "source": "supplementary_file_1",
+        "regex": "/(GSM\\d+_[^/]+)\\.ReadsPerGene\\.out\\.tab\\.gz$"
+      }
+    },
+    "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42277794\\PMID42277794\\aligned\\metadata_keyed.csv",
+    "sha256": "0443fdee0f7109b25ac05bba67e40ed49f7c8bb90d55cb47dd9434f9054b7930",
+    "levels": {
+      "mkey": {
+        "GSM8187306_SED-Control-1.STAR": 1,
+        "GSM8187307_SED-Control-2.STAR": 1,
+        "GSM8187308_SED-Control-3.STAR": 1,
+        "GSM8187309_SED-Treat-1.STAR": 1,
+        "GSM8187310_SED-Treat-2.STAR": 1,
+        "GSM8187311_SED-Treat-3.STAR": 1,
+        "GSM8187312_EXT-Control-1.STAR": 1,
+        "GSM8187313_EXT-Control-2.STAR": 1,
+        "GSM8187314_EXT-Control-3.STAR": 1,
+        "GSM8187315_EXT-Treat-1.STAR": 1,
+        "GSM8187316_EXT-Treat-2.STAR": 1,
+        "GSM8187317_EXT-Treat-3.STAR": 1
+      }
+    }
+  },
+  "design": {
+    "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42277794\\PMID42277794\\aligned\\aligned_metadata.csv",
+    "columns": {
+      "ex": {
+        "source": "title",
+        "regex": "^(SED|EXT)-"
+      },
+      "exo": {
+        "source": "title",
+        "regex": "^(?:SED|EXT)-(control|cancer exosome injection) bio",
+        "recode": {
+          "control": "ctrl",
+          "cancer exosome injection": "exo"
+        }
+      },
+      "trt_ex": {
+        "source": "characteristics_ch1.3.treatment",
+        "regex": "^(Sendentary|SED|exercise)",
+        "recode": {
+          "Sendentary": "SED",
+          "SED": "SED",
+          "exercise": "EXT"
+        }
+      },
+      "rep": {
+        "source": "title",
+        "regex": "rep ?(\\d)$"
+      }
+    },
+    "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42277794\\PMID42277794\\aligned\\design_metadata.csv",
+    "sha256": "b0f374d6d5028a19b91373fb6c01c61c8dc7418c35581e66bb83651d97038a6d",
+    "levels": {
+      "grp": {
+        "SED_ctrl": 3,
+        "SED_exo": 3,
+        "EXT_ctrl": 3,
+        "EXT_exo": 3
+      },
+      "ex": {
+        "SED": 6,
+        "EXT": 6
+      },
+      "exo": {
+        "ctrl": 6,
+        "exo": 6
+      }
+    },
+    "key": "matrix column 'GSM8187306_SED-Control-1.STAR' = basename of GEO supplementary_file_1 without '.ReadsPerGene.out.tab.gz' -> metadata column mkey; ex/exo from title, cross-checked against characteristics treatment"
+  }
+}

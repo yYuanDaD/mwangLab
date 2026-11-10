@@ -1,0 +1,82 @@
+{
+  "paper_id": "PMID42155766 / PMC13319373 (J Sport Health Sci 2026, 101146)",
+  "accessions": {
+    "GSE304653": "bulk RNA-seq of flow-sorted Met1-iRFP tumour fractions (S8.p1, S2.4.p1)"
+  },
+  "assay": "Met1-iRFP orthotopic tumours digested, sorted into iRFP+ (cancer) and iRFP- (TME); KAPA stranded mRNA; HiSeq 2x50; STAR mm10 + featureCounts gencode vM18 (S2.4.p1)",
+  "sample_inclusion": [
+    "female FVB mice, Met1-iRFP grafted; voluntary wheel running vs sedentary (no wheel) from day 3 for ~15 days (S2.1.2.p1, S2.2.p1)",
+    "TME RNA-seq: exercise n=4, control n=4 (FIG2C)",
+    "cancer-cell RNA-seq: exercise n=7, control n=8, 'from the same tumors' (S3.p4, FIG3B)"
+  ],
+  "sample_exclusion": [
+    "missed fat-pad injection, ulceration, or injury that prohibited exercise (S2.1.p1); not identifiable at the sample level"
+  ],
+  "factors": [
+    {
+      "name": "treatment",
+      "levels": [
+        "sedentary control",
+        "voluntary wheel running"
+      ],
+      "type": "between-mouse",
+      "locator": "S2.1.2.p1"
+    },
+    {
+      "name": "fraction",
+      "levels": [
+        "iRFP- TME",
+        "iRFP+ cancer"
+      ],
+      "type": "analysis stratum (separate analyses)",
+      "locator": "S2.4.p1; S3.p2; S3.p4"
+    }
+  ],
+  "primary_estimand": "Effect of voluntary wheel running vs sedentary control on gene expression of (a) the iRFP- tumour-microenvironment fraction and (b) the iRFP+ cancer-cell fraction of Met1 tumours, each fraction analysed separately.",
+  "planned_contrasts": [
+    {
+      "name": "TME: grp_ex_vs_sed",
+      "definition": "exercise vs control, iRFP- cells",
+      "locator": "S3.p2; FIG2C"
+    },
+    {
+      "name": "Cancer: grp_ex_vs_sed",
+      "definition": "exercise vs control, iRFP+ cells",
+      "locator": "S3.p4; FIG3B"
+    }
+  ],
+  "repeated_measure_unit": "mouse; one sample per mouse per fraction; fractions from the same tumours are analysed separately",
+  "normalization": "DESeq2 size factors (S2.4.p1)",
+  "paper_method": "DESeq2 (Bioconductor) on featureCounts gene counts (S2.4.p1); design formula and prefilter not reported",
+  "paper_threshold": {
+    "metric": "padj",
+    "adjustment": "BH",
+    "cutoff": 0.1,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": false,
+    "source_locator": "S3.p2; S3.p4; FIG2; FIG3"
+  },
+  "reported_counts": {
+    "TME_iRFPneg": {
+      "n_deg": 87,
+      "rule": "p_adj < 0.1",
+      "locator": "S3.p2; FIG2C"
+    },
+    "Cancer_iRFPpos": {
+      "n_deg": 293,
+      "rule": "p_adj < 0.1",
+      "locator": "S3.p4; FIG3B; S2.5.p1"
+    }
+  },
+  "enrichment": {
+    "TME": "GSEA Hallmark (mouse) on all genes ranked by log2FC via genekitr; BH p_adj < 0.05 (S2.4.p1, FIG2B)",
+    "Cancer": "Reactome ORA on up/down DEGs; IPA functions (S2.4.p1, S3.p4, FIG3D)"
+  },
+  "this_case": "TME_iRFPneg",
+  "reported_for_this_case": {
+    "n_deg": 87,
+    "rule": "p_adj < 0.1",
+    "locator": "S3.p2; FIG2C"
+  }
+}

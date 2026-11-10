@@ -1,0 +1,63 @@
+[
+  {
+    "item": "threshold",
+    "paper": "S2.2.p2: FDR < 0.001",
+    "data": "S3.5.p1 / FIG2 report the DEG counts at logFC > 1 and FDR < 0.05",
+    "classification": "executable_without_change",
+    "note": "the count-bearing rule (FDR<0.05 & |logFC|>1) is the paper_threshold; FDR<0.001 (with and without |logFC|>1) reported as audit"
+  },
+  {
+    "item": "matrix scale",
+    "paper": "voom on tximport counts",
+    "data": "'Raw_gene_counts_matrix' holds non-integer Salmon/tximport estimated counts (34% integers)",
+    "classification": "requires_explicit_deviation",
+    "note": "voom executor needs integer counts, two arms, no covariates"
+  },
+  {
+    "item": "method",
+    "paper": "limma-voom with RIN covariate",
+    "data": "no executor for voom + covariate + multigroup contrasts",
+    "classification": "requires_explicit_deviation",
+    "note": "limma (inmoose) on log2(CPM+1), ~ 0 + cell + rin on all 48 samples"
+  },
+  {
+    "item": "gene filter",
+    "paper": "14,789 genes, filter not stated",
+    "data": "median CPM >= 0.5 over all 48 samples keeps exactly 14,789 genes (the rule of the authors' companion paper PMID33486778)",
+    "classification": "executable_without_change",
+    "note": "also implies a single filter (and likely one model) over both muscles"
+  },
+  {
+    "item": "RIN",
+    "paper": "RIN > 8.0 for each sample (S2.2.p1)",
+    "data": "GEO rin 7.8-8.6; 9 samples below 8.0",
+    "classification": "executable_without_change",
+    "note": "RIN used as given, continuous covariate"
+  },
+  {
+    "item": "library kit",
+    "paper": "TruSeq Stranded Total RNA + Ribo-Zero Gold",
+    "data": "GEO extract protocol: TruSeq RNA Sample Prep Kit (FC-122-1001)",
+    "classification": "executable_without_change"
+  },
+  {
+    "item": "animal identity",
+    "paper": "plantaris and soleus taken from the same rats",
+    "data": "no animal ID in GEO; rep numbers may or may not pair across muscles",
+    "classification": "requires_explicit_deviation",
+    "note": "tissue (within-animal) comparisons not run; within-muscle contrasts are between animals"
+  },
+  {
+    "item": "exercise",
+    "paper": "lines defined by response to 8-wk treadmill training at ~12 wk",
+    "data": "no trained/sedentary samples; all rats 14 months",
+    "classification": "executable_without_change",
+    "note": "analysable stimulus is disuse (HI); line effect is genotype (associational)"
+  },
+  {
+    "item": "enrichment library",
+    "paper": "GO BP GSEA (clusterProfiler)",
+    "data": "repository GSEA: MSigDB Hallmark (mouse) only; rat via symbol identity",
+    "classification": "requires_explicit_deviation"
+  }
+]

@@ -27,9 +27,13 @@ def run_deseq2_analysis(
     output_dir: str = "./output",
     covariate_columns: str = "",
     interaction_terms: str = "",
+    alpha: float = 0.05,
 ) -> str:
     """
     Run Differential Expression Analysis using PyDESeq2.
+
+    ``alpha`` is the independent-filtering target (pydeseq2 default 0.05; R DESeq2's
+    results() uses 0.1). Set it to the paper's FDR cutoff.
 
     Args:
         counts_csv: Path to the raw counts CSV file (must be unnormalized raw counts).
@@ -126,6 +130,20 @@ def run_deseq2_analysis(
                 if original != design_column:
                     rename_map[original] = safe
         metadata_df = metadata_df.rename(columns=rename_map)
+        # Recode the levels so the control sorts first: pydeseq2 takes the alphabetically first
+        # level as reference (ref_level is ignored with design_factors), and lfc_shrink can only
+        # shrink a model coefficient, so treatment-vs-control must be one. A C(..., contr.treatment)
+        # formula would set the reference too but shrinks every LFC to 0 once a covariate is added.
+        others = sorted({str(v) for v in metadata_df[safe_col]} - {str(control_group), str(treatment_group)})
+        level_codes = {str(control_group): "A_control", str(treatment_group): "B_treatment"}
+        level_codes.update({v: f"C_other{i}" for i, v in enumerate(others)})
+        metadata_df[safe_col] = metadata_df[safe_col].astype(str).map(level_codes)
+        # Covariates are categorical (subject, batch): numeric subject IDs read from CSV must
+        # not become one continuous slope, which silently unpairs a paired design (GSE308252).
+        if multifactor_plan is not None:
+            for col in multifactor_plan.covariates:
+                safe = multifactor_plan.safe_columns[col]
+                metadata_df[safe] = metadata_df[safe].astype(str)
 
         print(f"Running DESeq2 on {len(counts_df.index)} samples and {len(counts_df.columns)} genes...")
 
@@ -146,12 +164,25 @@ def run_deseq2_analysis(
 
         stat_res = DeseqStats(
             dds,
-            contrast=(safe_col, treatment_group, control_group),
+            contrast=(safe_col, "B_treatment", "A_control"),
+            alpha=alpha,
             n_cpus=8,
         )
         stat_res.summary()
 
-        res_df = stat_res.results_df
+        # log2FoldChange stays the MLE so every DA method writes the same quantity; the apeglm
+        # shrunken estimate (what DESeq2 papers usually threshold on) goes in its own columns.
+        # Shrinkage leaves stat/pvalue/padj unchanged.
+        res_df = stat_res.results_df.copy()
+        shrink_note = ""
+        coeff = f"{safe_col}[T.B_treatment]"
+        try:
+            stat_res.lfc_shrink(coeff=coeff)
+            res_df["log2FoldChange_shrunk"] = stat_res.results_df["log2FoldChange"]
+            res_df["lfcSE_shrunk"] = stat_res.results_df["lfcSE"]
+        except Exception as e:  # keep the MLE results rather than failing the run
+            shrink_note = f"\nLFC shrinkage skipped ({type(e).__name__}: {e})."
+            print(shrink_note.strip())
         res_df = res_df.sort_values("padj")
 
         output_file = os.path.join(output_dir, deg_filename(treatment_group, control_group))
@@ -161,11 +192,16 @@ def run_deseq2_analysis(
         up_regulated = sig_genes[sig_genes["log2FoldChange"] > 1]
         down_regulated = sig_genes[sig_genes["log2FoldChange"] < -1]
 
-        return (f"DESeq2 analysis completed successfully!\n"
-                f"Results saved to: {output_file}\n"
-                f"Summary (padj < 0.05, |log2FC| > 1):\n"
-                f"- Up-regulated genes: {len(up_regulated)}\n"
-                f"- Down-regulated genes: {len(down_regulated)}")
+        summary = (f"DESeq2 analysis completed successfully!\n"
+                   f"Results saved to: {output_file}\n"
+                   f"Summary (padj < 0.05, |log2FC| > 1):\n"
+                   f"- Up-regulated genes: {len(up_regulated)}\n"
+                   f"- Down-regulated genes: {len(down_regulated)}")
+        if "log2FoldChange_shrunk" in res_df:
+            shrunk = sig_genes["log2FoldChange_shrunk"]
+            summary += (f"\nWith apeglm-shrunken log2FC (column log2FoldChange_shrunk), |log2FC| > 1: "
+                        f"{int((shrunk > 1).sum())} up, {int((shrunk < -1).sum())} down.")
+        return summary + shrink_note
 
     except PolicyViolation as e:
         return f"POLICY BLOCKED: {e}"

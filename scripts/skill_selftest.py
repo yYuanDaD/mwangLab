@@ -243,7 +243,12 @@ def gates(case, *, spec: dict, inputs: list[dict], matrix_type: str, design: dic
     case.decide("matrix", evidence=inputs[:1], confidence="high", reasoning="generated scale",
                 final={"matrix_type": matrix_type, "recommended_method": method["method"]})
     design = {k: v for k, v in design.items() if k != "estimand"}
-    case.decide("design", evidence=inputs, confidence="high", reasoning="planted design", final=design)
+    blocking = covariance.get("blocking_terms") or []
+    _, report, summary = case.suitability(
+        matrix_type=matrix_type, metadata=pd.read_csv(inputs[-1]["path"], index_col=0),
+        factors=[design["design_column"]], subject=blocking[0] if blocking else None, covariate_candidates=[])
+    case.decide("design", evidence=inputs + [report], confidence="high", reasoning="planted design",
+                final={**design, "suitability": summary})
     case.decide("covariance", evidence=inputs, confidence="high", reasoning="planted structure", final=covariance)
     case.decide("method", evidence=inputs[:1], confidence="high", reasoning="matrix-method policy",
                 final={"matrix_type": matrix_type, **method})

@@ -1,0 +1,95 @@
+{
+  "paper_id": "PMID39000297 / PMC11241292",
+  "accessions": [
+    "GSE232510"
+  ],
+  "accession_roles": {
+    "GSE232510": "single deposit for both RNA-seq experiments (S5.6.2.p1, DA.p1): voluntary running (RW/DIO) and miR-211 ICV injection"
+  },
+  "assay": "bulk RNA-seq, MARS-Seq bulk adaptation, NextSeq 75 cycles; STAR to Rnor6, samtools rmdup, htseq-count -s no --mode union (S5.6.2.p1, S5.6.3.p1-p2)",
+  "organism": "Rattus norvegicus, female Wistar, hypothalamic arcuate nucleus punch (S5.1.p2, S5.4.2.p1)",
+  "factors": [
+    {
+      "name": "diet",
+      "levels": [
+        "chow",
+        "60% HFD"
+      ]
+    },
+    {
+      "name": "activity",
+      "levels": [
+        "sedentary",
+        "voluntary wheel running (4 wk)"
+      ]
+    },
+    {
+      "name": "group (paper coding)",
+      "levels": [
+        "CS",
+        "CR",
+        "HFS",
+        "HFR"
+      ],
+      "reference": "CS"
+    }
+  ],
+  "sample_inclusion": [
+    "RNA-seq n = 3 CS, 3 CR, 4 HFS, 4 HFR (S5.6.2.p1, FIG2)",
+    "one HFR outlier on PCA kept (S2.2.p1)"
+  ],
+  "sample_exclusion": [
+    "miR-211 injection experiment (n = 4 mimic, 4 inhibitor) is a separate, non-exercise experiment (S2.4.p1, S5.3) - out of scope for the exercise question"
+  ],
+  "primary_estimand": "Effect of 4-week voluntary wheel running on ARC gene expression in diet-induced obese female rats, framed as rescue: HFS vs CS (DIO effect) and HFR vs CS (residual after exercise) - the reduction in DEGs from HFS to HFR is the paper's rescue claim; CR vs CS is the exercise effect on chow.",
+  "planned_contrasts": [
+    "HFS_vs_CS",
+    "HFR_vs_CS",
+    "CR_vs_CS"
+  ],
+  "paper_supporting_comparison": "HFR vs HFS on k-means cluster averages (S2.2.p3), not a gene-level DE test",
+  "blocking_or_covariance": {
+    "status": "not_required",
+    "repeated_measures": "none - one ARC per animal, independent animals",
+    "batch": "experiment run twice (S5.2.p1); cohort not recorded in GEO and not modelled by the paper"
+  },
+  "matrix_scale": "htseq-count raw read counts after rmdup (S5.6.3.p2)",
+  "paper_method": "DESeq2, pair-wise comparisons vs CS on a read-count matrix assembled from all RW groups (S5.6.3.p2)",
+  "paper_formula": "not_reported",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (DESeq2 default; method not named in paper)",
+    "cutoff": 0.1,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 0.5,
+    "effect_cutoff_original": "log2FC > 0.5 (volcano, FIG2 A)",
+    "inclusive": false,
+    "source_locator": "S2.2.p2; FIG2"
+  },
+  "paper_threshold_note": "S2.2.p2 states FDR < 0.1 only; FIG2 legend (the figure the counts refer to) adds log2FC > 0.5. The legend rule is taken as the paper rule; FDR < 0.1 alone is reported as an audit.",
+  "paper_reported_deg_counts": {
+    "HFS_vs_CS": {
+      "total": 430,
+      "up": 165,
+      "down": 265,
+      "locator": "S2.2.p2 ('CS vs. HFS'); S5.6.3.p1 n = 430"
+    },
+    "HFR_vs_CS": {
+      "total": 39,
+      "up": 20,
+      "down": 19,
+      "locator": "S2.2.p2"
+    },
+    "CR_vs_CS": {
+      "total": 128,
+      "up": 93,
+      "down": 35,
+      "locator": "S2.2.p2"
+    },
+    "HFR_vs_HFS": {
+      "total": "not_reported",
+      "locator": "S2.2.p3 compares HFS vs HFR only on cluster-average log2FC"
+    }
+  },
+  "paper_enrichment": "GO (HOMER / ToppFun) on k-means clusters of the 430 HFS_vs_CS DEGs (S5.6.3.p2, FIG2D); not requested here"
+}

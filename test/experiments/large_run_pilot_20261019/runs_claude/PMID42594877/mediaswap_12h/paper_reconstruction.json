@@ -1,0 +1,69 @@
+{
+  "paper_id": "PMID42594877 / PMC13589506 (Cell-press STAR Methods article)",
+  "accessions": [
+    "GSE308252"
+  ],
+  "accession_locator": "S4.3.p1",
+  "other_deposits": "PXD069170 (plasma proteomics), PR002719 (metabolomics); skeletal-muscle RNA-seq re-used from Botella et al. (not in GSE308252, S9.3.13.p1)",
+  "assay": "bulk RNA-seq, Illumina stranded mRNA, NextSeq 2000; Salmon v1.8.0 -> tximport -> DESeq2 (S9.3.14.p1, S9.3.15.p1)",
+  "sub_experiment": "mediaswap_12h",
+  "sample_inclusion": [
+    "Cohort 1 plasma, 6 SIE and 6 MIE participants, pre and 0 h (S9.3.18.p1)"
+  ],
+  "sample_exclusion": [
+    "one SIE plasma sample detached the adipocytes, not used for the 12 h experiment -> 5 SIE donors (S9.3.18.p1)"
+  ],
+  "factors": [
+    {
+      "name": "intensity",
+      "levels": [
+        "MIE",
+        "SIE"
+      ],
+      "type": "between-donor (plasma donor randomised to SIE or MIE)",
+      "locator": "S9.2.1.1.p1"
+    },
+    {
+      "name": "time",
+      "levels": [
+        "pre",
+        "post"
+      ],
+      "type": "within-subject",
+      "locator": "S2.4.p3; S9.3.18.p1; Table S4 J-N (SUP5)"
+    }
+  ],
+  "primary_estimand": "Independent 12 h media-swap experiment: effect of 0 h versus pre plasma on the adipocyte transcriptome, separately for SIE and MIE plasma (supporting the 3 h result).",
+  "planned_contrasts": [
+    {
+      "name": "SIE_post_vs_pre",
+      "definition": "12 h, SIE 0 h vs pre plasma, paired by donor",
+      "reported": "not_reported in text (Table S4 J; Figures S5A-D)",
+      "locator": "S2.4.p3; SUP5"
+    },
+    {
+      "name": "MIE_post_vs_pre",
+      "definition": "12 h, MIE 0 h vs pre plasma, paired by donor",
+      "reported": "not_reported in text (Table S4 K; Figures S5A-D)",
+      "locator": "S2.4.p3; SUP5"
+    }
+  ],
+  "blocking_or_covariance": {
+    "status": "required",
+    "term": "subject (participant / plasma donor)",
+    "locator": "S9.3.15.p1 ('controlling for each subject in the linear model')"
+  },
+  "matrix_scale": "Salmon/tximport gene-level counts as stored in DESeq2 (GEO: 'raw counts from DESeq2')",
+  "paper_method": "DESeq2 v1.42.1/1.44.0, paired: ~ subject + time (S9.3.15.p1)",
+  "paper_formula": "~ subject + time (per experiment / per intensity; exact formula not printed)",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (DESeq2 default padj; method not named in paper)",
+    "cutoff": 0.05,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": false,
+    "source_locator": "S2.4.p2; S2.4.p4"
+  },
+  "enrichment": "GSEA (clusterProfiler, GO BP via msigdbr) ranked by DESeq2 Wald statistic (S9.3.15.p1)"
+}

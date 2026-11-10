@@ -1,0 +1,368 @@
+{
+ "run_dir": "E:\\agent\\mwangLab_tokens\\test\\experiments\\case_runner_validation_20261028\\runs\\PMID40069235",
+ "decision_maker": "validation: decisions copied from the 2026-10 large run",
+ "request": "Re-run PMID40069235 through tools/case_runner.py with its recorded decisions",
+ "platform": "case_runner_validation",
+ "cases": [
+  {
+   "case_id": "case_01",
+   "accession": "GSE273041",
+   "inputs": {
+    "paper": [
+     "E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC11897176.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/data/GSE273041/GSE273041_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/data/GSE273041/GSE273041_raw_counts.txt.gz"
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE273041"
+      ],
+      "primary_estimand": "Exercise response: change from baseline (BL) within each diet group at H0 and at H2 (S2.3.p1, S2.3.p6, S5.6.p3); diet differences at each time point are a secondary, associational estimand (S2.2.p1) and are not the requested exercise question.",
+      "planned_contrasts": [
+       "HC_H0_vs_BL",
+       "HC_H2_vs_BL",
+       "LC_H0_vs_BL",
+       "LC_H2_vs_BL"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "adjustment": "Benjamini-Hochberg",
+       "cutoff": 0.05,
+       "effect_metric": "log2FC",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "source_locator": "S5.6.p3"
+      },
+      "paper_method": "mixed-effect ANOVA (car, R 3.0) + Tukey post-hoc, BH FDR (S5.6.p3)",
+      "matrix_scale": "RPKM (easyRNASeq), filtered at 50 mapped reads; values < 10 reads replaced by the RPKM equivalent of 10 reads (S5.6.p2)",
+      "blocking": "subject (repeated biopsies)",
+      "reported_counts": {
+       "omnibus": "diet 653, exercise 8,413, interaction 312 transcripts (p<0.01, FDR<0.05) (S2.1.p1)",
+       "HC_only_vs_BL": "330 genes 'differentially expressed vs. baseline in HC only' (S2.3.p2; time point not stated, read with FIG4)",
+       "LC_H0_vs_BL": "161 genes 'different at H0 vs. baseline in LC' (S2.3.p2; unclear whether total or LC-unique)",
+       "shared_H0": "198 genes DE at H0 irrespective of diet (both HC and LC) (S2.3.p3)",
+       "HC_H2_vs_BL": "222 genes (S2.3.p6)",
+       "LC_H2_vs_BL": "193 genes, described as 'a separate group' (S2.3.p6)",
+       "shared_H2": "100 DEGs shared between diets at H2 (S2.3.p6)",
+       "direction": "up/down split not reported in text (only in FIG4 bars)"
+      }
+     },
+     "reasoning": "Paper's own deposit is GSE273041 (DA.p1). Exercise effects are defined as change from BL within each diet at H0 and H2 (S2.3.p1, S2.3.p6, S5.6.p3) with FDR<0.05 and |log2FC|>1. Per-contrast DEG totals are only partly unambiguous in text (S2.3.p2-p6).",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.6.p3"
+    },
+    "ownership": {
+     "final": {
+      "accession": "GSE273041",
+      "matrix_file": "data/GSE273041/GSE273041_raw_counts.txt.gz",
+      "metadata_file": "data/GSE273041/GSE273041_metadata.csv",
+      "owned": true,
+      "checks": {
+       "series_id": [
+        "GSE273041"
+       ],
+       "n_samples": 60,
+       "diet": {
+        "HiCarb": 30,
+        "LowCarb": 30
+       },
+       "timepoint": {
+        "Base": 20,
+        "IP": 20,
+        "IP120": 20
+       },
+       "data_processing": "FASTQs from different flow cells were combined for a given sample using NGmerge,alignment via TopHat,Assembly: ensembl Hg19,Supplementary files format and content: processed data are RPKM normalized read counts"
+      }
+     },
+     "reasoning": "Metadata series_id GSE273041 = paper's DA accession; 60 samples = 20 athletes x 3 biopsies; 30 HiCarb / 30 LowCarb; 20 Base/IP/IP120 each; TopHat + Hg19 + RPKM matches S5.6.p2. The only supplementary matrix is GSE273041_raw_counts.txt.gz.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "DA.p1"
+    },
+    "alignment": {
+     "final": {},
+     "reasoning": "All 60 matrix columns match the GEO 'description' field exactly (e.g. CC39020001_1_Base). Matrix column CC39020003_1_IP20 carries a typo ('IP20') but maps exactly via description to GSM8417462, whose timepoint field is IP120 (participant id '1_IP20' carries the same typo); subject and time come from the participant-id and timepoint fields, and the participant-id suffix agrees with timepoint for every sample.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.1.p3",
+     "key_column": "description",
+     "aliases": {
+      "diet": "characteristics_ch1.2.diet",
+      "time": "characteristics_ch1.3.timepoint"
+     },
+     "patterns": {
+      "subject": [
+       "characteristics_ch1.1.participant id",
+       "^(\\d+)_(?:Base|IP|IP120|IP20)$"
+      ]
+     },
+     "combine": {
+      "tgrp": [
+       "diet",
+       "time"
+      ]
+     },
+     "recode": {
+      "diet": {
+       "HiCarb": "HC",
+       "LowCarb": "LC"
+      },
+      "time": {
+       "Base": "BL",
+       "IP": "H0",
+       "IP120": "H2"
+      },
+      "tgrp": {
+       "HC_BL": "BL",
+       "HC_H0": "HC_H0",
+       "HC_H2": "HC_H2",
+       "LC_BL": "BL",
+       "LC_H0": "LC_H0",
+       "LC_H2": "LC_H2"
+      }
+     }
+    },
+    "matrix": {
+     "final": {},
+     "reasoning": "Integer fraction 0, min 0.052, max 70,799, median 1.98: linear normalized. GEO data_processing says 'processed data are RPKM normalized read counts' and S5.6.p2 describes easyRNASeq RPKM with low values replaced by the 10-read RPKM equivalent (per-gene floor ~0.109 visible). The file name 'raw_counts' is misleading; no integer counts were deposited, so count methods are excluded. 25,262 genes vs 25,282 reported in S2.1.p1 (20-gene difference).",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.6.p2",
+     "matrix_type": "RPKM (linear, filtered/floored by submitter)",
+     "recommended_method": "limma on log2(RPKM+1)"
+    },
+    "design": {
+     "final": {
+      "analysis_type": "repeated",
+      "formula": "~ C(subject) + C(tgrp)",
+      "contrasts": [
+       {
+        "name": "HC_H0_vs_BL",
+        "coefficients": {
+         "C(tgrp)[T.HC_H0]": 1
+        }
+       },
+       {
+        "name": "HC_H2_vs_BL",
+        "coefficients": {
+         "C(tgrp)[T.HC_H2]": 1
+        }
+       },
+       {
+        "name": "LC_H0_vs_BL",
+        "coefficients": {
+         "C(tgrp)[T.LC_H0]": 1
+        }
+       },
+       {
+        "name": "LC_H2_vs_BL",
+        "coefficients": {
+         "C(tgrp)[T.LC_H2]": 1
+        }
+       }
+      ],
+      "factors": {
+       "diet": [
+        "HC",
+        "LC"
+       ],
+       "time": [
+        "BL",
+        "H0",
+        "H2"
+       ]
+      },
+      "parameterization": "tgrp = BL for every baseline sample, otherwise <diet>_<time>; with subject fixed effects (which absorb diet) this equals ~ subject + diet:time with diet-specific time effects; each coefficient is a within-diet change from BL",
+      "estimand_type": "within-subject exercise effect, per diet group"
+     },
+     "reasoning": "20 athletes each biopsied at BL/H0/H2 (complete, unique); diet is between-subject. Exercise estimand per paper = change from BL within each diet at H0 and H2 (4 planned contrasts).",
+     "confidence": "high",
+     "candidates": [
+      {
+       "value": "pooled H0 vs BL across diets",
+       "reason_rejected": "paper reports within-diet changes from BL (S2.3.p1); its 'irrespective of diet' 198 genes are the intersection of the two within-diet lists (S2.3.p3), reproduced as an overlap"
+      },
+      {
+       "value": "~ subject + diet*time (full factorial)",
+       "reason_rejected": "rank deficient: diet main effect is aliased with subject fixed effects; the within-diet time effects are the same estimable quantities as in the tgrp parameterization"
+      },
+      {
+       "value": "LC vs HC at each time point",
+       "reason_rejected": "diet comparison (associational, S2.2) is not the exercise estimand requested"
+      },
+      {
+       "value": "separate per-diet paired models (30 samples each)",
+       "reason_rejected": "paper fits one model with both diets; a pooled residual variance across all 60 samples is closer to its single mixed model"
+      }
+     ],
+     "locator": "S5.6.p3",
+     "factors": [
+      "tgrp"
+     ],
+     "references": {
+      "tgrp": "BL"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "tgrp_HC_H0_vs_BL",
+      "tgrp_HC_H2_vs_BL",
+      "tgrp_LC_H0_vs_BL",
+      "tgrp_LC_H2_vs_BL"
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "included (fixed-effect block for 3 biopsies per athlete)"
+       },
+       {
+        "name": "diet",
+        "disposition": "nested: subjects are nested in diet; diet main effect absorbed by subject; diet-specific time effects kept via tgrp"
+       },
+       {
+        "name": "biopsy leg/site",
+        "disposition": "excluded: not in metadata (alternate legs, S5.3.p1)"
+       },
+       {
+        "name": "flow-cell/batch (CC39020 vs CC39034 prefix)",
+        "disposition": "excluded: within-subject constant (all 3 biopsies of an athlete share a prefix), absorbed by subject block"
+       }
+      ],
+      "pairing": {
+       "n_subjects": 20,
+       "n_complete": 20
+      },
+      "paper_covariance": "mixed-effect model with subject random effect (S5.6.p3); fixed subject block used here"
+     },
+     "reasoning": "Repeated biopsies per athlete; pairing complete for 20/20. Design ~ C(subject) + C(tgrp): rank 24/24, residual df 36. Fixed subject effects replace the paper's random subject intercept; for within-subject contrasts in a complete balanced design these give the same point estimates.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.6.p3"
+    },
+    "method": {
+     "final": {
+      "method": "limma (lmFit + contrasts.fit + eBayes, inmoose) via run_multigroup_analysis",
+      "matrix_type": "RPKM",
+      "transform": "log2(x+1)",
+      "formula": "~ subject + tgrp",
+      "executor_formula": "~ C(subject) + C(tgrp)",
+      "paper_route": {
+       "method": "mixed-effect ANOVA (car, subject random effect) + Tukey post-hoc on RPKM, BH FDR",
+       "status": "blocked",
+       "reason": "no executor for car Type-I mixed ANOVA + Tukey post-hoc; R car route not available in repository tools"
+      }
+     },
+     "reasoning": "Deposited data are RPKM (linear), so count methods are invalid; limma on log2(RPKM+1) with a subject block and planned contrasts is the validated route for repeated-measures linear-normalized data. This is a declared deviation from the paper's mixed ANOVA/Tukey route.",
+     "confidence": "medium",
+     "candidates": [],
+     "locator": "S5.6.p3",
+     "transform": "log2(x+1)"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "adjustment": "Benjamini-Hochberg",
+       "cutoff": 0.05,
+       "effect_metric": "log2FC",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "source_locator": "S5.6.p3"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "FDR",
+       "adjustment": "Benjamini-Hochberg",
+       "cutoff": 0.05,
+       "effect_metric": "log2FC",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "source_locator": "S5.6.p3"
+      },
+      "deviation_note": "Paper FDR came from BH on mixed-model/Tukey p-values; here BH is applied within each limma moderated-t contrast. log2FC is the limma coefficient on log2(RPKM+1), which is compressed toward 0 for low-expressed genes relative to a log2 ratio of mean RPKM."
+     },
+     "reasoning": "Paper: FDR < 0.05 and |log2FC| > 1 (S5.6.p3), applied unchanged on the deviation route.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.6.p3"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "execution_outcome": "completed",
+      "deviation": "limma on log2(RPKM+1) with fixed subject block instead of mixed ANOVA + Tukey",
+      "exploratory": false,
+      "exploratory_reason": "not exploratory: 10 subjects per diet, residual df 36"
+     },
+     "reasoning": "Planned paper contrasts run on a validated alternative method with the paper threshold.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S5.6.p3",
+     "paper_counts": {
+      "limma/HC_H0_vs_BL": 330,
+      "limma/HC_H2_vs_BL": 222,
+      "limma/LC_H0_vs_BL": 161,
+      "limma/LC_H2_vs_BL": 193
+     }
+    }
+   },
+   "executions": [
+    {
+     "name": "limma",
+     "tool": "tools.multigroup_tools:run_multigroup_analysis",
+     "args": {
+      "plan": {
+       "analysis_type": "repeated_multilevel",
+       "formula": "~ C(subject) + C(tgrp)",
+       "contrasts": [
+        {
+         "name": "HC_H0_vs_BL",
+         "coefficients": {
+          "C(tgrp)[T.HC_H0]": 1
+         }
+        },
+        {
+         "name": "HC_H2_vs_BL",
+         "coefficients": {
+          "C(tgrp)[T.HC_H2]": 1
+         }
+        },
+        {
+         "name": "LC_H0_vs_BL",
+         "coefficients": {
+          "C(tgrp)[T.LC_H0]": 1
+         }
+        },
+        {
+         "name": "LC_H2_vs_BL",
+         "coefficients": {
+          "C(tgrp)[T.LC_H2]": 1
+         }
+        }
+       ]
+      }
+     },
+     "role": "primary",
+     "reasoning": "one limma model ~ subject + tgrp over all 60 samples"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "limma/HC_H0_vs_BL",
+     "reasoning": "paper's pathway analysis per diet and time"
+    }
+   ]
+  }
+ ]
+}

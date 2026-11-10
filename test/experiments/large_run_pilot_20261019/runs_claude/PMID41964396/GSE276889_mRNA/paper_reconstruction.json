@@ -1,0 +1,157 @@
+{
+  "paper_id": "PMID41964396 / PMC13069499 (FASEB J 2026, e71764)",
+  "accessions": {
+    "GSE220280": "isolated mitochondria small RNA-seq (S2.12.p1)",
+    "GSE277549": "whole-muscle small RNA-seq (S2.12.p1) - not requested, not analysed here",
+    "GSE276889": "whole-muscle total RNA-seq (S2.13.p1)"
+  },
+  "assay": {
+    "GSE220280": "NEBNext small RNA libraries from RNase-A-treated anti-TOM22 immunoprecipitated mitochondria; NovaSeq 2x51, read1; fastp + blastn (word 19) vs miRBase v22.1 mature; perl read counts (S2.8.p1, S2.11.p1, S2.12.p1)",
+    "GSE276889": "TruSeq stranded total RNA RiboZero, NovaSeq 2x150; kallisto 0.46.1 vs GRCh38.p13 Ensembl, transcript counts summed to gene; genes with mean < 10 reads excluded (S2.13.p1)"
+  },
+  "sample_inclusion": [
+    "12 healthy males, 60 min cycling at 70% VO2peak; vastus lateralis biopsies pre, immediately post, 3 h post (S2.1.p1, S2.4.p1)",
+    "mitochondria: 33 libraries, pre n=9, post n=12, 3h n=12; 3 pre libraries failed QC (S2.8.p1, FIG1)",
+    "mRNA: pre n=10, post n=12, 3h n=11 (SUP1 Figure S5 legend)",
+    "five high-miRNA-fraction mitochondrial libraries from 2 participants retained (S3.2.p1, SUP1 Figure S6)"
+  ],
+  "sample_exclusion": [
+    "3 pre-exercise mitochondrial libraries not sequenced (S2.8.p1)"
+  ],
+  "factors": [
+    {
+      "name": "time",
+      "levels": [
+        "pre",
+        "post (0 h)",
+        "3 h post"
+      ],
+      "type": "within-subject",
+      "locator": "S2.4.p1"
+    },
+    {
+      "name": "subject",
+      "levels": "12 participants",
+      "type": "repeated-measure unit",
+      "locator": "S2.12.p1, FIG3, FIG5"
+    }
+  ],
+  "primary_estimand": "Within-subject change in expression after one bout of acute endurance cycling: immediately post vs pre, 3 h post vs pre, and 3 h post vs immediately post, for (a) whole-muscle mRNA (GSE276889) and (b) miRNA in isolated skeletal-muscle mitochondria (GSE220280).",
+  "planned_contrasts": [
+    {
+      "name": "time_post0h_vs_pre",
+      "definition": "immediately post vs pre",
+      "locator": "S2.14.p1, S3.1.p1, S3.4.p1"
+    },
+    {
+      "name": "time_post3h_vs_pre",
+      "definition": "3 h post vs pre",
+      "locator": "S2.14.p1, S3.1.p1, S3.4.p1"
+    },
+    {
+      "name": "time_post3h_vs_post0h",
+      "definition": "3 h post vs immediately post ('relative to pre- or immediately post-exercise')",
+      "locator": "S2.14.p1, S3.4.p1"
+    }
+  ],
+  "blocking_or_covariance": {
+    "status": "required (repeated biopsies per participant)",
+    "paper": "DESeq2 design formula not reported. The paper uses linear mixed models with participant as random effect for read-count QC (S2.12.p1) and figure annotations (FIG3, FIG5); SUP1 Figure S6 notes 'after correction for repeated measures'.",
+    "locator": "S2.12.p1; FIG3; FIG5; SUP1"
+  },
+  "matrix_scale": {
+    "GSE220280": "raw miRNA read counts (integer)",
+    "GSE276889": "kallisto gene-level counts, deposited as integers"
+  },
+  "paper_method": "DESeq2 (v1.36 in Methods; v1.48.2 in Table S1-S3 legends) on raw counts; prefilter: < 10 normalized counts across all samples removed (S2.14.p1)",
+  "paper_formula": "not_reported",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "effect_cutoff_original": "log2FC > 1 or < -1",
+    "inclusive": false,
+    "source_locator": "S2.14.p1"
+  },
+  "reported_counts": {
+    "GSE276889_mRNA": {
+      "time_post0h_vs_pre": {
+        "up_FDR<0.05": 178,
+        "locator": "S3.1.p1"
+      },
+      "time_post3h_vs_pre": {
+        "up_FDR<0.05": 465,
+        "locator": "S3.1.p1"
+      },
+      "time_post3h_vs_post0h": {
+        "note": "not reported in text"
+      },
+      "n_genes_in_results": {
+        "value": 17663,
+        "locator": "S2.15.p1"
+      },
+      "PPARGC1A": {
+        "post0h_FC": 4.0,
+        "post3h_FC": 5.6,
+        "FDR": "< 0.0001",
+        "locator": "S3.1.p1"
+      }
+    },
+    "GSE220280_mito_miRNA": {
+      "time_post0h_vs_pre": {
+        "FDR<0.05": 0,
+        "raw_p<0.05": 16,
+        "locator": "S3.4.p1"
+      },
+      "time_post3h_vs_pre": {
+        "FDR<0.05": 0,
+        "raw_p<0.05": 11,
+        "locator": "S3.4.p1"
+      },
+      "time_post3h_vs_post0h": {
+        "FDR<0.05": 0,
+        "raw_p<0.05": 22,
+        "locator": "S3.4.p1"
+      },
+      "n_mirna_in_results": {
+        "value": 459,
+        "locator": "S2.15.p1"
+      },
+      "hsa-miR-146b-5p": {
+        "post3h_vs_pre": "log2FC 5.4, p 0.003, FDR 0.82",
+        "post3h_vs_post0h": "p < 0.0001, FDR 0.071",
+        "locator": "ABS.p1; S3.4.p2"
+      }
+    }
+  },
+  "enrichment": {
+    "method": "GO BP over-representation of mRNAs from mirTarRnaSeq miRNA-mRNA interrelations (p<0.05)",
+    "locator": "S2.15.p1, S3.5.p1"
+  },
+  "this_case": "GSE276889",
+  "reported_for_this_case": {
+    "time_post0h_vs_pre": {
+      "up_FDR<0.05": 178,
+      "locator": "S3.1.p1"
+    },
+    "time_post3h_vs_pre": {
+      "up_FDR<0.05": 465,
+      "locator": "S3.1.p1"
+    },
+    "time_post3h_vs_post0h": {
+      "note": "not reported in text"
+    },
+    "n_genes_in_results": {
+      "value": 17663,
+      "locator": "S2.15.p1"
+    },
+    "PPARGC1A": {
+      "post0h_FC": 4.0,
+      "post3h_FC": 5.6,
+      "FDR": "< 0.0001",
+      "locator": "S3.1.p1"
+    }
+  }
+}

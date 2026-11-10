@@ -1,0 +1,641 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID42802483",
+  "subject_id": "GSE331495",
+  "created_at": "2026-10-25T10:46:49",
+  "finished_at": "2026-10-25T10:47:04",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13617198.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13617198.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-25T10:46:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "6ec71dec2d042a44c3d4e0d8e19dba48bfc461876fa26beaaf5494a65ec5b711",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC13617198.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13617198.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-25T10:46:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4f8e3c88d231b2afb62125e9e5678725b605ae88bf4e525c54c4ee725c873a18",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE331495_metadata.csv",
+      "uri": "data\\GSE331495\\GSE331495_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-25T10:46:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7f0c5dbb91dedb6e80e79840fc2c3e916b57a22ceb4fd662529d5fe2abadf7db",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE331495_Fibroblast_salmon.merged.gene_counts.tsv.gz",
+      "uri": "data\\GSE331495\\GSE331495_Fibroblast_salmon.merged.gene_counts.tsv.gz",
+      "locator": null,
+      "captured_at": "2026-10-25T10:46:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "00444fddcc76a94dde6319806d7082b1fdf7f45a5c1730c23ed3031076c26003",
+        "kind": "matrix"
+      }
+    },
+    {
+      "source_id": "SRC-0005",
+      "origin": "artifact",
+      "label": "GSE331495_iN_salmon.merged.gene_counts.tsv.gz",
+      "uri": "data\\GSE331495\\GSE331495_iN_salmon.merged.gene_counts.tsv.gz",
+      "locator": null,
+      "captured_at": "2026-10-25T10:46:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4a2995359c47af1a0fb9a740fd817417bfe1a75e436ea6a3dfc41327c699be97",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "paper_id": "PMID42802483 / PMC13617198 / doi:10.1111/acel.70734",
+        "accessions": [
+          "GSE331495"
+        ],
+        "assay": "bulk polyA RNA-seq of cultured primary dermal fibroblasts (9) and directly converted induced neurons (13) from SHOCK healthy-aging donors (S4.6.p1, S4.6.p2, DA.p1)",
+        "organism": "Homo sapiens",
+        "sample_inclusion": "fibroblasts: 4 young (23-33 y) + 5 older (64-72 y); iNs: 8 young (23-35 y) + 5 older (64-76 y); donors selected a priori by age and sex (S4.6.p1, S4.6.p2, S4.1.p1)",
+        "sample_exclusion": "not_reported (all samples met QC, S4.6.p3)",
+        "factors": [
+          {
+            "name": "age group",
+            "levels": [
+              "Young",
+              "Older"
+            ]
+          },
+          {
+            "name": "sex",
+            "levels": [
+              "F",
+              "M"
+            ]
+          },
+          {
+            "name": "cell type",
+            "levels": [
+              "fibroblast",
+              "iN"
+            ],
+            "note": "processed and analyzed separately"
+          }
+        ],
+        "exercise_factor_in_this_accession": "none. The paper's only exercise component is the STRONG pilot (5 older adults, 12-week mild exercise), measured as PBMC autophagy flux by LC3B-II Western blot (S2.5.p1-p3, S4.2.p1, S4.10.p1, S4.11.p1); it was not sequenced. Treadmill exercise in SHOCK (S2.4.p1) is a fitness assessment correlated with flux, not an intervention and not sequenced.",
+        "primary_estimand": "RNA-seq: effect of donor age (older vs young) on gene expression within fibroblasts and within iNs, adjusted for sex (~ sex + age) (S4.6.p4). Exercise estimand (pre vs post 12-week mild exercise) exists only for PBMC autophagy flux protein readout, not for transcription.",
+        "planned_contrasts": [
+          "fibroblast: older vs young, ~ sex + age, DESeq2 + apeglm (S2.1.p1, S4.6.p4)",
+          "iN: older vs young, ~ sex + age, DESeq2 + apeglm (S2.1.p3, S4.6.p4)"
+        ],
+        "exercise_contrasts_in_paper": [
+          "PBMC autophagy flux week 12 vs week 0, paired t-test, N=5 (FIG5B) - protein assay, no GEO data"
+        ],
+        "repeated_measure_unit": "none in RNA-seq (one sample per donor per cell type; 5 donors are subject-matched across fibroblast and iN but cell types are analyzed separately, S2.1.p3)",
+        "normalization": "nf-core/rnaseq STAR + Salmon, tximport gene counts (salmon.merged.gene_counts.tsv); DESeq2, genes with <10 total counts removed (S4.6.p3, S4.6.p4)",
+        "paper_method": "DESeq2 ~ sex + age, Wald test, apeglm LFC shrinkage (S4.6.p4)",
+        "paper_threshold": {
+          "metric": "padj",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange (apeglm-shrunken)",
+          "effect_cutoff": 1.0,
+          "effect_cutoff_original": "|log2 fold change| > 1",
+          "inclusive": false,
+          "source_locator": "S4.6.p4",
+          "applies_to": "older vs young donors (age), not exercise"
+        },
+        "paper_result": {
+          "fibroblast_older_vs_young": "94 up + 188 down = 282 DEGs (S2.1.p1)",
+          "iN_older_vs_young": "fewer DEGs than fibroblasts; count not stated (S2.1.p3, SUP1 Figure S1D)"
+        }
+      },
+      "reason": "DA.p1 ties GSE331495 to the fibroblast and iN RNA-seq only. S4.6.p1-p4 define the RNA-seq as a young-vs-older aging comparison with ~ sex + age, BH padj<0.05 and |log2FC|>1. The exercise intervention (STRONG, S2.5, S4.2) is a PBMC Western-blot autophagy flux readout in 5 participants and was never sequenced.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-25T10:46:49"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE331495",
+        "matrix_file": "GSE331495_Fibroblast_salmon.merged.gene_counts.tsv.gz (9 samples); GSE331495_iN_salmon.merged.gene_counts.tsv.gz (13 samples)",
+        "metadata_file": "GSE331495_metadata.csv",
+        "owned": true,
+        "checks": {
+          "series_id": [
+            "GSE331495"
+          ],
+          "n_gsm": 22,
+          "cell_type_x_age": {
+            "Old": {
+              "Fibroblast": 5,
+              "induced Neurons": 5
+            },
+            "Young": {
+              "Fibroblast": 4,
+              "induced Neurons": 8
+            }
+          },
+          "cell_type_x_sex(batch)": {
+            "F": {
+              "Fibroblast": 5,
+              "induced Neurons": 7
+            },
+            "M": {
+              "Fibroblast": 4,
+              "induced Neurons": 6
+            }
+          },
+          "paper_design": "fibroblasts 4 young + 5 older; iNs 8 young + 5 older (S4.6.p1, S4.6.p2, SUP1)",
+          "fibroblast_matrix_samples": 9,
+          "iN_matrix_samples": 13
+        },
+        "note": "Files belong to the paper, but to its aging RNA-seq arm; the exercise arm has no sequencing data."
+      },
+      "reason": "Series GSE331495 is named in DA.p1; 22 GSMs = 9 fibroblast (4 Young, 5 Old) + 13 iN (8 Young, 5 Old), matching S4.6.p1/p2 and Figure S1 Ns.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-25T10:46:50"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact (per cell-type matrix, key column libkey)",
+        "n_aligned": 22,
+        "n_metadata": 22,
+        "coverage": 1.0,
+        "unmatched": [],
+        "per_matrix": {
+          "fibroblast": {
+            "method": "exact:libkey",
+            "n_aligned": 9,
+            "n_metadata": 9,
+            "coverage": 1.0
+          },
+          "iN": {
+            "method": "exact:libkey",
+            "n_aligned": 13,
+            "n_metadata": 13,
+            "coverage": 1.0
+          }
+        },
+        "key_derivation": {
+          "fibroblast": {
+            "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast_metadata.csv",
+            "columns": {
+              "libkey": {
+                "source": "description",
+                "regex": "^Library name: (TM\\d+_CKC\\d+_[YO]_CTRL_S\\d+)$"
+              }
+            },
+            "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast_meta_key.csv",
+            "sha256": "59842d99cfc15ea65e858fe7eba2d5dd9a2c92e2ae19f477bc45d08702c2d393",
+            "levels": {
+              "libkey": {
+                "TM1_CKC3_Y_CTRL_S1": 1,
+                "TM2_CKC4_Y_CTRL_S2": 1,
+                "TM3_CKC5_O_CTRL_S3": 1,
+                "TM4_CKC6_O_CTRL_S4": 1,
+                "TM15_CKC7_O_CTRL_S15": 1,
+                "TM16_CKC8_Y_CTRL_S16": 1,
+                "TM17_CKC14_O_CTRL_S17": 1,
+                "TM18_CKC15_Y_CTRL_S18": 1,
+                "TM19_CKC16_O_CTRL_S19": 1
+              }
+            }
+          },
+          "iN": {
+            "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN_metadata.csv",
+            "columns": {
+              "libkey": {
+                "source": "title",
+                "regex": "_(A\\d+)$"
+              }
+            },
+            "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN_meta_key.csv",
+            "sha256": "0e13f3d094ac1cef9cd8e9eb9c7969903a3f53ae3744a85a681023cb9fa70e95",
+            "levels": {
+              "libkey": {
+                "A1": 1,
+                "A2": 1,
+                "A3": 1,
+                "A4": 1,
+                "A5": 1,
+                "A6": 1,
+                "A7": 1,
+                "A8": 1,
+                "A15": 1,
+                "A16": 1,
+                "A17": 1,
+                "A18": 1,
+                "A19": 1
+              }
+            }
+          }
+        },
+        "derived_columns": {
+          "fibroblast": {
+            "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\aligned_metadata.csv",
+            "columns": {
+              "age": {
+                "alias_of": "characteristics_ch1.3.genotype",
+                "recode": {
+                  "Young": "Y",
+                  "Old": "O"
+                }
+              },
+              "sex": {
+                "alias_of": "characteristics_ch1.4.batch",
+                "recode": {
+                  "F": "female",
+                  "M": "male"
+                }
+              }
+            },
+            "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\design_metadata.csv",
+            "sha256": "474ab2488aba1959e569e7de966c1dcfd6ef976a505f689e336e796c8cc142f4",
+            "levels": {
+              "age": {
+                "O": 5,
+                "Y": 4
+              },
+              "sex": {
+                "female": 5,
+                "male": 4
+              }
+            }
+          },
+          "iN": {
+            "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\aligned_metadata.csv",
+            "columns": {
+              "age": {
+                "alias_of": "characteristics_ch1.3.genotype",
+                "recode": {
+                  "Young": "Y",
+                  "Old": "O"
+                }
+              },
+              "sex": {
+                "alias_of": "characteristics_ch1.4.batch",
+                "recode": {
+                  "F": "female",
+                  "M": "male"
+                }
+              }
+            },
+            "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\design_metadata.csv",
+            "sha256": "67c2b263e6aabb62acb86a883ab1d264618230e0ef35c738ea64f91d23e8de50",
+            "levels": {
+              "age": {
+                "Y": 8,
+                "O": 5
+              },
+              "sex": {
+                "female": 7,
+                "male": 6
+              }
+            }
+          }
+        },
+        "iN_library_name_tokens_agree_with_age_and_sex": true
+      },
+      "reason": "Fibroblast columns equal the library name in GEO 'description'; iN columns (A1..A19) equal the suffix of GEO title (NSC201_A1). Both exact, full coverage. 'genotype' Young/Old is the age group and 'batch' F/M is sex (confirmed by iN library names).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0003",
+        "ART-0006",
+        "ART-0007",
+        "ART-0008",
+        "ART-0006",
+        "ART-0007",
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-25T10:46:53"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "estimated counts (Salmon, tximport gene-level; non-integer)",
+        "recommended_method": "DESeq2 on rounded estimated counts (rounding_documented) for the paper's age contrast; not applicable to an exercise question",
+        "profile": {
+          "fibroblast": {
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\aligned_matrix.csv",
+            "sha256": "36915f239fcad33e09efca1ea8b05d91772b025ebd224ba61577badd2c51d2cb",
+            "n_features": 29744,
+            "n_samples": 9,
+            "sample_columns": [
+              "GSM9748171",
+              "GSM9748172",
+              "GSM9748173",
+              "GSM9748174",
+              "GSM9748175",
+              "GSM9748176",
+              "GSM9748177",
+              "GSM9748178",
+              "GSM9748179"
+            ],
+            "annotation_columns_dropped": [],
+            "duplicated_feature_ids": 0,
+            "missing_values": 0,
+            "negative_values": 0,
+            "negative_fraction": 0.0,
+            "min": 0.0,
+            "max": 2236370.999,
+            "median": 4.0,
+            "integer_fraction": 0.8953,
+            "candidates": [
+              "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+            ],
+            "note": "Candidates only. Decide the matrix type from these values together with the file name, platform, and processing notes, and record the evidence."
+          },
+          "iN": {
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\aligned_matrix.csv",
+            "sha256": "1a0d419ebce7f6b755af8c0ecd6b459ed4908dc50b260fa067eddaf2eb4b4ee9",
+            "n_features": 78932,
+            "n_samples": 13,
+            "sample_columns": [
+              "GSM9748180",
+              "GSM9748181",
+              "GSM9748182",
+              "GSM9748183",
+              "GSM9748184",
+              "GSM9748185",
+              "GSM9748186",
+              "GSM9748187",
+              "GSM9748188",
+              "GSM9748189",
+              "GSM9748190",
+              "GSM9748191",
+              "GSM9748192"
+            ],
+            "annotation_columns_dropped": [],
+            "duplicated_feature_ids": 0,
+            "missing_values": 0,
+            "negative_values": 0,
+            "negative_fraction": 0.0,
+            "min": 0.0,
+            "max": 5380358.701,
+            "median": 0.0,
+            "integer_fraction": 0.9254,
+            "candidates": [
+              "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+            ],
+            "note": "Candidates only. Decide the matrix type from these values together with the file name, platform, and processing notes, and record the evidence."
+          }
+        },
+        "source": "GEO data_processing: nf-core/rnaseq STAR + Salmon, 'raw counts file' (salmon.merged.gene_counts); S4.6.p3",
+        "paper_input": "salmon.merged.gene_counts.tsv into DESeq2 (S4.6.p3, S4.6.p4)"
+      },
+      "reason": "Salmon merged gene counts are estimated counts (fractional values such as 1230.001); the paper feeds them to DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0006",
+        "ART-0006",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-25T10:46:54"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        },
+        "suitability_iN": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\suitability_iN\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        },
+        "available_contrasts": {
+          "fibroblast": [
+            "age_Y_vs_O"
+          ],
+          "iN": [
+            "age_Y_vs_O"
+          ]
+        }
+      },
+      "reason": "Refused at design: the requested estimand (exercise effect on gene expression) is absent from the sequenced samples. The age contrasts are analyzable but answer a different question.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0003",
+        "ART-0010",
+        "ART-0010",
+        "ART-0007",
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "GSE331495 holds only bulk RNA-seq of cultured primary dermal fibroblasts (4 young, 5 older donors) and induced neurons (8 young, 5 older) from the SHOCK healthy-aging cohort (DA.p1, S4.6.p1-p2). Its only factors are donor age group and sex; there is no exercise, training, or pre/post intervention sample. The paper's exercise result (12-week mild exercise in 5 STRONG participants) is PBMC autophagy flux measured by LC3B-II Western blot (S2.5.p1-p3, S4.2.p1, S4.11.p1) and was not sequenced, so the data cannot identify how exercise affects gene expression."
+      },
+      "recorded_at": "2026-10-25T10:47:04"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "72b484829c13bff9314f104d62450beb5e095ca356eb13f4c33682774336360e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "01947090733cb57a996833778c0617c2986ff247eed3c656216c2aa6df48b76c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\aligned_matrix.csv",
+      "role": "aligned_matrix_fibroblast",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "36915f239fcad33e09efca1ea8b05d91772b025ebd224ba61577badd2c51d2cb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\design_metadata.csv",
+      "role": "design_metadata_fibroblast",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "474ab2488aba1959e569e7de966c1dcfd6ef976a505f689e336e796c8cc142f4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\fibroblast\\alignment_map.csv",
+      "role": "alignment_map_fibroblast",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f68975503409f5952ca2ac607f4315594cb12f16ca0b3823db7d3632f9b0eb3a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\aligned_matrix.csv",
+      "role": "aligned_matrix_iN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1a0d419ebce7f6b755af8c0ecd6b459ed4908dc50b260fa067eddaf2eb4b4ee9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\design_metadata.csv",
+      "role": "design_metadata_iN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "67c2b263e6aabb62acb86a883ab1d264618230e0ef35c738ea64f91d23e8de50",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\aligned\\iN\\alignment_map.csv",
+      "role": "alignment_map_iN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "132c670337988d9b073313bf74916150afd8022dd1ef601c23298af170dd6d9a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b716e147786afe939a3de13cfbdd7d8cceb2d9ceb802b633b84543ad0d47b63d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\suitability_iN\\suitability.json",
+      "role": "suitability_report_iN",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6bd7d69f08d1564d236eb197e44e0a474c82c1d4621f709d8095752dd1da9b19",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\reproduction_plan.json",
+      "role": "reproduction_plan",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a04c0c43bd6afc9bfcb871a9a0967336a178e7d88e1046679e6d13908f001f06",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42802483\\GSE331495\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ab4e73376f06889d417d15e40458bce2c1c72c79db96aa05213c0cfac1f1398c",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

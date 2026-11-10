@@ -1,0 +1,90 @@
+{
+  "paper_id": "PMID41314005 / PMC12702345",
+  "accessions": [
+    "GSE308674"
+  ],
+  "accession_roles": {
+    "GSE308674": "bulk mRNA-seq (QuantSeq 3') - this case",
+    "GSE308673/GSE308675": "methylation array and miRNA-seq deposits of the same paper (S10.p1); not analyzed here"
+  },
+  "assay": "bulk RNA-seq, QuantSeq 3' mRNA-Seq FWD v2, UMI-deduplicated, STAR GRCm39, featureCounts (S2.7.1.p1)",
+  "organism": "Mus musculus, male BALB/c ~2 months, gastrocnemius (S2.2.p1)",
+  "sample_inclusion": [
+    "5 groups randomised n=6/group (S2.2.p1); RNA-seq n=4-6 per group (S2.7.1.p1, FIG3)"
+  ],
+  "sample_exclusion": [
+    "not_reported (Control has 4 RNA-seq libraries; reason not stated)"
+  ],
+  "factors": [
+    {
+      "name": "Grouping",
+      "levels": [
+        "C (Control, PBS)",
+        "L (Lactate i.p.)",
+        "H (HIIT)",
+        "M (MCT1/2 inhibitor AR-C155858)",
+        "HM (HIIT + MCTi)"
+      ],
+      "reference": "C"
+    },
+    {
+      "name": "Batch",
+      "levels": "not_reported in paper; GEO characteristics batch1/batch2"
+    }
+  ],
+  "primary_estimand": "Chronic (6-week) effect of HIIT on gastrocnemius gene expression vs PBS Control, 48 h after the last session (H vs C); companion estimands L vs C, M vs C, HM vs C (each vs Control)",
+  "planned_contrasts": [
+    "H_vs_C",
+    "HM_vs_C",
+    "L_vs_C",
+    "M_vs_C"
+  ],
+  "blocking_or_covariance": {
+    "status": "required",
+    "terms": [
+      "Batch (additive)"
+    ],
+    "repeated_measures": "none - one muscle per animal, independent animals per group",
+    "source_locator": "S2.7.1.p1"
+  },
+  "matrix_scale": "raw featureCounts gene counts (S2.7.1.p1; GEO data_processing 'values = raw integer counts')",
+  "pre_filter": "edgeR filterByExpr (S2.7.1.p1)",
+  "paper_method": "DESeq2, Wald test, one model on all groups",
+  "paper_formula": "~ Batch + Grouping, Control reference",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 0.5,
+    "inclusive": false,
+    "source_locator": "S2.7.1.p1"
+  },
+  "paper_reported_deg_counts": {
+    "H_vs_C": {
+      "total": 474,
+      "up": 265,
+      "down": 209
+    },
+    "HM_vs_C": {
+      "total": 414,
+      "up": 154,
+      "down": 260
+    },
+    "L_vs_C": {
+      "total": 857,
+      "up": 412,
+      "down": 445
+    },
+    "M_vs_C": {
+      "total": 40,
+      "up": 28,
+      "down": 12
+    },
+    "source_locator": "S3.3.p1"
+  },
+  "paper_enrichment": {
+    "ORA": "clusterProfiler GO BP + KEGG on DEGs (S2.7.1.p1)",
+    "GSEA": "fgsea MSigDB Hallmark, 10,000 permutations, adjusted p <= 0.25 (S2.7.1.p1); H_vs_C and L_vs_C shown (FIG3, S3.3.p3)"
+  }
+}

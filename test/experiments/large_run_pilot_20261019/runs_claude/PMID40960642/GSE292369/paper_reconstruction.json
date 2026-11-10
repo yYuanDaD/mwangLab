@@ -1,0 +1,98 @@
+{
+  "paper_id": "PMID40960642 / PMC12948831 / doi 10.1007/s00421-025-05987-9",
+  "accessions": [
+    "GSE292369"
+  ],
+  "assay": "bulk poly-A mRNA-seq, vastus lateralis, NextSeq 2000 2x50 bp; STAR 2.7.8a GRCh38, Ensembl 99 quantification in Partek Flow (S2.9.p2-p3)",
+  "organism": "Homo sapiens, recreationally active men",
+  "sample_inclusion": [
+    "10 recruited, 1 excluded (drink provision error) -> 9 participants (S2.1.p1)",
+    "biopsies ~60 min pre-exercise and 180 min post-exercise in each of 2 trials (S2.7.p1) -> 36 biopsies"
+  ],
+  "sample_exclusion": [
+    "participant excluded for drink error (S2.1.p1); no sample-level outlier removal reported in the paper"
+  ],
+  "factors": [
+    {
+      "name": "time",
+      "levels": [
+        "PRE",
+        "POST (180 min after 90 min cycling at 60% VO2max)"
+      ],
+      "reference": "PRE"
+    },
+    {
+      "name": "condition",
+      "levels": [
+        "PLA",
+        "KME"
+      ],
+      "reference": "PLA",
+      "note": "randomised double-blind crossover, 7-14 d washout (S2.3.p1)"
+    }
+  ],
+  "repeated_measure_unit": "participant (4 biopsies each); within each trial a PRE/POST pair from the same visit",
+  "primary_estimand": "Effect of an acute 90-min aerobic exercise bout (180 min recovery) on vastus lateralis gene expression (POST vs PRE, within participant), and whether KME modifies it",
+  "planned_contrasts": [
+    "time_POST_vs_PRE_pooled",
+    "time_POST_vs_PRE_cond-PLA",
+    "time_POST_vs_PRE_cond-KME",
+    "cond_time_KME_POST_vs_PLA_PRE",
+    "cond_KME_vs_PLA_time-POST"
+  ],
+  "planned_contrast_labels": {
+    "time_POST_vs_PRE_pooled": "Exercise effect: 180 min POST vs PRE (~60 min pre-exercise), pooled over KME and PLA trials, within visit (ABS.p3: 1561 DEGs, 909 up / 652 down)",
+    "time_POST_vs_PRE_cond-PLA": "Exercise effect within the placebo trial (S3.4.p1 / FIG4C: per-condition POST vs PRE log2FC)",
+    "time_POST_vs_PRE_cond-KME": "Exercise effect within the ketone-ester trial (S3.4.p1 / FIG4C)",
+    "cond_time_KME_POST_vs_PLA_PRE": "Condition x time interaction: does KME change the exercise response (paper: no gene at FDR 0.05)",
+    "cond_KME_vs_PLA_time-POST": "KME vs PLA at POST (paper: KME did not regulate any gene, S3.4.p1)"
+  },
+  "blocking_or_covariance": {
+    "status": "required",
+    "note": "within-subject crossover; paper also ran lmerseq mixed models 'appropriate for within-subject RNA-seq designs' (S2.9.p3)"
+  },
+  "matrix_scale": "Partek 'filtered raw counts' (S2.9.p3); GEO deposits Partek transcript-level estimated counts and a DESeq2-normalized gene matrix with outliers removed",
+  "normalization": "DESeq2 median-of-ratios (Partek Flow)",
+  "paper_method": "DESeq2 in Partek Flow (S2.9.p3); lmerseq sensitivity (S2.9.p3, S3.4.p1)",
+  "paper_formula": "not_reported (Partek DESeq2 model terms not printed)",
+  "paper_prefilter": "'filtered raw counts' - filter rule not_reported; 16,898 genes measured (ABS.p3, S4.p1)",
+  "paper_threshold": {
+    "metric": "FDR",
+    "adjustment": "BH (DESeq2 FDR step-up, Partek Flow)",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 0.5849625007211562,
+    "effect_cutoff_original": "fold change > 1.5 (either direction)",
+    "inclusive": false,
+    "source_locator": "S2.9.p3",
+    "note": "'significantly different ... when FDR q < 0.05 and fold change (FC) > 1.5' (S2.9.p3); ABS.p3 'q < 0.05 fold change > +/- 1.5'"
+  },
+  "paper_reported_deg_counts": {
+    "time_POST_vs_PRE_pooled": {
+      "total": 1561,
+      "up": 909,
+      "down": 652,
+      "locator": "ABS.p3; S3.4.p1; S4.p1"
+    },
+    "cond_KME_vs_PLA (condition effect)": {
+      "total": 0,
+      "locator": "S3.4.p1 (FDR 0.05)"
+    },
+    "note": "S3.4.p1 also calls the 1561 'overlapped DEGs between conditions'; ABS.p3 calls them DEGs 'post vs pre-exercise'"
+  },
+  "paper_top_genes": {
+    "up": [
+      "NR4A3",
+      "SOCS3",
+      "MAFF",
+      "PPARGC1A"
+    ],
+    "down": [
+      "ARRDC2",
+      "HIF3A",
+      "DDIT4",
+      "NR1D1"
+    ],
+    "locator": "S3.4.p1"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "paper_id": "PMID35456380 / PMC9027771 / doi:10.3390/genes13040574",
+  "accessions": [
+    "GSE164890"
+  ],
+  "other_accessions_in_paper": {
+    "GSE149938": "public scRNA-seq used for cell-type signatures (S2.6.p1), not exercise DE",
+    "8 microarray studies": "sea-level exercise reanalysis (S2.7.p1), not this deposit"
+  },
+  "assay": "bulk RNA-seq, globin-depleted whole blood, stranded polyA, HiSeq 4000 PE150 (S2.3.p1)",
+  "organism": "Homo sapiens",
+  "sample_inclusion": "7 female elite speed skaters, day 18 of altitude camp (1850 m), whole blood before and after an intense 1 h skating bout; 14 samples (S2.1.p1, S2.1.p2, S2.3.p1)",
+  "sample_exclusion": "none reported",
+  "factors": [
+    {
+      "name": "exercise",
+      "levels": [
+        "before",
+        "after"
+      ]
+    },
+    {
+      "name": "donor",
+      "levels": "7 skaters (d1..d7), each sampled before and after"
+    }
+  ],
+  "primary_estimand": "Within-skater change in whole-blood gene expression after vs before an intense 1 h skating bout at altitude (S2.5.p1, FIG1)",
+  "planned_contrasts": [
+    "after vs before exercise, donor-blocked (DESeq2 ~ donor + exercise); 2516 up / 1542 down at 10% FDR (S3.2.p2)"
+  ],
+  "repeated_measure_unit": "donor (skater); paired pre/post (FIG1 'donor + exercise' design; S3.2.p1)",
+  "blocking_or_covariance": {
+    "status": "required",
+    "term": "donor"
+  },
+  "matrix_scale": "RSEM gene-level expected counts (S2.4.p1), rounded with round(x, 0) before DESeq2 (author script line 66)",
+  "normalization": "DESeq2 size factors; rlog + ComBat only for PCA/plots (S2.5.p1)",
+  "paper_method": "DESeq2 v1.18.1 (S2.5.p1)",
+  "paper_formula": "~ donor + exercise, contrast exercise after vs before (FIG1; author script lines 66-69)",
+  "gene_filter": "none before DESeq2 (author script line 66 uses the full table; DESeq2 independent filtering at default alpha 0.1)",
+  "paper_threshold": {
+    "metric": "padj",
+    "adjustment": "BH (DESeq2 results() default)",
+    "cutoff": 0.1,
+    "effect_metric": null,
+    "effect_cutoff": null,
+    "inclusive": true,
+    "source_locator": "S2.5.p1; FIG1 legend ('reported at 10% FDR'); author script all_analysis_and_figures.R:83-84 (padj <= 0.1)"
+  },
+  "paper_result": {
+    "up": 2516,
+    "down": 1542,
+    "total": 4058,
+    "more_than_twofold": {
+      "up": 104,
+      "down": 58
+    },
+    "locator": "S3.2.p2"
+  },
+  "enrichment_in_paper": "ORA (clusterProfiler) with MSigDB H and CP collections, plus fGSEA (S2.5.p1, S3.3.p1)",
+  "author_code": "https://github.com/apredeus/skater_rnaseq (cited in S2.7.p1 and S10.p1); all_analysis_and_figures.R and data/Conditions.txt saved in author_code/"
+}

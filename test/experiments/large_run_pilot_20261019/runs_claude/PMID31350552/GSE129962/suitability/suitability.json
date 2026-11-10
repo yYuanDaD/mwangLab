@@ -1,0 +1,462 @@
+{
+  "case_id": "GSE129962",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "cond"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "cond"
+      ],
+      "levels": {
+        "geno": {
+          "WT": 15,
+          "DH": 15
+        },
+        "cond": {
+          "EX6": 10,
+          "RA3": 10,
+          "RA6": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(cond)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 26,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": [
+        "cond_EX6_vs_RA6_geno-WT",
+        "cond_EX6_vs_RA6_geno-DH",
+        "geno_cond_DH_EX6_vs_WT_RA6"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 18,
+        "female": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31350552\\GSE129962\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "geno_DH_vs_WT__sex-female_cond-RA3"
+          ],
+          "male": [
+            "geno_DH_vs_WT__sex-male_cond-EX6",
+            "geno_DH_vs_WT__sex-male_cond-RA6",
+            "cond_EX6_vs_RA6__sex-male_geno-DH",
+            "cond_EX6_vs_RA6__sex-male_geno-WT",
+            "geno_cond_DH_EX6_vs_WT_RA6__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_DH_vs_WT_cond-EX6",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "cond": "EX6"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "EX6",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "cond": "EX6",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_DH_vs_WT_cond-RA3",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "cond": "RA3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "RA3",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "cond": "RA3",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_DH_vs_WT_cond-RA6",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "DH",
+      "reference": "WT",
+      "within": {
+        "cond": "RA6"
+      },
+      "cells": [
+        {
+          "cell": {
+            "cond": "RA6",
+            "geno": "DH"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "cond": "RA6",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_RA3_vs_EX6_geno-DH",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "RA3",
+      "reference": "EX6",
+      "within": {
+        "geno": "DH"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "EX6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_EX6_vs_RA6_geno-DH",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "EX6",
+      "reference": "RA6",
+      "within": {
+        "geno": "DH"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "EX6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_RA3_vs_RA6_geno-DH",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "RA3",
+      "reference": "RA6",
+      "within": {
+        "geno": "DH"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_RA3_vs_EX6_geno-WT",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "RA3",
+      "reference": "EX6",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "EX6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_EX6_vs_RA6_geno-WT",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "EX6",
+      "reference": "RA6",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "EX6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_RA3_vs_RA6_geno-WT",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "RA3",
+      "reference": "RA6",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_cond_DH_EX6_vs_WT_RA6",
+      "kind": "interaction",
+      "factor": "geno:cond",
+      "test": "DH:EX6",
+      "reference": "WT:RA6",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "EX6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "EX6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_cond_DH_RA3_vs_WT_RA6",
+      "kind": "interaction",
+      "factor": "geno:cond",
+      "test": "DH:RA3",
+      "reference": "WT:RA6",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA3"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "DH",
+            "cond": "RA6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "cond": "RA6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

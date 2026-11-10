@@ -1,4 +1,5 @@
 import os
+import re
 import GEOparse
 from tools.tooling import tool
 import requests
@@ -70,7 +71,8 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
                 file_url = ftp_url + href
                 file_path = os.path.join(target_dir, href)
                 # skip-if-exists: a repeated cohort run must not re-download (matrices can be
-                # 100s of MB). An .xlsx is deleted after conversion, so its .csv sibling counts.
+                # 100s of MB). Older runs deleted the .xlsx after conversion, so its .csv
+                # sibling also counts.
                 csv_sibling = file_path.rsplit(".", 1)[0] + ".csv"
                 if os.path.exists(file_path) or (
                         file_path.endswith((".xlsx", ".xls")) and os.path.exists(csv_sibling)):
@@ -82,13 +84,9 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
 
                 if file_path.endswith(".xlsx") or file_path.endswith(".xls"):
                     try:
-                        df = pd.read_excel(file_path)
-                        csv_path = file_path.rsplit(".", 1)[0] + ".csv"
-                        df.to_csv(csv_path, index=False)
-                        converted_files.append(csv_path)
-                        os.remove(file_path)
-                    except Exception:
-                        pass
+                        converted_files += excel_to_csvs(file_path)
+                    except Exception as e:
+                        converted_files.append(f"{file_path} (not converted: {type(e).__name__}: {e})")
 
         if not downloaded_files and not skipped_files:
             return f"Target {geo_accession} has no supplementary files provided."
@@ -103,6 +101,24 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
 
     except Exception as e:
         return f"Failed to download supplementary files. Error: {str(e)}"
+
+
+def excel_to_csvs(path: str) -> list[str]:
+    """Write every sheet of an Excel workbook as CSV and keep the workbook.
+
+    The first sheet goes to ``<base>.csv`` (the name callers already expect); every other
+    sheet to ``<base>__<sheet>.csv``. Converting the first sheet only and deleting the
+    workbook silently lost 3 of 4 sheets of GSE208639_edgeR_output.xlsx.
+    """
+    base = path.rsplit(".", 1)[0]
+    sheets = pd.read_excel(path, sheet_name=None)
+    out = []
+    for i, (name, df) in enumerate(sheets.items()):
+        slug = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("_") or f"sheet{i + 1}"
+        csv_path = base + ".csv" if i == 0 else f"{base}__{slug}.csv"
+        df.to_csv(csv_path, index=False)
+        out.append(csv_path)
+    return out
 
 
 _EUTILS = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"

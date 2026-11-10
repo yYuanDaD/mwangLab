@@ -1,0 +1,549 @@
+[
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "paper_reconstruction",
+    "evidence": [
+      {
+        "id": "paper:PMC11810837.paper.json",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC11810837.paper.json",
+        "sha256": "5c0dd8fac712b65882f21163206c1c66a9ceed3e1c1d87134d0a02a2c600d3ac"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accessions": [
+        "GSE283493"
+      ],
+      "primary_estimand": "Genes whose exercise response differs between ZT13 and ZT23 (phase:training interaction), modelled across SAT and VAT with tissue as an additive term",
+      "planned_contrasts": [
+        {
+          "name": "phase:training interaction across tissues",
+          "test": "DESeq2 LRT: SVs + Tissue + Phase + Training + Phase:Training vs reduced without interaction",
+          "locator": "S2.9.p2"
+        }
+      ],
+      "paper_threshold": {
+        "metric": "padj",
+        "adjustment": "not_reported",
+        "cutoff": 0.1,
+        "effect_metric": null,
+        "effect_cutoff": null,
+        "inclusive": false,
+        "source_locator": "S2.9.p2; FIG1"
+      },
+      "paper_method": "DESeq2 (Wald + apeglm; LRT for interaction) with 2 SVs",
+      "sample_exclusion": "4 PCA outliers with a higher number of expressed genes: 2 SAT LAE, 1 VAT EAE, 1 VAT EAC (S2.9.p2); identities given only in Supplementary 4D (SUP8, PDF not available here)",
+      "gene_filter": "genes removed if reads < 10 in fewer than 6 samples (S2.9.p2)",
+      "matrix_scale": "Salmon gene-level raw counts (S2.9.p2); GEO data_processing: 'Comma separated file with raw gene counts'",
+      "design_note": "2 x 2 x 2 (training x phase x tissue), n=6 rats per group; SAT and VAT from the same rats"
+    },
+    "paper": {
+      "locator": "S2.9.p2"
+    },
+    "confidence": "high",
+    "reasoning": "S2.9.p1 deposits GSE283493 with EAC/EAE/LAC/LAE n=6 each for SAT and VAT. S2.9.p2 defines two DE approaches: DESeq2 Wald exercise-vs-control per tissue and phase (padj<0.1 and |shrunken LFC|>0.5, apeglm) and an LRT for Phase:Training (padj<0.1), both with 2 SVs, after removing 4 outliers and filtering genes with <10 reads in <6 samples. S3.p1 reports 7/353/2/14 Wald DEGs and 632 LRT genes.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-19T20:29:13+00:00"
+  },
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "ownership",
+    "evidence": [
+      {
+        "id": "metadata:GSE283493_metadata.csv",
+        "kind": "metadata",
+        "path": "data\\GSE283493\\GSE283493_metadata.csv",
+        "sha256": "f89a3df7eef1fe01c5e1b95a0cfdd982b2af8b73cfb86f9466550a60808d2835"
+      },
+      {
+        "id": "metadata:GSE283493_family.soft.gz",
+        "kind": "metadata",
+        "path": "data\\GSE283493\\GSE283493_family.soft.gz",
+        "sha256": "cb6f2da72ad7b02d7f4eee36ab569e7a464cee2bfa1d475069e9d79a1234d9f9"
+      },
+      {
+        "id": "matrix:GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "kind": "matrix",
+        "path": "data\\GSE283493\\GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "sha256": "5405ccefb2b4c1fdbfc2832628c40d25ff21ceb3c3894e8802b47fac07ea2fe6"
+      },
+      {
+        "id": "paper:PMC11810837.paper.json",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC11810837.paper.json",
+        "sha256": "5c0dd8fac712b65882f21163206c1c66a9ceed3e1c1d87134d0a02a2c600d3ac"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accession": "GSE283493",
+      "matrix_file": "data/GSE283493/GSE283493_Salmon_Gene_table_counts.csv.gz",
+      "metadata_file": "data/GSE283493/GSE283493_metadata.csv",
+      "owned": true,
+      "checks": [
+        "SOFT !Series_pubmed_id = 39832562",
+        "series title equals paper title",
+        "48 GSM = 2 tissues x 4 groups x 6 reps, matching S2.9.p1",
+        "matrix 23481 Ensembl rat genes x 48 libraries whose names encode tissue/AM-PM/Cont-Exp/rep",
+        "data_processing: Salmon 1.4.0, raw gene counts, matching S2.9.p2"
+      ]
+    },
+    "paper": {
+      "locator": "S2.9.p1"
+    },
+    "confidence": "high",
+    "reasoning": "GEO series cites PMID 39832562, has the paper's title, the paper's 4 groups x 2 tissues x n=6, and is the only accession named in Methods (S2.9.p1).",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-19T20:29:13+00:00"
+  },
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "alignment",
+    "evidence": [
+      {
+        "id": "matrix:GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "kind": "matrix",
+        "path": "data\\GSE283493\\GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "sha256": "5405ccefb2b4c1fdbfc2832628c40d25ff21ceb3c3894e8802b47fac07ea2fe6"
+      },
+      {
+        "id": "metadata:GSE283493_metadata.csv",
+        "kind": "metadata",
+        "path": "data\\GSE283493\\GSE283493_metadata.csv",
+        "sha256": "f89a3df7eef1fe01c5e1b95a0cfdd982b2af8b73cfb86f9466550a60808d2835"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\aligned_matrix.csv",
+        "sha256": "f3b6e8defde1cc7e244b160f1f1e25881cd660030f56a7bf26baa0129a67a2d6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\design_metadata.csv",
+        "sha256": "2e25366122bcd6ff1308764d928138147aad4cc4c4c4380470d0381e08c612a0"
+      },
+      {
+        "id": "tool_output:alignment_map.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\alignment_map.csv",
+        "sha256": "27feae8084b26e4b5bf1210c3feadd1de8605c8a084c7bda4d07bcf4c23d8035"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "exact:library_name (library_name derived from GEO 'description' by regex ^Library name: (\\S+)$)",
+      "n_aligned": 48,
+      "n_metadata": 48,
+      "coverage": 1.0,
+      "unmatched_matrix_columns": [],
+      "unmatched_metadata_samples": [],
+      "derived_columns": {
+        "key": {
+          "library_name": {
+            "source": "description",
+            "regex": "^Library name: (\\S+)$"
+          }
+        },
+        "design": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "library": {
+              "alias_of": "library_name"
+            },
+            "tissue": {
+              "source": "characteristics_ch1.0.tissue",
+              "regex": "\\((SAT|VAT)\\)"
+            },
+            "grp": {
+              "source": "characteristics_ch1.2.group",
+              "regex": "\\((EAC|EAE|LAC|LAE)\\)"
+            },
+            "phase": {
+              "source": "characteristics_ch1.2.group",
+              "regex": "^(early|late) active",
+              "recode": {
+                "early": "EA",
+                "late": "LA"
+              }
+            },
+            "training": {
+              "source": "characteristics_ch1.2.group",
+              "regex": "(control|exercise)",
+              "recode": {
+                "control": "ctrl",
+                "exercise": "ex"
+              }
+            },
+            "libphase": {
+              "source": "library_name",
+              "regex": "^[SV]AT_(AM|PM)_"
+            },
+            "rep_letter": {
+              "source": "library_name",
+              "regex": "_([a-f])$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\design_metadata.csv",
+          "sha256": "2e25366122bcd6ff1308764d928138147aad4cc4c4c4380470d0381e08c612a0",
+          "levels": {
+            "library": {
+              "SAT_AM_Cont_a": 1,
+              "SAT_AM_Cont_b": 1,
+              "SAT_AM_Cont_c": 1,
+              "SAT_AM_Cont_d": 1,
+              "SAT_AM_Cont_e": 1,
+              "SAT_AM_Cont_f": 1,
+              "SAT_AM_Exp_a": 1,
+              "SAT_AM_Exp_b": 1,
+              "SAT_AM_Exp_c": 1,
+              "SAT_AM_Exp_d": 1,
+              "SAT_AM_Exp_e": 1,
+              "SAT_AM_Exp_f": 1,
+              "SAT_PM_Cont_a": 1,
+              "SAT_PM_Cont_b": 1,
+              "SAT_PM_Cont_c": 1,
+              "SAT_PM_Cont_d": 1,
+              "SAT_PM_Cont_e": 1,
+              "SAT_PM_Cont_f": 1,
+              "SAT_PM_Exp_a": 1,
+              "SAT_PM_Exp_b": 1,
+              "SAT_PM_Exp_c": 1,
+              "SAT_PM_Exp_d": 1,
+              "SAT_PM_Exp_e": 1,
+              "SAT_PM_Exp_f": 1,
+              "VAT_AM_Cont_a": 1,
+              "VAT_AM_Cont_b": 1,
+              "VAT_AM_Cont_c": 1,
+              "VAT_AM_Cont_d": 1,
+              "VAT_AM_Cont_e": 1,
+              "VAT_AM_Cont_f": 1,
+              "VAT_AM_Exp_a": 1,
+              "VAT_AM_Exp_b": 1,
+              "VAT_AM_Exp_c": 1,
+              "VAT_AM_Exp_d": 1,
+              "VAT_AM_Exp_e": 1,
+              "VAT_AM_Exp_f": 1,
+              "VAT_PM_Cont_a": 1,
+              "VAT_PM_Cont_b": 1,
+              "VAT_PM_Cont_c": 1,
+              "VAT_PM_Cont_d": 1,
+              "VAT_PM_Cont_e": 1,
+              "VAT_PM_Cont_f": 1,
+              "VAT_PM_Exp_a": 1,
+              "VAT_PM_Exp_b": 1,
+              "VAT_PM_Exp_c": 1,
+              "VAT_PM_Exp_d": 1,
+              "VAT_PM_Exp_e": 1,
+              "VAT_PM_Exp_f": 1
+            },
+            "tissue": {
+              "SAT": 24,
+              "VAT": 24
+            },
+            "grp": {
+              "EAC": 12,
+              "EAE": 12,
+              "LAC": 12,
+              "LAE": 12
+            },
+            "phase": {
+              "EA": 24,
+              "LA": 24
+            },
+            "training": {
+              "ctrl": 24,
+              "ex": 24
+            },
+            "libphase": {
+              "AM": 24,
+              "PM": 24
+            },
+            "rep_letter": {
+              "a": 8,
+              "b": 8,
+              "c": 8,
+              "d": 8,
+              "e": 8,
+              "f": 8
+            }
+          }
+        }
+      },
+      "consistency_checks": {
+        "library_prefix_equals_tissue": true,
+        "library_Exp_equals_exercise_group": true,
+        "library_AMPM_vs_title_phase": {
+          "EA": {
+            "AM": 24,
+            "PM": 0
+          },
+          "LA": {
+            "AM": 0,
+            "PM": 24
+          }
+        }
+      }
+    },
+    "paper": {
+      "locator": "S2.9.p1"
+    },
+    "confidence": "high",
+    "reasoning": "All 48 matrix columns match exactly one GEO 'Library name' (coverage 1.0). Library prefix agrees with the tissue characteristic and Cont/Exp agrees with the group characteristic for all 48. AM libraries are titled 'early active' and PM 'late active' (one-to-one). Derived formula-safe columns: tissue, grp, phase, training.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-19T20:29:14+00:00"
+  },
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "matrix",
+    "evidence": [
+      {
+        "id": "tool_output:matrix_profile.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\matrix_profile.json",
+        "sha256": "6fd98dfb5457173d0b8d81f4100de6ef0b648508ec3bba478a61ab93e513e9ae"
+      },
+      {
+        "id": "matrix:GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "kind": "matrix",
+        "path": "data\\GSE283493\\GSE283493_Salmon_Gene_table_counts.csv.gz",
+        "sha256": "5405ccefb2b4c1fdbfc2832628c40d25ff21ceb3c3894e8802b47fac07ea2fe6"
+      },
+      {
+        "id": "metadata:GSE283493_metadata.csv",
+        "kind": "metadata",
+        "path": "data\\GSE283493\\GSE283493_metadata.csv",
+        "sha256": "f89a3df7eef1fe01c5e1b95a0cfdd982b2af8b73cfb86f9466550a60808d2835"
+      },
+      {
+        "id": "paper:PMC11810837.paper.json",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC11810837.paper.json",
+        "sha256": "5c0dd8fac712b65882f21163206c1c66a9ceed3e1c1d87134d0a02a2c600d3ac"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "raw counts",
+      "recommended_method": "DESeq2",
+      "provenance": "Salmon 1.4.0 gene-level counts; GEO: 'raw gene counts'; all values integer",
+      "profile": {
+        "n_features": 23481,
+        "n_samples": 48,
+        "min": 0.0,
+        "max": 2077195.0,
+        "median": 44.0,
+        "integer_fraction": 1.0,
+        "missing_values": 0,
+        "negative_values": 0,
+        "candidates": [
+          "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+        ]
+      },
+      "paper_input": "raw counts into DESeq2 (S2.9.p2)"
+    },
+    "paper": {
+      "locator": "S2.9.p2"
+    },
+    "confidence": "high",
+    "reasoning": "integer_fraction 1.0, non-negative, no missing values, max in the hundreds of thousands; file name 'Salmon_Gene_table_counts' and GEO processing state raw gene counts; the paper fits DESeq2 on these counts. Salmon output is estimated counts summed to genes, but the deposited file is already integer, matching what the authors fed DESeq2.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-19T20:29:15+00:00"
+  },
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC11810837.paper.json",
+        "kind": "paper"
+      },
+      {
+        "id": "tool_output:case_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\case_metadata.csv",
+        "sha256": "a02668139f8bc525babb06a7b7199e76a4e1c750c1a1acdf8ad15fbcf1040b6c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "analysis_type": "factorial",
+      "formula": "~ tissue + phase + training + phase:training",
+      "contrasts": [
+        {
+          "name": "phase:training interaction",
+          "coefficient": "phase[T.LA]:training[T.ex]",
+          "test": "LRT vs ~ tissue + phase + training (paper)"
+        }
+      ],
+      "design_check": {
+        "formula_equivalent": "~ C(tissue) + C(phase) + C(training) + C(phase):C(training)",
+        "n_samples": 44,
+        "n_columns": 5,
+        "columns": [
+          "Intercept",
+          "tissue_VAT",
+          "phase_LA",
+          "training_ex",
+          "phase_LA:training_ex"
+        ],
+        "rank": 5,
+        "full_rank": true,
+        "residual_df": 39,
+        "levels": {
+          "tissue": {
+            "SAT": 22,
+            "VAT": 22
+          },
+          "phase": {
+            "EA": 22,
+            "LA": 22
+          },
+          "training": {
+            "ctrl": 23,
+            "ex": 21
+          }
+        },
+        "cells": [
+          {
+            "cell": [
+              "SAT",
+              "EA",
+              "ctrl"
+            ],
+            "n": 6
+          },
+          {
+            "cell": [
+              "SAT",
+              "EA",
+              "ex"
+            ],
+            "n": 6
+          },
+          {
+            "cell": [
+              "SAT",
+              "LA",
+              "ctrl"
+            ],
+            "n": 6
+          },
+          {
+            "cell": [
+              "SAT",
+              "LA",
+              "ex"
+            ],
+            "n": 4
+          },
+          {
+            "cell": [
+              "VAT",
+              "EA",
+              "ctrl"
+            ],
+            "n": 5
+          },
+          {
+            "cell": [
+              "VAT",
+              "EA",
+              "ex"
+            ],
+            "n": 5
+          },
+          {
+            "cell": [
+              "VAT",
+              "LA",
+              "ctrl"
+            ],
+            "n": 6
+          },
+          {
+            "cell": [
+              "VAT",
+              "LA",
+              "ex"
+            ],
+            "n": 6
+          }
+        ],
+        "min_cell_size": 4,
+        "missing_values": {}
+      },
+      "n_samples": 44
+    },
+    "paper": {
+      "locator": "S2.9.p2"
+    },
+    "confidence": "high",
+    "reasoning": "S2.9.p2 LRT: SVs + Tissue + Phase + Training + Phase:Training vs reduced model; the interaction is the estimand.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-10-19T20:32:43+00:00"
+  },
+  {
+    "contract_version": "2",
+    "case_id": "interaction_lrt",
+    "stage": "covariance",
+    "evidence": [
+      {
+        "id": "paper:PMC11810837.paper.json",
+        "kind": "paper"
+      },
+      {
+        "id": "tool_output:case_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39832562\\interaction_lrt\\aligned\\case_metadata.csv",
+        "sha256": "a02668139f8bc525babb06a7b7199e76a4e1c750c1a1acdf8ad15fbcf1040b6c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "status": "unresolved",
+      "blocking_terms": [],
+      "covariates": [
+        {
+          "name": "animal",
+          "disposition": "unresolved: SAT and VAT come from the same rats (S2.5.p1, S2.9.p1) but no animal ID is deposited; replicate letters a-f are not documented as animal IDs"
+        },
+        {
+          "name": "surrogate_variables_1_2",
+          "disposition": "excluded: no sva executor"
+        }
+      ],
+      "pairing_report_if_letter_were_animal": {
+        "n_subjects": 6,
+        "n_complete": 0,
+        "complete_and_unique": false
+      }
+    },
+    "paper": {
+      "locator": "S2.5.p1"
+    },
+    "confidence": "medium",
+    "reasoning": "Repeated tissues per rat require blocking; the key is unknown, so the interaction model cannot be specified safely.",
+    "decision_status": "manual_review",
+    "execution_status": "not_started",
+    "stop_reason": "Model pools SAT and VAT from the same rats, so animal is a repeated-measure key, but GEO has no animal ID (replicate letters cannot be verified as rats). In addition no DESeq2 LRT executor exists. Unblock with an animal-to-library table from the authors and an LRT or limma interaction route.",
+    "recorded_at": "2026-10-19T20:32:43+00:00"
+  }
+]

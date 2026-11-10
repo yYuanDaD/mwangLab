@@ -1,0 +1,1743 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID35025912",
+  "subject_id": "PMID35025912",
+  "created_at": "2026-10-22T23:41:08",
+  "finished_at": "2026-10-22T23:51:59",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8757917.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC8757917.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-22T23:41:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dd1bc580fe66aca475d5cf130f2116d1934ffebc2da197fd57f611d9952bfce9",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC8757917.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC8757917.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-22T23:41:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "943a20b888ab4c03e4dec183bae696b4e2bddb0d9e95796a81dbeb0141e7c641",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE159861_metadata.csv",
+      "uri": "data\\GSE159861\\GSE159861_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-22T23:41:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e30a63aa923887bf0cd43958160271328ad94244022eb77eda0ae574087a8a1a",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE159861_Raw_gene_counts_matrix.txt.gz",
+      "uri": "data\\GSE159861\\GSE159861_Raw_gene_counts_matrix.txt.gz",
+      "locator": null,
+      "captured_at": "2026-10-22T23:41:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8932a0db9f9a47a76442e41498a73c280b29599b45d6a323b88e103e5b758942",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE159861"
+        ],
+        "primary_estimand": "Within each muscle (plantaris, soleus): transcriptome response to 3 d hindlimb immobilisation (disuse atrophy) in each endurance-trainability line (HIinLRT, HIinHRT), and the line difference in that response (DELTA = HIinLRT - HIinHRT, a line x treatment interaction). The 8-week endurance training at ~12 weeks only phenotyped the breeding lines; all sequenced rats are 14 months old and there is no trained-vs-sedentary contrast in the sequenced samples. 'Exercise' enters as the genetic endurance-trainability line (associational).",
+        "planned_contrasts": [
+          "PLN_HIinLRT",
+          "PLN_HIinHRT",
+          "PLN_DELTA",
+          "SOL_HIinLRT",
+          "SOL_HIinHRT",
+          "SOL_DELTA"
+        ],
+        "exploratory_contrasts": [
+          "LRT vs HRT within CTRL and within HI, per muscle (associational, genotype)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH (limma topTable default; method not named)",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 1.0,
+          "effect_cutoff_original": "logFC > 1 (S3.5.p1, FIG2 legend); applied to |logFC| (up and down DEGs counted)",
+          "inclusive": false,
+          "source_locator": "S3.5.p1; FIG2",
+          "conflicting_statement": "S2.2.p2 says significance accepted at FDR < 0.001 (no effect cutoff)"
+        },
+        "paper_method": "limma-voom with RNA integrity (RIN) covariate; gene filter not stated (14,789 genes 'detected/expressed', S3.4.p1, S3.5.p1, FIG2)",
+        "matrix_scale": "Salmon estimated counts summarised by tximport (S2.2.p2; GEO data_processing)",
+        "reported_counts": {
+          "n_genes": "14,789 (S3.4.p1, S3.5.p1, FIG2)",
+          "PLN_HIinLRT": "744 DEGs, 58.5% down (S3.5.p1; logFC>1, FDR<0.05)",
+          "PLN_HIinHRT": "251 DEGs, 66.5% down",
+          "SOL_HIinLRT": "294 DEGs, 57.1% down",
+          "SOL_HIinHRT": "326 DEGs, 57.1% down",
+          "common_all_four": "40 genes (S3.5.p1)",
+          "DELTA": "no DEG count; GSEA GO BP: 140 processes plantaris, 118 soleus (S3.6.p1)",
+          "atrogenes_logFC": "PLN HRT Trim63 1.41, Fbxo32 1.62, Hdac4 2.14; PLN LRT Trim63 2.55, Fbxo32 2.74, Hdac4 2.89; SOL Hdac4 1.85 (HRT) / 2.21 (LRT) (S3.7.p1)"
+        }
+      },
+      "reason": "GSE159861 is the paper's deposit (S7.p1). 2x2 between-animal design line (HRT/LRT) x treatment (CTRL/HI), n=6 per cell, in two muscles. Planned per muscle: HIinLRT, HIinHRT, DELTA (S2.2.p2). Two thresholds stated: FDR<0.001 (S2.2.p2) and logFC>1 & FDR<0.05 (S3.5.p1, FIG2); the counts are reported under the latter, so it is the paper_threshold. The request's 'exercise' maps to the endurance-trainability line; no training intervention is in the sequenced samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:08"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE159861",
+        "matrix_file": "data/GSE159861/GSE159861_Raw_gene_counts_matrix.txt.gz",
+        "metadata_file": "data/GSE159861/GSE159861_metadata.csv",
+        "owned": true,
+        "checks": {
+          "series_id": [
+            "GSE159861"
+          ],
+          "n_samples": 48,
+          "tissue_x_line_x_trt": {
+            "plantaris | HRT | control (CTRL)": 6,
+            "plantaris | HRT | hindlimb immobilisation (HI)": 6,
+            "plantaris | LRT | control (CTRL)": 6,
+            "plantaris | LRT | hindlimb immobilisation (HI)": 6,
+            "soleus | HRT | control (CTRL)": 6,
+            "soleus | HRT | hindlimb immobilisation (HI)": 6,
+            "soleus | LRT | control (CTRL)": 6,
+            "soleus | LRT | hindlimb immobilisation (HI)": 6
+          },
+          "sex": [
+            "female"
+          ],
+          "age": [
+            "14 months"
+          ],
+          "generation": [
+            "19"
+          ],
+          "data_processing": "Base calls performed using Illumina Real Time Analysis v2.4.11,Low-quality reads and 3' adapters were trimmed with BBDuk and then quasi-mapped to Ensembl Rnor_6.0 release 91 (cDNA and ncRNA) using Salmon v0.9.1,Transcript reads were imported into R/Bioconductor and summarised at the gene level using the tximport package,Genome_build: rn6",
+          "supplementary": "GSE159861_Raw_gene_counts_matrix.txt.gz (only file)"
+        }
+      },
+      "reason": "Series GSE159861 = paper accession; 48 female samples, 14 months, generation 19, 2 muscles x HRT/LRT x HI/CTRL, 6 each; Salmon v0.9.1 -> tximport on Rnor_6.0 r91, matching S2-S2.2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:08"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:mkey",
+        "n_aligned": 48,
+        "n_metadata": 48,
+        "coverage": 1.0,
+        "unmatched": [],
+        "key_derivation": "title 'Plantaris HRT HI rep1' -> tis/line/trt/rep by regex -> mkey 'HRT_HI_PLN_rep1' (= matrix column names); grp = tis_line_trt",
+        "derived_columns": [
+          "tis",
+          "line",
+          "trt",
+          "rep",
+          "rin",
+          "grp"
+        ],
+        "levels": {
+          "grp": {
+            "PLN_HRT_HI": 6,
+            "PLN_HRT_CTRL": 6,
+            "PLN_LRT_HI": 6,
+            "PLN_LRT_CTRL": 6,
+            "SOL_HRT_HI": 6,
+            "SOL_HRT_CTRL": 6,
+            "SOL_LRT_HI": 6,
+            "SOL_LRT_CTRL": 6
+          },
+          "line": {
+            "HRT": 24,
+            "LRT": 24
+          },
+          "trt": {
+            "HI": 24,
+            "CTRL": 24
+          },
+          "tis": {
+            "PLN": 24,
+            "SOL": 24
+          }
+        },
+        "caveat": "rep numbers are only matched within tissue/line/treatment; whether repN is the same animal across muscles is not stated"
+      },
+      "reason": "Matrix columns (e.g. HRT_CTRL_SOL_rep1) are the GEO titles ('Soleus HRT CTRL rep1') re-ordered; 48/48 exact on the derived key. Title-derived tis/line/trt agree with the characteristics columns for every sample.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0003",
+        "ART-0004",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:10"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "estimated counts",
+        "recommended_method": "limma on log2(CPM+1) (paper: voom)",
+        "profile": {
+          "n_features": 31998,
+          "n_samples": 48,
+          "min": 0.0,
+          "max": 3091766.834,
+          "median": 8.111081876,
+          "integer_fraction": 0.3401,
+          "missing_values": 0,
+          "negative_values": 0,
+          "duplicated_feature_ids": 0,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ],
+          "library_sizes_millions": [
+            26.82,
+            36.37
+          ],
+          "n_genes_median_cpm_ge_0.5": 14789,
+          "feature_ids": {
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\aligned\\aligned_matrix.csv",
+            "n_features": 31998,
+            "n_checked": 2000,
+            "type_counts": {
+              "ensembl_gene": 2000
+            },
+            "dominant_type": "ensembl_gene",
+            "dominant_fraction": 1.0,
+            "duplicated_ids": 0,
+            "gene_set_ready": true,
+            "note": "Ensembl gene IDs are mapped to symbols through MyGene.info (network).",
+            "examples": [
+              "ENSRNOG00000000001",
+              "ENSRNOG00000000007",
+              "ENSRNOG00000000008",
+              "ENSRNOG00000000009",
+              "ENSRNOG00000000010"
+            ]
+          }
+        },
+        "provenance": "Salmon v0.9.1 quasi-mapping -> tximport gene-level counts (GEO data_processing; S2.2.p2)",
+        "rounding_documented": false
+      },
+      "reason": "Non-negative, integer fraction 0.3401, max 3091767, library sizes [26.82, 36.37] M; the 'Raw' file name notwithstanding, these are tximport estimated counts. Median CPM >= 0.5 over 48 samples keeps 14789 genes = the paper's 14,789.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:12"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "factorial (2x2 between-animal line x treatment, per muscle) fitted as an 8-cell means model on all 48 samples",
+        "formula": "~ 0 + cell + rin  (cell = tis x line x trt)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "PLN_HIinLRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-PLN_line-LRT",
+            "role": "paper_planned"
+          },
+          {
+            "name": "PLN_HIinHRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-PLN_line-HRT",
+            "role": "paper_planned"
+          },
+          {
+            "name": "PLN_DELTA",
+            "suitability_name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+            "role": "paper_planned"
+          },
+          {
+            "name": "SOL_HIinLRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-SOL_line-LRT",
+            "role": "paper_planned"
+          },
+          {
+            "name": "SOL_HIinHRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-SOL_line-HRT",
+            "role": "paper_planned"
+          },
+          {
+            "name": "SOL_DELTA",
+            "suitability_name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+            "role": "paper_planned"
+          },
+          {
+            "name": "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+            "suitability_name": "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+            "role": "exploratory",
+            "estimand_type": "associational (genotype line)"
+          },
+          {
+            "name": "line_LRT_vs_HRT_tis-PLN_trt-HI",
+            "suitability_name": "line_LRT_vs_HRT_tis-PLN_trt-HI",
+            "role": "exploratory",
+            "estimand_type": "associational (genotype line)"
+          },
+          {
+            "name": "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+            "suitability_name": "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+            "role": "exploratory",
+            "estimand_type": "associational (genotype line)"
+          },
+          {
+            "name": "line_LRT_vs_HRT_tis-SOL_trt-HI",
+            "suitability_name": "line_LRT_vs_HRT_tis-SOL_trt-HI",
+            "role": "exploratory",
+            "estimand_type": "associational (genotype line)"
+          }
+        ],
+        "not_run": {
+          "comparisons": [
+            "tis_SOL_vs_PLN_line-HRT_trt-CTRL",
+            "tis_SOL_vs_PLN_line-HRT_trt-HI",
+            "tis_SOL_vs_PLN_line-LRT_trt-CTRL",
+            "tis_SOL_vs_PLN_line-LRT_trt-HI",
+            "tis_line_SOL_LRT_vs_PLN_HRT_trt-CTRL",
+            "tis_line_SOL_LRT_vs_PLN_HRT_trt-HI",
+            "tis_trt_SOL_HI_vs_PLN_CTRL_line-HRT",
+            "tis_trt_SOL_HI_vs_PLN_CTRL_line-LRT"
+          ],
+          "reason": "tissue comparisons are within-animal (both muscles from each rat) but no animal key is deposited, and they do not address the paper's question"
+        },
+        "estimand_type": "interventional for HI contrasts (randomised, S2.p1); associational for line contrasts",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\suitability\\suitability.md",
+          "n_comparisons": 18,
+          "n_analyzable": 18
+        }
+      },
+      "reason": "Four independent groups of 6 rats; each rat gave plantaris and soleus. Within a muscle all contrasts are between animals. The paper reports one gene universe (14,789) for all four volcano plots, which the 48-sample median-CPM filter reproduces exactly, so one model over both muscles is the most faithful reading; per-muscle models are run as an audit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0008",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:18"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "rin",
+            "disposition": "included: continuous RNA integrity covariate as in the paper (S2.2.p2); not aliased"
+          },
+          {
+            "name": "animal",
+            "disposition": "excluded: not deposited; within-muscle contrasts are between animals; the two muscles of a rat share residual correlation that the pooled 48-sample variance ignores (per-muscle audit fits check this)"
+          },
+          {
+            "name": "sex/age/generation",
+            "disposition": "excluded: single level (female, 14 months, gen 19)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 48,
+          "n_columns": 8,
+          "rank": 8,
+          "full_rank": true,
+          "residual_df": 40,
+          "min_cell_size": 6
+        },
+        "rin_check": {
+          "rank_with_rin": 9,
+          "n_columns_with_rin": 9,
+          "residual_df_with_rin": 39,
+          "rin_by_grp": {
+            "mean": {
+              "PLN_HRT_CTRL": 8.27,
+              "PLN_HRT_HI": 8.38,
+              "PLN_LRT_CTRL": 8.28,
+              "PLN_LRT_HI": 8.38,
+              "SOL_HRT_CTRL": 8.18,
+              "SOL_HRT_HI": 8.03,
+              "SOL_LRT_CTRL": 8.12,
+              "SOL_LRT_HI": 8.02
+            },
+            "min": {
+              "PLN_HRT_CTRL": 8.0,
+              "PLN_HRT_HI": 7.9,
+              "PLN_LRT_CTRL": 8.1,
+              "PLN_LRT_HI": 8.3,
+              "SOL_HRT_CTRL": 8.0,
+              "SOL_HRT_HI": 7.8,
+              "SOL_LRT_CTRL": 7.9,
+              "SOL_LRT_HI": 7.8
+            },
+            "max": {
+              "PLN_HRT_CTRL": 8.6,
+              "PLN_HRT_HI": 8.5,
+              "PLN_LRT_CTRL": 8.5,
+              "PLN_LRT_HI": 8.6,
+              "SOL_HRT_CTRL": 8.4,
+              "SOL_HRT_HI": 8.2,
+              "SOL_LRT_CTRL": 8.4,
+              "SOL_LRT_HI": 8.2
+            }
+          },
+          "r2_rin_on_grp": 0.383164005805516
+        }
+      },
+      "reason": "~ 0 + grp + rin is full rank (9/9), residual df 39; RIN R2 on group 0.38. No repeated measures within a muscle.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:18"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "method": "limma (inmoose lmFit/contrasts.fit/eBayes) on log2(CPM+1), one model on all 48 samples",
+        "matrix_type": "estimated counts",
+        "transform": "log2(CPM+1) via preprocess_counts after median-CPM>=0.5 filter (48 samples)",
+        "filter": "median CPM >= 0.5 across all 48 samples -> 14,789 genes (= paper)",
+        "formula": "~ 0 + cell + rin",
+        "executor": "tools.joint_contrasts:run_joint_limma (covariates=['rin'], continuous)",
+        "paper_route": {
+          "method": "limma-voom with RIN covariate",
+          "status": "blocked",
+          "reason": "tools/limma_voom_tools.py + tools/limma_voom.R fit only ~ g on two arms, no covariates, integer counts required; no voom executor for an 8-cell + RIN model"
+        }
+      },
+      "reason": "Same linear model family, design, contrasts and gene filter as the paper, without voom precision weights. Declared deviation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:18"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH (limma topTable default; method not named)",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 1.0,
+          "effect_cutoff_original": "logFC > 1 (S3.5.p1, FIG2 legend); applied to |logFC| (up and down DEGs counted)",
+          "inclusive": false,
+          "source_locator": "S3.5.p1; FIG2",
+          "conflicting_statement": "S2.2.p2 says significance accepted at FDR < 0.001 (no effect cutoff)"
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH (limma topTable default; method not named)",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 1.0,
+          "effect_cutoff_original": "logFC > 1 (S3.5.p1, FIG2 legend); applied to |logFC| (up and down DEGs counted)",
+          "inclusive": false,
+          "source_locator": "S3.5.p1; FIG2",
+          "conflicting_statement": "S2.2.p2 says significance accepted at FDR < 0.001 (no effect cutoff)"
+        },
+        "deviation_note": "paper rule applied to limma on log2(CPM+1) instead of voom",
+        "audit_thresholds": [
+          {
+            "metric": "padj",
+            "cutoff": 0.001,
+            "effect_metric": null,
+            "label": "audit: S2.2.p2 rule"
+          },
+          {
+            "metric": "padj",
+            "cutoff": 0.001,
+            "effect_metric": "log2FC",
+            "effect_cutoff": 1.0,
+            "label": "audit"
+          },
+          {
+            "metric": "padj",
+            "cutoff": 0.05,
+            "effect_metric": null,
+            "label": "audit: workflow default"
+          }
+        ]
+      },
+      "reason": "S3.5.p1/FIG2 count DEGs at logFC>1 & FDR<0.05; S2.2.p2's FDR<0.001 is kept as an audit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:41:18"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "limma (inmoose) on log2(CPM+1), ~ 0 + cell + rin on 48 samples, contrasts.fit + eBayes, BH per contrast",
+        "outputs": [
+          {
+            "contrast": "PLN_HIinLRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-PLN_line-LRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT.csv",
+            "sha256": "d8020bbf673c5fb41e56d7f35afc1335ed31ee599e4569348c9aa9b3c24a1ffa"
+          },
+          {
+            "contrast": "PLN_HIinHRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-PLN_line-HRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT.csv",
+            "sha256": "f959f77f494263ec07d300296ab8d8419d2eb0efbfc67232220bbdd404295bf0"
+          },
+          {
+            "contrast": "PLN_DELTA",
+            "suitability_name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN.csv",
+            "sha256": "9632255b6115d99b6a8e4b036fd49070765d5feb08888287783af6e8c48352b6"
+          },
+          {
+            "contrast": "SOL_HIinLRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-SOL_line-LRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT.csv",
+            "sha256": "1abf19ccac6156313351d59815700743db82091ada3435c4aa5526fe125309b4"
+          },
+          {
+            "contrast": "SOL_HIinHRT",
+            "suitability_name": "trt_HI_vs_CTRL_tis-SOL_line-HRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT.csv",
+            "sha256": "5a22c4107b9fa4f935f3f7512114af735ff24cfa4f07c04153be941f699fe4b4"
+          },
+          {
+            "contrast": "SOL_DELTA",
+            "suitability_name": "line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL.csv",
+            "sha256": "19fb202d25e5a00152bf95ec97680ce6facf9beb5ceab3540b2ec76ae570985e"
+          },
+          {
+            "contrast": "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+            "suitability_name": "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-CTRL.csv",
+            "sha256": "74c63e0f009906bf72bed28b3ec079c8e8bcb6507909963a8b3699aa3de7d4a2"
+          },
+          {
+            "contrast": "line_LRT_vs_HRT_tis-PLN_trt-HI",
+            "suitability_name": "line_LRT_vs_HRT_tis-PLN_trt-HI",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-HI.csv",
+            "sha256": "db468684ee75fa8a0f99dbb9fd7baf56f7b6ec4fdbf3cf72caa4c29b019fc354"
+          },
+          {
+            "contrast": "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+            "suitability_name": "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-CTRL.csv",
+            "sha256": "205c06a501c23e2c3d5f505d0b1ed382253862ee593f7ff99fe642e0e603fde4"
+          },
+          {
+            "contrast": "line_LRT_vs_HRT_tis-SOL_trt-HI",
+            "suitability_name": "line_LRT_vs_HRT_tis-SOL_trt-HI",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-HI.csv",
+            "sha256": "c1a30067b7be50fcb938d2308830e12ee635a79e90f8a0af94a6bd14be2dd1ec"
+          }
+        ],
+        "n_genes_tested": 14789,
+        "design_rank": 9,
+        "residual_df": 39,
+        "deg_counts_paper_rule": {
+          "PLN_HIinLRT": {
+            "n_significant": 519,
+            "n_up": 367,
+            "n_down": 152
+          },
+          "PLN_HIinHRT": {
+            "n_significant": 126,
+            "n_up": 74,
+            "n_down": 52
+          },
+          "PLN_DELTA": {
+            "n_significant": 0,
+            "n_up": 0,
+            "n_down": 0
+          },
+          "SOL_HIinLRT": {
+            "n_significant": 186,
+            "n_up": 101,
+            "n_down": 85
+          },
+          "SOL_HIinHRT": {
+            "n_significant": 203,
+            "n_up": 97,
+            "n_down": 106
+          },
+          "SOL_DELTA": {
+            "n_significant": 2,
+            "n_up": 2,
+            "n_down": 0
+          },
+          "line_LRT_vs_HRT_tis-PLN_trt-CTRL": {
+            "n_significant": 9,
+            "n_up": 1,
+            "n_down": 8
+          },
+          "line_LRT_vs_HRT_tis-PLN_trt-HI": {
+            "n_significant": 28,
+            "n_up": 17,
+            "n_down": 11
+          },
+          "line_LRT_vs_HRT_tis-SOL_trt-CTRL": {
+            "n_significant": 50,
+            "n_up": 22,
+            "n_down": 28
+          },
+          "line_LRT_vs_HRT_tis-SOL_trt-HI": {
+            "n_significant": 53,
+            "n_up": 26,
+            "n_down": 27
+          }
+        },
+        "deg_sanity": {
+          "PLN_HIinLRT": "ok",
+          "PLN_HIinHRT": "ok",
+          "PLN_DELTA": "ok",
+          "SOL_HIinLRT": "ok",
+          "SOL_HIinHRT": "ok",
+          "SOL_DELTA": "ok",
+          "line_LRT_vs_HRT_tis-PLN_trt-CTRL": "ok",
+          "line_LRT_vs_HRT_tis-PLN_trt-HI": "ok",
+          "line_LRT_vs_HRT_tis-SOL_trt-CTRL": "ok",
+          "line_LRT_vs_HRT_tis-SOL_trt-HI": "ok"
+        },
+        "audit": {
+          "no_rin": {
+            "PLN_HIinLRT": {
+              "n_significant": 510,
+              "n_up": 363,
+              "n_down": 147
+            },
+            "PLN_HIinHRT": {
+              "n_significant": 122,
+              "n_up": 71,
+              "n_down": 51
+            },
+            "PLN_DELTA": {
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0
+            },
+            "SOL_HIinLRT": {
+              "n_significant": 192,
+              "n_up": 102,
+              "n_down": 90
+            },
+            "SOL_HIinHRT": {
+              "n_significant": 223,
+              "n_up": 104,
+              "n_down": 119
+            },
+            "SOL_DELTA": {
+              "n_significant": 2,
+              "n_up": 2,
+              "n_down": 0
+            },
+            "line_LRT_vs_HRT_tis-PLN_trt-CTRL": {
+              "n_significant": 10,
+              "n_up": 2,
+              "n_down": 8
+            },
+            "line_LRT_vs_HRT_tis-PLN_trt-HI": {
+              "n_significant": 29,
+              "n_up": 18,
+              "n_down": 11
+            },
+            "line_LRT_vs_HRT_tis-SOL_trt-CTRL": {
+              "n_significant": 49,
+              "n_up": 20,
+              "n_down": 29
+            },
+            "line_LRT_vs_HRT_tis-SOL_trt-HI": {
+              "n_significant": 54,
+              "n_up": 26,
+              "n_down": 28
+            }
+          },
+          "per_muscle": {
+            "PLN_HIinLRT": {
+              "n_significant": 522,
+              "n_up": 373,
+              "n_down": 149
+            },
+            "PLN_HIinHRT": {
+              "n_significant": 117,
+              "n_up": 68,
+              "n_down": 49
+            },
+            "PLN_DELTA": {
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0
+            },
+            "line_LRT_vs_HRT_tis-PLN_trt-CTRL": {
+              "n_significant": 11,
+              "n_up": 2,
+              "n_down": 9
+            },
+            "line_LRT_vs_HRT_tis-PLN_trt-HI": {
+              "n_significant": 15,
+              "n_up": 9,
+              "n_down": 6
+            },
+            "SOL_HIinLRT": {
+              "n_significant": 169,
+              "n_up": 94,
+              "n_down": 75
+            },
+            "SOL_HIinHRT": {
+              "n_significant": 149,
+              "n_up": 64,
+              "n_down": 85
+            },
+            "SOL_DELTA": {
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0
+            },
+            "line_LRT_vs_HRT_tis-SOL_trt-CTRL": {
+              "n_significant": 22,
+              "n_up": 4,
+              "n_down": 18
+            },
+            "line_LRT_vs_HRT_tis-SOL_trt-HI": {
+              "n_significant": 46,
+              "n_up": 23,
+              "n_down": 23
+            }
+          }
+        },
+        "common_all_four_HI_contrasts": 22
+      },
+      "reason": "Approved route ran on all 48 samples; counts from native.apply_threshold under the paper rule (FDR<0.05 & |log2FC|>1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0043"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:46:44"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy.prerank via run_gsea_analysis)",
+        "ranking_metric": "stat (limma moderated t)",
+        "gene_sets": "MSigDB Hallmark mh.all v2024.1.Mm (mouse)",
+        "organism": "Rat",
+        "feature_id_type": "ensembl_gene",
+        "id_mapping": "rat Ensembl gene -> symbol via MyGene.info (species=rat) inside run_gsea_analysis",
+        "ortholog_mapping": "rat symbols matched to mouse Hallmark symbols by identity (no ortholog table)",
+        "contrasts": [
+          "PLN_HIinLRT",
+          "PLN_HIinHRT",
+          "PLN_DELTA",
+          "SOL_HIinLRT",
+          "SOL_HIinHRT",
+          "SOL_DELTA"
+        ],
+        "paper_enrichment": "GO BP GSEA (clusterProfiler, 10,000 permutations, size 25-500, FDR<0.05 & P<0.001) - different library; declared deviation",
+        "summaries": {
+          "PLN_HIinLRT": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 14,
+            "up": [
+              "HALLMARK_MYC_TARGETS_V2 (1.93)",
+              "HALLMARK_UNFOLDED_PROTEIN_RESPONSE (1.68)",
+              "HALLMARK_TGF_BETA_SIGNALING (1.60)",
+              "HALLMARK_TNFA_SIGNALING_VIA_NFKB (1.56)",
+              "HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY (1.55)",
+              "HALLMARK_WNT_BETA_CATENIN_SIGNALING (1.52)",
+              "HALLMARK_MYC_TARGETS_V1 (1.48)"
+            ],
+            "down": [
+              "HALLMARK_GLYCOLYSIS (-1.70)",
+              "HALLMARK_ADIPOGENESIS (-1.80)",
+              "HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION (-1.87)",
+              "HALLMARK_MYOGENESIS (-1.97)",
+              "HALLMARK_FATTY_ACID_METABOLISM (-2.09)",
+              "HALLMARK_ANGIOGENESIS (-2.13)",
+              "HALLMARK_OXIDATIVE_PHOSPHORYLATION (-4.17)"
+            ],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          },
+          "PLN_HIinHRT": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 11,
+            "up": [
+              "HALLMARK_G2M_CHECKPOINT (1.65)",
+              "HALLMARK_P53_PATHWAY (1.63)",
+              "HALLMARK_MYC_TARGETS_V2 (1.58)",
+              "HALLMARK_E2F_TARGETS (1.56)"
+            ],
+            "down": [
+              "HALLMARK_GLYCOLYSIS (-1.55)",
+              "HALLMARK_MYOGENESIS (-1.79)",
+              "HALLMARK_ADIPOGENESIS (-1.91)",
+              "HALLMARK_FATTY_ACID_METABOLISM (-2.24)",
+              "HALLMARK_ANGIOGENESIS (-2.43)",
+              "HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION (-2.64)",
+              "HALLMARK_OXIDATIVE_PHOSPHORYLATION (-4.43)"
+            ],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          },
+          "PLN_DELTA": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 7,
+            "up": [
+              "HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY (1.78)",
+              "HALLMARK_MYC_TARGETS_V2 (1.69)",
+              "HALLMARK_TGF_BETA_SIGNALING (1.67)",
+              "HALLMARK_TNFA_SIGNALING_VIA_NFKB (1.57)",
+              "HALLMARK_MYC_TARGETS_V1 (1.56)",
+              "HALLMARK_UNFOLDED_PROTEIN_RESPONSE (1.53)"
+            ],
+            "down": [
+              "HALLMARK_OXIDATIVE_PHOSPHORYLATION (-1.68)"
+            ],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          },
+          "SOL_HIinLRT": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 12,
+            "up": [
+              "HALLMARK_XENOBIOTIC_METABOLISM (1.66)",
+              "HALLMARK_DNA_REPAIR (1.62)"
+            ],
+            "down": [
+              "HALLMARK_UV_RESPONSE_DN (-1.53)",
+              "HALLMARK_FATTY_ACID_METABOLISM (-1.53)",
+              "HALLMARK_HYPOXIA (-1.56)",
+              "HALLMARK_ANDROGEN_RESPONSE (-1.62)",
+              "HALLMARK_APICAL_JUNCTION (-1.63)",
+              "HALLMARK_TNFA_SIGNALING_VIA_NFKB (-1.64)",
+              "HALLMARK_MYOGENESIS (-1.76)",
+              "HALLMARK_ANGIOGENESIS (-2.30)",
+              "HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION (-2.31)",
+              "HALLMARK_OXIDATIVE_PHOSPHORYLATION (-2.92)"
+            ],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          },
+          "SOL_HIinHRT": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 8,
+            "up": [
+              "HALLMARK_E2F_TARGETS (1.81)"
+            ],
+            "down": [
+              "HALLMARK_IL2_STAT5_SIGNALING (-1.47)",
+              "HALLMARK_APICAL_JUNCTION (-1.52)",
+              "HALLMARK_TGF_BETA_SIGNALING (-1.55)",
+              "HALLMARK_MYOGENESIS (-1.71)",
+              "HALLMARK_ANGIOGENESIS (-1.72)",
+              "HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION (-2.17)",
+              "HALLMARK_OXIDATIVE_PHOSPHORYLATION (-2.73)"
+            ],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          },
+          "SOL_DELTA": {
+            "n_sets": 50,
+            "n_fdr_lt_0.05": 1,
+            "up": [
+              "HALLMARK_MYC_TARGETS_V2 (1.69)"
+            ],
+            "down": [],
+            "tool_notes": [
+              "Rat genes matched to mouse Hallmark by symbol: 3356/4291 Hallmark genes present in the ranking."
+            ]
+          }
+        },
+        "outputs": [
+          {
+            "contrast": "PLN_HIinLRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_HIinLRT\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT_GSEA_Hallmark.csv",
+            "sha256": "48fc9205e3c25e8e5aa13b74398ecae542db7dcbf5a1d4fc8142c05d8cbeb0a4"
+          },
+          {
+            "contrast": "PLN_HIinHRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_HIinHRT\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT_GSEA_Hallmark.csv",
+            "sha256": "6e6c59d92acd97158100f5b70e1acb7e86b34f58329dcdc3181257806ad1c764"
+          },
+          {
+            "contrast": "PLN_DELTA",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_DELTA\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN_GSEA_Hallmark.csv",
+            "sha256": "3c77850677b388e2c7b499349257cb696fbc8c1a01e059403a64d99dbcd6813a"
+          },
+          {
+            "contrast": "SOL_HIinLRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_HIinLRT\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT_GSEA_Hallmark.csv",
+            "sha256": "afd65e94623df8e53f8ed1e0ac856ed705f56df94b04cadbd8fd759d9677ea30"
+          },
+          {
+            "contrast": "SOL_HIinHRT",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_HIinHRT\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT_GSEA_Hallmark.csv",
+            "sha256": "0933bd57b9c387eff0e273ff57ad43d9f916edc47e14ecdbd5de64646848c951"
+          },
+          {
+            "contrast": "SOL_DELTA",
+            "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_DELTA\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL_GSEA_Hallmark.csv",
+            "sha256": "fbbd8a458662f832b9deddcc7b4f65a244de482a459e85d9a8121929ec1352a9"
+          }
+        ]
+      },
+      "reason": "Paper ranks genes by t and runs GSEA (S2.2.p2, S3.6.p1). Repository offers Hallmark only; same ranking statistic. Not term-comparable with the paper's GO BP maps.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0061"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:51:37"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "summary": "paper contrasts, gene filter and threshold on limma log-CPM with RIN (joint 48-sample model) instead of voom",
+        "deg_counts_paper_rule": {
+          "PLN_HIinLRT": {
+            "n_significant": 519,
+            "n_up": 367,
+            "n_down": 152
+          },
+          "PLN_HIinHRT": {
+            "n_significant": 126,
+            "n_up": 74,
+            "n_down": 52
+          },
+          "PLN_DELTA": {
+            "n_significant": 0,
+            "n_up": 0,
+            "n_down": 0
+          },
+          "SOL_HIinLRT": {
+            "n_significant": 186,
+            "n_up": 101,
+            "n_down": 85
+          },
+          "SOL_HIinHRT": {
+            "n_significant": 203,
+            "n_up": 97,
+            "n_down": 106
+          },
+          "SOL_DELTA": {
+            "n_significant": 2,
+            "n_up": 2,
+            "n_down": 0
+          },
+          "line_LRT_vs_HRT_tis-PLN_trt-CTRL": {
+            "n_significant": 9,
+            "n_up": 1,
+            "n_down": 8
+          },
+          "line_LRT_vs_HRT_tis-PLN_trt-HI": {
+            "n_significant": 28,
+            "n_up": 17,
+            "n_down": 11
+          },
+          "line_LRT_vs_HRT_tis-SOL_trt-CTRL": {
+            "n_significant": 50,
+            "n_up": 22,
+            "n_down": 28
+          },
+          "line_LRT_vs_HRT_tis-SOL_trt-HI": {
+            "n_significant": 53,
+            "n_up": 26,
+            "n_down": 27
+          }
+        },
+        "paper_counts": {
+          "PLN_HIinLRT": "744 (58.5% down)",
+          "PLN_HIinHRT": "251 (66.5% down)",
+          "SOL_HIinLRT": "294 (57.1% down)",
+          "SOL_HIinHRT": "326 (57.1% down)",
+          "common_all_four": 40
+        },
+        "exploratory": [
+          "line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+          "line_LRT_vs_HRT_tis-PLN_trt-HI",
+          "line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+          "line_LRT_vs_HRT_tis-SOL_trt-HI"
+        ],
+        "estimand_note": "no trained-vs-sedentary samples; 'exercise' enters only as the endurance-trainability line (associational)"
+      },
+      "reason": "All gates valid; the paper's voom route is blocked by executor limits, so the run is a declared deviation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0063"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-22T23:51:59"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c06d7891fba9fa2bc1d64ec48be4028d6ec0915e21f8c874d6d2204f3c57a308",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "57202e2c28bd9055f52d8c2f8785fe4ce70287b48e67c875ea64e2a9764b0217",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9ba8987c9bf83612c4a44065246c011e03bbc56490641fa4d75561d532353b43",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "50307783da48847364182e082316a1ac642072d13ed068e4eeff0b4c2cd789f6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9d9972d681957ade0458ba9066634d8eb64f943f8a3ace9a56eb4956bb318111",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\aligned\\derived_columns.json",
+      "role": "derived_columns",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "adb15f4ba3ab04934600b32cb7082feef3a879a692b281f86e55f80ff56eef6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\matrix_profile.json",
+      "role": "matrix_profile",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "161d16bafd27f7a89684d2f7551e122b99bb49751329b2ffb51e28e67a708c68",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "55bdd25195ce8a0677e1d12f459bb8f6d79a274ad0278be0d01d5c6c8158008c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\suitability_comparisons.json",
+      "role": "suitability_comparisons",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "68666dadb82de9640ed69e681a6ad306cd13bcd67342f4b4c0adacc9f31c5f3b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\covariance_reports.json",
+      "role": "covariance_reports",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "066f227a4adf7effe5c1f1440ee0fbe76f7866cb35ff8e46748d5d2d5c0b6007",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\GSE159861_counts_medcpm0.5.csv",
+      "role": "filtered_counts",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "08bfce07cd3d8081b802890a063cd4a1df370fa3068a90c6fcd2f2629d1bf5fe",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\GSE159861_counts_medcpm0.5_normalized.csv",
+      "role": "log2cpm_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5821fc2b3c847421314f146eb3a276e8ee7423d7a58c6bf491865fa44838092b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT.csv",
+      "role": "deg_PLN_HIinLRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d8020bbf673c5fb41e56d7f35afc1335ed31ee599e4569348c9aa9b3c24a1ffa",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT.csv",
+      "role": "deg_PLN_HIinHRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f959f77f494263ec07d300296ab8d8419d2eb0efbfc67232220bbdd404295bf0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN.csv",
+      "role": "deg_PLN_DELTA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9632255b6115d99b6a8e4b036fd49070765d5feb08888287783af6e8c48352b6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT.csv",
+      "role": "deg_SOL_HIinLRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1abf19ccac6156313351d59815700743db82091ada3435c4aa5526fe125309b4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT.csv",
+      "role": "deg_SOL_HIinHRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5a22c4107b9fa4f935f3f7512114af735ff24cfa4f07c04153be941f699fe4b4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL.csv",
+      "role": "deg_SOL_DELTA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "19fb202d25e5a00152bf95ec97680ce6facf9beb5ceab3540b2ec76ae570985e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-CTRL.csv",
+      "role": "deg_line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "74c63e0f009906bf72bed28b3ec079c8e8bcb6507909963a8b3699aa3de7d4a2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-HI.csv",
+      "role": "deg_line_LRT_vs_HRT_tis-PLN_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "db468684ee75fa8a0f99dbb9fd7baf56f7b6ec4fdbf3cf72caa4c29b019fc354",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-CTRL.csv",
+      "role": "deg_line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "205c06a501c23e2c3d5f505d0b1ed382253862ee593f7ff99fe642e0e603fde4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0022",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\joint_limma_rin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-HI.csv",
+      "role": "deg_line_LRT_vs_HRT_tis-SOL_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c1a30067b7be50fcb938d2308830e12ee635a79e90f8a0af94a6bd14be2dd1ec",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0023",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT.csv",
+      "role": "audit_norin_trt_HI_vs_CTRL_tis-PLN_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0b1cb4ee99d7eea4bf0dc12dd25a5a69196b0077c033bf45267a6d8e6b6af175",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0024",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT.csv",
+      "role": "audit_norin_trt_HI_vs_CTRL_tis-PLN_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bcd49f49bd749f6d24ad91b0f6268ee373a856b98125a707cd6abea7d97b3e61",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0025",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN.csv",
+      "role": "audit_norin_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b02074907525e2fd2865cb8e37f4eb3cb7ea1f3f40b844480f21239d83407a61",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0026",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT.csv",
+      "role": "audit_norin_trt_HI_vs_CTRL_tis-SOL_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f15cb5b2f6efbb690c998091fff81fa618c8267c0736aee68640c99be4786d82",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0027",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT.csv",
+      "role": "audit_norin_trt_HI_vs_CTRL_tis-SOL_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "02330b8b319613622fd5f293daf0dbbb088d69c0f88046cfa534bcadcf10e835",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0028",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL.csv",
+      "role": "audit_norin_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7120db9e85706e12ef792a1b002a24e38ad550dc03e87dcaad212c70e7450d54",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0029",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-CTRL.csv",
+      "role": "audit_norin_line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1d9abed376b68efe69634a5f5dd95bf86257a693c48def084e1d23edb7852f46",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0030",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-HI.csv",
+      "role": "audit_norin_line_LRT_vs_HRT_tis-PLN_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d206fc91639a56e66f859509324eb337e69880d01d30215b514703f425625553",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0031",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-CTRL.csv",
+      "role": "audit_norin_line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5edcec9c3e2c05f2f8d133c7883cc112830e1fad3baae19130f1d4fcaaca2457",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0032",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_joint_limma_norin\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-HI.csv",
+      "role": "audit_norin_line_LRT_vs_HRT_tis-SOL_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e8538f3fd64915d3e1b9d9af90374d018737227e2696b3a8036a89b6d16b04a7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0033",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_PLNonly\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT.csv",
+      "role": "audit_permuscle_trt_HI_vs_CTRL_tis-PLN_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "581992d46c07d0da6217d292854823dc6e0c6c73ec23782032b63ae8eba979e9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0034",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_PLNonly\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT.csv",
+      "role": "audit_permuscle_trt_HI_vs_CTRL_tis-PLN_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bade123fa4c1727654fcba5d2baa90e1716b67c6fad3834cebe7b9b5b017d64d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0035",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_PLNonly\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN.csv",
+      "role": "audit_permuscle_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0e9618d9e9b2fd2a80231a3e8cc5dcd4ff1b07225592a4e858ab0109800111a3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0036",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_PLNonly\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-CTRL.csv",
+      "role": "audit_permuscle_line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2528d3a184f6207ac380e4fb8cb2f65daf97b9b351f0407b155a3e0728e32370",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0037",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_PLNonly\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-HI.csv",
+      "role": "audit_permuscle_line_LRT_vs_HRT_tis-PLN_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "11993616da33ca71e5d72028c834a797c43c9a7c37f0c8deb210e94aaadd2367",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0038",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_SOLonly\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT.csv",
+      "role": "audit_permuscle_trt_HI_vs_CTRL_tis-SOL_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e2bc8ccb79b3c9007eae2c70b94856f4ba5cce6654b0a5a5149eed295b052a81",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0039",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_SOLonly\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT.csv",
+      "role": "audit_permuscle_trt_HI_vs_CTRL_tis-SOL_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bc54198030a39c1760b8adb36c54ead705106f0fe0e5792583e3dd7891843f8d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0040",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_SOLonly\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL.csv",
+      "role": "audit_permuscle_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4a7a75399c3e764722a6eea8d1f95207fd9c0768514a400e624cb24601e48341",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0041",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_SOLonly\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-CTRL.csv",
+      "role": "audit_permuscle_line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "906d1d15418de59190b273ab47527131ceb5884227e374f3f6cd6005c39a3a01",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0042",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_limma_rin_SOLonly\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-HI.csv",
+      "role": "audit_permuscle_line_LRT_vs_HRT_tis-SOL_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2bb114d3b44d0790ca85fcf3465df4a6128ae38a05d1dafa35d76900dfe723ef",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0043",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\deg_counts.json",
+      "role": "deg_counts",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "81512a296c735a5c64d3ac217171525b5a835d1509b5c3268908e9dd2ec1ef18",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0044",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT.csv",
+      "role": "audit_tmm_trt_HI_vs_CTRL_tis-PLN_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "340840e3320af300baa689335e8c4d81283988f274bfcf3c6b70755bb57062dc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0045",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT.csv",
+      "role": "audit_tmm_trt_HI_vs_CTRL_tis-PLN_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b395dd41fd6bd3b9f7a7a2c1b43b6e858c9c480212653fc695335ae9c6fb6eab",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0046",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN.csv",
+      "role": "audit_tmm_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c03a98ff9c5d3a52b82c2aeab655204caa913c15f19617bb305139225c314eee",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0047",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT.csv",
+      "role": "audit_tmm_trt_HI_vs_CTRL_tis-SOL_line-LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3db4a2b28af71b29c2feaa6902b119fae0b43b05259ccd0d5c5468290818d31e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0048",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT.csv",
+      "role": "audit_tmm_trt_HI_vs_CTRL_tis-SOL_line-HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "47f9f897d27ef744a8a1012e89b8734280ebb4201a0e39df756692eab4e4037f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0049",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL.csv",
+      "role": "audit_tmm_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "db3a004b0dc6ae47d6cbdb989b3575811ed6983e374dade9f2f70d0b00d93e8f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0050",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-CTRL.csv",
+      "role": "audit_tmm_line_LRT_vs_HRT_tis-PLN_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "73c74736fa1b8428645466cca00a3bd4a85d16dfe63299d19998c3720d68fee1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0051",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_LRT_vs_HRT_tis-PLN_trt-HI.csv",
+      "role": "audit_tmm_line_LRT_vs_HRT_tis-PLN_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d8aa275ae2cbc139e8361454db405dfdbd0149d68bbe74d840a8ac5763aea3bc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0052",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-CTRL.csv",
+      "role": "audit_tmm_line_LRT_vs_HRT_tis-SOL_trt-CTRL",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b38d9a4e04cc7b63ef64789840e8c9d4c2442ebba638fd2ae302e1b76f10b578",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0053",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\DEG_results_line_LRT_vs_HRT_tis-SOL_trt-HI.csv",
+      "role": "audit_tmm_line_LRT_vs_HRT_tis-SOL_trt-HI",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3152a95c7b2cf977ba066ee3a20b1c8fb844446ce1608f9349b33a0d78467d82",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0054",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\audit_tmm\\audit_tmm_counts.json",
+      "role": "audit_tmm_counts",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "760cd1ea8ec39d6d3cd0ef6b90fe7c34b0a5ca64d591635e93b6be79986d83f8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0055",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_HIinLRT\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-LRT_GSEA_Hallmark.csv",
+      "role": "gsea_PLN_HIinLRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "48fc9205e3c25e8e5aa13b74398ecae542db7dcbf5a1d4fc8142c05d8cbeb0a4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0056",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_HIinHRT\\DEG_results_trt_HI_vs_CTRL_tis-PLN_line-HRT_GSEA_Hallmark.csv",
+      "role": "gsea_PLN_HIinHRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6e6c59d92acd97158100f5b70e1acb7e86b34f58329dcdc3181257806ad1c764",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0057",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\PLN_DELTA\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-PLN_GSEA_Hallmark.csv",
+      "role": "gsea_PLN_DELTA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3c77850677b388e2c7b499349257cb696fbc8c1a01e059403a64d99dbcd6813a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0058",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_HIinLRT\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-LRT_GSEA_Hallmark.csv",
+      "role": "gsea_SOL_HIinLRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "afd65e94623df8e53f8ed1e0ac856ed705f56df94b04cadbd8fd759d9677ea30",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0059",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_HIinHRT\\DEG_results_trt_HI_vs_CTRL_tis-SOL_line-HRT_GSEA_Hallmark.csv",
+      "role": "gsea_SOL_HIinHRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0933bd57b9c387eff0e273ff57ad43d9f916edc47e14ecdbd5de64646848c951",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0060",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\SOL_DELTA\\DEG_results_line_trt_LRT_HI_vs_HRT_CTRL_tis-SOL_GSEA_Hallmark.csv",
+      "role": "gsea_SOL_DELTA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fbbd8a458662f832b9deddcc7b4f65a244de482a459e85d9a8121929ec1352a9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0061",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\results\\gsea\\gsea_summary.json",
+      "role": "gsea_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "905b941fb6a3b17610febaa8250e76ea62479e5e9c6ea7e5b3464f27d690b415",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0062",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\reproduction_plan.json",
+      "role": "reproduction_plan",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a43dc5adab99eafe0b20578f076db08ba6c0adcccccdbd81237042a72c868dc3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0063",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35025912\\PMID35025912\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9f0c8c62be5de6466b740fe988c02a4b25b42d0db6305d82c93056457da5c2f4",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

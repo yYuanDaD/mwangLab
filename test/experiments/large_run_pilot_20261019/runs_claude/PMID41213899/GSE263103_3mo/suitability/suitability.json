@@ -1,0 +1,138 @@
+{
+  "case_id": "GSE263103_3mo",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "genotype"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "genotype"
+      ],
+      "levels": {
+        "genotype": {
+          "ko": 5,
+          "ctrl": 4
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(genotype)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 7,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "genotype_ko_vs_ctrl"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 9 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 9
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41213899\\GSE263103_3mo\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "genotype_ko_vs_ctrl",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "ko",
+      "reference": "ctrl",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "genotype": "ko"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "genotype": "ctrl"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

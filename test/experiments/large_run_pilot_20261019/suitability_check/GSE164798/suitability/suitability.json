@@ -1,0 +1,438 @@
+{
+  "case_id": "GSE164798",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "genotype",
+    "activity"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "genotype",
+        "activity"
+      ],
+      "levels": {
+        "genotype": {
+          "wt": 12,
+          "tg": 12
+        },
+        "activity": {
+          "sed": 8,
+          "chr": 8,
+          "acu": 8
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(genotype) + C(activity)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 20,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 24 samples.",
+      "metadata_sex_column": "characteristics_ch1.3.Sex",
+      "predicted": {
+        "male": 24
+      },
+      "mismatched": [],
+      "table": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\suitability_check\\GSE164798\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "genotype_tg_vs_wt_activity-acu",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "tg",
+      "reference": "wt",
+      "within": {
+        "activity": "acu"
+      },
+      "cells": [
+        {
+          "cell": {
+            "activity": "acu",
+            "genotype": "tg"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "activity": "acu",
+            "genotype": "wt"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_tg_vs_wt_activity-chr",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "tg",
+      "reference": "wt",
+      "within": {
+        "activity": "chr"
+      },
+      "cells": [
+        {
+          "cell": {
+            "activity": "chr",
+            "genotype": "tg"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "activity": "chr",
+            "genotype": "wt"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_tg_vs_wt_activity-sed",
+      "kind": "simple",
+      "factor": "genotype",
+      "test": "tg",
+      "reference": "wt",
+      "within": {
+        "activity": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "activity": "sed",
+            "genotype": "tg"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "activity": "sed",
+            "genotype": "wt"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_chr_vs_acu_genotype-tg",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "chr",
+      "reference": "acu",
+      "within": {
+        "genotype": "tg"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "acu"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_acu_vs_sed_genotype-tg",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "acu",
+      "reference": "sed",
+      "within": {
+        "genotype": "tg"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "acu"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_chr_vs_sed_genotype-tg",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "chr",
+      "reference": "sed",
+      "within": {
+        "genotype": "tg"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_chr_vs_acu_genotype-wt",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "chr",
+      "reference": "acu",
+      "within": {
+        "genotype": "wt"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "acu"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_acu_vs_sed_genotype-wt",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "acu",
+      "reference": "sed",
+      "within": {
+        "genotype": "wt"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "acu"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_chr_vs_sed_genotype-wt",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "chr",
+      "reference": "sed",
+      "within": {
+        "genotype": "wt"
+      },
+      "cells": [
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_activity_tg_acu_vs_wt_sed",
+      "kind": "interaction",
+      "factor": "genotype:activity",
+      "test": "tg:acu",
+      "reference": "wt:sed",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "acu"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "acu"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "sed"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "genotype_activity_tg_chr_vs_wt_sed",
+      "kind": "interaction",
+      "factor": "genotype:activity",
+      "test": "tg:chr",
+      "reference": "wt:sed",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "chr"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "tg",
+            "activity": "sed"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "genotype": "wt",
+            "activity": "sed"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

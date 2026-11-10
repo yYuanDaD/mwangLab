@@ -1,0 +1,6 @@
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[6]))
+import os; os.chdir(pathlib.Path(__file__).resolve().parents[6])
+from tools import native
+native.enable_native_mode()
+print(native.call_tool("tools.geo_tools:download_geo_data", geo_accession="GSE164798")[:1500])
+print(native.call_tool("tools.geo_tools:download_supplementary_files", geo_accession="GSE164798")[:1500])

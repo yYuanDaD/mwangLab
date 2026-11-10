@@ -64,7 +64,7 @@ Record `derived` (sources, regexes, mappings, levels) as evidence in the alignme
 Keep driver scripts in `output/<run_name>/scripts/` so they stay with the run, and start each with:
 
 ```python
-import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))  # repository root
+import sys, pathlib; sys.path.insert(0, str(next(p for p in pathlib.Path(__file__).resolve().parents if (p / "tools" / "native.py").exists())))  # repository root
 from tools import native
 ```
 
@@ -110,11 +110,13 @@ All executors read the aligned files. Raw-count executors require integer counts
 
 | Route | Call |
 |---|---|
-| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="")` |
-| limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="")` |
+| DESeq2, optional additive covariates or blocking | `run_deseq2_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, covariate_columns="", interaction_terms="", alpha=0.05)` (set `alpha` to the paper's FDR; R uses 0.1) |
+| limma, two arms, optional formula | `run_limma_analysis(normalized_csv, metadata_csv, design_column, control_group, treatment_group, output_dir, design_formula="", coefficient="", covariate_columns="", interaction_terms="", alpha=0.05)` (set `alpha` to the paper's FDR; R uses 0.1) |
 | edgeR, two arms, no covariates | `run_edger_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | limma-voom (needs R + limma) | `run_limma_voom_analysis(counts_csv, metadata_csv, design_column, control_group, treatment_group, output_dir)` |
 | one model, several levels / factorial / paired change | `tools.multigroup_tools:run_multigroup_analysis(expression_csv, metadata_csv, plan, output_dir)` (plain function; through `call_tool` a `PolicyViolation` becomes a `NativeToolError`) |
+| every comparison from one model (counts) | `tools.joint_contrasts:run_joint_deseq2(counts_csv, metadata_csv, comparisons, output_dir, covariates=())`: DESeq2 `~ covariates + cell` on all samples; `comparisons` from the suitability report (`rep["comparisons"]`) |
+| every comparison from one model (log scale) | `tools.joint_contrasts:run_joint_limma(expression_csv, metadata_csv, comparisons, output_dir, covariates=())`: limma `~ 0 + C(cell) + covariates` |
 | log2(CPM+1) for raw counts before limma | `preprocess_counts(counts_csv, output_dir)` → `*_normalized.csv` |
 | single-cell pseudobulk, native | `tools.scrna_tools:aggregate_pseudobulk(matrix_path, sample_col, celltype_col, condition_col, cell_metadata_path, min_cells, output_dir, report)` (plain function, returns a per-cell-type manifest), then a DE executor per cell type |
 | single-cell pseudobulk, one call | `run_scrna_pseudobulk_da(matrix_path, sample_col, celltype_col, condition_col, control_group, treatment_group, ..., paired=False)` |
@@ -124,7 +126,7 @@ All executors read the aligned files. Raw-count executors require integer counts
 | ORA | `run_enrichment_analysis(deg_csv, organism, padj_cutoff, log2fc_cutoff, ...)`; pass the applied cutoffs explicitly (the default `log2fc_cutoff=1.0` adds an effect cutoff) |
 | paper text | `tools.paper_tools:fetch_paper_text(pmcid=...)` (Europe PMC, needs network); otherwise read the paper file the user gave |
 
-Module paths for `call_tool`: `tools.deseq2_tools`, `tools.limma_tools`, `tools.edger_tools`, `tools.limma_voom_tools`, `tools.preprocess_tools`, `tools.multigroup_tools`, `tools.scrna_tools`, `tools.proteomics_tools`, `tools.methylation_tools`, `tools.enrichment_tools`, `tools.paper_tools`. Modality-specific details are in [Modalities](modalities.md).
+Module paths for `call_tool`: `tools.joint_contrasts`, `tools.deseq2_tools`, `tools.limma_tools`, `tools.edger_tools`, `tools.limma_voom_tools`, `tools.preprocess_tools`, `tools.multigroup_tools`, `tools.scrna_tools`, `tools.proteomics_tools`, `tools.methylation_tools`, `tools.enrichment_tools`, `tools.paper_tools`. Modality-specific details are in [Modalities](modalities.md).
 
 Blocking with DESeq2 or limma: pass the derived subject column in `covariate_columns`. The tool validates the design and fits `Treatment` plus the covariate; internally it renames covariates to safe names such as `Covariate0`. In the records, write the model with the derived names (for example `~ subject + time`) in `method.final.formula`, and the same subject name in `covariance.final.blocking_terms`. The validator checks that every required blocking term appears in the recorded formula.
 

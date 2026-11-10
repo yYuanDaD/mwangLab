@@ -1,0 +1,106 @@
+{
+  "paper_id": "PMID 39832562 / PMC11810837",
+  "accessions": [
+    "GSE283493"
+  ],
+  "accession_locator": "S2.9.p1 (DA.p1 says 'Data will be made available on request')",
+  "assay": "bulk polyA RNA-seq, HiSeq2500 50-nt SE, Salmon 1.4.0 to Ensembl rn6 (S2.9.p1, S2.9.p2)",
+  "organism": "Rattus norvegicus, male Sprague-Dawley (S2.1.p1)",
+  "sample_inclusion": "SAT (inguinal) and VAT (pararenal) from EAC, EAE, LAC, LAE rats, n=6 per group, P61, 24 h after last session (S2.9.p1, S2.5.p1)",
+  "sample_exclusion": "4 PCA outliers with a higher number of expressed genes: 2 SAT LAE, 1 VAT EAE, 1 VAT EAC (S2.9.p2); identities given only in Supplementary 4D (SUP8, PDF not available here)",
+  "factors": [
+    {
+      "name": "training",
+      "levels": [
+        "control",
+        "exercise"
+      ]
+    },
+    {
+      "name": "phase",
+      "levels": [
+        "EA (ZT13)",
+        "LA (ZT23)"
+      ]
+    },
+    {
+      "name": "tissue",
+      "levels": [
+        "SAT",
+        "VAT"
+      ]
+    }
+  ],
+  "primary_estimand": "Effect of forced-wheel exercise (vs handled cage control) on adipose transcriptome, separately by tissue and time of day; plus the phase-by-training interaction",
+  "planned_contrasts": [
+    {
+      "name": "SAT_EA: EAE vs EAC",
+      "test": "DESeq2 Wald, apeglm shrinkage",
+      "locator": "S2.9.p2"
+    },
+    {
+      "name": "SAT_LA: LAE vs LAC",
+      "test": "DESeq2 Wald, apeglm shrinkage",
+      "locator": "S2.9.p2"
+    },
+    {
+      "name": "VAT_EA: EAE vs EAC",
+      "test": "DESeq2 Wald, apeglm shrinkage",
+      "locator": "S2.9.p2"
+    },
+    {
+      "name": "VAT_LA: LAE vs LAC",
+      "test": "DESeq2 Wald, apeglm shrinkage",
+      "locator": "S2.9.p2"
+    },
+    {
+      "name": "phase:training interaction across tissues",
+      "test": "DESeq2 LRT: SVs + Tissue + Phase + Training + Phase:Training vs reduced without interaction",
+      "locator": "S2.9.p2"
+    }
+  ],
+  "reported_results": {
+    "wald_deg_counts": {
+      "SAT_EA": 7,
+      "SAT_LA": 353,
+      "VAT_EA": 2,
+      "VAT_LA": 14,
+      "locator": "S3.p1"
+    },
+    "lrt_deg_count": {
+      "n": 632,
+      "locator": "S3.p1; FIG1"
+    },
+    "gsea": "fgsea on shrunken log2FC, KEGG; only LAE-LAC enriched (energy, carbohydrate, lipid metabolism), EA none (S3.p1, FIG1 H)",
+    "direction_claims": "LAE up: cholesterol biosynthesis, glycerolipid synthesis, glycolysis, TCA/ETC, NADH shuttle; Cpt1a down in LAE (S3.1.p1-S3.4.p1, FIG2, FIG3)"
+  },
+  "repeated_measure_unit": "rat; SAT and VAT come from the same rats (S2.5.p1, S2.9.p1); within one tissue each rat contributes one sample",
+  "blocking_or_covariance": {
+    "status": "not_required within a tissue-by-phase Wald contrast; paper adds 2 surrogate variables (sva, top 3000 variable genes) to the models (S2.9.p2)"
+  },
+  "matrix_scale": "Salmon gene-level raw counts (S2.9.p2); GEO data_processing: 'Comma separated file with raw gene counts'",
+  "paper_method": "DESeq2 (Wald + apeglm; LRT for interaction) with 2 SVs",
+  "gene_filter": "genes removed if reads < 10 in fewer than 6 samples (S2.9.p2)",
+  "paper_threshold": {
+    "wald": {
+      "metric": "padj",
+      "adjustment": "not_reported (DESeq2 default BH assumed by executor)",
+      "cutoff": 0.1,
+      "effect_metric": "log2FC",
+      "effect_estimator": "apeglm-shrunken log2 fold change",
+      "effect_cutoff": 0.5,
+      "inclusive": false,
+      "source_locator": "S2.9.p2; S3.p1"
+    },
+    "lrt": {
+      "metric": "padj",
+      "adjustment": "not_reported",
+      "cutoff": 0.1,
+      "effect_metric": null,
+      "effect_cutoff": null,
+      "inclusive": false,
+      "source_locator": "S2.9.p2; FIG1"
+    }
+  },
+  "enrichment": "harmonic-mean p combination per KEGG pathway + Bonferroni; GSEA (fgsea) on shrunken log2FC with KEGG; Fisher ORA (clusterProfiler) on LRT genes (S2.9.p2)"
+}

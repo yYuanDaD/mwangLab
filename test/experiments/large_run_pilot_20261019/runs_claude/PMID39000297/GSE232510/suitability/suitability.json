@@ -1,0 +1,185 @@
+{
+  "case_id": "GSE232510",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "HFR": 4,
+          "CS": 3,
+          "HFS": 3
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 7,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 3,
+      "n_analyzable": 3,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_HFS_vs_CS",
+        "grp_HFR_vs_CS"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 10 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "unknown": 10
+      },
+      "mismatched": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39000297\\GSE232510\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_HFR_vs_CS",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HFR",
+      "reference": "CS",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "HFR"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "grp": "CS"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HFS_vs_CS",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HFS",
+      "reference": "CS",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "HFS"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "grp": "CS"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HFS_vs_HFR",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HFS",
+      "reference": "HFR",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "HFS"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "grp": "HFR"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+{
+ "run_dir": "E:\\agent\\mwangLab_tokens\\test\\experiments\\case_runner_validation_20261028\\runs\\PMID41787055",
+ "decision_maker": "validation: decisions copied from the 2026-10 large run",
+ "request": "Re-run PMID41787055 through tools/case_runner.py with its recorded decisions",
+ "platform": "case_runner_validation",
+ "cases": [
+  {
+   "case_id": "GSE293221",
+   "accession": "GSE293221",
+   "inputs": {
+    "paper": [
+     "E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC13076624.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/data/GSE293221/GSE293221_metadata.csv",
+    "raw_tar": true
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "paper_id": "PMID41787055 / PMC13076624 / doi:10.1038/s41598-026-42892-3",
+      "accessions": [
+       "GSE293221"
+      ],
+      "assay": "bulk RNA-seq of prostate tumor tissue, HiSeq 3000 50 bp SE, TopHat (mm9) + HTSeq-count (S4.6.p1, S4.7.p1, DA.p1)",
+      "organism": "Mus musculus (male TRAMP, C57BL/6)",
+      "sample_inclusion": "tumors from 3 representative animals per group (control, exercise, Phellodendron amurense extract) (S2.2.p1, S4.6.p1)",
+      "sample_exclusion": "one exercise mouse died in week 8 (excluded from the study, S2.1.p1); selection rule for the 3 sequenced 'representative' tumors not reported",
+      "factors": [
+       {
+        "name": "intervention",
+        "levels": [
+         "control (group housed, AIN-93, no wheel)",
+         "exercise (single housed, voluntary wheel running, 12 wk)",
+         "Phellodendron amurense extract (PhAm/Nexrutine, 600 mg/kg in AIN-93 diet, group housed)"
+        ]
+       }
+      ],
+      "primary_estimand": "effect of 12-week voluntary wheel running on prostate tumor gene expression, exercise vs control (S2.2.p1); secondary paper contrast PhAm vs control (S2.2.p2)",
+      "planned_contrasts": [
+       "exercise vs control (S2.2.p1; paper: 32 DEGs)",
+       "PhAm vs control (S2.2.p2; paper: 176 DEGs, 76 up / 100 down)"
+      ],
+      "blocking_or_covariance": {
+       "status": "not_required",
+       "note": "independent animals, one tumor each; no batch reported"
+      },
+      "repeated_measure_unit": "none",
+      "matrix_scale": "HTSeq raw read counts per gene (S4.7.p1)",
+      "normalization": "DESeq normalization (S4.7.p1)",
+      "paper_method": "R package DESeq, group-pairwise differential expression (S4.7.p1)",
+      "paper_formula": "pairwise two-group comparison (not_reported beyond 'group-pairwise')",
+      "paper_threshold": {
+       "metric": "FDR",
+       "adjustment": "FDR (method not named; executor applies BH)",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625007211562,
+       "effect_cutoff_original": "fold change > 1.5 (either way)",
+       "inclusive": false,
+       "expression_filter": "at least one sample type with mean RPKM > 1",
+       "source_locator": "S4.7.p1",
+       "also_stated": "ABS.p1 '>= 1.5-fold change, adjusted p < 0.05'; S2.2.p1 'adj p < 0.05 and +/-1.5-fold'"
+      },
+      "paper_results": {
+       "exercise_vs_control": 32,
+       "PhAm_vs_control": {
+        "total": 176,
+        "up": 76,
+        "down": 100
+       },
+       "overlap": "2 genes (Bb123696, Lman1l), up in both (S2.2.p3)"
+      },
+      "pathway_analysis": "GO biological process / molecular function and gene-set enrichment of DEGs (FIG3C-D, FIG4C-D); tool not named"
+     },
+     "reasoning": "S4.2.p1 randomizes male TRAMP mice to control, exercise (wheel) and PhAm diet for 12 weeks; S4.6.p1 sequences 3 tumors per group; S4.7.p1 gives HTSeq counts, DESeq group-pairwise tests, RPKM>1 + FDR<0.05 + FC>1.5. S2.2.p1 reports 32 exercise-vs-control DEGs; DA.p1 names GSE293221.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S4.7.p1"
+    },
+    "ownership": {
+     "final": {
+      "accession": "GSE293221",
+      "matrix_file": "GSE293221_RAW.tar -> 9 GSM*_Genes_ReadCount.txt.gz (HTSeq-count), merged to aligned/merged_counts.csv",
+      "metadata_file": "GSE293221_metadata.csv",
+      "owned": true,
+      "checks": {
+       "series_id": [
+        "GSE293221"
+       ],
+       "n_gsm": 9,
+       "groups": {
+        "Control": 3,
+        "Exercise": 3,
+        "Nexrutine": 3
+       },
+       "organism": [
+        "Mus musculus"
+       ],
+       "tissue": [
+        "prostate tumor tissue"
+       ],
+       "per_sample_files": [
+        "GSM8878836_Sample_DP_MT_013_Genes_ReadCount.txt.gz",
+        "GSM8878837_Sample_DP_MT_014_Genes_ReadCount.txt.gz",
+        "GSM8878838_Sample_DP_MT_017_Genes_ReadCount.txt.gz",
+        "GSM8878839_Sample_DP_MT_001_Genes_ReadCount.txt.gz",
+        "GSM8878840_Sample_DP_MT_002_Genes_ReadCount.txt.gz",
+        "GSM8878841_Sample_DP_MT_004_Genes_ReadCount.txt.gz",
+        "GSM8878842_Sample_DP_MT_012_Genes_ReadCount.txt.gz",
+        "GSM8878843_Sample_DP_MT_022_Genes_ReadCount.txt.gz",
+        "GSM8878844_Sample_DP_MT_23b_Genes_ReadCount.txt.gz"
+       ],
+       "data_processing": "TopHat v2.0.8 to mm9, HTSeq-count (matches S4.7.p1)"
+      }
+     },
+     "reasoning": "DA.p1 names GSE293221; 9 GSMs = Control/Exercise/Nexrutine x 3 from TRAMP prostate tumor, TopHat+HTSeq, as in S4.6.p1 and S4.7.p1.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "DA.p1"
+    },
+    "alignment": {
+     "final": {},
+     "reasoning": "Each per-sample file name starts with its GSM id, which equals the metadata index; exact alignment, 9/9. grp derived from title and checked against the treatment characteristic.",
+     "confidence": "high",
+     "candidates": [],
+     "patterns": {
+      "grp": [
+       "title",
+       "^(Control|Exercise|Nexrutine), rep\\d$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Control": "CON",
+       "Exercise": "EX",
+       "Nexrutine": "PHAM"
+      }
+     }
+    },
+    "matrix": {
+     "final": {},
+     "reasoning": "Non-negative integers from HTSeq-count with __no_feature/__ambiguous summary rows; matches the paper's DESeq input.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S4.7.p1",
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2"
+    },
+    "design": {
+     "final": {
+      "analysis_type": "one factor, three levels (control reference); paper ran group-pairwise two-arm tests",
+      "design_column": "grp",
+      "control": "CON",
+      "treatment": "EX",
+      "contrasts": [
+       {
+        "name": "grp_EX_vs_CON",
+        "control": "CON",
+        "treatment": "EX",
+        "role": "primary (request + S2.2.p1)",
+        "route": "paper_aligned (pairwise, as paper)"
+       },
+       {
+        "name": "grp_PHAM_vs_CON",
+        "control": "CON",
+        "treatment": "PHAM",
+        "role": "paper's second planned contrast (S2.2.p2); not an exercise effect",
+        "route": "paper_aligned (pairwise, as paper)"
+       },
+       {
+        "name": "grp_PHAM_vs_EX",
+        "control": "EX",
+        "treatment": "PHAM",
+        "role": "exploratory, not in paper",
+        "route": "exploratory (joint model only)"
+       }
+      ],
+      "estimand_type": "causal (randomized, S4.2.p1)",
+      "sex_check": "all 9 predicted male from X/Y genes; paper: male TRAMP mice",
+      "sensitivity": "all three comparisons also extracted from one DESeq2 model ~ grp on all 9 samples (tools.joint_contrasts), labelled sensitivity/exploratory"
+     },
+     "reasoning": "Randomized 3-arm design (S4.2.p1); the request is the exercise effect, which the paper estimates as exercise vs control (S2.2.p1). PhAm vs control is the paper's other planned contrast. Suitability: analyzable, 3 per arm, all male.",
+     "confidence": "high",
+     "candidates": [
+      {
+       "value": "pool PHAM with CON as 'non-exercise'",
+       "reason_rejected": "pools a distinct active intervention; paper compares each arm to control"
+      },
+      {
+       "value": "only joint 3-group model for planned contrasts",
+       "reason_rejected": "paper states group-pairwise DESeq tests (S4.7.p1); joint model kept as sensitivity"
+      }
+     ],
+     "locator": "S2.2.p1",
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "CON"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_EX_vs_CON",
+      "grp_PHAM_vs_CON"
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "housing (single with wheel vs group housed)",
+        "disposition": "excluded: inseparable component of the paper's exercise arm (S4.2.p1, S4.3.p1), not a recorded metadata column; interpretation caveat"
+       },
+       {
+        "name": "description (library name)",
+        "disposition": "excluded: unique per sample, identifier only"
+       },
+       {
+        "name": "batch / sequencing run",
+        "disposition": "excluded: not reported in paper or GEO"
+       },
+       {
+        "name": "sex",
+        "disposition": "excluded: single level (male)"
+       }
+      ]
+     },
+     "reasoning": "Independent animals, one tumor each, randomized; no batch, subject, or pairing structure recorded. Single housing of the exercise mice is part of the intervention and cannot be separated.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S4.2.p1",
+     "confounding_candidates": [
+      "description"
+     ]
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald test), two-arm fits per planned contrast",
+      "matrix_type": "raw counts",
+      "formula": "~ grp (two arms per fit); sensitivity: ~ grp on all 9 samples",
+      "alpha": 0.05,
+      "paper_route": {
+       "method": "R DESeq (original package), group-pairwise, after mean RPKM > 1 filter",
+       "status": "blocked",
+       "reason": "original DESeq is not installed (pydeseq2 implements DESeq2); RPKM filter needs gene lengths for the mm9 annotation, which are not deposited"
+      },
+      "deviations": [
+       "DESeq2 dispersion shrinkage and Wald test instead of DESeq negative-binomial exact test",
+       "RPKM > 1 pre-filter not applied; DESeq2 independent filtering only"
+      ]
+     },
+     "reasoning": "Raw HTSeq counts support the DESeq family. The closest available executor is DESeq2 two-arm, matching the paper's pairwise approach.",
+     "confidence": "medium",
+     "candidates": [],
+     "locator": "S4.7.p1"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625007211562,
+       "effect_cutoff_original": "fold change > 1.5 (either way)",
+       "inclusive": false,
+       "expression_filter": "mean RPKM > 1 in at least one group",
+       "source_locator": "S4.7.p1"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625007211562,
+       "inclusive": false
+      },
+      "deviation_note": "paper FDR method not named (BH applied by executor); RPKM > 1 pre-filter not applied (no gene lengths)",
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null,
+       "label": "audit: BH padj < 0.05 without fold-change rule"
+      }
+     },
+     "reasoning": "S4.7.p1: FDR < 0.05 and fold change > 1.5 either way; log2(1.5) = 0.5849625.",
+     "confidence": "high",
+     "candidates": [],
+     "locator": "S4.7.p1"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "deviation": "DESeq2 (pydeseq2) instead of original DESeq; RPKM > 1 filter not applied",
+      "joint_sensitivity": {
+       "grp_EX_vs_CON": 32,
+       "grp_PHAM_vs_CON": 3694,
+       "grp_PHAM_vs_EX": 2467
+      },
+      "paper_counts": {
+       "grp_EX_vs_CON": 32,
+       "grp_PHAM_vs_CON": 176
+      },
+      "overlap_EX_PHAM": [
+       "2610203C20Rik",
+       "2810417H13Rik",
+       "4930503L19Rik",
+       "5330417C22Rik",
+       "5430419D17Rik",
+       "A3galt2",
+       "AW011738",
+       "Ache",
+       "Acrbp",
+       "Adamts20",
+       "Adamts9",
+       "Aff3",
+       "Agpat3",
+       "Ank2",
+       "Ankrd29",
+       "Aspm",
+       "Asrgl1",
+       "Btg1",
+       "C2cd4a",
+       "C630004H02Rik",
+       "Cacna1a",
+       "Cad",
+       "Casc4",
+       "Cdh8",
+       "Cib4",
+       "Cited2",
+       "Clip2",
+       "Col11a1",
+       "Col2a1",
+       "Cpxm2",
+       "Dchs1",
+       "Dclk1",
+       "Dclk3",
+       "Disp2",
+       "Dner",
+       "Dpysl2",
+       "Edem2",
+       "Elovl5",
+       "Esm1",
+       "Exph5",
+       "Eya1",
+       "Fam174b",
+       "Fam38b",
+       "Fam64a",
+       "Fat3",
+       "Fat4",
+       "Fxyd6",
+       "Gchfr",
+       "Gm13889",
+       "Gne",
+       "Gng2",
+       "Gpc1",
+       "Gpm6b",
+       "Grhl1",
+       "Gucy1a2",
+       "Hist1h3b",
+       "Hist1h3d",
+       "Hlf",
+       "Hmgb2",
+       "Hunk",
+       "Igj",
+       "Igsf3",
+       "Irf7",
+       "Kcnk3",
+       "Kif11",
+       "Kif23",
+       "Kif3c",
+       "Klf12",
+       "Klhdc7a",
+       "Klhl23",
+       "L1cam",
+       "Man2b2",
+       "Mdk",
+       "Myo9a",
+       "Ncam1",
+       "Ncapg",
+       "Nfil3",
+       "Nnat",
+       "Nr2f1",
+       "Nsg2",
+       "Pak3",
+       "Pcyt1b",
+       "Pgap2",
+       "Pigr",
+       "Pip4k2a",
+       "Prnd",
+       "Prtn3",
+       "Ptn",
+       "Rab3d",
+       "Racgap1",
+       "Rad54l",
+       "Rapgef4",
+       "Rgs12",
+       "Rhobtb3",
+       "Rmst",
+       "Rnf157",
+       "Robo2",
+       "Rspo3",
+       "Samd14",
+       "Satb1",
+       "Scand1",
+       "Scap",
+       "Scn3a",
+       "Sestd1",
+       "Sgcb",
+       "Shisa5",
+       "Slc19a2",
+       "Slc1a1",
+       "Slc45a3",
+       "Slc6a6",
+       "Slc9a2",
+       "Socs2",
+       "Sorcs2",
+       "Spag5",
+       "Spdef",
+       "Sphkap",
+       "Srcin1",
+       "Srgap3",
+       "St8sia2",
+       "Stk32a",
+       "Syt9",
+       "Tagap",
+       "Tor3a",
+       "Vash1",
+       "Wfdc3",
+       "Zfhx4",
+       "Zfp354c",
+       "Zfp532"
+      ],
+      "caveat": "exercise mice were singly housed; housing cannot be separated from wheel running"
+     },
+     "reasoning": "Planned paper contrasts ran on the closest available executor with the paper threshold.",
+     "confidence": "medium",
+     "candidates": [],
+     "locator": "S2.2.p1",
+     "paper_counts": {
+      "grp_EX_vs_CON": 32,
+      "grp_PHAM_vs_CON": 176,
+      "joint/grp_EX_vs_CON": 32,
+      "joint/grp_PHAM_vs_CON": 176
+     },
+     "paper_genes": {
+      "grp_EX_vs_CON": [
+       "Lipe",
+       "Plin1",
+       "Slc7a10",
+       "Dgat2l6",
+       "Lman1l",
+       "Bb123696"
+      ]
+     }
+    }
+   },
+   "executions": [
+    {
+     "name": "grp_EX_vs_CON",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "role": "primary",
+     "args": {
+      "design_column": "grp",
+      "control_group": "CON",
+      "treatment_group": "EX",
+      "alpha": 0.05
+     },
+     "reasoning": "EX vs CON, two-arm DESeq2 as the paper's group-pairwise tests"
+    },
+    {
+     "name": "grp_PHAM_vs_CON",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "role": "secondary",
+     "args": {
+      "design_column": "grp",
+      "control_group": "CON",
+      "treatment_group": "PHAM",
+      "alpha": 0.05
+     },
+     "reasoning": "PHAM vs CON, two-arm DESeq2 as the paper's group-pairwise tests"
+    },
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all"
+     },
+     "role": "sensitivity",
+     "reasoning": "one DESeq2 model ~ grp on all 9 samples"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "grp_EX_vs_CON",
+     "reasoning": "paper reports GO and gene-set enrichment (FIG3C-D)"
+    }
+   ]
+  }
+ ]
+}

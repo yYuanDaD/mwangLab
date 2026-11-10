@@ -1,0 +1,271 @@
+{
+  "case_id": "PMID42277794",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "ex",
+    "exo"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "ex",
+        "exo"
+      ],
+      "levels": {
+        "ex": {
+          "SED": 6,
+          "EXT": 6
+        },
+        "exo": {
+          "ctrl": 6,
+          "exo": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(ex) + C(exo)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "ex_EXT_vs_SED_exo-ctrl",
+        "ex_EXT_vs_SED_exo-exo",
+        "exo_exo_vs_ctrl_ex-SED"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42277794\\PMID42277794\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "ex_EXT_vs_SED_exo-ctrl",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EXT",
+      "reference": "SED",
+      "within": {
+        "exo": "ctrl"
+      },
+      "cells": [
+        {
+          "cell": {
+            "exo": "ctrl",
+            "ex": "EXT"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "exo": "ctrl",
+            "ex": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_EXT_vs_SED_exo-exo",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EXT",
+      "reference": "SED",
+      "within": {
+        "exo": "exo"
+      },
+      "cells": [
+        {
+          "cell": {
+            "exo": "exo",
+            "ex": "EXT"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "exo": "exo",
+            "ex": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "exo_exo_vs_ctrl_ex-EXT",
+      "kind": "simple",
+      "factor": "exo",
+      "test": "exo",
+      "reference": "ctrl",
+      "within": {
+        "ex": "EXT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "EXT",
+            "exo": "exo"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "EXT",
+            "exo": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "exo_exo_vs_ctrl_ex-SED",
+      "kind": "simple",
+      "factor": "exo",
+      "test": "exo",
+      "reference": "ctrl",
+      "within": {
+        "ex": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "SED",
+            "exo": "exo"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "exo": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_exo_EXT_exo_vs_SED_ctrl",
+      "kind": "interaction",
+      "factor": "ex:exo",
+      "test": "EXT:exo",
+      "reference": "SED:ctrl",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "ex": "EXT",
+            "exo": "exo"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "exo": "exo"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "EXT",
+            "exo": "ctrl"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "exo": "ctrl"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

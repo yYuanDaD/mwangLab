@@ -1,0 +1,274 @@
+{
+  "case_id": "GSE183150",
+  "verdict": "not_analyzable",
+  "failed": [
+    "covariance"
+  ],
+  "warnings": [],
+  "factors": [
+    "grp",
+    "visit"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp",
+        "visit"
+      ],
+      "levels": {
+        "grp": {
+          "ex": 18,
+          "uc": 12
+        },
+        "visit": {
+          "base": 15,
+          "eos": 15
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "fail",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "lane_gsms",
+          "decision": "omit",
+          "reason": "sample_identifier: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp) + C(visit) + C(subject)",
+        "rank": 16,
+        "full_rank": false,
+        "residual_df": 14,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_visit_ex_eos_vs_uc_base"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 25,
+        "male": 5
+      },
+      "mismatched": [],
+      "table": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37724990\\GSE183150\\suitability\\library_counts_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "grp_ex_vs_uc__sex-female_visit-base",
+            "grp_ex_vs_uc__sex-female_visit-eos",
+            "visit_eos_vs_base__sex-female_grp-ex",
+            "visit_eos_vs_base__sex-female_grp-uc",
+            "grp_visit_ex_eos_vs_uc_base__sex-female"
+          ],
+          "male": []
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_ex_vs_uc_visit-base",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "ex",
+      "reference": "uc",
+      "within": {
+        "visit": "base"
+      },
+      "cells": [
+        {
+          "cell": {
+            "visit": "base",
+            "grp": "ex"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "visit": "base",
+            "grp": "uc"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_ex_vs_uc_visit-eos",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "ex",
+      "reference": "uc",
+      "within": {
+        "visit": "eos"
+      },
+      "cells": [
+        {
+          "cell": {
+            "visit": "eos",
+            "grp": "ex"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "visit": "eos",
+            "grp": "uc"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "visit_eos_vs_base_grp-ex",
+      "kind": "simple",
+      "factor": "visit",
+      "test": "eos",
+      "reference": "base",
+      "within": {
+        "grp": "ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "ex",
+            "visit": "eos"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "grp": "ex",
+            "visit": "base"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "visit_eos_vs_base_grp-uc",
+      "kind": "simple",
+      "factor": "visit",
+      "test": "eos",
+      "reference": "base",
+      "within": {
+        "grp": "uc"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "uc",
+            "visit": "eos"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "uc",
+            "visit": "base"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_visit_ex_eos_vs_uc_base",
+      "kind": "interaction",
+      "factor": "grp:visit",
+      "test": "ex:eos",
+      "reference": "uc:base",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "ex",
+            "visit": "eos"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "grp": "uc",
+            "visit": "eos"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "grp": "ex",
+            "visit": "base"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "grp": "uc",
+            "visit": "base"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

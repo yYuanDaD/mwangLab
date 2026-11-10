@@ -1,0 +1,187 @@
+{
+  "case_id": "GSE293221",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "CON": 3,
+          "EX": 3,
+          "PHAM": 3
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 6,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 3,
+      "n_analyzable": 3,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_EX_vs_CON",
+        "grp_PHAM_vs_CON"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 9 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 9
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "E:\\agent\\mwangLab_tokens\\test\\experiments\\case_runner_validation_20261028\\runs\\PMID41787055\\GSE293221\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_EX_vs_CON",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "EX",
+      "reference": "CON",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "EX"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "grp": "CON"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_PHAM_vs_CON",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "PHAM",
+      "reference": "CON",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "PHAM"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "grp": "CON"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_PHAM_vs_EX",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "PHAM",
+      "reference": "EX",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "PHAM"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "grp": "EX"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

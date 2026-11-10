@@ -1,0 +1,80 @@
+{
+  "paper_id": "PMID40650303 / PMC12249896",
+  "accessions": [
+    "GSE298775"
+  ],
+  "accession_locator": "DA.p1",
+  "assay": "bulk poly-A RNA-seq (Illumina Stranded mRNA), NextSeq 2000 PE100; Salmon 1.10.2 -> tximport gene level (S4.5.p1, S4.6.p1)",
+  "sample_inclusion": [
+    "male Wistar rats, 2x2 between-animal design: saline/monocrotaline (CC) x sedentary/4-week aerobic treadmill training (S4.1.p1, S4.2.p1)",
+    "RNA-seq on left medial gastrocnemius of six animals per group -> 24 libraries (S4.5.p1)"
+  ],
+  "sample_exclusion": [
+    "which 6 of 9-12 animals per group were sequenced is not reported (S4.5.p1)"
+  ],
+  "factors": [
+    {
+      "name": "dis",
+      "levels": [
+        "Ctl (saline)",
+        "CC (monocrotaline 60 mg/kg)"
+      ],
+      "locator": "S4.1.p1"
+    },
+    {
+      "name": "ex",
+      "levels": [
+        "Sed",
+        "Ex (treadmill 30 min ~55% max, 5x/wk, 4 wk)"
+      ],
+      "locator": "S4.2.p1"
+    }
+  ],
+  "primary_estimand": "Cardiac-cachexia (monocrotaline) effect on the gastrocnemius transcriptome within sedentary (CC-Sed vs Sed) and within trained (CC-Ex vs Ex) rats; the paper infers that aerobic training attenuates the CC signature by comparing the two (S2.2.p1-p2, ABS). The training effect itself (Ex vs Sed, CC-Ex vs CC-Sed) and the disease x training interaction were not tested in the paper.",
+  "planned_contrasts": [
+    {
+      "name": "CC_in_Sed",
+      "definition": "CC-Sed vs Sed (reference Sed)",
+      "locator": "S2.2.p1"
+    },
+    {
+      "name": "CC_in_Ex",
+      "definition": "CC-Ex vs Ex (reference Ex)",
+      "locator": "S2.2.p1"
+    }
+  ],
+  "exploratory_contrasts": [
+    "Ex vs Sed within saline",
+    "CC-Ex vs CC-Sed within CC",
+    "interaction (CC-Ex - CC-Sed) - (Ex - Sed)"
+  ],
+  "blocking_or_covariance": {
+    "status": "not_required",
+    "note": "one muscle sample per animal, independent groups"
+  },
+  "matrix_scale": "Salmon/tximport gene-level counts, deposited as integer 'Raw counts of Salmon mapped reads' (GEO)",
+  "paper_method": "DESeq2 v1.44.0 (S4.6.p2); model/fit structure (one 4-group fit vs pairwise) not reported",
+  "paper_formula": "not_reported",
+  "paper_threshold": {
+    "metric": "padj",
+    "adjustment": "BH",
+    "cutoff": 0.05,
+    "inclusive": false,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "effect_inclusive": true,
+    "effect_cutoff_original": "log2 fold-change magnitude of 1 or greater (|log2FC| >= 1)",
+    "source_locator": "S4.6.p2",
+    "note": "'BH corrected, Wilcoxon p-test' in S4.6.p2; DESeq2 uses a Wald test, the Wilcoxon wording is unexplained"
+  },
+  "reported_counts": {
+    "CC_in_Sed": "145 DEGs: 131 up, 14 down (S2.2.p2); abstract says 114 (ABS.p1)",
+    "CC_in_Ex": "18 DEGs: 16 up, 2 down (S2.2.p2, ABS.p1)",
+    "overlap": "13 shared DEGs, gas transport (S2.2.p2, TAB2)",
+    "top_genes": "CC-Sed up Tnnc1, Tpm3, Tnni1, Myl3, Nr4a3; CC-Ex up Hbb, Hba-a1, Hba-a3, Aqp4, Prodh; CC-Ex down Nrip3, Egr1 (S2.2.p3)"
+  },
+  "enrichment": {
+    "method": "clusterProfiler GO and KEGG ORA on DEGs, padj<0.05 BH (S4.6.p2)",
+    "locator": "S2.3"
+  }
+}

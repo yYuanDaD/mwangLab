@@ -1,0 +1,1155 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41314005",
+  "subject_id": "GSE308674",
+  "created_at": "2026-10-20T02:18:43",
+  "finished_at": "2026-10-20T02:25:54",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12702345.paper.json",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12702345.paper.json",
+      "locator": null,
+      "captured_at": "2026-10-20T02:18:43",
+      "sha256": null,
+      "attributes": {
+        "sha256": "46c1f7accb4ac8e65ccbbf9046289501d1fb71b1c113a38b88258f3c54ae64e5",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC12702345.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC12702345.paper.md",
+      "locator": null,
+      "captured_at": "2026-10-20T02:18:43",
+      "sha256": null,
+      "attributes": {
+        "sha256": "b870a51a915ed6475922770d90dd1216eb14545871f604ec62b4cdc078cf711d",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE308674_metadata.csv",
+      "uri": "data\\GSE308674\\GSE308674_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-10-20T02:18:43",
+      "sha256": null,
+      "attributes": {
+        "sha256": "aa3d3edb010cbb9f1a68c139db4ddffc5f265bfaef3706766197c1ffa074005c",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE308674_gene_counts.csv.gz",
+      "uri": "data\\GSE308674\\GSE308674_gene_counts.csv.gz",
+      "locator": null,
+      "captured_at": "2026-10-20T02:18:43",
+      "sha256": null,
+      "attributes": {
+        "sha256": "451426b06b3ed88ffb5b1880cb38e51a682930e85209e4290325c294f69f80bb",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE308674"
+        ],
+        "primary_estimand": "Chronic (6-week) effect of HIIT on gastrocnemius gene expression vs PBS Control, 48 h after the last session (H vs C); companion estimands L vs C, M vs C, HM vs C (each vs Control)",
+        "planned_contrasts": [
+          "H_vs_C",
+          "HM_vs_C",
+          "L_vs_C",
+          "M_vs_C"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "source_locator": "S2.7.1.p1"
+        },
+        "paper_method": "DESeq2, Wald test, one model on all groups",
+        "paper_formula": "~ Batch + Grouping, Control reference",
+        "assay": "bulk RNA-seq, QuantSeq 3' mRNA-Seq FWD v2, UMI-deduplicated, STAR GRCm39, featureCounts (S2.7.1.p1)",
+        "matrix_scale": "raw featureCounts gene counts (S2.7.1.p1; GEO data_processing 'values = raw integer counts')"
+      },
+      "reason": "Methods S2.7.1.p1 give DESeq2 ~ Batch + Grouping with Control reference, Wald pairwise contrasts L/H/M/HM vs C, BH FDR < 0.05 and |log2FC| > 0.5. S2.2.p1 defines 5 independent groups (no repeated measures). S10.p1 lists three deposits; GSE308674 is the mRNA-seq one (GEO library_strategy RNA-Seq, QuantSeq protocol). The exercise estimand is H vs C; HM vs C, L vs C and M vs C are the paper's other planned contrasts and are kept as separate contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:43"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "accession": "GSE308674",
+        "matrix_file": "data/GSE308674/GSE308674_gene_counts.csv.gz",
+        "metadata_file": "data/GSE308674/GSE308674_metadata.csv",
+        "owned": true,
+        "checks": {
+          "series_id": "GSE308674 in metadata",
+          "data_availability": "S10.p1 lists GSE308674",
+          "samples": "28 RNA-seq gastrocnemius, male BALB/c; treatment levels PBS/Lactate/HIIT/MCT1/2 inhibitor/HIIT+MCT1/2 inhibitor = paper's 5 groups (S2.2.p1)",
+          "group_sizes": "C=4, L=6, H=6, M=6, HM=6, within paper's n = 4-6 (S2.7.1.p1)",
+          "protocol": "QuantSeq 3' FWD v2, NovaSeq X Plus SE75, UMI, STAR GRCm39 - matches S2.7.1.p1",
+          "contact": "Zsolt Radak, Research Center for Molecular Exercise Science (S2.1.p1 institution)"
+        },
+        "matrix_integrity_issue": "6 genes (Dst, Neb, Ttn, Syne1, Mycbp2, Huwe1) were split across continuation rows by a 32,767-character cell limit in the annotation columns; repaired deterministically (see repair_log.json)",
+        "matrix_used": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\case_GSE308674_repair\\GSE308674_gene_counts_repaired.csv"
+      },
+      "reason": "Series ID, sample count, groups, tissue, sex, strain, and library protocol all match the paper. The deposited CSV has six long genes whose featureCounts annotation strings overflowed a spreadsheet cell limit; their Length + 28 counts were reattached by scripts/repair_counts.py without changing any value.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0001",
+        "ART-0002",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:43"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:count_col",
+        "n_aligned": 28,
+        "n_metadata": 28,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "derived_columns": {
+          "batch": {
+            "alias_of": "characteristics_ch1.4.batch"
+          },
+          "count_col": {
+            "source": "description",
+            "regex": "Column name in gene_counts\\.csv: (\\S+)$"
+          },
+          "grp": {
+            "source": "characteristics_ch1.3.treatment",
+            "regex": "^(.+)$",
+            "recode": {
+              "PBS injection": "C",
+              "Lactate administration": "L",
+              "HIIT": "H",
+              "MCT1/2 inhibitor": "M",
+              "HIIT+MCT1/2 inhibitor": "HM"
+            }
+          }
+        },
+        "levels": {
+          "grp": {
+            "M": 6,
+            "HM": 6,
+            "L": 6,
+            "H": 6,
+            "C": 4
+          },
+          "batch": {
+            "batch1": 25,
+            "batch2": 3
+          },
+          "count_col": "28 unique"
+        }
+      },
+      "reason": "GEO 'description' states the gene_counts.csv column name of each GSM; extracted it as count_col by regex and aligned exactly (28/28). grp recoded from characteristics treatment (PBS injection = C, the paper's Control); batch copied from characteristics batch.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "ART-0002",
+        "SRC-0003",
+        "ART-0004",
+        "ART-0005",
+        "ART-0006",
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:45"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "integer_fraction": 1.0,
+        "min": 0.0,
+        "max": 36285.0,
+        "missing_values": 0,
+        "duplicated_feature_ids": 0,
+        "feature_ids": "MGI gene symbols / NCBI LOC ids (featureCounts Geneid, GRCm39 RefSeq annotation)",
+        "paper_input": "raw featureCounts counts (S2.7.1.p1)"
+      },
+      "reason": "All values non-negative integers (integer_fraction 1.0, no missing after repair, no duplicated IDs). GEO data_processing states 'values = raw integer counts' from featureCounts on UMI-deduplicated BAMs; paper imports raw counts into DESeq2. UMI-dedup counts are genuine integer counts, not estimated counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0008",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:46"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel (one factor, 5 independent groups, planned treatment-vs-Control contrasts)",
+        "design_column": "grp",
+        "formula": "~ batch + grp",
+        "control": "C",
+        "treatment": [
+          "H",
+          "HM",
+          "L",
+          "M"
+        ],
+        "contrasts": [
+          {
+            "name": "H_vs_C",
+            "control": "C",
+            "treatment": "H",
+            "description": "HIIT vs Control (primary exercise effect)"
+          },
+          {
+            "name": "HM_vs_C",
+            "control": "C",
+            "treatment": "HM",
+            "description": "HIIT+MCT1/2 inhibitor vs Control"
+          },
+          {
+            "name": "L_vs_C",
+            "control": "C",
+            "treatment": "L",
+            "description": "Lactate vs Control"
+          },
+          {
+            "name": "M_vs_C",
+            "control": "C",
+            "treatment": "M",
+            "description": "MCT1/2 inhibitor vs Control"
+          }
+        ],
+        "primary_contrast": "H_vs_C",
+        "estimand_type": "causal (randomised intervention)",
+        "levels": {
+          "M": 6,
+          "HM": 6,
+          "L": 6,
+          "H": 6,
+          "C": 4
+        }
+      },
+      "reason": "Five randomised, independent groups with Control as reference; the paper fits Wald contrasts L/H/M/HM vs C. Control n=4, others n=6; every arm replicated.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007",
+        "ART-0009",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:46"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "batch",
+            "disposition": "included (H_vs_C, the only contrast in which batch varies: H batch1=3, batch2=3; C all batch1); constant within the L/M/HM vs C sample subsets, so not estimable there and dropped"
+          }
+        ],
+        "full_model_rank": 6,
+        "full_model_residual_df": 22,
+        "batch_vs_grp": "crossed",
+        "pairing": "each GSM is a different animal (titles control1-4, hiit1-6, ...); no repeated measures"
+      },
+      "reason": "batch is crossed with grp (not aliased): batch2 contains only HIIT samples, so the batch effect is identified only by the 3+3 split of HIIT. ~ grp + batch is full rank (rank 6, residual df 22). No subject/animal blocking needed (independent animals).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007",
+        "ART-0009",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:46"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "method": "DESeq2 (pydeseq2, Wald test), one two-group fit per contrast",
+        "matrix_type": "raw counts",
+        "formula": "~ batch + grp (H_vs_C); ~ grp (HM_vs_C, L_vs_C, M_vs_C, batch constant in subset)",
+        "pre_filter": "all-zero genes dropped by the executor; DESeq2 independent filtering of padj",
+        "effect_size": "MLE log2FoldChange (unshrunken, as DESeq2 results() default)",
+        "paper_route": {
+          "method": "DESeq2 ~ Batch + Grouping on all 28 samples after edgeR filterByExpr",
+          "status": "blocked",
+          "reason": "run_deseq2_analysis fits only the two arms of a contrast (select_valid_two_group_design subsets samples), so dispersions are estimated from the 2-group subset rather than all 5 groups; no filterByExpr executor in the repository (inmoose.edgepy lacks filterByExpr)"
+        }
+      },
+      "reason": "Raw integer counts support the paper's DESeq2 route. The repository DESeq2 executor accepts the batch covariate but subsets to the two contrast arms, and filterByExpr is unavailable, so this is a declared deviation in dispersion pooling and gene pre-filtering, not in method family or contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008",
+        "ART-0009",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:46"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "source_locator": "S2.7.1.p1"
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "source_locator": "S2.7.1.p1"
+        },
+        "deviation_note": "paper rule applied unchanged to the two-group DESeq2 fits (route deviation is in model scope/pre-filter, not in the threshold)"
+      },
+      "reason": "Paper: genes with BH FDR < 0.05 and |log2FC| > 0.5 are DEGs (S2.7.1.p1, S3.3.p1). Applied exactly via native.apply_threshold on padj and log2FoldChange.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:18:47"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "subset": "H_vs_C",
+        "formula": "~ batch + grp",
+        "samples": "C (n=4) + H (n=6)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\H_vs_C\\DEG_results_H_vs_C.csv"
+        ],
+        "n_tested": 6075,
+        "n_deg": 328,
+        "n_up": 187,
+        "n_down": 141,
+        "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+        "paper_n_deg": {
+          "total": 474,
+          "up": 265,
+          "down": 209
+        },
+        "deg_sanity": "ok"
+      },
+      "reason": "Ran ~ batch + grp on the C and H samples; counted DEGs under the paper rule with apply_threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0007",
+        "ART-0012"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:21:11"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "subset": "HM_vs_C",
+        "formula": "~ grp",
+        "samples": "C (n=4) + HM (n=6)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\HM_vs_C\\DEG_results_HM_vs_C.csv"
+        ],
+        "n_tested": 8628,
+        "n_deg": 399,
+        "n_up": 135,
+        "n_down": 264,
+        "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+        "paper_n_deg": {
+          "total": 414,
+          "up": 154,
+          "down": 260
+        },
+        "deg_sanity": "ok"
+      },
+      "reason": "Ran ~ grp on the C and HM samples; counted DEGs under the paper rule with apply_threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0007",
+        "ART-0013"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:22:00"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "subset": "L_vs_C",
+        "formula": "~ grp",
+        "samples": "C (n=4) + L (n=6)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\L_vs_C\\DEG_results_L_vs_C.csv"
+        ],
+        "n_tested": 7321,
+        "n_deg": 764,
+        "n_up": 333,
+        "n_down": 431,
+        "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+        "paper_n_deg": {
+          "total": 857,
+          "up": 412,
+          "down": 445
+        },
+        "deg_sanity": "ok"
+      },
+      "reason": "Ran ~ grp on the C and L samples; counted DEGs under the paper rule with apply_threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0007",
+        "ART-0014"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:22:52"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "subset": "M_vs_C",
+        "formula": "~ grp",
+        "samples": "C (n=4) + M (n=6)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\M_vs_C\\DEG_results_M_vs_C.csv"
+        ],
+        "n_tested": 6037,
+        "n_deg": 49,
+        "n_up": 28,
+        "n_down": 21,
+        "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+        "paper_n_deg": {
+          "total": 40,
+          "up": 28,
+          "down": 12
+        },
+        "deg_sanity": "ok"
+      },
+      "reason": "Ran ~ grp on the C and M samples; counted DEGs under the paper rule with apply_threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "ART-0007",
+        "ART-0015"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:24:05"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy prerank)",
+        "subset": "H_vs_C",
+        "gene_sets": "MSigDB Hallmark mh.all 2024.1.Mm",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "ranking_metric": "stat (DESeq2 Wald)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C\\DEG_results_H_vs_C_GSEA_Hallmark.csv"
+        ],
+        "paper_route": "fgsea, 10,000 permutations, padj <= 0.25 (S2.7.1.p1)",
+        "n_sets_fdr_le_0.25": 29
+      },
+      "reason": "Paper reports Hallmark GSEA; ranked the full H_vs_C table by Wald stat. Engine differs from fgsea (declared).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0012",
+        "SRC-0001",
+        "ART-0016"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:35"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy prerank)",
+        "subset": "HM_vs_C",
+        "gene_sets": "MSigDB Hallmark mh.all 2024.1.Mm",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "ranking_metric": "stat (DESeq2 Wald)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\HM_vs_C\\DEG_results_HM_vs_C_GSEA_Hallmark.csv"
+        ],
+        "paper_route": "fgsea, 10,000 permutations, padj <= 0.25 (S2.7.1.p1)",
+        "n_sets_fdr_le_0.25": 15
+      },
+      "reason": "Paper reports Hallmark GSEA; ranked the full HM_vs_C table by Wald stat. Engine differs from fgsea (declared).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0013",
+        "SRC-0001",
+        "ART-0017"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:40"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy prerank)",
+        "subset": "L_vs_C",
+        "gene_sets": "MSigDB Hallmark mh.all 2024.1.Mm",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "ranking_metric": "stat (DESeq2 Wald)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\L_vs_C\\DEG_results_L_vs_C_GSEA_Hallmark.csv"
+        ],
+        "paper_route": "fgsea, 10,000 permutations, padj <= 0.25 (S2.7.1.p1)",
+        "n_sets_fdr_le_0.25": 25
+      },
+      "reason": "Paper reports Hallmark GSEA; ranked the full L_vs_C table by Wald stat. Engine differs from fgsea (declared).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0014",
+        "SRC-0001",
+        "ART-0018"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:45"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "enrichment",
+      "selected": {
+        "method": "GSEA preranked (gseapy prerank)",
+        "subset": "M_vs_C",
+        "gene_sets": "MSigDB Hallmark mh.all 2024.1.Mm",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "ranking_metric": "stat (DESeq2 Wald)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\M_vs_C\\DEG_results_M_vs_C_GSEA_Hallmark.csv"
+        ],
+        "paper_route": "fgsea, 10,000 permutations, padj <= 0.25 (S2.7.1.p1)",
+        "n_sets_fdr_le_0.25": 29
+      },
+      "reason": "Paper reports Hallmark GSEA; ranked the full M_vs_C table by Wald stat. Engine differs from fgsea (declared).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0015",
+        "SRC-0001",
+        "ART-0019"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:51"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "method": "ORA (Enrichr)",
+        "subset": "H_vs_C up",
+        "gene_sets": "GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG_2019_Mouse (Enrichr)",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "input_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "source_locator": "S2.7.1.p1"
+        },
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_KEGG_2019_Mouse.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Biological_Process_2023.csv"
+        ],
+        "paper_route": "clusterProfiler GO BP + KEGG (S2.7.1.p1)"
+      },
+      "reason": "Paper reports GO/KEGG enrichment of up- and down-regulated DEGs; gene lists use the applied paper threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0012",
+        "SRC-0001",
+        "ART-0020",
+        "ART-0021",
+        "ART-0022",
+        "ART-0023"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:53"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "enrichment",
+      "selected": {
+        "method": "ORA (Enrichr)",
+        "subset": "H_vs_C down",
+        "gene_sets": "GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG_2019_Mouse (Enrichr)",
+        "organism": "Mouse",
+        "feature_id_type": "gene_symbol",
+        "input_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FC",
+          "effect_cutoff": 0.5,
+          "inclusive": false,
+          "source_locator": "S2.7.1.p1"
+        },
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_KEGG_2019_Mouse.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Biological_Process_2023.csv"
+        ],
+        "paper_route": "clusterProfiler GO BP + KEGG (S2.7.1.p1)"
+      },
+      "reason": "Paper reports GO/KEGG enrichment of up- and down-regulated DEGs; gene lists use the applied paper threshold.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0012",
+        "SRC-0001",
+        "ART-0024",
+        "ART-0025",
+        "ART-0026",
+        "ART-0027"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:54"
+    },
+    {
+      "decision_id": "DEC-0019",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "primary_contrast": "H_vs_C",
+        "deviations": [
+          "two-group DESeq2 fits instead of one 5-group model",
+          "no edgeR filterByExpr pre-filter",
+          "gseapy prerank instead of fgsea",
+          "6 split rows of the deposited CSV repaired"
+        ],
+        "deg_comparison": {
+          "H_vs_C": {
+            "ours": {
+              "n_significant": 328,
+              "n_up": 187,
+              "n_down": 141,
+              "n_tested": 6075
+            },
+            "paper": {
+              "total": 474,
+              "up": 265,
+              "down": 209
+            },
+            "formula": "~ batch + grp"
+          },
+          "HM_vs_C": {
+            "ours": {
+              "n_significant": 399,
+              "n_up": 135,
+              "n_down": 264,
+              "n_tested": 8628
+            },
+            "paper": {
+              "total": 414,
+              "up": 154,
+              "down": 260
+            },
+            "formula": "~ grp"
+          },
+          "L_vs_C": {
+            "ours": {
+              "n_significant": 764,
+              "n_up": 333,
+              "n_down": 431,
+              "n_tested": 7321
+            },
+            "paper": {
+              "total": 857,
+              "up": 412,
+              "down": 445
+            },
+            "formula": "~ grp"
+          },
+          "M_vs_C": {
+            "ours": {
+              "n_significant": 49,
+              "n_up": 28,
+              "n_down": 21,
+              "n_tested": 6037
+            },
+            "paper": {
+              "total": 40,
+              "up": 28,
+              "down": 12
+            },
+            "formula": "~ grp"
+          }
+        }
+      },
+      "reason": "All four planned contrasts executed with the paper threshold on a declared-deviation DESeq2 route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0028"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-10-20T02:25:54"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d31dd4b6d211b8377a16fcd3f2b158cb2125827638cdc0122d54c207521f3b9e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\case_GSE308674_repair\\GSE308674_gene_counts_repaired.csv",
+      "role": "repaired_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3ea64e601ed55655afedac23eb42b87c260f63654d5f73f6d1dfa00edaeea723",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\case_GSE308674_repair\\repair_log.json",
+      "role": "repair_log",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9d49982b499815dff567d933fc592ff3c8bcd67bfbb4b2b07fa13083d5fd140b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "87fedf73d9b31b987e13d63e21079dd4853b7444783752990c19211c8bd030a8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\aligned\\aligned_metadata.csv",
+      "role": "aligned_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c629a956401dd197117e8fffcd4efaeeae25f2c9b270677c2c19a55aa9605511",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "37ed68f9d84b07c4cef2406bab21af6a95c1ab8cd1834ddb38489b8037b40f2b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4785de09d177be0b7e5d2ae71f2ad18d53ae4832e0aa16c12e953fce61bb664c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\matrix_profile.json",
+      "role": "matrix_profile",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9e8432ddb065398ac5950afcae2fddcdc3bdb896e17077c3b4d4aeef985a91cf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\design_check.json",
+      "role": "design_check",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f92162f700bb911290608d2b21faeead669a916e2e677e45d186a496eb02d82d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\reproduction_plan.json",
+      "role": "reproduction_plan",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8fd76413d80590c0d2a2035c54f021e7af6a4a239ac4210c6195c28486b44201",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1e16f9acc56791fe3f9f5d2f3474fb3773fc1569a216631611567c63db1540f7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\H_vs_C\\DEG_results_H_vs_C.csv",
+      "role": "deg_table_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "304056cb16f5015f0b44271376e71f3adda0540eb32fc8904aa00af09de9eae2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\HM_vs_C\\DEG_results_HM_vs_C.csv",
+      "role": "deg_table_HM_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ee3273b6d6696cf61cd9c59ff50926ee76b0c717e24c786fa7f085c265e4f415",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\L_vs_C\\DEG_results_L_vs_C.csv",
+      "role": "deg_table_L_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5ad6513dccd1577f26f89569cb031c20e9ad9b5724c651271df579eee6a43a2a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\results\\M_vs_C\\DEG_results_M_vs_C.csv",
+      "role": "deg_table_M_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "be89252a9a2ba254abc7d39ea116d33a0384ec8294a71c33021fc41eda2ad8a7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C\\DEG_results_H_vs_C_GSEA_Hallmark.csv",
+      "role": "gsea_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a61c1113635a33a89465eb52faa0c3718af42002e29f838edd65aa3205986c7f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\HM_vs_C\\DEG_results_HM_vs_C_GSEA_Hallmark.csv",
+      "role": "gsea_HM_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c276d91a7d842ea582bde5f690e5950cce488e185430c0314283ff95594d91fd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\L_vs_C\\DEG_results_L_vs_C_GSEA_Hallmark.csv",
+      "role": "gsea_L_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b0783415709fb07c8b8214819c72cf97e5641a66f7d54eef93c4b100ee6bd839",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\M_vs_C\\DEG_results_M_vs_C_GSEA_Hallmark.csv",
+      "role": "gsea_M_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "03498018b0d880834ac6836bede35a4a00673aab9f1132afe5d6f94eb8880c29",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_KEGG_2019_Mouse.csv",
+      "role": "ora_H_vs_C_up_0",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1beeee2fac4420c28ac41534078bdb4d71fc941ce3d74bd31c4f6d3f06975205",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Cellular_Component_2023.csv",
+      "role": "ora_H_vs_C_up_1",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "36ecbd84af7b12600bfa03b22af0824215210bdc7369666dd1c1027d2e0f33e4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0022",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Molecular_Function_2023.csv",
+      "role": "ora_H_vs_C_up_2",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "412cd3a62404a60c8846f5bb1a5abe9ace1dae89c543463d0d5e1efb4846464b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0023",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\up\\DEG_results_H_vs_C_GO_Biological_Process_2023.csv",
+      "role": "ora_H_vs_C_up_3",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "96bc7efdcfd70b604ade5ec2d792921849e1b8b87bb060f2aa5c76c7d46cd4a5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0024",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_KEGG_2019_Mouse.csv",
+      "role": "ora_H_vs_C_down_0",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "93c129016063bd568680a2bd051a76bfa6b57509a7a32868d1293aa8c921149c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0025",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Cellular_Component_2023.csv",
+      "role": "ora_H_vs_C_down_1",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7d014927f1508864eec6abe3da3573ec23fc0e5e9797f41b037a7d95c11aeaf3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0026",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Molecular_Function_2023.csv",
+      "role": "ora_H_vs_C_down_2",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dcd14c56d8546c50691cd5407fdef5ae5b2ea1b241ac49b57d7008778167a39f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0027",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\enrichment\\H_vs_C_ORA\\down\\DEG_results_H_vs_C_GO_Biological_Process_2023.csv",
+      "role": "ora_H_vs_C_down_3",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7b02d8c2f657d97a1a327fe5ad15d9f7cfc50be8ca07bdd9fb2dff6e371ea623",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0028",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41314005\\GSE308674\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7416cb8f008813209fc229c26f1726704502066c82d924f0fb37595c74831681",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

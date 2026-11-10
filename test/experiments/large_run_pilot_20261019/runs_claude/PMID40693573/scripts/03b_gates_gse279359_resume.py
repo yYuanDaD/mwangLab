@@ -1,0 +1,145 @@
+"""Gates 1-8 (paper_reconstruction .. threshold) for case GSE279359 (mouse long-read, PMID40693573)."""
+import sys, pathlib; ROOT = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "tools" / "native.py").exists()); sys.path.insert(0, str(ROOT))
+import os, json
+os.chdir(ROOT)
+import pandas as pd
+from tools import native
+
+native.enable_native_mode()
+RUN = "test/experiments/large_run_pilot_20261019/runs_claude/PMID40693573"
+CASE = "GSE279359"
+PAPER_JSON = "test/experiments/paper_screen_20261019/papers/PMC12248044.paper.json"
+PAPER_MD = "test/experiments/paper_screen_20261019/papers/PMC12248044.paper.md"
+MATRIX = "data/GSE279359/GSE279359_processed_counts.txt.gz"
+META = "data/GSE279359/GSE279359_metadata.csv"
+
+# Resumed after 03_gates crashed at the matrix gate (paper_reconstruction, ownership, alignment already recorded).
+# Fix: the deposited TSV has one fewer header field than data fields, so its first column is an unnamed row
+# number; read_table uses that row number as the index and gene_ID becomes a numeric column. Map row -> gene_ID.
+run = native.RunRecorder.open(RUN)
+case = run.case(CASE)
+paper = case.evidence_item("paper:PMC12248044.paper.json")
+meta_ev = case.evidence_item("metadata:GSE279359_metadata.csv")
+aligned_mat = case.evidence_item("tool_output:aligned_matrix.csv")
+design_meta = case.evidence_item("tool_output:design_metadata.csv")
+dm = pd.read_csv(case.dir / "aligned" / "design_metadata.csv", index_col=0)
+aln = {"outputs": {"aligned_matrix": {"path": str(case.dir / "aligned" / "aligned_matrix.csv")}}}
+
+# ---------------------------------------------------------------- 4 matrix
+raw = pd.read_csv(MATRIX, sep="\t")  # index = unnamed row number, same as the aligned matrix index
+am = pd.read_csv(aln["outputs"]["aligned_matrix"]["path"], index_col=0)
+assert am.index.equals(raw.index) and raw.index.is_unique
+prof = native.profile_matrix(aln["outputs"]["aligned_matrix"]["path"], sample_columns=dm.index.tolist())
+ann = raw.drop_duplicates("gene_ID").set_index("gene_ID")[["annot_gene_id", "annot_gene_name", "gene_novelty"]]
+assert raw.groupby("gene_ID")["annot_gene_id"].nunique().max() == 1
+gene = am[dm.index.tolist()].groupby(raw["gene_ID"]).sum()
+gene = gene.join(ann)
+# deterministic gene-level summary (sum of transcript read counts per TALON gene), needed for the sex check and later gates
+gene["ensembl"] = gene["annot_gene_id"].str.replace(r"\.\d+$", "", regex=True)
+gene_counts = gene.set_index("ensembl")[dm.index.tolist()]
+assert gene_counts.index.is_unique
+gpath = case.dir / "aligned" / "gene_counts_all.csv"
+gene_counts.to_csv(gpath)
+annp = case.dir / "aligned" / "gene_annotation.csv"
+gene.set_index("ensembl")[["annot_gene_id", "annot_gene_name", "gene_novelty"]].to_csv(annp)
+known = gene[gene.gene_novelty == "Known"]
+sym = known.set_index("annot_gene_name")[dm.index.tolist()]
+sym = sym.groupby(level=0).sum()
+spath = case.dir / "aligned" / "gene_counts_known_symbols.csv"
+sym.to_csv(spath)
+gene_ev = case.add_output(gpath, "gene_level_counts")
+case.add_output(annp, "gene_annotation")
+case.add_output(spath, "gene_level_counts_symbols")
+prof_short = {k: prof.get(k) for k in ("n_features", "n_samples", "min", "max", "median", "integer_fraction",
+                                       "missing_values", "negative_values", "duplicated_feature_ids", "candidates")}
+prof_short.update({"n_transcripts": int(len(raw)), "n_genes": int(len(gene)), "n_known_genes": int(len(known)),
+                   "gene_novelty": gene.gene_novelty.value_counts().to_dict(),
+                   "transcript_novelty": raw.transcript_novelty.value_counts().to_dict(),
+                   "library_sizes_reads": [int(am.sum().min()), int(am.sum().max())]})
+case.write_json("matrix_profile.json", prof_short, role="matrix_profile")
+print("profile", json.dumps(prof_short, default=str)[:1200])
+case.decide("matrix",
+            final={"matrix_type": "raw counts", "recommended_method": "DESeq2 (paper's Swan test unavailable)",
+                   "profile": prof_short, "feature_level": "transcript (TALON); summed to gene level per TALON gene",
+                   "provenance": "TALON read counts per transcript, 'raw counts for each sample' (GEO data_processing, S2.5.p2)"},
+            evidence=[aligned_mat, meta_ev, paper, gene_ev], paper={"locator": "S2.5.p2"}, confidence="high",
+            reasoning=(f"All integers (fraction {prof.get('integer_fraction')}), non-negative, max {prof.get('max')}; GEO says raw "
+                       f"counts. One row per transcript ({len(raw)}), {len(gene)} TALON genes of which {len(known)} known. "
+                       "Long-read libraries are small (77k-336k reads)."))
+
+# ---------------------------------------------------------------- 5 design
+refs = {"time": "pre"}
+rep0 = __import__("tools.suitability", fromlist=["x"]).enumerate_comparisons(dm, ["time"], references=refs)
+names0 = [c["name"] for c in rep0]
+print("comparison names", names0)
+planned = [n for n in names0 if n.endswith("_vs_pre")]
+rep, suit_item, suit_summary = case.suitability(
+    matrix_type="raw counts", metadata=dm, factors=["time"], matrix_csv=str(spath), organism="Mouse",
+    subject=None, references=refs, planned=planned)
+comps = [{k: c.get(k) for k in ("name", "kind", "test", "reference", "within", "analyzable")} for c in rep["comparisons"]]
+print("suitability", json.dumps(suit_summary, default=str))
+sexchk = rep["checks"].get("sex", {})
+print("sex", json.dumps({k: sexchk.get(k) for k in ("status", "predicted", "mismatched", "uncertain", "split_plan")}, default=str)[:1500])
+exploratory = [n for n in names0 if n not in planned]
+LABEL = {"time_ipe_vs_pre": "ipe_vs_pre", "time_h1_vs_pre": "1pe_vs_pre", "time_h24_vs_pre": "24pe_vs_pre"}
+case.write_json("suitability_comparisons.json", {"comparisons": comps, "planned": planned, "exploratory": exploratory},
+                role="suitability_comparisons")
+case.decide("design",
+            final={"analysis_type": "multilevel (one factor, 4 independent groups)", "design_column": "time",
+                   "formula": "~ time", "control": "pre",
+                   "contrasts": ([{"name": LABEL.get(p, p), "suitability_name": p, "role": "paper_planned",
+                                   "fit": "pairwise DESeq2 on the two groups, genes filtered per comparison (paper route)"}
+                                  for p in planned]
+                                 + [{"name": e, "suitability_name": e, "role": "exploratory",
+                                     "fit": "joint DESeq2 ~ time on all 20 samples"} for e in exploratory]),
+                   "audit": "planned contrasts also extracted from the joint 20-sample model",
+                   "estimand_type": "interventional (random assignment to sampling time, S2.2.p1)",
+                   "sex_split": "not run: 2-3 animals per sex per time point (< 3 in several cells)",
+                   "suitability": suit_summary},
+            candidates=[{"value": "pool post-exercise time points vs pre", "reason_rejected": "paper reports each time point; distinct levels are never pooled"},
+                        {"value": "time as continuous", "reason_rejected": "non-monotone acute response; paper uses categorical time points"}],
+            evidence=[design_meta, suit_item, paper], paper={"locator": "S3.1.p2"}, confidence="high",
+            reasoning="Three planned contrasts vs pre; remaining pairwise time contrasts are exploratory from one model.")
+
+# ---------------------------------------------------------------- 6 covariance
+conf = native.confounding_report(dm, "time", ["sex"])
+dc = native.design_check(dm, ["time"])
+dc_sex = native.design_check(dm, ["time", "sex"])
+dc_short = {k: dc.get(k) for k in ("formula_equivalent", "n_samples", "n_columns", "rank", "full_rank", "residual_df", "min_cell_size")}
+case.write_json("covariance_reports.json", {"confounding": conf, "design_check": dc_short,
+                                            "design_check_with_sex": {k: dc_sex.get(k) for k in dc_short}},
+                role="covariance_reports")
+print(json.dumps({"conf": conf, "dc": dc_short}, default=str)[:800])
+assert dc["full_rank"]
+case.decide("covariance",
+            final={"status": "not_required", "blocking_terms": [],
+                   "covariates": [{"name": "animal", "disposition": "excluded: one sample per animal (terminal sampling)"},
+                                  {"name": "sex", "disposition": "excluded: crossed with time (2-3 per sex per group), not modelled by the paper; "
+                                                                 "kept in the primary route out, noted as a limitation"}],
+                   "design_check": dc_short},
+            evidence=[design_meta, paper], paper={"locator": "S2.2.p1"}, confidence="high",
+            reasoning=f"Independent animals; ~ time full rank, residual df {dc_short['residual_df']} (joint) and 8 per pairwise fit.")
+
+# ---------------------------------------------------------------- 7 method
+case.decide("method",
+            final={"method": "DESeq2 (pydeseq2 Wald test, BH, independent filtering), pairwise vs pre",
+                   "matrix_type": "raw counts", "formula": "~ time",
+                   "transform": "transcript counts summed to TALON gene; gene_novelty == Known; per-comparison filter count > 0 in >= half of the samples",
+                   "executor": "tools.deseq2_tools:run_deseq2_analysis per planned contrast",
+                   "exploratory_executor": "tools.joint_contrasts:run_joint_deseq2 on all 20 (Known genes detected in >= 10 of 20)",
+                   "paper_route": {"method": "Swan v2.0 gene-level differential expression", "status": "blocked",
+                                   "reason": "Swan (diffxpy-based test) is not installed and has no executor here"}},
+            evidence=[gene_ev, paper], paper={"locator": "S2.6.p2"}, confidence="high",
+            reasoning="Raw integer read counts support DESeq2; Swan's own test cannot run -> declared deviation.")
+
+# ---------------------------------------------------------------- 8 threshold
+case.decide("threshold",
+            final={"paper_threshold": paper_threshold, "threshold_source": "paper_on_deviation_route",
+                   "applied_threshold": dict(paper_threshold),
+                   "deviation_note": "paper rule applied to DESeq2 instead of Swan; p-value adjustment is BH",
+                   "audit_thresholds": [{"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FC", "effect_cutoff": 1.0,
+                                         "label": "audit: paper's relaxed rule (S3.1.p2)"},
+                                        {"metric": "padj", "cutoff": 0.05, "effect_metric": None, "label": "audit: workflow default"}]},
+            evidence=[paper], paper={"locator": "S3.1.p2"}, confidence="high",
+            reasoning="S3.1.p2: |log2FC| > 1.5 and p-adj < .05; the relaxed |log2FC| > 1.0 rule is reported as an audit count.")
+print("done gates 1-8 for", CASE)

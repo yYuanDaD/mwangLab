@@ -43,3 +43,62 @@ def deg_filename(treatment: str, control: str) -> str:
     """Canonical DEG filename used by run_deseq2_analysis (writer) and
     batch_tools (reader). Both sides must use this helper to stay in sync."""
     return f"DEG_results_{safe_for_filename(treatment)}_vs_{safe_for_filename(control)}.csv"
+
+
+def tmm_factors(counts: pd.DataFrame, logratio_trim: float = 0.3, sum_trim: float = 0.05) -> pd.Series:
+    """edgeR TMM normalisation factors (``calcNormFactors(method="TMM")``) for a genes x
+    samples count matrix, scaled to a geometric mean of 1.
+
+    inmoose's edgepy has no ``calcNormFactors``; without TMM a composition shift between
+    groups (about 0.27 log2 in GSE208639 disease vs control) inflates the DEG count.
+    The reference sample is the one whose upper-quartile proportion is closest to the mean,
+    as in edgeR; each factor is the precision-weighted mean of the trimmed log ratios.
+    """
+    x = counts.astype(float)
+    x = x.loc[(x > 0).any(axis=1)]
+    lib = x.sum(axis=0)
+    f75 = (x / lib).quantile(0.75)
+    if f75.median() < 1e-20:
+        ref = np.sqrt(x).sum(axis=0).idxmax()
+    else:
+        ref = (f75 - f75.mean()).abs().idxmin()
+    r = x[ref]
+    n_r = lib[ref]
+    factors = {}
+    with np.errstate(divide="ignore", invalid="ignore"):
+        for col in x.columns:
+            o = x[col]
+            n_o = lib[col]
+            log_r = np.log2((o / n_o) / (r / n_r))
+            abs_e = (np.log2(o / n_o) + np.log2(r / n_r)) / 2
+            v = (n_o - o) / n_o / o + (n_r - r) / n_r / r
+            fin = np.isfinite(log_r) & np.isfinite(abs_e)
+            log_r, abs_e, v = log_r[fin], abs_e[fin], v[fin]
+            if len(log_r) == 0 or log_r.abs().max() < 1e-6:
+                factors[col] = 1.0
+                continue
+            n = len(log_r)
+            lo_l = np.floor(n * logratio_trim) + 1
+            hi_l = n + 1 - lo_l
+            lo_s = np.floor(n * sum_trim) + 1
+            hi_s = n + 1 - lo_s
+            rk_r = log_r.rank(method="average")
+            rk_e = abs_e.rank(method="average")
+            keep = (rk_r >= lo_l) & (rk_r <= hi_l) & (rk_e >= lo_s) & (rk_e <= hi_s)
+            f = (log_r[keep] / v[keep]).sum() / (1 / v[keep]).sum()
+            factors[col] = float(2 ** (0.0 if not np.isfinite(f) else f))
+    out = pd.Series(factors)[counts.columns]
+    return out / np.exp(np.log(out).mean())
+
+
+def limma_standard_error(top: pd.DataFrame) -> pd.DataFrame:
+    """Replace inmoose's ``lfcSE`` with the moderated standard error, ``|logFC / t|``.
+
+    inmoose's topTable fills ``lfcSE`` with the unscaled coefficient SD (sqrt(1/n1 + 1/n2)),
+    the same constant for every gene; limma's moderated SE is sqrt(s2.post) times that.
+    """
+    top = top.copy()
+    if {"log2FoldChange", "stat"} <= set(top.columns):
+        with np.errstate(divide="ignore", invalid="ignore"):
+            top["lfcSE"] = (top["log2FoldChange"] / top["stat"]).abs()
+    return top

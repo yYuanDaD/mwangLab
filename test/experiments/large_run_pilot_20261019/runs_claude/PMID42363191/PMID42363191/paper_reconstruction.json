@@ -1,0 +1,77 @@
+{
+  "paper_id": "PMID42363191 / PMC13591731 (BMC Musculoskelet Disord 2026, doi 10.1186/s12891-026-10131-5)",
+  "accessions": [
+    "GSE328094"
+  ],
+  "accession_locator": "S11.p1",
+  "assay": "bulk RNA-seq, gastrocnemius, Illumina NovaSeq 6000 PE150; fastp -> HISAT2 (GRCm39) -> HTSeq-count; FPKM also computed (S2.6.p1, S2.7.p1)",
+  "sample_inclusion": [
+    "48 male BALB/c mice, 4 groups x 12: C (control), E (exercise), T (CT26 tumor-bearing), TE (tumor + exercise) (S2.1.p2)",
+    "RNA-seq on 4 randomly selected mice per group, n=16 (S2.6.p1, S3.3.p1, FIG2)"
+  ],
+  "sample_exclusion": [
+    "not_reported for RNA-seq (one TE mouse missing from phenotype figure, FIG1; n=4/group sequenced)"
+  ],
+  "factors": [
+    {
+      "name": "tumor",
+      "levels": [
+        "no",
+        "yes"
+      ],
+      "type": "between-animal; CT26 s.c. inoculation vs saline",
+      "locator": "S2.2.p3"
+    },
+    {
+      "name": "ex",
+      "levels": [
+        "sed",
+        "ex"
+      ],
+      "type": "between-animal; 4-wk treadmill 14 m/min 60 min/d 6 d/wk vs stationary treadmill",
+      "locator": "S2.3.p1"
+    }
+  ],
+  "design": "2x2 factorial, one gastrocnemius sample per mouse, independent animals",
+  "primary_estimand": "Effect of aerobic exercise on the gastrocnemius transcriptome of tumor-bearing mice (TE vs T), interpreted against the tumor effect (T vs C) that exercise is said to partially reverse.",
+  "planned_contrasts": [
+    {
+      "name": "T_vs_C",
+      "definition": "tumor-bearing vs control (sedentary)",
+      "reported": "486 DEGs (273 up, 213 down)",
+      "locator": "S3.3.p3, FIG2F"
+    },
+    {
+      "name": "TE_vs_T",
+      "definition": "tumor+exercise vs tumor-bearing (exercise effect under tumor burden)",
+      "reported": "270 DEGs (165 up, 105 down)",
+      "locator": "S3.3.p3, FIG2G"
+    }
+  ],
+  "not_reported_contrasts": [
+    "E vs C (exercise in healthy mice), TE vs E, tumor x exercise interaction: no DE results reported; run as exploratory"
+  ],
+  "blocking_or_covariance": {
+    "status": "not_required",
+    "reason": "one sample per independent animal; single batch (GEO batch=1)",
+    "locator": "S2.1.p2, S2.6.p1"
+  },
+  "matrix_scale": "HTSeq-count raw read counts (GEO counts.xls) plus FPKM (S2.7.p1)",
+  "paper_method": "DESeq2 (S2.7.p2); formula and pairwise vs joint fitting not reported",
+  "paper_formula": "not_reported",
+  "paper_threshold": {
+    "metric": "qvalue",
+    "adjustment": "not_reported (DESeq2 q value; executor applies BH)",
+    "cutoff": 0.05,
+    "effect_metric": "log2FC",
+    "effect_cutoff": 1.0,
+    "effect_cutoff_original": "fold change > 2 or < 0.5 (|log2FC| > 1)",
+    "inclusive": false,
+    "source_locator": "S2.7.p2"
+  },
+  "enrichment": {
+    "ORA": "clusterProfiler GO/KEGG on DEGs, p<0.05 (S2.8.p1)",
+    "GSEA": "GSEA software, GO gene sets (S2.7.p2, S3.4.p2)",
+    "WGCNA": "top 2000 variable genes (S2.7.p2, S2.9)"
+  }
+}
