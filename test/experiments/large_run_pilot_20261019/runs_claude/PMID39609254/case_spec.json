@@ -1,0 +1,141 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39609254",
+  "request": "Analyze GSE281849 for PMID 39609254 (Inactivity-mediated molecular adaptations: Insights from a preclinical model of physical activity reduction.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE281849",
+      "accession": "GSE281849",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC11604346.paper.md"],
+        "metadata": "GSE281849/GSE281849_metadata.csv",
+        "matrix": "GSE281849/GSE281849_Gastroc_RawCounts.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE281849"],
+            "assay": "bulk poly(A) RNA-seq, gastrocnemius medial belly, female C57BL/6NJ mice (S2.11.p1, S3.7.p1, FIG3)",
+            "factors": {"group": ["Inactive (inactive control, 6 wk standard housing)", "Active (treadmill 5 d/wk for 6 wk)", "Activity Reduction (treadmill 4 wk then 2 wk inactive)"]},
+            "sample_inclusion": "RNA-seq on female mice only, n = 7 per group (S3.7.p1, FIG3 legend); males not sequenced",
+            "primary_estimand": "Effect of regular treadmill exercise on the gastrocnemius transcriptome (Active vs Inactive), plus the effect of 2 weeks of activity reduction relative to the inactive and active controls",
+            "planned_contrasts": [
+              "Active vs Inactive (FIG3a; paper: 71 DEGs)",
+              "Activity Reduction vs Inactive (FIG3b; paper: 40 DEGs)",
+              "Activity Reduction vs Active (FIG3c; paper: 124 DEGs)"
+            ],
+            "repeated_measure_unit": "none; one sample per independent mouse",
+            "normalization": "DESeq2 median-of-ratios on featureCounts counts (S2.11.p1)",
+            "paper_method": "DESeq2 ~ group, each pairwise comparison fitted on the two groups' samples only (authors' Figure 3.Rmd: subset columns, design ~group, results(contrast=...), no lfcShrink, rowSums>0 prefilter)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.25, "source_locator": "S2.11.p1"},
+            "paper_results": "71/40/124 DEGs (S3.7.p1); 7 transcripts unique to Activity Reduction (Smyd2, En1, Hoxa11os up; Ostn, Ak4, Srrm4os, Zfhx4 down); Igfbp5 down in Active and AR vs Inactive; 16 Active-unique transcripts (S3.7.p1)"
+          },
+          "reasoning": "S2.3.p1 defines the three randomized groups; S2.11.p1 gives DESeq2 and 'FDR<0.05 and the fold change was >0.25 in either direction'; FIG3 legend says 'q < 0.05 and expression change >= 20%'; S3.7.p1 gives the DEG counts on female gastrocnemius n=7/group. The authors' public Figure 3.Rmd (DA.p1 link) fits each pairwise comparison separately with design ~group and calls DEGs at padj<=0.05 and |log2FC|>=0.27.",
+          "confidence": "high",
+          "locator": "S2.11.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE281849", "21 GEO samples = 7 per group, female gastrocnemius, matches FIG3 legend n=21", "GEO data_processing (fastp, STAR GRCm39, featureCounts, DESeq2) matches S2.11.p1", "sample IDs M304-M325 match the columns in the authors' Figure 3.Rmd and their group lists"]},
+          "reasoning": "DA.p1 names GSE281849; samples, tissue and processing agree with the paper and the authors' code.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {},
+          "aliases": {"grp": "characteristics_ch1.2.treatment"},
+          "recode": {"grp": {"Inactive 6 weeks": "SED", "Treadmill trained 6 weeks": "ACT", "Treadmill trained 4 weeks, inactive 2 weeks": "AR"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (M304...) equal the metadata 'description' field for all 21 samples (inspect alignment_keys). Group from characteristics treatment: SED = inactive control, ACT = active control, AR = activity reduction. The resulting sample lists equal the authors' code lists (AR = M307,M310,M314,M318,M320,M321,M322; Active = M304,M305,M306,M308,M309,M312,M319).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE281849_Gastroc_RawCounts.csv.gz", "paper_input": "featureCounts read counts into DESeq2 (S2.11.p1)"},
+          "candidates": [{"value": "GSE281849_Gastroc_NormalizedCounts.csv.gz", "reason_rejected": "DESeq2-normalized values; DESeq2 needs the raw counts"}],
+          "reasoning": "All values integer, 0 to 4.7e6; file named RawCounts; GEO data_processing: featureCounts, 'csv file includes raw counts for each sample'. Matches the paper's input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_ACT_vs_SED", "grp_AR_vs_SED", "grp_AR_vs_ACT"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multi-group, pairwise planned contrasts",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_ACT_vs_SED", "control": "SED", "treatment": "ACT", "role": "primary"},
+              {"name": "grp_AR_vs_SED", "control": "SED", "treatment": "AR", "role": "secondary"},
+              {"name": "grp_AR_vs_ACT", "control": "ACT", "treatment": "AR", "role": "secondary"}
+            ]
+          },
+          "candidates": [{"value": "pool ACT and AR as 'trained'", "reason_rejected": "the paper keeps three groups and the AR arm is defined by detraining; pooling changes the estimand"}],
+          "reasoning": "Three randomized independent groups (S2.3.p1). The exercise effect is Active vs Inactive (primary); Activity Reduction vs Inactive and vs Active are the paper's other planned contrasts (FIG3b,c). All female, so no sex split.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice randomized to groups (S2.3.p1); no batch, lane or litter recorded in GEO; the paper models group only.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), separate fit per pairwise comparison",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 ~ group, pairwise subsets", "status": "reproduced"},
+            "deviations": ["pydeseq2 instead of R DESeq2; the authors prefilter rowSums>0, which does not change DESeq2 results for kept genes"]
+          },
+          "transform": null,
+          "reasoning": "Raw counts support the paper's DESeq2. The authors' code fits each comparison on its two groups only, so each execution subsets to the two groups. A joint 3-group model is run as a sensitivity analysis.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.25, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.25, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.27, "inclusive": true},
+            "deviation_note": "Methods text S2.11.p1 ('FDR<0.05 and fold change >0.25 in either direction', read as |log2FC| > 0.25) is applied. FIG3 legend says >=20% change (|log2FC| >= 0.263); the authors' code uses padj<=0.05 and |log2FC|>=0.27, recorded as the audit rule."
+          },
+          "reasoning": "S2.11.p1 states the DEG rule; FIG3 legend and the authors' code give near-equal variants, kept as an audit rule.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["Female mice only; the effect of exercise in males is not assessed by this dataset.", "Paper's GSEA used GO BP with fgsea; this run's GSEA uses MSigDB Hallmark, so pathway results are not directly comparable."]},
+          "paper_counts": {"grp_ACT_vs_SED": 71, "grp_AR_vs_SED": 40, "grp_AR_vs_ACT": 124},
+          "paper_genes": {
+            "grp_ACT_vs_SED": ["Igfbp5", "Acly", "Elovl6", "F13a1", "Folr2", "Gfpt2", "Il1r1", "Lama4", "Nrp2", "Ctxn3", "Dglucy", "Gstp2"],
+            "grp_AR_vs_SED": ["Igfbp5", "Smyd2", "En1", "Hoxa11os", "Ostn", "Ak4", "Srrm4os", "Zfhx4"],
+            "grp_AR_vs_ACT": ["Smyd2", "En1", "Hoxa11os", "Ostn", "Ak4", "Srrm4os", "Zfhx4", "Acly", "Elovl6"]
+          },
+          "reasoning": "Paper-aligned DESeq2 pairwise route on the deposited raw counts; compare counts and named genes from S3.7.p1.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DEG fold-change rule", "paper": "S2.11.p1: fold change >0.25; FIG3 legend: >=20% change", "data": "authors' Figure 3.Rmd: |log2FC| >= 0.27, padj <= 0.05", "disposition": "executable_without_change"},
+        {"item": "GSEA gene sets", "paper": "fgsea on GO Biological Process, FDR<0.25", "data": "workflow GSEA uses MSigDB Hallmark", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "grp_ACT_vs_SED", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "ACT", "alpha": 0.05}, "subset": {"grp": ["SED", "ACT"]}, "role": "primary", "reasoning": "FIG3a Active vs Inactive, fitted on these 14 samples as in the authors' code"},
+        {"name": "grp_AR_vs_SED", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "AR", "alpha": 0.05}, "subset": {"grp": ["SED", "AR"]}, "role": "secondary", "reasoning": "FIG3b Activity Reduction vs Inactive"},
+        {"name": "grp_AR_vs_ACT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "ACT", "treatment_group": "AR", "alpha": 0.05}, "subset": {"grp": ["ACT", "AR"]}, "role": "secondary", "reasoning": "FIG3c Activity Reduction vs Active"},
+        {"name": "joint", "tool": "tools.joint_contrasts:run_joint_deseq2", "args": {"comparisons": "planned"}, "role": "sensitivity", "reasoning": "one 3-group DESeq2 model on all 21 samples, to check robustness of the pairwise fits"}
+      ],
+      "enrichment": [
+        {"execution": "grp_ACT_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GSEA for Active vs Inactive (S3.7.p2)"},
+        {"execution": "grp_AR_vs_ACT", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GSEA for Activity Reduction vs Active (S3.7.p2)"},
+        {"execution": "grp_AR_vs_SED", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports no enrichment for AR vs Inactive (S3.7.p2); checked"}
+      ]
+    }
+  ]
+}

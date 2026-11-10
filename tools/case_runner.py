@@ -84,6 +84,10 @@ class AlignmentGate(Gate):
     key_patterns: dict[str, tuple[str, str]] = Field(
         default_factory=dict, description="derive the key_column itself from metadata before aligning")
     exclude_samples: dict[str, str] = Field(default_factory=dict, description="sample id -> reason")
+    matrix_column_pattern: Optional[str] = Field(
+        None, description="regex applied to matrix column names before aligning: the key is its group(s) "
+                          "joined with _ (e.g. '^(.+)_Count$' turns PBS1_Count into PBS1); columns it does not "
+                          "match are dropped")
 
 
 class MatrixGate(Gate):
@@ -501,6 +505,23 @@ class CaseRun:
         if a.key_patterns:
             keyed = native.derive_columns(metadata, adir / "metadata_keyed.csv", patterns=a.key_patterns)
             metadata = Path(keyed["output"])
+        if a.matrix_column_pattern:
+            table = native.read_table(matrix_path)
+            keys = {}
+            for column in table.columns.astype(str):
+                hit = re.search(a.matrix_column_pattern, column)
+                if hit:
+                    keys[column] = "_".join(g for g in hit.groups() if g) if hit.groups() else hit.group(0)
+            if not keys or len(set(keys.values())) != len(keys):
+                raise native.NativeToolError(
+                    f"alignment.matrix_column_pattern matched {len(keys)} columns with "
+                    f"{len(set(keys.values()))} distinct keys: {list(keys.items())[:5]}")
+            adir.mkdir(parents=True, exist_ok=True)
+            table = table.loc[:, list(keys)]
+            table.columns = [keys[c] for c in table.columns]
+            matrix_path = adir / "matrix_renamed.csv"
+            table.to_csv(matrix_path)
+            self.result["matrix_column_keys"] = dict(list(keys.items())[:10])
         aln = native.align_to_metadata(matrix_path, metadata, adir, key_column=a.key_column)
         aligned_meta = Path(aln["outputs"]["aligned_metadata"]["path"])
         if a.exclude_samples:

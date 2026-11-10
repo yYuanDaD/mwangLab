@@ -1,0 +1,76 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40713776",
+ "request": "Analyze GSE283853 for PMID 40713776 (Large MAF transcription factors reawaken evolutionarily dormant fast-glycolytic type IIb myofibers in human skeletal muscle.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [{
+  "case_id": "GSE283853",
+  "accession": "GSE283853",
+  "inputs": {
+   "paper": ["test/experiments/paper_screen_20261019/papers/PMC12296675.paper.md"],
+   "metadata": "GSE283853/GSE283853_metadata.csv",
+   "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID40713776/prep/GSE283853_expression_values.csv",
+   "raw_tar": false,
+   "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID40713776/prep/extract_counts.py"]
+  },
+  "gates": {
+   "paper_reconstruction": {
+    "final": {
+     "accessions": ["GSE283853"],
+     "assay": "bulk total-RNA RNA-seq (rRNA-depleted, NextSeq500 2x36) of human iPSC-derived (414C2 iMuSC) myotubes, day 4 after adenoviral infection (S2.10.p1)",
+     "samples": "12 cultures: pAV-mCherry (control), pAV-MAFA, pAV-MAFB, pAV-MAF, n=3 each (FIG4 C-H)",
+     "factors": {"grp": ["mCherry", "MAFA", "MAFB", "MAF"]},
+     "primary_estimand": "Effect of adenoviral overexpression of each large MAF transcription factor (MAFA, MAFB, MAF) versus mCherry control on the myotube transcriptome; not an exercise estimand",
+     "planned_contrasts": ["MAFA vs mCherry (FIG4.A; paper: 3,685 DEGs)", "MAFB vs mCherry (FIG4.A; paper: 2,289 DEGs)", "MAF vs mCherry (FIG4.A; paper: 4,446 DEGs)"],
+     "paper_method": "CLC Main Workbench Empirical Analysis of DGE (edgeR exact test), genes with zero counts in any sample excluded (S2.10.p1)",
+     "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.10.p1"},
+     "exercise_component": "Exercise/training appears only in the human biopsy analyses (GSE200398 Russian endurance- vs power-trained, resting-state, cross-sectional; dbGaP phs001048 Finnish), which are separate accessions (S2.18.p1, S3.4.p3, DA.p1). GSE283853 contains no exercise, training, or physical-activity factor."
+    },
+    "reasoning": "S2.10.p1 describes the GSE283853 experiment: myotubes overexpressing MAFA/MAFB/MAF or mCherry, edgeR test, FDR < 0.05. FIG4.A gives DEG counts per MAF vs control. DA.p1 maps GSE283853 to the myotube RNA-seq only; the training-background comparison (S3.4.p3) uses GSE200398, not this series.",
+    "confidence": "high",
+    "locator": "S2.10.p1; FIG4; DA.p1"
+   },
+   "ownership": {
+    "final": {"owned": true, "checks": ["DA.p1 names GSE283853 for RNA-seq of human iMuSC-derived myotubes", "GEO cell type 'iPS cell-derived myotubes', cell line 414C2, 12 samples pAV-mCherry/MAFA/MAFB/MAF x3, NextSeq 500 match S2.10.p1"]},
+    "reasoning": "Metadata and the CLC export (sample groups pAV-mCherry, pAV-MAFA, pAV-MAFB, pAV-MAF; library names m/a/b/c 1-3) match the paper's myotube experiment.",
+    "confidence": "high"
+   },
+   "alignment": {
+    "key_column": "lib",
+    "key_patterns": {"lib": ["description", "^Library name: ([mabc][123])$"]},
+    "patterns": {"grp": ["title", "^pAV-(mCherry|MAFA|MAFB|MAF)_\\d$"]},
+    "recode": {},
+    "aliases": {},
+    "exclude_samples": {},
+    "reasoning": "The deposited CLC export has per-sample columns '<lib> - Expression values'; the prep script keeps those 12 columns and renames them to the library name, which equals the metadata 'description' field ('Library name: m1'). Group taken from title.",
+    "confidence": "high"
+   },
+   "matrix": {
+    "matrix_type": "raw counts",
+    "recommended_method": "edgeR",
+    "final": {"matrix_type": "raw counts", "source": "CLC 'Expression values' columns (total read counts per gene) from GSE283853_ProcessedData_quantile_totalcount_normalized_ANOVA.csv", "paper_input": "CLC total read counts analyzed with the edgeR test (S2.10.p1)"},
+    "reasoning": "The 12 extracted 'Expression values' columns are all integers (file name 'totalcount'); the 'Normalized expression values' (quantile) and 'Transformed values' columns plus group means were dropped. S2.10.p1 runs edgeR on these counts.",
+    "confidence": "medium",
+    "candidates": [{"value": "Normalized expression values (quantile)", "reason_rejected": "quantile-normalized, not counts; not the paper's edgeR input"}]
+   },
+   "design": {
+    "factors": ["grp"],
+    "references": {"grp": "mCherry"},
+    "organism": "Human",
+    "planned": [],
+    "decision_status": "refused",
+    "stop_reason": "No exercise contrast: GSE283853 is an in-vitro gain-of-function experiment (adenoviral MAFA/MAFB/MAF overexpression vs mCherry in iPSC-derived myotubes). There is no exercise, training, or physical-activity arm, so the requested exercise estimand cannot be identified from this series. The paper's exercise-related data (endurance- vs power-trained biopsies) are in GSE200398/dbGaP, not GSE283853.",
+    "final": {"analysis_type": "none", "design_column": "grp", "contrasts": []},
+    "reasoning": "The only factor is the overexpressed transgene (title pAV-*; S2.10.p1; FIG4). A MAF-vs-mCherry contrast is valid for the paper's own question but does not answer how exercise affects gene expression; manufacturing an exercise interpretation would be invalid. Refused at design.",
+    "confidence": "high",
+    "candidates": [{"value": "grp MAFA/MAFB/MAF vs mCherry (paper's planned contrasts)", "reason_rejected": "transgene overexpression in culture, not an exercise intervention; outside the requested estimand"}]
+   }
+  },
+  "discrepancies": [
+   {"item": "requested estimand", "paper": "GSE283853 = MAF overexpression in myotubes (S2.10.p1, DA.p1); training comparison uses GSE200398 (S3.4.p3)", "data": "12 myotube cultures, groups pAV-mCherry/MAFA/MAFB/MAF", "disposition": "blocks_estimand"}
+  ],
+  "executions": [],
+  "enrichment": []
+ }]
+}

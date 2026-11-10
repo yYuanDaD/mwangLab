@@ -495,3 +495,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 86991572b4ea250a7e68eadebb3fa005f4fe2282 (GSE86338)
 
 - suitability.py:273 + decision_contract.py:171 force refusal when all arms n<3, contradicting SKILL.md 'small n alone is not a stop'; no low-expression filter for FPKM input Details: `86991572b4ea250a7e68eadebb3fa005f4fe2282/HANDBACK.md`.
+
+## PMID40713776 (GSE283853)
+
+- minor: inspect treats a CLC 3-columns-per-sample export as 48 samples, no alignment keys (tools/case_runner.py:361,367); a prep script was needed Details: `PMID40713776/HANDBACK.md`.
+
+## PMID41078024 (GSE302532)
+
+- case_runner.py:504 align_to_metadata cannot match keys embedded in matrix column names (patched after this row); prep rename script needed; inspect gave no hint Details: `PMID41078024/HANDBACK.md`.

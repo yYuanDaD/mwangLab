@@ -1,0 +1,141 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41078024",
+  "request": "Analyze GSE302532 for PMID 41078024 (Moderate Chronic Treadmill Exercise Slows Dopaminergic Neuron Loss in a Rat Model of Parkinson's Disease and Alters RNA Content of Circulating Plasma Exosomes.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE302532",
+      "accession": "GSE302532",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12516300.paper.md"],
+        "metadata": "GSE302532/GSE302532_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41078024/prep/GSE302532_TPM_libnames.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41078024/prep_rename_columns.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE302532"],
+            "assay": "total RNA-seq (Takara SMARTer Pico v3) of plasma exosome RNA, NovaSeq X Plus (S2.13.p1, S2.14.p1)",
+            "organism": "Rattus norvegicus, male Sprague Dawley (S2.1.p1)",
+            "sample_inclusion": "Cohort 2 only (non-PD, age-matched rats): exercise treatment then exosome molecular biology (S2.1.p1, ABS.p1); n = 4 per group (S2.5.p1); S4.4.p1 states 5 per group (discrepancy). Cohort 1 (PFF histology) has no sequencing.",
+            "factors": {"group": ["Sedentary (control)", "Exercise (1 month treadmill, 20 m/min, 30 min, 5 d/wk)"]},
+            "primary_estimand": "Difference in plasma exosomal RNA abundance, exercised vs sedentary non-PD rats, blood drawn within 30 min of last exercise (S2.4.p1, S3.4.p1)",
+            "planned_contrasts": ["Exercise vs Sedentary (S2.5.p1, S3.4.p1; paper: 27 RNAs upregulated, Table 2; no downregulated list reported)"],
+            "repeated_measure_unit": "none (independent animals, one sample each)",
+            "normalization": "CLC Genomics Workbench v25 TPM (GEO data_processing); paper does not describe the DE normalization",
+            "paper_method": "not_reported (GEO data_processing names CLC Genomics Workbench v25.0; the DE test is not named in the paper)",
+            "paper_threshold": {
+              "metric": "not_reported",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S3.4.p1, TAB2",
+              "note": "No rule stated. Table 2 lists only upregulated RNAs with raw P-values 3.76E-04 to 0.05 and FC 3.09 to 142.31 (S3.4.p1: 'fold change ranging from 3 to 142'); implied rule raw P <= 0.05 and FC >= 3, up only."
+            },
+            "paper_results": {"n_up": 27, "n_down": "not_reported", "named_genes": ["Npy", "Rgs4", "Mt-atp6", "rno-mir-486", "B2m", "Np4"]}
+          },
+          "reasoning": "Two-cohort study; only cohort 2 (exercise vs sedentary, non-PD) was sequenced (S2.1.p1, S2.5.p1). The RNA-seq result is Table 2 (S3.4.p1). The paper states no DE method or threshold; GEO names CLC Genomics Workbench.",
+          "confidence": "medium",
+          "locator": "S2.5.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": ["Data availability S10.p1 names GSE302532", "GEO: Rattus norvegicus plasma, Sprague Dawley, 4 Sedentary + 4 Exercised, matches S2.5.p1 n=4", "TPM file ExerciseExosomeTPMs matches the exosome RNA-seq", "Table 2 named RNAs (Npy, Rgs4, Np4, LOC120093427, ...) present as matrix rows"]
+          },
+          "reasoning": "S10.p1 names the accession; sample counts and organism match the methods."
+        },
+        "alignment": {
+          "key_patterns": {"lib": ["description", "^Library name: (\\d+P)$"]},
+          "key_column": "lib",
+          "aliases": {"treatment": "characteristics_ch1.2.treatment"},
+          "recode": {"grp": {"Sedentary": "SED", "Exercised": "EX"}},
+          "patterns": {"grp": ["characteristics_ch1.2.treatment", "^(Sedentary|Exercised)$"]},
+          "exclude_samples": {},
+          "final": {"note": "matrix columns renamed to library names by prep_rename_columns.py (regex ' - (\\d+P)_S\\d+ (GE) - TPM'); matrix group label prefix (Sedentary/Exercise) agrees with GEO treatment for every library"},
+          "reasoning": "Deposited TPM columns embed the GEO library name (437P etc.); the prep script renames them exactly and the metadata key is derived from description 'Library name: 437P'. Exact match, no positional alignment."
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma",
+          "final": {"source": "GEO data_processing: 'Excel file with TPM values for each sample', CLC Genomics Workbench v25; column headers end in '- TPM'; every column sums to 1e6", "paper_input": "not_reported (paper presents fold change and P-values only)"},
+          "reasoning": "Column sums are exactly 1,000,000 and headers say TPM; non-integer values. No raw counts are deposited, so count models cannot run."
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "organism": "Rat",
+          "planned": ["grp_EX_vs_SED"],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "EX",
+            "estimand_type": "causal (randomized, S2.5.p1)",
+            "contrasts": [{"name": "grp_EX_vs_SED", "control": "SED", "treatment": "EX", "role": "primary"}]
+          },
+          "reasoning": "Randomized two-arm design, one sample per rat (S2.5.p1). Only male rats (S2.1.p1)."
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, no batch, sex, or pairing recorded in GEO or paper; no covariates added."
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) on log2(TPM+1)",
+            "formula": "~ grp",
+            "paper_route": {"method": "CLC Genomics Workbench differential expression (not named in paper; GEO data_processing)", "status": "blocked", "reason": "CLC's DE test works on read counts; only TPM is deposited and the paper does not name the test"},
+            "deviations": ["limma on log2(TPM+1) replaces the unnamed CLC test; zero-variance features dropped by the executor"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "TPM supports limma after log2(x+1) under the matrix policy; count methods are not valid on TPM."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.4.p1, TAB2", "note": "implied by Table 2: raw P <= 0.05 and FC >= 3, up only"},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.5849625, "effect_cutoff_original": "FC 3", "inclusive": true, "label": "Table 2 implied rule (raw P <= 0.05, |FC| >= 3); paper reports up only"}
+          },
+          "reasoning": "The paper states no significance rule; workflow default BH < 0.05 applied. The rule implied by Table 2 is reported as a labelled audit for comparison with the 27 upregulated RNAs."
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper's DE method (CLC) cannot be rerun from TPM; limma on log2(TPM+1) is a declared deviation.",
+              "Paper reports only upregulated RNAs; compare audit up count with 27.",
+              "Sample size: GEO and S2.5.p1 give 4 per group, S4.4.p1 says 5 per group.",
+              "Exosome libraries are dominated by a few small RNAs (max TPM ~5.7e5), so TPM compositional effects are strong.",
+              "No feature passes BH < 0.05 (min padj 0.47); the paper's 27 RNAs rest on raw P without multiple-testing correction.",
+              "Direction contradiction: LOC120098346 (snRNA) is up 3.25-fold in Table 2 but log2FC -0.49 (p = 0.82) here; the other 26 Table 2 RNAs are positive.",
+              "log2FoldChange is on log2(TPM+1), which shrinks fold changes of low-TPM RNAs relative to the paper's FC."
+            ]
+          },
+          "paper_counts": {"grp_EX_vs_SED": 27},
+          "paper_genes": {"grp_EX_vs_SED": ["Npy", "Rgs4", "Mt-atp6", "rno-mir-486", "B2m", "Np4", "RatNP-3b", "Fth1", "Pf4", "Anp32e", "Snora81_1", "Y_RNA_6", "LOC120093427", "LOC120096085", "AY172581.23"]},
+          "reasoning": "Route is a declared deviation (method). Paper count 27 is upregulated-only."
+        }
+      },
+      "discrepancies": [
+        {"item": "sample size", "paper": "S2.5.p1 n = 4 per group; S4.4.p1 '5 male rats in each of the exosomal RNA sequencing groups'", "data": "GEO: 4 Sedentary + 4 Exercised", "disposition": "executable_without_change"},
+        {"item": "DE method and threshold", "paper": "not reported; Table 2 shows raw P and FC >= 3", "data": "TPM only (CLC)", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "grp_EX_vs_SED",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "EX"},
+          "role": "primary",
+          "reasoning": "Exercise vs sedentary, limma on log2(TPM+1)"
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}
