@@ -1,0 +1,21 @@
+{"case": "GSE327036", "reviewer": "claude sonnet 5.5 (read-only decision reviewer)",
+ "blind": {
+  "B1": "No for an exercise question. The RNA-seq is soleus of Stard7 flox/flox control vs Myf5-Cre muscle-KO (mKO), n=3 per group (S2.5.p1, FLT.p3 Fig 3A). Exercise (treadmill S2.3, lactate S2.4) is phenotyping on other cohorts; no sequenced sample carries an exercise factor and metadata have no exercise words.",
+  "B2": "mKO vs control soleus, 3 vs 3 (S3.3.p1; FLT.p3 'n = 3 per group'). Only comparison in the transcriptome.",
+  "B3": "No repeated measures. FLT.p3: 'Each dot represents an individual animal (n = 3 per group)'; one tissue (soleus), one time. The packet's candidate keys (title minus genotype, i.e. rep1-3) only encode replicate number; the expression check is not_supported (same-key r 0.136 vs other -0.068, permutation p 0.18). Not a pairing unit.",
+  "B4": "Paper says edgeR with filterByExpr on all samples (FLT.p3); only one contrast, so joint vs pairwise is moot.",
+  "B5": "FLT.p3: 'Genes with |log fold change| > 1 and FDR < 0.05 were defined as DEGs' (edgeR, filterByExpr; GO/WikiPathways adjusted p < 0.05). No DEG total given in text; named down genes Mybpc2, Actn3, Pvalb, Mct4, Myh4; Myh7 unchanged."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "S2.5.p1, S3.3.p1, FLT.p3: only genotype contrast; no exercise arm in RNA-seq samples. Refusal at design matches B1.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "WT 3 / mKO 3 matches paper n=3 per group; no exclusions; alignment 6/6 exact on geo_accession.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast run.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Mechanical flag pairing_key_candidate is spurious: key = replicate index; FLT.p3 says each dot is an individual animal; pairing_check status not_supported (p=0.18). Record 'repeated_measure_unit: none (independent animals)' is correct.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Single two-group contrast, no model fitted.", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "Single sex-unspecified, single tissue; no batch info in metadata; not reached since stopped.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Per-sample files hold only a TPM column summing to 1e6 although data_processing says raw counts; recorded as discrepancy. Paper's edgeR route not possible from deposit.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "FDR<0.05, |logFC|>1 (strict >) transcribed correctly from FLT.p3 in paper_reconstruction and HANDBACK.", "fix": ""},
+  {"id": "paper_match", "verdict": "na", "severity": "none", "evidence": "No DE run; HANDBACK claims no counts and notes paper gives no total.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise contrast' is true: the search covered metadata (single genotype column, no exercise words) and the paper (exercise only on separate cohorts, S2.3/S2.4, FLT.p2). Claim is not a narrow-search absence.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: a genotype-only series (muscle KO with exercise-intolerance phenotype) is refused for an exercise question; if the person wants it as a genotype baseline reproduction, that would be a declared deviation (limma on log2 TPM)."],
+ "summary": "该系列只有 soleus 中 WT 对 mKO 的基因型比较(3 对 3),RNA-seq 样本没有运动组,在 design 阶段拒绝是正确的。自动标记的 pairing_key_candidate 只是重复编号 rep1-3,论文说每个点代表独立动物,表达检查也不支持配对,属于误报。阈值、矩阵类型(TPM 与 GEO 说明不符)等记录均准确。"}

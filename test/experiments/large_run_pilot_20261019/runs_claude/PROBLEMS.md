@@ -543,3 +543,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38576560 (GSE256152)
 
 - derive_columns key_patterns reject optional regex groups (patched after this row; needed rename prep script); inspect does not split paired read count/fpkm columns; pydeseq2 exp overflow warnings Details: `PMID38576560/HANDBACK.md`.
+
+## PMID40000838 (GSE280656)
+
+- suitability.py:259-277/502-505 + decision_contract.py:172 hard-stop n=2 vs skill 'small n not a stop'; all-NaN RSEM rows needed prep (joint_contrasts.py:106) Details: `PMID40000838/HANDBACK.md`.

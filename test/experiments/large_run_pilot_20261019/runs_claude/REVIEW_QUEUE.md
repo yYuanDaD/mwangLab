@@ -73,3 +73,12 @@ One section per case; newest last.
 
 - policy: Open policy: which threshold to report when the paper's rule (OPLS loadings) has no p-value equivalent and the headline counts (852/928) are far above what BH padj < 0.05 gives (0/6); the case's choice (padj 0.05 applied, p<0.01 audit) is recorded and labelled, so it is not an error.
 - policy: Open policy: the paper's headline result needs T1/T2 from GSE58608/GSE60590; whether a joint multi-accession analysis should be queued is a scoping decision for the person.
+
+## 4dab7a2f1bb2b9c3ef1ca5ac8a606107b7c80b16 / GSE327036 (2026-11-10)
+
+- policy: Open policy: a genotype-only series (muscle KO with exercise-intolerance phenotype) is refused for an exercise question; if the person wants it as a genotype baseline reproduction, that would be a declared deviation (limma on log2 TPM).
+
+## PMID38576560 / GSE256152 (2026-11-10)
+
+- direction (unsure, major): Ours (treatment/Tnm) up/down: swim 73/138, cur 110/54, union 286/237; paper 79/55, 28/79, 154/291. In all three contrasts the dominant direction is opposite to the paper's; a single global sign flip (Tnm over treatment) reproduces the dominant direction in all three (flipped: swim 138/73, cur 54/110, union 237/286). The study caveat 'no single sign flip reconciles all three' is therefore not supported. The paper does not state the sign convention; Fig 3C gene directions are not available in the text.
+- policy: Sign convention of the paper's up/down counts is not stated. Ours is the reverse in dominant direction for all three contrasts; the pattern is consistent with the paper using Tnm over treatment, but this cannot be settled from the paper text. Decide whether to report with a confirmed or flagged sign (Fig 3C / author query).
