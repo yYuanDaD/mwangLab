@@ -1,0 +1,89 @@
+{
+  "case": "interaction_lrt",
+  "reviewer": "Claude Code subagent (claude-sonnet-5-5)",
+  "blind": {
+    "B1": "Yes. GSE283493 (PMC11810837) is an in vivo adolescent rat forced-wheel study (5 weeks, EAE ZT13 / LAE ZT23 vs handled cage controls EAC / LAC). All 24 rats (6 per group) have exercise or its control; both SAT and VAT RNA-seq libraries exist (48 libraries). Exercise-factor samples: the 12 EAE + 12 LAE libraries (SAT and VAT). S2.1.p1, S2.3.p1, S2.9.p1.",
+    "B2": "Main comparisons (S2.9.p2, S3.p1): (1) DESeq2 LRT for the Phase:Training interaction pooled over SAT+VAT (632 genes); (2) Wald exercise vs control within each tissue and phase: SAT-EA, SAT-LA, VAT-EA, VAT-LA. n = 6 per group per tissue (24 rats x 2 tissues = 48 libraries), reduced by 4 PCA outliers (2 SAT LAE, 1 VAT EAE, 1 VAT EAC) to 44; cells SAT EAC6/EAE6/LAC6/LAE4, VAT EAC5/EAE5/LAC6/LAE6.",
+    "B3": "Yes. SAT and VAT were taken from the same rat (S2.5.p1: SAT, VAT, blood, brain collected from each decapitated rat; S2.9.p1: n=6 per group for both tissues; S2.1.p1: each animal one experimental unit). So the 44 pooled libraries are 2 per rat. The deposited field that can identify the rat is group + replicate letter/number: title 'rep1..6' or library_name suffix a-f, combined with the group. Letter alone repeats across 4 groups and is not an animal. Packet A: 24 keys, 0 duplicates in a level, 48/48 linked; expression check same-key r=0.345 vs -0.01, permutation p=0.0005 (supported).",
+    "B4": "The LRT is one joint model on all samples, both tissues: 'SVs + Tissue + Phase + Training + Phase:Training vs SVs + Tissue + Phase + Training' (S2.9.p2). The model has no animal term (the authors treated libraries as independent). Wald contrasts: 'comparing directly samples from exercise vs control rats in each tissue and time-of-day' with apeglm; the paper does not say whether these are subset fits or one joint fit with contrasts.",
+    "B5": "LRT: 'Differentially expressed genes were reported if adjusted p-value was <0.1 for the LRT, and absolute shrunken log2 fold-change greater than 0.5 for Wald-test' (S2.9.p2); Wald also padj <0.1 (S3.p1: 'p. adj <0.1 and absolute shrunken log2 foldchange >0.5'). Strict inequalities; adjustment method not named (DESeq2 default). Gene filter: <10 reads in fewer than 6 samples removed. Counts: 632 LRT genes; Wald SAT 7 (EA) and 353 (LA); VAT 2 (EA) and 14 (LA) (S3.p1). Fig 2/3 raw p<0.05 and |log2FC|>0.5 is display coloring only."
+  },
+  "checks": [
+    {
+      "id": "run_or_refuse",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "In vivo exercise vs control arms exist (EAE/LAE vs EAC/LAC, S2.3.p1; training column ex 24 / ctrl 24 in packet A). The case plans to run, and stops only at covariance, not on a no-exercise-arm claim.",
+      "fix": ""
+    },
+    {
+      "id": "grouping",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "design_check n=44, cells SAT 6/6/6/4 and VAT 5/5/6/6 equal the paper's 6 per group minus 2 SAT LAE, 1 VAT EAE, 1 VAT EAC (S2.9.p2). Outlier identity is inferred from the paper's stated criterion (genes >10 counts) rather than Supp 4D, and is recorded as requires_explicit_deviation with the 4 libraries named. AM->early, PM->late consistent with GEO titles.",
+      "fix": ""
+    },
+    {
+      "id": "direction",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "Reference levels EA and ctrl (coefficient phase[T.LA]:training[T.ex]), so the interaction is (LA ex-vs-ctrl) minus (EA ex-vs-ctrl), as in the paper's reduced/full pair. No Wald results are produced in this case, so no sign to check.",
+      "fix": ""
+    },
+    {
+      "id": "pairing",
+      "verdict": "disagree",
+      "severity": "major",
+      "evidence": "Two libraries (SAT, VAT) per rat is documented by the paper (S2.5.p1, S2.9.p1, 6 per group in both tissues). The key group + replicate letter (e.g. EAC|a, or the title with the tissue stripped) links 48/48 libraries, 24 keys, once per tissue, no duplicates (packet A table), and the expression check supports it (same-key r 0.345 vs -0.01, p=0.0005). The covariance record tested the letter alone (pairing_report_if_letter_were_animal: n_subjects 6, n_complete 0), which cannot link anything since a-f repeats in 4 groups; this is the narrow search the review guide warns about. Its statement 'no animal ID' is therefore wrong. Note also the paper's own LRT has no animal term, so the paper-faithful reproduction needs no key at all.",
+      "fix": "Replace the covariance record with: animal = grp + rep_letter (equivalently the tissue-stripped title), 24 rats, labelled assumption supported by the paper and by pairing_check. (1) Primary reproduction as the paper specifies: DESeq2 LRT (full vs reduced) on the 44 libraries without an animal term, recorded as 'libraries treated as independent, as in the paper'. (2) Sensitivity run with the repeated tissue accounted for: because animal is nested in Phase x Training, an animal fixed effect is aliased with Phase, Training and the interaction in DESeq2 and cannot be added; use limma-voom with duplicateCorrelation(block = animal) on the same ~ tissue + phase + training + phase:training design (test the interaction coefficient), or fit each tissue separately (one library per rat per tissue, no pairing needed) and combine. Report both next to the 632."
+    },
+    {
+      "id": "model_fit",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "Design formula ~ tissue + phase + training + phase:training on all 44 libraries, LRT against the reduced model, matches S2.9.p2 and is full rank (rank 5, residual df 39). The omission of the 2 SVs is declared as a deviation (no sva executor). The paper is silent on joint vs subset for the Wald contrasts; that is outside this case.",
+      "fix": ""
+    },
+    {
+      "id": "confounding",
+      "verdict": "agree",
+      "severity": "minor",
+      "evidence": "Recorded: the SVs the authors used for hidden batch are dropped. Not recorded: three rats per cage matched by body weight (S2.1.p1), cage ID is not deposited so cage is unmodeled; collection time (ZT13 vs ZT23 session, 2 h per sample set) is inherent to Phase and cannot be separated from it; library-prep batch unknown. None of these is aliased with training inside a phase from the available fields.",
+      "fix": "Optional: add one line to the covariance record noting cage (not deposited) and collection-time/Phase aliasing as unmodelled."
+    },
+    {
+      "id": "matrix_method",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "Salmon gene-level table, all integer, non-negative (matrix record: integer_fraction 1.0, median 44); GEO states raw gene counts; the paper fed these to DESeq2 (S2.9.p2). Salmon estimated counts are noted. DESeq2 is the right route.",
+      "fix": ""
+    },
+    {
+      "id": "threshold",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "paper_threshold: padj 0.1, exclusive, adjustment not_reported, no effect cutoff for the LRT, matches 'adjusted p-value was <0.1 for the LRT' (S2.9.p2). The Wald rule (padj<0.1, |shrunken LFC|>0.5) is kept in the discrepancy table with the MLE-vs-apeglm deviation. Packet B threshold table is empty because nothing was run.",
+      "fix": ""
+    },
+    {
+      "id": "paper_match",
+      "verdict": "agree",
+      "severity": "none",
+      "evidence": "reproduction_summary: paper_reported 632 (S3.p1, LRT Phase:Training across both tissues), reproduced null with the reason stated. The summary does not claim a match.",
+      "fix": ""
+    },
+    {
+      "id": "stop_reason",
+      "verdict": "disagree",
+      "severity": "major",
+      "evidence": "Stop reason claims 'GEO has no animal ID (replicate letters cannot be verified as rats)'. This is an absence claim established by a narrow check (letter alone). The wider search in packet A finds group + letter as a one-per-tissue key for all 48 libraries, with expression support, and the paper states SAT and VAT come from the same rats with n=6 per group. Second half of the reason ('no DESeq2 LRT executor') may be true in this snapshot of the repository and is not assessed here; it blocks the primary reproduction independently of the animal key (project notes say LRT/SVA executors were added on a later branch).",
+      "fix": "Corrected stop reason: the animal key is plausible and well supported (group + replicate letter) but undocumented by the authors; the remaining blocker is the missing LRT/SVA executor. Run the paper-faithful LRT once an executor exists (no animal term in the paper), and run the sensitivity analysis in pairing's fix with the key labelled as an assumption. Confirmation would come from Supplementary 4D / the authors."
+    }
+  ],
+  "overall": "fix",
+  "human_items": [
+    "Policy: for a paper whose own model ignores a repeated-measure unit (here 2 tissues per rat, no animal term), which result is primary: the paper-faithful unpaired fit or the blocked sensitivity fit? Review suggests paper-faithful primary and blocked fit reported alongside.",
+    "Outlier identities (SAT_PM_Exp_d, SAT_PM_Exp_f, VAT_AM_Cont_e, VAT_AM_Exp_c) are inferred, not read from Supplementary 4D (PDF unavailable); confirm if the supplement can be obtained."
+  ],
+  "summary": "该案例在 covariance 步骤停止，理由是“GEO 没有动物 ID”，但这个结论只检验了单独的重复字母 a-f，没有检验“组别+字母”。组别+字母能把 48 个文库一一配成 24 只大鼠的 SAT/VAT 对，没有重复，表达相关性检查也支持（同键 r=0.345 对比 -0.01，p=0.0005），论文也说明 SAT 和 VAT 取自同一只大鼠，所以停止理由有误，评为 major。其余决策（分组、n=44 及离群点、公式、阈值、矩阵类型、论文复现数 632）与论文一致；建议先按论文原模型（无动物项）做 LRT，再以 limma-voom duplicateCorrelation 或分组织拟合做带标注的敏感性分析（动物嵌套于 Phase×Training，DESeq2 里不能直接加动物固定效应）。"
+}

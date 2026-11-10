@@ -1,0 +1,90 @@
+{
+ "case": "GSE302867",
+ "reviewer": "Claude (Sonnet 5.5) read-only reviewer",
+ "blind": {
+  "B1": "Yes. GSE302867 is the paper's own bulk heart RNA-seq (DA.p1; S4.10). Exercise factor = 6-week voluntary wheel running (Ex) vs sedentary (Sed); all 20 sequenced hearts carry it (10 Ex, 10 Sed), crossed with genotype (WT vs cardiomyocyte PGC-1a KO), 5 per cell (FIG11 e/f legend: n=5 per group; FIG13 a: n=5 hearts/group). Real in-vivo exercise arm, not an in-vitro mediator design.",
+  "B2": "Within genotype: WT_Ex vs WT_Sed and KO_Ex vs KO_Sed (Fig 2e, GSEA Hallmark; 5 vs 5). Within state: KO_Sed vs WT_Sed and KO_Ex vs WT_Ex (Fig 4a volcanos, DESeq2 FDR<0.05; 5 vs 5). No DEG counts reported in text or legends I found.",
+  "B3": "No repeated measures: one heart per mouse, four independent groups. The candidate pairing keys in packet A are only within-group index suffixes (title _1.._5) that recur across groups; they are not animal IDs, and the expression check does not support them (r 0.143 vs -0.036, permutation p 0.10). No blocking unit needed.",
+  "B4": "Paper does not say. S4.10.p1 only says DESeq2 was used for differential expression; Fig 2e/4a compare pairs of the 4 groups with no statement about a joint 4-group model versus per-pair fits.",
+  "B5": "S4.10.p1: 'Genes were considered differentially expressed if upregulated by log2FC>1 or downregulated by log2FC<-1 with an adjusted P-value <0.05 (using Benjamini-Hochberg correction).' Strict inequalities, DESeq2. Fig 4a legend: DESeq2, FDR<0.05 (no fold-change cutoff stated there). Counts reported: none."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "In-vivo wheel-running arm in all four groups (S4.4, FIG11, FIG13); suitability partially_analyzable only because of enumerated-name artefact; the run executed.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp derived from title regex; levels WTSed/KOSed/WTEx/KOEx n=5 each match FIG11 e/f and FIG13 a n=5/group; agrees with genotype and treatment characteristics; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts built explicitly in paper direction (KOEx vs KOSed, KOEx vs WTEx etc.); sanity: Gdf15 log2FC +2.94 (KOSed vs WTSed) and +3.44 (KOEx vs WTEx), matching S2.4.p2 (Gdf15 most upregulated in KO). Handback flags and avoids the alphabetical reversal in tools/suitability.py.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B3: one heart per mouse; candidate keys are within-group index suffixes only, expression check not_supported (p=0.10). Record 'repeated_measure_unit: none' is correct; no blocking required.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper silent on joint vs per-pair fit (B4). Joint cell-means limma on all 20 samples with rejected alternative recorded; paper gives no DEG counts so no basis to require both fits. Open policy item only.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Batch (5/16/2023), sex (male), age (14-16 wk), tissue constant; no covariate aliased with exercise or genotype beyond the design itself (wheel-cage housing is intrinsic to the exercise factor).",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Only FPKM deposited (processed_data_fpkm; integer fraction 0.17, max 69409, non-negative); limma on log2(FPKM+1) per policy, DESeq2 route recorded as blocked and not faked by rounding. Plain eBayes without limma-trend is acknowledged in HANDBACK tool problem 2; fold changes on log-FPKM scale compressed (declared deviation).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Applied rule padj<0.05 and |log2FC|>1 transcribes S4.10.p1; audit rule padj<0.05 matches Fig 4a legend (FDR<0.05). Deviation note on log-FPKM fold change recorded. No paper counts, so no rule-fit test possible.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "unsure",
+   "severity": "major",
+   "evidence": "No DEG counts to compare (stated). Pathway check: KO_Ex vs KO_Sed OXPHOS NES -3.54 agrees in sign with paper -10.22, but WT_Ex vs WT_Sed OXPHOS NES -2.64 is the OPPOSITE sign to paper +5.14 (Fig 2e). HANDBACK discloses this and says cause unresolved, but the study record caveats do not list it, and the cause cannot be settled from the files (method difference vs sample/label problem; Ppargc1a is +0.86 in KO vs WT sedentary, also unexpected). Honest disclosure; the primary WT-training pathway result is not reproduced.",
+   "fix": "Add the WT_Ex vs WT_Sed OXPHOS sign discordance to the study record caveats (currently only in HANDBACK). Optionally add a sensitivity check (e.g. run WT_Ex vs WT_Sed as a two-group fit, and rank-based GSEA on logFC) to see whether the sign depends on the joint model or the ranking statistic."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case; DESeq2 route blocked only as a method statement (counts truly not deposited, file list shows FPKM only).",
+   "fix": ""
+  }
+ ],
+ "overall": "human",
+ "human_items": [
+  "WT_Ex vs WT_Sed Hallmark OXPHOS goes the opposite way to the paper's Fig 2e (ours NES -2.64, paper +5.14) while KO_Ex vs KO_Sed agrees; cause (FPKM/limma vs DESeq2 counts, prerank vs phenotype-permutation GSEA, or sample labelling) is unresolved and a person should decide whether the primary result is acceptable as a declared deviation.",
+  "Open policy: joint cell-means model vs per-pair fits when the paper is silent.",
+  "Open policy: which threshold to report; here the paper rule is applied on the deviation route, with an unfiltered audit alongside."
+ ],
+ "summary": "本案例运行与分组、方向、配对（无重复测量）、阈值转录均与论文一致，FPKM 走 limma 的偏离已如实记录。但 WT 运动对 WT 静息的 Hallmark OXPHOS 方向与论文 Fig 2e 相反（NES -2.64 对 +5.14），HANDBACK 已披露但原因未解决，且 study 记录的 caveats 未列出，需要人工判断。"
+}

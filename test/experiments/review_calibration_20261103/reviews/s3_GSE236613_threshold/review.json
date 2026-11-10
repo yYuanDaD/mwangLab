@@ -1,0 +1,88 @@
+{
+ "case": "GSE236613",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Rat tibia RNA-seq, ovariectomized SD rats; resistance exercise (ladder climbing, 12 weeks) is a real in-vivo exercise arm (S2.3, S2.7.p1). Exercise samples: the 3 RE/Ovx left tibias; NE/Ovx are the exercise controls; Sham are non-ovariectomized controls.",
+  "B2": "NE/Ovx vs Sham (6697 DEGs, 4040 up/2657 down) and RE/Ovx vs NE/Ovx (4423 DEGs, 2227 up/2196 down), S3.4.p2; n=3 tibias per group (S2.7.p1), 18 rats total, 6 per group.",
+  "B3": "None. One left tibia per rat, three groups of different rats; right tibia was used for qPCR, not sequenced. Packet A candidate keys (title suffix) recur across groups but are animal numbers within groups, not a unit.",
+  "B4": "Paper does not say. S2.8.p1 only says 'The DESeq2 R software was used for differential expression analysis'.",
+  "B5": "S2.8.p1: 'differentially expressed genes (DEGs) with p-value < 0.05 and foldchange >1.2 or <0.83 were selected' (raw p-value, not FDR; fold change 1.2 up / 0.83 down). Counts: 6697 (NE vs Sham) and 4423 (RE vs NE), S3.4.p2; 401 and 213 after OP-gene intersection, S3.4.p3."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper S2.3/S2.7: RE/Ovx ladder-climbing resistance exercise arm, 3 left tibias sequenced; metadata treatment has 'resistance exercise' x3. Run is correct.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sham 3 / NE 3 / RE 3 matches S2.7.p1 (3 tibias per group); grp recode from characteristics_ch1.1.treatment agrees with titles Sham_*, Ovx_NE_*, Ovx_RE_*. No exclusions. Recorded discrepancy that 3 of 6 rats per group were sequenced is noted.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "disagree",
+   "severity": "minor",
+   "evidence": "Paper S3.4.p2 reports NE/Ovx vs Sham (NE treatment, Sham control). Design has grp_Sham_vs_NE (treatment=Sham, control=NE), signs reversed; disclosed in design note and study caveats, and the pairwise sensitivity pair_NE_vs_Sham is in the paper's orientation. RE vs NE is correct. flags.json possible_reversed_contrast is partly a false alarm for RE vs NE but real for Sham vs NE.",
+   "fix": "Change the secondary contrast to name grp_NE_vs_Sham with control=Sham, treatment=NE so the primary-model table has the paper's sign."
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One left tibia per independent rat (S2.4.p1, S2.7.p1); no animal contributes to two groups. Flag unused_subject_like_column is the group column itself (3 values), false positive. Title suffix key (e.g. 8) recurs across groups but animals are numbered within group and randomized to a single group, so it is not a unit.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on joint vs pairwise (S2.8.p1 only says DESeq2). Counts differ (joint RE vs NE 5 padj hits vs pairwise 152), and both fits were run and reported (joint primary, pair_RE_vs_NE and pair_NE_vs_Sham sensitivity).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All female, one tissue, one sequencing run/company (S2.1.p1, S2.7.p1); no batch/housing/lane columns in metadata. Record states no confounding columns. Sham vs OVX is intrinsically model vs surgery, noted as secondary.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer counts (integer_fraction 1.0, library sizes 12-17M) from eXpress via per-sample counts files; FPKM columns dropped. p-histogram frac_p_gt_0.9 0.09-0.12, not piled at 1. DESeq2 route matches S2.8.p1.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Paper S2.8.p1: 'DEGs with p-value < 0.05 and foldchange >1.2 or <0.83'. Record (threshold gate, paper_reconstruction, reasoning 'adjusted p < 0.05') transcribed padj < 0.05 with effect_cutoff null. The paper states raw p-value and a fold-change cutoff of 1.2/0.83 (log2 +0.263/-0.269) and neither is recorded; no discrepancy entry. Read-only count from result tables at pvalue<0.05 & FC rule: joint RE vs NE 749, joint Sham vs NE 2727, pair RE vs NE 874, pair NE vs Sham 2522; none reaches the paper's 4423 / 6697, so the paper's counts fit neither the stated rule nor padj.",
+   "fix": "Set paper_threshold = {metric: pvalue, cutoff: 0.05, effect_metric: fold change (|FC|>1.2 up, <0.83 down; log2 0.263/-0.269), inclusive: false, source_locator: S2.8.p1}; report counts under this rule as the paper-rule counts, keep padj<0.05 as the secondary statistically stricter rule, and add a discrepancy entry that the paper's 4423/6697 are not reproduced by either rule or by joint or pairwise fits."
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "study.reasoning says 'Paper's primary exercise contrast is reproduced with its method and threshold' and method gate says paper_route status 'reproduced', yet ours 5 vs paper 4423 (RE vs NE) and 1007 vs 6697 (Sham vs NE) under a rule that is not the paper's. The comparison is therefore not at the same rule and the claim overstates. Also Stat1 is up in RE vs NE in the paper but log2FC -0.566 in ours (padj 0.9999); other qPCR genes agree in direction but none is significant at padj.",
+   "fix": "Rerun the comparison table at the paper's rule (raw p<0.05, FC 1.2) and change the study and method statements to 'method reproduced, DEG counts not reproduced (order-of-magnitude gap); exercise effect is weak at n=3 under padj'. Note Stat1 direction conflict."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case; flags.json stop_claims empty.",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Which threshold to report as headline when the paper's raw-p + FC 1.2 rule yields 749-874 (RE vs NE) and 2522-2727 (NE vs Sham) but the paper reports 4423 and 6697: no tested rule or fit reproduces the counts."
+ ],
+ "summary": "分析的分组、配对（无重复测量）、矩阵类型和联合/成对拟合都与论文一致。主要问题是阈值转录错误：论文 S2.8.p1 使用原始 p<0.05 且倍数变化>1.2或<0.83，记录却写成 padj<0.05 且无效应量阈值，同时声称论文主对比已复现，而差异基因数 5 对 4423 差距极大。另外次要对比 Sham vs NE 的方向与论文（NE vs Sham）相反，虽已注明，建议改为 NE vs Sham。"
+}

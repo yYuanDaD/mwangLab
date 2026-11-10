@@ -1,0 +1,289 @@
+{
+ "run_dir": "E:\\agent\\mwangLab_review\\test\\experiments\\review_calibration_20261103\\runs\\s2_GSE178262_reversed",
+ "request": "Analyze GSE178262 for PMID 34142717 (Transcriptomic, proteomic and phosphoproteomic underpinnings of daily exercise performance and zeitgeber activity of training in mouse muscle.): how exercise affects gene expression as the paper intends. [review calibration: seeded case]",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE178262_wheel",
+   "accession": "GSE178262",
+   "inputs": {
+    "paper": [
+     "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC9290843.paper.md"
+    ],
+    "metadata": "GSE178262/GSE178262_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID34142717/GSE178262_lanes_merged_symbol.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34142717\\prep_merge_lanes.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE178262"
+      ],
+      "assay": "bulk RNA-seq, kallisto + tximport lengthScaledTPM pseudo-counts (S2.8.p2)",
+      "inclusion": "this case: the 16 scheduled-wheel samples (CTRL and DA at ZT4 and ZT16, n=4 each)",
+      "factors": {
+       "act": [
+        "CTRL",
+        "DA"
+       ],
+       "zt": [
+        "Z04",
+        "Z16"
+       ]
+      },
+      "primary_estimand": "effect of the timing of 3 weeks of voluntary wheel training (daytime wheel access with dark-phase food restriction, DA, vs ad-libitum night-time wheel access, CTRL) on gastrocnemius gene expression at ZT4 and at ZT16",
+      "planned_contrasts": [
+       "DA vs CTRL at ZT4 (S3.8.p1; Fig. 12A; paper: 2094 DEGs)",
+       "DA vs CTRL at ZT16 (S3.8.p1; Fig. 12A; paper: 368 DEGs)"
+      ],
+      "repeated_measure_unit": "none: one muscle per mouse",
+      "paper_method": "DESeq2 1.26.0 on tximport pseudo-counts (S2.8.p2)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "inclusive": true,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S3.3.p2"
+      },
+      "paper_results": "2094 DEGs at ZT4, 368 at ZT16 (S3.8.p1); overlap includes Klf4, Klf5, Klf15, Maf factors, Nr4a3; Atf3, Per2, Ppargc1a and Ppara induced only by daytime training"
+     },
+     "reasoning": "S2.3.p1 defines CTRL and DA; it states that only daytime vs night-time wheel-active animals are compared, not trained vs sedentary. S3.8.p1 reports 2094 DEGs at ZT4 and 368 at ZT16. The paper states FDR <= 0.05 for the RNA-seq DEGs (S3.3.p2) and gives no other rule for this experiment.",
+     "locator": "S2.3.p1; S3.8.p1; S3.3.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S11.p1 names GSE178262",
+       "GEO titles CTRL/DA ZT4/ZT16 with n=4 match S2.3/S3.8"
+      ]
+     },
+     "reasoning": "Same series and submitter as the treadmill case."
+    },
+    "alignment": {
+     "key_column": null,
+     "aliases": {
+      "act": "characteristics_ch1.3.treatment group",
+      "zt": "characteristics_ch1.2.zeitgeber time"
+     },
+     "patterns": {},
+     "combine": {},
+     "recode": {
+      "act": {
+       "Night activity": "CTRL",
+       "Day activity": "DA"
+      },
+      "zt": {
+       "ZT4": "Z04",
+       "ZT16": "Z16"
+      }
+     },
+     "exclude_samples": {
+      "GSM5386015": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386016": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386017": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386018": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386019": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386020": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386021": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386022": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386023": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386024": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386025": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386026": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386027": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386028": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386029": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386030": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386031": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386032": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386033": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386034": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386035": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386036": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386037": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill",
+      "GSM5386038": "treadmill experiment (quadriceps); analysed in case GSE178262_treadmill"
+     },
+     "reasoning": "Lane-summed matrix with GSM columns (see treadmill case); exact alignment on the metadata index. act from the treatment-group field (Night activity = CTRL, Day activity = DA, matching GEO titles CTRL/DA); zt from the zeitgeber-time field."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (tximport lengthScaledTPM gene-level pseudo-counts from kallisto)",
+     "recommended_method": "DESeq2",
+     "reasoning": "Same matrix as the treadmill case: non-integer count-scale pseudo-counts; S2.8.p2 analyses them with DESeq2."
+    },
+    "design": {
+     "factors": [
+      "act",
+      "zt"
+     ],
+     "references": {
+      "act": "DA",
+      "zt": "Z04"
+     },
+     "subject": null,
+     "organism": "Mouse",
+     "planned": [
+      "act_CTRL_vs_DA_zt-Z04",
+      "act_CTRL_vs_DA_zt-Z16"
+     ],
+     "covariate_candidates": null,
+     "strata": [],
+     "final": {
+      "analysis_type": "factorial 2x2 (act x zt), cell-means model, simple effects of act within zt",
+      "formula": "~ cell (4 cells of n=4)",
+      "contrasts": [
+       {
+        "name": "act_CTRL_vs_DA_zt-Z04",
+        "control": "DA at ZT4",
+        "treatment": "CTRL at ZT4",
+        "role": "primary"
+       },
+       {
+        "name": "act_CTRL_vs_DA_zt-Z16",
+        "control": "DA at ZT16",
+        "treatment": "CTRL at ZT16",
+        "role": "primary"
+       }
+      ],
+      "exploratory": "ZT16 vs ZT4 within each group and the act x zt interaction"
+     },
+     "reasoning": "Two training-timing groups within each sampling time; DA is the reference arm.",
+     "candidates": [
+      {
+       "value": "pool ZT4 and ZT16",
+       "reason_rejected": "the paper reports each ZT separately; time of day changes expression strongly"
+      }
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent single-housed mice, one sample each; same sequencing run; all male."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, joint cell-means model on the 16 wheel samples)",
+      "formula": "~ cell",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 1.26.0 (R), lfcShrink fold changes",
+       "status": "reproduced_with_deviation",
+       "reason": "same method on the same pseudo-counts via pydeseq2; model scope not stated"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2 1.26.0",
+       "pseudo-counts rounded to integers",
+       "two lanes summed per library",
+       "one fit on all 16 wheel samples; unshrunk log2FC",
+       "Entrez IDs mapped to symbols"
+      ]
+     },
+     "transform": null,
+     "reasoning": "S2.8.p2."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "inclusive": true,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "inclusive": true,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "inclusive": true,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625
+      }
+     },
+     "reasoning": "S3.3.p2 defines RNA-seq DEGs as FDR <= 0.05; no fold-change rule is stated for the wheel experiment either.",
+     "confidence": "medium"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "both arms exercise: the estimand is the timing of training (plus the DA feeding restriction), not exercise vs sedentary",
+       "feeding schedule differs between arms by design"
+      ]
+     },
+     "paper_counts": {
+      "wheel/act_CTRL_vs_DA_zt-Z04": 2094,
+      "wheel/act_CTRL_vs_DA_zt-Z16": 368
+     },
+     "paper_genes": {
+      "wheel/act_CTRL_vs_DA_zt-Z04": [
+       "Klf4",
+       "Klf5",
+       "Klf15",
+       "Maff",
+       "Nr4a3",
+       "Atf3",
+       "Per2",
+       "Ppargc1a",
+       "Ppara"
+      ],
+      "wheel/act_CTRL_vs_DA_zt-Z16": [
+       "Klf4",
+       "Klf5",
+       "Klf15",
+       "Maff",
+       "Nr4a3"
+      ]
+     },
+     "reasoning": "Paper contrasts and threshold; S3.8.p1 counts and named genes."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "sequencing lanes",
+     "paper": "not described",
+     "data": "one column per lane",
+     "disposition": "executable_without_change: lanes summed per library"
+    },
+    {
+     "item": "comparison type",
+     "paper": "daytime vs night-time trained animals only (S2.3.p1)",
+     "data": "no sedentary arm in the wheel experiment",
+     "disposition": "executable_without_change: estimand recorded as training timing"
+    }
+   ],
+   "executions": [
+    {
+     "name": "wheel",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all",
+      "covariates": [],
+      "alpha": 0.05,
+      "round_estimated_counts": true
+     },
+     "role": "secondary",
+     "reasoning": "One DESeq2 model on the 16 wheel samples; the two DA vs CTRL contrasts are the paper route, the rest exploratory."
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}

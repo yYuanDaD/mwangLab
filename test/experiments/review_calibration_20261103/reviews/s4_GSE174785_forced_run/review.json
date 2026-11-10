@@ -1,0 +1,89 @@
+{
+ "case": "case_07 / GSE174785",
+ "reviewer": "Claude Code subagent, claude-sonnet-5-5",
+ "blind": {
+  "B1": "No exercise arm in this series: GSE174785 compares FACS-sorted muscle ECs from soleus (oxidative, RmEC) vs EDL (glycolytic, WmEC) in WT and EC-specific Atf4-KO mice (S4.4.3.p1, DA.p1, S2.6.p1). No sedentary/exercised samples; metadata have no exercise words. It supports the paper's exercise-angiogenesis story only as a baseline EC-subtype (priming) comparison, not as an exercise-versus-sedentary study. No sample carries an exercise factor.",
+  "B2": "WT RmEC(soleus) vs WT WmEC(EDL), n=5 vs 5 (782 DEGs, S2.6.p1/Fig2G/Fig6B); Atf4-KO RmEC vs KO WmEC, n=5 vs 5 (Fig6B); WT vs KO within muscle is a secondary view (Fig6B-D). 20 samples = 2 muscles x 2 genotypes x 5.",
+  "B3": "Paper does not say whether soleus and EDL ECs came from the same animal or were pooled per sample. Titles carry only 'repN' within each muscle/genotype group; candidate key = genotype + rep suffix (links 20/20, 10 sets of 2, no duplicates) but it is just a replicate label; expression check says not_supported (diff -0.023, perm p 0.88). No animal ID field exists.",
+  "B4": "S4.4.3.p1: 'Samples were pooled together on a single dataset ... fitting a generalized linear model' - suggests one joint DESeq2 model on all samples; design formula not given. Paper does not state pairwise-only fits.",
+  "B5": "S4.4.3.p2 / S2.6.p1 / Fig6C legend: 'log fold change > 1 and adjusted p value < 0.05'. Counts: 782 and 140 genes DE between WT RmECs and WmECs 'respectively' (782 = higher in R, 140 = higher in W, since 211/782=27% and 126/140=90% match '73% not different' and '10% affected'); after Atf4 KO 211 and 126 remain."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Series has no exercise arm (B1; packet A 'Values with exercise words: none'). Record runs it as primary with primary_estimand 'Exercise-primed vs non-primed ECs' and only a caveat 'exercise priming inferred from muscle type'.",
+   "fix": "Label the case in the spec/HANDBACK as a baseline oxidative-vs-glycolytic EC (fibre-type) comparison from an exercise paper, not an exercise-vs-control analysis; do not describe it as an exercise result. Policy on whether such series count is for the person (human_items)."
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "muscle R/W 10/10 and genotype 10/10 map to source_name_ch1 / characteristics genotype; cells 5/5/5/5 match n=5 per group; no exclusions (alignment excluded_samples empty).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "design: treatment R (soleus RmEC) vs control W (EDL WmEC), matches paper 'RmECs versus WmECs'; up 945 = higher in R.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "B3: paper silent on animal identity; key genotype + rep suffix links 20/20 once each but expression check not_supported (p 0.88). decisions.json never mentions the candidate key; covariance reasoning only says 'one sample per sorted EC pool'.",
+   "fix": "Record in covariance/design reasoning that soleus-vs-EDL pairing by genotype+rep was considered, the expression check did not support it, and the animal identity is undocumented (confirm with authors/Data S1). No model change needed on current evidence."
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Joint '~ cell' (4 cells) model on all 20 samples, consistent with S4.4.3.p1 'pooled together on a single dataset' fit; paper silent on design formula (open policy), no pairwise comparison reported.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Muscle is by design the contrast; sex unknown (no markers), no batch column; run lane/sorting day not available. Library protocol discrepancy (Smart-seq2 vs TruSeq) recorded as non-blocking. Sex/batch unknown is only partly recorded in covariance.",
+   "fix": "Optionally note in covariance that sex and sort date are unknown."
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "matrix decision: feature_level 'transcript (ENSMUST)', 129,439 features, integer_fraction 0.62, and its own reasoning says 'a gene-level summary would be needed before DESeq2'. DEG_results_...WT.csv has 96,971 ENSMUST transcript rows and 1177 'DEGs' are transcripts; no gene mapping, so Atf3/Atf4 cannot be checked. Paper counts are genes (kallisto counts processed for DESeq2).",
+   "fix": "Summarise est_counts to gene level (tx2gene via Ensembl mouse annotation, sum per gene, round) and rerun DESeq2 for both contrasts; report DEGs per gene and confirm Atf3/Atf4 among top DEGs."
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "paper_threshold padj<0.05 and log2FC>1 (not inclusive) transcribed from S4.4.3.p2 / S2.6.p1; applied identically. Minor: paper says only 'log fold change' (base not stated); |lfc|>1 applied as log2.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "comparison pairs ours 1177 (up 945 + down 232, transcripts) with paper 782. B5: 782 is the count higher in RmEC (140 higher in WmEC), so total paper DEGs = 922 and the like-for-like pair is up 945 vs 782 / down 232 vs 140, at transcript not gene level. Also KO 'paper 211' is the number of WT DEGs still different after KO, not a KO DEG count, and no KO comparison is made against it.",
+   "fix": "Record paper counts as 782 up / 140 down (922 total) and compare after gene-level rerun; compare 211/126 as overlap of KO DEGs with WT DEGs; restate HANDBACK so it does not claim reproduction on the 1177 vs 782 pair."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case; execution completed.",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Whether a series comparing baseline oxidative vs glycolytic muscle ECs (no exercise-vs-sedentary arm) counts as an exercise study and should be run as primary.",
+  "Whether the paper's DEG counts 782/140 were obtained at gene level with log2 FC; and whether SOL and EDL samples with the same rep number come from the same mouse (ask authors / Data S1)."
+ ],
+ "summary": "该系列没有运动组，只有比目鱼与趾长伸肌内皮细胞（及Atf4敲除）的基线比较，运行记录应明确不是运动对照分析。更重要的是矩阵仍是转录本水平（ENSMUST，9.7万行），1177个DEG是转录本数，并且论文的782只是RmEC高表达方向（另有140个WmEC高表达），因此与论文的比较口径不一致，需要汇总到基因水平后重跑并重新比较。分组、方向、阈值和联合模型与论文一致；配对信息无法确认，已被表达检查否定支持。"
+}
