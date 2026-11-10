@@ -307,6 +307,18 @@ def _key_matches(columns: list[str], meta: pd.DataFrame) -> list[dict]:
     return sorted(out, key=lambda d: -d["matched"])
 
 
+def _column_groups(columns: list[str]) -> dict:
+    """Several value columns per sample (CLC exports, read_count + FPKM side by side): the shared
+    suffixes, so the spec can keep one kind with alignment.matrix_column_pattern."""
+    suffix = pd.Series([re.split(r"[_.\s]", str(c))[-1].lower() for c in columns])
+    counts = suffix.value_counts()
+    big = counts[(counts >= 2) & counts.index.str.contains("[a-z]", regex=True)]  # not replicate numbers
+    if len(big) < 2 or big.sum() < 0.8 * len(columns):
+        return {}
+    return {"suffixes": {k: int(v) for k, v in big.items()},
+            "use": "alignment.matrix_column_pattern, e.g. '^(.+)_<suffix>$' keeps one kind and strips the suffix"}
+
+
 def _norm_key(value: Any) -> str:
     return re.sub(r"[-_.\s]+", "", str(value)).lower()
 
@@ -388,6 +400,9 @@ def inspect_series(accession: str, *, data_root: str = "data", merge_tar: bool =
             if ids.get("excel_date_ids"):
                 entry["excel_date_ids"] = ids["excel_date_ids"]
             entry["alignment_keys"] = _key_matches(prof["sample_columns"], meta)
+            groups = _column_groups(prof["sample_columns"])
+            if groups:
+                entry["column_groups"] = groups
         except Exception as exc:  # an unreadable file is a fact to report, not a crash
             entry["error"] = _short(f"{type(exc).__name__}: {exc}", 300)
         matrices.append(entry)

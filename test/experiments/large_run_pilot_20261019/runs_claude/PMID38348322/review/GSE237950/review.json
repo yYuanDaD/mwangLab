@@ -1,0 +1,21 @@
+{"case": "GSE237950", "reviewer": "Claude Sonnet 5.5 (read-only decision review)",
+ "blind": {
+  "B1": "Yes. Rat obese model, 2x2 oxygen (normoxia 21% / hypoxia 13.6%) x quiet/treadmill exercise (S4.1.p1-p2), adipose and gastrocnemius. Exercise-carrying samples: CE (FCE1-3, MCE1-3) and HE (FHE2-3, MHE1-3); in vivo, 22 sequenced samples.",
+  "B2": "The data article (data descriptor) names no explicit comparisons. Natural contrasts: CE vs C and HE vs H within each tissue. n: FC 3, FCE 3, FH 2, FHE 2, MC 3, MCE 3, MH 3, MHE 3 (S3.p1, S4.1.p1, TAB2).",
+  "B3": "No within-tissue repeats (one tissue sample per rat per group). Adipose and muscle may come from the same rats, but the paper gives no animal ID (S4.1.p1 even says 22 rats, which conflicts with 10+12 samples). Packet A lists no candidate pairing key. Tissues must not be pooled without a unit.",
+  "B4": "The paper does not say whether groups were fitted jointly or as pairs (ABS.p1 only says 'differential gene expression analysis using DESeq').",
+  "B5": "The paper states no DEG rule (no FDR/p, no fold-change cutoff) and reports no DEG counts (ABS.p1, S3.p1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run decision matches B1: in vivo exercise arms present (CE, HE).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp levels C 6, CE 6, H 5, HE 5 split by tissue give the paper's n (TAB2, S3.p1). Controls are the same-oxygen quiet group (CE vs C, HE vs H), so no second factor is confounded. No exclusions beyond the paper's own (FH2, FHE1 absent, recorded as a discrepancy).", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts are named treatment vs control: CE vs C, HE vs H, with control listed as the quiet group.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Within a tissue the samples are different rats. Cross-tissue pairing is unrecorded in the paper and the data, but tissues are fitted separately, so it does not enter the model. The stated reason is recorded in the design rejected alternatives.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "The paper is silent (B4). The primary fit is original DESeq on 4 groups per tissue, and a DESeq2 joint model per tissue is run as a sensitivity. Both fits are reported, as the check asks when counts differ a lot (1 vs 56 DEG for fat CE vs C).", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Metadata show no batch, housing or counting-run column; all male, one strain. Tissue is crossed with grp and handled by stratifying.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "22 'Count (X)' columns are integers (integer_fraction 1.0), library sums 27-44 M; TPM/FPKM columns ignored. Raw counts fit DESeq/DESeq2.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "The paper states no rule (B5); the workflow default padj < 0.05 is labelled as default with an audit rule |log2FC| > 1 and the deviation noted.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No paper DEG numbers exist; HANDBACK and study caveat say nothing can be compared and claim no match.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal claims (flags.json stop_claims is empty).", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy question: the paper gives no threshold, so the workflow default is used; a person may want to confirm that default for data-descriptor papers.", "Fat HE vs H and H arms have n=2: results are low power, correctly labelled exploratory."],
+ "summary": "该案例为大鼠体内运动实验，样本分组与论文一致，对照选择为同氧浓度的安静组，方向正确。论文未给出DEG阈值、对比或结果，分析使用默认阈值并如实记录，同时以DESeq为主、DESeq2为敏感性分析。未发现阻断或重大问题，整体通过。"}

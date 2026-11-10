@@ -116,3 +116,8 @@ One section per case; newest last.
 ## be59c707b58c7328d0828ad5b9b2975ab6940ac8 / GSE229755 (2026-11-10)
 
 - policy: Open policy question (not an error): the paper's 88 DEGs are not reproduced from FPKM; whether to also seek counts from SRA (the series is type SRA) for a DESeq run is a person's call.
+
+## PMID38348322 / GSE237950 (2026-11-10)
+
+- policy: Open policy question: the paper gives no threshold, so the workflow default is used; a person may want to confirm that default for data-descriptor papers.
+- policy: Fat HE vs H and H arms have n=2: results are low power, correctly labelled exploratory.

@@ -583,3 +583,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38348322 (GSE237950)
 
 - joint_contrasts.py:64/131 'all' comparisons with execution subset raises on other-stratum cells (patched after this row); DESeq v1 executor slow (~1.5 min/contrast) Details: `PMID38348322/HANDBACK.md`.
+
+## 81faf204ee0675e01ceda312c920ebef1ecfe011 (GSE178367)
+
+- minor: inspect alignment_keys empty for 'counts.'-prefixed columns with key in title brackets (tools/case_runner.py:314 _contained_keys) Details: `81faf204ee0675e01ceda312c920ebef1ecfe011/HANDBACK.md`.
+
+## PMID39171527 (GSE269016)
+
+- no spec option to pick an annotation column as feature ID or a subset of sample columns, so a prep script was needed (case_runner.py:383); inspect mixes read_count+fpkm columns (inspect hint added after this row) Details: `PMID39171527/HANDBACK.md`.

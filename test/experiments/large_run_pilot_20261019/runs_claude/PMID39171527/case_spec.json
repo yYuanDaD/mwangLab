@@ -1,0 +1,132 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39171527",
+  "request": "Analyze GSE269016 for PMID 39171527 (Postprandial exercise regulates tissue-specific triglyceride uptake through angiopoietin-like proteins.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code subagent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE269016",
+      "accession": "GSE269016",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC11343597.paper.md"],
+        "metadata": "GSE269016/GSE269016_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID39171527/GSE269016_read_counts_by_symbol.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID39171527/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE269016"],
+            "assay": "bulk liver RNA-seq (BGI, MGISEQ-2000RS), mouse",
+            "primary_estimand": "Effect of a single bout of postprandial aerobic treadmill exercise (14 m/min, 3 h, started 3 h after refeeding) on the hepatic transcriptome of wild-type male C57BL/6J mice, versus sedentary littermates sampled at the same time.",
+            "sample_inclusion": "12 liver samples, 6 Sedentary + 6 Exercise (GEO); paper's postprandial liver experiments use n = 6 males/group, 8-10 weeks (FIG3, FIG4).",
+            "factors": {"treatment": ["Sedentary", "Exercise"]},
+            "planned_contrasts": ["Exercise vs Sedentary, liver, postprandial (S2.3.p1, Supplemental Figure 3A; paper reports only KEGG pathways, no DEG count)"],
+            "repeated_measure_unit": "none; independent animals per arm (S4.3.p2: half exercised, half sedentary)",
+            "paper_threshold": {"metric": null, "stated": false, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.13.p1 (RNA-seq 'as described previously (27)'; KEGG via BGI Dr.Tom); S4.14.p1 (P < 0.05 t test applies to bench assays, not to the transcriptome)"},
+            "paper_method": "not stated: RNA-seq 'performed as described previously (27)', KEGG enrichment with BGI Dr.Tom online tool (S4.13.p1); GEO data_processing: HISAT2/Bowtie2/RSEM",
+            "paper_results": "Hepatic insulin signaling pathway most dramatically regulated by exercise (S2.3.p1, Supp Fig 3A); exercise suppresses hepatic Angptl8 transcription (FIG3, S2.3.p1); Cebpa regulated by fasting and by exercise (S2.3.p2, Supp Fig 3D); exercise increases liver Angptl4 transcription (S2.4.p2, Supp Fig 4C)."
+          },
+          "reasoning": "S4.16.p1 states liver RNA-seq is deposited as GSE269016. S4.3.p2 defines the postprandial single-bout protocol (half exercised, half sedentary, sampled together). S2.3.p1 uses the transcriptome for KEGG (insulin signaling). No DE method or DEG threshold is given in the article (S4.13.p1 defers to ref 27 and BGI Dr.Tom).",
+          "confidence": "medium",
+          "locator": "S4.16.p1; S4.13.p1; S4.3.p2; S2.3.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.16.p1 names GSE269016 for liver RNA-seq", "GEO: 12 liver WT samples, Sedentary 6 / Exercise 6, Mus musculus", "matrix GSE269016_raw_counts.txt.gz holds read_count_S1..S6/E1..E6 matching the S#/E# codes in GEO titles"]},
+          "reasoning": "Paper data availability names this series; sample codes in matrix columns match GEO titles one-to-one; tissue liver and genotype WT agree with the paper's postprandial liver experiments.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "\\(([SE]\\d)\\)$"]},
+          "aliases": {"treatment": "characteristics_ch1.2.treatment"},
+          "patterns": {"grp": ["title", "Liver, (Sedentary|Exercise) \\d"]},
+          "recode": {"grp": {"Sedentary": "SED", "Exercise": "EX"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (after prep_matrix.py strips 'read_count_') are S1..S6, E1..E6; the GEO title ends with the same code in parentheses, e.g. 'Liver, Sedentary 1(S1)'. Key derived from title by regex, exact match. grp from title, cross-checked against characteristics treatment.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2 on rounded RSEM expected counts",
+          "reasoning": "GEO data_processing: Bowtie2 to assembled genes, expression by RSEM v1.3.1; supplementary file described as raw counts plus FPKM. read_count_* columns are ~68% integer with non-integer values like 64.36 (RSEM expected counts); fpkm_* columns are dropped. Paper's input to DE is not stated (BGI pipeline, S4.13.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_EX_vs_SED"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "estimand_type": "causal",
+            "design_column": "grp",
+            "control": "SED",
+            "treatment": "EX",
+            "contrasts": [{"name": "grp_EX_vs_SED", "control": "SED", "treatment": "EX", "role": "primary"}]
+          },
+          "reasoning": "Single factor with two arms of independent animals (S4.3.p2); the paper's transcriptome question is exercise vs sedentary in the postprandial liver (S2.3.p1). Tissue and genotype are constant.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one per sample; no batch, sex or litter recorded in GEO (all male per FIG3/FIG4 legends). No covariate added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald) on rounded RSEM expected counts",
+            "formula": "~ grp",
+            "rounding_documented": true,
+            "paper_route": {"method": "not stated (BGI pipeline, ref 27; Dr.Tom)", "status": "not_reported", "reason": "Article does not name the DE method or input; reproducing it exactly is not possible."},
+            "deviations": ["DE method chosen by the workflow because the paper does not state one; RSEM expected counts rounded to integers before DESeq2."]
+          },
+          "transform": "round",
+          "reasoning": "Estimated counts from RSEM support a negative-binomial count model after documented rounding (standard practice, tximport-style). BGI's standard pipeline also uses DESeq2, but the paper does not say so, so this is recorded as a workflow choice.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": null, "stated": false, "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false}
+          },
+          "reasoning": "The article states no DEG threshold (S4.13.p1); its P < 0.05 rule (S4.14.p1) is for t tests on bench data. Workflow default BH padj < 0.05 without effect cutoff applied; audit adds |log2FC| > 1 for comparison with typical BGI reporting.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["Paper reports no DEG count or threshold; comparison is limited to named genes (Angptl8 down, Cebpa regulated, Angptl4 up in liver) and the KEGG insulin-signaling finding.", "DE method not stated in paper; DESeq2 on rounded RSEM counts is a workflow choice."]
+          },
+          "paper_counts": {},
+          "paper_genes": {"grp_EX_vs_SED": ["Angptl8", "Cebpa", "Angptl4", "Angptl3"]},
+          "reasoning": "Paper-defined contrast and samples, method and threshold not stated by the paper so filled by workflow choice: declared deviation.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method and threshold", "paper": "not stated (RNA-seq as described previously, ref 27; KEGG via Dr.Tom)", "data": "RSEM expected counts deposited", "disposition": "executable_without_change"},
+        {"item": "matrix content", "paper": "not stated", "data": "file named raw_counts holds RSEM expected counts (non-integer) and FPKM columns", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "EX", "alpha": 0.05},
+          "role": "primary",
+          "reasoning": "Two independent arms, exercise vs sedentary, DESeq2 on rounded estimated counts."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_EX_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports KEGG enrichment (insulin signaling, S2.3.p1, Supp Fig 3A)."}
+      ]
+    }
+  ]
+}

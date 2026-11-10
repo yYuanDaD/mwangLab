@@ -1,0 +1,332 @@
+{
+  "schema_version": "1.0",
+  "run_id": "81faf204ee0675e01ceda312c920ebef1ecfe011",
+  "subject_id": "GSE178367",
+  "created_at": "2026-11-10T11:58:27",
+  "finished_at": "2026-11-10T11:58:34",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8348158.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC8348158.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T11:58:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "b770f2712696aedd2bd3a106a97b5dd251b38a807198efad3450ec62b372e3f1",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE178367_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE178367\\GSE178367_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T11:58:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0df0f8a2152e3431f17ce22d64b779491303c332a90a20ebdb3cd14ec0b0714e",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE178367_15Q_84Q_IGF1.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE178367\\GSE178367_15Q_84Q_IGF1.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-10T11:58:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1d174f12af4d20aa6aa4c35a90105852c75e3bfef18f18a76beea0a97e6b0a40",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE178367"
+        ],
+        "assay": "bulk RNA-seq (paired-end 150 bp, HISAT2 mm10, featureCounts) of total cerebellar RNA from 18-month-old YAC ATXN3 transgenic mice (S4.2.p1, S4.4.p1, S4.5.p2)",
+        "factors": {
+          "genotype": [
+            "15Q (control)",
+            "84Q (SCA3)"
+          ],
+          "treatment": [
+            "PBS (sham)",
+            "IGF-1 50 mg/kg i.p. weekly, 9-18 months"
+          ]
+        },
+        "groups": [
+          "15Q control (n=3)",
+          "84Q SCA3 sham (n=3)",
+          "84Q+IGF-1 (n=3)"
+        ],
+        "sample_inclusion": "9 cerebellar samples, 3 per group (GEO); no exclusions described",
+        "exercise_arm": "none: no exercise, training, or physical-activity intervention anywhere in the paper; 'exercise behavior' (ABS.p1) and rotarod/locomotor tests (S1.p3) are outcome measures from a prior GH study, not an intervention",
+        "primary_estimand": "Transcriptomic effect of SCA3 84Q genotype vs 15Q control in cerebellum, and of IGF-1 injection in 84Q mice (S1.p4, S2.2.p1); no exercise estimand",
+        "planned_contrasts": [
+          "84Q vs 15Q (S2.2.p1; paper: 521 DEGs, 62 up / 459 down)",
+          "84Q+IGF-1 vs 15Q (S2.2.p1; paper: 588 DEGs, 45 up / 543 down)",
+          "84Q+IGF-1 vs 84Q (S2.2.p1; paper: 6 DEGs, 1 up / 5 down)"
+        ],
+        "repeated_measure_unit": "none (independent animals)",
+        "normalization": "DESeq2 size factors; TPM for EDA and IPA (S4.5.p2, S4.6.p2)",
+        "paper_method": "DESeq2 v1.12.3 Wald test, BH adjustment (S4.6.p2, S4.7.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false,
+          "effect_inclusive": true,
+          "source_locator": "S4.7.p1"
+        },
+        "paper_results": "S2.2.p1 reports counts 'with an adjusted p-value < 0.05' (521 / 588 / 6), which conflicts with the methods rule padj < 0.1 and |log2FC| >= log2(1.5) (S4.7.p1)"
+      },
+      "reason": "Paper compares SCA3 84Q transgenic vs 15Q control mice and 84Q mice injected with IGF-1 (S4.1.p1, S1.p4). DE by DESeq2 Wald, BH, |log2FC| >= log2(1.5) and padj < 0.1 (S4.7.p1). No exercise arm exists; the request's exercise estimand is not part of this study.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T11:58:27"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE178367\\GSE178367_15Q_84Q_IGF1.txt.gz",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE178367",
+          "GEO treatment_protocol matches S4.1.p1 (PBS or IGF1 50 mg/kg weekly from 9 to 18 months)",
+          "3 groups x 3 cerebellar samples (15Q, 84Q, 84Q+IGF1) match the paper's groups",
+          "data_processing: Trimmomatic v0.36, hisat2, mm10, featureCounts, matching S4.5.p2"
+        ],
+        "accession": "GSE178367",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE178367\\GSE178367_metadata.csv"
+      },
+      "reason": "Data availability statement and GEO protocols match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T11:58:27"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 9,
+        "n_metadata": 9,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "source_name_ch1",
+              "regex": "^Cerebellar tissue - (15Q|84Q|84Q\\+IGF1)$",
+              "recode": {
+                "15Q": "Q15",
+                "84Q": "Q84",
+                "84Q+IGF1": "Q84IGF"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\design_metadata.csv",
+          "sha256": "0cab692b374bd9bad6e2e4bce16c81139a53d083d262de4ba7421abd4561f536",
+          "levels": {
+            "grp": {
+              "Q15": 3,
+              "Q84": 3,
+              "Q84IGF": 3
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are 'counts.<lab id>'; the lab id sits in brackets at the end of the GEO title (e.g. 'Cerebellar tissue - 84Q_rep1 [18_1_4]'). Exact match after stripping the 'counts.' prefix. Group from source_name_ch1, recoded to formula-safe names.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T11:58:28"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE178367_15Q_84Q_IGF1.txt.gz (GEO supplementary)",
+        "paper_input": "featureCounts raw counts into DESeq2 (S4.5.p2, S4.7.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\aligned_matrix.csv",
+          "sha256": "abd292f9ad5b70ea04daa3f65314ae9894f1fc7fa34ec30482f9c5fd77532561",
+          "n_features": 37816,
+          "n_samples": 9,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 360695.0,
+          "median": 10.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integer (integer_fraction 1.0, max 360695, median 10); GEO data_processing says raw counts from featureCounts; matches paper input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T11:58:28"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "contrasts": [],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "The request asks how exercise affects gene expression. The paper's estimands are SCA3 genotype and IGF-1 treatment effects; the word 'exercise' appears only as a behavioral outcome of prior GH treatment (ABS.p1). Refused at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the study's only factors are ATXN3 genotype (15Q vs 84Q) and IGF-1 injection (PBS vs IGF-1 in 84Q). No sample received an exercise or training intervention and no sedentary-vs-exercise grouping exists in the paper (S4.1.p1) or GEO metadata (source_name_ch1, genotype, treatment), so the requested exercise estimand cannot be identified. Manufacturing a genotype or IGF-1 contrast as 'exercise' would change the estimand."
+      },
+      "recorded_at": "2026-11-10T11:58:34"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "eaf3791ca190f4196a5a5d277520c98c0e49ef73e7faa6e1eb4567218eef9a38",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6f9d2f78c72a2af245f6967c27bb84d815ecd0836603a7515d464bcb014e88e9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "abd292f9ad5b70ea04daa3f65314ae9894f1fc7fa34ec30482f9c5fd77532561",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0cab692b374bd9bad6e2e4bce16c81139a53d083d262de4ba7421abd4561f536",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a607ab6b4ffc307c54c0c1a4837c1790daf0f631c96c28a885d4adfb1797aaa6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\81faf204ee0675e01ceda312c920ebef1ecfe011\\GSE178367\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a88a25e884749f1a55d61ec0394f0629ccdc1c17412806ff2b00325163e2a04e",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
