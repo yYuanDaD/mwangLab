@@ -615,3 +615,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40627397 (GSE282641)
 
 - none blocking; joint_contrasts.py:150 logs n at fixed 0.05 instead of alpha 0.1; per-contrast filtering makes a padj plateau at 0.1; Hif1a not reduced at gene level Details: `PMID40627397/HANDBACK.md`.
+
+## PMID37059838 (GSE228901)
+
+- none blocking; metadata protocol text shows GBK mojibake (cosmetic) Details: `PMID37059838/HANDBACK.md`.
