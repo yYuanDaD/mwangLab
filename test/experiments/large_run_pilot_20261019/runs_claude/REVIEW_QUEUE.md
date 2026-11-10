@@ -130,3 +130,7 @@ One section per case; newest last.
 
 - policy: Open policy question: whether to still run the paper's own (batch-aliased) comparison as a labelled paper-reproduction with no biological claim, since the paper itself did exactly this; the skill's gate stops it.
 - policy: Not an error: the CPM-only deposit would need limma on log2(CPM+1) even if the covariance gate were waived.
+
+## PMID40789206 / GSE297842 (2026-11-10)
+
+- policy: Open policy: joint vs pairwise fit when paper is silent (counts differ 29 vs 93); paper's counts are closer to the joint fit but do not fully match either.
