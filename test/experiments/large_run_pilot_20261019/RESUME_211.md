@@ -72,3 +72,7 @@ Next time: rerun 35, 46, 50, 51, then continue in `run_order_211.txt` from 52.
 
 Resumed 2026-11-03 01:19 local (owner shares one 5-hour window across three threads; this run has the
 lowest priority): 2 papers at a time instead of 5. Order: rows 35, 46, 50, 51, then 52 onward.
+
+Quota stop 2026-11-03 ~05:10: row 35 had finished (42/211); rows 46 and 50 were cut off. PR #8 (review
+step) merged; resumed 2026-11-10 00:20 local (owner: "对的"): rows 46, 50 rerun (folders moved to
+`_interrupted/`), 51, then 52 onward, 3 analyses at a time plus their reviews.
