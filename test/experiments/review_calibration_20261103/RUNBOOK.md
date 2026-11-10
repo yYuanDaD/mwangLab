@@ -60,4 +60,4 @@ Optional arm after the Sonnet pass, only if quota is left: Haiku on the same pac
 | 4 review | c3_GSE324100 | done (case_10; first try stopped by quota before writing, rerun 2026-11-10) | sonnet (requested) | 103932 | 0.8 | OVERALL: pass; DISAGREE: none (unsure only: model_fit:minor, confounding:minor) |
 | 4 review | c4_GSE302867 | done (case_03) | sonnet (requested) | 109815 | 1.4 | OVERALL: human; DISAGREE: none (unsure: paper_match:major, WT_Ex vs WT_Sed Hallmark OXPHOS sign opposite to paper Fig 2e) |
 | 4 review | c5_GSE230002 | done (case_02) | sonnet (requested) | 101879 | 1.1 | OVERALL: pass; DISAGREE: none (minor notes: threshold, paper_match, confounding, grouping) |
-| 5 score | all | | | | | |
+| 5 score | all | done | | mean 98917 | mean 1.0 | caught 6/6; clean blocking/major 0/5, 0 false alarms after adjudication (REPORT.md) |
