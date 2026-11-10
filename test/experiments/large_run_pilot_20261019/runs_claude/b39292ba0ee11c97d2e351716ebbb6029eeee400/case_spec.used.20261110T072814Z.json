@@ -1,0 +1,162 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/b39292ba0ee11c97d2e351716ebbb6029eeee400",
+  "request": "Analyze GSE97718 for the paper (Exercise and high-fat feeding remodel transcript-metabolite interactive networks in mouse skeletal muscle): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE97718",
+      "accession": "GSE97718",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC5647435.paper.md"],
+        "metadata": "GSE97718/GSE97718_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/b39292ba0ee11c97d2e351716ebbb6029eeee400/prep/GSE97718_FPKM_gene_level.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/b39292ba0ee11c97d2e351716ebbb6029eeee400/prep/fix_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE97718"],
+            "assay": "bulk RNA-seq (TruSeq stranded mRNA, HiSeq 2500), mouse quadriceps",
+            "factors": {"diet": ["CON (10% fat)", "HFD (60% fat) for 10 weeks"], "exercise": ["pre (basal, acclimatized+fasted)", "post (3 h after one maximal treadmill bout)"]},
+            "sample_inclusion": "2x2 factorial, n = 4 muscles per group (FIG2/FIG3/FIG4 legends), independent male C57BL/6NTac mice; all 16 GEO samples",
+            "primary_estimand": "Acute maximal exercise effect (post vs pre, 3 h) on quadriceps gene expression within CON-diet mice and within HFD mice (between-animal, not repeated measures)",
+            "planned_contrasts": [
+              "CON-post vs CON-pre (S2.2.p1; paper: 292 up + 109 down = 401 DEGs)",
+              "HFD-post vs HFD-pre (S2.2.p1; paper: 208 up + 115 down = 323 DEGs)",
+              "HFD-pre vs CON-pre (S2.1.p2; paper: 119 up + 93 down = 212 DEGs) - diet effect, secondary",
+              "HFD-post vs CON-post (S2.2.p3; paper: 234 DEGs) - diet effect post-exercise, secondary"
+            ],
+            "repeated_measure_unit": "none (pre and post are different animals, S4.4.p1)",
+            "normalization": "Cufflinks FPKM (S4.6.p1)",
+            "paper_method": "TopHat (mm9) + Cufflinks/Cuffdiff pairwise comparisons (S4.6.p1)",
+            "paper_threshold": {"metric": "not_stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.6.p1", "note": "Paper says only that comparisons were done with cufflinks; no FDR/fold-change rule is stated (Cuffdiff's default 'significant' flag is q < 0.05, but that is not written in the paper). S4.9.p1 p < 0.05 refers to physiological t-tests/ANOVA."},
+            "paper_results": "DEG counts in S2.1.p2/S2.2.p1/S2.2.p3; named genes: Ppargc1a and Nr4a3 (exercise reverts HFD-pre pattern, S2.2.p3), Egr1 and Klf5 induced by exercise mainly in CON (S2.2.p2), Cited2/Dusp10/Trp63 induced in CON but abrogated in HFD (S3.p4), Pfkfb3 down and Tbc1d1 up in HFD-pre (S2.1.p2)"
+          },
+          "reasoning": "Methods S4.1/S4.4: CON vs HFD for 10 weeks, then basal (pre) or 3 h after a maximal treadmill test (post). RNA-seq S4.6.p1 with Cufflinks; n = 4 per group (FIG3). The paper's question about exercise is the post vs pre comparison within each diet (S2.2.p1); the diet contrasts (S2.1.p2, S2.2.p3) are secondary.",
+          "confidence": "high",
+          "locator": "S2.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.10.p1 names GSE97718", "16 GEO samples = 4 groups x 4, matching n = 4 per group", "titles CON-pre/HFD-pre/CON-post/HFD-post match the paper's group names", "source quadriceps matches S2.2.p1", "data_processing TopHat mm9 + cufflinks matches S4.6.p1"]},
+          "reasoning": "Data availability statement S4.10.p1 cites GSE97718; sample groups, tissue, strain (C57BL/6NTac), age (16 weeks) and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(CON|HFD)-(pre|post) (\\d)$"]},
+          "matrix_column_pattern": "^(CON|HFD)(pre|post)_(\\d) \\(FPKM\\)$",
+          "patterns": {"grp": ["title", "^(CON|HFD)-(pre|post) \\d$"]},
+          "recode": {"grp": {"CON_pre": "CONpre", "CON_post": "CONpost", "HFD_pre": "HFDpre", "HFD_post": "HFDpost"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns 'CONpre_1 (FPKM)' and metadata titles 'CON-pre 1' both reduce to the key CON_pre_1 by name (diet, time, replicate number); no positional matching. grp is the 4-level diet x exercise group taken from the title.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "reasoning": "File name GSE97718_FPKM_cufflinks_all_samples, column headers '(FPKM)', data_processing 'cufflinks', 39% integer fraction (mostly zeros) and decimal values; linear FPKM, not counts. The paper's input was Cufflinks/Cuffdiff on aligned reads, which is not deposited (no BAM/counts). Prep script restored 25 Excel-mangled names (Marchf*/Septin*/Selenof) and summed the 262 gene names that Cufflinks reported on several loci into one gene-level row.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CONpre"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_CONpost_vs_CONpre", "grp_HFDpost_vs_HFDpre", "grp_HFDpre_vs_CONpre", "grp_HFDpost_vs_CONpost"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multi-group (2x2 factorial as a 4-level group factor)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_CONpost_vs_CONpre", "control": "CONpre", "treatment": "CONpost", "role": "primary"},
+              {"name": "grp_HFDpost_vs_HFDpre", "control": "HFDpre", "treatment": "HFDpost", "role": "primary"},
+              {"name": "grp_HFDpre_vs_CONpre", "control": "CONpre", "treatment": "HFDpre", "role": "secondary"},
+              {"name": "grp_HFDpost_vs_CONpost", "control": "CONpost", "treatment": "HFDpost", "role": "secondary"}
+            ],
+            "estimand_type": "causal (assigned intervention groups)"
+          },
+          "candidates": [
+            {"value": "pooled exercise effect (post vs pre across diets)", "reason_rejected": "paper analyzes exercise separately within CON and HFD (S2.2.p1); pooling would mix diet-specific responses"},
+            {"value": "diet x exercise interaction term", "reason_rejected": "paper does not test an interaction; it compares within-diet exercise DEG lists and CON-post vs HFD-post (S2.2.p3)"}
+          ],
+          "reasoning": "Paper reports pairwise Cuffdiff comparisons among the four groups; a single model with all 16 samples and the four planned contrasts reproduces those comparisons (one control level per contrast, no pooling).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Each sample is a different mouse (pre group is a separate basal cohort, S4.4.p1); no batch, lane or animal pairing is recorded in GEO. No blocking term.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) on log2(FPKM+1)",
+            "formula": "~ 0 + grp",
+            "paper_route": {"method": "Cufflinks/Cuffdiff on TopHat alignments", "status": "blocked", "reason": "only the FPKM matrix is deposited; Cuffdiff needs the aligned reads (BAM) or per-sample abundance files"},
+            "deviations": ["limma on log2(FPKM+1) instead of Cuffdiff", "one model on all 16 samples instead of pairwise Cuffdiff runs", "gene-level rows (multi-locus names summed) instead of Cufflinks loci"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: FPKM -> log2(x+1) -> limma. DESeq2/edgeR/voom are not allowed on FPKM.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper states no DEG rule (S4.6.p1). Workflow default BH FDR < 0.05 with no fold-change cutoff; it coincides with Cuffdiff's default q < 0.05 'significant' call. Audit raw p < 0.01 shown only to gauge sensitivity of counts."
+          },
+          "reasoning": "No threshold in S4.6.p1; S4.9.p1's p < 0.05 refers to physiology statistics, so workflow default is used and marked as a fallback.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Cuffdiff is blocked (no reads deposited); limma on log2(FPKM+1) is a declared deviation, so DEG counts are not expected to match exactly",
+              "paper DEG threshold not stated; workflow default BH FDR < 0.05 applied",
+              "n = 4 per group; pre and post are different animals (between-animal exercise effect)"
+            ]
+          },
+          "paper_counts": {
+            "joint/grp_CONpost_vs_CONpre": 401,
+            "joint/grp_HFDpost_vs_HFDpre": 323,
+            "joint/grp_HFDpre_vs_CONpre": 212,
+            "joint/grp_HFDpost_vs_CONpost": 234
+          },
+          "paper_genes": {
+            "joint/grp_CONpost_vs_CONpre": ["Egr1", "Klf5", "Cited2", "Dusp10", "Trp63", "Nr4a3", "Ppargc1a"],
+            "joint/grp_HFDpost_vs_HFDpre": ["Egr1", "Klf5", "Nr4a3", "Ppargc1a"],
+            "joint/grp_HFDpre_vs_CONpre": ["Pfkfb3", "Tbc1d1"]
+          },
+          "reasoning": "Paper counts from S2.1.p2, S2.2.p1, S2.2.p3. Named genes from S2.2.p2, S2.2.p3, S3.p4, S2.1.p2.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method", "paper": "Cufflinks/Cuffdiff on TopHat alignments (S4.6.p1)", "data": "only FPKM matrix in GEO", "disposition": "declared_deviation"},
+        {"item": "threshold", "paper": "not stated", "data": "n/a", "disposition": "workflow_default"},
+        {"item": "gene identifiers", "paper": "mm9 gene names", "data": "25 names Excel-mangled to date serials; 262 names on several Cufflinks loci", "disposition": "repaired by prep/fix_matrix.py (restored names; multi-locus rows summed)"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "reasoning": "One limma model on all 16 log2(FPKM+1) samples; the two within-diet exercise contrasts are primary, the two diet contrasts secondary."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_CONpost_vs_CONpre", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO/KEGG enrichment of CON-post DEG (FIG3 A,C)."},
+        {"execution": "joint/grp_HFDpost_vs_HFDpre", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO/KEGG enrichment of HFD-post DEG (FIG3 B,D)."}
+      ]
+    }
+  ]
+}

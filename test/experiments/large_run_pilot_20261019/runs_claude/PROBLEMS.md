@@ -519,3 +519,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## e6da17ec35146322588e4f22850014a7def00cc7 (GSE217155)
 
 - tools/geo_tar.py:111-114 drops multi-sample tar member GSM6705777 (9->8 samples), warning not in inspect notes; Entrez IDs need prep symbol mapping Details: `e6da17ec35146322588e4f22850014a7def00cc7/HANDBACK.md`.
+
+## b39292ba0ee11c97d2e351716ebbb6029eeee400 (GSE97718)
+
+- inspect misses Excel date-serial gene IDs (case_runner.py ~366); filter_low_counts raw-counts-only so FPKM filter needed prep matrix (patched after this row); GBK mojibake in contact_name Details: `b39292ba0ee11c97d2e351716ebbb6029eeee400/HANDBACK.md`.

@@ -1,0 +1,88 @@
+{
+ "case": "GSE217155",
+ "reviewer": "Claude Sonnet 5.5 (read-only)",
+ "blind": {
+  "B1": "Yes. Ath-diet NASH mice with 8 wk treadmill training vs sedentary Ath mice (S2.1.p1, S2.2.p1); sequenced samples with the exercise factor are the 3 EXE samples (grp=EXE), compared with 3 NASH; 3 CON are the diet control.",
+  "B2": "EXE (Ath+exercise) vs NASH (Ath sedentary): 204 DEGs (S3.2.p1, FIG3B); NASH vs NCD control via GO/GSEA only (S3.2.p2, FIG3D/E). Paper randomized n=8/group (S2.1.p1); sequenced n not stated; GEO has 3 per group.",
+  "B3": "No repeated measures: one liver per independent mouse; no candidate pairing keys in packet A.",
+  "B4": "Paper does not say; S2.6.p1 only states 'performed RNA-seq analysis of mice liver tissue from each group using DESeq2'.",
+  "B5": "S2.6.p1: 'genes with adjusted P-values less than 0.05 and absolute values of log2 fold change (log2FC) greater than 1 were considered to be statistically significant'; strict, FDR-type padj. Reported 204 DEGs, 79 up, 125 down (S3.2.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper S2.1.p1/S2.2.p1: Ath+8wk treadmill arm exists; metadata grp=EXE (3 samples). Run is right.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp is an alias of characteristics_ch1.4.treatment (Con/Ath diet/EXE+Ath diet), 3/3/3, titles musCTR/musNASH/musEXE agree. Control for the exercise contrast is NASH (same Ath diet), correct. GEO has 3 of the paper's 8 mice per group; recorded as a discrepancy.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EXE vs NASH (treatment EXE, control NASH); Dio1 log2FC +1.95, up as in S3.2.p1. NASH vs CON with CON as control matches S3.2.p3 (inflammation positive, OXPHOS negative).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Packet A lists no candidate pairing keys; S2.1.p1 gives independent mice, one liver each. The unused_subject_like_column flag is the treatment column itself (the group variable, 3 levels), a false positive.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper does not say joint or pairwise (S2.6.p1 only 'DESeq2'); one ~grp model on all 9 samples with planned contrasts. Open policy question; minor record inconsistency ('~ cell' in execution vs '~ grp' in method) is cosmetic.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All male, same strain, tissue, platform; GEO has no batch/lane/date column; recorded as not_required.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM read_count columns (integer_fraction 0.69, some fractional) are estimated counts, rounded for DESeq2; documented. Packet B p-value fractions (frac_p_gt_0.9 0.10, frac_p_lt_0.05 0.11) show no pathological histogram.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.6.p1: adjusted P < 0.05 and |log2FC| > 1, strict; applied identically. 188 (padj+lfc1) is nearest to 204; no other rule in the table fits better (309, 336, 546), so no alternative rule is implied.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same contrast (EXE vs NASH) and same rule compared: 188 vs 204 (68/120 vs 79/125). HANDBACK states the gap and does not claim reproduction beyond direction/Dio1/GSEA signs; the n=3 vs 8 difference is stated.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Joint vs pairwise fit when the paper is silent (open policy question); pairwise fit of EXE vs NASH alone would be a cheap sensitivity check but not required."
+ ],
+ "summary": "本案例与论文一致:EXE 对 NASH 为主要比较,方向、阈值(padj<0.05 且 |log2FC|>1)、样本分组均正确。差异基因数 188 对论文 204,差异已如实记录(GEO 每组仅3只,论文随机8只)。未发现阻断或重要问题,整体通过。"
+}

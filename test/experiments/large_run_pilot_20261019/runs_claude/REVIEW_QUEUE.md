@@ -47,3 +47,11 @@ One section per case; newest last.
 ## PMID40832111 / GSE296683 (2026-11-10)
 
 - policy: Open policy: whether an in-vitro exercise-like (electrical pulse) stimulation series with the drug as the only varied factor counts as an exercise study; the refusal is consistent with the skill rule but the person may want the tomatidine-vs-vehicle contrasts run and labelled as a drug effect under E-Stim.
+
+## 9eef7b263d48ceff706cefc035f28c278d2d060d / GSE124676 (2026-11-10)
+
+- policy: Open policy question: the paper's numbers fit its raw P<0.05 rule on a paired t-test, while our limma route gives 1,984 (up count 529 vs 417); whether to add a plain paired t-test executor to close the gap is a policy choice, not an error.
+
+## e6da17ec35146322588e4f22850014a7def00cc7 / GSE217155 (2026-11-10)
+
+- policy: Joint vs pairwise fit when the paper is silent (open policy question); pairwise fit of EXE vs NASH alone would be a cheap sensitivity check but not required.
