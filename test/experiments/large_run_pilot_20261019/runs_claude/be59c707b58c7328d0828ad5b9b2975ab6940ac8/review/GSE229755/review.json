@@ -1,0 +1,21 @@
+{"case": "GSE229755", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. PMC10318136 (S2.1.p1, S2.2.p1) is an in-vivo chronic treadmill exercise study (6 weeks) in male C57BL/6J mice, liver. GSE229755 is the transcriptomics deposit (S6.p1). All 6 Exe samples carry the exercise factor; the 6 Con are sedentary.",
+  "B2": "Exe vs Con, n = 6 per group for transcriptomics (S2.3.p1), 12 mice; proteomics/acetylomics n = 4 per group (not in this series).",
+  "B3": "No repeated measures: one liver per mouse (S2.3.p1), 12 distinct mice. The title suffix L1-L6 in packet A is only a within-group replicate index (same-key expression check not_supported, r -0.08, permutation p 0.79), not an animal ID.",
+  "B4": "Two groups only, so one model equals the pairwise fit. The paper states 'Differential expression analysis was performed using the DESeq' (S2.4.p1) without further model detail.",
+  "B5": "S2.4.p1: 'DEGs were obtained with |log_2FC| > 1 and Q-value <= 0.05'; S3.1.p1: 88 DEGs, 28 up and 60 down in Exe vs Con."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run decision matches B1: real in-vivo exercise arm, metadata carry sedentary vs chronic exercise.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp from title, Con 6 / Exe 6, matches S2.3.p1; identical to treatment/description columns; no exclusions; control is the sedentary arm.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Exe vs Con, Con as reference; Cyp4a10 and Cyp4a14 are up (log2FC +1.17, +2.13), same direction as S3.3/S4.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Flag pairing_key_candidate is the L1-L6 replicate index; paper says one liver per mouse in independent groups (S2.1.p1, S2.3.p1); pairing_check not_supported. Not a repeated measure, no blocking needed.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "~ grp on all 12 samples, a single two-group contrast; full rank, residual df 10.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "All male, same tissue, no batch/housing fields in GEO; Con kept in the same room (S2.2.p1); only the group column is aliased with itself.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "minor", "evidence": "Only per-sample FPKM deposited (non-integer, median 2.4); DESeq blocked and FPKM not rounded; limma-trend on log2(FPKM+1) with a declared deviation and an unfiltered sensitivity run. p-value histogram is near uniform (frac p<0.05 0.061), consistent with a real null on this input rather than a method fault. Minor: GEO mentions both mm10/Bowtie2 and GRCm39, recorded as a discrepancy.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Transcribed exactly: padj <= 0.05 inclusive, |log2FC| > 1 exclusive (S2.4.p1); Q-value read as BH. Audit rule BH < 0.05 also reported. No alternative rule reproduces 88 (best nominal p<0.01 gives 121, p<0.05 & |lfc|>1 gives 6), so no threshold discrepancy to record.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Ours 0 vs paper 88 is the same Exe vs Con contrast, reported honestly as a deviation-route (FPKM limma vs counts DESeq) not directly comparable; HANDBACK does not claim a reproduction and names Cyp4a10/Cyp4a14 as same-direction but not FDR-significant.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; ORA skipped only because 0 genes pass the input threshold, which is true (padj min 0.58), and Hallmark GSEA was run.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy question (not an error): the paper's 88 DEGs are not reproduced from FPKM; whether to also seek counts from SRA (the series is type SRA) for a DESeq run is a person's call."],
+ "summary": "该系列是真正的体内慢性运动实验（Exe vs Con，每组6只），分组、方向、阈值（Q<=0.05且|log2FC|>1）均与论文一致。pairing_key_candidate 只是组内重复编号 L1-L6，论文明确每只小鼠一个肝脏样本，表达相关性检查也不支持，因此无需配对。因GEO只有FPKM，改用limma-trend并如实声明偏离，结果0个DEG与论文88个不可直接比较，整体通过。"}

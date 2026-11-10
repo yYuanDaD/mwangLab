@@ -579,3 +579,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40169574 (GSE269020)
 
 - none blocking; inspect gave alignment_keys [] for title WT-1 vs column WT_1 (separator-only difference; patched after this row), fixed via key_patterns Details: `PMID40169574/HANDBACK.md`.
+
+## PMID38348322 (GSE237950)
+
+- joint_contrasts.py:64/131 'all' comparisons with execution subset raises on other-stratum cells (patched after this row); DESeq v1 executor slow (~1.5 min/contrast) Details: `PMID38348322/HANDBACK.md`.

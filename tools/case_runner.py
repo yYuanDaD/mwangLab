@@ -750,7 +750,7 @@ class CaseRun:
                 raise native.NativeToolError(f"{ex.tool} takes none of {MATRIX_KWARGS}")
             kwargs.update({matrix_kw: str(matrix), "metadata_csv": str(meta_path), "output_dir": str(out)})
             if "comparisons" in params:
-                kwargs["comparisons"] = self._comparisons(kwargs.get("comparisons", "planned"))
+                kwargs["comparisons"] = self._comparisons(kwargs.get("comparisons", "planned"), ex.subset)
             final.update(n_samples=int(len(meta)), matrix=str(matrix))
             transform = ex.transform or (self.spec.gates.method.transform if ex.matrix == "analysis" else None)
             if transform:
@@ -792,9 +792,13 @@ class CaseRun:
                              execution_status="failed")
             self.result.setdefault("executions", {})[ex.name] = {"error": final["execution_error"]}
 
-    def _comparisons(self, choice: Any) -> list[dict]:
+    def _comparisons(self, choice: Any, subset: Optional[dict] = None) -> list[dict]:
         if choice == "all":
-            return self.comparisons
+            # with an execution subset, "all" means the comparisons whose cells lie inside it
+            keep = {str(k): {str(v) for v in vals} for k, vals in (subset or {}).items()}
+            return [c for c in self.comparisons
+                    if all(str(cell["cell"].get(k, next(iter(vals)))) in vals
+                           for cell in c.get("cells", []) for k, vals in keep.items() if k in cell["cell"])]
         names = self.spec.gates.design.planned if choice == "planned" else list(choice)
         by_name = {c["name"]: c for c in self.comparisons}
         missing = [n for n in names if n not in by_name]

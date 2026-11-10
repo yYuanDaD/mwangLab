@@ -108,3 +108,11 @@ One section per case; newest last.
 ## 2148e268704227111378324e8a4175163d2e8e5f / GSE110507 (2026-11-10)
 
 - policy: Open policy: whether a VDR-OE vs control run is wanted as a non-exercise sensitivity/reference result (paired edgeR, P<0.05, paper 3,330 genes). Not required: the case is correctly refused for the exercise question. The paper's exercise data (GSE47881 human RET microarray) would need a separate case.
+
+## PMID40169574 / GSE269020 (2026-11-10)
+
+- policy: Policy (open): whether a KO vs WT genetic contrast in a series with an exercise-factor paper should be offered as a labelled non-exercise result; the case chose to refuse, consistent with the skill.
+
+## be59c707b58c7328d0828ad5b9b2975ab6940ac8 / GSE229755 (2026-11-10)
+
+- policy: Open policy question (not an error): the paper's 88 DEGs are not reproduced from FPKM; whether to also seek counts from SRA (the series is type SRA) for a DESeq run is a person's call.

@@ -1,0 +1,21 @@
+{"case": "GSE269020", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No for an exercise question: GSE269020 holds iWAT RNA-seq of HFD-fed male sedentary WT (flox/flox) and KLF10-AKO mice only (Fig 5a legend 'without exercise'; DA.p1; S4.18.p1). Packet A has no exercise words in any column and treatment is constant HFD-fed. No sequenced sample carries the exercise factor; Ex/Sed groups were used for physiology, qPCR, western only.",
+  "B2": "KLF10AKO vs WT, HFD-fed, sedentary, iWAT; n = 4 mice per group (Fig 5 legend 'n = 4 mice per group in a, c'). Paper: 2907 up, 1639 down.",
+  "B3": "No repeated measures: 8 samples, one tissue (iWAT), one time point, 4 mice per genotype. Titles WT-1..4 / KO-1..4 are replicate numbers within genotype, not shared animals; the suffix 'pairing' key is a label coincidence. Expression check not_supported (r 0.02 vs -0.006, permutation p 0.19).",
+  "B4": "Paper does not state a model structure; a single two-group comparison (KO vs WT) with edgeR, BH (S4.18.p1); Fig 5 legend says 'two-sided Wald tests plus Benjamini-Hochberg' (inconsistent with edgeR, which has no Wald test by default).",
+  "B5": "S4.18.p1: 'padj < =0.05 and |log2(foldchange)| >= 1' (BH-adjusted, edgeR). Fig 5a/b/c legends state only 'Padj < 0.05'. Reported counts 2907 up / 1639 down (4546) in Fig 5a."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Blind B1 matches: no exercise arm among the 8 sequenced samples (Fig 5a legend, DA.p1, packet A exercise words none). Refusal for an exercise claim is right; the KO vs WT genetic contrast is correctly not substituted.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp WT 4 / KO 4 matches Fig 5 n = 4 per group; genotype column agrees with title-derived grp; no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run; the planned KLF10AKO vs WT is the paper's direction.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "The mechanical pairing_key_candidate flag is spurious: titles WT-n/KO-n number replicates within genotype, paper has n = 4 mice per group with a single tissue/time point, and pairing_check status not_supported (same-key r 0.02, p 0.19). No repeated measures.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Single two-group comparison; paper silent on structure; nothing was fitted.", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "One sex, one diet, one tissue; only genotype varies. Nothing to alias with an exercise factor.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Only GSE269020_gene_fpkm.txt.gz deposited (FPKM, non-integer, max 76877); paper used edgeR on counts. Recorded as a discrepancy; moot at refusal.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "minor", "evidence": "paper_threshold transcribed as S4.18.p1 (padj <= 0.05, |log2FC| >= 1, inclusive) and the Fig 5a legend-only Padj < 0.05 discrepancy recorded. Possible note: the 4546 count likely corresponds to the Padj-only rule, stated as recorded/moot.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK reports no ours-vs-paper comparison (not run) and claims nothing beyond the numbers; paper counts quoted from Fig 5a.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise arm in sequenced samples' is true and established widely: GEO metadata (treatment constant HFD-fed), Fig 5a legend, S4.18.p1, DA.p1 and packet A exercise-word scan all agree. Not a narrow search.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Policy (open): whether a KO vs WT genetic contrast in a series with an exercise-factor paper should be offered as a labelled non-exercise result; the case chose to refuse, consistent with the skill."],
+ "summary": "该系列只测序了高脂饮食、久坐的WT与KLF10 AKO小鼠iWAT(每组4只),没有运动组,拒绝作为运动问题分析的理由属实且证据充分。自动给出的pairing_key_candidate标记是虚假的:标题后缀只是组内重复编号,表达相关性检验也不支持配对。未发现需要修改的阻断或主要问题,总体通过。"}
