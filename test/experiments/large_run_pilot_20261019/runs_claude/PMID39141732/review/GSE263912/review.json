@@ -1,0 +1,21 @@
+{"case": "GSE263912", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No for an exercise question. The only RNA-seq (S4.22.p1-p2, FIG5 A-C) is gastrocnemius from HFD-fed, overnight-fasted sedentary mice of three genotypes (control, p38a MCK-KO, p38a/g MCK-KO). Exercise appears only in unsequenced experiments (treadmill plasma IL-15 FIG5E, human biopsies, behaviour). No sequenced sample carries an exercise factor; packet A finds no exercise words in any column.",
+  "B2": "Three pairwise contrasts (S4.22.p2): p38a MCK-KO vs control, p38a/g MCK-KO vs control, p38a MCK-KO vs p38a/g MCK-KO; 3 libraries per genotype (9 total), each library a pool of two animals (S4.22.p1).",
+  "B3": "No repeated measures. Each library is a pool of two individual animals, one tissue, one time point. The only 'candidate keys' are the replicate suffix 1-3 of the title, which is a replicate number across genotypes, not an animal; the expression check is not_supported (r -0.054, p 0.70).",
+  "B4": "Paper says limma with TMM and a CPM>=1 in >=3 samples filter, then three pairwise contrasts (S4.22.p2). It does not say explicitly whether one joint model or separate pair fits were used.",
+  "B5": "'Changes in gene expression were considered significant if associated with a Benjamini and Hochberg adjusted P value of <0.05' (S4.22.p2), no fold-change cutoff. Secreted-protein candidate list used raw P < 0.05 (S4.24.p1); 15 secreted-protein DEGs in p38a MCK-KO (S2.7.p1). Total FDR DEG counts not reported."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Refusal matches B1: genotype-only design, no exercise arm in sequenced samples (S4.22.p1, FIG5 A-C).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Alignment 9/9; HN=p38aMCK-KO, COW=p38a/gMCK-KO, KIC=control matches GEO genotype field per sample; n=3 each matches paper. No exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Flags unused_subject_like_column and pairing_key_candidate are spurious: the title suffix is a replicate index across genotypes, libraries are pools of two animals (S4.22.p1), expression check not_supported.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "No model fitted; paper is silent on joint vs pairwise, which the record does not need to settle.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Single sex, single diet and tissue; no batch field. Nothing aliased with genotype in the metadata.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Deposited file is TMM-normalized CPM (non-integer, filtered), correctly not treated as counts; recommended limma on log2(x+1) is sensible. Paper-vs-data difference recorded.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "HANDBACK states BH FDR<0.05, no FC cutoff (S4.22.p2) and the raw-P rule for the secreted list (S4.24.p1), matching B5.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No 'ours vs paper' comparison is claimed; HANDBACK says none because refused.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "The reason is that no exercise factor exists. It is true and was established from the paper's Methods and the metadata, not from a narrow search.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy question only: whether a muscle knockout genotype series in a paper about exercise signalling should be run as a non-exercise analysis; the refusal follows the stated skill rule."],
+ "summary": "该系列仅含三种基因型（对照、p38α MCK-KO、p38α/γ MCK-KO）的久坐高脂饲喂小鼠腓肠肌，每组3个由两只动物混合的文库，没有运动因素，因此在设计阶段拒绝分析是正确的。分组、样本数和阈值转录均与论文一致；配对标记为误报（后缀只是重复编号，表达检查不支持）。未发现需要修改的项目。"}

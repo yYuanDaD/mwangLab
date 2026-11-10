@@ -166,3 +166,17 @@ One section per case; newest last.
 ## PMID36695573 / GSE198827 (2026-11-10)
 
 - policy: Open policy question: whether the trained-only genotype contrast (LSD1-mKO vs WT under VWR, the paper's Fig 5 analysis) should be reported as an exercise-context result with an explicit 'no exercise factor' label, or refused as done here. Refusal is consistent with the stated rule; this is not an error.
+
+## PMID39141732 / GSE263912 (2026-11-10)
+
+- policy: Open policy question only: whether a muscle knockout genotype series in a paper about exercise signalling should be run as a non-exercise analysis; the refusal follows the stated skill rule.
+
+## PMID36198295 / GSE183239 (2026-11-10)
+
+- policy: Open policy: which threshold/filter reading to treat as primary when the paper's numbers fit another reading (literal all-sample count>10 filter vs total count>10 sensitivity; padj<0.1 closest for scWAT rescue).
+- policy: Open policy: joint (~ grp) vs pairwise fits when the paper is silent; only the joint fit is reported.
+
+## PMID36198295 / GSE183239 (2026-11-10)
+
+- policy: Open policy: which threshold/filter reading to treat as primary when the paper's numbers fit another reading (literal all-sample count>10 filter vs total count>10 sensitivity; padj<0.1 closest for scWAT rescue).
+- policy: Open policy: joint (~ grp) vs pairwise fits when the paper is silent; only the joint fit is reported.

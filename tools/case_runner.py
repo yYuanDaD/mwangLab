@@ -51,7 +51,7 @@ Status = Literal["valid", "unresolved", "manual_review", "refused"]
 MATRIX_KWARGS = ("counts_csv", "normalized_csv", "expression_csv")
 Transform = Literal["log2(x+1)", "log2(CPM+1)", "beta_to_m", "round"]
 RECORD_FILES = ("run_manifest.json", "run_status.json", "summary.csv", "workflow.log")
-_EXTENSIONS = (".csv", ".tsv", ".txt", ".csv.gz", ".tsv.gz", ".txt.gz", ".xlsx")
+_EXTENSIONS = (".csv", ".tsv", ".txt", ".csv.gz", ".tsv.gz", ".txt.gz", ".xlsx", ".xls.gz")  # GEO .xls.gz are TSV
 
 
 # ---------------------------------------------------------------- spec
@@ -541,6 +541,10 @@ class CaseRun:
 
         # alignment
         a = g.alignment
+        if a.decision_status != "valid":
+            # a refused / manual_review alignment stops here, before any matching is attempted
+            self.decide("alignment", a, dict(a.final), [matrix_item, meta_item])
+            return self._finish()
         adir = case.dir / "aligned"
         metadata = Path(s.inputs.metadata)
         if a.key_patterns:

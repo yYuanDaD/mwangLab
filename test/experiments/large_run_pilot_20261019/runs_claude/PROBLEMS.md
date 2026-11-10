@@ -655,3 +655,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39141732 (GSE263912)
 
 - inspect hung: no timeout on suppl download over HTTPS, no FTP fallback (tools/geo_tools.py:60, :93; timeout added after this row); file fetched over ftp:// by hand Details: `PMID39141732/HANDBACK.md`.
+
+## PMID35030322 (GSE190355)
+
+- case_runner.py:582 ran align_to_metadata before reading the manual_review gate (patched after this row); inspect missed .xls.gz TSV matrix (patched) Details: `PMID35030322/HANDBACK.md`.

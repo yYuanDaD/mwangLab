@@ -1,0 +1,748 @@
+{
+  "case_id": "GSE194193",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "train",
+    "nr",
+    "pt"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "train",
+        "nr",
+        "pt"
+      ],
+      "levels": {
+        "train": {
+          "SED": 32,
+          "VWR": 30
+        },
+        "nr": {
+          "Sal": 31,
+          "NR": 31
+        },
+        "pt": {
+          "PT": 32,
+          "noPT": 30
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "rin"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "rin",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(train) + C(nr) + C(pt) + C(rin)",
+        "rank": 16,
+        "full_rank": true,
+        "residual_df": 46,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 18,
+      "n_analyzable": 18,
+      "too_small": [],
+      "planned_analyzable": [
+        "train_VWR_vs_SED_nr-Sal_pt-noPT",
+        "train_VWR_vs_SED_nr-NR_pt-noPT",
+        "train_VWR_vs_SED_nr-Sal_pt-PT",
+        "train_VWR_vs_SED_nr-NR_pt-PT"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 62 samples.",
+      "metadata_sex_column": "characteristics_ch1.6.Sex",
+      "predicted": {
+        "male": 62
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "train_VWR_vs_SED_nr-NR_pt-PT",
+      "kind": "simple",
+      "factor": "train",
+      "test": "VWR",
+      "reference": "SED",
+      "within": {
+        "nr": "NR",
+        "pt": "PT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "NR",
+            "pt": "PT",
+            "train": "VWR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "NR",
+            "pt": "PT",
+            "train": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_VWR_vs_SED_nr-NR_pt-noPT",
+      "kind": "simple",
+      "factor": "train",
+      "test": "VWR",
+      "reference": "SED",
+      "within": {
+        "nr": "NR",
+        "pt": "noPT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "NR",
+            "pt": "noPT",
+            "train": "VWR"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "nr": "NR",
+            "pt": "noPT",
+            "train": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_VWR_vs_SED_nr-Sal_pt-PT",
+      "kind": "simple",
+      "factor": "train",
+      "test": "VWR",
+      "reference": "SED",
+      "within": {
+        "nr": "Sal",
+        "pt": "PT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "Sal",
+            "pt": "PT",
+            "train": "VWR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "Sal",
+            "pt": "PT",
+            "train": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_VWR_vs_SED_nr-Sal_pt-noPT",
+      "kind": "simple",
+      "factor": "train",
+      "test": "VWR",
+      "reference": "SED",
+      "within": {
+        "nr": "Sal",
+        "pt": "noPT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "Sal",
+            "pt": "noPT",
+            "train": "VWR"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "nr": "Sal",
+            "pt": "noPT",
+            "train": "SED"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_NR_vs_Sal_train-SED_pt-PT",
+      "kind": "simple",
+      "factor": "nr",
+      "test": "NR",
+      "reference": "Sal",
+      "within": {
+        "train": "SED",
+        "pt": "PT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "SED",
+            "pt": "PT",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "pt": "PT",
+            "nr": "Sal"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_NR_vs_Sal_train-SED_pt-noPT",
+      "kind": "simple",
+      "factor": "nr",
+      "test": "NR",
+      "reference": "Sal",
+      "within": {
+        "train": "SED",
+        "pt": "noPT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "SED",
+            "pt": "noPT",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "pt": "noPT",
+            "nr": "Sal"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_NR_vs_Sal_train-VWR_pt-PT",
+      "kind": "simple",
+      "factor": "nr",
+      "test": "NR",
+      "reference": "Sal",
+      "within": {
+        "train": "VWR",
+        "pt": "PT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "VWR",
+            "pt": "PT",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "pt": "PT",
+            "nr": "Sal"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_NR_vs_Sal_train-VWR_pt-noPT",
+      "kind": "simple",
+      "factor": "nr",
+      "test": "NR",
+      "reference": "Sal",
+      "within": {
+        "train": "VWR",
+        "pt": "noPT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "VWR",
+            "pt": "noPT",
+            "nr": "NR"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "pt": "noPT",
+            "nr": "Sal"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "pt_PT_vs_noPT_train-SED_nr-NR",
+      "kind": "simple",
+      "factor": "pt",
+      "test": "PT",
+      "reference": "noPT",
+      "within": {
+        "train": "SED",
+        "nr": "NR"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "NR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "NR",
+            "pt": "noPT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "pt_PT_vs_noPT_train-SED_nr-Sal",
+      "kind": "simple",
+      "factor": "pt",
+      "test": "PT",
+      "reference": "noPT",
+      "within": {
+        "train": "SED",
+        "nr": "Sal"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "Sal",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "Sal",
+            "pt": "noPT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "pt_PT_vs_noPT_train-VWR_nr-NR",
+      "kind": "simple",
+      "factor": "pt",
+      "test": "PT",
+      "reference": "noPT",
+      "within": {
+        "train": "VWR",
+        "nr": "NR"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "NR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "NR",
+            "pt": "noPT"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "pt_PT_vs_noPT_train-VWR_nr-Sal",
+      "kind": "simple",
+      "factor": "pt",
+      "test": "PT",
+      "reference": "noPT",
+      "within": {
+        "train": "VWR",
+        "nr": "Sal"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "Sal",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "Sal",
+            "pt": "noPT"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_nr_VWR_NR_vs_SED_Sal_pt-PT",
+      "kind": "interaction",
+      "factor": "train:nr",
+      "test": "VWR:NR",
+      "reference": "SED:Sal",
+      "within": {
+        "pt": "PT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "pt": "PT",
+            "train": "VWR",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "pt": "PT",
+            "train": "SED",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "pt": "PT",
+            "train": "VWR",
+            "nr": "Sal"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "pt": "PT",
+            "train": "SED",
+            "nr": "Sal"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_nr_VWR_NR_vs_SED_Sal_pt-noPT",
+      "kind": "interaction",
+      "factor": "train:nr",
+      "test": "VWR:NR",
+      "reference": "SED:Sal",
+      "within": {
+        "pt": "noPT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "pt": "noPT",
+            "train": "VWR",
+            "nr": "NR"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "pt": "noPT",
+            "train": "SED",
+            "nr": "NR"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "pt": "noPT",
+            "train": "VWR",
+            "nr": "Sal"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "pt": "noPT",
+            "train": "SED",
+            "nr": "Sal"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_pt_VWR_PT_vs_SED_noPT_nr-NR",
+      "kind": "interaction",
+      "factor": "train:pt",
+      "test": "VWR:PT",
+      "reference": "SED:noPT",
+      "within": {
+        "nr": "NR"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "NR",
+            "train": "VWR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "NR",
+            "train": "SED",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "NR",
+            "train": "VWR",
+            "pt": "noPT"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "nr": "NR",
+            "train": "SED",
+            "pt": "noPT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "train_pt_VWR_PT_vs_SED_noPT_nr-Sal",
+      "kind": "interaction",
+      "factor": "train:pt",
+      "test": "VWR:PT",
+      "reference": "SED:noPT",
+      "within": {
+        "nr": "Sal"
+      },
+      "cells": [
+        {
+          "cell": {
+            "nr": "Sal",
+            "train": "VWR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "Sal",
+            "train": "SED",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "nr": "Sal",
+            "train": "VWR",
+            "pt": "noPT"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "nr": "Sal",
+            "train": "SED",
+            "pt": "noPT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_pt_NR_PT_vs_Sal_noPT_train-SED",
+      "kind": "interaction",
+      "factor": "nr:pt",
+      "test": "NR:PT",
+      "reference": "Sal:noPT",
+      "within": {
+        "train": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "NR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "Sal",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "NR",
+            "pt": "noPT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "SED",
+            "nr": "Sal",
+            "pt": "noPT"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "nr_pt_NR_PT_vs_Sal_noPT_train-VWR",
+      "kind": "interaction",
+      "factor": "nr:pt",
+      "test": "NR:PT",
+      "reference": "Sal:noPT",
+      "within": {
+        "train": "VWR"
+      },
+      "cells": [
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "NR",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "Sal",
+            "pt": "PT"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "NR",
+            "pt": "noPT"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "train": "VWR",
+            "nr": "Sal",
+            "pt": "noPT"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

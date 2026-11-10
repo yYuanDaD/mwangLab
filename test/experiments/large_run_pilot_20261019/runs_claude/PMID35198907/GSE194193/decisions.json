@@ -1,0 +1,852 @@
+[
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "paper_reconstruction",
+    "evidence": [
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accessions": [
+        "GSE194193"
+      ],
+      "assay": "bulk mRNA-seq (TruSeq stranded, NovaSeq 52-bp PE), quadriceps muscle, male C57BL/6NTac mice on western diet",
+      "factors": {
+        "VWR": [
+          "sedentary",
+          "voluntary wheel running 4 wk"
+        ],
+        "NR": [
+          "saline i.v.",
+          "NR 100 mg/kg i.v. daily"
+        ],
+        "PT": [
+          "regular WD",
+          "WD + pterostilbene"
+        ]
+      },
+      "sample_inclusion": "2^3 full factorial, 8 groups x 8 mice = 64; 2 mice removed (stroke at surgery; button infection) -> 62 (S4.3.2.p1, S4.4.1.p1)",
+      "primary_estimand": "Main effect of 4 weeks of voluntary wheel running (VWR vs sedentary) on quadriceps gene expression, averaged over the NR and PT arms; wheels locked before the last dark phase, so a chronic training effect, not acute exercise",
+      "planned_contrasts": [
+        "VWR main effect (S2.6.p3; paper: 2,245 protein-coding genes at q < 0.05)",
+        "NR main effect (S2.6.p1; paper: 4 protein-coding genes: Nmrk2 down, Art3, Myh8, Mymk up)",
+        "NR x PT x VWR interactions (S2.6.p1; paper: none at q < 0.05)",
+        "PT main effect (S2.6.p3; paper: 0 genes)"
+      ],
+      "repeated_measure_unit": "none (one quadriceps sample per mouse)",
+      "normalization": "edgeR (TMM, edgeR default)",
+      "paper_method": "edgeR v3.30.3 quasi-likelihood NB GLM, ~ group + RIN, group = 4 (or 8) combinations of NR, VWR (and PT); effects from contrasts between group levels; FDR q-values (S4.4.10.p3)",
+      "paper_threshold": {
+        "metric": "FDR",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null,
+        "source_locator": "S2.6.p1, S2.6.p3"
+      },
+      "paper_results": {
+        "VWR": "2,245 protein-coding genes q < 0.05; Art3 down (q=0.019), Mymk down (q=0.006); Cd38, Sirt3, Sirt5 up; NAD+ synthesis genes (Nmrk1, Nmrk2, Nmnat1, Nmnat3, Nadsyn1, Naprt, Qprt, Nampt) unchanged",
+        "NR": "Nmrk2 down about 65%, Art3 up, Myh8 up, Mymk up",
+        "GO": "camera GO, top-10 terms up with VWR (Fig 6J)"
+      }
+    },
+    "paper": {
+      "locator": "S4.4.10.p3"
+    },
+    "confidence": "medium",
+    "reasoning": "S4.3.2.p1 describes the 2x2x2 factorial with VWR as the exercise factor; S4.4.10.p3 gives the edgeR QL model ~ group + RIN with group-level contrasts; S2.6.p1/p3 give q < 0.05 counts restricted to protein-coding genes. The methods say 4 (or 8) groups without saying which model produced the VWR count; the main figures pool PT (PT had no effect), so both variants are run.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:24+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "ownership",
+    "evidence": [
+      {
+        "id": "metadata:GSE194193_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_metadata.csv",
+        "sha256": "56c9db1e048fd5235313a1e44f2748a29b1f7240fbbc82446e0bc83733f4ec36"
+      },
+      {
+        "id": "matrix:GSE194193_counts.csv.gz",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_counts.csv.gz",
+        "sha256": "288178dcfb66173ff69a9caafa355e8203589a9e6511249253d4cb09d0ca01d7"
+      },
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_counts.csv.gz",
+      "owned": true,
+      "checks": [
+        "key resources table lists GEO: GSE194193 as RNA-seq data from this paper",
+        "metadata: quadriceps, Mus musculus, male, NovaSeq 6000, 62 samples = 64 minus the 2 removed mice",
+        "titles encode Training/NR/PT exactly as the 2x2x2 design",
+        "data_processing matches STAR 2.7.3a + featureCounts 2.0.0 on GENCODE vM22 (S4.4.10.p3)"
+      ],
+      "accession": "GSE194193",
+      "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_metadata.csv"
+    },
+    "paper": {
+      "locator": "Key resources table"
+    },
+    "confidence": "high",
+    "reasoning": "Key resources table (RNA-seq data, GEO: GSE194193) and the data availability statement name this series; sample count and factors match S4.3.2.p1.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:24+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "alignment",
+    "evidence": [
+      {
+        "id": "matrix:GSE194193_counts.csv.gz",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_counts.csv.gz",
+        "sha256": "288178dcfb66173ff69a9caafa355e8203589a9e6511249253d4cb09d0ca01d7"
+      },
+      {
+        "id": "metadata:GSE194193_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_metadata.csv",
+        "sha256": "56c9db1e048fd5235313a1e44f2748a29b1f7240fbbc82446e0bc83733f4ec36"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+        "sha256": "bea59d1e1ee97d295031dc9934bd37ed1c28562f6876e6d9c953cb40cfa2297d"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\design_metadata.csv",
+        "sha256": "b8883cf9d87d98d7db06b2a7fb210c029cb7bcbb1896821ea83afb493f526ec6"
+      },
+      {
+        "id": "tool_output:alignment_map.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\alignment_map.csv",
+        "sha256": "dab79bd320c3efb1b7ebf84ffdd047d02b29f2fa2ef7aabc71caf6888fb04e11"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "exact:title",
+      "n_aligned": 62,
+      "n_metadata": 62,
+      "coverage": 1.0,
+      "unmatched_matrix_columns": [
+        "start",
+        "end",
+        "length"
+      ],
+      "unmatched_metadata_samples": [],
+      "excluded_samples": {},
+      "derived_columns": {
+        "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_metadata.csv",
+        "columns": {
+          "train": {
+            "alias_of": "characteristics_ch1.0.training_state",
+            "recode": {
+              "noTraining": "SED",
+              "Training": "VWR"
+            }
+          },
+          "nr": {
+            "alias_of": "characteristics_ch1.1.nr_supplementation",
+            "recode": {
+              "noNR": "Sal",
+              "NR": "NR"
+            }
+          },
+          "pt": {
+            "alias_of": "characteristics_ch1.2.pt_supplementation",
+            "recode": {
+              "noPT": "noPT",
+              "PT": "PT"
+            }
+          },
+          "rin": {
+            "alias_of": "characteristics_ch1.5.rin"
+          },
+          "cohort": {
+            "alias_of": "characteristics_ch1.3.cohort"
+          },
+          "grp": {
+            "combine": [
+              "train",
+              "nr",
+              "pt"
+            ],
+            "separator": "_",
+            "of": "recoded values"
+          },
+          "grp4": {
+            "combine": [
+              "train",
+              "nr"
+            ],
+            "separator": "_",
+            "of": "recoded values"
+          }
+        },
+        "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\design_metadata.csv",
+        "sha256": "b8883cf9d87d98d7db06b2a7fb210c029cb7bcbb1896821ea83afb493f526ec6",
+        "levels": {
+          "train": {
+            "SED": 32,
+            "VWR": 30
+          },
+          "nr": {
+            "Sal": 31,
+            "NR": 31
+          },
+          "pt": {
+            "PT": 32,
+            "noPT": 30
+          },
+          "rin": {
+            "9.6": 13,
+            "9.9": 7,
+            "9.8": 7,
+            "10.0": 7,
+            "9.4": 5,
+            "9.7": 5,
+            "9.2": 5,
+            "9.5": 4,
+            "9.3": 3,
+            "9.1": 3,
+            "8.7": 1,
+            "9.0": 1,
+            "8.6": 1
+          },
+          "cohort": {
+            "1": 31,
+            "2": 31
+          },
+          "grp": {
+            "VWR_Sal_PT": 8,
+            "SED_Sal_noPT": 8,
+            "SED_NR_noPT": 8,
+            "SED_NR_PT": 8,
+            "SED_Sal_PT": 8,
+            "VWR_NR_PT": 8,
+            "VWR_NR_noPT": 7,
+            "VWR_Sal_noPT": 7
+          },
+          "grp4": {
+            "SED_Sal": 16,
+            "SED_NR": 16,
+            "VWR_Sal": 15,
+            "VWR_NR": 15
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "inspect: metadata title equals the 62 matrix sample columns exactly (62/62). Factor columns come from the GEO characteristics; grp is the 8-cell combination and grp4 the NR x VWR combination used by the paper's ~ group + RIN model. The annotation columns (seqnames, start, end, strand, length) are not samples.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:27+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "matrix",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+        "sha256": "bea59d1e1ee97d295031dc9934bd37ed1c28562f6876e6d9c953cb40cfa2297d"
+      },
+      {
+        "id": "metadata:GSE194193_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_metadata.csv",
+        "sha256": "56c9db1e048fd5235313a1e44f2748a29b1f7240fbbc82446e0bc83733f4ec36"
+      },
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "raw counts",
+      "recommended_method": "edgeR",
+      "profile": {
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+        "sha256": "bea59d1e1ee97d295031dc9934bd37ed1c28562f6876e6d9c953cb40cfa2297d",
+        "n_features": 55487,
+        "n_samples": 62,
+        "annotation_columns_dropped": [],
+        "duplicated_feature_ids": 0,
+        "missing_values": 0,
+        "negative_values": 0,
+        "negative_fraction": 0.0,
+        "min": 0.0,
+        "max": 1849479.0,
+        "median": 0.0,
+        "integer_fraction": 1.0,
+        "candidates": [
+          "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+        ]
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "integer fraction 1.0, max 1.85e6, median 0; data_processing says featureCounts output and the supplementary csv holds raw counts; the paper's input is featureCounts counts into edgeR (S4.4.10.p3).",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:29+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\design_metadata.csv",
+        "sha256": "b8883cf9d87d98d7db06b2a7fb210c029cb7bcbb1896821ea83afb493f526ec6"
+      },
+      {
+        "id": "tool_output:suitability.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\suitability\\suitability.json",
+        "sha256": "5a5010b9129463f54b866b9df8ce37989ced7188230abdda3f3f54111626f511"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "two-group VWR vs SED pooling all other arms (~ train)",
+        "reason_rejected": "drops the NR/PT cells that the paper's group model keeps"
+      },
+      {
+        "value": "4-group model (NR x VWR, PT pooled) as primary",
+        "reason_rejected": "the paper's 4 (or 8) wording allows it; run as sensitivity because the 8-group model uses the full design"
+      }
+    ],
+    "final": {
+      "analysis_type": "factorial",
+      "formula": "~ 0 + grp + rin",
+      "design_column": "grp",
+      "contrasts": [
+        {
+          "name": "train_main_VWR_vs_SED",
+          "expr": "mean of the 4 VWR cells - mean of the 4 SED cells",
+          "role": "primary"
+        },
+        {
+          "name": "nr_main_NR_vs_Sal",
+          "expr": "mean of the 4 NR cells - mean of the 4 saline cells",
+          "role": "secondary"
+        },
+        {
+          "name": "pt_main_PT_vs_noPT",
+          "expr": "mean of the 4 PT cells - mean of the 4 noPT cells",
+          "role": "secondary"
+        },
+        {
+          "name": "interactions train:nr, train:pt, train:nr:pt",
+          "role": "exploratory"
+        },
+        {
+          "name": "VWR simple effects within each NR x PT cell",
+          "role": "exploratory"
+        }
+      ],
+      "suitability": {
+        "verdict": "analyzable",
+        "failed": [],
+        "warnings": [],
+        "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\suitability\\suitability.md",
+        "n_comparisons": 18,
+        "n_analyzable": 18
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S4.3.2.p1: balanced 2^3 factorial; S4.4.10.p3: one group-means model over all cells, effects found by comparing the levels encoded by group. S2.6.p1 reports main effects because no interaction reached q < 0.05. The exercise estimand is the VWR main effect averaged over NR and PT; the four planned simple effects are its components. Every cell has 7-8 mice.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "covariance",
+    "evidence": [
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\design_metadata.csv",
+        "sha256": "b8883cf9d87d98d7db06b2a7fb210c029cb7bcbb1896821ea83afb493f526ec6"
+      },
+      {
+        "id": "metadata:GSE194193_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE194193\\GSE194193_metadata.csv",
+        "sha256": "56c9db1e048fd5235313a1e44f2748a29b1f7240fbbc82446e0bc83733f4ec36"
+      },
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "status": "required",
+      "blocking_terms": [],
+      "covariates": [
+        {
+          "name": "rin",
+          "disposition": "included as a continuous covariate, as in the paper's ~ group + RIN (S4.4.10.p3)"
+        },
+        {
+          "name": "cohort",
+          "disposition": "not included: the paper does not model it; balanced across VWR (15/16 per cohort); checked in the confounding report only"
+        },
+        {
+          "name": "purification_pool, day_of_termination, time_of_termination",
+          "disposition": "not included: not in the paper's model"
+        }
+      ],
+      "design_check": {
+        "formula_equivalent": "~ C(train) + C(nr) + C(pt)",
+        "n_samples": 62,
+        "n_columns": 4,
+        "columns": [
+          "Intercept",
+          "train_VWR",
+          "nr_Sal",
+          "pt_noPT"
+        ],
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 58,
+        "levels": {
+          "train": {
+            "SED": 32,
+            "VWR": 30
+          },
+          "nr": {
+            "Sal": 31,
+            "NR": 31
+          },
+          "pt": {
+            "PT": 32,
+            "noPT": 30
+          }
+        },
+        "cells": [
+          {
+            "cell": [
+              "SED",
+              "NR",
+              "PT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "SED",
+              "NR",
+              "noPT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "SED",
+              "Sal",
+              "PT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "SED",
+              "Sal",
+              "noPT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "VWR",
+              "NR",
+              "PT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "VWR",
+              "NR",
+              "noPT"
+            ],
+            "n": 7
+          },
+          {
+            "cell": [
+              "VWR",
+              "Sal",
+              "PT"
+            ],
+            "n": 8
+          },
+          {
+            "cell": [
+              "VWR",
+              "Sal",
+              "noPT"
+            ],
+            "n": 7
+          }
+        ],
+        "min_cell_size": 7,
+        "missing_values": {}
+      },
+      "confounding": [
+        {
+          "column": "cohort",
+          "n_levels": 2,
+          "status": "crossed",
+          "crosstab": {
+            "SED_NR_PT": {
+              "1": 4,
+              "2": 4
+            },
+            "SED_NR_noPT": {
+              "1": 4,
+              "2": 4
+            },
+            "SED_Sal_PT": {
+              "1": 4,
+              "2": 4
+            },
+            "SED_Sal_noPT": {
+              "1": 4,
+              "2": 4
+            },
+            "VWR_NR_PT": {
+              "1": 4,
+              "2": 4
+            },
+            "VWR_NR_noPT": {
+              "1": 4,
+              "2": 3
+            },
+            "VWR_Sal_PT": {
+              "1": 4,
+              "2": 4
+            },
+            "VWR_Sal_noPT": {
+              "1": 3,
+              "2": 4
+            }
+          }
+        },
+        {
+          "column": "rin",
+          "n_levels": 13,
+          "status": "crossed",
+          "crosstab": {
+            "SED_NR_PT": {
+              "10.0": 0,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 0,
+              "9.2": 0,
+              "9.3": 0,
+              "9.4": 0,
+              "9.5": 2,
+              "9.6": 3,
+              "9.7": 1,
+              "9.8": 0,
+              "9.9": 2
+            },
+            "SED_NR_noPT": {
+              "10.0": 0,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 0,
+              "9.2": 3,
+              "9.3": 1,
+              "9.4": 0,
+              "9.5": 1,
+              "9.6": 1,
+              "9.7": 2,
+              "9.8": 0,
+              "9.9": 0
+            },
+            "SED_Sal_PT": {
+              "10.0": 3,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 1,
+              "9.2": 1,
+              "9.3": 1,
+              "9.4": 1,
+              "9.5": 0,
+              "9.6": 0,
+              "9.7": 0,
+              "9.8": 1,
+              "9.9": 0
+            },
+            "SED_Sal_noPT": {
+              "10.0": 1,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 0,
+              "9.2": 0,
+              "9.3": 0,
+              "9.4": 1,
+              "9.5": 0,
+              "9.6": 2,
+              "9.7": 0,
+              "9.8": 1,
+              "9.9": 3
+            },
+            "VWR_NR_PT": {
+              "10.0": 0,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 0,
+              "9.2": 0,
+              "9.3": 0,
+              "9.4": 3,
+              "9.5": 0,
+              "9.6": 1,
+              "9.7": 1,
+              "9.8": 2,
+              "9.9": 1
+            },
+            "VWR_NR_noPT": {
+              "10.0": 2,
+              "8.6": 1,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 1,
+              "9.2": 1,
+              "9.3": 1,
+              "9.4": 0,
+              "9.5": 0,
+              "9.6": 0,
+              "9.7": 0,
+              "9.8": 1,
+              "9.9": 0
+            },
+            "VWR_Sal_PT": {
+              "10.0": 1,
+              "8.6": 0,
+              "8.7": 1,
+              "9.0": 1,
+              "9.1": 1,
+              "9.2": 0,
+              "9.3": 0,
+              "9.4": 0,
+              "9.5": 0,
+              "9.6": 3,
+              "9.7": 1,
+              "9.8": 0,
+              "9.9": 0
+            },
+            "VWR_Sal_noPT": {
+              "10.0": 0,
+              "8.6": 0,
+              "8.7": 0,
+              "9.0": 0,
+              "9.1": 0,
+              "9.2": 0,
+              "9.3": 0,
+              "9.4": 0,
+              "9.5": 1,
+              "9.6": 3,
+              "9.7": 0,
+              "9.8": 2,
+              "9.9": 1
+            }
+          }
+        }
+      ]
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "One sample per independent mouse, no repeated measures. The paper adjusts for RIN only; other recorded processing columns are not added because of their names.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "method",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+        "sha256": "bea59d1e1ee97d295031dc9934bd37ed1c28562f6876e6d9c953cb40cfa2297d"
+      },
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "raw counts",
+      "method": "edgeR QL (R edgeR glmQLFit/glmQLFTest, TMM)",
+      "formula": "~ 0 + grp + rin",
+      "paper_route": {
+        "method": "edgeR QL ~ group + RIN",
+        "status": "reproduced"
+      },
+      "deviations": [
+        "edgeR 4.10.7 instead of 3.30.3",
+        "low-expression filter not stated in the paper; filterByExpr applied as the edgeR manual recommends (assumption)",
+        "main effect computed as the mean of the 4 VWR cells minus the mean of the 4 SED cells; the paper does not state its contrast weights"
+      ]
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Raw featureCounts counts support the paper's edgeR QL route directly; tools.r_de_tools:run_r_de with engine edger_ql runs R edgeR on an arbitrary design with makeContrasts expressions, so the main-effect contrast over the cell-means model is expressible.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "threshold",
+    "evidence": [
+      {
+        "id": "paper:PMC8844641.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC8844641.paper.md",
+        "sha256": "56c3f96962cd273e8c6a7b5f68228b9067a76579b8656bc0521a8b4c6edcbd5a"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "paper_threshold": {
+        "metric": "FDR",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null
+      },
+      "deviation_note": "the paper counts only protein-coding genes; our tables include all GENCODE genes passing filterByExpr, so a protein-coding subset count is reported separately in HANDBACK.md"
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.6.p1 and S2.6.p3: q-value cutoff 0.05 (FDR), no fold-change rule.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:27:39+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE194193",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+        "sha256": "bea59d1e1ee97d295031dc9934bd37ed1c28562f6876e6d9c953cb40cfa2297d"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\design_metadata.csv",
+        "sha256": "b8883cf9d87d98d7db06b2a7fb210c029cb7bcbb1896821ea83afb493f526ec6"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "edgeR QL (R), TMM, ~ 0 + grp + rin",
+      "subset": "vwr_main_8grp",
+      "role": "primary",
+      "tool": "tools.r_de_tools:run_r_de",
+      "n_samples": 62,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\aligned\\aligned_matrix.csv",
+      "formula": "~ 0 + grp + rin",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35198907\\GSE194193\\results\\vwr_main_8grp\\DEG_results_train_main_VWR_vs_SED.csv"
+      ],
+      "counts": {
+        "vwr_main_8grp/train_main_VWR_vs_SED": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 14942,
+            "n_significant": 1980,
+            "n_up": 1073,
+            "n_down": 907,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's edgeR QL ~ group + RIN on the 8 cells; VWR main effect as the mean VWR-minus-SED difference over the NR x PT cells.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T22:28:32+00:00"
+  }
+]
