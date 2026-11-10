@@ -1,0 +1,1717 @@
+{
+  "schema_version": "1.0",
+  "run_id": "463ad4ee2ce52e09b589fa8ce48a64d7c595a849",
+  "subject_id": "GSE207992",
+  "created_at": "2026-11-10T00:29:03",
+  "finished_at": "2026-11-10T00:32:16",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9971895.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC9971895.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T00:29:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e3beab7ecac0b12ba9ba3b72d4717975f601dba512f7c766b40bc2f8c32ba1df",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE207992_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE207992\\GSE207992_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T00:29:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d202dd92b618046d6990e86a64869f79f92ed7b6d7bf30b4e7dfbabb2ed62417",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_recover_raw_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\prep_recover_raw_counts.py",
+      "locator": null,
+      "captured_at": "2026-11-10T00:29:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2b79a414d9ffbb9f80a057baa8dee74c59ab34e61a77d271620569ba93125a2a",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE207992_raw_counts_recovered.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992_raw_counts_recovered.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T00:29:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e4595fe561349aa5a0b1e156e664f21e07091f8c49b89150e18f83891a8527a5",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE207992"
+        ],
+        "assay": "bulk RNA-seq (Lexogen Sense total RNA, paired-end HiSeq 4000) of laser-captured SCN, adult male mice (S4.4.2.p1, S4.3.p1)",
+        "factors": {
+          "genotype": [
+            "Vipr2+/+ (WT)",
+            "Vipr2-/- (KO)"
+          ],
+          "exercise": [
+            "nSVE (free wheel access)",
+            "SVE (scheduled 6h/24h wheel access)"
+          ]
+        },
+        "sample_inclusion": "WT nSVE CT14 n=4, WT SVE ZT14/CT22 n=4, KO nSVE CT14 n=3, KO SVE ZT14/CT14 n=3 (S4.4.2.p1, S2.2.p1, FIG4); only entrained/rhythmic animals used (S4.4.p2)",
+        "primary_estimand": "Effect of scheduled voluntary exercise (SVE vs nSVE) on the SCN transcriptome, within genotype; the KO comparison is matched for circadian time (CT14), the WT comparison is not (SVE ZT14/CT22 vs nSVE CT14) and the paper states its DEGs mix circadian phase and exercise (S2.4.p1, S2.5.p1)",
+        "planned_contrasts": [
+          "KO SVE vs KO nSVE (S2.5.p1; paper: 223 DEGs, 105 up / 118 down)",
+          "WT SVE vs WT nSVE (S2.4.p1; paper: 795 DEGs, 556 up / 239 down; confounded with circadian time)",
+          "KO nSVE vs WT nSVE (S2.3.p1; genotype; paper: 307 DEGs, 158 up / 149 down)",
+          "KO SVE vs WT nSVE (S2.6.p1; paper: 557 DEGs, 246 up / 311 down)"
+        ],
+        "repeated_measure_unit": "none: one SCN sample per animal",
+        "normalization": "DESeq2 size factors (S4.4.2.p1)",
+        "paper_method": "DESeq2 pairwise analyses with default independent filtering and Cook's distance outlier handling; BH FDR (S4.4.2.p1-p2)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.2.p2"
+        },
+        "paper_results": "DEG counts per contrast as above; genes tested per pairwise analysis 9524 (WT SVE vs nSVE), 15735 (KO SVE vs nSVE), 15269 (WT nSVE vs KO nSVE), 11931 (WT nSVE vs KO SVE) (S4.4.2.p1); KEGG by clusterProfiler, GO BP by topGO (S4.5.p1)"
+      },
+      "reason": "Four RNA-seq groups (S2.2.p1, S4.4.2.p1). Exercise question is answered by SVE vs nSVE within genotype; the paper treats the KO comparison as the clean exercise effect (both CT14) and flags that the WT comparison also contains an 8h circadian-phase difference (S2.4.p1 last sentence). Genotype contrasts are reported in the paper and run here as secondary comparisons for count comparison. Threshold FDR < 0.05 with no fold-change rule (S2.2.p2, S4.4.2.p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:03"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992_raw_counts_recovered.csv",
+        "owned": true,
+        "checks": [
+          "S2.2.p2 and S10.p1 name GSE207992",
+          "14 GEO samples = 4+4+3+3 as in S4.4.2.p1",
+          "GEO source SCN, Mus musculus, genotype and treatment fields match the paper's groups",
+          "matrix columns carry the same AH labels as GEO description"
+        ],
+        "accession": "GSE207992",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE207992\\GSE207992_metadata.csv"
+      },
+      "reason": "Paper data availability (S10.p1) names GSE207992; group sizes and labels match exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:03"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 14,
+        "n_metadata": 14,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "geno": {
+              "alias_of": "characteristics_ch1.1.genotype",
+              "recode": {
+                "wildtype": "WT",
+                "Vipr2-/-": "KO"
+              }
+            },
+            "ex": {
+              "alias_of": "characteristics_ch1.2.treatment",
+              "recode": {
+                "non-SVE": "nSVE",
+                "SVE": "SVE"
+              }
+            },
+            "grp": {
+              "combine": [
+                "geno",
+                "ex"
+              ],
+              "separator": "_",
+              "of": "recoded values"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\design_metadata.csv",
+          "sha256": "332c95e193cfb0ce378a9fc91ba3e50ccc6f41a1946845efd325470b6c2f9a60",
+          "levels": {
+            "geno": {
+              "WT": 8,
+              "KO": 6
+            },
+            "ex": {
+              "nSVE": 7,
+              "SVE": 7
+            },
+            "grp": {
+              "WT_nSVE": 4,
+              "WT_SVE": 4,
+              "KO_nSVE": 3,
+              "KO_SVE": 3
+            }
+          }
+        }
+      },
+      "reason": "The prep script renamed matrix columns from 'KO SVE AH14 Gene counts' to the AH label, which equals GEO 'description' (AH1..AH16). The genotype/treatment words embedded in the original column names agree with GEO characteristics for every sample. grp = genotype_exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:03"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\aligned_matrix.csv",
+          "sha256": "1cd9597bf4949a5cd8bde39494cef3d228f7159b12813d3d317e128ff470faad",
+          "n_features": 55401,
+          "n_samples": 14,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 10645758.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "The deposited file is DESeq2-normalized counts (GEO data_processing: 'tabular file containing normalised counts'; non-integer values). Dividing each sample by its smallest non-zero value returns integers for all 55401 x 14 entries (max deviation < 1e-8), i.e. the original integer counts (StringTie/prepDE) divided by DESeq2 size factors 0.65-1.45. prep_recover_raw_counts.py recovers them. Paper input to DESeq2 is the same integer count matrix (S4.4.2.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:04"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group (pairwise, one DESeq2 fit per pair of groups as in the paper)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_KO_SVE_vs_KO_nSVE",
+            "control": "KO_nSVE",
+            "treatment": "KO_SVE",
+            "role": "primary"
+          },
+          {
+            "name": "grp_WT_SVE_vs_WT_nSVE",
+            "control": "WT_nSVE",
+            "treatment": "WT_SVE",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_KO_nSVE_vs_WT_nSVE",
+            "control": "WT_nSVE",
+            "treatment": "KO_nSVE",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_KO_SVE_vs_WT_nSVE",
+            "control": "WT_nSVE",
+            "treatment": "KO_SVE",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\suitability\\suitability.md",
+          "n_comparisons": 7,
+          "n_analyzable": 7
+        }
+      },
+      "reason": "Paper ran pairwise DESeq2 comparisons with per-comparison independent filtering (S4.4.2.p1 lists genes passing filtering per pairwise analysis), so each contrast is a separate two-group fit on its two groups. Primary exercise estimand: KO SVE vs KO nSVE, both sampled at CT14 (S2.2.p1, S2.5.p1). WT SVE vs nSVE is an exercise comparison confounded by design with circadian time (ZT14/CT22 vs CT14; S2.4.p1) - run as paper-aligned secondary with a caveat, not as a pure exercise effect. Genotype contrasts are secondary.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:09"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 14,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_KO_nSVE",
+            "grp_WT_SVE",
+            "grp_WT_nSVE"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 10,
+          "levels": {
+            "grp": {
+              "WT_nSVE": 4,
+              "WT_SVE": 4,
+              "KO_nSVE": 3,
+              "KO_SVE": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "KO_SVE"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "KO_nSVE"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "WT_SVE"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "WT_nSVE"
+              ],
+              "n": 4
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.genotype",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KO_SVE": {
+                "Vipr2-/-": 3,
+                "wildtype": 0
+              },
+              "KO_nSVE": {
+                "Vipr2-/-": 3,
+                "wildtype": 0
+              },
+              "WT_SVE": {
+                "Vipr2-/-": 0,
+                "wildtype": 4
+              },
+              "WT_nSVE": {
+                "Vipr2-/-": 0,
+                "wildtype": 4
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.2.treatment",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KO_SVE": {
+                "SVE": 3,
+                "non-SVE": 0
+              },
+              "KO_nSVE": {
+                "SVE": 0,
+                "non-SVE": 3
+              },
+              "WT_SVE": {
+                "SVE": 4,
+                "non-SVE": 0
+              },
+              "WT_nSVE": {
+                "SVE": 0,
+                "non-SVE": 4
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "growth_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_laboratory",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "geno",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KO_SVE": {
+                "KO": 3,
+                "WT": 0
+              },
+              "KO_nSVE": {
+                "KO": 3,
+                "WT": 0
+              },
+              "WT_SVE": {
+                "KO": 0,
+                "WT": 4
+              },
+              "WT_nSVE": {
+                "KO": 0,
+                "WT": 4
+              }
+            }
+          },
+          {
+            "column": "ex",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KO_SVE": {
+                "SVE": 3,
+                "nSVE": 0
+              },
+              "KO_nSVE": {
+                "SVE": 0,
+                "nSVE": 3
+              },
+              "WT_SVE": {
+                "SVE": 4,
+                "nSVE": 0
+              },
+              "WT_nSVE": {
+                "SVE": 0,
+                "nSVE": 4
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Independent animals, one sample each; no batch, lane, or sex variable recorded (all male, S4.3.p1). Circadian sampling time is not a metadata column: it is fixed by group (WT SVE = CT22, others CT14) and is aliased with the WT exercise contrast by design; this is recorded as a caveat rather than a covariate.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:09"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, default independent filtering and Cook's outlier handling)",
+        "formula": "~ grp",
+        "deviations": [
+          "pydeseq2 instead of R DESeq2 (Bioconductor 3.14)"
+        ]
+      },
+      "reason": "Paper method DESeq2 on integer counts (S4.4.2.p1); raw counts recovered exactly, so the paper route runs.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:09"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "S2.2.p2: DEGs with FDR < 0.05; S4.4.2.p2: BH-corrected p. No fold-change rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:09"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_KO_SVE_vs_KO_nSVE",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 6,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_KO_nSVE\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_KO_nSVE\\DEG_results_KO_SVE_vs_KO_nSVE.csv"
+        ],
+        "counts": {
+          "grp_KO_SVE_vs_KO_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 16714,
+              "n_significant": 33,
+              "n_up": 18,
+              "n_down": 15,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper S2.5.p1: KO SVE vs KO nSVE, both CT14; separate pairwise DESeq2 fit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:35"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_WT_SVE_vs_WT_nSVE",
+        "role": "secondary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 8,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_WT_SVE_vs_WT_nSVE\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_WT_SVE_vs_WT_nSVE\\DEG_results_WT_SVE_vs_WT_nSVE.csv"
+        ],
+        "counts": {
+          "grp_WT_SVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 13172,
+              "n_significant": 2047,
+              "n_up": 1235,
+              "n_down": 812,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper S2.4.p1: WT SVE (ZT14/CT22) vs WT nSVE (CT14); exercise confounded with circadian phase.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:29:55"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_KO_nSVE_vs_WT_nSVE",
+        "role": "secondary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 7,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_nSVE_vs_WT_nSVE\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_nSVE_vs_WT_nSVE\\DEG_results_KO_nSVE_vs_WT_nSVE.csv"
+        ],
+        "counts": {
+          "grp_KO_nSVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17830,
+              "n_significant": 326,
+              "n_up": 137,
+              "n_down": 189,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper S2.3.p1: genotype at CT14 under nSVE.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:30:16"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_KO_SVE_vs_WT_nSVE",
+        "role": "secondary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 7,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_WT_nSVE\\input\\matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_WT_nSVE\\DEG_results_KO_SVE_vs_WT_nSVE.csv"
+        ],
+        "counts": {
+          "grp_KO_SVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 13045,
+              "n_significant": 594,
+              "n_up": 242,
+              "n_down": 352,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper S2.6.p1: KO SVE vs WT nSVE at CT14.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:30:36"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint_all",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 14,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\aligned_matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_nSVE_vs_KO_SVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_KO_SVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_SVE_vs_WT_nSVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_KO_nSVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_nSVE_vs_WT_nSVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_WT_nSVE.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_SVE_vs_KO_nSVE.csv"
+        ],
+        "counts": {
+          "joint_all/grp_KO_nSVE_vs_KO_SVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17059,
+              "n_significant": 329,
+              "n_up": 139,
+              "n_down": 190,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_WT_SVE_vs_KO_SVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 10540,
+              "n_significant": 532,
+              "n_up": 285,
+              "n_down": 247,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_KO_SVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 12074,
+              "n_significant": 557,
+              "n_up": 242,
+              "n_down": 315,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_WT_SVE_vs_KO_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17521,
+              "n_significant": 1246,
+              "n_up": 782,
+              "n_down": 464,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_KO_nSVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17521,
+              "n_significant": 457,
+              "n_up": 187,
+              "n_down": 270,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_WT_SVE_vs_WT_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 10540,
+              "n_significant": 772,
+              "n_up": 542,
+              "n_down": 230,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint_all/grp_KO_SVE_vs_KO_nSVE": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17059,
+              "n_significant": 329,
+              "n_up": 190,
+              "n_down": 139,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Sensitivity: one DESeq2 model on all 14 samples (dispersion shared across the four groups), every pairwise comparison incl. WT SVE vs KO SVE (paper S4.4.2.p1 lists it). Tests whether the pairwise-fit counts' gap to the paper (KO exercise 33 vs 223; WT exercise 2047 vs 795) comes from the per-pair dispersion fit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:31:06"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_KO_SVE_vs_KO_nSVE",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "up",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_up\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_up\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_up\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_up\\DEG_results_KO_SVE_vs_KO_nSVE_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 18 Mouse genes (direction=up, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Blood Vessel Morphogenesis (GO:0048514) | padj=5.79e-02 | overlap=2/53 | genes=SYK;KDR - Peptidyl-Tyrosine Modification (GO:0018212) | padj=5.79e-02 | overlap=2/54 | genes=SYK;KDR - Negative Regulation Of Protein Catabolic Process (GO:0042177) | padj=5.79e-02 | overlap=2/54 | genes=SNRNP70;BANP - Peptidyl-Tyrosine Phosphorylation (GO:0018108) | padj=5.79e-02 | overlap=2/67 | genes=SYK;KDR - Cell-Cell Junction Organization (GO:0045216) | padj=5.79e-02 | overlap=2/68 | genes=GJC1;PCDHGB4 - Cell-Cell Junction Assembly (GO:0007043) | padj=5.79e-02 | overlap=2/71 | genes=GJC1;PCDHGB4 - Cell Junction Assembly (GO:0034329) | padj=5.79e-02 | overlap=2/95 | genes=GJC1;PCDHGB4 - Positive Regulation Of Killing Of Cells Of Another Organism (GO:0051712) | padj=5.79e-02 | overlap=1/5 | genes=SYK - Regulation Of Superoxide Metabolic Process (GO:0090322) | padj=5.79e-02 | overlap=1/5 | genes=SYK - Vascular Endothelial Growth Factor Receptor-2 Signaling Pathway (GO:0036324) | padj=5.79e-02 | overlap=1/5 | genes=KDR ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - Protein Tyrosine Kinase Activity (GO:0004713) | padj=5.66e-02 | overlap=2/99 | genes=SYK;KDR - Vascular Endothelial Growth Factor Receptor Activity (GO:0005021) | padj=5.66e-02 | overlap=1/6 | genes=KDR - U1 snRNA Binding (GO:0030619) | padj=5.66e-02..."
+      },
+      "reason": "Paper reports KEGG terms up by exercise in KO SCN (Fig 3F, S2.5.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:31:09"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_KO_SVE_vs_KO_nSVE",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "down",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_down\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_down\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_down\\DEG_results_KO_SVE_vs_KO_nSVE_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\ora_down\\DEG_results_KO_SVE_vs_KO_nSVE_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 14 Mouse genes (direction=down, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Cytoplasmic Translation (GO:0002181) | padj=2.08e-03 | overlap=3/93 | genes=RPL3;RPS24;RPL19 - Peptide Biosynthetic Process (GO:0043043) | padj=5.04e-03 | overlap=3/158 | genes=RPL3;RPS24;RPL19 - Macromolecule Biosynthetic Process (GO:0009059) | padj=5.18e-03 | overlap=3/183 | genes=RPL3;RPS24;RPL19 - Translation (GO:0006412) | padj=7.98e-03 | overlap=3/234 | genes=RPL3;RPS24;RPL19 - Gene Expression (GO:0010467) | padj=1.26e-02 | overlap=3/296 | genes=RPL3;RPS24;RPL19 - Regulation Of cGMP-mediated Signaling (GO:0010752) | padj=3.05e-02 | overlap=1/5 | genes=PDE2A - Response To cGMP (GO:0070305) | padj=3.05e-02 | overlap=1/5 | genes=PDE2A - Negative Regulation Of cAMP-mediated Signaling (GO:0043951) | padj=4.26e-02 | overlap=1/8 | genes=PDE2A - Positive Regulation Of Vascular Permeability (GO:0043117) | padj=4.26e-02 | overlap=1/11 | genes=PDE2A - Negative Regulation Of Vascular Permeability (GO:0043116) | padj=4.26e-02 | overlap=1/11 | genes=PDE2A ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - 3',5'-cyclic-GMP Phosphodiesterase Activity (GO:0047555) | padj=2.60e-02 | overlap=1/7 | genes=PDE2A - Phosphate Ion Binding (GO:0042301) | padj=2.60e-02 | overlap=1/9 | genes=PDE2A - cGMP Binding (GO:0030553) | padj=2.60e-02 | overlap=1/10 | genes=PDE2A - cAMP Binding (GO:0030552) | padj=2.60e-02 |..."
+      },
+      "reason": "Paper reports KEGG terms down by exercise in KO SCN (mTOR signaling; S2.5.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:31:11"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_KO_SVE_vs_KO_nSVE",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_KO_SVE_vs_KO_nSVE\\gsea\\DEG_results_KO_SVE_vs_KO_nSVE_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 22279 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 23 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_G2M_CHECKPOINT | NES=1.64 | NOM p=1.63e-03 | FDR q=6.25e-02 - HALLMARK_MITOTIC_SPINDLE | NES=1.62 | NOM p=1.68e-03 | FDR q=3.64e-02 - HALLMARK_UV_RESPONSE_DN | NES=1.57 | NOM p=3.42e-03 | FDR q=3.79e-02 - HALLMARK_MYOGENESIS | NES=1.33 | NOM p=4.13e-02 | FDR q=2.85e-01 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.33 | NOM p=3.56e-02 | FDR q=2.33e-01 - HALLMARK_E2F_TARGETS | NES=1.32 | NOM p=1.95e-02 | FDR q=2.08e-01 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.30 | NOM p=3.79e-02 | FDR q=2.26e-01 - HALLMARK_TGF_BETA_SIGNALING | NES=1.28 | NOM p=1.08e-01 | FDR q=2.20e-01 - HALLMARK_SPERMATOGENESIS | NES=1.25 | NOM p=1.25e-01 | FDR q=2.56e-01 - HALLMARK_P53_PATHWAY | NES=1.25 | NOM p=6.57e-02 | FDR q=2.33e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.67 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.04 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-1.66 | NOM p=0.00e+00 | FDR q=1.20e-02 - HALLMARK_MYC_TARGETS_V2 | NES=-1.63 | NOM p=4.71e-03 | FDR q=1.32e-02 - HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY | NES=-1.45 | NOM p=2.61e-02 | FDR q=7.36e-02 - HALLMARK_MTORC1_SIGNALING | NES=-1.39 | NOM p=4.94e-03 | FDR q=1.05e-01 - HALLMARK_COMPLEMENT | NES=-1.36 | NOM p=1.42e-02 | FDR q=1.20e-01 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NE..."
+      },
+      "reason": "Hallmark GSEA on the full ranking of the primary exercise contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:32:02"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_WT_SVE_vs_WT_nSVE",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\enrichment_grp_WT_SVE_vs_WT_nSVE\\gsea\\DEG_results_WT_SVE_vs_WT_nSVE_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 24852 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 25 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_HEDGEHOG_SIGNALING | NES=2.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_WNT_BETA_CATENIN_SIGNALING | NES=1.77 | NOM p=4.82e-03 | FDR q=9.93e-03 - HALLMARK_MYOGENESIS | NES=1.69 | NOM p=0.00e+00 | FDR q=1.57e-02 - HALLMARK_APICAL_JUNCTION | NES=1.57 | NOM p=2.65e-03 | FDR q=4.15e-02 - HALLMARK_COAGULATION | NES=1.50 | NOM p=1.15e-02 | FDR q=6.20e-02 - HALLMARK_NOTCH_SIGNALING | NES=1.39 | NOM p=6.85e-02 | FDR q=1.50e-01 - HALLMARK_KRAS_SIGNALING_DN | NES=1.32 | NOM p=5.28e-02 | FDR q=2.49e-01 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=1.32 | NOM p=3.52e-02 | FDR q=2.18e-01 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.28 | NOM p=1.15e-01 | FDR q=2.87e-01 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.27 | NOM p=6.94e-02 | FDR q=2.70e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_MYC_TARGETS_V1 | NES=-2.65 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_PROTEIN_SECRETION | NES=-2.45 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.32 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=-2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=-1.88 | NOM p=0.00e+00 | FDR q=9.88e-04 - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.71 | NOM p=0.00e+00 | FDR q=3.50e-03 - HALLMARK_PEROXISOME | NES=-1.69 | NOM p=0.00e+00 | FDR q=3.8..."
+      },
+      "reason": "Hallmark GSEA on the WT exercise (phase-confounded) contrast; paper reports KEGG for it (Fig 3D).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:32:15"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "WT SVE vs WT nSVE compares ZT14/CT22 with CT14: the exercise effect is confounded with an 8h circadian-phase difference (paper S2.4.p1); it is not a pure exercise effect.",
+          "KO SVE vs WT nSVE crosses genotype and exercise and is not an exercise estimand.",
+          "pydeseq2 rather than R DESeq2; counts recovered from the deposited normalized matrix."
+        ],
+        "results": {
+          "grp_KO_SVE_vs_KO_nSVE": {
+            "n_deg": 33,
+            "up": 18,
+            "down": 15,
+            "rule": "padj < 0.05"
+          },
+          "grp_WT_SVE_vs_WT_nSVE": {
+            "n_deg": 2047,
+            "up": 1235,
+            "down": 812,
+            "rule": "padj < 0.05"
+          },
+          "grp_KO_nSVE_vs_WT_nSVE": {
+            "n_deg": 326,
+            "up": 137,
+            "down": 189,
+            "rule": "padj < 0.05"
+          },
+          "grp_KO_SVE_vs_WT_nSVE": {
+            "n_deg": 594,
+            "up": 242,
+            "down": 352,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_KO_nSVE_vs_KO_SVE": {
+            "n_deg": 329,
+            "up": 139,
+            "down": 190,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_WT_SVE_vs_KO_SVE": {
+            "n_deg": 532,
+            "up": 285,
+            "down": 247,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_KO_SVE_vs_WT_nSVE": {
+            "n_deg": 557,
+            "up": 242,
+            "down": 315,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_WT_SVE_vs_KO_nSVE": {
+            "n_deg": 1246,
+            "up": 782,
+            "down": 464,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_KO_nSVE_vs_WT_nSVE": {
+            "n_deg": 457,
+            "up": 187,
+            "down": 270,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_WT_SVE_vs_WT_nSVE": {
+            "n_deg": 772,
+            "up": 542,
+            "down": 230,
+            "rule": "padj < 0.05"
+          },
+          "joint_all/grp_KO_SVE_vs_KO_nSVE": {
+            "n_deg": 329,
+            "up": 190,
+            "down": 139,
+            "rule": "padj < 0.05"
+          }
+        },
+        "paper_counts": {
+          "grp_KO_SVE_vs_KO_nSVE": 223,
+          "grp_WT_SVE_vs_WT_nSVE": 795,
+          "grp_KO_nSVE_vs_WT_nSVE": 307,
+          "grp_KO_SVE_vs_WT_nSVE": 557
+        },
+        "comparison": {
+          "grp_KO_SVE_vs_KO_nSVE": {
+            "ours": 33,
+            "paper": 223
+          },
+          "grp_WT_SVE_vs_WT_nSVE": {
+            "ours": 2047,
+            "paper": 795
+          },
+          "grp_KO_nSVE_vs_WT_nSVE": {
+            "ours": 326,
+            "paper": 307
+          },
+          "grp_KO_SVE_vs_WT_nSVE": {
+            "ours": 594,
+            "paper": 557
+          }
+        },
+        "paper_gene_check": {
+          "grp_KO_SVE_vs_KO_nSVE": {
+            "Kdr": {
+              "baseMean": 84.4297,
+              "log2FoldChange": 9.7048,
+              "padj": 0.0062,
+              "pvalue": 0.0
+            },
+            "Banp": {
+              "baseMean": 1095.8975,
+              "log2FoldChange": 0.9711,
+              "padj": 0.0268,
+              "pvalue": 0.0
+            },
+            "Syk": {
+              "baseMean": 55.1583,
+              "log2FoldChange": 9.0895,
+              "padj": 0.0334,
+              "pvalue": 0.0001
+            },
+            "Naif1": {
+              "baseMean": 191.0321,
+              "log2FoldChange": 1.3387,
+              "padj": 0.3807,
+              "pvalue": 0.0038
+            },
+            "Kctd18": {
+              "baseMean": 110.5274,
+              "log2FoldChange": 1.9001,
+              "padj": 0.3602,
+              "pvalue": 0.0031
+            },
+            "Gm1848": {
+              "baseMean": 77.2999,
+              "log2FoldChange": 9.5772,
+              "padj": 0.0088,
+              "pvalue": 0.0
+            },
+            "Ncor1": {
+              "baseMean": 3527.9496,
+              "log2FoldChange": 0.3924,
+              "padj": 0.3696,
+              "pvalue": 0.0036
+            },
+            "Cox16": {
+              "baseMean": 447.0676,
+              "log2FoldChange": -1.1075,
+              "padj": 0.1984,
+              "pvalue": 0.0009
+            },
+            "Ndufa4": null,
+            "Per2": {
+              "baseMean": 1871.9668,
+              "log2FoldChange": -0.0606,
+              "padj": 0.9984,
+              "pvalue": 0.8238
+            },
+            "Arntl": null,
+            "Nr1d1": {
+              "baseMean": 7025.6021,
+              "log2FoldChange": 0.2656,
+              "padj": 0.968,
+              "pvalue": 0.2655
+            },
+            "Cry1": {
+              "baseMean": 929.4737,
+              "log2FoldChange": 0.1108,
+              "padj": 0.9984,
+              "pvalue": 0.6705
+            }
+          },
+          "grp_WT_SVE_vs_WT_nSVE": {
+            "Nr1d1": {
+              "baseMean": 11473.3479,
+              "log2FoldChange": 1.9499,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cry1": {
+              "baseMean": 1082.2517,
+              "log2FoldChange": -0.8911,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Per2": {
+              "baseMean": 3180.9863,
+              "log2FoldChange": -1.2985,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Rgs16": {
+              "baseMean": 10696.8944,
+              "log2FoldChange": 1.756,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Miat": {
+              "baseMean": 3349.4763,
+              "log2FoldChange": 1.5129,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc2a13": {
+              "baseMean": 3909.1355,
+              "log2FoldChange": -0.7842,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Serpine1": {
+              "baseMean": 776.2514,
+              "log2FoldChange": 2.9919,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Syngap1": {
+              "baseMean": 5346.9445,
+              "log2FoldChange": 0.7589,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Arntl": null,
+            "Avp": {
+              "baseMean": 14684.782,
+              "log2FoldChange": -0.0177,
+              "padj": 0.9488,
+              "pvalue": 0.8829
+            },
+            "Prok2": {
+              "baseMean": 191.7347,
+              "log2FoldChange": 1.9951,
+              "padj": 0.0114,
+              "pvalue": 0.001
+            }
+          },
+          "grp_KO_nSVE_vs_WT_nSVE": {
+            "Tmem254b": null,
+            "Tmem254c": null,
+            "Gpc3": {
+              "baseMean": 1889.3957,
+              "log2FoldChange": 1.3033,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Kdr": {
+              "baseMean": 45.876,
+              "log2FoldChange": -8.6033,
+              "padj": 0.0053,
+              "pvalue": 0.0
+            },
+            "Penk": {
+              "baseMean": 3840.6599,
+              "log2FoldChange": 1.0135,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ncor1": {
+              "baseMean": 4110.7548,
+              "log2FoldChange": -0.6422,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "C1ql3": {
+              "baseMean": 598.7023,
+              "log2FoldChange": -2.6421,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Vip": {
+              "baseMean": 6158.3086,
+              "log2FoldChange": -0.927,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Avp": {
+              "baseMean": 9599.0971,
+              "log2FoldChange": -1.0551,
+              "padj": 0.0005,
+              "pvalue": 0.0
+            },
+            "Creb3l1": {
+              "baseMean": 1184.3927,
+              "log2FoldChange": -2.9158,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Kcnc2": {
+              "baseMean": 2470.8267,
+              "log2FoldChange": -0.7265,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Mobp": {
+              "baseMean": 6655.9598,
+              "log2FoldChange": -1.6911,
+              "padj": 0.0,
+              "pvalue": 0.0
+            }
+          },
+          "grp_KO_SVE_vs_WT_nSVE": {
+            "Gpc3": {
+              "baseMean": 1907.9828,
+              "log2FoldChange": 1.0956,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Penk": {
+              "baseMean": 4139.5624,
+              "log2FoldChange": 0.9515,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Rgs16": {
+              "baseMean": 6392.41,
+              "log2FoldChange": 0.9788,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Nr1d1": {
+              "baseMean": 6195.745,
+              "log2FoldChange": 0.9894,
+              "padj": 0.0001,
+              "pvalue": 0.0
+            },
+            "Mobp": {
+              "baseMean": 7488.9642,
+              "log2FoldChange": -1.5638,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Creb3l1": {
+              "baseMean": 1323.0257,
+              "log2FoldChange": -2.767,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Avp": {
+              "baseMean": 9697.6669,
+              "log2FoldChange": -1.6241,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Vip": {
+              "baseMean": 6255.8101,
+              "log2FoldChange": -1.4185,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Sst": {
+              "baseMean": 5069.4992,
+              "log2FoldChange": -1.2265,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Per2": {
+              "baseMean": 3272.1449,
+              "log2FoldChange": -1.015,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Gpr176": {
+              "baseMean": 2908.3874,
+              "log2FoldChange": -0.8412,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Sod3": {
+              "baseMean": 542.1266,
+              "log2FoldChange": -2.0377,
+              "padj": 0.0,
+              "pvalue": 0.0
+            }
+          }
+        }
+      },
+      "reason": "Paper-aligned DESeq2 pairwise route at the paper's FDR rule. Expected directions: KO exercise up Kdr/Banp/Syk/Naif1/Kctd18/Ncor1, down Cox16/Ndufa4, no core clock genes DE (S2.5.p1, S2.7.p2); WT exercise up Nr1d1/Rgs16/Miat/Serpine1/Syngap1, down Cry1/Per2/Slc2a13 (S2.4.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T00:32:16"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "27ceca1d5566feb8c78f3b4d32bcab3708228fef395dd2cbe040969a0a5b1144",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1384612d7d900b063c93adeb3eb2556c9f2f36bfb72c1e620228de31942c0a73",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1cd9597bf4949a5cd8bde39494cef3d228f7159b12813d3d317e128ff470faad",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "332c95e193cfb0ce378a9fc91ba3e50ccc6f41a1946845efd325470b6c2f9a60",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0cc267cd814f3eb0b05d37fce14a04419fb7425726c4e49139f8b7c9658223d4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "40b69c0d4bf6523550c0d2d0dce3d129ef8cce31f2d5b9a74e20e0b838d61564",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_KO_nSVE\\DEG_results_KO_SVE_vs_KO_nSVE.csv",
+      "role": "deg_grp_KO_SVE_vs_KO_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ca62b81f302d1fbd5379a7d934203ba64a4d7826c144b58472edf8d0a0e58e04",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_WT_SVE_vs_WT_nSVE\\DEG_results_WT_SVE_vs_WT_nSVE.csv",
+      "role": "deg_grp_WT_SVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "09a27af8dd33dd07eed056f10d05f1c61b883df1faa5cc8893ffe5fc0ab6c333",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_nSVE_vs_WT_nSVE\\DEG_results_KO_nSVE_vs_WT_nSVE.csv",
+      "role": "deg_grp_KO_nSVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bc0ea55933cf28211cdc8b9ffc4174f739103a96578660a89b3cf0d1bc8bbf4b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\grp_KO_SVE_vs_WT_nSVE\\DEG_results_KO_SVE_vs_WT_nSVE.csv",
+      "role": "deg_grp_KO_SVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0d87d8300af2a54cb33ead8ee0efdfed1c501de56d5f58245b29228c542c89a1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_nSVE_vs_KO_SVE.csv",
+      "role": "deg_joint_all/grp_KO_nSVE_vs_KO_SVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "82cdf95ebce6552e2565cb5ae95c14d63be497920158d84510cd1316147ca5ce",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_KO_SVE.csv",
+      "role": "deg_joint_all/grp_WT_SVE_vs_KO_SVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "84320edd3ce12f458465ca1bba0ab2bd1df8e84ffb6eed26a871b9a557e8a8d8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_SVE_vs_WT_nSVE.csv",
+      "role": "deg_joint_all/grp_KO_SVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2935c04a13e4ebaa585224f7f6764b9082c642ff90d748b657e2008bc84aae1d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_KO_nSVE.csv",
+      "role": "deg_joint_all/grp_WT_SVE_vs_KO_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b942810f23f5914ce532c175aae96a01b3ffba2358c498d8268f1417d055c53e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_nSVE_vs_WT_nSVE.csv",
+      "role": "deg_joint_all/grp_KO_nSVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f7aaf66c3cf4e069f834c33121333c8b123c09e96ca003967b9b3ba37606356a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_WT_SVE_vs_WT_nSVE.csv",
+      "role": "deg_joint_all/grp_WT_SVE_vs_WT_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bb104572817ac2aaacad9849d334b526099a7954f8eb08b9ce93d30381e9ee43",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\results\\joint_all\\DEG_results_grp_KO_SVE_vs_KO_nSVE.csv",
+      "role": "deg_joint_all/grp_KO_SVE_vs_KO_nSVE",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4d6897507d69554783f84720ce363a062d0c8d61117adae022e05d3f53980f49",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\463ad4ee2ce52e09b589fa8ce48a64d7c595a849\\GSE207992\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0bf754c8165d6ee80ce360e147c58cc147d34c255f66bfe8a29c802d77827f5c",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -463,3 +463,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42003465 (GSE315915)
 
 - native.py:609 no tab sep (patched after this row); inspect omits ID type; ENSMUST gene lookup null (case_runner.py:438); no transcript-sum route; geo_tools.py:29 encoding Details: `PMID42003465/HANDBACK.md`.
+
+## PMID41555288 (GSE310294)
+
+- none blocking; pydeseq2 overflow warnings (utils.py:1088); Tnfsf11 symbol unmapped in _gene_lookup (case_runner.py:428) Details: `PMID41555288/HANDBACK.md`.
+
+## f7900835fe5a860049245a1bad8be8ffb0d6309e (GSE128078)
+
+- case_runner.py:749 paired_change multi-followup tables overwrite by contrast name; run_joint_limma 'all'+subset pulls other stratum's comparisons (POLICY BLOCKED) Details: `f7900835fe5a860049245a1bad8be8ffb0d6309e/HANDBACK.md`.
+
+## 463ad4ee2ce52e09b589fa8ce48a64d7c595a849 (GSE207992)
+
+- case_runner.py:429-443 gene lookup misses renamed symbols (Arntl,Ndufa4,Tmem254b/c); inspect misses exact raw-count recovery from DESeq2 normcounts Details: `463ad4ee2ce52e09b589fa8ce48a64d7c595a849/HANDBACK.md`.

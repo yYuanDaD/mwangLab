@@ -1,0 +1,161 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41555288",
+  "request": "Analyze GSE310294 for PMID 41555288 (Effect of moderate-intensity treadmill exercise on bone quality in adult rats and the underlying mechanisms.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE310294",
+      "accession": "GSE310294",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12896231.paper.md"],
+        "metadata": "GSE310294/GSE310294_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41555288/prep/GSE310294_counts_renamed.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41555288/prep_rename_columns.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE310294"],
+            "assay": "bulk RNA-seq of left tibia (bone tissue), Novogene, Illumina",
+            "organism": "Rat (male SD, 16 weeks old at start)",
+            "factors": {"group": ["Ctrl", "Exercise"]},
+            "sample_inclusion": "RNA-seq n = 3 rats per group (Fig. 5 legend); left tibiae",
+            "primary_estimand": "Effect of 6-week moderate-intensity treadmill exercise vs sedentary control on tibial bone gene expression in adult male rats",
+            "planned_contrasts": ["Exercise vs Ctrl (S3.3.p1; paper: 2076 DEGs, 1552 up / 524 down)"],
+            "repeated_measure_unit": "none (independent rats, one sample each)",
+            "normalization": "not_reported (Novogene pipeline; GEO: StringTie FPKM)",
+            "paper_method": "DEGseq R package (S2.6.p1)",
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 1.0,
+              "inclusive": true,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "effect_inclusive": false,
+              "effect_cutoff_original": "Fold Change < -2 or > 2",
+              "significance_criterion": "not_reported (paper states only the fold-change rule); encoded as no p-value filter",
+              "source_locator": "S3.3.p1"
+            },
+            "paper_results": "2076 DEGs (1552 up, 524 down); 39 bone-formation genes up incl. Igf1r, Bglap, Sp7, Smad6, Runx2, Ctnnb1, Col1a1, Pth1r (S3.3.p3); qPCR Runx2 up, Rankl/Trap down; GO/KEGG ORA (FDR < 0.05 for terms), GSEA ECM/osteoblast differentiation enriched in exercise"
+          },
+          "reasoning": "S2.6.p1: left tibiae RNA-seq by Novogene, DE with DEGseq, GO/KEGG on DEGs with FDR < 0.05 for terms, GSEA v4.1.0. S3.3.p1: 'classic criteria (Fold Change < -2 or > 2)' gives 2076 DEGs (1552 up / 524 down); no p or q cutoff is stated for genes. Fig. 5 legend: n = 3 rats per group. ABS.p2: male SD rats, 6-week moderate treadmill. The gene threshold is encoded literally as FC-only (no p filter); a significance-filtered audit rule is reported separately.",
+          "confidence": "high",
+          "locator": "S2.6.p1; S3.3.p1; FIG5"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 names GSE310294",
+              "organism Rattus norvegicus, ENSRNOG gene IDs",
+              "tissue bone; 3 'control' + 3 'exercised' samples matches Fig. 5 n = 3 per group",
+              "only one expression file deposited (gene_expression_list.csv/.xlsx identical content)"
+            ]
+          },
+          "reasoning": "Data availability statement (DA.p1) names GSE310294; the series has 6 rat bone samples, 3 control and 3 exercised, matching the RNA-seq design in Fig. 5. The csv and xlsx contain the same 32883 x 6 table; the csv is used.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^Library name: (Sample) (\\d+)$"]},
+          "patterns": {"grp": ["characteristics_ch1.3.treatment", "^(no|exercise)$"]},
+          "recode": {"grp": {"no": "CTRL", "exercise": "EX"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns sample1..6_FPKM were renamed to Sample_1..6 by prep_rename_columns.py (values untouched); metadata 'description' holds 'Library name: Sample N', from which key_patterns derives 'Sample_N' for an exact match. Group from characteristics 'treatment' (no -> CTRL, exercise -> EX), consistent with titles 'bone, control/exercised, repN'. No position-based mapping.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE310294_gene_expression_list.csv (supplementary, columns renamed only)", "paper_input": "not_reported explicitly; DEGseq takes read counts"},
+          "reasoning": "Column names say '_FPKM' but every value is an integer (integer fraction 1.0), median 2, max 1.2e6, and column sums are 14.1-18.1 million, i.e. library sizes; FPKM columns would not be integers and would not sum to read depths. GEO data_processing says 'Supplementary files ... include raw fragment counts for each Sample'. Decision: raw fragment counts mislabelled as FPKM. (data_processing also mentions hg38/mm10, which is boilerplate: IDs are rat ENSRNOG.)",
+          "candidates": [{"value": "FPKM", "reason_rejected": "all-integer values with column sums equal to read depths (14-18 M); GEO processing note says raw fragment counts"}],
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CTRL"},
+          "subject": null,
+          "organism": "Rat",
+          "planned": ["grp_EX_vs_CTRL"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "CTRL",
+            "treatment": "EX",
+            "estimand_type": "causal (randomized intervention per paper)",
+            "contrasts": [{"name": "grp_EX_vs_CTRL", "control": "CTRL", "treatment": "EX", "role": "primary"}]
+          },
+          "reasoning": "One exercise arm and one control arm of independent rats (S3.3.p1, Fig. 5); the paper's only RNA-seq contrast is Exercise vs Ctrl. 3 vs 3.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one tibia sample each; no batch, sex (all male) or other covariate in the metadata or paper.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DEGseq (R)", "status": "blocked", "reason": "no DEGseq executor in the workflow; DEGseq's MA-plot test is designed for unreplicated data and is not a validated route here"},
+            "deviations": ["DESeq2 Wald on raw counts instead of DEGseq; edgeR (TMM) run as sensitivity because GEO data_processing names edgeR"]
+          },
+          "transform": null,
+          "reasoning": "Raw integer counts support DESeq2. The paper's DEGseq (S2.6.p1) has no executor, so DESeq2 runs as a declared deviation with the paper's threshold; edgeR sensitivity mirrors the GEO processing note.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 1.0, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 1.0, "inclusive": true, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "deviation_note": "Paper rule (FC > 2 or < -2, no stated p/q cutoff) applied to DESeq2 log2FC; audit adds BH padj < 0.05."
+          },
+          "reasoning": "S3.3.p1 states only 'Fold Change < -2 or > 2' -> |log2FC| > 1 (exact, strict); no gene-level significance cutoff is given, so the paper rule is FC-only. Audit rule padj < 0.05 & |log2FC| > 1 shows how many of those also pass significance.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper used DEGseq; DESeq2 runs instead (paper route blocked).",
+              "Paper threshold is fold-change only; FC-only counts on DESeq2 MLE log2FC include low-count genes, so the padj audit count is the more reliable number.",
+              "Matrix columns are labelled FPKM but hold raw integer counts (decided from values and GEO processing note)."
+            ]
+          },
+          "paper_counts": {"grp_EX_vs_CTRL": 2076},
+          "paper_genes": {"grp_EX_vs_CTRL": ["Igf1r", "Bglap", "Sp7", "Smad6", "Runx2", "Ctnnb1", "Col1a1", "Pth1r", "Tnfsf11", "Acp5", "Tp53", "Casp3"]},
+          "reasoning": "Paper reports 2076 DEGs (1552 up / 524 down) and names bone-formation genes as up in exercise (S3.3.p3); qPCR Rankl (Tnfsf11) and Trap (Acp5) down; p53/Caspase-3 protein down (S3.5.p1).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix scale label", "paper": "not stated", "data": "columns named *_FPKM but integer raw fragment counts (sums 14-18 M; GEO: raw fragment counts)", "disposition": "executable_without_change"},
+        {"item": "DE method", "paper": "DEGseq (S2.6.p1)", "data": "GEO data_processing says edgeR; workflow has neither DEGseq executor", "disposition": "requires_explicit_deviation"},
+        {"item": "gene threshold", "paper": "Fold Change < -2 or > 2, no p/q stated (S3.3.p1)", "data": "applied literally (FC-only) plus padj audit", "disposition": "executable_without_change"},
+        {"item": "reference genome note", "paper": "not stated", "data": "GEO says hg38 / mm10 but IDs are rat ENSRNOG", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "grp_EX_vs_CTRL", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "CTRL", "treatment_group": "EX", "alpha": 0.05},
+         "role": "primary", "reasoning": "two-group count model for the paper's Exercise vs Ctrl contrast (deviation from DEGseq)"},
+        {"name": "edgeR_EX_vs_CTRL", "tool": "tools.edger_tools:run_edger_analysis",
+         "args": {"design_column": "grp", "control_group": "CTRL", "treatment_group": "EX"},
+         "role": "sensitivity", "reasoning": "GEO data_processing names edgeR; checks method sensitivity"}
+      ],
+      "enrichment": [
+        {"execution": "grp_EX_vs_CTRL", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "paper reports GO/KEGG ORA on DEGs and GSEA (S2.6.p1, S3.3.p2-p3)"}
+      ]
+    }
+  ]
+}

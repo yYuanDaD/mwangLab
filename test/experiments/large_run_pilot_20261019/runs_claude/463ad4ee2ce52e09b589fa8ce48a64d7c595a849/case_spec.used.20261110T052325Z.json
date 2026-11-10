@@ -1,0 +1,167 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/463ad4ee2ce52e09b589fa8ce48a64d7c595a849",
+  "request": "Analyze GSE207992 for PMID 36866044 (Timed exercise stabilizes behavioral rhythms but not molecular programs in the brain's suprachiasmatic clock): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE207992",
+      "accession": "GSE207992",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC9971895.paper.md"],
+        "metadata": "GSE207992/GSE207992_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/463ad4ee2ce52e09b589fa8ce48a64d7c595a849/GSE207992_raw_counts_recovered.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/463ad4ee2ce52e09b589fa8ce48a64d7c595a849/prep_recover_raw_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE207992"],
+            "assay": "bulk RNA-seq (Lexogen Sense total RNA, paired-end HiSeq 4000) of laser-captured SCN, adult male mice (S4.4.2.p1, S4.3.p1)",
+            "factors": {"genotype": ["Vipr2+/+ (WT)", "Vipr2-/- (KO)"], "exercise": ["nSVE (free wheel access)", "SVE (scheduled 6h/24h wheel access)"]},
+            "sample_inclusion": "WT nSVE CT14 n=4, WT SVE ZT14/CT22 n=4, KO nSVE CT14 n=3, KO SVE ZT14/CT14 n=3 (S4.4.2.p1, S2.2.p1, FIG4); only entrained/rhythmic animals used (S4.4.p2)",
+            "primary_estimand": "Effect of scheduled voluntary exercise (SVE vs nSVE) on the SCN transcriptome, within genotype; the KO comparison is matched for circadian time (CT14), the WT comparison is not (SVE ZT14/CT22 vs nSVE CT14) and the paper states its DEGs mix circadian phase and exercise (S2.4.p1, S2.5.p1)",
+            "planned_contrasts": [
+              "KO SVE vs KO nSVE (S2.5.p1; paper: 223 DEGs, 105 up / 118 down)",
+              "WT SVE vs WT nSVE (S2.4.p1; paper: 795 DEGs, 556 up / 239 down; confounded with circadian time)",
+              "KO nSVE vs WT nSVE (S2.3.p1; genotype; paper: 307 DEGs, 158 up / 149 down)",
+              "KO SVE vs WT nSVE (S2.6.p1; paper: 557 DEGs, 246 up / 311 down)"
+            ],
+            "repeated_measure_unit": "none: one SCN sample per animal",
+            "normalization": "DESeq2 size factors (S4.4.2.p1)",
+            "paper_method": "DESeq2 pairwise analyses with default independent filtering and Cook's distance outlier handling; BH FDR (S4.4.2.p1-p2)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.2.p2"},
+            "paper_results": "DEG counts per contrast as above; genes tested per pairwise analysis 9524 (WT SVE vs nSVE), 15735 (KO SVE vs nSVE), 15269 (WT nSVE vs KO nSVE), 11931 (WT nSVE vs KO SVE) (S4.4.2.p1); KEGG by clusterProfiler, GO BP by topGO (S4.5.p1)"
+          },
+          "reasoning": "Four RNA-seq groups (S2.2.p1, S4.4.2.p1). Exercise question is answered by SVE vs nSVE within genotype; the paper treats the KO comparison as the clean exercise effect (both CT14) and flags that the WT comparison also contains an 8h circadian-phase difference (S2.4.p1 last sentence). Genotype contrasts are reported in the paper and run here as secondary comparisons for count comparison. Threshold FDR < 0.05 with no fold-change rule (S2.2.p2, S4.4.2.p2).",
+          "confidence": "high",
+          "locator": "S2.2.p1; S4.4.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.2.p2 and S10.p1 name GSE207992", "14 GEO samples = 4+4+3+3 as in S4.4.2.p1", "GEO source SCN, Mus musculus, genotype and treatment fields match the paper's groups", "matrix columns carry the same AH labels as GEO description"]},
+          "reasoning": "Paper data availability (S10.p1) names GSE207992; group sizes and labels match exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "aliases": {"geno": "characteristics_ch1.1.genotype", "ex": "characteristics_ch1.2.treatment"},
+          "recode": {"geno": {"wildtype": "WT", "Vipr2-/-": "KO"}, "ex": {"non-SVE": "nSVE", "SVE": "SVE"}},
+          "combine": {"grp": ["geno", "ex"]},
+          "patterns": {},
+          "exclude_samples": {},
+          "reasoning": "The prep script renamed matrix columns from 'KO SVE AH14 Gene counts' to the AH label, which equals GEO 'description' (AH1..AH16). The genotype/treatment words embedded in the original column names agree with GEO characteristics for every sample. grp = genotype_exercise.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "The deposited file is DESeq2-normalized counts (GEO data_processing: 'tabular file containing normalised counts'; non-integer values). Dividing each sample by its smallest non-zero value returns integers for all 55401 x 14 entries (max deviation < 1e-8), i.e. the original integer counts (StringTie/prepDE) divided by DESeq2 size factors 0.65-1.45. prep_recover_raw_counts.py recovers them. Paper input to DESeq2 is the same integer count matrix (S4.4.2.p1).",
+          "confidence": "high",
+          "candidates": [
+            {"value": "use DESeq2-normalized counts rounded as estimated counts", "reason_rejected": "rescaling by size factors distorts the count variance; exact raw counts are recoverable"}
+          ]
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WT_nSVE"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_KO_SVE_vs_KO_nSVE", "grp_WT_SVE_vs_WT_nSVE", "grp_KO_nSVE_vs_WT_nSVE", "grp_KO_SVE_vs_WT_nSVE"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group (pairwise, one DESeq2 fit per pair of groups as in the paper)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_KO_SVE_vs_KO_nSVE", "control": "KO_nSVE", "treatment": "KO_SVE", "role": "primary"},
+              {"name": "grp_WT_SVE_vs_WT_nSVE", "control": "WT_nSVE", "treatment": "WT_SVE", "role": "secondary"},
+              {"name": "grp_KO_nSVE_vs_WT_nSVE", "control": "WT_nSVE", "treatment": "KO_nSVE", "role": "secondary"},
+              {"name": "grp_KO_SVE_vs_WT_nSVE", "control": "WT_nSVE", "treatment": "KO_SVE", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Paper ran pairwise DESeq2 comparisons with per-comparison independent filtering (S4.4.2.p1 lists genes passing filtering per pairwise analysis), so each contrast is a separate two-group fit on its two groups. Primary exercise estimand: KO SVE vs KO nSVE, both sampled at CT14 (S2.2.p1, S2.5.p1). WT SVE vs nSVE is an exercise comparison confounded by design with circadian time (ZT14/CT22 vs CT14; S2.4.p1) - run as paper-aligned secondary with a caveat, not as a pure exercise effect. Genotype contrasts are secondary.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "genotype x exercise factorial with interaction", "reason_rejected": "paper does not fit an interaction; WT SVE sampled at a different circadian time so the interaction would not be an exercise-by-genotype estimand"},
+            {"value": "one joint model on all 14 samples", "reason_rejected": "paper used separate pairwise analyses; kept the paper's route"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one sample each; no batch, lane, or sex variable recorded (all male, S4.3.p1). Circadian sampling time is not a metadata column: it is fixed by group (WT SVE = CT22, others CT14) and is aliased with the WT exercise contrast by design; this is recorded as a caveat rather than a covariate.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald, default independent filtering and Cook's outlier handling)", "formula": "~ grp", "deviations": ["pydeseq2 instead of R DESeq2 (Bioconductor 3.14)"]},
+          "transform": null,
+          "reasoning": "Paper method DESeq2 on integer counts (S4.4.2.p1); raw counts recovered exactly, so the paper route runs.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.2.p2: DEGs with FDR < 0.05; S4.4.2.p2: BH-corrected p. No fold-change rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "WT SVE vs WT nSVE compares ZT14/CT22 with CT14: the exercise effect is confounded with an 8h circadian-phase difference (paper S2.4.p1); it is not a pure exercise effect.",
+              "KO SVE vs WT nSVE crosses genotype and exercise and is not an exercise estimand.",
+              "pydeseq2 rather than R DESeq2; counts recovered from the deposited normalized matrix."
+            ]
+          },
+          "paper_counts": {
+            "grp_KO_SVE_vs_KO_nSVE": 223,
+            "grp_WT_SVE_vs_WT_nSVE": 795,
+            "grp_KO_nSVE_vs_WT_nSVE": 307,
+            "grp_KO_SVE_vs_WT_nSVE": 557
+          },
+          "paper_genes": {
+            "grp_KO_SVE_vs_KO_nSVE": ["Kdr", "Banp", "Syk", "Naif1", "Kctd18", "Gm1848", "Ncor1", "Cox16", "Ndufa4", "Per2", "Arntl", "Nr1d1", "Cry1"],
+            "grp_WT_SVE_vs_WT_nSVE": ["Nr1d1", "Cry1", "Per2", "Rgs16", "Miat", "Slc2a13", "Serpine1", "Syngap1", "Arntl", "Avp", "Prok2"],
+            "grp_KO_nSVE_vs_WT_nSVE": ["Tmem254b", "Tmem254c", "Gpc3", "Kdr", "Penk", "Ncor1", "C1ql3", "Vip", "Avp", "Creb3l1", "Kcnc2", "Mobp"],
+            "grp_KO_SVE_vs_WT_nSVE": ["Gpc3", "Penk", "Rgs16", "Nr1d1", "Mobp", "Creb3l1", "Avp", "Vip", "Sst", "Per2", "Gpr176", "Sod3"]
+          },
+          "reasoning": "Paper-aligned DESeq2 pairwise route at the paper's FDR rule. Expected directions: KO exercise up Kdr/Banp/Syk/Naif1/Kctd18/Ncor1, down Cox16/Ndufa4, no core clock genes DE (S2.5.p1, S2.7.p2); WT exercise up Nr1d1/Rgs16/Miat/Serpine1/Syngap1, down Cry1/Per2/Slc2a13 (S2.4.p1).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "genome build", "paper": "GRCm38 (S4.4.2.p1)", "data": "GEO data_processing: GRCm39, GENCODE vM27", "disposition": "executable_without_change"},
+        {"item": "WT SVE sampling phase", "paper": "ZT14/CT22 (S2.2.p1, S4.4.p4) vs ZT14/CT24 (S4.4.2.p1)", "data": "GEO: culled at ZT14", "disposition": "executable_without_change"},
+        {"item": "deposited matrix", "paper": "DESeq2 on counts", "data": "only DESeq2-normalized counts deposited; integer counts recovered exactly by per-sample rescaling (prep_recover_raw_counts.py)", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "grp_KO_SVE_vs_KO_nSVE", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "KO_nSVE", "treatment_group": "KO_SVE", "alpha": 0.05},
+         "subset": {"grp": ["KO_nSVE", "KO_SVE"]}, "role": "primary",
+         "reasoning": "Paper S2.5.p1: KO SVE vs KO nSVE, both CT14; separate pairwise DESeq2 fit."},
+        {"name": "grp_WT_SVE_vs_WT_nSVE", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "WT_nSVE", "treatment_group": "WT_SVE", "alpha": 0.05},
+         "subset": {"grp": ["WT_nSVE", "WT_SVE"]}, "role": "secondary",
+         "reasoning": "Paper S2.4.p1: WT SVE (ZT14/CT22) vs WT nSVE (CT14); exercise confounded with circadian phase."},
+        {"name": "grp_KO_nSVE_vs_WT_nSVE", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "WT_nSVE", "treatment_group": "KO_nSVE", "alpha": 0.05},
+         "subset": {"grp": ["WT_nSVE", "KO_nSVE"]}, "role": "secondary",
+         "reasoning": "Paper S2.3.p1: genotype at CT14 under nSVE."},
+        {"name": "grp_KO_SVE_vs_WT_nSVE", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "WT_nSVE", "treatment_group": "KO_SVE", "alpha": 0.05},
+         "subset": {"grp": ["WT_nSVE", "KO_SVE"]}, "role": "secondary",
+         "reasoning": "Paper S2.6.p1: KO SVE vs WT nSVE at CT14."}
+      ],
+      "enrichment": [
+        {"execution": "grp_KO_SVE_vs_KO_nSVE", "ora": true, "gsea": false, "direction": "up", "reasoning": "Paper reports KEGG terms up by exercise in KO SCN (Fig 3F, S2.5.p1)."},
+        {"execution": "grp_KO_SVE_vs_KO_nSVE", "ora": true, "gsea": false, "direction": "down", "reasoning": "Paper reports KEGG terms down by exercise in KO SCN (mTOR signaling; S2.5.p1)."},
+        {"execution": "grp_KO_SVE_vs_KO_nSVE", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "Hallmark GSEA on the full ranking of the primary exercise contrast."},
+        {"execution": "grp_WT_SVE_vs_WT_nSVE", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "Hallmark GSEA on the WT exercise (phase-confounded) contrast; paper reports KEGG for it (Fig 3D)."}
+      ]
+    }
+  ]
+}
