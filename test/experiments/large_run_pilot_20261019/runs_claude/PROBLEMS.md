@@ -487,3 +487,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40695537 (GSE293163)
 
 - runner cannot express post-hoc mean-log2FC DEG subset; filter_low_counts CPM-only, no read-count rule (tools/case_runner.py:668, patched after this row) Details: `PMID40695537/HANDBACK.md`.
+
+## d446594d1ade71b3541cb0f6a971599e29ccdf5a (GSE124819)
+
+- decision_contract.py:160 rejects paper_threshold null for workflow_default (patched after this row); case_runner.py:873-875 summary n_deg holds only first table Details: `d446594d1ade71b3541cb0f6a971599e29ccdf5a/HANDBACK.md`.
+
+## 86991572b4ea250a7e68eadebb3fa005f4fe2282 (GSE86338)
+
+- suitability.py:273 + decision_contract.py:171 force refusal when all arms n<3, contradicting SKILL.md 'small n alone is not a stop'; no low-expression filter for FPKM input Details: `86991572b4ea250a7e68eadebb3fa005f4fe2282/HANDBACK.md`.

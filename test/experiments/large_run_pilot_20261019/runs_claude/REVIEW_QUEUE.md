@@ -21,3 +21,7 @@ One section per case; newest last.
 - policy: Open policy question: which threshold to report as headline when the paper's counts fit FDR-only unblocked (2965/2224) but its Methods state FDR + |log2FC| > 1; the case applies the stated rule and reports the other as audit.
 - policy: Paper's stated directions (oxidative metabolism up with training, GGNBP2 up with SR) are opposite to the data under exercise-over-control ordering; the analysis attributes this to reference-over-test labels (NS3_vs_NS9). A person may want to confirm with the authors before any direction-dependent claim is quoted against the paper.
 - policy: Primary fit blocks on participant while the paper's counts match the unblocked fit; joint blocked vs unblocked as the primary is an open policy choice when the paper is silent.
+
+## PMID40695537 / GSE293163 (2026-11-10)
+
+- policy: Which threshold to report when the paper's numbers fit the post-hoc mean-log2FC subset better than the stated FDR rule (open policy question).
