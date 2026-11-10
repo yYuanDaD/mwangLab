@@ -130,9 +130,9 @@ def excel_to_csvs(path: str) -> list[str]:
     out = []
     for i, (name, raw) in enumerate(sheets.items()):
         # Title rows and merged group-label rows sit above the real header: the header is the
-        # first of the top rows that fills at least half of the columns (as native.read_table).
+        # first of the top rows with the most filled cells (one blank allowed, e.g. an empty corner cell) (as native.read_table).
         filled = raw.head(10).notna().sum(axis=1)
-        start = int(next((r for r, n in filled.items() if n >= raw.shape[1] / 2), 0)) if len(raw) else 0
+        start = int(next((r for r, n in filled.items() if n >= filled.max() - 1), 0)) if len(raw) else 0
         df = raw.iloc[start + 1:].copy()
         df.columns = [str(c) if pd.notna(c) else f"Unnamed: {j}" for j, c in enumerate(raw.iloc[start])] \
             if len(raw) else raw.columns

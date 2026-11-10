@@ -204,7 +204,7 @@ def read_table(path: str | Path) -> pd.DataFrame:
     if str(path).lower().endswith((".xlsx", ".xls")):
         raw = pd.read_excel(path, header=None)
         filled = raw.head(10).notna().sum(axis=1)
-        start = int(next((i for i, n in filled.items() if n >= raw.shape[1] / 2), 0))
+        start = int(next((i for i, n in filled.items() if n >= filled.max() - 1), 0))
         frame = raw.iloc[start + 1:].copy()
         frame.columns = [str(c) for c in raw.iloc[start]]
         frame = frame.set_index(frame.columns[0])

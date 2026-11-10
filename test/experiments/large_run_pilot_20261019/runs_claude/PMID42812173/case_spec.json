@@ -13,9 +13,11 @@
      "test/experiments/paper_screen_20261027/papers/PMC13619381.paper.md"
     ],
     "metadata": "GSE320360/GSE320360_metadata.csv",
-    "matrix": "GSE320360/GSE320360_MDD_Final_Counts.csv.gz",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42812173/prep/GSE320360_counts_paperfilter.csv",
     "raw_tar": false,
-    "prep_scripts": []
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID42812173/prep/paper_filter.py"
+    ]
    },
    "gates": {
     "paper_reconstruction": {
@@ -218,13 +220,13 @@
        "status": "reproduced_with_deviations"
       },
       "deviations": [
-       "low-count filter on raw counts (>=10 in >=3 samples; 2,611 kept) instead of DESeq2-normalized counts (~2,596 kept with our size factors); paper reports 2,609 kept (S3.2.p4)",
-       "pydeseq2 instead of R DESeq2; the paper's exclusion of non-converging genes (2%) is not replicated",
-       "pydeseq2 Cook's outlier refit may differ from R"
+       "pydeseq2 instead of R DESeq2 1.44 for the primary table; R DESeq2 1.51.7 (Bioconductor, Wald, default Cook's cutoff and independent filtering) runs as a sensitivity on the same matrix and model",
+       "the paper's exclusion of genes failing to converge (2%) is not replicated: neither executor reports per-gene convergence",
+       "R DESeq2 here is 1.51.7, not the paper's 1.44.0"
       ]
      },
      "transform": null,
-     "reasoning": "Reproduces the paper's DESeq2 within-subject model. The runner's low-count filter works on raw counts; only 36 miRNAs are zero-free, so size factors come from the same genes either way, and the raw rule keeps a count (2,611) closer to the paper's reported 2,609 than the normalized rule (~2,596).",
+     "reasoning": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Sensitivity runs: R DESeq2 (the paper's software) and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
      "confidence": "medium"
     },
     "threshold": {
@@ -266,7 +268,13 @@
      "paper_counts": {
       "joint/time_mid_vs_pre": 15,
       "joint/time_post_vs_pre": 33,
-      "joint/time_post75_vs_pre": 4
+      "joint/time_post75_vs_pre": 4,
+      "r_deseq2/time_mid_vs_pre": 15,
+      "edger_ql/time_mid_vs_pre": 15,
+      "r_deseq2/time_post_vs_pre": 33,
+      "edger_ql/time_post_vs_pre": 33,
+      "r_deseq2/time_post75_vs_pre": 4,
+      "edger_ql/time_post75_vs_pre": 4
      },
      "paper_genes": {
       "joint/time_mid_vs_pre": [
@@ -337,8 +345,8 @@
     {
      "item": "low-count filter",
      "paper": ">=10 DESeq2-normalized counts in >=3 samples (S2.7.p1); 2,609 retained (S3.2.p4)",
-     "data": "raw rule keeps 2,611, normalized rule ~2,596 with our size factors",
-     "disposition": "declared_deviation"
+     "data": "same rule reproduced by prep/paper_filter.py keeps 2,596 (13 fewer than reported); the raw-count rule would keep 2,611",
+     "disposition": "executable_without_change"
     },
     {
      "item": "non-converging genes",
@@ -365,11 +373,81 @@
       "alpha": 0.05
      },
      "role": "primary",
-     "filter_low_counts": {
-      "min_count": 10,
-      "min_samples": 3
+     "reasoning": "One pydeseq2 model ~ subject + time on all 115 samples, paper-filtered matrix; the three vs-pre contrasts are the paper's, the others exploratory."
+    },
+    {
+     "name": "r_deseq2",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "deseq2",
+      "design": "~ subject + time",
+      "contrasts": [
+       {
+        "name": "time_mid_vs_pre",
+        "factor": "time",
+        "test": "mid",
+        "ref": "pre"
+       },
+       {
+        "name": "time_post_vs_pre",
+        "factor": "time",
+        "test": "post",
+        "ref": "pre"
+       },
+       {
+        "name": "time_post75_vs_pre",
+        "factor": "time",
+        "test": "post75",
+        "ref": "pre"
+       }
+      ],
+      "levels": {
+       "time": [
+        "pre",
+        "mid",
+        "post",
+        "post75"
+       ]
+      },
+      "alpha": 0.05,
+      "label": "r_deseq2"
      },
-     "reasoning": "One DESeq2 model ~ subject + time on all 115 samples; the three vs-pre contrasts are the paper's, the others exploratory."
+     "role": "sensitivity",
+     "reasoning": "Reviewer request: the paper's software (R DESeq2, Wald, default Cook's/independent filtering) on the same matrix and model, to test whether pydeseq2 explains the 3-7x larger DEG sets."
+    },
+    {
+     "name": "edger_ql",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "edger_ql",
+      "design": "~ subject + time",
+      "contrasts": [
+       {
+        "name": "time_mid_vs_pre",
+        "coef": "timemid"
+       },
+       {
+        "name": "time_post_vs_pre",
+        "coef": "timepost"
+       },
+       {
+        "name": "time_post75_vs_pre",
+        "coef": "timepost75"
+       }
+      ],
+      "levels": {
+       "time": [
+        "pre",
+        "mid",
+        "post",
+        "post75"
+       ]
+      },
+      "alpha": 0.05,
+      "label": "edger_ql"
+     },
+     "role": "sensitivity",
+     "reasoning": "Independent NB method (edgeR QL, TMM) with the same within-subject model."
     }
    ],
    "enrichment": []

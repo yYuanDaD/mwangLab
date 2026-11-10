@@ -1,0 +1,456 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42812173",
+ "request": "Analyze GSE320360 for PMID 42812173 (Acute aerobic exercise is associated with a biphasic, temporally ordered shift in serum extracellular vesicle microRNA expression in major depressive disorder.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session (Claude Code)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE320360",
+   "accession": "GSE320360",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC13619381.paper.md"
+    ],
+    "metadata": "GSE320360/GSE320360_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42812173/prep/GSE320360_counts_paperfilter.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID42812173/prep/paper_filter.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE320360"
+      ],
+      "assay": "small RNA-seq (miRBase mature miRNA counts) of serum EV-enriched fraction, Illumina NovaSeq 6000 (S2.5.p2, S2.6.p1)",
+      "primary_estimand": "Within-subject change in serum EV-enriched miRNA abundance at mid-AAE, immediately post-AAE and 75 min post-AAE relative to pre-AAE baseline, in adults with MDD after one 30-min moderate cycling bout (S2.2.p1, S2.7.p1). Single arm, no resting control (S4.5.p4).",
+      "factors": {
+       "time": [
+        "pre (E1, baseline)",
+        "mid (E2)",
+        "post (E3)",
+        "post75 (E6)"
+       ],
+       "subject": "participant ID (30)"
+      },
+      "inclusion": "30 pre, 29 mid, 28 post, 28 75-min samples after 10 library failures; no outliers removed (S2.5.p2, S2.6.p1)",
+      "planned_contrasts": [
+       "mid vs pre (S3.3.p2; paper: 15 DE, 13 down / 2 up)",
+       "post vs pre (S3.3.p2; paper: 33 DE, all down)",
+       "post75 vs pre (S3.3.p2; paper: 4 DE, all up)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "inclusive": true,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S2.7.p1"
+      },
+      "paper_method": "DESeq2 v1.44 ~ ID + Treatment, Wald tests, BH; size factors from unfiltered matrix; keep miRNAs with >=10 normalized counts in >=3 samples; non-converging genes (2%) excluded (S2.7.p1)",
+      "paper_results": "15/33/4 DE at FDR<=0.05; 2,609 miRNAs after filtering (S3.2.p4); Table 1"
+     },
+     "reasoning": "Methods S2.7.p1 define one DESeq2 model on all samples with subject ID and time as factors and three Wald contrasts vs pre-AAE; FDR<=0.05 with no fold-change rule. FDR<=0.10 is reported only as trending.",
+     "locator": "S2.7.p1",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 names GSE320360",
+       "115 samples = 30+29+28+28 as in S2.5.p2",
+       "matrix median library size 560,077 equals S3.2.p4 median of 560,077 counts per sample",
+       "features are miRBase mature hsa- names"
+      ]
+     },
+     "reasoning": "Data availability names GSE320360; sample counts per timepoint and median library size match the paper exactly.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "description",
+       "Library name: ([^,]+),"
+      ]
+     },
+     "patterns": {
+      "time": [
+       "description",
+       "Library name: \\d+_(E\\d),"
+      ],
+      "subject": [
+       "description",
+       "Library name: (\\d+)_E\\d,"
+      ]
+     },
+     "recode": {
+      "time": {
+       "E1": "pre",
+       "E2": "mid",
+       "E3": "post",
+       "E6": "post75"
+      },
+      "subject": {
+       "352": "s352",
+       "354": "s354",
+       "366": "s366",
+       "371": "s371",
+       "373": "s373",
+       "379": "s379",
+       "380": "s380",
+       "381": "s381",
+       "382": "s382",
+       "383": "s383",
+       "387": "s387",
+       "388": "s388",
+       "391": "s391",
+       "394": "s394",
+       "396": "s396",
+       "406": "s406",
+       "407": "s407",
+       "408": "s408",
+       "409": "s409",
+       "410": "s410",
+       "413": "s413",
+       "415": "s415",
+       "416": "s416",
+       "421": "s421",
+       "428": "s428",
+       "429": "s429",
+       "437": "s437",
+       "438": "s438",
+       "442": "s442",
+       "445": "s445"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns (e.g. 352_E1) equal the Library name inside description for 115/115 samples. Suffix E1/E2/E3/E6 crosstabs one-to-one with characteristics treatment Baseline/Mid/Post/75 min. Subject IDs get an 's' prefix so they are a factor, not a numeric covariate.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "All integers, max 4.0e6, median 5; GEO data_processing: tab-delimited matrix of raw miRNA read counts; paper fits DESeq2 on raw counts (S2.7.p1).",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "time"
+     ],
+     "references": {
+      "time": "pre"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "time_mid_vs_pre",
+      "time_post_vs_pre",
+      "time_post75_vs_pre"
+     ],
+     "covariate_candidates": [
+      "subject"
+     ],
+     "final": {
+      "analysis_type": "repeated-measures multilevel (4 timepoints, within subject)",
+      "formula": "~ subject + time",
+      "contrasts": [
+       {
+        "name": "time_mid_vs_pre",
+        "control": "pre",
+        "treatment": "mid",
+        "role": "primary"
+       },
+       {
+        "name": "time_post_vs_pre",
+        "control": "pre",
+        "treatment": "post",
+        "role": "primary"
+       },
+       {
+        "name": "time_post75_vs_pre",
+        "control": "pre",
+        "treatment": "post75",
+        "role": "primary"
+       }
+      ],
+      "estimand_type": "within-subject temporal change (no resting control; not attributable to exercise alone, S4.5.p4)"
+     },
+     "candidates": [
+      {
+       "value": "pooled post-exercise vs pre",
+       "reason_rejected": "paper tests each timepoint against baseline separately (S2.7.p1)"
+      },
+      {
+       "value": "separate two-group fits per timepoint",
+       "reason_rejected": "paper fits one ~ ID + Treatment model on all samples"
+      }
+     ],
+     "reasoning": "S2.7.p1: one model on all samples, time as factor with pre as reference plus subject ID; three planned contrasts. Pairwise comparisons among mid/post/post75 come from the same model as exploratory. Sex is not in GEO metadata and miRNA features carry no X/Y genes, so no sex check is possible.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "fixed-effect blocking factor (paper ~ ID + Treatment)"
+       }
+      ]
+     },
+     "confounding_candidates": null,
+     "reasoning": "Repeated samples from the same 30 participants; paper blocks on ID as a fixed factor (S2.7.p1). Sequencing pool/lane is not recorded in GEO, so it cannot be assessed.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, joint model)",
+      "formula": "~ subject + time",
+      "paper_route": {
+       "method": "DESeq2 ~ ID + Treatment (R 1.44)",
+       "status": "reproduced_with_deviations"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2 1.44 for the primary table; R DESeq2 1.51.7 (Bioconductor, Wald, default Cook's cutoff and independent filtering) runs as a sensitivity on the same matrix and model",
+       "the paper's exclusion of genes failing to converge (2%) is not replicated: neither executor reports per-gene convergence",
+       "R DESeq2 here is 1.51.7, not the paper's 1.44.0"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Sensitivity runs: R DESeq2 (the paper's software) and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.1,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": true
+      }
+     },
+     "reasoning": "S2.7.p1/S3.3.p2: adjusted p <= 0.05 significant, no fold-change cutoff; audit = paper's trending FDR <= 0.10.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "single-arm repeated-measures design without a resting control: changes are temporal, not attributable to exercise alone (S4.5.p4)",
+       "paper used R DESeq2 and a normalized-count filter; DE counts near the FDR boundary may differ"
+      ]
+     },
+     "paper_counts": {
+      "joint/time_mid_vs_pre": 15,
+      "joint/time_post_vs_pre": 33,
+      "joint/time_post75_vs_pre": 4,
+      "r_deseq2/time_mid_vs_pre": 15,
+      "edger_ql/time_mid_vs_pre": 15,
+      "r_deseq2/time_post_vs_pre": 33,
+      "edger_ql/time_post_vs_pre": 33,
+      "r_deseq2/time_post75_vs_pre": 4,
+      "edger_ql/time_post75_vs_pre": 4
+     },
+     "paper_genes": {
+      "joint/time_mid_vs_pre": [
+       "hsa-miR-3618",
+       "hsa-miR-1288-5p",
+       "hsa-miR-148a-5p",
+       "hsa-miR-212-5p",
+       "hsa-miR-542-3p",
+       "hsa-miR-329-5p",
+       "hsa-miR-380-3p",
+       "hsa-miR-5007-5p",
+       "hsa-miR-6861-5p",
+       "hsa-miR-7154-5p",
+       "hsa-miR-1252-3p",
+       "hsa-miR-6720-3p",
+       "hsa-miR-137-3p",
+       "hsa-miR-4496",
+       "hsa-miR-6780a-3p"
+      ],
+      "joint/time_post_vs_pre": [
+       "hsa-miR-4465",
+       "hsa-miR-183-5p",
+       "hsa-miR-657",
+       "hsa-miR-4479",
+       "hsa-miR-21-5p",
+       "hsa-miR-765",
+       "hsa-miR-92a-1-5p",
+       "hsa-miR-661",
+       "hsa-miR-5008-5p",
+       "hsa-miR-6822-3p",
+       "hsa-miR-7855-5p",
+       "hsa-miR-1252-3p",
+       "hsa-miR-1268a",
+       "hsa-miR-130a-5p",
+       "hsa-miR-224-5p",
+       "hsa-miR-4687-3p",
+       "hsa-miR-4695-5p",
+       "hsa-miR-4746-3p",
+       "hsa-miR-6127",
+       "hsa-miR-3682-5p",
+       "hsa-miR-4458",
+       "hsa-miR-7157-3p",
+       "hsa-miR-4446-3p",
+       "hsa-miR-4292",
+       "hsa-miR-625-3p",
+       "hsa-miR-6783-5p",
+       "hsa-miR-4523",
+       "hsa-miR-4804-5p",
+       "hsa-miR-6758-5p",
+       "hsa-miR-8056",
+       "hsa-miR-940",
+       "hsa-miR-1911-5p",
+       "hsa-miR-4685-5p"
+      ],
+      "joint/time_post75_vs_pre": [
+       "hsa-miR-217-3p",
+       "hsa-miR-3682-3p",
+       "hsa-miR-649",
+       "hsa-miR-7851-3p",
+       "hsa-miR-1252-3p"
+      ]
+     },
+     "reasoning": "Paper Table 1 FDR<=0.05 miRNAs per contrast; hsa-miR-1252-3p added for 75 min (FDR 0.071, trending) because the paper highlights it as persistent (S3.3.p3).",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "low-count filter",
+     "paper": ">=10 DESeq2-normalized counts in >=3 samples (S2.7.p1); 2,609 retained (S3.2.p4)",
+     "data": "same rule reproduced by prep/paper_filter.py keeps 2,596 (13 fewer than reported); the raw-count rule would keep 2,611",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "non-converging genes",
+     "paper": "2% failing to converge excluded (S2.7.p1)",
+     "data": "pydeseq2 does not flag per-gene convergence the same way",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "sequencing pool/lane",
+     "paper": "four pools, four lanes each (S2.5.p2)",
+     "data": "not recorded in GEO; not modelled (the paper did not model it either)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all",
+      "covariates": [
+       "subject"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "One pydeseq2 model ~ subject + time on all 115 samples, paper-filtered matrix; the three vs-pre contrasts are the paper's, the others exploratory."
+    },
+    {
+     "name": "r_deseq2",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "deseq2",
+      "design": "~ subject + time",
+      "contrasts": [
+       {
+        "name": "time_mid_vs_pre",
+        "factor": "time",
+        "test": "mid",
+        "ref": "pre"
+       },
+       {
+        "name": "time_post_vs_pre",
+        "factor": "time",
+        "test": "post",
+        "ref": "pre"
+       },
+       {
+        "name": "time_post75_vs_pre",
+        "factor": "time",
+        "test": "post75",
+        "ref": "pre"
+       }
+      ],
+      "levels": {
+       "time": [
+        "pre",
+        "mid",
+        "post",
+        "post75"
+       ]
+      },
+      "alpha": 0.05,
+      "label": "r_deseq2"
+     },
+     "role": "sensitivity",
+     "reasoning": "Reviewer request: the paper's software (R DESeq2, Wald, default Cook's/independent filtering) on the same matrix and model, to test whether pydeseq2 explains the 3-7x larger DEG sets."
+    },
+    {
+     "name": "edger_ql",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "edger_ql",
+      "design": "~ subject + time",
+      "contrasts": [
+       {
+        "name": "time_mid_vs_pre",
+        "coef": "timemid"
+       },
+       {
+        "name": "time_post_vs_pre",
+        "coef": "timepost"
+       },
+       {
+        "name": "time_post75_vs_pre",
+        "coef": "timepost75"
+       }
+      ],
+      "levels": {
+       "time": [
+        "pre",
+        "mid",
+        "post",
+        "post75"
+       ]
+      },
+      "alpha": 0.05,
+      "label": "edger_ql"
+     },
+     "role": "sensitivity",
+     "reasoning": "Independent NB method (edgeR QL, TMM) with the same within-subject model."
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}
