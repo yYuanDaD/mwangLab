@@ -213,20 +213,20 @@
     },
     "method": {
      "final": {
-      "method": "DESeq2 (pydeseq2 Wald, joint model)",
+      "method": "DESeq2 (R 1.51.7, Wald)",
       "formula": "~ subject + time",
       "paper_route": {
        "method": "DESeq2 ~ ID + Treatment (R 1.44)",
        "status": "reproduced_with_deviations"
       },
       "deviations": [
-       "pydeseq2 instead of R DESeq2 1.44 for the primary table; R DESeq2 1.51.7 (Bioconductor, Wald, default Cook's cutoff and independent filtering) runs as a sensitivity on the same matrix and model",
-       "the paper's exclusion of genes failing to converge (2%) is not replicated: neither executor reports per-gene convergence",
-       "R DESeq2 here is 1.51.7, not the paper's 1.44.0"
+       "R DESeq2 1.51.7 instead of the paper's 1.44.0",
+       "the paper's exclusion of genes failing to converge (2%) is not replicated: tools/r_de.R does not export betaConv",
+       "sensitivity runs: pydeseq2 joint model (3-7x more DEGs than the paper) and edgeR QL (far fewer)"
       ]
      },
      "transform": null,
-     "reasoning": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Sensitivity runs: R DESeq2 (the paper's software) and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
+     "reasoning": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Primary executor is R DESeq2 (the paper's software). Sensitivity runs: pydeseq2 and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
      "confidence": "medium"
     },
     "threshold": {
@@ -262,7 +262,8 @@
       "route": "paper_aligned",
       "caveats": [
        "single-arm repeated-measures design without a resting control: changes are temporal, not attributable to exercise alone (S4.5.p4)",
-       "paper used R DESeq2 and a normalized-count filter; DE counts near the FDR boundary may differ"
+       "R DESeq2 (primary) recovers 15/15, 30/33 and 4/4 of the paper's DEGs but finds 16/53/15 vs the paper's 15/33/4. pydeseq2 finds 45/72/28 on the same matrix and model, so most of the earlier inflation came from the pydeseq2 port. The remaining excess at post and 75 min is not explained; candidates are the DESeq2 version and the paper's unreplicated removal of non-converging genes",
+       "at 75 min, R DESeq2 calls 2 down-regulated miRNAs (including miR-1252-3p) where the paper's significant set is all up"
       ]
      },
      "paper_counts": {
@@ -335,6 +336,65 @@
        "hsa-miR-649",
        "hsa-miR-7851-3p",
        "hsa-miR-1252-3p"
+      ],
+      "r_deseq2/time_mid_vs_pre": [
+       "hsa-miR-3618",
+       "hsa-miR-1288-5p",
+       "hsa-miR-148a-5p",
+       "hsa-miR-212-5p",
+       "hsa-miR-542-3p",
+       "hsa-miR-329-5p",
+       "hsa-miR-380-3p",
+       "hsa-miR-5007-5p",
+       "hsa-miR-6861-5p",
+       "hsa-miR-7154-5p",
+       "hsa-miR-1252-3p",
+       "hsa-miR-6720-3p",
+       "hsa-miR-137-3p",
+       "hsa-miR-4496",
+       "hsa-miR-6780a-3p"
+      ],
+      "r_deseq2/time_post_vs_pre": [
+       "hsa-miR-4465",
+       "hsa-miR-183-5p",
+       "hsa-miR-657",
+       "hsa-miR-4479",
+       "hsa-miR-21-5p",
+       "hsa-miR-765",
+       "hsa-miR-92a-1-5p",
+       "hsa-miR-661",
+       "hsa-miR-5008-5p",
+       "hsa-miR-6822-3p",
+       "hsa-miR-7855-5p",
+       "hsa-miR-1252-3p",
+       "hsa-miR-1268a",
+       "hsa-miR-130a-5p",
+       "hsa-miR-224-5p",
+       "hsa-miR-4687-3p",
+       "hsa-miR-4695-5p",
+       "hsa-miR-4746-3p",
+       "hsa-miR-6127",
+       "hsa-miR-3682-5p",
+       "hsa-miR-4458",
+       "hsa-miR-7157-3p",
+       "hsa-miR-4446-3p",
+       "hsa-miR-4292",
+       "hsa-miR-625-3p",
+       "hsa-miR-6783-5p",
+       "hsa-miR-4523",
+       "hsa-miR-4804-5p",
+       "hsa-miR-6758-5p",
+       "hsa-miR-8056",
+       "hsa-miR-940",
+       "hsa-miR-1911-5p",
+       "hsa-miR-4685-5p"
+      ],
+      "r_deseq2/time_post75_vs_pre": [
+       "hsa-miR-217-3p",
+       "hsa-miR-3682-3p",
+       "hsa-miR-649",
+       "hsa-miR-7851-3p",
+       "hsa-miR-1252-3p"
       ]
      },
      "reasoning": "Paper Table 1 FDR<=0.05 miRNAs per contrast; hsa-miR-1252-3p added for 75 min (FDR 0.071, trending) because the paper highlights it as persistent (S3.3.p3).",
@@ -362,19 +422,6 @@
     }
    ],
    "executions": [
-    {
-     "name": "joint",
-     "tool": "tools.joint_contrasts:run_joint_deseq2",
-     "args": {
-      "comparisons": "all",
-      "covariates": [
-       "subject"
-      ],
-      "alpha": 0.05
-     },
-     "role": "primary",
-     "reasoning": "One pydeseq2 model ~ subject + time on all 115 samples, paper-filtered matrix; the three vs-pre contrasts are the paper's, the others exploratory."
-    },
     {
      "name": "r_deseq2",
      "tool": "tools.r_de_tools:run_r_de",
@@ -412,8 +459,21 @@
       "alpha": 0.05,
       "label": "r_deseq2"
      },
+     "role": "primary",
+     "reasoning": "The paper's software and model: R DESeq2 Wald ~ subject + time on all 115 samples, default Cook's cutoff and independent filtering, three contrasts vs pre (S2.7.p1). A first pydeseq2 run gave 3-7x more DEGs; R DESeq2 removes most of that gap."
+    },
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "all",
+      "covariates": [
+       "subject"
+      ],
+      "alpha": 0.05
+     },
      "role": "sensitivity",
-     "reasoning": "Reviewer request: the paper's software (R DESeq2, Wald, default Cook's/independent filtering) on the same matrix and model, to test whether pydeseq2 explains the 3-7x larger DEG sets."
+     "reasoning": "pydeseq2 joint model ~ subject + time (same matrix); sensitivity for the three vs-pre contrasts and the only source of the exploratory between-timepoint comparisons (post vs mid, post75 vs mid, post75 vs post)."
     },
     {
      "name": "edger_ql",

@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "run_id": "PMID42812173",
   "subject_id": "GSE320360",
-  "created_at": "2026-11-10T12:12:38",
+  "created_at": "2026-11-10T12:19:53",
   "finished_at": null,
   "status": null,
   "error": null,
@@ -13,7 +13,7 @@
       "label": "PMC13619381.paper.md",
       "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC13619381.paper.md",
       "locator": null,
-      "captured_at": "2026-11-10T12:12:38",
+      "captured_at": "2026-11-10T12:19:53",
       "sha256": null,
       "attributes": {
         "sha256": "3c37d9bb7bc72b443f15b5a6607c3f9b65f51a01a7b206e48dc854b3d1765d89",
@@ -26,7 +26,7 @@
       "label": "GSE320360_metadata.csv",
       "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE320360\\GSE320360_metadata.csv",
       "locator": null,
-      "captured_at": "2026-11-10T12:12:38",
+      "captured_at": "2026-11-10T12:19:53",
       "sha256": null,
       "attributes": {
         "sha256": "bc072e523ee51574db34c4367150ea36fb2d4d52ab849e76496ca2fb44b8a19e",
@@ -39,7 +39,7 @@
       "label": "prep script paper_filter.py",
       "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\prep\\paper_filter.py",
       "locator": null,
-      "captured_at": "2026-11-10T12:12:38",
+      "captured_at": "2026-11-10T12:19:53",
       "sha256": null,
       "attributes": {
         "sha256": "dfb8cde8002cc29651e95d7a8ae07bd941c7d318e2d78d7632b27b7b7d58b1ac",
@@ -52,7 +52,7 @@
       "label": "GSE320360_counts_paperfilter.csv",
       "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\prep\\GSE320360_counts_paperfilter.csv",
       "locator": null,
-      "captured_at": "2026-11-10T12:12:38",
+      "captured_at": "2026-11-10T12:19:53",
       "sha256": null,
       "attributes": {
         "sha256": "e1735ba4af66bcd19d796dd76cdc2ce9d596e74260a6a375231bc8af15e1f7bd",
@@ -109,7 +109,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:38"
+      "recorded_at": "2026-11-10T12:19:53"
     },
     {
       "decision_id": "DEC-0002",
@@ -140,7 +140,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:38"
+      "recorded_at": "2026-11-10T12:19:53"
     },
     {
       "decision_id": "DEC-0003",
@@ -263,7 +263,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:38"
+      "recorded_at": "2026-11-10T12:19:53"
     },
     {
       "decision_id": "DEC-0004",
@@ -304,7 +304,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:38"
+      "recorded_at": "2026-11-10T12:19:53"
     },
     {
       "decision_id": "DEC-0005",
@@ -356,7 +356,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:41"
+      "recorded_at": "2026-11-10T12:19:55"
     },
     {
       "decision_id": "DEC-0006",
@@ -1612,26 +1612,26 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:41"
+      "recorded_at": "2026-11-10T12:19:55"
     },
     {
       "decision_id": "DEC-0007",
       "step": "method",
       "selected": {
         "matrix_type": "raw counts",
-        "method": "DESeq2 (pydeseq2 Wald, joint model)",
+        "method": "DESeq2 (R 1.51.7, Wald)",
         "formula": "~ subject + time",
         "paper_route": {
           "method": "DESeq2 ~ ID + Treatment (R 1.44)",
           "status": "reproduced_with_deviations"
         },
         "deviations": [
-          "pydeseq2 instead of R DESeq2 1.44 for the primary table; R DESeq2 1.51.7 (Bioconductor, Wald, default Cook's cutoff and independent filtering) runs as a sensitivity on the same matrix and model",
-          "the paper's exclusion of genes failing to converge (2%) is not replicated: neither executor reports per-gene convergence",
-          "R DESeq2 here is 1.51.7, not the paper's 1.44.0"
+          "R DESeq2 1.51.7 instead of the paper's 1.44.0",
+          "the paper's exclusion of genes failing to converge (2%) is not replicated: tools/r_de.R does not export betaConv",
+          "sensitivity runs: pydeseq2 joint model (3-7x more DEGs than the paper) and edgeR QL (far fewer)"
         ]
       },
-      "reason": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Sensitivity runs: R DESeq2 (the paper's software) and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
+      "reason": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Primary executor is R DESeq2 (the paper's software). Sensitivity runs: pydeseq2 and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
       "method": "llm",
       "alternatives": [],
       "evidence_ids": [
@@ -1644,7 +1644,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:41"
+      "recorded_at": "2026-11-10T12:19:55"
     },
     {
       "decision_id": "DEC-0008",
@@ -1685,7 +1685,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T12:12:41"
+      "recorded_at": "2026-11-10T12:19:55"
     }
   ],
   "artifacts": [

@@ -1,0 +1,154 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40789206",
+  "request": "Analyze GSE297842 for PMID 40789206 (Exercise sensitizes the pressure diuresis response: shifting immune landscapes may underlie renal adaptations.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE297842",
+      "accession": "GSE297842",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC12412461.paper.md"],
+        "metadata": "GSE297842/GSE297842_metadata.csv",
+        "matrix": "GSE297842/GSE297842_htseq_rawCounts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE297842"],
+            "assay": "bulk poly-A RNA-seq, renal cortex, single-end NextSeq 2000 (S2.8.p1)",
+            "organism": "Mus musculus C57BL/6J, 10-wk-old males (S2.1.p3)",
+            "sample_inclusion": "forced treadmill experiment only: Sed, 24 h (pre/post ECT, no training), 1 wk and 2 wk training; n=4 per group (S3.4.p1, FIG6 n=4 per group). The voluntary-wheel experiment had no RNA-seq.",
+            "factors": {"grp": ["SED", "H24", "W1", "W2"]},
+            "primary_estimand": "Effect of 2 wk forced treadmill training vs sedentary on renal cortex gene expression in male mice (S3.4.p1, TAB2)",
+            "planned_contrasts": [
+              "2 wk vs Sed (TAB1, TAB2: 24 DEGs, 17 up / 7 down)",
+              "1 wk vs Sed (TAB1: 0 DEGs)",
+              "24 h vs Sed (TAB1: 54 DEGs, 34 up / 20 down)"
+            ],
+            "repeated_measure_unit": "none; independent animals per group",
+            "normalization": "DESeq2 RLE; genes with fewer than ten counts across samples removed (S2.9.p1)",
+            "paper_method": "DESeq2 on HTSeq raw counts of Ensembl protein-coding genes (S2.9.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": true, "source_locator": "S2.9.p1; TAB1 (p<=0.05; q<=0.05; |log2FC|>=0)"},
+            "paper_results": "2wk: 24 DEGs incl. Scnn1a/b/g up, Foxi1, Cyp4a14 up, Mmp13, Cd209a down; 1wk: 0; 24h: 54"
+          },
+          "reasoning": "Methods S2.9.p1 give DESeq2 with BH-adjusted p<=0.05 and no fold-change cutoff; TAB1 lists the three comparisons vs Sed with counts; S3.4.p1 states RNA-seq was done on forced treadmill groups only.",
+          "confidence": "high",
+          "locator": "S2.9.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.9.p1 and DA.p1 name GSE297842", "GEO treatment protocol describes 1 day / 1 wk / 2 wk forced treadmill at 70% capacity for 40 min, matching S2.1.p3", "growth protocol: wild type C57BL/6J male mice", "16 GSM samples = 4 groups x 4, matching FIG6 n=4", "supplementary file is HTSeq raw counts, matching S2.9.p1"]},
+          "reasoning": "Series, protocol, and sample counts match the paper's treadmill RNA-seq experiment. The deposited matrix also holds 8 extra columns (STC804_17..24, D*_Run / D*_Sed) that have no GSM record in the series and are not described in the paper's RNA-seq section; they are not part of this accession's sample set and are dropped at alignment.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: (STC804_\\d+)_"]},
+          "matrix_column_pattern": "^(STC804_\\d+)_.*$",
+          "aliases": {"grp": "characteristics_ch1.2.treatment"},
+          "recode": {"grp": {"Control": "SED", "24 h": "H24", "1 wk": "W1", "2 wk": "W2"}},
+          "exclude_samples": {},
+          "reasoning": "Metadata description holds 'Library name: STC804_<n>_B<k>_<group>_Re_L1...'; matrix columns are 'STC804_<n>_B<k>_<group>_Re_S<n>'. Key = STC804_<n> on both sides (exact). Matrix columns STC804_17..24 (D-prefixed Run/Sed) have no GSM in the series and will be unmatched and dropped. Group from characteristics treatment, cross-checked by the group token in the library name.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer fraction 1.0, max 2.3M, many zeros; GEO data_processing: HTSeq v0.10.0 read counts, 'raw counts for each sample'; file name htseq_rawCounts; paper S2.9.p1 uses HTSeq raw counts in DESeq2.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "organism": "Mouse",
+          "planned": ["grp_W2_vs_SED", "grp_W1_vs_SED", "grp_H24_vs_SED"],
+          "final": {
+            "analysis_type": "multi-group, one control",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_W2_vs_SED", "control": "SED", "treatment": "W2", "role": "primary"},
+              {"name": "grp_W1_vs_SED", "control": "SED", "treatment": "W1", "role": "secondary"},
+              {"name": "grp_H24_vs_SED", "control": "SED", "treatment": "H24", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled exercise (24h+1wk+2wk) vs Sed", "reason_rejected": "paper compares each exercise group to Sed separately (TAB1); pooling mixes acute and training estimands"}
+          ],
+          "reasoning": "One control (Sed) with three exercise levels (TAB1). One DESeq2 model on all 16 samples with three planned contrasts vs Sed; 2 wk vs Sed is the primary estimand (TAB2, FIG6). The 24 h group is an acute bout response (S2.1.p3) rather than training.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one sample each; no batch, sex (all male) or other covariate recorded in GEO or the paper.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, one model ~ grp)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on protein-coding genes, genes with < 10 counts across samples removed", "status": "reproduced_with_deviations"},
+            "deviations": [
+              "No restriction to protein-coding genes: the deposited matrix has Ensembl gene IDs without biotype, so all genes passing the count filter are tested (this changes the BH denominator slightly).",
+              "Low-count filter implemented as mean raw count >= 0.625 over the 16 samples, i.e. total count >= 10 across samples (S2.9.p1).",
+              "pydeseq2 rather than R DESeq2; whether the paper fitted one 4-group model or pairwise models is not stated. A pairwise 2wk-vs-Sed DESeq2 run is added as a sensitivity analysis."
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw HTSeq counts support the paper's DESeq2 route directly.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": true},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": true}
+          },
+          "reasoning": "S2.9.p1: BH-adjusted p<=0.05; TAB1 header 'p<=0.05; q<=0.05; |log2FC|>=0' (no fold-change cutoff; q<=0.05 implies p<=0.05).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["All genes tested, not only protein-coding (no biotype in deposited matrix).", "n=4 per group."]},
+          "paper_counts": {"joint/grp_W2_vs_SED": 24, "joint/grp_W1_vs_SED": 0, "joint/grp_H24_vs_SED": 54, "W2_vs_SED_pairwise": 24},
+          "paper_genes": {
+            "joint/grp_W2_vs_SED": ["Scnn1a", "Scnn1b", "Scnn1g", "Foxi1", "Cyp4a14", "Phactr1", "Scd2", "Acnat2", "Hsd11b1", "Mmp13", "Cd209a", "Aplnr", "Stc1", "Clu", "Gata2", "Il17re", "Hsd11b2", "Slc8a1"],
+            "W2_vs_SED_pairwise": ["Scnn1a", "Scnn1b", "Scnn1g", "Foxi1", "Cyp4a14", "Mmp13", "Cd209a"],
+            "joint/grp_H24_vs_SED": ["Lcn2", "Havcr1"]
+          },
+          "reasoning": "Paper-aligned DESeq2 route with the paper's threshold; deviations limited to gene universe and implementation.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "extra matrix columns", "paper": "RNA-seq on 4 treadmill groups, n=4 (S3.4.p1, FIG6)", "data": "matrix has 24 columns; 8 (STC804_17..24, D*_Run/D*_Sed) have no GSM record in GSE297842", "disposition": "executable_without_change"},
+        {"item": "gene universe", "paper": "ENSEMBL protein-coding transcripts (S2.9.p1)", "data": "55,414 Ensembl gene IDs, no biotype column", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned"},
+          "filter_low_counts": {"min_mean_count": 0.625},
+          "role": "primary",
+          "reasoning": "One DESeq2 model on all 16 samples, three planned contrasts vs Sed (TAB1); filter total count >= 10 across samples (S2.9.p1)."
+        },
+        {
+          "name": "W2_vs_SED_pairwise",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "SED", "treatment_group": "W2", "alpha": 0.05},
+          "subset": {"grp": ["SED", "W2"]},
+          "filter_low_counts": {"min_mean_count": 1.25},
+          "role": "sensitivity",
+          "reasoning": "Pairwise 2wk vs Sed fit on 8 samples (total count >= 10 over those 8), in case the paper fitted each comparison separately."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_W2_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper ran clusterProfiler GO/KEGG on the 2 wk DEGs (S2.9.p1, FIG6A)."},
+        {"execution": "joint/grp_H24_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports stress-response GO pathways for the 24 h DEGs (Supp Fig 7A)."}
+      ]
+    }
+  ]
+}

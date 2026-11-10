@@ -603,3 +603,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42897930 (GSE325957)
 
 - geo_tools.py:129 xlsx->csv keeps 2-row header (cols Unnamed:N; inspect mis-typed matrix); inspect no note for 15 matrix cols vs 9 metadata samples Details: `PMID42897930/HANDBACK.md`.
+
+## PMID40789206 (GSE297842)
+
+- case_runner.py:489 rounds gene-check p-values to 0.0 (patched after this row); DEG tables have no symbol column; no total-count filter option (mean used); protein-coding-only filter impossible (no biotype) Details: `PMID40789206/HANDBACK.md`.

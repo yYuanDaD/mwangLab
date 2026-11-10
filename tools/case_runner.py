@@ -486,7 +486,8 @@ def _gene_lookup(deg_csv: str, genes: list[str], organism: str = "Mouse") -> dic
     for gene in genes:
         key = upper.get(gene.upper())
         out[gene] = (None if key is None else
-                     {c: (None if pd.isna(v) else round(float(v), 4)) for c, v in table.loc[key, cols].items()})
+                     {c: (None if pd.isna(v) else float(f"{float(v):.3g}") if c in ("padj", "adj.P.Val", "pvalue")
+                          else round(float(v), 4)) for c, v in table.loc[key, cols].items()})
     return out
 
 

@@ -125,3 +125,8 @@ One section per case; newest last.
 ## PMID38982049 / GSE266883 (2026-11-10)
 
 - policy: Open policy: report which threshold when the paper states none (workflow default padj<0.05 used); joint vs pairwise fits when the paper is silent.
+
+## PMID42897930 / GSE325957 (2026-11-10)
+
+- policy: Open policy question: whether to still run the paper's own (batch-aliased) comparison as a labelled paper-reproduction with no biological claim, since the paper itself did exactly this; the skill's gate stops it.
+- policy: Not an error: the CPM-only deposit would need limma on log2(CPM+1) even if the covariance gate were waived.

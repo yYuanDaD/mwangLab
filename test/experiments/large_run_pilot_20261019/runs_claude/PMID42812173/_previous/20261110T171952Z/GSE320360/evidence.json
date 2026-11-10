@@ -1,0 +1,2690 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID42812173",
+  "subject_id": "GSE320360",
+  "created_at": "2026-11-10T12:12:38",
+  "finished_at": "2026-11-10T12:19:13",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13619381.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC13619381.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T12:12:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3c37d9bb7bc72b443f15b5a6607c3f9b65f51a01a7b206e48dc854b3d1765d89",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE320360_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE320360\\GSE320360_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T12:12:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "bc072e523ee51574db34c4367150ea36fb2d4d52ab849e76496ca2fb44b8a19e",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script paper_filter.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\prep\\paper_filter.py",
+      "locator": null,
+      "captured_at": "2026-11-10T12:12:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dfb8cde8002cc29651e95d7a8ae07bd941c7d318e2d78d7632b27b7b7d58b1ac",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE320360_counts_paperfilter.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\prep\\GSE320360_counts_paperfilter.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T12:12:38",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e1735ba4af66bcd19d796dd76cdc2ce9d596e74260a6a375231bc8af15e1f7bd",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE320360"
+        ],
+        "assay": "small RNA-seq (miRBase mature miRNA counts) of serum EV-enriched fraction, Illumina NovaSeq 6000 (S2.5.p2, S2.6.p1)",
+        "primary_estimand": "Within-subject change in serum EV-enriched miRNA abundance at mid-AAE, immediately post-AAE and 75 min post-AAE relative to pre-AAE baseline, in adults with MDD after one 30-min moderate cycling bout (S2.2.p1, S2.7.p1). Single arm, no resting control (S4.5.p4).",
+        "factors": {
+          "time": [
+            "pre (E1, baseline)",
+            "mid (E2)",
+            "post (E3)",
+            "post75 (E6)"
+          ],
+          "subject": "participant ID (30)"
+        },
+        "inclusion": "30 pre, 29 mid, 28 post, 28 75-min samples after 10 library failures; no outliers removed (S2.5.p2, S2.6.p1)",
+        "planned_contrasts": [
+          "mid vs pre (S3.3.p2; paper: 15 DE, 13 down / 2 up)",
+          "post vs pre (S3.3.p2; paper: 33 DE, all down)",
+          "post75 vs pre (S3.3.p2; paper: 4 DE, all up)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "inclusive": true,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.7.p1"
+        },
+        "paper_method": "DESeq2 v1.44 ~ ID + Treatment, Wald tests, BH; size factors from unfiltered matrix; keep miRNAs with >=10 normalized counts in >=3 samples; non-converging genes (2%) excluded (S2.7.p1)",
+        "paper_results": "15/33/4 DE at FDR<=0.05; 2,609 miRNAs after filtering (S3.2.p4); Table 1"
+      },
+      "reason": "Methods S2.7.p1 define one DESeq2 model on all samples with subject ID and time as factors and three Wald contrasts vs pre-AAE; FDR<=0.05 with no fold-change rule. FDR<=0.10 is reported only as trending.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:38"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\prep\\GSE320360_counts_paperfilter.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE320360",
+          "115 samples = 30+29+28+28 as in S2.5.p2",
+          "matrix median library size 560,077 equals S3.2.p4 median of 560,077 counts per sample",
+          "features are miRBase mature hsa- names"
+        ],
+        "accession": "GSE320360",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE320360\\GSE320360_metadata.csv"
+      },
+      "reason": "Data availability names GSE320360; sample counts per timepoint and median library size match the paper exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:38"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 115,
+        "n_metadata": 115,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "time": {
+              "source": "description",
+              "regex": "Library name: \\d+_(E\\d),",
+              "recode": {
+                "E1": "pre",
+                "E2": "mid",
+                "E3": "post",
+                "E6": "post75"
+              }
+            },
+            "subject": {
+              "source": "description",
+              "regex": "Library name: (\\d+)_E\\d,",
+              "recode": {
+                "352": "s352",
+                "354": "s354",
+                "366": "s366",
+                "371": "s371",
+                "373": "s373",
+                "379": "s379",
+                "380": "s380",
+                "381": "s381",
+                "382": "s382",
+                "383": "s383",
+                "387": "s387",
+                "388": "s388",
+                "391": "s391",
+                "394": "s394",
+                "396": "s396",
+                "406": "s406",
+                "407": "s407",
+                "408": "s408",
+                "409": "s409",
+                "410": "s410",
+                "413": "s413",
+                "415": "s415",
+                "416": "s416",
+                "421": "s421",
+                "428": "s428",
+                "429": "s429",
+                "437": "s437",
+                "438": "s438",
+                "442": "s442",
+                "445": "s445"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\design_metadata.csv",
+          "sha256": "256fe131fc531285393c4b3ccb6b100e8d88be7b5da973ac6375fd8623dd30dc",
+          "levels": {
+            "time": {
+              "pre": 30,
+              "mid": 29,
+              "post": 28,
+              "post75": 28
+            },
+            "subject": {
+              "s352": 4,
+              "s354": 4,
+              "s366": 4,
+              "s371": 4,
+              "s373": 4,
+              "s379": 4,
+              "s380": 4,
+              "s381": 4,
+              "s382": 4,
+              "s387": 4,
+              "s388": 4,
+              "s391": 4,
+              "s394": 4,
+              "s396": 4,
+              "s406": 4,
+              "s407": 4,
+              "s408": 4,
+              "s409": 4,
+              "s410": 4,
+              "s413": 4,
+              "s415": 4,
+              "s416": 4,
+              "s429": 4,
+              "s437": 4,
+              "s438": 4,
+              "s442": 4,
+              "s383": 3,
+              "s421": 3,
+              "s445": 3,
+              "s428": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (e.g. 352_E1) equal the Library name inside description for 115/115 samples. Suffix E1/E2/E3/E6 crosstabs one-to-one with characteristics treatment Baseline/Mid/Post/75 min. Subject IDs get an 's' prefix so they are a factor, not a numeric covariate.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:38"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_matrix.csv",
+          "sha256": "9f04aef86c0c6cb52f27a6ea170bf66db4f0e440cbf60cbfd4c39af1120a774c",
+          "n_features": 2596,
+          "n_samples": 115,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 4000918.0,
+          "median": 6.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All integers, max 4.0e6, median 5; GEO data_processing: tab-delimited matrix of raw miRNA read counts; paper fits DESeq2 on raw counts (S2.7.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:38"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "repeated-measures multilevel (4 timepoints, within subject)",
+        "formula": "~ subject + time",
+        "contrasts": [
+          {
+            "name": "time_mid_vs_pre",
+            "control": "pre",
+            "treatment": "mid",
+            "role": "primary"
+          },
+          {
+            "name": "time_post_vs_pre",
+            "control": "pre",
+            "treatment": "post",
+            "role": "primary"
+          },
+          {
+            "name": "time_post75_vs_pre",
+            "control": "pre",
+            "treatment": "post75",
+            "role": "primary"
+          }
+        ],
+        "estimand_type": "within-subject temporal change (no resting control; not attributable to exercise alone, S4.5.p4)",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "S2.7.p1: one model on all samples, time as factor with pre as reference plus subject ID; three planned contrasts. Pairwise comparisons among mid/post/post75 come from the same model as exploratory. Sex is not in GEO metadata and miRNA features carry no X/Y genes, so no sex check is possible.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:41"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "fixed-effect blocking factor (paper ~ ID + Treatment)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 115,
+          "n_columns": 33,
+          "columns": [
+            "Intercept",
+            "time_post",
+            "time_post75",
+            "time_pre",
+            "subject_s354",
+            "subject_s366",
+            "subject_s371",
+            "subject_s373",
+            "subject_s379",
+            "subject_s380",
+            "subject_s381",
+            "subject_s382",
+            "subject_s383",
+            "subject_s387",
+            "subject_s388",
+            "subject_s391",
+            "subject_s394",
+            "subject_s396",
+            "subject_s406",
+            "subject_s407",
+            "subject_s408",
+            "subject_s409",
+            "subject_s410",
+            "subject_s413",
+            "subject_s415",
+            "subject_s416",
+            "subject_s421",
+            "subject_s428",
+            "subject_s429",
+            "subject_s437",
+            "subject_s438",
+            "subject_s442",
+            "subject_s445"
+          ],
+          "rank": 33,
+          "full_rank": true,
+          "residual_df": 82,
+          "levels": {
+            "time": {
+              "pre": 30,
+              "mid": 29,
+              "post": 28,
+              "post75": 28
+            },
+            "subject": {
+              "s352": 4,
+              "s354": 4,
+              "s366": 4,
+              "s371": 4,
+              "s373": 4,
+              "s379": 4,
+              "s380": 4,
+              "s381": 4,
+              "s382": 4,
+              "s387": 4,
+              "s388": 4,
+              "s391": 4,
+              "s394": 4,
+              "s396": 4,
+              "s406": 4,
+              "s407": 4,
+              "s408": 4,
+              "s409": 4,
+              "s410": 4,
+              "s413": 4,
+              "s415": 4,
+              "s416": 4,
+              "s429": 4,
+              "s437": 4,
+              "s438": 4,
+              "s442": 4,
+              "s383": 3,
+              "s421": 3,
+              "s445": 3,
+              "s428": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "mid",
+                "s352"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s354"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s366"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s371"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s373"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s379"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s380"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s381"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s382"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s383"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s387"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s388"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s391"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s394"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s396"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s406"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s407"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s408"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s409"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s410"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s413"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s415"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s416"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s428"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s429"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s437"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s438"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s442"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "mid",
+                "s445"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s352"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s354"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s366"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s371"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s373"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s379"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s380"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s381"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s382"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s387"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s388"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s391"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s394"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s396"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s406"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s407"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s408"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s409"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s410"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s413"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s415"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s416"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s421"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s429"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s437"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s438"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s442"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "s445"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s352"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s354"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s366"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s371"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s373"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s379"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s380"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s381"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s382"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s383"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s387"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s388"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s391"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s394"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s396"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s406"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s407"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s408"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s409"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s410"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s413"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s415"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s416"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s421"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s429"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s437"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s438"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post75",
+                "s442"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s352"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s354"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s366"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s371"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s373"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s379"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s380"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s381"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s382"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s383"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s387"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s388"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s391"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s394"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s396"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s406"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s407"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s408"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s409"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s410"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s413"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s415"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s416"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s421"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s428"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s429"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s437"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s438"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s442"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "s445"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 115,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 115,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.treatment",
+            "n_levels": 4,
+            "status": "complete_confounding",
+            "crosstab": {
+              "mid": {
+                "75 minutes post-exercise": 0,
+                "Baseline (pre-exercise)": 0,
+                "Mid-exercise (15 min)": 29,
+                "Post-exercise (immediate)": 0
+              },
+              "post": {
+                "75 minutes post-exercise": 0,
+                "Baseline (pre-exercise)": 0,
+                "Mid-exercise (15 min)": 0,
+                "Post-exercise (immediate)": 28
+              },
+              "post75": {
+                "75 minutes post-exercise": 28,
+                "Baseline (pre-exercise)": 0,
+                "Mid-exercise (15 min)": 0,
+                "Post-exercise (immediate)": 0
+              },
+              "pre": {
+                "75 minutes post-exercise": 0,
+                "Baseline (pre-exercise)": 30,
+                "Mid-exercise (15 min)": 0,
+                "Post-exercise (immediate)": 0
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 115,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 115,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 115,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "subject",
+            "n_levels": 30,
+            "status": "crossed",
+            "crosstab": {
+              "mid": {
+                "s352": 1,
+                "s354": 1,
+                "s366": 1,
+                "s371": 1,
+                "s373": 1,
+                "s379": 1,
+                "s380": 1,
+                "s381": 1,
+                "s382": 1,
+                "s383": 1,
+                "s387": 1,
+                "s388": 1,
+                "s391": 1,
+                "s394": 1,
+                "s396": 1,
+                "s406": 1,
+                "s407": 1,
+                "s408": 1,
+                "s409": 1,
+                "s410": 1,
+                "s413": 1,
+                "s415": 1,
+                "s416": 1,
+                "s421": 0,
+                "s428": 1,
+                "s429": 1,
+                "s437": 1,
+                "s438": 1,
+                "s442": 1,
+                "s445": 1
+              },
+              "post": {
+                "s352": 1,
+                "s354": 1,
+                "s366": 1,
+                "s371": 1,
+                "s373": 1,
+                "s379": 1,
+                "s380": 1,
+                "s381": 1,
+                "s382": 1,
+                "s383": 0,
+                "s387": 1,
+                "s388": 1,
+                "s391": 1,
+                "s394": 1,
+                "s396": 1,
+                "s406": 1,
+                "s407": 1,
+                "s408": 1,
+                "s409": 1,
+                "s410": 1,
+                "s413": 1,
+                "s415": 1,
+                "s416": 1,
+                "s421": 1,
+                "s428": 0,
+                "s429": 1,
+                "s437": 1,
+                "s438": 1,
+                "s442": 1,
+                "s445": 1
+              },
+              "post75": {
+                "s352": 1,
+                "s354": 1,
+                "s366": 1,
+                "s371": 1,
+                "s373": 1,
+                "s379": 1,
+                "s380": 1,
+                "s381": 1,
+                "s382": 1,
+                "s383": 1,
+                "s387": 1,
+                "s388": 1,
+                "s391": 1,
+                "s394": 1,
+                "s396": 1,
+                "s406": 1,
+                "s407": 1,
+                "s408": 1,
+                "s409": 1,
+                "s410": 1,
+                "s413": 1,
+                "s415": 1,
+                "s416": 1,
+                "s421": 1,
+                "s428": 0,
+                "s429": 1,
+                "s437": 1,
+                "s438": 1,
+                "s442": 1,
+                "s445": 0
+              },
+              "pre": {
+                "s352": 1,
+                "s354": 1,
+                "s366": 1,
+                "s371": 1,
+                "s373": 1,
+                "s379": 1,
+                "s380": 1,
+                "s381": 1,
+                "s382": 1,
+                "s383": 1,
+                "s387": 1,
+                "s388": 1,
+                "s391": 1,
+                "s394": 1,
+                "s396": 1,
+                "s406": 1,
+                "s407": 1,
+                "s408": 1,
+                "s409": 1,
+                "s410": 1,
+                "s413": 1,
+                "s415": 1,
+                "s416": 1,
+                "s421": 1,
+                "s428": 1,
+                "s429": 1,
+                "s437": 1,
+                "s438": 1,
+                "s442": 1,
+                "s445": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Repeated samples from the same 30 participants; paper blocks on ID as a fixed factor (S2.7.p1). Sequencing pool/lane is not recorded in GEO, so it cannot be assessed.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:41"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, joint model)",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "DESeq2 ~ ID + Treatment (R 1.44)",
+          "status": "reproduced_with_deviations"
+        },
+        "deviations": [
+          "pydeseq2 instead of R DESeq2 1.44 for the primary table; R DESeq2 1.51.7 (Bioconductor, Wald, default Cook's cutoff and independent filtering) runs as a sensitivity on the same matrix and model",
+          "the paper's exclusion of genes failing to converge (2%) is not replicated: neither executor reports per-gene convergence",
+          "R DESeq2 here is 1.51.7, not the paper's 1.44.0"
+        ]
+      },
+      "reason": "Paper's DESeq2 within-subject model ~ ID + Treatment. The paper's filter (>=10 DESeq2-normalized counts in >=3 samples, size factors from the unfiltered matrix) is applied by prep/paper_filter.py: 2,596 of 2,656 kept; all 36 zero-free miRNAs are kept, so the executors' size factors equal those of the unfiltered matrix. Sensitivity runs: R DESeq2 (the paper's software) and edgeR QL ~ subject + time, to see whether pydeseq2 dispersion/Wald explains the larger DEG sets.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:41"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        }
+      },
+      "reason": "S2.7.p1/S3.3.p2: adjusted p <= 0.05 significant, no fold-change cutoff; audit = paper's trending FDR <= 0.10.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:41"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 115,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post_vs_mid.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_mid.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_mid_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_post.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_pre.csv"
+        ],
+        "counts": {
+          "joint/time_post_vs_mid": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2042,
+              "n_significant": 50,
+              "n_up": 9,
+              "n_down": 41,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2042,
+              "n_significant": 80,
+              "n_up": 17,
+              "n_down": 63,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post75_vs_mid": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 14,
+              "n_up": 14,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 62,
+              "n_up": 57,
+              "n_down": 5,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_mid_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 45,
+              "n_up": 7,
+              "n_down": 38,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 81,
+              "n_up": 12,
+              "n_down": 69,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post75_vs_post": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 173,
+              "n_up": 165,
+              "n_down": 8,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 291,
+              "n_up": 273,
+              "n_down": 18,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 72,
+              "n_up": 3,
+              "n_down": 69,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 159,
+              "n_up": 11,
+              "n_down": 148,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post75_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 28,
+              "n_up": 18,
+              "n_down": 10,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 45,
+              "n_up": 31,
+              "n_down": 14,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One pydeseq2 model ~ subject + time on all 115 samples, paper-filtered matrix; the three vs-pre contrasts are the paper's, the others exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:12:55"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_r_de",
+        "subset": "r_deseq2",
+        "role": "sensitivity",
+        "tool": "tools.r_de_tools:run_r_de",
+        "n_samples": 115,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_matrix.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_mid_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_post75_vs_pre.csv"
+        ],
+        "counts": {
+          "r_deseq2/time_mid_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 16,
+              "n_up": 2,
+              "n_down": 14,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 38,
+              "n_up": 6,
+              "n_down": 32,
+              "deg_sanity": "ok"
+            }
+          },
+          "r_deseq2/time_post_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 1489,
+              "n_significant": 53,
+              "n_up": 1,
+              "n_down": 52,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 1489,
+              "n_significant": 98,
+              "n_up": 2,
+              "n_down": 96,
+              "deg_sanity": "ok"
+            }
+          },
+          "r_deseq2/time_post75_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2294,
+              "n_significant": 15,
+              "n_up": 13,
+              "n_down": 2,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2294,
+              "n_significant": 43,
+              "n_up": 35,
+              "n_down": 8,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Reviewer request: the paper's software (R DESeq2, Wald, default Cook's/independent filtering) on the same matrix and model, to test whether pydeseq2 explains the 3-7x larger DEG sets.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:18:10"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_r_de",
+        "subset": "edger_ql",
+        "role": "sensitivity",
+        "tool": "tools.r_de_tools:run_r_de",
+        "n_samples": 115,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_matrix.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_mid_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_post_vs_pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_post75_vs_pre.csv"
+        ],
+        "counts": {
+          "edger_ql/time_mid_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 9,
+              "n_up": 3,
+              "n_down": 6,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 13,
+              "n_up": 6,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            }
+          },
+          "edger_ql/time_post_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 4,
+              "n_up": 1,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 11,
+              "n_up": 4,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            }
+          },
+          "edger_ql/time_post75_vs_pre": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 2596,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj <= 0.1",
+              "n_tested": 2596,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Independent NB method (edgeR QL, TMM) with the same within-subject model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:19:13"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "single-arm repeated-measures design without a resting control: changes are temporal, not attributable to exercise alone (S4.5.p4)",
+          "paper used R DESeq2 and a normalized-count filter; DE counts near the FDR boundary may differ"
+        ],
+        "results": {
+          "joint/time_post_vs_mid": {
+            "n_deg": 50,
+            "up": 9,
+            "down": 41,
+            "rule": "padj <= 0.05",
+            "audit_n": 80
+          },
+          "joint/time_post75_vs_mid": {
+            "n_deg": 14,
+            "up": 14,
+            "down": 0,
+            "rule": "padj <= 0.05",
+            "audit_n": 62
+          },
+          "joint/time_mid_vs_pre": {
+            "n_deg": 45,
+            "up": 7,
+            "down": 38,
+            "rule": "padj <= 0.05",
+            "audit_n": 81
+          },
+          "joint/time_post75_vs_post": {
+            "n_deg": 173,
+            "up": 165,
+            "down": 8,
+            "rule": "padj <= 0.05",
+            "audit_n": 291
+          },
+          "joint/time_post_vs_pre": {
+            "n_deg": 72,
+            "up": 3,
+            "down": 69,
+            "rule": "padj <= 0.05",
+            "audit_n": 159
+          },
+          "joint/time_post75_vs_pre": {
+            "n_deg": 28,
+            "up": 18,
+            "down": 10,
+            "rule": "padj <= 0.05",
+            "audit_n": 45
+          },
+          "r_deseq2/time_mid_vs_pre": {
+            "n_deg": 16,
+            "up": 2,
+            "down": 14,
+            "rule": "padj <= 0.05",
+            "audit_n": 38
+          },
+          "r_deseq2/time_post_vs_pre": {
+            "n_deg": 53,
+            "up": 1,
+            "down": 52,
+            "rule": "padj <= 0.05",
+            "audit_n": 98
+          },
+          "r_deseq2/time_post75_vs_pre": {
+            "n_deg": 15,
+            "up": 13,
+            "down": 2,
+            "rule": "padj <= 0.05",
+            "audit_n": 43
+          },
+          "edger_ql/time_mid_vs_pre": {
+            "n_deg": 9,
+            "up": 3,
+            "down": 6,
+            "rule": "padj <= 0.05",
+            "audit_n": 13
+          },
+          "edger_ql/time_post_vs_pre": {
+            "n_deg": 4,
+            "up": 1,
+            "down": 3,
+            "rule": "padj <= 0.05",
+            "audit_n": 11
+          },
+          "edger_ql/time_post75_vs_pre": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj <= 0.05",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "joint/time_mid_vs_pre": 15,
+          "joint/time_post_vs_pre": 33,
+          "joint/time_post75_vs_pre": 4,
+          "r_deseq2/time_mid_vs_pre": 15,
+          "edger_ql/time_mid_vs_pre": 15,
+          "r_deseq2/time_post_vs_pre": 33,
+          "edger_ql/time_post_vs_pre": 33,
+          "r_deseq2/time_post75_vs_pre": 4,
+          "edger_ql/time_post75_vs_pre": 4
+        },
+        "comparison": {
+          "joint/time_mid_vs_pre": {
+            "ours": 45,
+            "paper": 15
+          },
+          "joint/time_post_vs_pre": {
+            "ours": 72,
+            "paper": 33
+          },
+          "joint/time_post75_vs_pre": {
+            "ours": 28,
+            "paper": 4
+          },
+          "r_deseq2/time_mid_vs_pre": {
+            "ours": 16,
+            "paper": 15
+          },
+          "edger_ql/time_mid_vs_pre": {
+            "ours": 9,
+            "paper": 15
+          },
+          "r_deseq2/time_post_vs_pre": {
+            "ours": 53,
+            "paper": 33
+          },
+          "edger_ql/time_post_vs_pre": {
+            "ours": 4,
+            "paper": 33
+          },
+          "r_deseq2/time_post75_vs_pre": {
+            "ours": 15,
+            "paper": 4
+          },
+          "edger_ql/time_post75_vs_pre": {
+            "ours": 0,
+            "paper": 4
+          }
+        },
+        "paper_gene_check": {
+          "joint/time_mid_vs_pre": {
+            "hsa-miR-3618": {
+              "baseMean": 22.6262,
+              "log2FoldChange": -3.0074,
+              "padj": 0.0012,
+              "pvalue": 0.0
+            },
+            "hsa-miR-1288-5p": {
+              "baseMean": 17.8029,
+              "log2FoldChange": 2.4351,
+              "padj": 0.0078,
+              "pvalue": 0.0
+            },
+            "hsa-miR-148a-5p": {
+              "baseMean": 11.8448,
+              "log2FoldChange": -2.9184,
+              "padj": 0.0088,
+              "pvalue": 0.0
+            },
+            "hsa-miR-212-5p": {
+              "baseMean": 18.2388,
+              "log2FoldChange": -2.8271,
+              "padj": 0.0114,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-542-3p": {
+              "baseMean": 17.9036,
+              "log2FoldChange": -2.7697,
+              "padj": 0.0114,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-329-5p": {
+              "baseMean": 15.6293,
+              "log2FoldChange": -3.148,
+              "padj": 0.0051,
+              "pvalue": 0.0
+            },
+            "hsa-miR-380-3p": {
+              "baseMean": 5.9261,
+              "log2FoldChange": 2.9182,
+              "padj": 0.0144,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-5007-5p": {
+              "baseMean": 81.4424,
+              "log2FoldChange": -2.2173,
+              "padj": 0.0152,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-6861-5p": {
+              "baseMean": 101.1668,
+              "log2FoldChange": -2.0396,
+              "padj": 0.0144,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-7154-5p": {
+              "baseMean": 17.3628,
+              "log2FoldChange": -2.2783,
+              "padj": 0.0152,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-1252-3p": {
+              "baseMean": 44.3177,
+              "log2FoldChange": -2.422,
+              "padj": 0.0152,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-6720-3p": {
+              "baseMean": 14.0208,
+              "log2FoldChange": -2.3017,
+              "padj": 0.0254,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-137-3p": {
+              "baseMean": 9.1647,
+              "log2FoldChange": -4.0393,
+              "padj": 0.0138,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-4496": {
+              "baseMean": 6.761,
+              "log2FoldChange": -2.6123,
+              "padj": 0.0332,
+              "pvalue": 0.0005
+            },
+            "hsa-miR-6780a-3p": {
+              "baseMean": 15.4104,
+              "log2FoldChange": -2.1918,
+              "padj": 0.0254,
+              "pvalue": 0.0003
+            }
+          },
+          "joint/time_post_vs_pre": {
+            "hsa-miR-4465": {
+              "baseMean": 15.2576,
+              "log2FoldChange": -3.159,
+              "padj": 0.0002,
+              "pvalue": 0.0
+            },
+            "hsa-miR-183-5p": {
+              "baseMean": 223.9458,
+              "log2FoldChange": -2.2295,
+              "padj": 0.0005,
+              "pvalue": 0.0
+            },
+            "hsa-miR-657": {
+              "baseMean": 72.0422,
+              "log2FoldChange": -2.1508,
+              "padj": 0.0028,
+              "pvalue": 0.0
+            },
+            "hsa-miR-4479": {
+              "baseMean": 80.7166,
+              "log2FoldChange": -1.9578,
+              "padj": 0.0079,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-21-5p": {
+              "baseMean": 84.3582,
+              "log2FoldChange": -2.1381,
+              "padj": 0.0121,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-765": {
+              "baseMean": 57.811,
+              "log2FoldChange": -1.82,
+              "padj": 0.0096,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-92a-1-5p": {
+              "baseMean": 29.6312,
+              "log2FoldChange": -2.6094,
+              "padj": 0.0047,
+              "pvalue": 0.0
+            },
+            "hsa-miR-661": {
+              "baseMean": 21.7891,
+              "log2FoldChange": -2.35,
+              "padj": 0.0182,
+              "pvalue": 0.0002
+            },
+            "hsa-miR-5008-5p": {
+              "baseMean": 46.6194,
+              "log2FoldChange": -2.9407,
+              "padj": 0.0064,
+              "pvalue": 0.0
+            },
+            "hsa-miR-6822-3p": {
+              "baseMean": 53.2988,
+              "log2FoldChange": -2.1536,
+              "padj": 0.0235,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-7855-5p": {
+              "baseMean": 17.8636,
+              "log2FoldChange": -2.0785,
+              "padj": 0.0232,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-1252-3p": {
+              "baseMean": 44.3177,
+              "log2FoldChange": -2.6768,
+              "padj": 0.0096,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-1268a": {
+              "baseMean": 51.9566,
+              "log2FoldChange": -1.6461,
+              "padj": 0.0232,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-130a-5p": {
+              "baseMean": 21.3412,
+              "log2FoldChange": -2.9521,
+              "padj": 0.0079,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-224-5p": {
+              "baseMean": 23.5833,
+              "log2FoldChange": -1.8944,
+              "padj": 0.0239,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-4687-3p": {
+              "baseMean": 5811.1037,
+              "log2FoldChange": -1.1252,
+              "padj": 0.0239,
+              "pvalue": 0.0004
+            },
+            "hsa-miR-4695-5p": {
+              "baseMean": 71.7024,
+              "log2FoldChange": -1.2398,
+              "padj": 0.0232,
+              "pvalue": 0.0002
+            },
+            "hsa-miR-4746-3p": {
+              "baseMean": 19.6125,
+              "log2FoldChange": -2.1363,
+              "padj": 0.0281,
+              "pvalue": 0.0004
+            },
+            "hsa-miR-6127": {
+              "baseMean": 98.7086,
+              "log2FoldChange": -1.8918,
+              "padj": 0.0235,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-3682-5p": {
+              "baseMean": 45.9631,
+              "log2FoldChange": -2.2141,
+              "padj": 0.0244,
+              "pvalue": 0.0004
+            },
+            "hsa-miR-4458": {
+              "baseMean": 40.6744,
+              "log2FoldChange": -2.2236,
+              "padj": 0.0297,
+              "pvalue": 0.0005
+            },
+            "hsa-miR-7157-3p": {
+              "baseMean": 16.1486,
+              "log2FoldChange": -3.2096,
+              "padj": 0.0043,
+              "pvalue": 0.0
+            },
+            "hsa-miR-4446-3p": {
+              "baseMean": 36.4408,
+              "log2FoldChange": -1.9914,
+              "padj": 0.033,
+              "pvalue": 0.0006
+            },
+            "hsa-miR-4292": {
+              "baseMean": 260.7879,
+              "log2FoldChange": -1.6003,
+              "padj": 0.0297,
+              "pvalue": 0.0005
+            },
+            "hsa-miR-625-3p": {
+              "baseMean": 43.6576,
+              "log2FoldChange": -2.031,
+              "padj": 0.0434,
+              "pvalue": 0.0009
+            },
+            "hsa-miR-6783-5p": {
+              "baseMean": 59.0693,
+              "log2FoldChange": -1.8935,
+              "padj": 0.0373,
+              "pvalue": 0.0007
+            },
+            "hsa-miR-4523": {
+              "baseMean": 157.1562,
+              "log2FoldChange": -1.5479,
+              "padj": 0.0404,
+              "pvalue": 0.0008
+            },
+            "hsa-miR-4804-5p": {
+              "baseMean": 27.5298,
+              "log2FoldChange": -1.774,
+              "padj": 0.044,
+              "pvalue": 0.001
+            },
+            "hsa-miR-6758-5p": {
+              "baseMean": 24.4226,
+              "log2FoldChange": -1.9053,
+              "padj": 0.044,
+              "pvalue": 0.001
+            },
+            "hsa-miR-8056": {
+              "baseMean": 25.7941,
+              "log2FoldChange": -1.7972,
+              "padj": 0.0463,
+              "pvalue": 0.0011
+            },
+            "hsa-miR-940": {
+              "baseMean": 95.5273,
+              "log2FoldChange": -1.6406,
+              "padj": 0.0434,
+              "pvalue": 0.0009
+            },
+            "hsa-miR-1911-5p": {
+              "baseMean": 48.2707,
+              "log2FoldChange": -2.2441,
+              "padj": 0.0239,
+              "pvalue": 0.0003
+            },
+            "hsa-miR-4685-5p": {
+              "baseMean": 198.9709,
+              "log2FoldChange": -1.8402,
+              "padj": 0.0296,
+              "pvalue": 0.0005
+            }
+          },
+          "joint/time_post75_vs_pre": {
+            "hsa-miR-217-3p": {
+              "baseMean": 6.4287,
+              "log2FoldChange": 3.3591,
+              "padj": 0.0309,
+              "pvalue": 0.0002
+            },
+            "hsa-miR-3682-3p": {
+              "baseMean": 17.1242,
+              "log2FoldChange": 2.8712,
+              "padj": 0.0204,
+              "pvalue": 0.0001
+            },
+            "hsa-miR-649": {
+              "baseMean": 18.087,
+              "log2FoldChange": 2.5924,
+              "padj": 0.0171,
+              "pvalue": 0.0
+            },
+            "hsa-miR-7851-3p": {
+              "baseMean": 22.1633,
+              "log2FoldChange": 2.3101,
+              "padj": 0.0171,
+              "pvalue": 0.0
+            },
+            "hsa-miR-1252-3p": {
+              "baseMean": 44.3177,
+              "log2FoldChange": -2.3115,
+              "padj": 0.0429,
+              "pvalue": 0.0004
+            }
+          }
+        }
+      },
+      "reason": "Paper Table 1 FDR<=0.05 miRNAs per contrast; hsa-miR-1252-3p added for 75 min (FDR 0.071, trending) because the paper highlights it as persistent (S3.3.p3).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T12:19:13"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "99fc3ee2ec1dd8732f936b29a6cbb63839a24a3ba355df23c9c99921b94e4c4c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4f4125ffe2e737800b496b7289246d7b73cdcd92cbaa0e6b5012610239c78d6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9f04aef86c0c6cb52f27a6ea170bf66db4f0e440cbf60cbfd4c39af1120a774c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "256fe131fc531285393c4b3ccb6b100e8d88be7b5da973ac6375fd8623dd30dc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "be56fec6e1a41663200fc3dbe6ce7c27da4a12d82bb8ce00e24b9e5533658856",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "097b4b4585c9143aa01be3d95048209a9e1d9d24241ea4e12de353cd2df4ffcf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post_vs_mid.csv",
+      "role": "deg_joint/time_post_vs_mid",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5601bda1ac98a55880bef32b99c19a46c024dacdf9d80b85836d29ef006623aa",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_mid.csv",
+      "role": "deg_joint/time_post75_vs_mid",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "03ce8896d7ee28f1b734aff349508d3ab531e3af0333ba3042de59fc021c30c8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_mid_vs_pre.csv",
+      "role": "deg_joint/time_mid_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "72c822c818fb948e9f3812ac26b5bb5a6028ae6972f6ac594d24f1bd4a68eb05",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_post.csv",
+      "role": "deg_joint/time_post75_vs_post",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "265e95e84b22635a6fae6b1e9c9cec2455efcb7bf9f3efe9316ae94d323e0ede",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post_vs_pre.csv",
+      "role": "deg_joint/time_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "36a70a463b6a81cc99e0506c6739076d5459b74f405856f54233e99389bd94a0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\joint\\DEG_results_time_post75_vs_pre.csv",
+      "role": "deg_joint/time_post75_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "556d98d969d558fd718d2067819a753f174850bb66f9cb2262b0002045209a7d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_mid_vs_pre.csv",
+      "role": "deg_r_deseq2/time_mid_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5546ba1091b7e1c3a064bb10be5afcf4696c24f92b19654ffafb1f4679f3ae80",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_post_vs_pre.csv",
+      "role": "deg_r_deseq2/time_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c7c4ca00edb6ddce6a8b12d5dcb33c19e9315542b3c7c3675ec3dfe1106a060f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\r_deseq2\\DEG_results_time_post75_vs_pre.csv",
+      "role": "deg_r_deseq2/time_post75_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "70638d213e5b46e9d19907d5d14f28acfc943e15a66df0db7f4d130a5737ab58",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_mid_vs_pre.csv",
+      "role": "deg_edger_ql/time_mid_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b71048be5a8beb0944761cbfb5d50579acee62fb465e9aeb96b0416d954433ab",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_post_vs_pre.csv",
+      "role": "deg_edger_ql/time_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "cfcc68010002d58587d9a0e0069f8416e8842294ec66a0ff7d3863bb062e410e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\results\\edger_ql\\DEG_results_time_post75_vs_pre.csv",
+      "role": "deg_edger_ql/time_post75_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f97cf6395c1cc21d1f190fda4fc97a421a5dc48aa8aacbf2637826e359f47e92",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42812173\\GSE320360\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "011bec8074346132c1e9270262f083dcd6d0e441d8b39bece53921bee30237ce",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
