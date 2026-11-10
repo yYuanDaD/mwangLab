@@ -1,0 +1,195 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36198295",
+  "request": "Analyze GSE183239 for PMID 36198295 (Single-cell dissection of the obesity-exercise axis in adipose-muscle tissues implies a critical role for mesenchymal stem cells.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (Claude Code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE183239",
+      "accession": "GSE183239",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9558082.paper.md"],
+        "metadata": "GSE183239/GSE183239_metadata.csv",
+        "matrix": "GSE183239/GSE183239_Bulk_gene_count_matrix.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE183239"],
+            "superseries": "GSE183290 (bulk GSE183239 + single-cell GSE183288)",
+            "assay": "bulk 3' DGE mRNA-seq (UMI-deduplicated, Salmon 0.14.2 + tximport, Ensembl 98), scWAT, vWAT, triceps (SkM)",
+            "factors": {"diet": ["standard chow (10% fat)", "HFD (60% fat)"], "exercise": ["sedentary", "voluntary wheel running training"], "tissue": ["scWAT", "vWAT", "SkM (triceps)"]},
+            "sample_inclusion": "5 male C57BL/6N mice per group per tissue (S4.3.2.p1); 4 groups x 3 tissues = 60 libraries; same mice across tissues",
+            "primary_estimand": "Per tissue, effect of 3 weeks of voluntary wheel-running training on tissue gene expression: 'training' (train chow vs sed chow) and 'rescue' (train HFD vs sed HFD); 'obesity' (sed HFD vs sed chow) is the paper's third, diet-only comparison",
+            "planned_contrasts": [
+              "training: train std vs sed std, per tissue (S2.2.p1, TAB1: scWAT 3, vWAT 47, SkM 92)",
+              "rescue: train HFD vs sed HFD, per tissue (S2.2.p1, TAB1: scWAT 132, vWAT 205, SkM 235)",
+              "obesity: sed HFD vs sed std, per tissue (S2.2.p1, TAB1: scWAT 492, vWAT 478, SkM 0)"
+            ],
+            "repeated_measure_unit": "none within a tissue (each tissue analysed separately; one library per mouse per tissue)",
+            "normalization": "DESeq2 size factors; per tissue keep genes with count > 10 in all samples (S4.4.1.1.p1)",
+            "paper_method": "DESeq2 per tissue, IHW-adjusted p values, ashr-shrunk fold changes (S4.4.1.1.p1)",
+            "paper_threshold": {"metric": "padj", "adjustment": "IHW", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S4.4.1.1.p1"},
+            "paper_results": "Table 1 (TAB1) DEG counts per tissue x comparison; Dbp, Tef, Nr1d2, Per3 up and Thbs1, Sparc down with training/rescue in WAT (S2.2.p2); Pdk4, Asb2 in SkM (S2.2.p2); Cdkn1a down by rescue in scWAT and vWAT (S2.2.p3)"
+          },
+          "reasoning": "S4.1.3.p1 and TAB2 name GSE183239 as the bulk mRNA-seq; GSE183288 is the single-cell series and is not this case. S4.3.1.p1 describes the 2x2 diet x exercise design; S4.3.2.p1 says 5 mice per group were sequenced for the three tissues. S2.2.p1 defines the three pairwise comparisons; S4.4.1.1.p1 gives the per-tissue filter, DESeq2, IHW and ashr, and adjusted p < 0.05 with no fold-change rule. TAB1 gives the counts.",
+          "confidence": "high",
+          "locator": "S2.2.p1; S4.4.1.1.p1; TAB1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper S4.1.3.p1/TAB2 name GSE183239 for bulk mRNA-seq", "60 GEO samples = 3 tissues x 4 groups x 5, matching S4.3.2.p1", "data_processing matches S4.4.1.1.p1 (UMI dedup, Salmon 0.14.2, Ensembl 98, tximport)", "series_id lists the SuperSeries GSE183290 named in the paper"]},
+          "reasoning": "Accession, sample count, processing text and SuperSeries all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "\\[\\s*([A-Z]+\\d+\\.[A-Za-z]+)\\s*\\]"]},
+          "matrix_column_pattern": "^([A-Z]+\\d+\\.[A-Za-z]+)\\.d\\d+\\.intCt$",
+          "patterns": {
+            "diet": ["characteristics_ch1.3.treatment", "^6-week (chow|high-fat)-diet"],
+            "ex": ["characteristics_ch1.3.treatment", "3-week (sedentary|training) interventions"],
+            "tissue": ["source_name_ch1", "^(subcutaneous|visceral|triceps)"]
+          },
+          "combine": {"grp": ["diet", "ex"]},
+          "recode": {
+            "diet": {"chow": "CD", "high-fat": "HFD"},
+            "ex": {"sedentary": "SED", "training": "TR"},
+            "tissue": {"subcutaneous": "scWAT", "visceral": "vWAT", "triceps": "SkM"},
+            "grp": {"CD_SED": "CDsed", "CD_TR": "CDtr", "HFD_SED": "HFDsed", "HFD_TR": "HFDtr"}
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "The matrix holds two column kinds per library (.intCt integer counts and .l2cpm log2CPM); matrix_column_pattern keeps only .intCt and reduces names such as 'SC3.vWAT.d316020.intCt' to 'SC3.vWAT'. The metadata title carries the same label in brackets ('[SC3.vWAT]', one with a trailing space '[TC14.vWAT ]'), extracted by key_patterns; exact match on that key. Diet and exercise come from characteristics treatment, tissue from source_name. The label prefix (SC/TC/SH/TH = sed chow / train chow / sed HFD / train HFD) agrees with the treatment field for every row (checked by eye before the run).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts (tximport gene-level counts from Salmon, UMI-deduplicated; deposited as integers)",
+          "recommended_method": "DESeq2",
+          "reasoning": "All .intCt values are integers (min 0, max 60651, library sums 0.51-0.74 M, typical of 3' DGE UMI counts). data_processing: Salmon -> tximport, 'Matrix table with raw gene counts and log2CPM values'. Paper ran DESeq2 on these counts (S4.4.1.1.p1). The .l2cpm columns are dropped.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CDsed"},
+          "strata": ["tissue"],
+          "organism": "Mouse",
+          "planned": [
+            "grp_CDtr_vs_CDsed_tissue-scWAT", "grp_HFDtr_vs_HFDsed_tissue-scWAT", "grp_HFDsed_vs_CDsed_tissue-scWAT",
+            "grp_CDtr_vs_CDsed_tissue-vWAT", "grp_HFDtr_vs_HFDsed_tissue-vWAT", "grp_HFDsed_vs_CDsed_tissue-vWAT",
+            "grp_CDtr_vs_CDsed_tissue-SkM", "grp_HFDtr_vs_HFDsed_tissue-SkM", "grp_HFDsed_vs_CDsed_tissue-SkM"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group (4 diet x exercise cells) per tissue, planned pairwise contrasts from one model per tissue",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "training", "control": "CDsed", "treatment": "CDtr", "role": "primary"},
+              {"name": "rescue", "control": "HFDsed", "treatment": "HFDtr", "role": "primary"},
+              {"name": "obesity", "control": "CDsed", "treatment": "HFDsed", "role": "secondary"}
+            ]
+          },
+          "reasoning": "S2.2.p1 defines exactly three pairwise comparisons per tissue; tissues are analysed separately (S4.4.1.1.p1 'for each tissue'), so tissue is a stratum. The 2x2 cells are coded as one 4-level factor grp so the comparisons are simple cell contrasts from one DESeq2 fit per tissue, as in the paper; the diet x exercise interaction is not a paper estimand and is not tested. Training and rescue are the exercise estimands (primary); obesity is diet-only and kept as secondary for comparison with TAB1. Rejected: pooling diets for a main exercise effect (not the paper's estimand); two-factor ~diet+ex additive model (paper compares cells, and an additive model would assume no interaction).",
+          "confidence": "high",
+          "candidates": [
+            {"value": "~ diet + ex main effects", "reason_rejected": "paper reports within-diet cell comparisons, not a main effect"},
+            {"value": "all 60 libraries in one model with tissue", "reason_rejected": "paper analyses each tissue separately; tissue effects dwarf treatment"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Within one tissue each mouse contributes one library, so there is no repeated unit. The same mice appear in all three tissues, but tissues are never compared. Library prep used two sub-pools (S4.3.2.p1) but the pool assignment is not deposited; the paper reports batch was not a major driver (S2.1.p1) and fitted no batch term. No covariate is added.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, one fit per tissue on all 20 samples, ~ grp)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 + IHW p-value adjustment + ashr LFC shrinkage", "status": "blocked", "reason": "IHW (and ashr) are R/Bioconductor-only and not available in the pydeseq2 executor; BH adjustment is used instead. ashr changes only fold-change estimates, not significance, so it does not affect DEG counts under the paper's rule (no effect cutoff)."},
+            "deviations": ["BH instead of IHW adjusted p values", "no ashr shrinkage (reported log2FC are MLE)", "pydeseq2 instead of R DESeq2"],
+            "rounding_documented": true,
+            "rounding_note": "deposited .intCt values are already integers (rounded tximport counts, 100% integer); no further rounding applied",
+            "filter": "per tissue, keep genes with count > 10 (>= 11, integer counts) in all 20 samples of that tissue (S4.4.1.1.p1)"
+          },
+          "transform": null,
+          "reasoning": "Integer estimated counts support DESeq2, the paper's method. The paper's low-count rule is applied per tissue execution with filter_low_counts {min_count: 11, min_samples: 20}. IHW is the only part of the route that changes significance calls and cannot be reproduced here, so this is a declared deviation.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper's adjusted p < 0.05 is IHW-adjusted; here the same cutoff is applied to BH-adjusted p values. IHW typically gives somewhat more discoveries than BH."
+          },
+          "reasoning": "S4.4.1.1.p1: 'significant DEGs at an adjusted p value cutoff of 0.05'; no fold-change rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["IHW replaced by BH; counts expected to be lower than the paper's where IHW gains power", "No ashr shrinkage; fold-change magnitudes are unshrunk MLE", "The paper's literal filter (count > 10 in every sample of the tissue) keeps only 2.2k-3.5k genes and removes the paper's named adipose DEGs Dbp, Tef, Nr1d2, Per3, Thbs1 and Cdkn1a, so the paper cannot have applied it literally. Under the sensitivity reading (total count > 10 across the tissue's samples) all of them are significant in the paper's direction (circadian genes up, Thbs1/Cdkn1a down with rescue in scWAT and vWAT, and with training in vWAT), and adipose counts are closer to Table 1; SkM training falls to 24 vs the paper's 92 under that reading (BH over ~12k genes vs IHW).", "Sparc is down with training/rescue as the paper says, but not significant in scWAT rescue (padj 0.21 / 0.31)."]
+          },
+          "paper_counts": {
+            "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": 3,
+            "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": 132,
+            "scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT": 492,
+            "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": 47,
+            "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": 205,
+            "vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT": 478,
+            "SkM/grp_CDtr_vs_CDsed_tissue-SkM": 92,
+            "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": 235,
+            "SkM/grp_HFDsed_vs_CDsed_tissue-SkM": 0
+          },
+          "paper_genes": {
+            "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc"],
+            "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": ["Pdk4", "Asb2"],
+            "SkM/grp_CDtr_vs_CDsed_tissue-SkM": ["Pdk4", "Asb2"],
+            "scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc"]
+          },
+          "reasoning": "Paper counts from TAB1 (up + down per tissue x comparison). Named genes from S2.2.p2 and S2.2.p3: circadian regulators up and ECM genes down with training/rescue in adipose depots (which depot/comparison each gene reached significance in is not itemised in the text); Pdk4 and Asb2 among SkM rescue/training DEGs (direction for Pdk4/Asb2 not stated explicitly); Cdkn1a down by rescue in scWAT and vWAT.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "p-value adjustment", "paper": "IHW", "data": "executor offers BH only", "disposition": "declared_deviation"},
+        {"item": "GEO strain", "paper": "C57BL/6N (S4.2.p1)", "data": "characteristics strain 'C57BL/6JN'", "disposition": "executable_without_change"},
+        {"item": "age", "paper": "6-week-old at start, 4 weeks of intervention + 3 weeks pre-diet (S4.3.1.p1)", "data": "GEO '12-week old', '6-week diet, 3-week exercise'", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "scWAT", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-scWAT", "grp_HFDtr_vs_HFDsed_tissue-scWAT", "grp_HFDsed_vs_CDsed_tissue-scWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["scWAT"]}, "filter_low_counts": {"min_count": 11, "min_samples": 20},
+         "role": "primary", "reasoning": "one DESeq2 fit on the 20 scWAT libraries; training, rescue, obesity contrasts"},
+        {"name": "vWAT", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-vWAT", "grp_HFDtr_vs_HFDsed_tissue-vWAT", "grp_HFDsed_vs_CDsed_tissue-vWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["vWAT"]}, "filter_low_counts": {"min_count": 11, "min_samples": 20},
+         "role": "primary", "reasoning": "one DESeq2 fit on the 20 vWAT libraries"},
+        {"name": "SkM", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-SkM", "grp_HFDtr_vs_HFDsed_tissue-SkM", "grp_HFDsed_vs_CDsed_tissue-SkM"], "alpha": 0.05},
+         "subset": {"tissue": ["SkM"]}, "filter_low_counts": {"min_count": 11, "min_samples": 20},
+         "role": "primary", "reasoning": "one DESeq2 fit on the 20 triceps libraries"},
+        {"name": "scWAT_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-scWAT", "grp_HFDtr_vs_HFDsed_tissue-scWAT", "grp_HFDsed_vs_CDsed_tissue-scWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["scWAT"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "alternative reading of S4.4.1.1.p1: total count across the tissue's 20 samples > 10 (mean >= 0.55, the DESeq2 rowSums idiom). The literal 'every sample > 10' rule removes the paper's named DEGs Dbp, Tef, Nr1d2, Per3, Thbs1, Cdkn1a, so the paper cannot have applied it literally."},
+        {"name": "vWAT_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-vWAT", "grp_HFDtr_vs_HFDsed_tissue-vWAT", "grp_HFDsed_vs_CDsed_tissue-vWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["vWAT"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "as scWAT_sumfilter"},
+        {"name": "SkM_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-SkM", "grp_HFDtr_vs_HFDsed_tissue-SkM", "grp_HFDsed_vs_CDsed_tissue-SkM"], "alpha": 0.05},
+         "subset": {"tissue": ["SkM"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "as scWAT_sumfilter"}
+      ],
+      "enrichment": []
+    }
+  ]
+}

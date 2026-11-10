@@ -110,6 +110,8 @@
             "formula": "~ grp",
             "paper_route": {"method": "DESeq2 + IHW p-value adjustment + ashr LFC shrinkage", "status": "blocked", "reason": "IHW (and ashr) are R/Bioconductor-only and not available in the pydeseq2 executor; BH adjustment is used instead. ashr changes only fold-change estimates, not significance, so it does not affect DEG counts under the paper's rule (no effect cutoff)."},
             "deviations": ["BH instead of IHW adjusted p values", "no ashr shrinkage (reported log2FC are MLE)", "pydeseq2 instead of R DESeq2"],
+            "rounding_documented": true,
+            "rounding_note": "deposited .intCt values are already integers (rounded tximport counts, 100% integer); no further rounding applied",
             "filter": "per tissue, keep genes with count > 10 (>= 11, integer counts) in all 20 samples of that tissue (S4.4.1.1.p1)"
           },
           "transform": null,
@@ -129,7 +131,7 @@
         "study": {
           "final": {
             "route": "declared_deviation",
-            "caveats": ["IHW replaced by BH; counts expected to be lower than the paper's where IHW gains power", "No ashr shrinkage; fold-change magnitudes are unshrunk MLE"]
+            "caveats": ["IHW replaced by BH; counts expected to be lower than the paper's where IHW gains power", "No ashr shrinkage; fold-change magnitudes are unshrunk MLE", "The paper's literal filter (count > 10 in every sample of the tissue) keeps only 2.2k-3.5k genes and removes the paper's named adipose DEGs Dbp, Tef, Nr1d2, Per3, Thbs1 and Cdkn1a, so the paper cannot have applied it literally. Under the sensitivity reading (total count > 10 across the tissue's samples) all of them are significant in the paper's direction (circadian genes up, Thbs1/Cdkn1a down with rescue in scWAT and vWAT, and with training in vWAT), and adipose counts are closer to Table 1; SkM training falls to 24 vs the paper's 92 under that reading (BH over ~12k genes vs IHW).", "Sparc is down with training/rescue as the paper says, but not significant in scWAT rescue (padj 0.21 / 0.31)."]
           },
           "paper_counts": {
             "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": 3,
@@ -147,7 +149,10 @@
             "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
             "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc"],
             "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": ["Pdk4", "Asb2"],
-            "SkM/grp_CDtr_vs_CDsed_tissue-SkM": ["Pdk4", "Asb2"]
+            "SkM/grp_CDtr_vs_CDsed_tissue-SkM": ["Pdk4", "Asb2"],
+            "scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc", "Cdkn1a"],
+            "vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT": ["Dbp", "Tef", "Nr1d2", "Per3", "Thbs1", "Sparc"]
           },
           "reasoning": "Paper counts from TAB1 (up + down per tissue x comparison). Named genes from S2.2.p2 and S2.2.p3: circadian regulators up and ECM genes down with training/rescue in adipose depots (which depot/comparison each gene reached significance in is not itemised in the text); Pdk4 and Asb2 among SkM rescue/training DEGs (direction for Pdk4/Asb2 not stated explicitly); Cdkn1a down by rescue in scWAT and vWAT.",
           "confidence": "medium"
@@ -170,7 +175,19 @@
         {"name": "SkM", "tool": "tools.joint_contrasts:run_joint_deseq2",
          "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-SkM", "grp_HFDtr_vs_HFDsed_tissue-SkM", "grp_HFDsed_vs_CDsed_tissue-SkM"], "alpha": 0.05},
          "subset": {"tissue": ["SkM"]}, "filter_low_counts": {"min_count": 11, "min_samples": 20},
-         "role": "primary", "reasoning": "one DESeq2 fit on the 20 triceps libraries"}
+         "role": "primary", "reasoning": "one DESeq2 fit on the 20 triceps libraries"},
+        {"name": "scWAT_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-scWAT", "grp_HFDtr_vs_HFDsed_tissue-scWAT", "grp_HFDsed_vs_CDsed_tissue-scWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["scWAT"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "alternative reading of S4.4.1.1.p1: total count across the tissue's 20 samples > 10 (mean >= 0.55, the DESeq2 rowSums idiom). The literal 'every sample > 10' rule removes the paper's named DEGs Dbp, Tef, Nr1d2, Per3, Thbs1, Cdkn1a, so the paper cannot have applied it literally."},
+        {"name": "vWAT_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-vWAT", "grp_HFDtr_vs_HFDsed_tissue-vWAT", "grp_HFDsed_vs_CDsed_tissue-vWAT"], "alpha": 0.05},
+         "subset": {"tissue": ["vWAT"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "as scWAT_sumfilter"},
+        {"name": "SkM_sumfilter", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_CDtr_vs_CDsed_tissue-SkM", "grp_HFDtr_vs_HFDsed_tissue-SkM", "grp_HFDsed_vs_CDsed_tissue-SkM"], "alpha": 0.05},
+         "subset": {"tissue": ["SkM"]}, "filter_low_counts": {"min_mean_count": 0.55},
+         "role": "sensitivity", "reasoning": "as scWAT_sumfilter"}
       ],
       "enrichment": []
     }

@@ -647,3 +647,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35774589 (GSE198652)
 
 - inspect used Chromosome column as feature ID (case_runner.py:393-399, native.py:284), Gene Symbol reindex prep needed (feature_column option added after this row); min_count uses >= (case_runner.py:747) Details: `PMID35774589/HANDBACK.md`.
+
+## PMID36198295 (GSE183239)
+
+- native.py:261-268 profile mixes intCt+l2cpm columns (int frac 0.877, misleading type); paper's literal all-sample >10 filter drops its named DEGs; IHW->BH Details: `PMID36198295/HANDBACK.md`.
+
+## PMID39141732 (GSE263912)
+
+- inspect hung: no timeout on suppl download over HTTPS, no FTP fallback (tools/geo_tools.py:60, :93; timeout added after this row); file fetched over ftp:// by hand Details: `PMID39141732/HANDBACK.md`.

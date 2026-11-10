@@ -1,0 +1,99 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39141732",
+  "request": "Analyze GSE263912 for PMID 39141732 (Remodeling p38 signaling in muscle controls locomotor activity via IL-15.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE263912",
+      "accession": "GSE263912",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC11323882.paper.md"],
+        "metadata": "GSE263912/GSE263912_metadata.csv",
+        "matrix": "GSE263912/GSE263912_NormCounts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE263912"],
+            "accession_source": "not named in the paper (S5.4.p1 says all data are in the paper/supplement); matched to the paper by content (tissue, diet, genotypes, RSEM + limma TMM pipeline, CPM>=1 in >=3 samples filter)",
+            "assay": "bulk RNA-seq (polyA, directional, single-end), gastrocnemius",
+            "sample_inclusion": "gastrocnemius of mice fed HFD for 6 weeks, fasted overnight; RIN > 8; each library = pool of two animals (S4.22.p1); 3 libraries per genotype",
+            "factors": {"genotype": ["control", "p38alpha MCK-KO", "p38alpha/gamma MCK-KO"]},
+            "exercise_factor": "none in the sequenced samples: all mice sedentary HFD-fed and fasted overnight (FIG5 A-C, S4.22.p1). Exercise appears only in non-sequencing experiments (treadmill IL-15 plasma ELISA, FIG5E; human biopsies, FIG1A; wheel/treadmill behaviour, FIG4)",
+            "primary_estimand": "genotype effect (muscle p38alpha or p38alpha/gamma knockout vs control) on gastrocnemius expression in sedentary HFD-fed mice; not an exercise effect",
+            "planned_contrasts": [
+              "p38alphaMCK-KO vs control (S4.22.p2; paper: 15 secreted-protein DEGs at raw P < 0.05, S2.7.p1/S4.24.p1; total DEG count at FDR not reported)",
+              "p38alpha/gammaMCK-KO vs control (S4.22.p2; count not reported)",
+              "p38alphaMCK-KO vs p38alpha/gammaMCK-KO (S4.22.p2; count not reported)"
+            ],
+            "repeated_measure_unit": "none (independent pooled libraries)",
+            "normalization": "TMM (limma pipeline), genes with CPM >= 1 in >= 3 samples (S4.22.p2)",
+            "paper_method": "limma on RSEM expected counts, TMM normalization (S4.22.p2)",
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S4.22.p2"},
+            "secondary_threshold": {"metric": "pvalue", "cutoff": 0.05, "use": "candidate list before secretome filtering", "source_locator": "S4.24.p1"},
+            "paper_results": "Il15 up in p38alphaMCK-KO but not in p38alpha/gammaMCK-KO vs control (S2.7.p1, FIG5C); 15 secreted-protein DEGs in p38alphaMCK-KO"
+          },
+          "reasoning": "The only RNA-seq in the paper (S4.22.p1-p2, FIG5 A-C) compares three muscle-specific genotypes in sedentary HFD-fed, overnight-fasted mice. No exercise arm, time point, or training status exists in the sequenced samples. Exercise enters the paper only through phenotyping and plasma IL-15 after treadmill running, which were not sequenced.",
+          "locator": "S4.22.p2",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GEO series GSE263912: gastrocnemius, mice fed HFD for 6 weeks, RIN > 8 (extract_protocol) = S4.22.p1",
+              "genotypes control / p38alphaMCK-KO / p38alpha/gammaMCK-KO, 3 each = FIG5 A-C groups",
+              "data_processing: RSEM + limma TMM, CPM >= 1 in >= 3 samples = S4.22.p2",
+              "contact CNIC Bioinformatics Unit = S4.22.p2 (CNIC Bioinformatics Unit)",
+              "paper does not name the accession (S5.4.p1)"
+            ]
+          },
+          "reasoning": "The paper names no GEO accession, but every described property of the sequencing experiment matches GSE263912. Minor discrepancy recorded: paper says GRCm38.76 and HiSeq2500; GEO says GRCm38.91 and Illumina MiSeq.",
+          "locator": "S4.22.p1",
+          "confidence": "medium"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^gastrocnemius, (\\w+_\\d)$"]},
+          "aliases": {"geno": "characteristics_ch1.1.genotype"},
+          "recode": {"geno": {"control": "CTRL", "p38alphaMCK-KO": "AKO", "p38alpha/gammaMCK-KO": "AGKO"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (HN_1..3, COW_1..3, KIC_1..3) sit inside the metadata title ('gastrocnemius, COW_1'); exact key match on that derived key. HN = p38alphaMCK-KO, COW = p38alpha/gammaMCK-KO, KIC = control per the genotype field.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear normalized (TMM-normalized CPM)",
+          "recommended_method": "limma on log2(x+1)",
+          "final": {"source": "GSE263912_NormCounts.txt.gz", "paper_input": "RSEM expected counts processed by limma/TMM (S4.22.p2); only the TMM-normalized CPM (pre-filtered CPM>=1 in >=3 samples) is deposited"},
+          "reasoning": "integer fraction 0, decimals, min 0.017, max 55154; GEO data_processing states 'TMM-normalized counts (CPM)'. Raw/expected counts are not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno"],
+          "references": {"geno": "CTRL"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast in the sequenced samples: GSE263912 has only a genotype factor (control, p38alphaMCK-KO, p38alpha/gammaMCK-KO; 3 pooled libraries each) in sedentary HFD-fed, overnight-fasted mice (S4.22.p1, FIG5 A-C). The paper's RNA-seq estimand is a knockout effect, not an exercise effect; no metadata column codes exercise, training, or time after exercise.",
+          "candidates": [
+            {"value": "geno AKO vs CTRL as an exercise proxy", "reason_rejected": "a genetic knockout is not an exercise exposure; the paper itself does not frame it as one, and relabelling it would misstate the estimand"},
+            {"value": "treadmill IL-15 experiment (FIG5E)", "reason_rejected": "plasma ELISA only; not sequenced"}
+          ],
+          "reasoning": "Refused at design per the contract rule 'no exercise contrast in the sequenced samples'. The genotype contrasts are well defined (n=3 per arm) and could be analysed with limma on log2(CPM+1), but they do not answer the request.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"field": "reference transcriptome", "paper": "GRCm38.76 (S4.22.p2)", "data": "GRCm38.91 (GEO data_processing)", "impact": "none for the stop decision"},
+        {"field": "sequencer", "paper": "HiSeq2500, 60-base single reads (S4.22.p1)", "data": "Illumina MiSeq (GEO instrument_model)", "impact": "none for the stop decision"},
+        {"field": "matrix", "paper": "RSEM expected counts into limma/TMM (S4.22.p2)", "data": "only TMM-normalized CPM deposited", "impact": "paper route would need limma on log2 CPM; moot because the design is refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import os
+import socket
 import re
 import GEOparse
 from tools.tooling import tool
@@ -57,7 +58,7 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
     ftp_url = f"https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}/{geo_accession}/suppl/"
 
     try:
-        response = requests.get(ftp_url)
+        response = requests.get(ftp_url, timeout=60)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -90,7 +91,12 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
                 if size > float(os.getenv("BIOAGENT_MAX_SUPPL_GB", "3")) * 1e9:
                     oversize_files.append(f"{href} ({size / 1e9:.1f} GB)")
                     continue
-                urllib.request.urlretrieve(file_url, file_path + ".part")
+                # a stalled HTTPS transfer hung inspect for good: time out each socket read
+                socket.setdefaulttimeout(120)
+                try:
+                    urllib.request.urlretrieve(file_url, file_path + ".part")
+                finally:
+                    socket.setdefaulttimeout(None)
                 os.replace(file_path + ".part", file_path)
                 downloaded_files.append(file_path)
 

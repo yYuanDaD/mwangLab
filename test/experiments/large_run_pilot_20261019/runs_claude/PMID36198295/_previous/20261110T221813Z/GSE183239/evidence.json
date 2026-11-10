@@ -1,0 +1,1818 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID36198295",
+  "subject_id": "GSE183239",
+  "created_at": "2026-11-10T17:15:37",
+  "finished_at": "2026-11-10T17:17:52",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9558082.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC9558082.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T17:15:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f6b1e48ba2c946545b3a667b8b5275f89dd25ed7f451f9be61d75e683847a62b",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE183239_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE183239\\GSE183239_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T17:15:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "71450d8976d29a53a8b14df0abd282a9e7506bf60bba63dae17521e1b31e0d01",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE183239_Bulk_gene_count_matrix.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE183239\\GSE183239_Bulk_gene_count_matrix.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-10T17:15:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f1dea9e59b395e4d3050b138aab896575bdce4b40cf4f3d04848b9f81b1368d4",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE183239"
+        ],
+        "superseries": "GSE183290 (bulk GSE183239 + single-cell GSE183288)",
+        "assay": "bulk 3' DGE mRNA-seq (UMI-deduplicated, Salmon 0.14.2 + tximport, Ensembl 98), scWAT, vWAT, triceps (SkM)",
+        "factors": {
+          "diet": [
+            "standard chow (10% fat)",
+            "HFD (60% fat)"
+          ],
+          "exercise": [
+            "sedentary",
+            "voluntary wheel running training"
+          ],
+          "tissue": [
+            "scWAT",
+            "vWAT",
+            "SkM (triceps)"
+          ]
+        },
+        "sample_inclusion": "5 male C57BL/6N mice per group per tissue (S4.3.2.p1); 4 groups x 3 tissues = 60 libraries; same mice across tissues",
+        "primary_estimand": "Per tissue, effect of 3 weeks of voluntary wheel-running training on tissue gene expression: 'training' (train chow vs sed chow) and 'rescue' (train HFD vs sed HFD); 'obesity' (sed HFD vs sed chow) is the paper's third, diet-only comparison",
+        "planned_contrasts": [
+          "training: train std vs sed std, per tissue (S2.2.p1, TAB1: scWAT 3, vWAT 47, SkM 92)",
+          "rescue: train HFD vs sed HFD, per tissue (S2.2.p1, TAB1: scWAT 132, vWAT 205, SkM 235)",
+          "obesity: sed HFD vs sed std, per tissue (S2.2.p1, TAB1: scWAT 492, vWAT 478, SkM 0)"
+        ],
+        "repeated_measure_unit": "none within a tissue (each tissue analysed separately; one library per mouse per tissue)",
+        "normalization": "DESeq2 size factors; per tissue keep genes with count > 10 in all samples (S4.4.1.1.p1)",
+        "paper_method": "DESeq2 per tissue, IHW-adjusted p values, ashr-shrunk fold changes (S4.4.1.1.p1)",
+        "paper_threshold": {
+          "metric": "padj",
+          "adjustment": "IHW",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S4.4.1.1.p1"
+        },
+        "paper_results": "Table 1 (TAB1) DEG counts per tissue x comparison; Dbp, Tef, Nr1d2, Per3 up and Thbs1, Sparc down with training/rescue in WAT (S2.2.p2); Pdk4, Asb2 in SkM (S2.2.p2); Cdkn1a down by rescue in scWAT and vWAT (S2.2.p3)"
+      },
+      "reason": "S4.1.3.p1 and TAB2 name GSE183239 as the bulk mRNA-seq; GSE183288 is the single-cell series and is not this case. S4.3.1.p1 describes the 2x2 diet x exercise design; S4.3.2.p1 says 5 mice per group were sequenced for the three tissues. S2.2.p1 defines the three pairwise comparisons; S4.4.1.1.p1 gives the per-tissue filter, DESeq2, IHW and ashr, and adjusted p < 0.05 with no fold-change rule. TAB1 gives the counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:37"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE183239\\GSE183239_Bulk_gene_count_matrix.txt.gz",
+        "owned": true,
+        "checks": [
+          "paper S4.1.3.p1/TAB2 name GSE183239 for bulk mRNA-seq",
+          "60 GEO samples = 3 tissues x 4 groups x 5, matching S4.3.2.p1",
+          "data_processing matches S4.4.1.1.p1 (UMI dedup, Salmon 0.14.2, Ensembl 98, tximport)",
+          "series_id lists the SuperSeries GSE183290 named in the paper"
+        ],
+        "accession": "GSE183239",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE183239\\GSE183239_metadata.csv"
+      },
+      "reason": "Accession, sample count, processing text and SuperSeries all match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:37"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 60,
+        "n_metadata": 60,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "diet": {
+              "source": "characteristics_ch1.3.treatment",
+              "regex": "^6-week (chow|high-fat)-diet",
+              "recode": {
+                "chow": "CD",
+                "high-fat": "HFD"
+              }
+            },
+            "ex": {
+              "source": "characteristics_ch1.3.treatment",
+              "regex": "3-week (sedentary|training) interventions",
+              "recode": {
+                "sedentary": "SED",
+                "training": "TR"
+              }
+            },
+            "tissue": {
+              "source": "source_name_ch1",
+              "regex": "^(subcutaneous|visceral|triceps)",
+              "recode": {
+                "subcutaneous": "scWAT",
+                "visceral": "vWAT",
+                "triceps": "SkM"
+              }
+            },
+            "grp": {
+              "combine": [
+                "diet",
+                "ex"
+              ],
+              "separator": "_",
+              "of": "recoded values",
+              "recode": {
+                "CD_SED": "CDsed",
+                "CD_TR": "CDtr",
+                "HFD_SED": "HFDsed",
+                "HFD_TR": "HFDtr"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\design_metadata.csv",
+          "sha256": "959123ffb81528c46944606f3b0c4985ce2d0dc216d0d3d14f71abb8b2220e54",
+          "levels": {
+            "diet": {
+              "CD": 30,
+              "HFD": 30
+            },
+            "ex": {
+              "SED": 30,
+              "TR": 30
+            },
+            "tissue": {
+              "scWAT": 20,
+              "vWAT": 20,
+              "SkM": 20
+            },
+            "grp": {
+              "CDsed": 15,
+              "CDtr": 15,
+              "HFDsed": 15,
+              "HFDtr": 15
+            }
+          }
+        }
+      },
+      "reason": "The matrix holds two column kinds per library (.intCt integer counts and .l2cpm log2CPM); matrix_column_pattern keeps only .intCt and reduces names such as 'SC3.vWAT.d316020.intCt' to 'SC3.vWAT'. The metadata title carries the same label in brackets ('[SC3.vWAT]', one with a trailing space '[TC14.vWAT ]'), extracted by key_patterns; exact match on that key. Diet and exercise come from characteristics treatment, tissue from source_name. The label prefix (SC/TC/SH/TH = sed chow / train chow / sed HFD / train HFD) agrees with the treatment field for every row (checked by eye before the run).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:45"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "estimated counts (tximport gene-level counts from Salmon, UMI-deduplicated; deposited as integers)",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\aligned_matrix.csv",
+          "sha256": "4ed2f88477ce6e1976b966fc83b8054c96dbf8055d74e9a379a935a9fc8ce963",
+          "n_features": 54352,
+          "n_samples": 60,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 60651.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All .intCt values are integers (min 0, max 60651, library sums 0.51-0.74 M, typical of 3' DGE UMI counts). data_processing: Salmon -> tximport, 'Matrix table with raw gene counts and log2CPM values'. Paper ran DESeq2 on these counts (S4.4.1.1.p1). The .l2cpm columns are dropped.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:47"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group (4 diet x exercise cells) per tissue, planned pairwise contrasts from one model per tissue",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "training",
+            "control": "CDsed",
+            "treatment": "CDtr",
+            "role": "primary"
+          },
+          {
+            "name": "rescue",
+            "control": "HFDsed",
+            "treatment": "HFDtr",
+            "role": "primary"
+          },
+          {
+            "name": "obesity",
+            "control": "CDsed",
+            "treatment": "HFDsed",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\suitability\\suitability.md",
+          "n_comparisons": 18,
+          "n_analyzable": 18
+        }
+      },
+      "reason": "S2.2.p1 defines exactly three pairwise comparisons per tissue; tissues are analysed separately (S4.4.1.1.p1 'for each tissue'), so tissue is a stratum. The 2x2 cells are coded as one 4-level factor grp so the comparisons are simple cell contrasts from one DESeq2 fit per tissue, as in the paper; the diet x exercise interaction is not a paper estimand and is not tested. Training and rescue are the exercise estimands (primary); obesity is diet-only and kept as secondary for comparison with TAB1. Rejected: pooling diets for a main exercise effect (not the paper's estimand); two-factor ~diet+ex additive model (paper compares cells, and an additive model would assume no interaction).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:56"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 60,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_CDtr",
+            "grp_HFDsed",
+            "grp_HFDtr"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 56,
+          "levels": {
+            "grp": {
+              "CDsed": 15,
+              "CDtr": 15,
+              "HFDsed": 15,
+              "HFDtr": 15
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "CDsed"
+              ],
+              "n": 15
+            },
+            {
+              "cell": [
+                "CDtr"
+              ],
+              "n": 15
+            },
+            {
+              "cell": [
+                "HFDsed"
+              ],
+              "n": 15
+            },
+            {
+              "cell": [
+                "HFDtr"
+              ],
+              "n": 15
+            }
+          ],
+          "min_cell_size": 15,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 60,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 60,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 3,
+            "status": "crossed",
+            "crosstab": {
+              "CDsed": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "CDtr": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "HFDsed": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "HFDtr": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              }
+            }
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.tissue",
+            "n_levels": 3,
+            "status": "crossed",
+            "crosstab": {
+              "CDsed": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "CDtr": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "HFDsed": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              },
+              "HFDtr": {
+                "subcutaneous white adipose tissue": 5,
+                "triceps": 5,
+                "visceral white adipose tissue": 5
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.2.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.treatment",
+            "n_levels": 4,
+            "status": "complete_confounding",
+            "crosstab": {
+              "CDsed": {
+                "6-week chow-diet and 3-week sedentary interventions": 15,
+                "6-week chow-diet and 3-week training interventions": 0,
+                "6-week high-fat-diet and 3-week sedentary interventions": 0,
+                "6-week high-fat-diet and 3-week training interventions": 0
+              },
+              "CDtr": {
+                "6-week chow-diet and 3-week sedentary interventions": 0,
+                "6-week chow-diet and 3-week training interventions": 15,
+                "6-week high-fat-diet and 3-week sedentary interventions": 0,
+                "6-week high-fat-diet and 3-week training interventions": 0
+              },
+              "HFDsed": {
+                "6-week chow-diet and 3-week sedentary interventions": 0,
+                "6-week chow-diet and 3-week training interventions": 0,
+                "6-week high-fat-diet and 3-week sedentary interventions": 15,
+                "6-week high-fat-diet and 3-week training interventions": 0
+              },
+              "HFDtr": {
+                "6-week chow-diet and 3-week sedentary interventions": 0,
+                "6-week chow-diet and 3-week training interventions": 0,
+                "6-week high-fat-diet and 3-week sedentary interventions": 0,
+                "6-week high-fat-diet and 3-week training interventions": 15
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 60,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 60,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "diet",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "CDsed": {
+                "CD": 15,
+                "HFD": 0
+              },
+              "CDtr": {
+                "CD": 15,
+                "HFD": 0
+              },
+              "HFDsed": {
+                "CD": 0,
+                "HFD": 15
+              },
+              "HFDtr": {
+                "CD": 0,
+                "HFD": 15
+              }
+            }
+          },
+          {
+            "column": "ex",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "CDsed": {
+                "SED": 15,
+                "TR": 0
+              },
+              "CDtr": {
+                "SED": 0,
+                "TR": 15
+              },
+              "HFDsed": {
+                "SED": 15,
+                "TR": 0
+              },
+              "HFDtr": {
+                "SED": 0,
+                "TR": 15
+              }
+            }
+          },
+          {
+            "column": "tissue",
+            "n_levels": 3,
+            "status": "crossed",
+            "crosstab": {
+              "CDsed": {
+                "SkM": 5,
+                "scWAT": 5,
+                "vWAT": 5
+              },
+              "CDtr": {
+                "SkM": 5,
+                "scWAT": 5,
+                "vWAT": 5
+              },
+              "HFDsed": {
+                "SkM": 5,
+                "scWAT": 5,
+                "vWAT": 5
+              },
+              "HFDtr": {
+                "SkM": 5,
+                "scWAT": 5,
+                "vWAT": 5
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Within one tissue each mouse contributes one library, so there is no repeated unit. The same mice appear in all three tissues, but tissues are never compared. Library prep used two sub-pools (S4.3.2.p1) but the pool assignment is not deposited; the paper reports batch was not a major driver (S2.1.p1) and fitted no batch term. No covariate is added.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:56"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "estimated counts (tximport gene-level counts from Salmon, UMI-deduplicated; deposited as integers)",
+        "method": "DESeq2 (pydeseq2 Wald, one fit per tissue on all 20 samples, ~ grp)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "DESeq2 + IHW p-value adjustment + ashr LFC shrinkage",
+          "status": "blocked",
+          "reason": "IHW (and ashr) are R/Bioconductor-only and not available in the pydeseq2 executor; BH adjustment is used instead. ashr changes only fold-change estimates, not significance, so it does not affect DEG counts under the paper's rule (no effect cutoff)."
+        },
+        "deviations": [
+          "BH instead of IHW adjusted p values",
+          "no ashr shrinkage (reported log2FC are MLE)",
+          "pydeseq2 instead of R DESeq2"
+        ],
+        "rounding_documented": true,
+        "rounding_note": "deposited .intCt values are already integers (rounded tximport counts, 100% integer); no further rounding applied",
+        "filter": "per tissue, keep genes with count > 10 (>= 11, integer counts) in all 20 samples of that tissue (S4.4.1.1.p1)"
+      },
+      "reason": "Integer estimated counts support DESeq2, the paper's method. The paper's low-count rule is applied per tissue execution with filter_low_counts {min_count: 11, min_samples: 20}. IHW is the only part of the route that changes significance calls and cannot be reproduced here, so this is a declared deviation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:56"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "deviation_note": "Paper's adjusted p < 0.05 is IHW-adjusted; here the same cutoff is applied to BH-adjusted p values. IHW typically gives somewhat more discoveries than BH."
+      },
+      "reason": "S4.4.1.1.p1: 'significant DEGs at an adjusted p value cutoff of 0.05'; no fold-change rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:15:56"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "scWAT",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_CDtr_vs_CDsed_tissue-scWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-scWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_HFDsed_vs_CDsed_tissue-scWAT.csv"
+        ],
+        "counts": {
+          "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3224,
+              "n_significant": 2,
+              "n_up": 0,
+              "n_down": 2,
+              "deg_sanity": "ok"
+            }
+          },
+          "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3224,
+              "n_significant": 85,
+              "n_up": 53,
+              "n_down": 32,
+              "deg_sanity": "ok"
+            }
+          },
+          "scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3098,
+              "n_significant": 401,
+              "n_up": 214,
+              "n_down": 187,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "one DESeq2 fit on the 20 scWAT libraries; training, rescue, obesity contrasts",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:16:12"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "vWAT",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_CDtr_vs_CDsed_tissue-vWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-vWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_HFDsed_vs_CDsed_tissue-vWAT.csv"
+        ],
+        "counts": {
+          "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 2163,
+              "n_significant": 54,
+              "n_up": 21,
+              "n_down": 33,
+              "deg_sanity": "ok"
+            }
+          },
+          "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3123,
+              "n_significant": 206,
+              "n_up": 83,
+              "n_down": 123,
+              "deg_sanity": "ok"
+            }
+          },
+          "vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3054,
+              "n_significant": 458,
+              "n_up": 212,
+              "n_down": 246,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "one DESeq2 fit on the 20 vWAT libraries",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:16:19"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "SkM",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_CDtr_vs_CDsed_tissue-SkM.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-SkM.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_HFDsed_vs_CDsed_tissue-SkM.csv"
+        ],
+        "counts": {
+          "SkM/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 1333,
+              "n_significant": 109,
+              "n_up": 80,
+              "n_down": 29,
+              "deg_sanity": "ok"
+            }
+          },
+          "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 1629,
+              "n_significant": 259,
+              "n_up": 164,
+              "n_down": 95,
+              "deg_sanity": "ok"
+            }
+          },
+          "SkM/grp_HFDsed_vs_CDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 2178,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "one DESeq2 fit on the 20 triceps libraries",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:16:25"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "scWAT_sumfilter",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-scWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-scWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-scWAT.csv"
+        ],
+        "counts": {
+          "scWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14630,
+              "n_significant": 3,
+              "n_up": 3,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 7258,
+              "n_significant": 139,
+              "n_up": 73,
+              "n_down": 66,
+              "deg_sanity": "ok"
+            }
+          },
+          "scWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-scWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 10661,
+              "n_significant": 525,
+              "n_up": 290,
+              "n_down": 235,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "alternative reading of S4.4.1.1.p1: total count across the tissue's 20 samples > 10 (mean >= 0.55, the DESeq2 rowSums idiom). The literal 'every sample > 10' rule removes the paper's named DEGs Dbp, Tef, Nr1d2, Per3, Thbs1, Cdkn1a, so the paper cannot have applied it literally.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:16:41"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "vWAT_sumfilter",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-vWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-vWAT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-vWAT.csv"
+        ],
+        "counts": {
+          "vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 5607,
+              "n_significant": 51,
+              "n_up": 22,
+              "n_down": 29,
+              "deg_sanity": "ok"
+            }
+          },
+          "vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 6179,
+              "n_significant": 224,
+              "n_up": 85,
+              "n_down": 139,
+              "deg_sanity": "ok"
+            }
+          },
+          "vWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-vWAT": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 8752,
+              "n_significant": 506,
+              "n_up": 255,
+              "n_down": 251,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "as scWAT_sumfilter",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:16:58"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "SkM_sumfilter",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-SkM.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-SkM.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-SkM.csv"
+        ],
+        "counts": {
+          "SkM_sumfilter/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 11989,
+              "n_significant": 24,
+              "n_up": 11,
+              "n_down": 13,
+              "deg_sanity": "ok"
+            }
+          },
+          "SkM_sumfilter/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 3622,
+              "n_significant": 244,
+              "n_up": 149,
+              "n_down": 95,
+              "deg_sanity": "ok"
+            }
+          },
+          "SkM_sumfilter/grp_HFDsed_vs_CDsed_tissue-SkM": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 11989,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "as scWAT_sumfilter",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:17:12"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "IHW replaced by BH; counts expected to be lower than the paper's where IHW gains power",
+          "No ashr shrinkage; fold-change magnitudes are unshrunk MLE"
+        ],
+        "results": {
+          "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": {
+            "n_deg": 2,
+            "up": 0,
+            "down": 2,
+            "rule": "padj < 0.05"
+          },
+          "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "n_deg": 85,
+            "up": 53,
+            "down": 32,
+            "rule": "padj < 0.05"
+          },
+          "scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT": {
+            "n_deg": 401,
+            "up": 214,
+            "down": 187,
+            "rule": "padj < 0.05"
+          },
+          "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "n_deg": 54,
+            "up": 21,
+            "down": 33,
+            "rule": "padj < 0.05"
+          },
+          "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "n_deg": 206,
+            "up": 83,
+            "down": 123,
+            "rule": "padj < 0.05"
+          },
+          "vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT": {
+            "n_deg": 458,
+            "up": 212,
+            "down": 246,
+            "rule": "padj < 0.05"
+          },
+          "SkM/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "n_deg": 109,
+            "up": 80,
+            "down": 29,
+            "rule": "padj < 0.05"
+          },
+          "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "n_deg": 259,
+            "up": 164,
+            "down": 95,
+            "rule": "padj < 0.05"
+          },
+          "SkM/grp_HFDsed_vs_CDsed_tissue-SkM": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05"
+          },
+          "scWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-scWAT": {
+            "n_deg": 3,
+            "up": 3,
+            "down": 0,
+            "rule": "padj < 0.05"
+          },
+          "scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "n_deg": 139,
+            "up": 73,
+            "down": 66,
+            "rule": "padj < 0.05"
+          },
+          "scWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-scWAT": {
+            "n_deg": 525,
+            "up": 290,
+            "down": 235,
+            "rule": "padj < 0.05"
+          },
+          "vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "n_deg": 51,
+            "up": 22,
+            "down": 29,
+            "rule": "padj < 0.05"
+          },
+          "vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "n_deg": 224,
+            "up": 85,
+            "down": 139,
+            "rule": "padj < 0.05"
+          },
+          "vWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-vWAT": {
+            "n_deg": 506,
+            "up": 255,
+            "down": 251,
+            "rule": "padj < 0.05"
+          },
+          "SkM_sumfilter/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "n_deg": 24,
+            "up": 11,
+            "down": 13,
+            "rule": "padj < 0.05"
+          },
+          "SkM_sumfilter/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "n_deg": 244,
+            "up": 149,
+            "down": 95,
+            "rule": "padj < 0.05"
+          },
+          "SkM_sumfilter/grp_HFDsed_vs_CDsed_tissue-SkM": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05"
+          }
+        },
+        "paper_counts": {
+          "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": 3,
+          "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": 132,
+          "scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT": 492,
+          "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": 47,
+          "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": 205,
+          "vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT": 478,
+          "SkM/grp_CDtr_vs_CDsed_tissue-SkM": 92,
+          "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": 235,
+          "SkM/grp_HFDsed_vs_CDsed_tissue-SkM": 0
+        },
+        "comparison": {
+          "scWAT/grp_CDtr_vs_CDsed_tissue-scWAT": {
+            "ours": 2,
+            "paper": 3
+          },
+          "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "ours": 85,
+            "paper": 132
+          },
+          "scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT": {
+            "ours": 401,
+            "paper": 492
+          },
+          "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "ours": 54,
+            "paper": 47
+          },
+          "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "ours": 206,
+            "paper": 205
+          },
+          "vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT": {
+            "ours": 458,
+            "paper": 478
+          },
+          "SkM/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "ours": 109,
+            "paper": 92
+          },
+          "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "ours": 259,
+            "paper": 235
+          },
+          "SkM/grp_HFDsed_vs_CDsed_tissue-SkM": {
+            "ours": 0,
+            "paper": 0
+          }
+        },
+        "paper_gene_check": {
+          "scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "Dbp": null,
+            "Tef": null,
+            "Nr1d2": null,
+            "Per3": null,
+            "Thbs1": null,
+            "Sparc": {
+              "baseMean": 1786.2309,
+              "log2FoldChange": -0.5531,
+              "padj": 0.21,
+              "pvalue": 0.0129
+            },
+            "Cdkn1a": null
+          },
+          "vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "Dbp": null,
+            "Tef": null,
+            "Nr1d2": null,
+            "Per3": null,
+            "Thbs1": null,
+            "Sparc": {
+              "baseMean": 2170.3165,
+              "log2FoldChange": -0.711,
+              "padj": 1.05e-05,
+              "pvalue": 2.7e-08
+            },
+            "Cdkn1a": null
+          },
+          "vWAT/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "Dbp": null,
+            "Tef": null,
+            "Nr1d2": null,
+            "Per3": null,
+            "Thbs1": null,
+            "Sparc": {
+              "baseMean": 2170.3165,
+              "log2FoldChange": -0.4852,
+              "padj": 0.0134,
+              "pvalue": 0.000161
+            }
+          },
+          "SkM/grp_HFDtr_vs_HFDsed_tissue-SkM": {
+            "Pdk4": {
+              "baseMean": 383.2793,
+              "log2FoldChange": -1.3307,
+              "padj": 7.59e-08,
+              "pvalue": 2.07e-10
+            },
+            "Asb2": {
+              "baseMean": 69.3574,
+              "log2FoldChange": -1.1811,
+              "padj": 3.96e-06,
+              "pvalue": 3.89e-08
+            }
+          },
+          "SkM/grp_CDtr_vs_CDsed_tissue-SkM": {
+            "Pdk4": {
+              "baseMean": 383.2793,
+              "log2FoldChange": -0.9708,
+              "padj": 0.000396,
+              "pvalue": 2.97e-06
+            },
+            "Asb2": {
+              "baseMean": 69.3574,
+              "log2FoldChange": -1.0628,
+              "padj": 0.000191,
+              "pvalue": 1e-06
+            }
+          },
+          "scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT": {
+            "Dbp": {
+              "baseMean": 15.0067,
+              "log2FoldChange": 2.9366,
+              "padj": 2.54e-05,
+              "pvalue": 1.9e-08
+            },
+            "Tef": {
+              "baseMean": 31.2068,
+              "log2FoldChange": 1.4311,
+              "padj": 0.000551,
+              "pvalue": 1.21e-06
+            },
+            "Nr1d2": {
+              "baseMean": 25.1553,
+              "log2FoldChange": 1.2259,
+              "padj": 0.00295,
+              "pvalue": 1.67e-05
+            },
+            "Per3": {
+              "baseMean": 18.1166,
+              "log2FoldChange": 1.5685,
+              "padj": 0.000563,
+              "pvalue": 1.32e-06
+            },
+            "Thbs1": {
+              "baseMean": 17.8067,
+              "log2FoldChange": -2.2929,
+              "padj": 2.87e-06,
+              "pvalue": 3.95e-10
+            },
+            "Sparc": {
+              "baseMean": 1754.9332,
+              "log2FoldChange": -0.5339,
+              "padj": 0.31,
+              "pvalue": 0.0201
+            },
+            "Cdkn1a": {
+              "baseMean": 12.9602,
+              "log2FoldChange": -2.1136,
+              "padj": 0.000376,
+              "pvalue": 6.98e-07
+            }
+          },
+          "vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT": {
+            "Dbp": {
+              "baseMean": 11.1281,
+              "log2FoldChange": 2.5668,
+              "padj": 0.000118,
+              "pvalue": 5.36e-07
+            },
+            "Tef": {
+              "baseMean": 25.8898,
+              "log2FoldChange": 1.946,
+              "padj": 1.57e-06,
+              "pvalue": 1.77e-09
+            },
+            "Nr1d2": {
+              "baseMean": 20.5808,
+              "log2FoldChange": 1.3993,
+              "padj": 0.00059,
+              "pvalue": 4.88e-06
+            },
+            "Per3": {
+              "baseMean": 14.845,
+              "log2FoldChange": 1.578,
+              "padj": 0.00747,
+              "pvalue": 0.000128
+            },
+            "Thbs1": {
+              "baseMean": 44.6981,
+              "log2FoldChange": -2.1036,
+              "padj": 2.37e-12,
+              "pvalue": 3.83e-16
+            },
+            "Sparc": {
+              "baseMean": 2129.8305,
+              "log2FoldChange": -0.7056,
+              "padj": 5.91e-07,
+              "pvalue": 5.56e-10
+            },
+            "Cdkn1a": {
+              "baseMean": 18.2766,
+              "log2FoldChange": -2.409,
+              "padj": 3.46e-05,
+              "pvalue": 8.97e-08
+            }
+          },
+          "vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT": {
+            "Dbp": {
+              "baseMean": 11.1281,
+              "log2FoldChange": 2.5764,
+              "padj": 8.43e-05,
+              "pvalue": 1.05e-07
+            },
+            "Tef": {
+              "baseMean": 25.8898,
+              "log2FoldChange": 1.2279,
+              "padj": 0.00765,
+              "pvalue": 2.87e-05
+            },
+            "Nr1d2": {
+              "baseMean": 20.5808,
+              "log2FoldChange": 1.2781,
+              "padj": 0.0079,
+              "pvalue": 3.31e-05
+            },
+            "Per3": {
+              "baseMean": 14.845,
+              "log2FoldChange": 1.4779,
+              "padj": 0.0278,
+              "pvalue": 0.000203
+            },
+            "Thbs1": {
+              "baseMean": 44.6981,
+              "log2FoldChange": -1.7857,
+              "padj": 8.53e-07,
+              "pvalue": 7.61e-10
+            },
+            "Sparc": {
+              "baseMean": 2129.8305,
+              "log2FoldChange": -0.5143,
+              "padj": 0.00258,
+              "pvalue": 7.09e-06
+            }
+          }
+        }
+      },
+      "reason": "Paper counts from TAB1 (up + down per tissue x comparison). Named genes from S2.2.p2 and S2.2.p3: circadian regulators up and ECM genes down with training/rescue in adipose depots (which depot/comparison each gene reached significance in is not itemised in the text); Pdk4 and Asb2 among SkM rescue/training DEGs (direction for Pdk4/Asb2 not stated explicitly); Cdkn1a down by rescue in scWAT and vWAT.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:17:52"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "72d9f7e9af8a63e841c055aa2dc9a729954433e95a4482ba39a4502d954f7f6e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "996c11af8008a30fdeb0c1f81254133eb78bd82763cd6eabbc9ccf471dcfa2d4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4ed2f88477ce6e1976b966fc83b8054c96dbf8055d74e9a379a935a9fc8ce963",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "959123ffb81528c46944606f3b0c4985ce2d0dc216d0d3d14f71abb8b2220e54",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "88e32f02fd0f29657b34b643fedde685c4da68049c88b88dea0c85d1d04051b8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "12ad0a20253fa8392b796fcde967cb13db7f9f7f68b90ad75f02a4af5c0c2d14",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_CDtr_vs_CDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT/grp_CDtr_vs_CDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1c60eff1893cd311a3636c1bdd4f091105a0882d328b6c123b43ee0ffa6bd308",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT/grp_HFDtr_vs_HFDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "556d8d1b2ebfee0e85c819b6be656e91b2b93a1a0af1c33447a7626455dfee73",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT\\DEG_results_grp_HFDsed_vs_CDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT/grp_HFDsed_vs_CDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ae279d5c08a3f7ee1b4e702a656330ea1f10df05d8aff7108f613ff1712bef47",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_CDtr_vs_CDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT/grp_CDtr_vs_CDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d815a4dc4d0036763693c0bd551ca6a8975ec19b46f65b3e729ca743a57bc4e1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT/grp_HFDtr_vs_HFDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "18d0ab5e9a80e423f73bdbbc0c1baafa386a6d009b2b92f25968192edcecd9a1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT\\DEG_results_grp_HFDsed_vs_CDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT/grp_HFDsed_vs_CDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4ff71e887a6b9c28dba2f9118e78d0a10e35c73605fb41a1ec137152f7acf352",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_CDtr_vs_CDsed_tissue-SkM.csv",
+      "role": "deg_SkM/grp_CDtr_vs_CDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "27309daf966f59b2bba80a43598683512041a116401bb25ad46e86055a3e911a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-SkM.csv",
+      "role": "deg_SkM/grp_HFDtr_vs_HFDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fa03f302bb4e9d9e73bae0158b4b4782c86304fc8f60f672efbffad27127f624",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM\\DEG_results_grp_HFDsed_vs_CDsed_tissue-SkM.csv",
+      "role": "deg_SkM/grp_HFDsed_vs_CDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4c96f78f19d4fc898574b474c5b92f8736461b08c1b335b313ef4a7940b788ea",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dbb84de895853e14c5a57f1be5d77cbd57a3ae67e66649c79a6e3819aaf237c6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8fef952eb9d1c993a393dd5f9ce0b7a534dbe4a33c8f51fcbb5e00befaa30f5a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\scWAT_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-scWAT.csv",
+      "role": "deg_scWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-scWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f7b8232254176ad13dc240b3c939abd9c7fdf3c1d7d79b8ba9e87838d7c5be8c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT_sumfilter/grp_CDtr_vs_CDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c5ccddfd72c6479248226f7ffb20cf86f1d3477749c4698025e8508c1a6ab0fd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT_sumfilter/grp_HFDtr_vs_HFDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c847be4146df37c5ce4dd266397ad4defdecd97b1d4a488325b797f9248b92c4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\vWAT_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-vWAT.csv",
+      "role": "deg_vWAT_sumfilter/grp_HFDsed_vs_CDsed_tissue-vWAT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a5242232b3005c8c1c8defd7bad709c257e615d8b91b8823158f5215f9727177",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0022",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_CDtr_vs_CDsed_tissue-SkM.csv",
+      "role": "deg_SkM_sumfilter/grp_CDtr_vs_CDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "da3c4ebd3caf51b9437823f600a96101712ba55ff4c5c2da0bfeb1dbd2120642",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0023",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_HFDtr_vs_HFDsed_tissue-SkM.csv",
+      "role": "deg_SkM_sumfilter/grp_HFDtr_vs_HFDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "accbd1c5b045092515e9ba7aafde17e055d40baee84b6e036fc9da994e5dcac0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0024",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\results\\SkM_sumfilter\\DEG_results_grp_HFDsed_vs_CDsed_tissue-SkM.csv",
+      "role": "deg_SkM_sumfilter/grp_HFDsed_vs_CDsed_tissue-SkM",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c3a7e521440b379a8c6dd758d312e767129a4e29e24eac01b8f6e3e316889e12",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0025",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36198295\\GSE183239\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1831c1e28a13c97f4dfbd448c16ff340ffcf1f28fb890689d8e10579e5131dd4",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
