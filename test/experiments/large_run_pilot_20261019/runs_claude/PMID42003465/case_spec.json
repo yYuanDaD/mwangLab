@@ -1,0 +1,464 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42003465",
+ "request": "Analyze GSE315915 for PMID 42003465 (Exercise Metabolic Memory Halts Pathological Cardiac Hypertrophy via PDK4.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE315915",
+   "accession": "GSE315915",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13189389.paper.md"
+    ],
+    "metadata": "GSE315915/GSE315915_metadata.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42003465/prep/GSE315915_gene_level_counts.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID42003465/prep/collapse_transcripts_to_genes.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE315915"
+      ],
+      "primary_estimand": "Persistent effect of 3 weeks of swimming plus 1 week of rest (EHP) versus 4 weeks sedentary on the adult mouse whole-heart transcriptome, after hypertrophy has regressed",
+      "planned_contrasts": [
+       "EHP vs sedentary (S2.2.p1, FIG2; paper: 92 DEGs, Pdk4 the only DEG in glucose gene set M13879)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR (Benjamini-Hochberg adjusted P)",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "source_locator": "S2.2.p1; FIG2"
+      },
+      "paper_method": "DESeq2, BH-adjusted P (FIG2); two independent groups",
+      "sample_inclusion": "5 EHP and 5 sedentary hearts (S2.2.p1); male C57BL/6J, 8-10 weeks (S1.3.p1)",
+      "factors": {
+       "group": [
+        "sedentary",
+        "EHP"
+       ]
+      },
+      "repeated_measure_unit": null,
+      "paper_results": {
+       "n_deg": 92,
+       "direction_split": "not stated in the text (FIG2 volcano only)",
+       "genes": {
+        "Pdk4": "down in EHP, DEG (S2.2.p1, FIG2D)",
+        "Lonp1": "no significant difference (S2.5.p1)"
+       }
+      },
+      "supplement_only": "Figures S2, S11, S13, S15 use this data but are not in the available text"
+     },
+     "reasoning": "S2.2.p1 and FIG2 give the only RNA-seq comparison. Other results are qPCR, western, metabolomics, or perturbation arms without sequencing. Rest is 1 week, so the estimand is the memory after regression, not the acute post-training state.",
+     "confidence": "high",
+     "locator": "S2.2.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "GEO series pubmed id 42003465 and series title match the paper",
+       "10 samples, 5 Sedentary and 5 EHP, equals S2.2.p1",
+       "treatment fields 'sedentary 4w' and 'swimming 3w + sedentary 1w' match S1.3.p1 and FIG1A",
+       "one supplementary matrix, GSE315915_mRNA_raw_count.txt.gz"
+      ]
+     },
+     "reasoning": "The paper's data statement (S1.1.p1) names no accession, so ownership rests on the GEO record linking PMID 42003465 with the same title and design. The gene matrix derives only from the deposited file.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "description",
+       "^Library name: sample \\d+,(\\w+)$"
+      ]
+     },
+     "patterns": {
+      "grp": [
+       "title",
+       "^(Sedentary|EHP) \\d+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Sedentary": "SED",
+       "EHP": "EHP"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns S1-S5, E1-E5 are the second field of GEO description ('Library name: sample 1,S1'). Group comes from title and agrees with the treatment characteristic on all 10 samples.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42003465/prep/GSE315915_gene_level_counts.csv",
+      "paper_input": "read count matrix from StringTie/featureCounts, then DESeq2 (GEO data_processing; FIG2)"
+     },
+     "reasoning": "Integer counts from HISAT2, StringTie and featureCounts per GEO notes. The deposit is per transcript; summed per Ensembl 102 gene (GRCm38, the assembly GEO names) by the listed script. 321 of 62384 transcripts, 0.012% of counts, have no Ensembl 102 entry and are dropped. In most genes one transcript holds nearly all counts and the others are near zero, which fits exclusive read assignment, so the sum is unlikely to double count. The exact counting options are not stated, hence medium confidence.",
+     "confidence": "medium"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_EHP_vs_SED"
+     ],
+     "covariate_candidates": [],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "EHP",
+      "contrasts": [
+       {
+        "name": "grp_EHP_vs_SED",
+        "control": "SED",
+        "treatment": "EHP",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Two randomized arms of independent mice (S1.3.p1), 5 per group, the single comparison the paper reports (S2.2.p1). No other metadata column varies; tissue and genotype are constant.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Each sample is one animal in one arm, so nothing is repeated. GEO records no batch, lane, or sex column.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 rather than R DESeq2; the paper states no version or shrinkage",
+       "transcript rows summed to genes before fitting, because the paper reports genes and the deposit is per transcript"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Integer counts and the paper's own method (FIG2). Wald test with BH adjustment and MLE log2FC; the paper states no shrinkage.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR (Benjamini-Hochberg adjusted P)",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "source_locator": "S2.2.p1; FIG2"
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null
+      }
+     },
+     "reasoning": "S2.2.p1 and FIG2: |log2(FC)|>0.5 and adjusted P<0.05. GEO data_processing writes the effect rule with a non-strict sign; the paper's strict form is used.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "Deposited matrix is per transcript; gene sums are my reconstruction",
+       "Only protein-coding-gene ('mRNA') rows are deposited",
+       "47% of counts sit on MT mRNAs"
+      ]
+     },
+     "paper_counts": {
+      "grp_EHP_vs_SED": 92
+     },
+     "paper_genes": {
+      "grp_EHP_vs_SED": [
+       "Pdk4",
+       "Lonp1"
+      ]
+     },
+     "reasoning": "Gene level is the paper's stated unit, so this was chosen as the primary route before any model was fitted. Deviation: the paper's own gene table is not deposited.",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "feature level of the deposited matrix",
+     "paper": "Reports differentially expressed genes (S2.2.p1, FIG2)",
+     "data": "Rows are 62384 ENSMUST transcript IDs under a column named GeneID, about 2.8 transcripts per gene",
+     "disposition": "declared_deviation: gene-level sum is primary, the as-deposited transcript table is a sensitivity case"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_EHP_vs_SED",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "EHP",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "the paper's two-group DESeq2 on this matrix"
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE315915_transcript",
+   "accession": "GSE315915",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261019/papers/PMC13189389.paper.md"
+    ],
+    "metadata": "GSE315915/GSE315915_metadata.csv",
+    "matrix": "GSE315915/GSE315915_mRNA_raw_count.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE315915"
+      ],
+      "primary_estimand": "Persistent effect of 3 weeks of swimming plus 1 week of rest (EHP) versus 4 weeks sedentary on the adult mouse whole-heart transcriptome, after hypertrophy has regressed",
+      "planned_contrasts": [
+       "EHP vs sedentary (S2.2.p1, FIG2; paper: 92 DEGs, Pdk4 the only DEG in glucose gene set M13879)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR (Benjamini-Hochberg adjusted P)",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "source_locator": "S2.2.p1; FIG2"
+      },
+      "paper_method": "DESeq2, BH-adjusted P (FIG2); two independent groups",
+      "sample_inclusion": "5 EHP and 5 sedentary hearts (S2.2.p1); male C57BL/6J, 8-10 weeks (S1.3.p1)",
+      "factors": {
+       "group": [
+        "sedentary",
+        "EHP"
+       ]
+      },
+      "repeated_measure_unit": null,
+      "paper_results": {
+       "n_deg": 92,
+       "direction_split": "not stated in the text (FIG2 volcano only)",
+       "genes": {
+        "Pdk4": "down in EHP, DEG (S2.2.p1, FIG2D)",
+        "Lonp1": "no significant difference (S2.5.p1)"
+       }
+      },
+      "supplement_only": "Figures S2, S11, S13, S15 use this data but are not in the available text"
+     },
+     "reasoning": "S2.2.p1 and FIG2 give the only RNA-seq comparison. Other results are qPCR, western, metabolomics, or perturbation arms without sequencing. Rest is 1 week, so the estimand is the memory after regression, not the acute post-training state.",
+     "confidence": "high",
+     "locator": "S2.2.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "GEO series pubmed id 42003465 and series title match the paper",
+       "10 samples, 5 Sedentary and 5 EHP, equals S2.2.p1",
+       "treatment fields 'sedentary 4w' and 'swimming 3w + sedentary 1w' match S1.3.p1 and FIG1A",
+       "one supplementary matrix, GSE315915_mRNA_raw_count.txt.gz"
+      ]
+     },
+     "reasoning": "Same record and samples as the primary case; this uses the deposited file unchanged.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "description",
+       "^Library name: sample \\d+,(\\w+)$"
+      ]
+     },
+     "patterns": {
+      "grp": [
+       "title",
+       "^(Sedentary|EHP) \\d+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Sedentary": "SED",
+       "EHP": "EHP"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns S1-S5, E1-E5 are the second field of GEO description ('Library name: sample 1,S1'). Group comes from title and agrees with the treatment characteristic on all 10 samples.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE315915/GSE315915_mRNA_raw_count.txt.gz",
+      "paper_input": "read count matrix from StringTie/featureCounts, then DESeq2 (GEO data_processing; FIG2)"
+     },
+     "reasoning": "Integer transcript-level counts exactly as deposited. Run to test whether the paper's 92 could have been counted on these rows.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_EHP_vs_SED"
+     ],
+     "covariate_candidates": [],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "EHP",
+      "contrasts": [
+       {
+        "name": "grp_EHP_vs_SED",
+        "control": "SED",
+        "treatment": "EHP",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Two randomized arms of independent mice (S1.3.p1), 5 per group, the single comparison the paper reports (S2.2.p1). No other metadata column varies; tissue and genotype are constant.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Each sample is one animal in one arm, so nothing is repeated. GEO records no batch, lane, or sex column.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 rather than R DESeq2; the paper states no version or shrinkage"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Integer counts and the paper's own method (FIG2). Wald test with BH adjustment and MLE log2FC; the paper states no shrinkage.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR (Benjamini-Hochberg adjusted P)",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "source_locator": "S2.2.p1; FIG2"
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null
+      }
+     },
+     "reasoning": "S2.2.p1 and FIG2: |log2(FC)|>0.5 and adjusted P<0.05. GEO data_processing writes the effect rule with a non-strict sign; the paper's strict form is used.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "exploratory",
+      "caveats": [
+       "Rows are transcripts, not genes; one gene can contribute several rows"
+      ]
+     },
+     "paper_counts": {
+      "grp_EHP_vs_SED": 92
+     },
+     "paper_genes": {
+      "grp_EHP_vs_SED": [
+       "Pdk4",
+       "Lonp1"
+      ]
+     },
+     "reasoning": "Sensitivity only: rows are transcripts, and the paper does not say it tested these rows.",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "feature level of the deposited matrix",
+     "paper": "Reports differentially expressed genes (S2.2.p1, FIG2)",
+     "data": "Rows are 62384 ENSMUST transcript IDs under a column named GeneID, about 2.8 transcripts per gene",
+     "disposition": "declared_deviation: gene-level sum is primary, the as-deposited transcript table is a sensitivity case"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_EHP_vs_SED",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "EHP",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "the paper's two-group DESeq2 on this matrix"
+    }
+   ],
+   "enrichment": []
+  }
+ ]
+}
