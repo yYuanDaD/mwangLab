@@ -1,0 +1,125 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42897930",
+  "request": "Analyze GSE325957 for PMID 42897930 (Exercise training does not mitigate high-phosphate diet-induced mitochondrial dysfunction in skeletal muscle in male mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent session)",
+  "platform": "claude-code",
+  "data_root": "data",
+  "cases": [
+    {
+      "case_id": "GSE325957",
+      "accession": "GSE325957",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC13680854.paper.md"],
+        "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42897930/GSE325957_combined_samples.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42897930/GSE325957_CPM_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42897930/prep_inputs.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE325957", "GSE120958"],
+            "assay": "bulk polyA RNA-seq of gastrocnemius-plantaris (GP) muscle, male C57BL/6 mice (S2.8.p1)",
+            "factors": {"diet": ["NPD (0.6% Pi)", "HPD (2.0% Pi)"], "activity": ["sedentary", "9 wk voluntary wheel running"]},
+            "sample_inclusion": "Exercised NPE (n=5) and HPE (n=4) sequenced in this study (GSE325957); sedentary NPS/HPS (n=3 each) are the previously published samples from GSE120958 (Peri-Okonny et al. 2019) (S2.8.p1, S9.p1, S3.7.p1, FIG6 n=3-5)",
+            "primary_estimand": "Effect of exercise training on GP muscle gene expression within each diet (NPS vs NPE; HPS vs HPE), and the diet-dependence of that response",
+            "planned_contrasts": [
+              "NPE vs NPS (S3.7.p1; Table S2; paper: 9467 DEGs, 4540 up / 4927 down)",
+              "HPE vs HPS (S3.7.p1; Table S3; paper: 8009 DEGs, 3883 up / 4126 down)",
+              "HPS vs NPS (diet, sedentary; S3.7.p1; count not stated)",
+              "HPE vs NPE (diet, exercised; S3.7.p2; Table S8; paper: 10 DEGs)"
+            ],
+            "repeated_measure_unit": "none; one muscle per mouse",
+            "paper_method": "featureCounts read counts; DESeq2 v1.50.2 Wald test, BH FDR, on NPE/HPE samples together with GSE120958 (S2.8.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "inclusive": false, "source_locator": "SUP5/SUP6/SUP11 (Tables S2, S3, S8: p_adj < 0.05 and |log2FC| > 0.5); S2.8.p1"},
+            "paper_results": {"NPE_vs_NPS": 9467, "HPE_vs_HPS": 8009, "HPE_vs_NPE": 10}
+          },
+          "reasoning": "S2.8.p1: only NPE and HPE GP samples were sequenced in this study (Plasmidsaurus, 2026); DE was run on these together with GSE120958 (the 2019 study's sedentary NPD/HPD GP samples). S9.p1 names both accessions. S3.7.p1 gives the four pairwise comparisons and counts; Tables S2/S3/S8 state padj < 0.05 and |log2FC| > 0.5. S2.1.p1: this study's mice were 25-week-old males fed diet for 14 weeks; the sedentary arm comes from a different cohort (prior study: 12-week HPD, S1.p2), and S2.4.p1 notes that the earlier study used different exercise testing equipment.",
+          "confidence": "high",
+          "locator": "S2.8.p1; S3.7.p1; S9.p1; SUP5; SUP6; SUP11"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GSE325957 supplementary CPM file is the series' own deposit; its NPE_1-5/HPE_1,2,3,5 columns match GSE325957 sample descriptions (Library name ...,NPE_1 etc.) one to one",
+              "Its NP_1-3/HP_1-3 columns are the GSE120958 samples GSM3422122-GSM3422127, as listed in the series' own GSE325957_reanalysis_samples file",
+              "Paper S9.p1 names GSE325957 as this study's data and GSE120958 as reused data",
+              "No raw count matrix is deposited: data_processing says the supplement holds CPM values plus DESeq2 output"
+            ]
+          },
+          "reasoning": "The CPM matrix and both sample sets belong to the paper's design (S2.8.p1, S9.p1). The sedentary arm is owned through the reanalysis listing, not through GSE325957 sample records; the combined sample sheet was built by prep_inputs.py from those two GEO-deposited sources.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {},
+          "patterns": {},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Combined sample sheet is indexed by the matrix column names (NP_1 ... HPE_5); exact match on the index. Exercised IDs come from GSE325957 description field ('Library name: ...,NPE_1'), sedentary IDs from GSE325957_reanalysis_samples ('Processed Data Column Header'). diet (NP/HP) and activity (S/E) are already formula-safe columns; series records origin.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "CPM (linear normalized, library-size scaled)",
+          "recommended_method": "limma on log2(CPM+1) (DESeq2 not applicable: no raw counts deposited)",
+          "reasoning": "GEO data_processing: 'excel file containing CPM values and pairwise comparison output from DESeq2'; column header group 'CPM'; inspect: 58% integer fraction driven by zeros, max 70167, non-integer positives. The paper's DESeq2 input was featureCounts counts (S2.8.p1), which are not deposited, so the paper route cannot be reproduced from this matrix regardless of design.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["activity"],
+          "references": {"activity": "S"},
+          "subject": null,
+          "organism": "Mouse",
+          "strata": ["diet"],
+          "planned": ["activity_E_vs_S_diet-NP", "activity_E_vs_S_diet-HP"],
+          "covariate_candidates": ["series"],
+          "final": {
+            "analysis_type": "two-group per diet stratum (exercise effect within NPD and within HPD)",
+            "design_column": "activity",
+            "contrasts": [
+              {"name": "activity_E_vs_S_diet-NP", "control": "S", "treatment": "E", "role": "primary"},
+              {"name": "activity_E_vs_S_diet-HP", "control": "S", "treatment": "E", "role": "primary"}
+            ]
+          },
+          "reasoning": "The paper's exercise estimand is sedentary vs trained within each diet (S3.7.p1, Tables S2/S3). The diet comparisons (HPS vs NPS, HPE vs NPE) are diet effects, not exercise effects, and are not the requested estimand. Group sizes: NP S=3/E=5, HP S=3/E=4.",
+          "candidates": [
+            {"value": "2x2 factorial diet*activity interaction", "reason_rejected": "the interaction is the paper's narrative question (diet-dependence of the exercise response) but it inherits the same activity-batch aliasing; not a separately identifiable estimand"},
+            {"value": "HPE vs NPE within exercised", "reason_rejected": "within-batch but a diet effect, not the requested exercise effect"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "unresolved",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "series", "disposition": "aliased: every sedentary sample is GSE120958 and every exercised sample is GSE325957"}
+            ]
+          },
+          "confounding_candidates": ["series"],
+          "decision_status": "refused",
+          "stop_reason": "Exercise (activity) is completely aliased with study batch: all sedentary samples (NP_1-3, HP_1-3) are reused from GSE120958, a separate 2019 cohort (12-week HPD, different age/protocol), and all exercised samples (NPE, HPE) were sequenced for GSE325957 by Plasmidsaurus (S2.8.p1, S9.p1, S2.1.p1, S1.p2). No sample of either activity level exists in the other batch, so the exercise effect cannot be separated from cohort, library preparation, sequencing run, mouse age and diet duration. The paper's own PCA (S3.7.p1: exercised vs sedentary 'vastly different', exercised diets similar) is what a batch split would also produce. Refused at covariance; no model can identify the estimand from these data.",
+          "reasoning": "Per decision gates, a covariate completely confounded with the treatment stops the case. series is a cohort/batch key, not an annotation chosen by name: it captures a different experiment, sequencing provider and time. Diet stratification does not help, since within each diet the activity split equals the series split.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "sedentary control arm",
+          "paper": "NPS/HPS from GSE120958 analysed together with new NPE/HPE samples (S2.8.p1)",
+          "data": "series column is identical to activity in every diet stratum",
+          "disposition": "blocks_estimand"
+        },
+        {
+          "item": "matrix input",
+          "paper": "featureCounts read counts into DESeq2 (S2.8.p1)",
+          "data": "only CPM values and the authors' DESeq2 output tables are deposited; no raw counts",
+          "disposition": "blocks_paper_method"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

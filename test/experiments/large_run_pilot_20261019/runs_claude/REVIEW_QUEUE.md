@@ -121,3 +121,7 @@ One section per case; newest last.
 
 - policy: Open policy question: the paper gives no threshold, so the workflow default is used; a person may want to confirm that default for data-descriptor papers.
 - policy: Fat HE vs H and H arms have n=2: results are low power, correctly labelled exploratory.
+
+## PMID38982049 / GSE266883 (2026-11-10)
+
+- policy: Open policy: report which threshold when the paper states none (workflow default padj<0.05 used); joint vs pairwise fits when the paper is silent.

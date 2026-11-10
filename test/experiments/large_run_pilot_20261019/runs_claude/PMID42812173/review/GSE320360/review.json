@@ -1,0 +1,86 @@
+{
+ "case": "GSE320360",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes, with a caveat. All 115 sequenced serum-EV samples come from 30 MDD adults sampled around one 30-min cycling bout (S2.2.p1, S2.3.p1); there is no resting control arm, so the exercise factor is time relative to exercise (pre = baseline; mid, post, 75 min post carry exercise or recovery). Packet A: characteristics_ch1.1.treatment / time columns.",
+  "B2": "Each time point vs pre-AAE: mid (29) vs pre (30), post (28) vs pre, 75 min (28) vs pre (S2.5.p2, S3.3.p2). Paper: 15 / 33 / 4 DE miRNAs (13 down+2 up; 33 down; 4 up).",
+  "B3": "Yes: every participant gives up to 4 samples (30 people). Packet A key 'subject' (from Library name NNN_E#, title) links 115/115 samples, no duplicates in any time level, 26 subjects in all four levels. Paper S2.7.p1 uses ID as a factor.",
+  "B4": "One joint DESeq2 model '~ ID + Treatment' on all samples, Wald tests, each time point vs pre via contrast() (S2.7.p1: 'The design formula was specified as ~ ID + Treatment').",
+  "B5": "S2.7.p1: 'miRNAs with adjusted p-values <=0.05 were considered significantly differentially expressed; those with adjusted p-values <=0.10 were classified as trending' (BH). S3.3.p2: 'FDR <=0.05'. No numeric fold-change cutoff is stated; the Fig 3 legend mentions a log2FC cut-off line without a value. Counts: 15 / 33 / 4 (S3.3.p2); 2,609 miRNAs after filter (S3.2.p4)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single-arm exercise bout; analyzed with caveat that changes are temporal (S4.5.p4); no refusal needed.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "time levels pre30/mid29/post28/post75=28 equal S2.5.p2; E1/E2/E3/E6 suffix matches GEO treatment one-to-one; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts coded treatment vs pre; paper_gene_check signs match Table 1 (miR-3618 -3.01 vs -3.01; miR-1288-5p +2.44 vs +2.44).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "subject blocked as factor with s prefix (numeric IDs not a slope); design full rank, 33 columns, residual df 82.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One joint model ~subject+time on all 115 samples, as S2.7.p1.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Pool/lane not in GEO, recorded as discrepancy; sex unavailable, recorded; no resting control stated as caveat.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer raw miRBase counts, DESeq2 route right; p histogram not piled (frac p>0.9 = 0.07-0.08). Filter and pydeseq2 deviations declared.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<=0.05 inclusive, FC none, audit 0.10 matches S2.7.p1. No other rule reproduces 15/33/4 (smallest count is 28 at any rule). Minor: Fig 3 legend FC cut-off value not stated, not recorded.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Ours 45/72/28 vs paper 15/33/4 (3x to 7x) for the same contrasts and rule; padj systematically smaller than paper (miR-3618 0.0015 vs 0.0055). HANDBACK names exclusion of ~2% non-converging genes as 'most likely cause of inflated counts', but dropping genes would only lower the paper's BH padj, so it cannot explain smaller padj in ours; the cause is unsupported. Also miR-137-3p/329-5p LFC differ (-4.04 vs -3.19; -3.15 vs -2.62), and 75 min direction differs (ours 18 up/10 down vs paper all up). Status 'reproduced_with_deviations' overstates.",
+   "fix": "Reword the HANDBACK/method record: paper DEGs are recovered but our sets are 3-7x larger and the cause is not established. Add a sensitivity run: R DESeq2 (~ID+Treatment, size factors on unfiltered matrix, normalized-count filter, Cook's cutoff as default) via the repo's R executor, or an edgeR/voom-block comparison, to see whether pydeseq2 dispersion/Wald is responsible; report both counts."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [],
+ "summary": "分组、配对（subject 作为区组因子）、方向、阈值与论文 S2.7.p1 一致，联合模型 ~ID+Treatment 也一致。主要问题在 paper_match：我们得到 45/72/28 个差异 miRNA，论文为 15/33/4，padj 系统性偏小，而 HANDBACK 把原因归于论文排除约2%未收敛基因，该解释逻辑上站不住。建议用 R DESeq2 做敏感性分析并改写结论。"
+}

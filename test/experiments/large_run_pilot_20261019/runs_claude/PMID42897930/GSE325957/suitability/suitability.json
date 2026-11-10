@@ -1,0 +1,159 @@
+{
+  "case_id": "GSE325957",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "covariance"
+  ],
+  "factors": [
+    "activity"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "CPM (linear normalized, library-size scaled)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "CPM (linear normalized, library-size scaled)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "activity"
+      ],
+      "levels": {
+        "activity": {
+          "E": 9,
+          "S": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "partial",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [
+        "series"
+      ],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "series",
+          "decision": "check",
+          "reason": "splits the samples exactly like a design factor: if it is that factor's own column, ignore it; if it is a batch, the comparison cannot be separated from it and the case stops"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(activity)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 13,
+        "min_cell_size": 6
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 2,
+      "n_analyzable": 2,
+      "too_small": [],
+      "planned_analyzable": [
+        "activity_E_vs_S_diet-NP",
+        "activity_E_vs_S_diet-HP"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 15 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 15
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42897930\\GSE325957\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "activity_E_vs_S_diet-HP",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "E",
+      "reference": "S",
+      "within": {
+        "diet": "HP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "HP",
+            "activity": "E"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "diet": "HP",
+            "activity": "S"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "activity_E_vs_S_diet-NP",
+      "kind": "simple",
+      "factor": "activity",
+      "test": "E",
+      "reference": "S",
+      "within": {
+        "diet": "NP"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "NP",
+            "activity": "E"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "diet": "NP",
+            "activity": "S"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

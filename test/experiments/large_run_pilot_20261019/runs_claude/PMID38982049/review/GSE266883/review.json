@@ -1,0 +1,21 @@
+{"case": "GSE266883", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes, analyzable for an exercise question: the rat NP RNA-seq arm has LSI (no exercise) vs LSI-E (treadmill running 8 wk) plus Sham (S2.1.p2, S4.20.2.p1, Fig 2A/G-J). Exercise factor = LSI-E vs LSI (3 vs 3); Sham is the surgery control. The 6 human NP samples (S2.1.p3, Fig 2K-M) are degeneration, not exercise.",
+  "B2": "Fig 2G: DEGs LSI-E vs LSI (n=3 vs 3); S2.1.p2/Supp Fig 2A: LSI-E vs Sham (3 vs 3); Fig 2H-J GSEA/heatmap LSI-E vs LSI. Human: degenerated vs normal NP, n=3 each (Fig 2K-M).",
+  "B3": "No repeated measures: one NP tissue per rat per group, groups are independent animals (Fig 2 legend n=3 biological independent samples; S4.21.p1). Candidate keys in packet A (title/description/key suffix, 3 keys, 9/9 linked) are just the replicate number 1-3 within each group; expression check not_supported (r -0.006 vs 0.003, p 0.69). Not an animal ID.",
+  "B4": "Paper does not say how DEGs were fitted (no DE method named; S4.3.p2, S4.21.p1, S4.25.p1 silent).",
+  "B5": "No DEG rule and no DEG count stated. Only GSEA cutoffs: 'NES <-1 or >1, unbiased p value < 0.05, FDR q-value < 0.25' (S4.3.p2)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run decision matches B1: LSI-E vs LSI exercise arm present (S2.1.p2, Fig 2G); human samples excluded as non-exercise.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp Sham/LSI/LSIE 3/3/3 matches Fig 2 legend n=3; metadata characteristics_ch1.2.treatment agrees; 6 human samples dropped with a stated reason (no columns in rat matrix, not exercise). Primary control for LSI-E is LSI, as the paper.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts grp_LSIE_vs_LSI (control LSI, treatment LSIE) and grp_LSIE_vs_Sham; exercise as treatment, matching the paper's LSI-E vs LSI / vs Sham.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per rat; the candidate keys are replicate indices within group and the expression check does not support pairing (p 0.69). No blocking needed.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent (B4); one joint limma model on 9 rat samples with all pairwise contrasts. Joint vs pairwise remains an open policy item.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "minor", "evidence": "No batch/sex/lane in GEO; male rats only. Caveat records that group may be aliased with unrecorded library processing (LSI RPKM max ~33k vs ~14k, 9801 DEGs), and a TPM-rescaled sensitivity run was added.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "File is RPKM (non-integer, integer fraction 0.16); limma on log2(RPKM+1) is the policy route, no rounding/count method used. Large sig fraction (42%) is flagged in caveats and a sensitivity fit is reported.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states no DEG rule (B5); padj<0.05 recorded as workflow_default fallback, GSEA cutoffs not misused as DEG rule.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK says paper reports no counts and compares only at pathway level (inflammatory response, NF-kB up in LSI-E vs LSI), consistent with S2.1.p2; ORA non-significance for cytosolic DNA-sensing is disclosed.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; case completed.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: report which threshold when the paper states none (workflow default padj<0.05 used); joint vs pairwise fits when the paper is silent."],
+ "summary": "该案例的运行决定、分组(Sham/LSI/LSI-E 各3只)、对比方向和RPKM的limma路线均与论文一致,论文未给出DEG方法、阈值和数量,已如实记录为默认规则。每只大鼠仅一个样本,候选配对键只是组内重复编号且表达检验不支持,无需配对。整体通过,仅有关于分组可能与未记录的文库处理混杂的轻微提示,已有敏感性分析。"}

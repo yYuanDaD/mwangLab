@@ -126,9 +126,16 @@ def excel_to_csvs(path: str) -> list[str]:
     workbook silently lost 3 of 4 sheets of GSE208639_edgeR_output.xlsx.
     """
     base = path.rsplit(".", 1)[0]
-    sheets = pd.read_excel(path, sheet_name=None)
+    sheets = pd.read_excel(path, sheet_name=None, header=None)
     out = []
-    for i, (name, df) in enumerate(sheets.items()):
+    for i, (name, raw) in enumerate(sheets.items()):
+        # Title rows and merged group-label rows sit above the real header: the header is the
+        # first of the top rows that fills at least half of the columns (as native.read_table).
+        filled = raw.head(10).notna().sum(axis=1)
+        start = int(next((r for r, n in filled.items() if n >= raw.shape[1] / 2), 0)) if len(raw) else 0
+        df = raw.iloc[start + 1:].copy()
+        df.columns = [str(c) if pd.notna(c) else f"Unnamed: {j}" for j, c in enumerate(raw.iloc[start])] \
+            if len(raw) else raw.columns
         slug = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("_") or f"sheet{i + 1}"
         csv_path = base + ".csv" if i == 0 else f"{base}__{slug}.csv"
         df.to_csv(csv_path, index=False)

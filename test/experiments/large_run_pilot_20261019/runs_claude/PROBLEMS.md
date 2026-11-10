@@ -599,3 +599,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42812173 (GSE320360)
 
 - joint_contrasts.py:71 numeric subject IDs become continuous covariate (patched after this row); case_runner.py:740 no normalized-count filter; suitability.py:356 duplicate subject 'omit' msg Details: `PMID42812173/HANDBACK.md`.
+
+## PMID42897930 (GSE325957)
+
+- geo_tools.py:129 xlsx->csv keeps 2-row header (cols Unnamed:N; inspect mis-typed matrix); inspect no note for 15 matrix cols vs 9 metadata samples Details: `PMID42897930/HANDBACK.md`.
