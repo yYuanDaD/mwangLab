@@ -1,0 +1,185 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/d446594d1ade71b3541cb0f6a971599e29ccdf5a",
+  "request": "Analyze GSE124819 for PMID 31197156 (Activity/exercise-induced changes in the liver transcriptome after chronic spinal cord injury): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE124819",
+      "accession": "GSE124819",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC6565704.paper.md"],
+        "metadata": "GSE124819/GSE124819_metadata.csv",
+        "matrix": "GSE124819/GSE124819_GeneMatrix_RawCounts_ALL_UpdatedSampleNames_UpdatedCounts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE124819"],
+            "study_type": "Scientific Data data descriptor: liver RNA-seq resource; no differential-expression analysis, DEG counts, or threshold reported (S2.5, S4.3).",
+            "primary_estimand": "Within chronic T2 contusion SCI rats, effect of exercise on the liver transcriptome: SWIM vs sedentary CONT (tiny cage) and SWW vs CONT (tiny cage) in the SCI + Exercise set (S1.p2, S1.p3, S2.2.p1, S2.2.p4); and effect of enhanced in-cage activity: CONT + Large cage vs CONT + Tiny cage in the SCI + In-Cage Activity set (S1.p3, S2.2.p1, S2.2.p3).",
+            "sample_sets": {
+              "SCI + Exercise (22 rats)": "No SCI 4, TX 4, CONT 4, CONT+SWIM 5, CONT+SWW 5; all tiny cages from 3 d post-injury (S2.2.p1, S2.2.p4)",
+              "SCI + In-Cage Activity (15 rats)": "No SCI + Standard 5, CONT + Tiny 5, CONT + Large 5 (S2.2.p1, S2.2.p3)"
+            },
+            "factors": {"sample_set": ["SCI + Exercise", "SCI + In-Cage Activity"], "arm": ["No SCI", "TX", "CONT", "CONT+SWIM", "CONT+SWW", "CONT+Large", "No SCI+Standard"]},
+            "inclusion": "All 37 samples deposited; paper suggests removing overlapping samples in PCA for future comparisons (S4.3) but specifies no exclusion rule.",
+            "planned_contrasts": [
+              "CONT+SWIM vs CONT (SCI + Exercise set; S1.p3, S4.3.p2; paper reports no DEG count)",
+              "CONT+SWW vs CONT (SCI + Exercise set; S1.p3, S4.3.p2; paper reports no DEG count)",
+              "CONT+Large vs CONT+Tiny (SCI + In-Cage Activity set; S1.p3, S4.3.p1; paper reports no DEG count)"
+            ],
+            "repeated_measure_unit": "none; one liver per rat; rats doubly housed with same-group partners (S2.2.p1), cage IDs not deposited",
+            "normalization": "DESeq2 RLE size factors (S2.5.p3, S8.p9)",
+            "paper_method": "DESeq2 normalization only; no DE test reported",
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "none: data descriptor reports no DE threshold", "stated": false},
+            "paper_results": "Fig. 3 mean expression of liver-pathology genes in CONT vs No SCI; Fig. 4 Apoa1/Cyp1a2 tracks; no DE results."
+          },
+          "reasoning": "Data descriptor (Sci Data). The stated objective (S1.p2) is how the chronic SCI liver profile is modified by in-cage activity and exercise; the two sample sets (S1.p3, S2.2.p1) define the exercise contrasts against sedentary CONT within each set. No DE test, DEG count, or threshold is reported, so the workflow default threshold applies and results are exploratory reproductions of the intended comparisons.",
+          "confidence": "medium",
+          "locator": "S1.p2; S1.p3; S2.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S3.p1 names GSE124819", "37 samples = 37 in paper Table 1", "GEO tissue liver, female Sprague-Dawley, T2 SCI", "HTSeq Rn6 v93, 24,613 genes in both paper (S2.5.p1) and matrix"]},
+          "reasoning": "Paper S3.p1 deposits GSE124819; matrix has 24,613 gene rows and 37 samples matching Table 1 groups and replicate counts."
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "set": ["title", "^SCI\\+(Exercise|In-Cage) "],
+            "arm": ["source_name_ch1", "^(.+)$"]
+          },
+          "recode": {
+            "set": {"Exercise": "Ex", "In-Cage": "Ac"},
+            "arm": {
+              "Contusion SCI + Tiny Cage": "CT",
+              "Contusion SCI + Swim + Tiny Cage": "SWIM",
+              "Contusion SCI + Sww + Tiny Cage": "SWW",
+              "Contusion SCI + Large Cage": "CL",
+              "No Injury + Standard Cage": "NSstd",
+              "Complete transection SCI + Tiny Cage": "TX",
+              "No Injury + Tiny Cage": "NStiny"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names equal metadata title exactly (37/37). set from the title prefix (SCI+Exercise vs SCI+In-Cage Activity/Acitivity typo); arm from source_name_ch1. CONT + Tiny Cage occurs in both sets (4 + 5) and is kept separate by set."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer, max 4.1e6, median 9; GEO data_processing and paper S2.5.p1/S8.p7 state HTSeq-count read counts; file named GeneMatrix_RawCounts. Paper input to DESeq2 is the raw counts (S8.p9).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["arm"],
+          "references": {"arm": "CT"},
+          "organism": "Rat",
+          "strata": ["set"],
+          "planned": ["arm_SWIM_vs_CT_set-Ex", "arm_SWW_vs_CT_set-Ex", "arm_CL_vs_CT_set-Ac"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group, stratified by sample set",
+            "design_column": "arm",
+            "contrasts": [
+              {"name": "arm_SWIM_vs_CT_set-Ex", "control": "CT", "treatment": "SWIM", "role": "primary"},
+              {"name": "arm_SWW_vs_CT_set-Ex", "control": "CT", "treatment": "SWW", "role": "primary"},
+              {"name": "arm_CL_vs_CT_set-Ac", "control": "CT", "treatment": "CL", "role": "primary"}
+            ],
+            "estimand_type": "causal (randomized arms within set)"
+          },
+          "candidates": [
+            {"value": "pool CONT+Tiny across both sets", "reason_rejected": "the two sets are separate experiments with different sequencing depth (~30M vs ~42M reads, Table 1) and different control housing; comparisons stay within set"},
+            {"value": "SWIM and SWW pooled as 'exercise'", "reason_rejected": "paper defines them as two distinct exercise paradigms (S1.p3); one model, separate contrasts"},
+            {"value": "injury contrasts (CT vs No SCI, TX vs CT)", "reason_rejected": "not exercise estimands; not run"}
+          ],
+          "reasoning": "Paper randomized animals to arms within each set (S2.2.p1). Exercise effect = exercised CONT vs sedentary CONT within the Exercise set; activity effect = Large vs Tiny cage CONT within the Activity set. Set is a stratum because the sets are separate experiments.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "cage (double housing with same-group partner, S2.2.p1)", "disposition": "not available in GEO; cannot be modelled; noted as caveat"},
+              {"name": "weeks post injury", "disposition": "GEO records 11.5 wk for all CONT arms in both sets; paper says exercised animals collected at 13.5 wk (S2.3.p1, S4.4.p1) - if so, time is part of the exercise arm by design and is not separable; caveat"}
+            ]
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one sample each; no batch or subject key within set. Separate sets handled as strata.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), one cell-means model per sample set",
+            "formula": "~ arm (within set)",
+            "paper_route": {"method": "DESeq2 RLE normalization only", "status": "not_reported", "reason": "paper ran no DE test"},
+            "deviations": ["DE test is our addition; paper only normalized with DESeq2 RLE"]
+          },
+          "transform": null,
+          "reasoning": "Raw HTSeq counts; DESeq2 is consistent with the paper's DESeq2 RLE normalization (S8.p9). One model fitted on all samples of a set (including No SCI and TX in the Exercise set) for shared dispersion; planned contrasts extracted from it.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": null,
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Data descriptor states no DE threshold; workflow default BH padj < 0.05, no fold-change cutoff."
+          },
+          "reasoning": "No threshold in the paper (data descriptor)."
+        },
+        "study": {
+          "final": {
+            "route": "exploratory",
+            "caveats": [
+              "Paper is a data descriptor with no DE results; DEG counts cannot be compared with the paper.",
+              "Paper says exercised animals were collected 13.5 wk post-injury vs other CONT animals at 8.5/11.5 wk (S2.3.p1, S4.4.p1) while GEO lists 11.5 wk for all CONT arms; if the paper is right, exercise is inseparable from 2 extra weeks post-injury.",
+              "Rats were doubly housed with same-group partners (S2.2.p1); cage effects cannot be modelled (no cage IDs), so arms may be pseudo-replicated by cage.",
+              "Paper notes large within-group variability in the In-Cage Activity set and overlapping CONT+Tiny/CONT+Large samples (S4.3.p1)."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Exploratory: intended contrasts reconstructed from a descriptor that did not test them."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "time of sacrifice for exercised animals",
+          "paper": "8.5, 11.5 or 13.5 wk post-SCI depending on condition; exercised animals 13.5 wk (S2.3.p1, S4.4.p1)",
+          "data": "GEO characteristics: 11.5 weeks post injury for all contusion arms incl. SWIM/SWW; TX 8.5 wk",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "anesthesia in protocol",
+          "paper": "ketamine/xylazine/acepromazine (S2.2.p2)",
+          "data": "GEO treatment_protocol: pentobarbital",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "exercise_set",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["arm_SWIM_vs_CT_set-Ex", "arm_SWW_vs_CT_set-Ex"]},
+          "subset": {"set": ["Ex"]},
+          "role": "primary",
+          "reasoning": "One DESeq2 cell-means model on all 22 SCI + Exercise samples; SWIM vs CONT and SWW vs CONT."
+        },
+        {
+          "name": "activity_set",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["arm_CL_vs_CT_set-Ac"]},
+          "subset": {"set": ["Ac"]},
+          "role": "primary",
+          "reasoning": "One DESeq2 cell-means model on all 15 SCI + In-Cage Activity samples; Large vs Tiny cage CONT."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}

@@ -123,9 +123,10 @@ class Execution(BaseModel):
     complete_pairs: Optional[dict[str, Any]] = Field(
         None, description="{subject, condition, levels}: keep subjects with one sample at every level")
     filter_low_counts: Optional[dict[str, float]] = Field(
-        None, description="{min_cpm, min_samples}: keep genes with CPM >= min_cpm in at least min_samples "
-                          "of this execution's samples (edgeR filterByExpr style; raw counts only), "
-                          "applied after subset/pairs and before transform")
+        None, description="{min_cpm, min_samples} | {min_count, min_samples} | {min_mean_count}: keep genes with "
+                          "CPM >= min_cpm (or raw count >= min_count) in at least min_samples of this execution's "
+                          "samples, or mean raw count >= min_mean_count (raw counts only), applied after "
+                          "subset/pairs and before transform")
     role: str = "primary"
     reasoning: str = ""
     confidence: Confidence = "high"
@@ -664,8 +665,14 @@ class CaseRun:
         if ex.filter_low_counts:
             rule = ex.filter_low_counts
             counts = numeric_matrix(native.read_table(matrix_path), label=str(matrix_path))
-            cpm = counts / counts.sum(axis=0) * 1e6
-            keep = (cpm >= float(rule.get("min_cpm", 1.0))).sum(axis=1) >= int(rule.get("min_samples", 3))
+            # one rule kind per spec: CPM in n samples (default), raw count in n samples, or mean raw count
+            if "min_mean_count" in rule:
+                keep = counts.mean(axis=1) >= float(rule["min_mean_count"])
+            elif "min_count" in rule:
+                keep = (counts >= float(rule["min_count"])).sum(axis=1) >= int(rule.get("min_samples", 3))
+            else:
+                cpm = counts / counts.sum(axis=0) * 1e6
+                keep = (cpm >= float(rule.get("min_cpm", 1.0))).sum(axis=1) >= int(rule.get("min_samples", 3))
             matrix_path = idir / "matrix_filtered.csv"
             counts.loc[keep].to_csv(matrix_path)
             self.result.setdefault("low_count_filter", {})[ex.name] = {

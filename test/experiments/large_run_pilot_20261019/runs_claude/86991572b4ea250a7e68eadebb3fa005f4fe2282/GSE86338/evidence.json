@@ -1,0 +1,318 @@
+{
+  "schema_version": "1.0",
+  "run_id": "86991572b4ea250a7e68eadebb3fa005f4fe2282",
+  "subject_id": "GSE86338",
+  "created_at": "2026-11-10T02:08:27",
+  "finished_at": "2026-11-10T02:08:34",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC5538645.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC5538645.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T02:08:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f87a4e147eee88e23ca86c26ed2fcce6fba3aced5a8173d3fc329784dbab744c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE86338_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T02:08:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dbf30645cb9c1399b87ef0c142857a988423d206b01559360760b3af430ea378",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE86338_gene_fpkm.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_gene_fpkm.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-10T02:08:27",
+      "sha256": null,
+      "attributes": {
+        "sha256": "773b4f942683f7287aa51a2aa03464a8bdb6de4cdf324bdaac1fb9c9484ff763",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE86338"
+        ],
+        "assay": "bulk polyA RNA-seq (Illumina HiSeq2000), mouse C57BL/6 male; each library = pooled RNA from 4 animals (S4.2.p1)",
+        "primary_estimand": "Effect of a swimming exercise program (ramp 10->90 min twice daily, then 2 weeks) on the inguinal WAT (iWAT) transcriptome versus room-temperature control iWAT (S2.1.p1, S4.4.p1)",
+        "sample_inclusion": "iWAT series S2: control (S2CNT_1/2) and swimming (S2SWIM_1/2); CL316243 and 7-day cold iWAT share the same control and are the paper's other browning arms. BAT series (S3, S5) are separate experiments (BAT whitening at 30C, BAT cold activation) with their own controls and are not part of the exercise estimand.",
+        "factors": {
+          "grp": [
+            "CNT",
+            "CL",
+            "COLD",
+            "SWIM"
+          ],
+          "tissue": [
+            "iWAT",
+            "BAT (excluded)"
+          ]
+        },
+        "planned_contrasts": [
+          "iWAT swimming vs iWAT control (S2.2.p1; paper: 673 up + 826 down mRNAs)",
+          "iWAT 4C 7d cold vs control (S2.2.p1; paper: 1062 up + 1201 down) - other browning arm, exploratory here",
+          "iWAT CL316243 vs control (S2.2.p1; paper: 837 up + 681 down) - other browning arm, exploratory here"
+        ],
+        "repeated_measure_unit": "none; each library is a pool of 4 independent mice (S4.2.p1); 2 pools per condition",
+        "normalization": "Cufflinks FPKM, compatible-hits-norm for DE (S4.3.1.p1)",
+        "paper_method": "Cuffdiff (Cufflinks 2.1.1) on TopHat alignments (S4.3.1.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": true,
+          "source_locator": "S2.2.p1 (absolute fold-change >= 2-fold, FDR <= 0.05)"
+        },
+        "paper_results": "Exercise iWAT: 673 up / 826 down mRNAs; induction of Ucp1, Elovl3, Cidea and mitochondrial genes across browning conditions (S2.2.p1, S1E Fig); GSEA GOBP up: cellular respiration, BAT gene set; down: immune processes, WAT gene set (S1F Fig)"
+      },
+      "reason": "S2.1.p1/S4.4.p1 describe the swimming protocol and the three iWAT browning arms sharing one control; S2.2.p1 gives the per-arm DEG counts with the threshold (|FC|>=2, FDR<=0.05); S4.3.1.p1 gives Cufflinks/Cuffdiff on FPKM; S4.2.p1 says each sequenced sample is a pool of 4 animals. GEO titles iWAT_Control_1/2 and iWAT_swimming_1/2 match.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:08:27"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_gene_fpkm.txt.gz",
+        "owned": true,
+        "checks": [
+          "FN.p1 and S4.2.p1 name GSE86338 as the study's deposit",
+          "18 GEO samples = 18 samples in the paper's PCA (S2.4.p1)",
+          "GSE86338_gene_fpkm.txt.gz columns S2CNT_1..S5BAT_WT_COLD_3 equal the metadata description field 18/18",
+          "data_processing: TopHat-2.0.9 + Cufflinks-2.1.1 FPKM, matching S4.3.1.p1"
+        ],
+        "accession": "GSE86338",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_metadata.csv"
+      },
+      "reason": "Series is cited by the paper, sample count and processing match, matrix columns match metadata description exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:08:27"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM2300503": "BAT experiment (S3CNT_1), separate tissue/control; not part of the iWAT exercise estimand",
+          "GSM2300504": "BAT experiment (S3CNT_2), separate tissue/control",
+          "GSM2300505": "BAT 30C whitening (S330oC_1), separate tissue",
+          "GSM2300506": "BAT 30C whitening (S330oC_2), separate tissue",
+          "GSM2300507": "BAT control for cold (S5BAT_WT_1), separate experiment",
+          "GSM2300508": "BAT control for cold (S5BAT_WT_2), separate experiment",
+          "GSM2300509": "BAT control for cold (S5BAT_WT_3), separate experiment",
+          "GSM2300510": "BAT cold (S5BAT_WT_COLD_1), separate experiment",
+          "GSM2300511": "BAT cold (S5BAT_WT_COLD_2), separate experiment",
+          "GSM2300512": "BAT cold (S5BAT_WT_COLD_3), separate experiment"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^iWAT_(Control|Cl316243|4oC7day|swimming)_\\d$",
+              "recode": {
+                "Control": "CNT",
+                "Cl316243": "CL",
+                "4oC7day": "COLD",
+                "swimming": "SWIM"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\design_metadata.csv",
+          "sha256": "2deae133a44c12246729f7f838fb0e13ec58a604a5f8345ec88908aac8df5d60",
+          "levels": {
+            "grp": {
+              "CNT": 2,
+              "CL": 2,
+              "COLD": 2,
+              "SWIM": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal metadata 'description' 18/18 (inspect alignment_keys). Group derived from GEO title. BAT samples belong to different experiments with their own controls (S2.3.p1) and are excluded; comparisons never cross tissue.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:08:28"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "FPKM (linear, Cufflinks)",
+        "recommended_method": "limma on log2(FPKM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\aligned_matrix.csv",
+          "sha256": "c07a44a1cf15a0383173d7e1a318f953e817314e65452ddadf5b3758fbbe402c",
+          "n_features": 38553,
+          "n_samples": 8,
+          "annotation_columns_dropped": [
+            "GSM2300503",
+            "GSM2300504",
+            "GSM2300505",
+            "GSM2300506",
+            "GSM2300507",
+            "GSM2300508",
+            "GSM2300509",
+            "GSM2300510",
+            "GSM2300511",
+            "GSM2300512"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 4508350.0,
+          "median": 0.0025673049999999998,
+          "integer_fraction": 0.4999,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "File name gene_fpkm, data_processing states Cufflinks FPKM, values are non-integer (integer fraction 0.52 driven by zeros), median 0. Paper input for Cuffdiff was the read alignments; counts were not deposited. Linear normalized expression -> log2(x+1) then limma per policy.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T02:08:28"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d5471bff3f03c8470cbe651f2ff7e349bfc5d3ca9c2c40001828d65a6abe0143",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "dc0acaf615701f610b3103ee9fb408c0bc0a1e4135641466ac6722ec134465f0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c07a44a1cf15a0383173d7e1a318f953e817314e65452ddadf5b3758fbbe402c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2deae133a44c12246729f7f838fb0e13ec58a604a5f8345ec88908aac8df5d60",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "17ee0397c8f021aae66abacad9b15fb108441909926699b472ac8663fbb5d6b2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "542ca5bf61c46c5e11132ff8bceec6a03abc0f428dea1ad7779cb7e64439ceba",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

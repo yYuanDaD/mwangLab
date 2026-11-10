@@ -483,3 +483,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38766755 (GSE263838)
 
 - filter_low_counts cannot do a mean-count filter (case_runner.py:668); paper comparison ignores audit/sensitivity counts (case_runner.py:846) Details: `PMID38766755/HANDBACK.md`.
+
+## PMID40695537 (GSE293163)
+
+- runner cannot express post-hoc mean-log2FC DEG subset; filter_low_counts CPM-only, no read-count rule (tools/case_runner.py:668, patched after this row) Details: `PMID40695537/HANDBACK.md`.
