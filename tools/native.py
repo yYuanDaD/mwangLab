@@ -230,7 +230,8 @@ def _frame(metadata: pd.DataFrame | str | Path) -> pd.DataFrame:
 _ANNOTATION_NAMES = {"start", "end", "stop", "length", "strand", "chr", "chrom", "chromosome", "width",
                      "gene_start", "gene_end", "gene_length", "transcript_length", "effective_length",
                      "efflength", "basemean", "log2foldchange", "lfcse", "stat", "pvalue", "padj", "logfc",
-                     "aveexpr", "p.value", "adj.p.val", "fdr", "gc", "gc_content", "entrez", "entrezid"}
+                     "aveexpr", "p.value", "adj.p.val", "fdr", "gc", "gc_content", "entrez", "entrezid",
+                     "gene_chr", "gene_start_position", "gene_end_position", "gene_length_bp", "exon_length"}
 
 
 def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None) -> dict:

@@ -1,0 +1,89 @@
+{
+ "case": "GSE289091",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "In-vitro design: immortalized human myotubes (clone 8220), siControl vs siLMNA, static vs 4 h equibiaxial stretch (S2.3, ABS, Fig1a). No exercise in people; stretch is an exercise-mimic mechanical loading. All 18 RNA-seq samples carry the stretch factor (7 stretch). Borderline exercise study; open policy question.",
+  "B2": "Fig3a: siLMNA vs Ctl static (876 DEGs, 446 up/430 down). Fig6d: S-Ctl vs Ctl (7 DEGs). Fig6e: S-siLMNA vs siLMNA (485 up/149 down). n per group not stated (S2.6.p1 'n = 4 to 9 samples/group'); metadata titles: Ctl static 3 (+1 late sample), Ctl stretch 4, siLMNA static 7, siLMNA stretch 4.",
+  "B3": "No repeated measures; independent wells/transfections (Fig3b '2 independent experiments'). Candidate key cond+title suffix is only a replicate number; expression check not_supported (p=0.23). No pairing.",
+  "B4": "S2.6.p3: DESeq2 GLM likelihood ratio test; the paper does not say whether each pair was fitted alone or jointly.",
+  "B5": "S2.6.p3: 'absolute log2 fold change >1 and FDR < 0.05'; Fig6 legend d,e: 'log2 fold change > 0.5, FDR < 0.05'; Fig3a/S3.2.p3 'FDR < 0.05 and log2 FC = 1'. Counts: static siLMNA vs Ctl 876 of 13,925 (446/430); S-Ctl 7; S-siLMNA 485 up + 149 down."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Analysis run and labelled in-vitro stretch mimic (HANDBACK, study caveats); matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Stretch vs static within genotype per Fig6d,e. GSM8783562 excluded with named reason (LMNA at knockdown level, profile clusters with siLMNA); GSM9181790 kept and recorded; siLMNA primary restricted to run 2 (4 vs 4) with 7 vs 4 sensitivity fits. Paper n unknown, so deviation is declared.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "control=static, treatment=stretch for both contrasts, as in the paper.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No repeated unit (B3); candidate key not supported by expression check; record states none.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on joint vs pairwise; per-genotype LRT used and both run-adjusted and naive all-sample fits reported next to the primary.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run (NovaSeq vs NextSeq) confounded with stretch in siLMNA and Ctl all run 1; crosstab, subsetting and sensitivity recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "NumReads estimated counts, rounded, DESeq2; p histogram sane (frac_p_gt_0.9 0.05-0.13).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Applied rule |lfc|>0.5 & FDR<0.05 is the Fig6 legend rule; Methods rule |lfc|>1 kept as audit; discrepancy recorded in HANDBACK and paper_data_discrepancies. Paper's 634 fits |lfc|>1 (554) or pvalue<0.05 & |lfc|>1 (581) better than the applied rule (2119). Recorded disposition 'executable_without_change' is slightly loose.",
+   "fix": "Optionally change disposition to state that paper counts fit the Methods rule."
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "minor",
+   "evidence": "study.comparison pairs the applied-rule count (21, 2119) with the paper counts (7, 634); the same-rule audit counts (3, 554) are closer. HANDBACK table shows both and hedges ('suggests'), so no overclaim.",
+   "fix": "Put the audit-rule counts next to the paper counts in study.comparison."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; the one exclusion (GSM8783562) is a data-based mislabel call with evidence.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Whether an in-vitro mechanical-stretch series counts as an exercise study (open policy).",
+  "Which threshold to report when the paper's counts fit |lfc|>1 but the Fig6 legend states 0.5 (open policy)."
+ ],
+ "summary": "该案例在体外拉伸肌管模型上按基因型分层比较拉伸与静态，方向、分组、批次混杂和排除样本均有记录，无重复测量问题。阈值取图例规则0.5并保留方法学规则1作审计，差异已记录；论文计数更接近|lfc|>1。仅有paper_match一处轻微问题，整体通过。"
+}

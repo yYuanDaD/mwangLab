@@ -527,3 +527,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41126185 (GSE289091)
 
 - geo_tar merge cannot read Salmon/DRAGEN quant.genes.sf (patched after this row), needed prep script; case_runner.py:877/801 wrong table-name keys silently gave null counts / enrichment not_run Details: `PMID41126185/HANDBACK.md`.
+
+## ef574c2d9b2d7f168faeb39ddc5cb09258575c41 (GSE60833)
+
+- native.py:539 merge_raw_tar cannot merge Cufflinks fpkm_tracking (needed prep script); case_runner.py:130 min_mean_count documented raw-only but used for FPKM mean filter Details: `ef574c2d9b2d7f168faeb39ddc5cb09258575c41/HANDBACK.md`.
+
+## PMID37872294 (GSE294565)
+
+- native.py:230 gene_chr not treated as annotation (patched after this row; inspect said 33 samples, real 32); case_runner.py:84-90 cannot map lab-code columns to GEO replicates (needed a prep script) Details: `PMID37872294/HANDBACK.md`.

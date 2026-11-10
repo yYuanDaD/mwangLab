@@ -123,6 +123,7 @@
             "paper_threshold": {"metric": "OPLS_jackknife_loading", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null},
             "threshold_source": "workflow_default",
             "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
             "deviation_note": "The paper's gene rule (|OPLS loading| - |jack-knife 99% CI| > 0, S4.6.p2) has no p-value equivalent; BH-adjusted p < 0.05 with no fold-change rule is the workflow default (and matches the paper's limma rule for novel transcripts, TAB3 adj p <= 0.05)."
           },
           "reasoning": "S4.6.p2 defines significance by OPLS loadings; not convertible to padj, so workflow default is used and labelled.",
@@ -134,7 +135,9 @@
             "caveats": [
               "Period 1 (T1/T2, paper 2,394 genes) is not in GSE60833 and was not analysed",
               "paper counts come from OPLS on ComBat-corrected FPKM; ours are limma padj < 0.05 on uncorrected FPKM, so counts are not directly comparable",
-              "T3 vs U3 and T4 vs U4 are leg comparisons (associational to prior training), exploratory"
+              "T3 vs U3 and T4 vs U4 are leg comparisons (associational to prior training), exploratory; T3 vs U3 shows 0 padj<0.05 genes (agrees with paper) but an excess of nominal p<0.05 genes (1784/13035), consistent with unmodelled sequencing batch rather than memory",
+              "direction agrees with the paper: the named OXPHOS/collagen genes have positive log2FC in both Period 2 legs, and GSEA Hallmark oxidative phosphorylation is the top up-regulated set in both legs, but under BH 0.05 the trained leg has 0 DEGs and the untrained leg 6 vs the paper's 852/928",
+              "per-sex analyses are exploratory with 4-6 pairs per sex"
             ]
           },
           "paper_counts": {"P2_trained_leg_T4_vs_T3": 852, "P2_untrained_leg_U4_vs_U3": 928, "leg_T3_vs_U3": 0},
@@ -191,6 +194,46 @@
           "filter_low_counts": {"min_mean_count": 1},
           "role": "exploratory",
           "reasoning": "S2.4.p2: legs after Period 2; paper OPLS found no difference."
+        },
+        {
+          "name": "P2_trained_leg_T4_vs_T3_female",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "T3", "treatment_group": "T4", "covariate_columns": "subject"},
+          "subset": {"grp": ["T3", "T4"], "sex": ["female"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["T3", "T4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "Per-sex split (suitability split_plan); paper pooled sexes and found no sex-specific training response (S2.1.p4)."
+        },
+        {
+          "name": "P2_trained_leg_T4_vs_T3_male",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "T3", "treatment_group": "T4", "covariate_columns": "subject"},
+          "subset": {"grp": ["T3", "T4"], "sex": ["male"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["T3", "T4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "Per-sex split (suitability split_plan); S2.1.p4."
+        },
+        {
+          "name": "P2_untrained_leg_U4_vs_U3_female",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "U3", "treatment_group": "U4", "covariate_columns": "subject"},
+          "subset": {"grp": ["U3", "U4"], "sex": ["female"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["U3", "U4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "Per-sex split (suitability split_plan); S2.1.p4."
+        },
+        {
+          "name": "P2_untrained_leg_U4_vs_U3_male",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "U3", "treatment_group": "U4", "covariate_columns": "subject"},
+          "subset": {"grp": ["U3", "U4"], "sex": ["male"]},
+          "complete_pairs": {"subject": "subject", "condition": "grp", "levels": ["U3", "U4"]},
+          "filter_low_counts": {"min_mean_count": 1},
+          "role": "exploratory",
+          "reasoning": "Per-sex split (suitability split_plan); S2.1.p4."
         }
       ],
       "enrichment": [

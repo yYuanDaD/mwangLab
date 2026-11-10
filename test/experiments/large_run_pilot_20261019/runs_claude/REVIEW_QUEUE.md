@@ -63,3 +63,8 @@ One section per case; newest last.
 ## b39292ba0ee11c97d2e351716ebbb6029eeee400 / GSE97718_expressed (2026-11-10)
 
 - policy: Open policy: joint vs pairwise fit when the paper is silent; FPKM limma vs Cuffdiff count gap (3-25x) is a declared deviation.
+
+## PMID41126185 / GSE289091 (2026-11-10)
+
+- policy: Whether an in-vitro mechanical-stretch series counts as an exercise study (open policy).
+- policy: Which threshold to report when the paper's counts fit |lfc|>1 but the Fig6 legend states 0.5 (open policy).
