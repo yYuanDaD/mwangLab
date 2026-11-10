@@ -27,6 +27,7 @@ import importlib
 import json
 import os
 import platform
+import gzip
 import re
 import subprocess
 import sys
@@ -214,7 +215,15 @@ def read_table(path: str | Path) -> pd.DataFrame:
             if converted.notna().sum() == frame[column].notna().sum():
                 frame[column] = converted
         return frame
-    return pd.read_csv(path, index_col=0, sep=None, engine="python")
+    # featureCounts and similar tools write '# Program:...' lines above the header
+    opener = gzip.open if str(path).lower().endswith(".gz") else open
+    skip = 0
+    with opener(path, "rt", encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            if not line.startswith("#"):
+                break
+            skip += 1
+    return pd.read_csv(path, index_col=0, sep=None, engine="python", skiprows=skip)
 
 
 def _frame(metadata: pd.DataFrame | str | Path) -> pd.DataFrame:

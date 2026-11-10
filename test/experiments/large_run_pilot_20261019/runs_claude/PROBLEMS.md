@@ -639,3 +639,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID26845575 (GSE69699)
 
 - suitability.py:259 hard-fails n<3 and decision_contract.py:172 rejects the design though the skill says small n is not a stop (open policy question); filter_low_counts cannot express group-mean RPM rule Details: `PMID26845575/HANDBACK.md`.
+
+## PMID36695573 (GSE198826;GSE198827)
+
+- inspect failed on featureCounts '#' header (tools/native.py:217; patched after this row), misleading 'found 0' error; needed a prep script Details: `PMID36695573/HANDBACK.md`.

@@ -1,0 +1,346 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID36695573",
+  "subject_id": "GSE198826",
+  "created_at": "2026-11-10T17:07:22",
+  "finished_at": "2026-11-10T17:07:27",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9876571.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC9876571.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T17:07:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "36377daa6a02287e4bf59696d9e5983b96a479d2b85889cfb095e6401e14c99b",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE198826_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE198826\\GSE198826_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T17:07:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "260d1c1252b7efb5c889f1dc2b0062bb75889c036541b8584b1355b3fce8d42a",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_GSE198826_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\prep\\prep_GSE198826_counts.py",
+      "locator": null,
+      "captured_at": "2026-11-10T17:07:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "fcee438b1ac23dff2b0ff388d2a42e01765efd1114c9f60f66f3bec585ce885c",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE198826_counts_merged.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\prep\\GSE198826_counts_merged.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T17:07:22",
+      "sha256": null,
+      "attributes": {
+        "sha256": "452470ab34992c43a795ca007f43a80d677b13ca7cf8ed8cebae6d7c484030d4",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE198911 (SuperSeries, S12.p1)",
+          "GSE198826 (Dex sub-series)",
+          "GSE198827 (VWR sub-series)"
+        ],
+        "assay": "poly(A) RNA-seq, NextSeq 500 75 bp SE, STAR mm10 (S4.10.p1)",
+        "sample_inclusion": "Dex-treated (1 mg/kg, 7 d) male WT and LSD1-mKO mice; gastrocnemius and soleus (S2.3.p1, S4.3.p2); GEO: WT 3 + mKO 5 per muscle",
+        "factors": [
+          {
+            "name": "genotype",
+            "levels": [
+              "WT",
+              "LSD1-mKO"
+            ]
+          },
+          {
+            "name": "tissue",
+            "levels": [
+              "Gas",
+              "Sol"
+            ]
+          }
+        ],
+        "primary_estimand": "LSD1-mKO vs WT gene expression in Dex-treated muscle (glucocorticoid atrophy model), separately per muscle; no exercise factor",
+        "planned_contrasts": [
+          "mKO vs WT, Dex Gas (S2.3.p1; paper: 150 up / 117 down = 267 DEGs)",
+          "mKO vs WT, Dex Sol (S2.3.p1, Fig 2E; count not stated in text)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S4.10.p1"
+        },
+        "paper_method": "edgeR, FDR < 0.05 (S4.10.p1)",
+        "paper_results": "Gas: 150 up, 117 down in mKO (S2.3.p1)"
+      },
+      "reason": "The paper's only exercise experiment is voluntary wheel running (S2.5, S2.6, S4.4); its RNA-seq is GSE198827. GSE198826 is the dexamethasone experiment (S2.3.p1; S4.10.p1 'For the dataset from Dex administration experiment, Edge R ...'). GEO characteristics treatment = 'Dexamethasone treated' for all 16 samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:07:22"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\prep\\GSE198826_counts_merged.csv",
+        "owned": true,
+        "checks": [
+          "GEO series_id lists GSE198911, the SuperSeries named in S12.p1/S12.p3",
+          "contact Araki H, Kumamoto Univ. matches authors",
+          "data_processing repeats the paper's edgeR FDR 0.05 rule",
+          "16 samples: Gas/Sol x WT/mKO, Dex-treated"
+        ],
+        "accession": "GSE198826",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE198826\\GSE198826_metadata.csv"
+      },
+      "reason": "S12.p1 deposits GSE198911; GSE198826 is its sub-series. Counts files are featureCounts outputs whose library labels (araki1.., a1..) match the bracketed labels in GEO titles.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:07:22"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 16,
+        "n_metadata": 16,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "geno": {
+              "source": "title",
+              "regex": "^(WT|LSD1-mKO)\\d",
+              "recode": {
+                "WT": "WT",
+                "LSD1-mKO": "KO"
+              }
+            },
+            "tissue": {
+              "source": "title",
+              "regex": " (Gas|Sol) "
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\design_metadata.csv",
+          "sha256": "6acdf908487a50dce608c3227ae45b3238da585056e735411d758b03dfd5dd46",
+          "levels": {
+            "geno": {
+              "KO": 10,
+              "WT": 6
+            },
+            "tissue": {
+              "Gas": 8,
+              "Sol": 8
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are featureCounts library labels (renamed from BAM paths by prep_GSE198826_counts.py); each GEO title carries the label in brackets, e.g. 'WT3 Gas Dex [araki8]'. Exact match on that derived key; no positional alignment.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:07:22"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE198826_counts_Gas.txt.gz + GSE198826_counts_Sol.txt.gz (featureCounts v1.5.2, gene level)",
+        "paper_input": "STAR + edgeR on read counts (S4.10.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\aligned_matrix.csv",
+          "sha256": "6f9e404d2fb03dbea34cb013a4cedabf64f64537c0fbc7e3fdaeca5979a2de9a",
+          "n_features": 24421,
+          "n_samples": 16,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1283080.0,
+          "median": 16.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Integer featureCounts read counts (header names featureCounts v1.5.2); the all_genes_FC files are edgeR result tables, not sample matrices.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:07:22"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\suitability\\suitability.md",
+          "n_comparisons": 2,
+          "n_analyzable": 2
+        }
+      },
+      "reason": "Request asks for the exercise effect. The exercise (VWR) RNA-seq is GSE198827; this series has no exercise arm.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: every sample is dexamethasone-treated and sedentary (GEO treatment constant 'Dexamethasone treated'; S4.3.p2). The only factors are genotype (LSD1-mKO vs WT) and muscle; a genotype contrast under glucocorticoid does not answer how exercise affects gene expression."
+      },
+      "recorded_at": "2026-11-10T17:07:27"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "56b8a276b24135813617e44427af7d03197f0f5dd2579fd317d796d3ae877331",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1bf3f0d0df5b154eb06f23922d0af5b4dee143624f8697a2e991f5b1f51146b7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6f9e404d2fb03dbea34cb013a4cedabf64f64537c0fbc7e3fdaeca5979a2de9a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6acdf908487a50dce608c3227ae45b3238da585056e735411d758b03dfd5dd46",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5b0a5e872e4935bf4c64eb263587cca33f36c18ed4584d0d38b36efb42b66f1e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36695573\\GSE198826\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "42d326521919dac0076e5655ef76ba6ddf9b6c1c61e747ed7bb4b46ccbe1b4d8",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

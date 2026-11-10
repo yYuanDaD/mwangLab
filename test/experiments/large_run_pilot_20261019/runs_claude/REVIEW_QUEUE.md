@@ -150,3 +150,11 @@ One section per case; newest last.
 ## PMID34039988 / GSE132520 (2026-11-10)
 
 - policy: Joint versus pairwise fits when the paper is silent (open policy question): the record uses one joint model; the paper's tool (Cuffdiff via GEO field) fits pairs.
+
+## PMID35440516 / GSE198266 (2026-11-10)
+
+- policy: Open policy: when the paper rule (raw p, FC 1.5) gives 1.5-3x the paper's counts with limma, which count is the headline; recorded as a declared deviation.
+
+## PMID26845575 / GSE69699 (2026-11-10)
+
+- policy: Policy: should the runner accept small-n (n=2) planned contrasts as exploratory, given the skill text says small n is not a stop but suitability.py hard-fails n<3?
