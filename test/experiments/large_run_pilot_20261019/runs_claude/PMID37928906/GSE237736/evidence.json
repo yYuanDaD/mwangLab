@@ -1,0 +1,1779 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37928906",
+  "subject_id": "GSE237736",
+  "created_at": "2026-11-10T07:18:54",
+  "finished_at": "2026-11-10T07:19:15",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10621069.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC10621069.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T07:18:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c06bc2cf7c9135368332ad328a045869051872e583d676307bdf1c19bd52e5e0",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE237736_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE237736\\GSE237736_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:18:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "6f76c33c457df97c9b704da1232d39155a51c3fe7e78c8c9bb857ada3215a724",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script merge_stringtie_fpkm.py",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\prep\\merge_stringtie_fpkm.py",
+      "locator": null,
+      "captured_at": "2026-11-10T07:18:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dfbf19c12458178a6436751e19604f9438c5cb4b58c7b655cc80530e79ad6ac9",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE237736_StringTie_FPKM_merged.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\prep\\GSE237736_StringTie_FPKM_merged.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:18:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5862595d6651cd3b6f38a76b8536ede86dc13e1284c9ce6b48806f5679cb0e5b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE237736"
+        ],
+        "assay": "bulk RNA-seq (Illumina NovaSeq 6000), bilateral dentate gyrus, 12-month-old male C57BL/6 p16Ink4a WT and KO mice",
+        "factors": {
+          "genotype": [
+            "p16 WT",
+            "p16 KO"
+          ],
+          "treatment": [
+            "CTL (sedentary)",
+            "RUN (12 days voluntary wheel running)"
+          ]
+        },
+        "design": "2x2 factorial, n = 4 independent mice per group (S2.10.p1), 16 samples",
+        "sample_inclusion": "all 16 deposited samples; no exclusions stated",
+        "primary_estimand": "effect of 12 days of voluntary running on dentate gyrus gene expression in aged p16 KO mice (Set A, KO RUN vs KO CTL) and how it differs from WT (genotype x running interaction, GLM/LRT); running in WT (Set C) is the WT exercise effect",
+        "planned_contrasts": [
+          "Set A: KO RUN vs KO CTL (S3.1.p4; paper: 3,272 genes p<0.05)",
+          "Set B: KO CTL vs WT CTL (S3.1.p4; paper: 1,230 genes p<0.05) - genotype, not exercise",
+          "Set C: WT RUN vs WT CTL (S3.1.p4; paper: 762 genes p<0.05)",
+          "Set D: KO RUN vs WT CTL (S3.1.p4; paper: 1,475 genes p<0.05)",
+          "Set E: KO RUN vs WT RUN (S3.1.p4; paper: 494 genes p<0.05)",
+          "GLM LRT genotype x treatment interaction (S2.5.p5, S3.4.1.p1; paper: 866 genes p<0.05)"
+        ],
+        "paper_method": "htseq-count reads -> DESeq2 Wald test per pairwise comparison; DESeq2 LRT full (genotype + treatment + interaction) vs reduced (no interaction) for the GLM set (S2.5.p4, S2.5.p5, S2.10.p1)",
+        "repeated_measure_unit": "none (independent animals)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S3.1.p3"
+        },
+        "paper_results": "Set A 3272, Set B 1230, Set C 762, Set D 1475, Set E 494, GLM interaction 866; Set A_Set E_GLM 106 genes; Set D_Set E_GLM 29 genes; qPCR-validated: Tfap2c, Lepr, Top2a, Slc18a2, Lpin2, Rgs14, Ramp3, Chrm5"
+      },
+      "reason": "S3.1.p3 states DE genes from DESeq2 Wald with significance threshold raw p-value < 0.05 (padj computed in S2.10.p1 but the counts in S3.1.p4 are at p<0.05). S3.1.p4 defines Sets A-E with counts. S2.5.p5/S3.4.1.p1 define the LRT interaction (866 genes). S2.10.p1 gives n = 4 per group.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:54"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\prep\\GSE237736_StringTie_FPKM_merged.csv",
+        "owned": true,
+        "checks": [
+          "S2.5.p6 names GSE237736",
+          "16 GSMs = 4 groups x 4 (S2.10.p1)",
+          "GEO characteristics: dentate gyrus, one-year-old male, p16Ink4a +/+ and -/-, sedentary vs running 12 days, matching S2 and FIG1"
+        ],
+        "accession": "GSE237736",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE237736\\GSE237736_metadata.csv"
+      },
+      "reason": "The paper deposits exactly this series; sample annotations match the design. Matrix is the merge of the 16 per-sample StringTie gene_abundance files in GSE237736_RAW.tar (prep/merge_stringtie_fpkm.py).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:54"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 16,
+        "n_metadata": 16,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "geno": {
+              "alias_of": "characteristics_ch1.4.genotype",
+              "recode": {
+                "p16Ink4a +/+": "WT",
+                "p16Ink4a -/-": "KO"
+              }
+            },
+            "trt": {
+              "alias_of": "characteristics_ch1.5.treatment",
+              "recode": {
+                "sedentary": "sed",
+                "running 12 days": "run"
+              }
+            },
+            "grp": {
+              "combine": [
+                "geno",
+                "trt"
+              ],
+              "separator": "_",
+              "of": "recoded values",
+              "recode": {
+                "WT_sed": "WTsed",
+                "WT_run": "WTrun",
+                "KO_sed": "KOsed",
+                "KO_run": "KOrun"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\design_metadata.csv",
+          "sha256": "285383b8875d9312a783d5f1980050a1c45de05cf1368647a764dde62a6d03c8",
+          "levels": {
+            "geno": {
+              "WT": 8,
+              "KO": 8
+            },
+            "trt": {
+              "sed": 8,
+              "run": 8
+            },
+            "grp": {
+              "WTsed": 4,
+              "KOsed": 4,
+              "WTrun": 4,
+              "KOrun": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are GSM ids taken from the tar member names; they equal the metadata index. Genotype and treatment come from the GEO characteristics; description (e.g. 1WTnoRun) agrees.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:54"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "FPKM",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\aligned_matrix.csv",
+          "sha256": "f239196d52479ed5754e1132b95ab9571a8c7eaeb80c908a500c8564e629b4bc",
+          "n_features": 24421,
+          "n_samples": 16,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 2469.810791,
+          "median": 1.3069410000000001,
+          "integer_fraction": 0.2737,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Deposited files are StringTie gene_abundance tables with Coverage/FPKM/TPM columns only; GEO data_processing: 'tab-delimited text files include FPKM values for each Sample'. No htseq counts were deposited although the paper's DESeq2 used htseq-count reads (S2.5.p4). Using FPKM column, gene IDs summed over duplicate loci.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:55"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel",
+        "design_column": "grp",
+        "formula": "~ 0 + C(grp)",
+        "contrasts": [
+          {
+            "name": "grp_KOrun_vs_KOsed",
+            "control": "KOsed",
+            "treatment": "KOrun",
+            "role": "primary",
+            "paper_set": "A"
+          },
+          {
+            "name": "grp_WTrun_vs_WTsed",
+            "control": "WTsed",
+            "treatment": "WTrun",
+            "role": "primary",
+            "paper_set": "C"
+          },
+          {
+            "name": "grp_KOsed_vs_WTsed",
+            "control": "WTsed",
+            "treatment": "KOsed",
+            "role": "secondary",
+            "paper_set": "B (genotype, not exercise)"
+          },
+          {
+            "name": "grp_KOrun_vs_WTsed",
+            "control": "WTsed",
+            "treatment": "KOrun",
+            "role": "secondary",
+            "paper_set": "D (genotype and running combined)"
+          },
+          {
+            "name": "grp_KOrun_vs_WTrun",
+            "control": "WTrun",
+            "treatment": "KOrun",
+            "role": "secondary",
+            "paper_set": "E (genotype within runners)"
+          },
+          {
+            "name": "interaction_geno_x_run",
+            "role": "secondary",
+            "paper_set": "GLM LRT interaction"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\suitability\\suitability.md",
+          "n_comparisons": 8,
+          "n_analyzable": 8
+        }
+      },
+      "reason": "2x2 factorial with n=4 independent mice per cell. The four cells are coded as one factor grp so all five pairwise Sets of S3.1.p4 come from one model; the exercise effects are Set A (running within KO) and Set C (running within WT). Sets B/D/E are genotype or mixed contrasts and are reproduced only for comparison with the paper. The interaction (S2.5.p5) is the 1-df contrast (KOrun-KOsed)-(WTrun-WTsed), equivalent in a 2x2 to the paper's LRT of full vs reduced model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:57"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 16,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_KOsed",
+            "grp_WTrun",
+            "grp_WTsed"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 12,
+          "levels": {
+            "grp": {
+              "WTsed": 4,
+              "KOsed": 4,
+              "WTrun": 4,
+              "KOrun": 4
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "KOrun"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "KOsed"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "WTrun"
+              ],
+              "n": 4
+            },
+            {
+              "cell": [
+                "WTsed"
+              ],
+              "n": 4
+            }
+          ],
+          "min_cell_size": 4,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 16,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 16,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.4.genotype",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOrun": {
+                "p16Ink4a +/+": 0,
+                "p16Ink4a -/-": 4
+              },
+              "KOsed": {
+                "p16Ink4a +/+": 0,
+                "p16Ink4a -/-": 4
+              },
+              "WTrun": {
+                "p16Ink4a +/+": 4,
+                "p16Ink4a -/-": 0
+              },
+              "WTsed": {
+                "p16Ink4a +/+": 4,
+                "p16Ink4a -/-": 0
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.5.treatment",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOrun": {
+                "running 12 days": 4,
+                "sedentary": 0
+              },
+              "KOsed": {
+                "running 12 days": 0,
+                "sedentary": 4
+              },
+              "WTrun": {
+                "running 12 days": 4,
+                "sedentary": 0
+              },
+              "WTsed": {
+                "running 12 days": 0,
+                "sedentary": 4
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 16,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 16,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 16,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "geno",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOrun": {
+                "KO": 4,
+                "WT": 0
+              },
+              "KOsed": {
+                "KO": 4,
+                "WT": 0
+              },
+              "WTrun": {
+                "KO": 0,
+                "WT": 4
+              },
+              "WTsed": {
+                "KO": 0,
+                "WT": 4
+              }
+            }
+          },
+          {
+            "column": "trt",
+            "n_levels": 2,
+            "status": "primary_nested_in_candidate",
+            "crosstab": {
+              "KOrun": {
+                "run": 4,
+                "sed": 0
+              },
+              "KOsed": {
+                "run": 0,
+                "sed": 4
+              },
+              "WTrun": {
+                "run": 4,
+                "sed": 0
+              },
+              "WTsed": {
+                "run": 0,
+                "sed": 4
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Independent animals, one sample each; all male, same age and tissue; no batch or lane recorded in GEO. No blocking unit.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:57"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "FPKM",
+        "method": "limma (log2(FPKM+1), moderated t, one model ~ 0 + C(grp))",
+        "formula": "~ 0 + C(grp)",
+        "paper_route": {
+          "method": "DESeq2 Wald / LRT on htseq-count reads",
+          "status": "blocked",
+          "reason": "only StringTie FPKM/TPM/Coverage tables deposited in GEO; no read counts; FPKM must not be rounded into counts"
+        },
+        "deviations": [
+          "limma on log2(FPKM+1) instead of DESeq2 on counts",
+          "genes kept with FPKM >= 1 in >= 4 samples (one group) before fitting; the paper's DESeq2 used its own independent filtering",
+          "interaction tested as 1-df limma contrast instead of DESeq2 LRT",
+          "sensitivity run without the FPKM filter (pairwise_nofilter) for low-expressed paper genes"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Matrix-method policy: FPKM -> log2(x+1) -> limma. Paper route blocked (no counts).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:57"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "deviation_note": "paper's raw p < 0.05 rule applied to limma p-values; BH padj < 0.05 reported as audit"
+      },
+      "reason": "S3.1.p3: 'significance threshold ... set to p-value <0.05'; Set counts in S3.1.p4 and the 866 GLM genes (S3.4.1.p1) use p < 0.05. No fold-change cutoff.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:18:57"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "pairwise",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 16,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\input\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_KOsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOsed_vs_WTsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_WTrun_vs_WTsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_WTsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_WTrun.csv"
+        ],
+        "counts": {
+          "pairwise/grp_KOrun_vs_KOsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 2857,
+              "n_up": 1500,
+              "n_down": 1357,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise/grp_KOsed_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 1725,
+              "n_up": 740,
+              "n_down": 985,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise/grp_WTrun_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 744,
+              "n_up": 399,
+              "n_down": 345,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise/grp_KOrun_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 1048,
+              "n_up": 539,
+              "n_down": 509,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise/grp_KOrun_vs_WTrun": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 317,
+              "n_up": 146,
+              "n_down": 171,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Sets A-E from one limma model on all 16 samples (exercise effects: A and C).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:01"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_multigroup_analysis",
+        "subset": "interaction",
+        "role": "secondary",
+        "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "n_samples": 16,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\interaction\\input\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(grp)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\interaction\\DEG_results_geno_x_run.csv"
+        ],
+        "counts": {
+          "interaction/geno_x_run": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 13019,
+              "n_significant": 619,
+              "n_up": 273,
+              "n_down": 346,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13019,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Genotype x running interaction, analogue of the paper's GLM LRT (866 genes).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:02"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "pairwise_nofilter",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 16,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\transformed\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_KOsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_WTrun_vs_WTsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_WTrun.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOsed_vs_WTsed.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_WTsed.csv"
+        ],
+        "counts": {
+          "pairwise_nofilter/grp_KOrun_vs_KOsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 20287,
+              "n_significant": 3669,
+              "n_up": 2023,
+              "n_down": 1646,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 20287,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise_nofilter/grp_WTrun_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 20287,
+              "n_significant": 1174,
+              "n_up": 639,
+              "n_down": 535,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 20287,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTrun": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 20287,
+              "n_significant": 713,
+              "n_up": 389,
+              "n_down": 324,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 20287,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise_nofilter/grp_KOsed_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 20287,
+              "n_significant": 2206,
+              "n_up": 952,
+              "n_down": 1254,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 20287,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTsed": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 20287,
+              "n_significant": 1528,
+              "n_up": 829,
+              "n_down": 699,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 20287,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Same model without the FPKM>=1 filter: the paper-validated genes (Tfap2c, Lepr, Top2a, Chrm5, Ccr1) have FPKM < 1 in this dentate gyrus and are removed by the primary filter; DESeq2 on counts would have tested them.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:04"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "pairwise/grp_KOrun_vs_KOsed",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_KOrun_vs_KOsed\\ora\\DEG_results_grp_KOrun_vs_KOsed_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_KOrun_vs_KOsed\\ora\\DEG_results_grp_KOrun_vs_KOsed_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_KOrun_vs_KOsed\\ora\\DEG_results_grp_KOrun_vs_KOsed_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_KOrun_vs_KOsed\\ora\\DEG_results_grp_KOrun_vs_KOsed_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 2857 Mouse genes (direction=all, pvalue<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Cytoplasmic Translation (GO:0002181) | padj=4.00e-43 | overlap=75/93 | genes=EIF4A2;RPL4;RPL5;RPL3;RPL32;RPL31;RPLP1;RPL10A;RPL8;RPL9;RPL6;RPL7;RPS15;RPS4X;R - Peptide Biosynthetic Process (GO:0043043) | padj=1.48e-33 | overlap=91/158 | genes=RPL4;RPL5;HBS1L;RPL3;RPL32;RPL31;MRPS14;RPLP1;RPL10A;RPL8;MRPL34;RPL9;PCSK5;RPL6 - Macromolecule Biosynthetic Process (GO:0009059) | padj=5.95e-32 | overlap=97/183 | genes=RPL4;RPL5;RPL3;RPL32;RPL31;RPL10A;RPL8;RPL9;RPL6;RPL7;EEF1B2;RPS15;RPS14;RPS17;R - Translation (GO:0006412) | padj=6.20e-29 | overlap=108/234 | genes=RPL4;RPL5;RPL3;RPL32;RPL31;RPL8;RPL10A;RPL9;RPL6;RPL7;RPS15;EEF1B2;RPS14;RPS17;R - Gene Expression (GO:0010467) | padj=9.48e-18 | overlap=106/296 | genes=RPL4;RPL5;RPL3;RPL32;RPL31;RPL8;RPL10A;RPL9;RPL6;RPL7;RPS15;RPS14;RPS17;RPS16;RP - protein-RNA Complex Assembly (GO:0022618) | padj=4.10e-04 | overlap=45/150 | genes=RPL5;RPL10;CELF1;RPL11;CELF4;CELF5;NOL3;RPL6;RPS15;RRP7A;RPS14;RPS19;PUF60;POLR2 - Mitochondrial ATP Synthesis Coupled Electron Transport (GO:0042775) | padj=3.98e-03 | overlap=25/70 | genes=NDUFB9;COX7B;NDUFB7;NDUFB10;NDUFA12;COX4I1;NDUFB4;NDUFB3;NDUFB2;COX7A2;UQCR10;CO - Aerobic Electron Transport Chain (GO:0019646) | padj=6.69e-03 | overlap=24/68 | genes=COX8A;NDUFB9;COX7B;NDUFA7;NDUFB7;NDUFA6;NDUFB10;NDUFA5;NDUFA4;COX4I1;NDUFB4;NDUF - Rib..."
+      },
+      "reason": "paper reports GO enrichment for running-regulated genes in KO (S3.6, Table 3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:10"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "pairwise/grp_KOrun_vs_KOsed",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_KOrun_vs_KOsed\\gsea\\DEG_results_grp_KOrun_vs_KOsed_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 13019 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 16 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_MITOTIC_SPINDLE | NES=1.72 | NOM p=0.00e+00 | FDR q=2.41e-02 - HALLMARK_G2M_CHECKPOINT | NES=1.36 | NOM p=2.18e-02 | FDR q=3.83e-01 - HALLMARK_MYOGENESIS | NES=1.36 | NOM p=2.90e-02 | FDR q=2.58e-01 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.32 | NOM p=4.39e-02 | FDR q=2.53e-01 - HALLMARK_APICAL_JUNCTION | NES=1.31 | NOM p=4.33e-02 | FDR q=2.21e-01 - HALLMARK_HEDGEHOG_SIGNALING | NES=1.27 | NOM p=1.30e-01 | FDR q=2.41e-01 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.27 | NOM p=6.72e-02 | FDR q=2.11e-01 - HALLMARK_TGF_BETA_SIGNALING | NES=1.14 | NOM p=2.51e-01 | FDR q=4.72e-01 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=1.13 | NOM p=2.21e-01 | FDR q=4.25e-01 - HALLMARK_WNT_BETA_CATENIN_SIGNALING | NES=1.09 | NOM p=3.11e-01 | FDR q=4.80e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.07 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.27 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.25 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=-1.87 | NOM p=0.00e+00 | FDR q=2.94e-03 - HALLMARK_XENOBIOTIC_METABOLISM | NES=-1.85 | NOM p=0.00e+00 | FDR q=2.69e-03 - HALLMARK_ALLOGRAFT_REJECTION | NES=-1.73 | NOM p=0.00e+00 | FDR q..."
+      },
+      "reason": "paper reports GO enrichment for running-regulated genes in KO (S3.6, Table 3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:13"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "pairwise/grp_WTrun_vs_WTsed",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\enrichment_pairwise_grp_WTrun_vs_WTsed\\gsea\\DEG_results_grp_WTrun_vs_WTsed_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 13019 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 21 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TGF_BETA_SIGNALING | NES=1.80 | NOM p=0.00e+00 | FDR q=1.82e-02 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=1.72 | NOM p=0.00e+00 | FDR q=1.58e-02 - HALLMARK_MITOTIC_SPINDLE | NES=1.70 | NOM p=0.00e+00 | FDR q=1.33e-02 - HALLMARK_MYOGENESIS | NES=1.46 | NOM p=2.07e-03 | FDR q=1.43e-01 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.45 | NOM p=1.28e-02 | FDR q=1.19e-01 - HALLMARK_APICAL_JUNCTION | NES=1.44 | NOM p=1.72e-02 | FDR q=1.10e-01 - HALLMARK_HEDGEHOG_SIGNALING | NES=1.42 | NOM p=7.04e-02 | FDR q=1.15e-01 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.38 | NOM p=2.22e-02 | FDR q=1.32e-01 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.36 | NOM p=2.50e-02 | FDR q=1.47e-01 - HALLMARK_KRAS_SIGNALING_UP | NES=1.32 | NOM p=5.23e-02 | FDR q=1.73e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_DNA_REPAIR | NES=-1.72 | NOM p=0.00e+00 | FDR q=2.66e-02 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-1.64 | NOM p=5.84e-03 | FDR q=3.42e-02 - HALLMARK_PANCREAS_BETA_CELLS | NES=-1.49 | NOM p=3.97e-02 | FDR q=9.53e-02 - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.47 | NOM p=7.18e-03 | FDR q=8.58e-02 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=-1.39 | NOM p=2.96e-02 | FDR q=1.43e-01 - HALLMARK_XENOBIOTIC_METABOLISM | NES=-1.37 | NOM p=2.14e-02 | FDR q=1.38e-01 - HALLMARK_P53_PATHWAY | NES=-1.32 | NOM p=3.59e-02 | FDR q..."
+      },
+      "reason": "exercise effect in WT; GSEA only (exploratory)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0011"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:15"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "paper's DESeq2-on-counts route is blocked: only FPKM deposited; limma on log2(FPKM+1) is a declared deviation",
+          "raw p < 0.05 without multiplicity correction is the paper's rule; padj audit counts reported alongside",
+          "n = 4 per group",
+          "Sets B, D, E are genotype or mixed contrasts, not exercise effects"
+        ],
+        "results": {
+          "pairwise/grp_KOrun_vs_KOsed": {
+            "n_deg": 2857,
+            "up": 1500,
+            "down": 1357,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise/grp_KOsed_vs_WTsed": {
+            "n_deg": 1725,
+            "up": 740,
+            "down": 985,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise/grp_WTrun_vs_WTsed": {
+            "n_deg": 744,
+            "up": 399,
+            "down": 345,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise/grp_KOrun_vs_WTsed": {
+            "n_deg": 1048,
+            "up": 539,
+            "down": 509,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise/grp_KOrun_vs_WTrun": {
+            "n_deg": 317,
+            "up": 146,
+            "down": 171,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "interaction/geno_x_run": {
+            "n_deg": 619,
+            "up": 273,
+            "down": 346,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise_nofilter/grp_KOrun_vs_KOsed": {
+            "n_deg": 3669,
+            "up": 2023,
+            "down": 1646,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise_nofilter/grp_WTrun_vs_WTsed": {
+            "n_deg": 1174,
+            "up": 639,
+            "down": 535,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTrun": {
+            "n_deg": 713,
+            "up": 389,
+            "down": 324,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise_nofilter/grp_KOsed_vs_WTsed": {
+            "n_deg": 2206,
+            "up": 952,
+            "down": 1254,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTsed": {
+            "n_deg": 1528,
+            "up": 829,
+            "down": 699,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "pairwise/grp_KOrun_vs_KOsed": 3272,
+          "pairwise/grp_KOsed_vs_WTsed": 1230,
+          "pairwise/grp_WTrun_vs_WTsed": 762,
+          "pairwise/grp_KOrun_vs_WTsed": 1475,
+          "pairwise/grp_KOrun_vs_WTrun": 494,
+          "interaction/geno_x_run": 866,
+          "pairwise_nofilter/grp_KOrun_vs_KOsed": 3272,
+          "pairwise_nofilter/grp_KOsed_vs_WTsed": 1230,
+          "pairwise_nofilter/grp_WTrun_vs_WTsed": 762,
+          "pairwise_nofilter/grp_KOrun_vs_WTsed": 1475,
+          "pairwise_nofilter/grp_KOrun_vs_WTrun": 494
+        },
+        "comparison": {
+          "pairwise/grp_KOrun_vs_KOsed": {
+            "ours": 2857,
+            "paper": 3272
+          },
+          "pairwise/grp_KOsed_vs_WTsed": {
+            "ours": 1725,
+            "paper": 1230
+          },
+          "pairwise/grp_WTrun_vs_WTsed": {
+            "ours": 744,
+            "paper": 762
+          },
+          "pairwise/grp_KOrun_vs_WTsed": {
+            "ours": 1048,
+            "paper": 1475
+          },
+          "pairwise/grp_KOrun_vs_WTrun": {
+            "ours": 317,
+            "paper": 494
+          },
+          "interaction/geno_x_run": {
+            "ours": 619,
+            "paper": 866
+          },
+          "pairwise_nofilter/grp_KOrun_vs_KOsed": {
+            "ours": 3669,
+            "paper": 3272
+          },
+          "pairwise_nofilter/grp_KOsed_vs_WTsed": {
+            "ours": 2206,
+            "paper": 1230
+          },
+          "pairwise_nofilter/grp_WTrun_vs_WTsed": {
+            "ours": 1174,
+            "paper": 762
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTsed": {
+            "ours": 1528,
+            "paper": 1475
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTrun": {
+            "ours": 713,
+            "paper": 494
+          }
+        },
+        "paper_gene_check": {
+          "pairwise/grp_KOrun_vs_KOsed": {
+            "Tfap2c": null,
+            "Lepr": null,
+            "Top2a": null,
+            "Slc18a2": {
+              "AveExpr": 1.725,
+              "log2FoldChange": 0.3156,
+              "padj": 0.1018,
+              "pvalue": 0.0015
+            },
+            "Lpin2": {
+              "AveExpr": 4.5887,
+              "log2FoldChange": 0.38,
+              "padj": 0.0657,
+              "pvalue": 0.0
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": -0.3748,
+              "padj": 0.0657,
+              "pvalue": 0.0001
+            },
+            "Ramp3": {
+              "AveExpr": 1.6447,
+              "log2FoldChange": -0.4956,
+              "padj": 0.1314,
+              "pvalue": 0.006
+            },
+            "Chrm5": null
+          },
+          "pairwise/grp_KOrun_vs_WTrun": {
+            "Tfap2c": null,
+            "Lepr": null,
+            "Top2a": null,
+            "Slc18a2": {
+              "AveExpr": 1.725,
+              "log2FoldChange": 0.2518,
+              "padj": 1.0,
+              "pvalue": 0.0073
+            },
+            "Lpin2": {
+              "AveExpr": 4.5887,
+              "log2FoldChange": 0.1736,
+              "padj": 1.0,
+              "pvalue": 0.0181
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": -0.2311,
+              "padj": 1.0,
+              "pvalue": 0.0059
+            },
+            "Ramp3": {
+              "AveExpr": 1.6447,
+              "log2FoldChange": -0.401,
+              "padj": 1.0,
+              "pvalue": 0.0206
+            },
+            "Chrm5": null
+          },
+          "pairwise/grp_KOsed_vs_WTsed": {
+            "Ccr1": null,
+            "Eif2ak2": {
+              "AveExpr": 1.588,
+              "log2FoldChange": 0.4685,
+              "padj": 0.366,
+              "pvalue": 0.0036
+            },
+            "Magt1": {
+              "AveExpr": 2.1228,
+              "log2FoldChange": 0.4341,
+              "padj": 0.366,
+              "pvalue": 0.0003
+            },
+            "Ntsr2": {
+              "AveExpr": 5.8699,
+              "log2FoldChange": 0.397,
+              "padj": 0.366,
+              "pvalue": 0.0011
+            },
+            "Slc16a1": {
+              "AveExpr": 3.0784,
+              "log2FoldChange": 0.4279,
+              "padj": 0.366,
+              "pvalue": 0.0002
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": 0.1619,
+              "padj": 0.3689,
+              "pvalue": 0.0404
+            }
+          },
+          "pairwise_nofilter/grp_KOrun_vs_KOsed": {
+            "Tfap2c": {
+              "AveExpr": 0.0417,
+              "log2FoldChange": 0.0889,
+              "padj": 0.1133,
+              "pvalue": 0.0012
+            },
+            "Lepr": {
+              "AveExpr": 0.3744,
+              "log2FoldChange": 0.368,
+              "padj": 0.0657,
+              "pvalue": 0.0001
+            },
+            "Top2a": {
+              "AveExpr": 0.2224,
+              "log2FoldChange": 0.2415,
+              "padj": 0.0842,
+              "pvalue": 0.0005
+            },
+            "Slc18a2": {
+              "AveExpr": 1.725,
+              "log2FoldChange": 0.3156,
+              "padj": 0.1139,
+              "pvalue": 0.0014
+            },
+            "Lpin2": {
+              "AveExpr": 4.5887,
+              "log2FoldChange": 0.38,
+              "padj": 0.0657,
+              "pvalue": 0.0
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": -0.3748,
+              "padj": 0.0657,
+              "pvalue": 0.0001
+            },
+            "Ramp3": {
+              "AveExpr": 1.6447,
+              "log2FoldChange": -0.4956,
+              "padj": 0.1612,
+              "pvalue": 0.0083
+            },
+            "Chrm5": {
+              "AveExpr": 0.3988,
+              "log2FoldChange": -0.3028,
+              "padj": 0.2342,
+              "pvalue": 0.0294
+            }
+          },
+          "pairwise_nofilter/grp_KOrun_vs_WTrun": {
+            "Tfap2c": {
+              "AveExpr": 0.0417,
+              "log2FoldChange": 0.0865,
+              "padj": 1.0,
+              "pvalue": 0.0015
+            },
+            "Lepr": {
+              "AveExpr": 0.3744,
+              "log2FoldChange": 0.2077,
+              "padj": 1.0,
+              "pvalue": 0.0098
+            },
+            "Top2a": {
+              "AveExpr": 0.2224,
+              "log2FoldChange": 0.2849,
+              "padj": 0.7675,
+              "pvalue": 0.0001
+            },
+            "Slc18a2": {
+              "AveExpr": 1.725,
+              "log2FoldChange": 0.2518,
+              "padj": 1.0,
+              "pvalue": 0.0065
+            },
+            "Lpin2": {
+              "AveExpr": 4.5887,
+              "log2FoldChange": 0.1736,
+              "padj": 1.0,
+              "pvalue": 0.0119
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": -0.2311,
+              "padj": 1.0,
+              "pvalue": 0.0045
+            },
+            "Ramp3": {
+              "AveExpr": 1.6447,
+              "log2FoldChange": -0.401,
+              "padj": 1.0,
+              "pvalue": 0.0259
+            },
+            "Chrm5": {
+              "AveExpr": 0.3988,
+              "log2FoldChange": -0.2018,
+              "padj": 1.0,
+              "pvalue": 0.1275
+            }
+          },
+          "pairwise_nofilter/grp_KOsed_vs_WTsed": {
+            "Ccr1": {
+              "AveExpr": 0.2002,
+              "log2FoldChange": 0.1975,
+              "padj": 0.4748,
+              "pvalue": 0.0706
+            },
+            "Eif2ak2": {
+              "AveExpr": 1.588,
+              "log2FoldChange": 0.4685,
+              "padj": 0.446,
+              "pvalue": 0.0049
+            },
+            "Magt1": {
+              "AveExpr": 2.1228,
+              "log2FoldChange": 0.4341,
+              "padj": 0.446,
+              "pvalue": 0.0004
+            },
+            "Ntsr2": {
+              "AveExpr": 5.8699,
+              "log2FoldChange": 0.397,
+              "padj": 0.446,
+              "pvalue": 0.0013
+            },
+            "Slc16a1": {
+              "AveExpr": 3.0784,
+              "log2FoldChange": 0.4279,
+              "padj": 0.446,
+              "pvalue": 0.0002
+            },
+            "Rgs14": {
+              "AveExpr": 4.9483,
+              "log2FoldChange": 0.1619,
+              "padj": 0.4471,
+              "pvalue": 0.0322
+            }
+          }
+        }
+      },
+      "reason": "Running effects (Set A, Set C) are the exercise estimands; paper-validated genes (S3.5.p2-p3; S3.5.p1) are looked up.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:19:15"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "69a56329578b8ffacf6d316f7f6b135e91434574313b2d89f6a230683d7d59ad",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "18eb50493346eaa336c9bafbf1bcb58c31bd09c7b6d601717ba631f60a0db3ef",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f239196d52479ed5754e1132b95ab9571a8c7eaeb80c908a500c8564e629b4bc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "285383b8875d9312a783d5f1980050a1c45de05cf1368647a764dde62a6d03c8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5033d9ed568234f8b3a2259839da1fab4e3c33ae94a6c4334bc8c9d9e6cfad80",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "47352acbdb1ebafabeb83de3e6f75b7caa7c15af9f8ad8f918c87b26170bc265",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "44490598dac7428b9d0ef620c54bcd7d71bfa5c14dd15699eb164970752e141b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\input\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "19aac52626a54f9ee4d4c1f58e30b04ebcfffe494fece05cd1f82a8d870246c6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_KOsed.csv",
+      "role": "deg_pairwise/grp_KOrun_vs_KOsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4a4128befc72d7c194aadb1aec51648c5535813c2869116ed40bf8db2be4640e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOsed_vs_WTsed.csv",
+      "role": "deg_pairwise/grp_KOsed_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bf8c4846e942a858064aa3231a1bc30b5c92e368a16d8abccccc7ea8adf378be",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_WTrun_vs_WTsed.csv",
+      "role": "deg_pairwise/grp_WTrun_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1aaa9f7ef159f7e4c85b25ac9a8f74608bf1ba2d8563e6fffd9d44189b77f7d7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_WTsed.csv",
+      "role": "deg_pairwise/grp_KOrun_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b92ccfc4025c2b9cb3eb01daa6e4f0aa38d40ed2ff3b36a883a5c0a448a7639d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise\\DEG_results_grp_KOrun_vs_WTrun.csv",
+      "role": "deg_pairwise/grp_KOrun_vs_WTrun",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5631d02e9ef10161d4f96bd0a85dd8e49d1b4e6e1cc645584c19db80fbe71f7f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\interaction\\input\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "19aac52626a54f9ee4d4c1f58e30b04ebcfffe494fece05cd1f82a8d870246c6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\interaction\\DEG_results_geno_x_run.csv",
+      "role": "deg_interaction/geno_x_run",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "804f149ea54971eb5a2feb090bb0e377bc58526bbf78e30ce6f528fac571e817",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_KOsed.csv",
+      "role": "deg_pairwise_nofilter/grp_KOrun_vs_KOsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dde7d268a74d183b751c7a5535990d257df82ff212e8a88d754dc94d080222e9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_WTrun_vs_WTsed.csv",
+      "role": "deg_pairwise_nofilter/grp_WTrun_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "afb5020d1f5e4346d28f579c21c72491ba9a5b664017b75247799e8147a2d359",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_WTrun.csv",
+      "role": "deg_pairwise_nofilter/grp_KOrun_vs_WTrun",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "60f6cfaf621ca8907072f4fae66df245c6f1470db6cf2d444d9a843b8daf17fb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOsed_vs_WTsed.csv",
+      "role": "deg_pairwise_nofilter/grp_KOsed_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "31b3f8eb88a64f3e3731e9927ce674926778e020c66476ba57fcdb524f4998fc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\results\\pairwise_nofilter\\DEG_results_grp_KOrun_vs_WTsed.csv",
+      "role": "deg_pairwise_nofilter/grp_KOrun_vs_WTsed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a51b83989bfbd8f0f273a5f3363362e1887b7a0231f946a75a773a43b4c93044",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37928906\\GSE237736\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "05cd803293944a8681abb7182c553be965d7498fde70477eb67c9bd732e7988b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

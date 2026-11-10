@@ -73,6 +73,7 @@ def unpack_and_merge_geo_tar(data_dir):
 
     print(f"  unpacked {len(members)} per-sample files from {os.path.basename(tar_path)}")
     series = []
+    fpkm_series = []   # Cufflinks fpkm_tracking / StringTie gene_abundance: no count column, only FPKM
     skipped = []   # (filename, reason) — a skipped SAMPLE file is a dropped sample (fail loud)
 
     # STAR ReadsPerGene.out.tab members: one strand column chosen for the whole set.
@@ -113,6 +114,11 @@ def unpack_and_merge_geo_tar(data_dir):
         df = df[~df[gene_col].astype(str).str.startswith("__")]
         decision = choose_count_column(df)
         if not decision.column:
+            fpkm_col = next((c for c in df.columns if str(c).strip().upper() == "FPKM"), None)
+            if fpkm_col is not None:
+                f = pd.to_numeric(df.set_index(gene_col)[fpkm_col], errors="coerce")
+                f.name = _tar_member_sample_name(m.name)
+                fpkm_series.append(f.groupby(level=0).sum())
             skipped.append((m.name, f"count_column_{decision.confidence}:{decision.reason}"))
             continue
         count_col = decision.column
@@ -129,6 +135,16 @@ def unpack_and_merge_geo_tar(data_dir):
         print(f"  WARNING: skipped {len(skipped)}/{len(members)} tar members "
               f"(possible dropped samples): {shown}" + (" ..." if len(skipped) > 8 else ""))
 
+    if not series and fpkm_series:
+        # Every member is an FPKM table: merge FPKM (summed per gene ID) into a separately named
+        # file so it can never be mistaken for counts; the agent still decides the matrix type.
+        merged = pd.concat(fpkm_series, axis=1, join="outer").fillna(0)
+        merged.index.name = "gene_id"
+        out_path = os.path.join(data_dir, f"{acc}_merged_from_tar_FPKM.csv")
+        merged.to_csv(out_path)
+        print(f"  merged FPKM matrix (no count column in any member): {merged.shape[0]} genes x "
+              f"{merged.shape[1]} samples -> {out_path}")
+        return out_path
     if not series:
         return None
 

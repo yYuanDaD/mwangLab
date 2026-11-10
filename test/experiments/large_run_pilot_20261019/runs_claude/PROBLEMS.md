@@ -551,3 +551,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36839405 (GSE222163)
 
 - inspect alignment keys miss case-only mismatch Ctrl/ctrl (case_runner.py:300-323); dup IDs 1-Mar/2-Mar needed a prep script (inspect flag added after this row); pydeseq2 overflow warnings Details: `PMID36839405/HANDBACK.md`.
+
+## PMID38370171 (GSE240131)
+
+- native.py:240-246 profile counts gene_id/gene_symbol as samples (patched); edger_tools.py:106 astype(int) truncates fractional counts; edger_tools.py:145 own padj/|lfc|>1 summary Details: `PMID38370171/HANDBACK.md`.
+
+## PMID37928906 (GSE237736)
+
+- StringTie gene_abundance _RAW.tar not mergeable (count_column_ambiguous, tools/omics_semantics.py:49; patched after this row); a prep script was needed Details: `PMID37928906/HANDBACK.md`.

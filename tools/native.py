@@ -231,7 +231,8 @@ _ANNOTATION_NAMES = {"start", "end", "stop", "length", "strand", "chr", "chrom",
                      "gene_start", "gene_end", "gene_length", "transcript_length", "effective_length",
                      "efflength", "basemean", "log2foldchange", "lfcse", "stat", "pvalue", "padj", "logfc",
                      "aveexpr", "p.value", "adj.p.val", "fdr", "gc", "gc_content", "entrez", "entrezid",
-                     "gene_chr", "gene_start_position", "gene_end_position", "gene_length_bp", "exon_length"}
+                     "gene_chr", "gene_start_position", "gene_end_position", "gene_length_bp", "exon_length",
+                     "gene_id", "geneid", "gene_symbol", "symbol", "entrez_id", "entrezgene", "ncbi_gene_id"}
 
 
 def profile_matrix(path: str | Path, sample_columns: Sequence[str] | None = None) -> dict:
@@ -531,7 +532,8 @@ def merge_raw_tar(data_dir: str | Path) -> dict:
 
     Handles plain gene/count tables, featureCounts output and STAR ``ReadsPerGene.out.tab``
     (one strand column for all samples, chosen from the forward/reverse totals and printed).
-    Writes ``<accession>_merged_from_tar.csv`` next to the tar. Unparseable members are
+    Writes ``<accession>_merged_from_tar.csv`` next to the tar (``..._FPKM.csv`` when every member
+    is an FPKM table without counts, as Cufflinks/StringTie write). Unparseable members are
     printed as possible dropped samples, so compare ``n_samples`` with the GEO sample count.
     """
     from tools.geo_tar import unpack_and_merge_geo_tar

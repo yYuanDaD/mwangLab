@@ -1,0 +1,21 @@
+{"case": "GSE222163", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Mouse CR x treadmill EX study (S2.3.p1, S3.1.p1); exercise factor is in the EX (8: 4 BAT + 4 SkM) and CREX (7: 4 BAT + 3 SkM) groups versus Ctrl (7) and CR (7); 29 sequenced samples (S2.6.p1), in vivo training, not an in-vitro mediator design.",
+  "B2": "Per tissue, two-group DESeq2: CR vs control, CREX vs EX (non-exercise effect of CR, S3.2.p1/S3.5.p1) and EX vs control, CREX vs CR (exercise effect, S3.3.p1/S3.6.p1). n per S2.6.p1: BAT ctrl 3, CR 4, EX 4, CREX 4; SkM ctrl 4, CR 3, EX 4, CREX 3.",
+  "B3": "BAT and gastrocnemius were collected from the same mice (S3.1.p1), so a cross-tissue animal link plausibly exists and the title/description-minus-tissue key (13 keys, 26/29 samples) is a candidate, but the paper does not say the numbers are animal IDs, group sizes differ between tissues, and the expression check is not_supported (r 0.06 vs -0.005). Each tissue is analysed alone, so no animal is sampled twice inside any model.",
+  "B4": "S2.7.p1: 'We conducted a differently expressed (DE) genes analysis for the two groups ... DESeq2 (v1.38.0)': each pair of groups fitted alone.",
+  "B5": "S2.7.p1: adjusted p value < 0.05 and |log2FC| > log2(1.5), strict. Counts: BAT EX vs ctrl 13 up + 24 down; BAT CREX vs CR 25 up + 5 down; SkM EX vs ctrl 20 up + 28 down; SkM CREX vs CR 6 up + 9 down (S3.3.p1, S3.6.p1). FIG2/FIG4 legends colour by p < 0.05 and |log2FC| > 0.58."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "In vivo exercise arms EX and CREX; analysis ran EX vs Ctrl and CREX vs CR (S3.3.p1, S3.6.p1).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Packet B group table: Ctrl 7 (3 BAT+4 SkM), CR 7 (4+3), EX 8 (4+4), CREX 7 (4+3), equal to S2.6.p1; no exclusions; each exercise arm compared with its own diet control (EX vs Ctrl, CREX vs CR), no second factor confounded.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts are treatment=EX/CREX over control=Ctrl/CR; BAT EX vs Ctrl 13 up / 26 down vs paper 13/24, SkM 20/30 vs 20/28, same signs.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "The flagged key links BAT to SkM; design fits each tissue stratum separately (grp_*_tissue-BAT / -SkM, n 6-8), so no animal appears twice in any model. Expression check status not_supported. The flag does not apply to the within-tissue paper design.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Two groups at a time per tissue, formula ~ grp on only the two compared groups, as S2.7.p1.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "All male, single sex check pass, no batch/lane field in GEO; recorded in covariance reasoning.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "RSEM expected counts (94% integer, sums 21-25 M) rounded for DESeq2 as S2.7.p1; p-value histogram frac_p_gt_0.9 0.11-0.12, no pile-up; pydeseq2 vs R DESeq2 difference recorded.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied padj < 0.05 and |log2FC| > 0.5849625 strict, equals S2.7.p1; legend raw-p wording recorded as discrepancy; packet table shows no other rule reproduces the paper better.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "Pairs compare the same contrast at the same rule: 39 vs 37, 50 vs 48, 30 vs 30. SkM CREX vs CR 29 vs 15 is reported openly as unstable (3 vs 3) in HANDBACK; no rule in the packet table gives 15 (padj<0.05 alone also 29).", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; analysis finished.", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该病例按论文的分组织两两DESeq2流程执行，分组、样本数、对照、方向和阈值均与论文一致。pairing_key_candidate 标记是BAT与SkM之间的跨组织配对，而分析在每个组织内单独拟合，不存在同一动物重复入模，因此不构成问题。SkM CREX vs CR 的DEG数(29对15)差异已如实记录，属于小样本下的不稳定，仅为轻微说明。"}

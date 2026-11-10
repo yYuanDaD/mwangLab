@@ -1,0 +1,432 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37928906",
+  "request": "Analyze GSE237736 for PMID 37928906 (Transcriptome analysis reveals genes associated with stem cell activation by physical exercise in the dentate gyrus of aged p16Ink4a knockout mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE237736",
+      "accession": "GSE237736",
+      "inputs": {
+        "paper": [
+          "E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC10621069.paper.md"
+        ],
+        "metadata": "GSE237736/GSE237736_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37928906/prep/GSE237736_StringTie_FPKM_merged.csv",
+        "raw_tar": false,
+        "prep_scripts": [
+          "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37928906/prep/merge_stringtie_fpkm.py"
+        ]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE237736"
+            ],
+            "assay": "bulk RNA-seq (Illumina NovaSeq 6000), bilateral dentate gyrus, 12-month-old male C57BL/6 p16Ink4a WT and KO mice",
+            "factors": {
+              "genotype": [
+                "p16 WT",
+                "p16 KO"
+              ],
+              "treatment": [
+                "CTL (sedentary)",
+                "RUN (12 days voluntary wheel running)"
+              ]
+            },
+            "design": "2x2 factorial, n = 4 independent mice per group (S2.10.p1), 16 samples",
+            "sample_inclusion": "all 16 deposited samples; no exclusions stated",
+            "primary_estimand": "effect of 12 days of voluntary running on dentate gyrus gene expression in aged p16 KO mice (Set A, KO RUN vs KO CTL) and how it differs from WT (genotype x running interaction, GLM/LRT); running in WT (Set C) is the WT exercise effect",
+            "planned_contrasts": [
+              "Set A: KO RUN vs KO CTL (S3.1.p4; paper: 3,272 genes p<0.05)",
+              "Set B: KO CTL vs WT CTL (S3.1.p4; paper: 1,230 genes p<0.05) - genotype, not exercise",
+              "Set C: WT RUN vs WT CTL (S3.1.p4; paper: 762 genes p<0.05)",
+              "Set D: KO RUN vs WT CTL (S3.1.p4; paper: 1,475 genes p<0.05)",
+              "Set E: KO RUN vs WT RUN (S3.1.p4; paper: 494 genes p<0.05)",
+              "GLM LRT genotype x treatment interaction (S2.5.p5, S3.4.1.p1; paper: 866 genes p<0.05)"
+            ],
+            "paper_method": "htseq-count reads -> DESeq2 Wald test per pairwise comparison; DESeq2 LRT full (genotype + treatment + interaction) vs reduced (no interaction) for the GLM set (S2.5.p4, S2.5.p5, S2.10.p1)",
+            "repeated_measure_unit": "none (independent animals)",
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.05,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S3.1.p3"
+            },
+            "paper_results": "Set A 3272, Set B 1230, Set C 762, Set D 1475, Set E 494, GLM interaction 866; Set A_Set E_GLM 106 genes; Set D_Set E_GLM 29 genes; qPCR-validated: Tfap2c, Lepr, Top2a, Slc18a2, Lpin2, Rgs14, Ramp3, Chrm5"
+          },
+          "reasoning": "S3.1.p3 states DE genes from DESeq2 Wald with significance threshold raw p-value < 0.05 (padj computed in S2.10.p1 but the counts in S3.1.p4 are at p<0.05). S3.1.p4 defines Sets A-E with counts. S2.5.p5/S3.4.1.p1 define the LRT interaction (866 genes). S2.10.p1 gives n = 4 per group.",
+          "confidence": "high",
+          "locator": "S3.1.p3"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S2.5.p6 names GSE237736",
+              "16 GSMs = 4 groups x 4 (S2.10.p1)",
+              "GEO characteristics: dentate gyrus, one-year-old male, p16Ink4a +/+ and -/-, sedentary vs running 12 days, matching S2 and FIG1"
+            ]
+          },
+          "reasoning": "The paper deposits exactly this series; sample annotations match the design. Matrix is the merge of the 16 per-sample StringTie gene_abundance files in GSE237736_RAW.tar (prep/merge_stringtie_fpkm.py).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {
+            "geno": "characteristics_ch1.4.genotype",
+            "trt": "characteristics_ch1.5.treatment"
+          },
+          "recode": {
+            "geno": {
+              "p16Ink4a +/+": "WT",
+              "p16Ink4a -/-": "KO"
+            },
+            "trt": {
+              "sedentary": "sed",
+              "running 12 days": "run"
+            },
+            "grp": {
+              "WT_sed": "WTsed",
+              "WT_run": "WTrun",
+              "KO_sed": "KOsed",
+              "KO_run": "KOrun"
+            }
+          },
+          "combine": {
+            "grp": [
+              "geno",
+              "trt"
+            ]
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids taken from the tar member names; they equal the metadata index. Genotype and treatment come from the GEO characteristics; description (e.g. 1WTnoRun) agrees.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "reasoning": "Deposited files are StringTie gene_abundance tables with Coverage/FPKM/TPM columns only; GEO data_processing: 'tab-delimited text files include FPKM values for each Sample'. No htseq counts were deposited although the paper's DESeq2 used htseq-count reads (S2.5.p4). Using FPKM column, gene IDs summed over duplicate loci.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "WTsed"
+          },
+          "subject": null,
+          "organism": "Mouse",
+          "planned": [
+            "grp_KOrun_vs_KOsed",
+            "grp_KOsed_vs_WTsed",
+            "grp_WTrun_vs_WTsed",
+            "grp_KOrun_vs_WTsed",
+            "grp_KOrun_vs_WTrun"
+          ],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "multilevel",
+            "design_column": "grp",
+            "formula": "~ 0 + C(grp)",
+            "contrasts": [
+              {
+                "name": "grp_KOrun_vs_KOsed",
+                "control": "KOsed",
+                "treatment": "KOrun",
+                "role": "primary",
+                "paper_set": "A"
+              },
+              {
+                "name": "grp_WTrun_vs_WTsed",
+                "control": "WTsed",
+                "treatment": "WTrun",
+                "role": "primary",
+                "paper_set": "C"
+              },
+              {
+                "name": "grp_KOsed_vs_WTsed",
+                "control": "WTsed",
+                "treatment": "KOsed",
+                "role": "secondary",
+                "paper_set": "B (genotype, not exercise)"
+              },
+              {
+                "name": "grp_KOrun_vs_WTsed",
+                "control": "WTsed",
+                "treatment": "KOrun",
+                "role": "secondary",
+                "paper_set": "D (genotype and running combined)"
+              },
+              {
+                "name": "grp_KOrun_vs_WTrun",
+                "control": "WTrun",
+                "treatment": "KOrun",
+                "role": "secondary",
+                "paper_set": "E (genotype within runners)"
+              },
+              {
+                "name": "interaction_geno_x_run",
+                "role": "secondary",
+                "paper_set": "GLM LRT interaction"
+              }
+            ]
+          },
+          "reasoning": "2x2 factorial with n=4 independent mice per cell. The four cells are coded as one factor grp so all five pairwise Sets of S3.1.p4 come from one model; the exercise effects are Set A (running within KO) and Set C (running within WT). Sets B/D/E are genotype or mixed contrasts and are reproduced only for comparison with the paper. The interaction (S2.5.p5) is the 1-df contrast (KOrun-KOsed)-(WTrun-WTsed), equivalent in a 2x2 to the paper's LRT of full vs reduced model.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "pool genotypes for RUN vs CTL",
+              "reason_rejected": "paper never pools; genotype modifies the running effect (the study's central question)"
+            }
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one sample each; all male, same age and tissue; no batch or lane recorded in GEO. No blocking unit.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (log2(FPKM+1), moderated t, one model ~ 0 + C(grp))",
+            "formula": "~ 0 + C(grp)",
+            "paper_route": {
+              "method": "DESeq2 Wald / LRT on htseq-count reads",
+              "status": "blocked",
+              "reason": "only StringTie FPKM/TPM/Coverage tables deposited in GEO; no read counts; FPKM must not be rounded into counts"
+            },
+            "deviations": [
+              "limma on log2(FPKM+1) instead of DESeq2 on counts",
+              "genes kept with FPKM >= 1 in >= 4 samples (one group) before fitting; the paper's DESeq2 used its own independent filtering",
+              "interaction tested as 1-df limma contrast instead of DESeq2 LRT",
+              "sensitivity run without the FPKM filter (pairwise_nofilter) for low-expressed paper genes"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix-method policy: FPKM -> log2(x+1) -> limma. Paper route blocked (no counts).",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "deviation_note": "paper's raw p < 0.05 rule applied to limma p-values; BH padj < 0.05 reported as audit"
+          },
+          "reasoning": "S3.1.p3: 'significance threshold ... set to p-value <0.05'; Set counts in S3.1.p4 and the 866 GLM genes (S3.4.1.p1) use p < 0.05. No fold-change cutoff.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "paper's DESeq2-on-counts route is blocked: only FPKM deposited; limma on log2(FPKM+1) is a declared deviation",
+              "raw p < 0.05 without multiplicity correction is the paper's rule; padj audit counts reported alongside",
+              "n = 4 per group",
+              "Sets B, D, E are genotype or mixed contrasts, not exercise effects"
+            ]
+          },
+          "paper_counts": {
+            "pairwise/grp_KOrun_vs_KOsed": 3272,
+            "pairwise/grp_KOsed_vs_WTsed": 1230,
+            "pairwise/grp_WTrun_vs_WTsed": 762,
+            "pairwise/grp_KOrun_vs_WTsed": 1475,
+            "pairwise/grp_KOrun_vs_WTrun": 494,
+            "interaction/geno_x_run": 866,
+            "pairwise_nofilter/grp_KOrun_vs_KOsed": 3272,
+            "pairwise_nofilter/grp_KOsed_vs_WTsed": 1230,
+            "pairwise_nofilter/grp_WTrun_vs_WTsed": 762,
+            "pairwise_nofilter/grp_KOrun_vs_WTsed": 1475,
+            "pairwise_nofilter/grp_KOrun_vs_WTrun": 494
+          },
+          "paper_genes": {
+            "pairwise/grp_KOrun_vs_KOsed": [
+              "Tfap2c",
+              "Lepr",
+              "Top2a",
+              "Slc18a2",
+              "Lpin2",
+              "Rgs14",
+              "Ramp3",
+              "Chrm5"
+            ],
+            "pairwise/grp_KOrun_vs_WTrun": [
+              "Tfap2c",
+              "Lepr",
+              "Top2a",
+              "Slc18a2",
+              "Lpin2",
+              "Rgs14",
+              "Ramp3",
+              "Chrm5"
+            ],
+            "pairwise/grp_KOsed_vs_WTsed": [
+              "Ccr1",
+              "Eif2ak2",
+              "Magt1",
+              "Ntsr2",
+              "Slc16a1",
+              "Rgs14"
+            ],
+            "pairwise_nofilter/grp_KOrun_vs_KOsed": [
+              "Tfap2c",
+              "Lepr",
+              "Top2a",
+              "Slc18a2",
+              "Lpin2",
+              "Rgs14",
+              "Ramp3",
+              "Chrm5"
+            ],
+            "pairwise_nofilter/grp_KOrun_vs_WTrun": [
+              "Tfap2c",
+              "Lepr",
+              "Top2a",
+              "Slc18a2",
+              "Lpin2",
+              "Rgs14",
+              "Ramp3",
+              "Chrm5"
+            ],
+            "pairwise_nofilter/grp_KOsed_vs_WTsed": [
+              "Ccr1",
+              "Eif2ak2",
+              "Magt1",
+              "Ntsr2",
+              "Slc16a1",
+              "Rgs14"
+            ]
+          },
+          "reasoning": "Running effects (Set A, Set C) are the exercise estimands; paper-validated genes (S3.5.p2-p3; S3.5.p1) are looked up.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "input matrix",
+          "paper": "htseq-count read counts into DESeq2 (S2.5.p4)",
+          "data": "GEO has only StringTie gene_abundance FPKM/TPM tables",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "interaction test",
+          "paper": "DESeq2 LRT full vs reduced (S2.5.p5)",
+          "data": "limma 1-df interaction contrast on log2 FPKM",
+          "disposition": "declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "pairwise",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": [
+              "grp_KOrun_vs_KOsed",
+              "grp_KOsed_vs_WTsed",
+              "grp_WTrun_vs_WTsed",
+              "grp_KOrun_vs_WTsed",
+              "grp_KOrun_vs_WTrun"
+            ],
+            "covariates": []
+          },
+          "role": "primary",
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "reasoning": "Sets A-E from one limma model on all 16 samples (exercise effects: A and C)."
+        },
+        {
+          "name": "interaction",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "multilevel",
+              "formula": "~ 0 + C(grp)",
+              "contrasts": [
+                {
+                  "name": "geno_x_run",
+                  "coefficients": {
+                    "C(grp)[KOrun]": 1,
+                    "C(grp)[KOsed]": -1,
+                    "C(grp)[WTrun]": -1,
+                    "C(grp)[WTsed]": 1
+                  }
+                }
+              ]
+            }
+          },
+          "role": "secondary",
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "reasoning": "Genotype x running interaction, analogue of the paper's GLM LRT (866 genes)."
+        },
+        {
+          "name": "pairwise_nofilter",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": [
+              "grp_KOrun_vs_KOsed",
+              "grp_WTrun_vs_WTsed",
+              "grp_KOrun_vs_WTrun",
+              "grp_KOsed_vs_WTsed",
+              "grp_KOrun_vs_WTsed"
+            ],
+            "covariates": []
+          },
+          "role": "sensitivity",
+          "reasoning": "Same model without the FPKM>=1 filter: the paper-validated genes (Tfap2c, Lepr, Top2a, Chrm5, Ccr1) have FPKM < 1 in this dentate gyrus and are removed by the primary filter; DESeq2 on counts would have tested them."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "pairwise/grp_KOrun_vs_KOsed",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports GO enrichment for running-regulated genes in KO (S3.6, Table 3)"
+        },
+        {
+          "execution": "pairwise/grp_WTrun_vs_WTsed",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "exercise effect in WT; GSEA only (exploratory)"
+        }
+      ]
+    }
+  ]
+}
