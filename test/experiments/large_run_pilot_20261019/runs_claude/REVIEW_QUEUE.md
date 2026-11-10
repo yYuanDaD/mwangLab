@@ -138,3 +138,7 @@ One section per case; newest last.
 ## PMID37059838 / GSE228901 (2026-11-10)
 
 - policy: Open policy question only: whether a series with exercise-performance readouts but no exercise intervention should be reported as an associational analysis; the skill's current rule (refuse) is followed.
+
+## PMID42318351 / GSE277623 (2026-11-10)
+
+- policy: Policy question only: whether a drug-vs-vehicle HFpEF series with an exercise-tolerance endpoint should be refused or run as a non-exercise record is outside this review; the refusal follows the skill's no-exercise-arm rule.

@@ -1,0 +1,22 @@
+{"case": "GSE277623", "reviewer": "Claude Sonnet 5.5 (read-only decision review)",
+ "blind": {
+  "B1": "No. The paper (S3.1.p1-p2, S3.9.p1, S4.4.p1) is a drug study (empagliflozin, pirfenidone, combination vs PBS vehicle) in an L-NAME + HFD HFpEF rat model. Exercise appears only as a treadmill tolerance outcome (S3.5, S4.1.p4). Packet A shows no exercise words in any column. No sequenced sample carries an exercise factor.",
+  "B2": "S4.4.p1/p4 and FIG5: EMPA+PFD vs untreated (n=3 vs 3; 717 DEGs), EMPA vs untreated (n=2 vs 3; 52), PFD vs untreated (n=2 vs 3; 4), control 9w vs untreated (295), control 9w vs 5w (PC), HFpEF vs control 5w (DE), untreated vs control 9w (UT); vs HFpEF 5w: 2954/1492/439/439. n=3 male hearts per group, one EMPA and one PFD sample excluded (corrupted files).",
+  "B3": "No repeated measures: one LV sample per animal at a single harvest; the 5w and 9w groups are different animals (euthanized at weeks 5 and 9, S3.1.p2). Packet A candidate keys only link 6/19 samples via the biorep suffix, which is a within-group replicate number and not an animal id.",
+  "B4": "Paper S3.9.p1: 'DESeq2 (idep ver 0.96) was used to determine the differential gene expression between two groups' i.e. pairwise two-group fits. Not stated whether the model was joint.",
+  "B5": "S3.9.p1: 'with an FDR cut-off of 0.05 and a minimum fold-change of 2'; FIG5 legend: 'adjusted p-value < 0.05 and absolute fold change >2'. Counts: 717 (421 up, 296 down), 52, 4, 295, 2954/1492/439/439."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Refusal matches B1: S3.1.p2, S3.9.p1; no exercise words in metadata; exercise only a treadmill endpoint (S3.5, S4.1.p4).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp levels 3/3/3/3/3/2/2 equal the paper's n=3 with EMPA and PFD n=2 explained by S4.4.p1 exclusion; derived from GEO title and cross-checked with characteristics.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Flag unused_subject_like_column is on characteristics_ch1.5.treatment: a 6-level group label (max_repeat 6), not an animal id. Biorep suffix is a within-group replicate index. Independent animals, one LV each.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Nothing fitted; the recorded paper_method is pairwise two-group DESeq2, matching B4.", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "Single sex (male), single tissue; no exercise factor to alias.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "integer_fraction 1.0, max 329596, HISAT2 + htseq-count (S3.9.p1) = raw counts.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "HANDBACK transcribes FDR<0.05 and |FC|>2 (|log2FC|>1) from S3.9.p1 and FIG5, as in B5.", "fix": ""},
+  {"id": "paper_match", "verdict": "na", "severity": "none", "evidence": "No ours-vs-paper comparison made; HANDBACK lists paper counts only and does not claim a match.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise contrast' is true: all seven groups are disease/time/drug, and the search covered the metadata columns, titles and the paper methods, not a narrow key test. No pairing claim is made on narrow evidence (design correctly states independent animals).", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Policy question only: whether a drug-vs-vehicle HFpEF series with an exercise-tolerance endpoint should be refused or run as a non-exercise record is outside this review; the refusal follows the skill's no-exercise-arm rule."],
+ "summary": "该系列是 HFpEF 大鼠药物(EMPA/PFD)研究,测序组按疾病、时间点和药物划分,运动仅为跑台耐力终点,没有运动组,因此在设计阶段拒绝是正确的。分组、n、矩阵类型和阈值转录均与论文一致,机械标记 unused_subject_like_column 指向的是分组标签而非动物编号,不构成配对问题。整体通过。"}

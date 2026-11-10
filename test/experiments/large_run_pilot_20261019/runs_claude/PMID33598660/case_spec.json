@@ -1,0 +1,152 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33598660",
+  "request": "Analyze GSE117161 for PMID 33598660 (Monitoring daytime differences in moderate intensity exercise capacity using treadmill test and muscle dissection.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (Claude Code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE117161",
+      "accession": "GSE117161",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC7868630.paper.md"],
+        "metadata": "GSE117161/GSE117161_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID33598660/prep/GSE117161_counts_fixed.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID33598660/prep/fix_excel_genes.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE117161"],
+            "paper_type": "STAR Protocols method paper; the transcriptome data come from the companion study Ezagouri et al. 2019 (S1.1.p2, S7.3.p2). No DE analysis, method, threshold or DEG count is reported in this article.",
+            "primary_estimand": "Effect of a moderate-intensity treadmill run versus the sedentary (basal) condition on gastrocnemius gene expression, evaluated separately at the two active-phase times of day the protocol compares, ZT14 (early) and ZT22 (late) (S3.3.p2, S4.p1, FIG4).",
+            "factors": {"running protocol": ["Basal (sedentary)", "Moderate", "High"], "time of day": ["ZT14 (Early)", "ZT22 (Late)"]},
+            "inclusion": "C57BL/6J males, 3 months old, gastrocnemius (S4.p1, S3.3; GEO source_name). All 18 deposited samples are used; the High intensity arm is outside this protocol's scope (moderate intensity only, S3.p1) and is analysed as exploratory.",
+            "planned_contrasts": [
+              "Moderate run vs Basal (sedentary) at ZT14 (S3.3.p2 running vs sedentary; S4.p1 ZT14; paper: no DEG count reported)",
+              "Moderate run vs Basal (sedentary) at ZT22 (S3.3.p2; S4.p1 ZT22; paper: no DEG count reported)"
+            ],
+            "repeated_measure_unit": "none: one muscle per mouse, independent animals",
+            "normalization": "not stated",
+            "paper_method": "not stated (protocol paper, no DE analysis)",
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "stated": false, "source_locator": null},
+            "paper_results": "none for gene expression; only running capacity and blood glucose (S4.p1, FIG4)"
+          },
+          "reasoning": "The article is a protocol for a moderate-intensity treadmill test at different ZTs and for muscle dissection comparing running versus sedentary mice (S3.3.p2). It names GSE117161 as the transcriptome data of Ezagouri et al. 2019 (TAB1, S7.3.p2) but contains no DE method, threshold or results. The intended exercise question is therefore moderate run vs sedentary, at ZT14 and ZT22 separately, since daytime dependence is the paper's theme (S1.1.p2, S4.p1).",
+          "confidence": "medium",
+          "locator": "S3.3.p2; S4.p1; S7.3.p2",
+          "candidates": [
+            {"value": "Pool ZT14 and ZT22 into one Moderate vs Basal contrast", "reason_rejected": "the paper's theme is daytime difference; pooling hides the ZT dependence it studies."},
+            {"value": "High vs Basal as a planned contrast", "reason_rejected": "this protocol covers moderate intensity only (S3.p1); High is an arm of the companion study, kept exploratory."}
+          ]
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["TAB1 and S7.3.p2 name GSE117161 as the transcriptome data of Ezagouri et al. 2019, which this protocol details", "GEO: gastrocnemius muscle, C57bl6 male, 3 months old (growth_protocol), Asher lab Weizmann", "GEO factors (time Early ZT14 / Late ZT22; protocol Basal/Moderate/High) match the paper's ZT14/ZT22 running design"]},
+          "reasoning": "Accession is stated in the paper; tissue, strain, sex, age and ZTs match. The single deposited supplementary file is a raw count matrix with 18 columns matching all 18 GSM titles.",
+          "confidence": "high",
+          "locator": "TAB1; S7.3.p2"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"run": ["title", "^(Basal|Moderate|High)_(?:Early|Late)_[A-C]$"], "time": ["title", "^(?:Basal|Moderate|High)_(Early|Late)_[A-C]$"]},
+          "recode": {"time": {"Early": "ZT14", "Late": "ZT22"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal the GEO title field exactly (inspect alignment_keys: title 18/18). run and time are parsed from the title and agree with the characteristics fields running protocole and time (Early (ZT14)/Late (ZT22)).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "100% integers, range 0-587781, median 89; GEO data_processing: STAR mapping and STAR gene counting, Raw read count for each gene in each sample. Excel-mangled symbols (Mar-0N/Sep-0N) repaired to MarchfN/SeptinN by prep/fix_excel_genes.py; 4 ambiguous duplicated rows (Mar-01 x2, Mar-02 x2: March1/2 vs Marc1/2) dropped. The paper states no input type.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["run", "time"],
+          "references": {"run": "Basal", "time": "ZT14"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["run_Moderate_vs_Basal_time-ZT14", "run_Moderate_vs_Basal_time-ZT22"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "factorial (3 running protocols x 2 times of day), cell-means joint model",
+            "formula": "~ cell (run x time cell means)",
+            "contrasts": [
+              {"name": "run_Moderate_vs_Basal_time-ZT14", "control": "Basal at ZT14", "treatment": "Moderate at ZT14", "role": "primary"},
+              {"name": "run_Moderate_vs_Basal_time-ZT22", "control": "Basal at ZT22", "treatment": "Moderate at ZT22", "role": "primary"}
+            ]
+          },
+          "reasoning": "Six cells of n=3 independent mice. The protocol's question is the moderate-run effect at each ZT, so the two within-ZT Moderate vs Basal contrasts are planned, estimated from one model fitted on all 18 samples. All other analyzable comparisons (High vs Basal, time-of-day effects within each protocol) are exploratory.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "One gastrocnemius per mouse; no subject, batch or lane information is deposited; all samples are male, same strain and age. Time of day is a design factor, not a nuisance covariate.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, joint cell-means model)",
+            "formula": "~ cell (run x time cells)",
+            "paper_route": {"method": "not stated", "status": "not_stated", "reason": "protocol paper reports no DE method"},
+            "deviations": []
+          },
+          "transform": null,
+          "reasoning": "Raw counts support DESeq2. The paper states no method, so the workflow's standard raw-count route is used.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "stated": false},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false}
+          },
+          "reasoning": "The article states no DE threshold, so the workflow default (BH padj < 0.05, no fold-change rule) applies. Audit rule padj < 0.05 and |log2FC| > 1 is reported separately and labelled.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "The paper is a protocol with no reported DE results; there are no paper DEG counts or genes to compare against.",
+              "GEO says the moderate group ran the moderate test for 1 hour (final speed 20 cm/s), while the protocol describes running at 22-25 cm/s until fatigue (several hours). The deposited samples therefore reflect a 1 h moderate bout, not run-to-fatigue.",
+              "The sacrifice time of the Basal (sedentary) controls relative to the run is not recorded (S3.3.p2 lists two options), so elapsed-time effects cannot be separated from the exercise effect.",
+              "n = 3 per cell."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Planned contrasts follow the protocol's running-vs-sedentary design at each ZT; nothing to compare quantitatively.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "moderate run duration and speed", "paper": "22-25 cm/s until fatigue, a few hours (S3.p1, S3.2)", "data": "GEO treatment_protocol: moderate intensity test for 1 hour, final speed 20 cm/s", "disposition": "executable_without_change"},
+        {"item": "sedentary control sacrifice time", "paper": "start or end of run time are both valid options (S3.3.p2)", "data": "not recorded in GEO", "disposition": "executable_without_change"},
+        {"item": "High intensity arm", "paper": "not part of this moderate-intensity protocol", "data": "6 High samples deposited", "disposition": "executable_without_change"},
+        {"item": "Excel-mangled gene symbols", "paper": "n/a", "data": "Mar-0N/Sep-0N date strings, 2 duplicated IDs", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "planned",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "reasoning": "Moderate vs Basal within ZT14 and within ZT22 from one DESeq2 model on all 18 samples."
+        },
+        {
+          "name": "exploratory",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "all", "covariates": []},
+          "role": "exploratory",
+          "reasoning": "Every analyzable comparison the suitability report lists (High vs Basal, time-of-day effects), same model; exploratory."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}
