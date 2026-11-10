@@ -1,0 +1,89 @@
+{
+ "case": "GSE293221",
+ "reviewer": "Claude Sonnet 5.5 (read-only decision review)",
+ "blind": {
+  "B1": "Yes. Exercise arm = voluntary wheel running in TRAMP mice, prostate tumor RNA-seq (S4.3.p1, S4.6.p1). GSE293221 holds 9 sequenced samples: Exercise rep1-3 (GSM8878839-41) carry the exercise factor; Control rep1-3 and Nexrutine rep1-3 are the control and the PhAm diet arm (DA.p1, packet A grp). In-vivo, not in-vitro.",
+  "B2": "Exercise vs control and PhAm vs control, n = 3 tumors per group (S2.2.p1, S4.6.p1); 32 DEGs for exercise, 176 (100 down, 76 up) for PhAm (S2.2.p1, S2.2.p2).",
+  "B3": "No repeated measures: one tumor per animal, 3 of the 6 animals per arm sequenced (S4.6.p1). The only candidate key in packet A, 'suffix of title', is the replicate number rep1-3 within each arm, not an animal ID; the expression check does not support it (same-key r -0.011 vs other 0.003, permutation p 0.63).",
+  "B4": "S4.7.p1: 'DESeq was used to normalize data and find group-pairwise differential gene expression'. The paper does not say whether dispersion was estimated jointly on all groups or per pair.",
+  "B5": "S4.7.p1: at least one sample type has average RPKM > 1, FDR adjusted p < 0.05 and fold change > 1.5 (either way). Abstract writes >= 1.5-fold, adjusted p < 0.05. Counts: exercise vs control 32 DEGs; PhAm vs control 176 (100 down, 76 up); 2 genes overlap (S2.2.p3)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B1: exercise arm (wheel running) present, 3 vs 3 vs 3; analysis ran (suitability analyzable).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp from title matches characteristics treatment 3/3/3 and S4.6.p1 (3 per group); no exclusions; control = untreated control for both contrasts (S2.2.p1, S2.2.p2).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EX vs CON and PHAM vs CON with CON as reference; paper-named genes Lipe, Plin1, Slc7a10 down and Dgat2l6 up in EX agree in sign; the BB123696/Lman1l sign contradiction is recorded in study caveats.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B3: no repeated measures; 'suffix of title' is rep number, expression check not_supported (p 0.63); record states one tumor per animal, no blocking.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper says group-pairwise, silent on dispersion sharing (S4.7.p1). Both the joint (primary) and two-arm fits are reported; they differ strongly (EX vs CON 32 vs 385 DEGs). Choice of primary is an open policy question (human_items).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise singly housed vs group-housed control and PhAm (S4.2.p1, S4.3.p1) is recorded as aliased with arm in covariance and study caveats.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer HTSeq counts (integer_fraction 1.0) match the paper's input; DESeq2 in place of original DESeq is a declared deviation; p-value fractions plausible (EX joint frac_p>0.9 0.166).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Transcribed as padj < 0.05 and |log2FC| > 0.5849625 (S4.7.p1 methods wording, not the abstract's >=); RPKM>1 prefilter not applicable without gene lengths and recorded with a CPM sensitivity run. Rule reproduces 32 for EX joint.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same contrasts compared; HANDBACK calls the 32 = 32 match a coincidence and reports PHAM 3694 vs 176 and the two-arm 385 openly.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Primary fit choice: the joint ~grp model gives 32 EX DEGs (count equals the paper's, but Lipe/Plin1/Slc7a10 get padj NA because the heterogeneous PHAM arm drives Cook flags), while the two-arm CON+EX fit recovers all five paper-named exercise genes but calls 385 DEGs. The paper is silent on joint vs pairwise dispersion, so which to label primary is the open policy question.",
+  "PHAM vs CON gives 3694 DEGs vs the paper's 176 because two of three PHAM tumors are transcriptionally distinct; whether to treat this as a sample or tissue-content issue is for a person."
+ ],
+ "summary": "该案例通过复核：运动臂存在，3/3/3 分组与论文一致，无重复测量（title 后缀只是重复编号，表达检验不支持配对），阈值按论文 S4.7.p1 方法部分原样转录，运球笼养混杂已记录。唯一开放问题是联合模型与两臂模型哪个作为主结果（论文未说明），已列入 human_items。"
+}

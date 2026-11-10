@@ -95,3 +95,12 @@ One section per case; newest last.
 ## PMID37928906 / GSE237736 (2026-11-10)
 
 - policy: Joint limma model on all 16 samples versus the paper's pair-wise fits: the paper says 'pair-wise' but not whether the model was joint (open policy question).
+
+## PMID38012706 / GSE242861 (2026-11-10)
+
+- policy: Open policy: miR-30 was chosen from the exercise-response arrays (S2.6.p1), so GSE242861 is an in-vitro exercise-mediator series. Decide whether such series count as exercise studies; if yes, run miR-30a/c vs scramble with donor blocking (donor key supported) and record the paper's unblocked Sex * Condition model as a discrepancy.
+
+## f719c1147eb0f406823e085b4396d05fdfa410d2 / GSE293221 (2026-11-10)
+
+- policy: Primary fit choice: the joint ~grp model gives 32 EX DEGs (count equals the paper's, but Lipe/Plin1/Slc7a10 get padj NA because the heterogeneous PHAM arm drives Cook flags), while the two-arm CON+EX fit recovers all five paper-named exercise genes but calls 385 DEGs. The paper is silent on joint vs pairwise dispersion, so which to label primary is the open policy question.
+- policy: PHAM vs CON gives 3694 DEGs vs the paper's 176 because two of three PHAM tumors are transcriptionally distinct; whether to treat this as a sample or tissue-content issue is for a person.
