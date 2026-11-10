@@ -30,3 +30,17 @@ Agent metrics and three-line replies are in `results.csv`.
 - Row 8 wrote `data/GSE174785/GSE174785_merged_from_tar.csv` in the shared data root (git-ignored cache, tool behaviour during tar handling).
 - Opus tokens and minutes come from `runs_claude/progress.csv`. Rows 2 and 18 were rerun there, so those figures may not cover the earlier passes. The Opus runs used earlier code than the pinned commit.
 - `transcripts.csv` paths are local to this machine; the transcripts are not committed. `runs/.gitignore` keeps matrices and result tables out of git, so `score.py` needs the local run directories.
+
+## Checkpoint 2 (Haiku), interrupted
+
+On 2026-11-03 rows 24, 2 and 27 were launched with Haiku from the saved prompts. All three stopped early on the account's session limit (HTTP 429) before writing a HANDBACK; their partial run directories are in `runs/haiku/` and are not scored. Rows 18, 8 and 13 were not started.
+
+## Workflow changes after checkpoint 1 (2026-11-09)
+
+The owner approved the three proposals from checkpoint 1, so runs after this point use newer code than the pinned commit:
+
+1. Fit scope: with more than two groups, a primary or secondary result must come from one model on all groups; a per-pair fit needs the paper's statement (`fit_scope_locator`) or the `sensitivity` role. `case_runner` stops such a spec with `SpecError`.
+2. Bulk data must use `case_runner`: the scripted recorder rejects a bulk `matrix` decision unless the run gives a `scripted_reason`.
+3. Every completed case runs ORA and GSEA on its primary execution (`skip_reason` to turn one off); `matrix.feature_ids: "entrez"` maps Entrez IDs to symbols.
+
+Checked against checkpoint-1 specs: Sonnet rows 24 and 18 now stop on the fit-scope rule, Sonnet rows 27 and 8 (scripted, no reason given) would be rejected at their matrix gate, and the enrichment rule flags Sonnet rows 24, 2, 18 and Opus row 2. Opus's wheel case rerun on Sonnet's Entrez-keyed matrix gives Opus's DEG counts (2257/369) with ORA and GSEA completed, so Sonnet's wheel difference came from the fit scope alone.

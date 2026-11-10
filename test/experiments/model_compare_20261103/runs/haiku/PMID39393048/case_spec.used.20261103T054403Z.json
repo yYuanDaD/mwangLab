@@ -1,0 +1,186 @@
+{
+  "run_dir": "test/experiments/model_compare_20261103/runs/haiku/PMID39393048",
+  "request": "Analyze GSE267512 for PMID 39393048 (Bioavailable testosterone and androgen receptor activation, but not total testosterone, are associated with muscle mass and strength in females): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "claude-haiku-5-5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE267512",
+      "accession": "GSE267512",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12456396.paper.md"],
+        "metadata": "GSE267512/GSE267512_metadata.csv",
+        "matrix": "GSE267512/GSE267512_GeneCounts_RAW_DATA.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE267512"],
+            "primary_estimand": "Within-person change in vastus lateralis muscle transcriptome after 12 weeks of supervised resistance training (POST vs PRE), untrained pre-menopausal females. Intervention (exercise) effect on gene expression, estimated with each participant as her own control.",
+            "estimand_type": "interventional (exercise, pre-post within subject)",
+            "planned_contrasts": ["timepoint_POST_vs_PRE (S3.6.p1, Fig. 7A; S2.14.p6)"],
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "factors": ["timepoint (PRE, POST)"],
+            "inclusion": "Paper: 35 recruited, 27 completed training (S2.2.p1). Fig. 7 legend: n = 35 pre-training, 27 post-training. GEO deposits 57 samples (31 PRE, 26 POST). All deposited samples kept, as the paper's ~ID + timepoint model pools them.",
+            "paper_method": "DESeq2, Genes ~ ID + timepoint; ID = repeated-measures subject (S2.14.p6); significance FDR-adjusted P < 0.05 (S2.14.p7); no fold-change cutoff stated",
+            "paper_results": "214 transcripts DE pre vs post (122 up, 92 down), FDR < 0.05 (S3.6.p1, Fig. 7A); RPS6KC1 up (FDR < 0.01, S3.4.p2); TRIM63, FBXO32, TRAF6, FOXO1, FOXO3 unchanged (S3.4.p2); AR mRNA unchanged (FDR = 0.956, S3.3.p1)"
+          },
+          "reasoning": "The paper's exercise comparison is pre vs post 12-week resistance training in the same females (S2.2.p1 'each participant acted as her own control'; S3.6.p1; Fig. 7 caption). The transcriptome analysis is DESeq2 with subject as blocking term and timepoint as the tested factor (S2.14.p6). Threshold is FDR < 0.05 with no effect-size rule (S2.14.p7). The paper's gene-count filter is stated at S2.12.6.p1 (mean across samples 10 RPM or fewer removed, leaving 14,979 genes).",
+          "locator": "S2.2.p1; S2.14.p6; S2.14.p7; S3.6.p1; FIG7",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": "GSE267512 is named by the paper for its RNA-seq data (S2.12.6.p1, S13.p1). The metadata series_id is GSE267512 for all 57 rows; platform GPL24676 (Homo sapiens, vastus lateralis, total RNA); treatment PRE/POST with female sex in all rows, matching the paper's female cohort."
+          },
+          "reasoning": "Matrix and metadata both belong to GSE267512 and to this paper's pre-menopausal female cohort. The 3col.tsv file is long format (one sample column only) and is not used; the wide GeneCounts file is the matrix.",
+          "locator": "S2.12.6.p1; S13.p1",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "subject": ["title", "^(.+?)(?:PRE|POST)$"],
+            "timepoint": ["title", "(PRE|POST)$"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names equal metadata title (for example ALORPRE, ALORPOST) in 57/57 samples per inspect alignment_keys. Derive subject (participant code) and timepoint from the title suffix. No samples excluded: the paper's ~ID + timepoint model uses every available sample, and the 7 PRE-only and 2 POST-only participants contribute to the pooled model without changing the within-subject comparison.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts (Kallisto gene-level, deposited as integers)",
+          "recommended_method": "DESeq2",
+          "reasoning": "Values are all non-negative integers (integer fraction 1.0, no fractional values). data_processing states Kallisto v0.46.1 mapping to GRCh38 'generate transcript counts' and 'aligned raw gene counts'; the paper analyzes with DESeq2 on these counts (S2.12.6.p1, S2.14.p6). Estimated counts are deposited rounded, so DESeq2 is applied to the deposited integers; rounding is documented here. Library sizes 20-29 M.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["timepoint"],
+          "references": {"timepoint": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["timepoint_POST_vs_PRE"],
+          "covariate_candidates": ["subject"],
+          "final": {
+            "analysis_type": "repeated-measures two-level (PRE vs POST) with subject as blocking term",
+            "design_column": "timepoint",
+            "control": "PRE",
+            "treatment": "POST",
+            "contrasts": [
+              {"name": "timepoint_POST_vs_PRE", "control": "PRE", "treatment": "POST", "role": "primary"}
+            ]
+          },
+          "reasoning": "Paper's design is pre vs post in the same participants (S2.2.p1). Subject is the repeated-measures key (S2.14.p6). Samples per arm: 31 PRE, 26 POST; 24 subjects have both timepoints. Sex is female in all samples (metadata), so no sex-stratified or X/Y check conflict is expected. Age, BMI, menstrual phase and HC use are paper covariates for the phenotype models (S2.14.p5), not for the transcriptome model (S2.14.p6), so they are not added here.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [{"name": "subject", "disposition": "blocking term: repeated measures per participant (paper ID term)"}]
+          },
+          "confounding_candidates": null,
+          "reasoning": "Each participant contributes PRE and POST samples, so subject is a required blocking term (paper: ~ ID + timepoint, S2.14.p6). No other covariate is in the paper's DE model."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald test, BH-adjusted padj)",
+            "formula": "~ subject + timepoint",
+            "rounding_documented": true,
+            "paper_route": {"method": "DESeq2 ~ ID + timepoint", "status": "reproduced in model form; gene filter deviates (see discrepancies)"},
+            "deviations": ["Gene pre-filter: paper's stated rule (mean >= 10 RPM across samples, S2.12.6.p1) keeps 6,084 genes in the deposited data, not the reported 14,979. Primary run uses filter_low_counts CPM >= 1 in >= 3 samples (14,821 genes), the nearest standard rule to the reported analyzed-gene count. The stated-rule run is a separate sensitivity case."]
+          },
+          "transform": null,
+          "reasoning": "Paper's DESeq2 model on counts reproduced. Primary gene universe is set to match the paper's analyzed-gene count because the stated filter cannot produce it (see discrepancies). Sensitivity runs cover the paired-only subset and the stated filter."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625},
+            "deviation_note": "Audit rule (FDR < 0.05 and |log2FC| >= log2(1.5)) is a labelled comparison only; the paper states no fold-change cutoff."
+          },
+          "reasoning": "S2.14.p7: genes significant at FDR-adjusted P < 0.05. No effect-size rule is stated, so none is applied to the paper rule. Paper's 214 DE count is at this rule."
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation"
+          },
+          "paper_counts": {"timepoint_POST_vs_PRE": 214},
+          "paper_genes": {"timepoint_POST_vs_PRE": ["RPS6KC1", "TRIM63", "FBXO32", "TRAF6", "FOXO1", "FOXO3", "AR"]},
+          "reasoning": "Same contrast, model form, and threshold as the paper. Route is declared_deviation because the primary gene universe uses CPM >= 1 in >= 3 samples instead of the stated mean-RPM rule, which is not reproducible on these data. Paper lookups: RPS6KC1 up (FDR < 0.01); TRIM63, FBXO32, TRAF6, FOXO1, FOXO3, AR unchanged."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "Sample size",
+          "paper": "27 completed training (S2.2.p1, S3.6 text); Fig. 7 legend n = 35 pre-training, 27 post-training",
+          "data": "GEO: 31 PRE, 26 POST, 24 paired subjects; 7 PRE-only (BRST, COGR, FLTH, GAVA, KACO, TEOC, WAAL) and 2 POST-only (SADI, SICE)",
+          "disposition": "declared_deviation: all 57 deposited samples used, as the paper's pooled ~ID + timepoint model; complete-pairs subset run as secondary"
+        },
+        {
+          "item": "Gene filter rule vs reported gene count",
+          "paper": "Genes with mean across all samples <= 10 RPM removed (63%), leaving 14,979 (S2.12.6.p1)",
+          "data": "Mean CPM > 10 across 57 samples keeps 6,084 of 40,514 genes; CPM >= 1 in >= 3 samples keeps 14,821; no tested simple rule gives 14,979 exactly",
+          "disposition": "declared_deviation: primary uses CPM >= 1 in >= 3 samples (closest reproduction of analyzed-gene count); stated rule run as sensitivity"
+        },
+        {
+          "item": "Feature type",
+          "paper": "'214 transcripts' and '14,979 individual detected transcripts' (S3.6.p1), Kallisto transcript counts",
+          "data": "Deposited matrix is gene-level (ENSG rows with SYMBOL annotation); DE is per gene",
+          "disposition": "executable_without_change: analyzed per gene, the deposited unit"
+        },
+        {
+          "item": "Named gene RPS6K1 vs RPS6KC1",
+          "paper": "Text S3.4.p2: RPS6KC1 up 11%, FDR < 0.01; Fig. 5 legend: RPS6K1",
+          "data": "ENSG00000136643 = RPS6KC1 present in the matrix; RPS6K1 has no SYMBOL row",
+          "disposition": "executable_without_change: lookup uses RPS6KC1 (text)"
+        },
+        {
+          "item": "Matrix input to DESeq2",
+          "paper": "Kallisto counts; DESeq2 input form (rounded or raw estimated) not stated",
+          "data": "Deposited integers (rounded estimated counts)",
+          "disposition": "executable_without_change: deposited integers used as DESeq2 input"
+        }
+      ],
+      "executions": [
+        {
+          "name": "timepoint_POST_vs_PRE",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "timepoint",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": ["subject"],
+            "alpha": 0.05
+          },
+          "filter_low_counts": {"min_cpm": 1, "min_samples": 3},
+          "role": "primary",
+          "reasoning": "Paper's DESeq2 model ~ subject + timepoint on all deposited samples. Gene filter CPM >= 1 in >= 3 samples (declared deviation, see method and discrepancies)."
+        },
+        {
+          "name": "paired_subjects_POST_vs_PRE",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "timepoint",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": ["subject"],
+            "alpha": 0.05
+          },
+          "complete_pairs": {"subject": "subject", "condition": "timepoint", "levels": ["PRE", "POST"]},
+          "filter_low_counts": {"min_cpm": 1, "min_samples": 3},
+          "role": "sensitivity",
+          "reasoning": "Within-subject-only sensitivity: the 24 participants with both PRE and POST samples. Tests whether the unpaired samples move the result."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}

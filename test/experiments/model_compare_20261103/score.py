@@ -67,6 +67,7 @@ def comparisons(run):
             ctrl, trt = gsm_sets(meta, cname, args, ex.get("subset"))
             out.append({
                 "case": case["case_id"], "key": key, "role": ex.get("role", ""),
+                "scope": fit_scope(ex.get("tool", ""), ex.get("subset"), meta, args),
                 "planned": (cname or ename) in planned or not cname, "ctrl": ctrl, "trt": trt,
                 "method": method.get("method", ""), "formula": method.get("formula", ""),
                 "covariance": cov.get("status", ""), "blocking": cov.get("blocking_terms") or [],
@@ -76,6 +77,19 @@ def comparisons(run):
                 "paper": ((repro.get("comparison") or {}).get(key) or {}).get("paper"),
             })
     return out
+
+
+def fit_scope(tool, subset, meta, args):
+    """joint = one model with planned contrasts; per_pair = fitted on a subset of a larger
+    design; two_group_all = the whole dataset has only those two groups."""
+    if "joint" in tool:
+        return "joint"
+    if subset:
+        return "per_pair"
+    col = args.get("design_column")
+    if meta is not None and col in meta and meta[col].nunique() > 2:
+        return "per_pair"
+    return "two_group_all"
 
 
 def from_decisions(run):
@@ -94,7 +108,7 @@ def from_decisions(run):
         ctrl, trt = gsm_sets(meta, "", args, None)
         rows = {r["case_id"]: r for r in csv.DictReader(open(run / "summary.csv", encoding="utf-8"))}
         out.append({"case": cdir.name, "key": f"{design['treatment']}_vs_{design['control']}", "role": "primary",
-                    "planned": True, "ctrl": ctrl, "trt": trt, "method": method.get("method", ""),
+                    "scope": fit_scope("", None, meta, args), "planned": True, "ctrl": ctrl, "trt": trt, "method": method.get("method", ""),
                     "formula": method.get("formula", ""), "covariance": cov.get("status", ""),
                     "blocking": cov.get("blocking_terms") or [], "threshold": thr.get("applied_threshold") or {},
                     "rule": "", "n_deg": rows.get(cdir.name, {}).get("n_deg"), "up": None, "down": None, "paper": None})
@@ -202,6 +216,26 @@ def forbidden(model, pid, transcripts):
     return f"{len(hits)} hit(s)" + (" | " + " | ".join(hits[:3]) if hits else "")
 
 
+def used_case_runner(run):
+    return "yes" if (run / "case_spec.json").exists() else "no"
+
+
+def prompt_check(model, pid, transcripts):
+    """Does the transcript's first message equal prompts/<paper_id>.txt for this model?"""
+    path = transcripts.get((model, pid))
+    if not path or not os.path.exists(path):
+        return "transcript not available"
+    want = (HERE / "prompts" / f"{pid}.txt").read_text(encoding="utf-8").replace("<model>", model).strip()
+    for line in open(path, encoding="utf-8", errors="replace"):
+        rec = json.loads(line)
+        msg = rec.get("message")
+        if rec.get("type") == "user" and isinstance(msg, dict):
+            content = msg.get("content")
+            text = content if isinstance(content, str) else "".join(b.get("text", "") for b in content if isinstance(b, dict))
+            return "verbatim" if text.strip() == want else "DIFFERS"
+    return "no user message"
+
+
 def main(models):
     transcripts = {}
     if (HERE / "transcripts.csv").exists():
@@ -215,7 +249,8 @@ def main(models):
             ref_state, _ = run_state(ref)
             papers.append({"model": model, "paper_id": pid, "gse": gse, "expected": expected, "state": state,
                            "opus_state": ref_state, "right": state == {"run": "ran", "refuse": "refused"}[expected],
-                           "route": "case_spec" if (run / "case_spec.json").exists() else "custom_scripts",
+                           "used_case_runner": used_case_runner(run), "opus_used_case_runner": used_case_runner(ref),
+                           "prompt": prompt_check(model, pid, transcripts),
                            "detail": detail, "validator": validator(run), "forbidden": forbidden(model, pid, transcripts)})
             got = comparisons(run)
             refs = comparisons(ref)
@@ -223,11 +258,11 @@ def main(models):
             for r in refs:
                 m, tag = best_match(r, got)
                 row = {"model": model, "paper_id": pid, "gse": gse, "opus_key": r["key"], "match": tag,
-                       "n_ctrl_opus": len(r["ctrl"] or []), "n_trt_opus": len(r["trt"] or []),
+                       "n_ctrl_opus": len(r["ctrl"] or []), "n_trt_opus": len(r["trt"] or []), "opus_scope": r["scope"],
                        "opus_formula": r["formula"], "opus_method": r["method"], "opus_rule": r["rule"],
                        "opus_deg": r["n_deg"], "paper_deg": r["paper"]}
                 if m:
-                    row.update({"key": m["key"], "role": m["role"], "n_ctrl": len(m["ctrl"]), "n_trt": len(m["trt"]),
+                    row.update({"key": m["key"], "role": m["role"], "scope": m["scope"], "n_ctrl": len(m["ctrl"]), "n_trt": len(m["trt"]),
                                 "formula": m["formula"], "formula_same": form(m["formula"]) == form(r["formula"]),
                                 "method": m["method"], "covariance": m["covariance"], "opus_covariance": r["covariance"],
                                 "blocking": ";".join(map(str, m["blocking"])), "opus_blocking": ";".join(map(str, r["blocking"])),
@@ -235,7 +270,7 @@ def main(models):
                                 "deg": m["n_deg"], "up": m["up"], "down": m["down"], "opus_up": r["up"], "opus_down": r["down"],
                                 "paper_deg_own": m["paper"]})
                 rows.append(row)
-    fields = ["model", "paper_id", "gse", "opus_key", "match", "key", "role", "n_ctrl", "n_ctrl_opus", "n_trt", "n_trt_opus",
+    fields = ["model", "paper_id", "gse", "opus_key", "match", "key", "role", "scope", "opus_scope", "n_ctrl", "n_ctrl_opus", "n_trt", "n_trt_opus",
               "formula", "opus_formula", "formula_same", "method", "opus_method", "covariance", "opus_covariance", "blocking",
               "opus_blocking", "rule", "opus_rule", "threshold_same", "deg", "opus_deg", "paper_deg", "paper_deg_own", "up",
               "opus_up", "down", "opus_down"]
@@ -244,12 +279,12 @@ def main(models):
         w.writeheader()
         w.writerows(rows)
     md = ["# Scores against the Opus reference", "", "Comparisons are the reference's planned non-sensitivity ones, matched by GSM sets.", "",
-          "## Papers", "", "| model | paper | expected | state | Opus | right | route | validator | forbidden reads |", "|---|---|---|---|---|---|---|---|---|"]
+          "## Papers", "", "| model | paper | expected | state | Opus | right | case_runner (Opus) | prompt | validator | forbidden reads |", "|---|---|---|---|---|---|---|---|---|---|"]
     for p in papers:
-        md.append(f"| {p['model']} | {p['paper_id'][:12]} ({p['gse']}) | {p['expected']} | {p['state']} | {p['opus_state']} | {p['right']} | {p['route']} | {p['validator']} | {p['forbidden'].split(' | ')[0]} |")
-    md += ["", "## Comparisons", "", "| model | paper | Opus comparison | match | n ctrl/trt (Opus) | formula (Opus) | threshold same | DEGs | Opus | paper |", "|---|---|---|---|---|---|---|---|---|---|"]
+        md.append(f"| {p['model']} | {p['paper_id'][:12]} ({p['gse']}) | {p['expected']} | {p['state']} | {p['opus_state']} | {p['right']} | {p['used_case_runner']} ({p['opus_used_case_runner']}) | {p['prompt']} | {p['validator']} | {p['forbidden'].split(' | ')[0]} |")
+    md += ["", "## Comparisons", "", "| model | paper | Opus comparison | match | fit scope (Opus) | n ctrl/trt (Opus) | formula (Opus) | threshold same | DEGs | Opus | paper |", "|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
-        md.append(f"| {r['model']} | {r['paper_id'][:12]} | {r['opus_key']} | {r['match']} | {r.get('n_ctrl', '-')}/{r.get('n_trt', '-')} ({r['n_ctrl_opus']}/{r['n_trt_opus']}) | {r.get('formula', '-')} ({r['opus_formula']}) | {r.get('threshold_same', '-')} | {r.get('deg', '-')} | {r['opus_deg']} | {r['paper_deg'] or '-'} |")
+        md.append(f"| {r['model']} | {r['paper_id'][:12]} | {r['opus_key']} | {r['match']} | {r.get('scope', '-')} ({r['opus_scope']}) | {r.get('n_ctrl', '-')}/{r.get('n_trt', '-')} ({r['n_ctrl_opus']}/{r['n_trt_opus']}) | {r.get('formula', '-')} ({r['opus_formula']}) | {r.get('threshold_same', '-')} | {r.get('deg', '-')} | {r['opus_deg']} | {r['paper_deg'] or '-'} |")
     hits = [p for p in papers if not p["forbidden"].startswith(("0 hit", "transcript"))]
     if hits:
         md += ["", "## Forbidden path hits", ""] + [f"- {p['model']} {p['paper_id']}: {p['forbidden']}" for p in hits]

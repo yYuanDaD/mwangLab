@@ -1,0 +1,336 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41835150",
+  "subject_id": "GSE319603",
+  "created_at": "2026-11-03T00:43:12",
+  "finished_at": "2026-11-03T00:43:19",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12982024.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC12982024.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "850d779267db3d89eab98f84d662d1a17b7ba45d74abe7e49c6fd90b5776e704",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE319603_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "73e741c868cbe47e81f7f1d6891756833fda091f064dde50ad1fa5d325bcce77",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE319603_All_gene_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_All_gene_counts.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:12",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d5df07ad0b084bc8a3fadcf4cc3ec7c2f32436da0e292af01224e028a6e34254",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE319603"
+        ],
+        "assay": "bulk RNA-seq, mouse gastrocnemius muscle, male C57BL/6J, 21 weeks diet, GRCm38.p6 featureCounts (S2.1.p1, S2.7.p1, S2.2.p1)",
+        "sample_inclusion": "18 RNA-seq libraries from three groups, n = 6 each: C (chow), H (HFD), HM (HFD + MICT) (S2.7.p1, S3.2.p1)",
+        "sample_exclusion": "CM group (chow + MICT) is not described among the RNA-seq groups; PCA and both DEG sets name only C, H and HM (S3.2.p1). No sample exclusions are reported.",
+        "factors": [
+          {
+            "name": "grp",
+            "levels": [
+              "C",
+              "H",
+              "HM"
+            ],
+            "meaning": "diet (C vs H) and exercise under HFD (H vs HM)"
+          }
+        ],
+        "primary_estimand": "Effect of 8-week MICT on the gastrocnemius transcriptome of HFD-fed mice: HM vs H (S3.2.p1, S4.p7-S4.p8). The diet effect H vs C is the paper's first contrast (S3.2.p1).",
+        "planned_contrasts": [
+          "grp_HM_vs_H (exercise under HFD; primary for this request; paper: 563 DEGs, S3.2.p1)",
+          "grp_H_vs_C (HFD vs chow; paper: 458 DEGs, S3.2.p1)"
+        ],
+        "blocking_or_covariance": {
+          "status": "not_required",
+          "note": "independent animals; no subject, batch or time-series structure reported (S2.1.p1, S2.7.p1)"
+        },
+        "matrix_scale": "raw counts (S2.7.p1: raw counts used as DESeq2 input)",
+        "paper_method": "DESeq2 v1.22.2 on raw counts, Benjamini-Hochberg adjustment (S2.7.p1). The paper does not state a design formula; the contrasts are the group comparisons.",
+        "paper_formula": "not_reported",
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "effect_inclusive": true,
+          "inclusive": false,
+          "source_locator": "S3.2.p1 (adjusted P-value < 0.05 and |log2FC| >= 0.5); S2.7.p1 (BH, FDR < 0.05)"
+        },
+        "paper_enrichment": "GO and KEGG ORA of the DEGs with clusterProfiler v3.10.1 (S2.7.p1; S3.3-S3.4); no GSEA"
+      },
+      "reason": "The paper's exercise effect is HM vs H (MICT added to HFD). The deposited data contain exactly the three groups the paper analyses, six per group, so the exercise contrast is answerable. Paper threshold is copied from S3.2.p1 with the inclusive effect rule. The CM group is not in the deposit; that does not affect either named contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:13"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "GSE319603/GSE319603_All_gene_counts.csv",
+        "owned": true,
+        "accession": "GSE319603",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv",
+        "checks": "series_id GSE319603 in every metadata row; 18 GSM samples = the paper's 18 RNA-seq libraries (S2.7.p1); GSM titles match the three paper groups (control1-6; high-fat diet1-6; high-fat diet with MICT intervention1-6); 'Library name' C1-C6, H1-H6, HM1-HM6 match the matrix columns; organism Mus musculus, GPL24247; data_processing lists Trim-galore, STAR, featureCounts and GRCm38.p6 as in S2.7.p1."
+      },
+      "reason": "Accession, sample count, group sizes and naming match the paper's Methods and data availability statement (S8.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:13"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "Library name: (HM|H|C)\\d+$"
+            }
+          },
+          "output": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\design_metadata.csv",
+          "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+          "levels": {
+            "grp": {
+              "C": 6,
+              "H": 6,
+              "HM": 6
+            }
+          }
+        }
+      },
+      "reason": "Exact match on the library name in the metadata 'description' column (C1..C6, H1..H6, HM1..HM6) against the matrix column names. grp is derived from the same field and matches the paper's group labels. No position-based alignment.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:13"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+          "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+          "n_features": 26166,
+          "n_samples": 18,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3346023.0,
+          "median": 31.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All 26,166 x 18 values are non-negative integers (integer fraction 1.0, min 0, no missing values, no duplicated Ensembl IDs). Library sizes are 33-45 million reads per sample, which fits featureCounts output from GRCm38.p6 (S2.7.p1; GEO data_processing). The paper states raw counts were DESeq2 input. Row IDs are Ensembl gene IDs (#ID) with a Symbol annotation column. The Symbol column has 27 Excel date-mangled entries (2026-09-DD, 2026-03-DD); these affect annotation only and do not affect the counts. Ensembl IDs are used for DE.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:13"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel",
+        "design_column": "grp",
+        "formula": "~ grp",
+        "contrasts": [
+          {
+            "name": "grp_H_vs_C",
+            "control": "C",
+            "treatment": "H",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HM_vs_H",
+            "control": "H",
+            "treatment": "HM",
+            "role": "primary"
+          }
+        ],
+        "estimand_type": "associational",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "One control (C) with two intervention arms (H, HM). The skill requires one model with planned contrasts rather than pooled levels, so the primary analysis is a single DESeq2 model ~ grp over all 18 samples with the two planned contrasts. The exercise contrast HM vs H is the paper's second contrast. Pairwise two-arm fits are run as sensitivity. The H vs C diet effect is kept as the paper's first contrast. Estimand is associational because the groups are fixed experimental arms, not a randomized subject effect (animals independent).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:19"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9ff0752d96f475db28f8e7dd91021ca963e9ea4e2fe3dd869df1f0a98fb6b444",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58855c94e2935b646192883bbe73141dbf6fbcd6d1803dbffff2ccb484967192",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5cdb6ffecf97bf2c08aea95b29f4916d9debec1c21f44bae8be428b25978cb8e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d367db7d48619263d5052e00e5151b7dd7921399ee0db5b73804ce9f224cbc53",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

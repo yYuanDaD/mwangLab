@@ -1,0 +1,1558 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41835150",
+  "subject_id": "GSE319603",
+  "created_at": "2026-11-03T00:43:31",
+  "finished_at": "2026-11-03T00:45:34",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12982024.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261019\\papers\\PMC12982024.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:31",
+      "sha256": null,
+      "attributes": {
+        "sha256": "850d779267db3d89eab98f84d662d1a17b7ba45d74abe7e49c6fd90b5776e704",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE319603_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:31",
+      "sha256": null,
+      "attributes": {
+        "sha256": "73e741c868cbe47e81f7f1d6891756833fda091f064dde50ad1fa5d325bcce77",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE319603_All_gene_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_All_gene_counts.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:43:31",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d5df07ad0b084bc8a3fadcf4cc3ec7c2f32436da0e292af01224e028a6e34254",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE319603"
+        ],
+        "assay": "bulk RNA-seq, mouse gastrocnemius muscle, male C57BL/6J, 21 weeks diet, GRCm38.p6 featureCounts (S2.1.p1, S2.7.p1, S2.2.p1)",
+        "sample_inclusion": "18 RNA-seq libraries from three groups, n = 6 each: C (chow), H (HFD), HM (HFD + MICT) (S2.7.p1, S3.2.p1)",
+        "sample_exclusion": "CM group (chow + MICT) is not described among the RNA-seq groups; PCA and both DEG sets name only C, H and HM (S3.2.p1). No sample exclusions are reported.",
+        "factors": [
+          {
+            "name": "grp",
+            "levels": [
+              "C",
+              "H",
+              "HM"
+            ],
+            "meaning": "diet (C vs H) and exercise under HFD (H vs HM)"
+          }
+        ],
+        "primary_estimand": "Effect of 8-week MICT on the gastrocnemius transcriptome of HFD-fed mice: HM vs H (S3.2.p1, S4.p7-S4.p8). The diet effect H vs C is the paper's first contrast (S3.2.p1).",
+        "planned_contrasts": [
+          "grp_HM_vs_H (exercise under HFD; primary for this request; paper: 563 DEGs, S3.2.p1)",
+          "grp_H_vs_C (HFD vs chow; paper: 458 DEGs, S3.2.p1)"
+        ],
+        "blocking_or_covariance": {
+          "status": "not_required",
+          "note": "independent animals; no subject, batch or time-series structure reported (S2.1.p1, S2.7.p1)"
+        },
+        "matrix_scale": "raw counts (S2.7.p1: raw counts used as DESeq2 input)",
+        "paper_method": "DESeq2 v1.22.2 on raw counts, Benjamini-Hochberg adjustment (S2.7.p1). The paper does not state a design formula; the contrasts are the group comparisons.",
+        "paper_formula": "not_reported",
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "effect_inclusive": true,
+          "inclusive": false,
+          "source_locator": "S3.2.p1 (adjusted P-value < 0.05 and |log2FC| >= 0.5); S2.7.p1 (BH, FDR < 0.05)"
+        },
+        "paper_enrichment": "GO and KEGG ORA of the DEGs with clusterProfiler v3.10.1 (S2.7.p1; S3.3-S3.4); no GSEA"
+      },
+      "reason": "The paper's exercise effect is HM vs H (MICT added to HFD). The deposited data contain exactly the three groups the paper analyses, six per group, so the exercise contrast is answerable. Paper threshold is copied from S3.2.p1 with the inclusive effect rule. The CM group is not in the deposit; that does not affect either named contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:31"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "GSE319603/GSE319603_All_gene_counts.csv",
+        "owned": true,
+        "accession": "GSE319603",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE319603\\GSE319603_metadata.csv",
+        "checks": "series_id GSE319603 in every metadata row; 18 GSM samples = the paper's 18 RNA-seq libraries (S2.7.p1); GSM titles match the three paper groups (control1-6; high-fat diet1-6; high-fat diet with MICT intervention1-6); 'Library name' C1-C6, H1-H6, HM1-HM6 match the matrix columns; organism Mus musculus, GPL24247; data_processing lists Trim-galore, STAR, featureCounts and GRCm38.p6 as in S2.7.p1."
+      },
+      "reason": "Accession, sample count, group sizes and naming match the paper's Methods and data availability statement (S8.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:31"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "Library name: (HM|H|C)\\d+$"
+            }
+          },
+          "output": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\design_metadata.csv",
+          "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+          "levels": {
+            "grp": {
+              "C": 6,
+              "H": 6,
+              "HM": 6
+            }
+          }
+        }
+      },
+      "reason": "Exact match on the library name in the metadata 'description' column (C1..C6, H1..H6, HM1..HM6) against the matrix column names. grp is derived from the same field and matches the paper's group labels. No position-based alignment.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:32"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+          "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+          "n_features": 26166,
+          "n_samples": 18,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3346023.0,
+          "median": 31.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All 26,166 x 18 values are non-negative integers (integer fraction 1.0, min 0, no missing values, no duplicated Ensembl IDs). Library sizes are 33-45 million reads per sample, which fits featureCounts output from GRCm38.p6 (S2.7.p1; GEO data_processing). The paper states raw counts were DESeq2 input. Row IDs are Ensembl gene IDs (#ID) with a Symbol annotation column. The Symbol column has 27 Excel date-mangled entries (2026-09-DD, 2026-03-DD); these affect annotation only and do not affect the counts. Ensembl IDs are used for DE.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:32"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel",
+        "design_column": "grp",
+        "formula": "~ grp",
+        "contrasts": [
+          {
+            "name": "grp_H_vs_C",
+            "control": "C",
+            "treatment": "H",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HM_vs_H",
+            "control": "H",
+            "treatment": "HM",
+            "role": "primary"
+          }
+        ],
+        "estimand_type": "associational",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "One control (C) with two intervention arms (H, HM). The skill requires one model with planned contrasts rather than pooled levels, so the primary analysis is a single DESeq2 model ~ grp over all 18 samples with the two planned contrasts. The exercise contrast HM vs H is the paper's second contrast. Pairwise two-arm fits are run as sensitivity. The H vs C diet effect is kept as the paper's first contrast. Estimand is associational because the groups are fixed experimental arms, not a randomized subject effect (animals independent).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:45"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "excluded: constant (all male)"
+          },
+          {
+            "name": "time point",
+            "disposition": "excluded: constant (25 weeks in every GEO record)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 18,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "grp_H",
+            "grp_HM"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 15,
+          "levels": {
+            "grp": {
+              "C": 6,
+              "H": 6,
+              "HM": 6
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "C"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "H"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "HM"
+              ],
+              "n": 6
+            }
+          ],
+          "min_cell_size": 6,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 18,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 18,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.Sex",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.time point",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 18,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 18,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 18,
+            "status": "sample_identifier"
+          }
+        ]
+      },
+      "reason": "Independent male mice, one animal per library (S2.1.p1, S2.7.p1). The paper's model has no blocking term. No recorded covariate varies, so none is added. GEO metadata has no batch, extraction date or library-prep column per sample (all submission and processing fields are constant), so batch cannot be checked and is a caveat.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:45"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald test, joint model)",
+        "formula": "~ grp",
+        "deviations": [
+          "implementation: pydeseq2 in place of R DESeq2 v1.22.2 (same model family, not the same code)",
+          "joint model over all 18 samples with planned contrasts (skill rule for one control with several levels); pairwise two-arm fits are run as sensitivity"
+        ]
+      },
+      "reason": "The matrix is raw counts, so DESeq2 is valid (matrix policy). The paper's DESeq2 route is reproduced, using pydeseq2 in place of the R package. Design is one-factor grp with planned contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:45"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "effect_inclusive": true,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "effect_inclusive": true,
+          "inclusive": false
+        }
+      },
+      "reason": "S3.2.p1: adjusted P-value < 0.05 and |log2FC| >= 0.5. The paper gives the effect cutoff directly as 0.5, so no fold-change conversion is needed. Strict on the adjusted p, inclusive on the effect size. The paper's FDR is BH (S2.7.p1), which is padj.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:43:45"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "deseq2_joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 18,
+        "matrix": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\deseq2_joint\\DEG_results_grp_H_vs_C.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\deseq2_joint\\DEG_results_grp_HM_vs_H.csv"
+        ],
+        "counts": {
+          "deseq2_joint/grp_H_vs_C": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 14874,
+              "n_significant": 458,
+              "n_up": 295,
+              "n_down": 163,
+              "deg_sanity": "ok"
+            }
+          },
+          "deseq2_joint/grp_HM_vs_H": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 14065,
+              "n_significant": 580,
+              "n_up": 212,
+              "n_down": 368,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One DESeq2 model ~ grp over all 18 samples, with the two planned contrasts (grp_H_vs_C and grp_HM_vs_H), as the skill requires for one control with several levels.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:44:06"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_HM_vs_H_pairwise",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 18,
+        "matrix": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\grp_HM_vs_H_pairwise\\DEG_results_HM_vs_H.csv"
+        ],
+        "counts": {
+          "grp_HM_vs_H_pairwise": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 13564,
+              "n_significant": 534,
+              "n_up": 191,
+              "n_down": 343,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Two-arm DESeq2 fit (H vs HM only, 12 samples). This is the form in which a paper often reports one pairwise contrast, so it shows whether the joint model changes the exercise count.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:44:24"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_H_vs_C_pairwise",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 18,
+        "matrix": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\grp_H_vs_C_pairwise\\DEG_results_H_vs_C.csv"
+        ],
+        "counts": {
+          "grp_H_vs_C_pairwise": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.5",
+              "n_tested": 14973,
+              "n_significant": 476,
+              "n_up": 296,
+              "n_down": 180,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Two-arm DESeq2 fit (C vs H only, 12 samples), the pairwise form of the paper's first contrast, for sensitivity to the joint model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:44:42"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "deseq2_joint/grp_HM_vs_H",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "effect_inclusive": true,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\enrichment_deseq2_joint_grp_HM_vs_H\\ora\\DEG_results_grp_HM_vs_H_GO_Biological_Process_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\enrichment_deseq2_joint_grp_HM_vs_H\\ora\\DEG_results_grp_HM_vs_H_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\enrichment_deseq2_joint_grp_HM_vs_H\\ora\\DEG_results_grp_HM_vs_H_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\enrichment_deseq2_joint_grp_HM_vs_H\\ora\\DEG_results_grp_HM_vs_H_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 534 Mouse genes (direction=all, padj<0.05, |log2FC|>0.5). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Negative Regulation Of Cell Differentiation (GO:0045596) | padj=4.04e-03 | overlap=19/207 | genes=TNFAIP6;NOTCH4;PTCH1;ZBTB16;CHRD;LRP5;RORA;HDAC9;FOXO1;ZFP36L2;EFNA1;MEIS1;REST; - Negative Regulation Of Insulin Secretion (GO:0046676) | padj=4.04e-03 | overlap=6/17 | genes=REST;IRS1;BMP8A;INHBB;PIM3;FOXO1 - Transmembrane Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169) | padj=6.87e-03 | overlap=22/284 | genes=RET;SHC2;MUSK;IRS1;PDGFA;PIK3R1;SORBS1;SULF1;FGF1;BAIAP2;MERTK;MMP9;FOXO1;SOCS2; - Cellular Response To Insulin Stimulus (GO:0032869) | padj=7.74e-03 | overlap=12/99 | genes=IRS1;PDK4;TRIB3;INHBB;PIK3R1;SORBS1;BAIAP2;CPEB2;HDAC9;FOXO1;GCK;PCK2 - Negative Regulation Of Osteoblast Differentiation (GO:0045668) | padj=8.35e-03 | overlap=7/32 | genes=TNFAIP6;RIOX1;NOCT;PTCH1;CHRD;LRP5;HDAC9 - Cellular Response To Peptide Hormone Stimulus (GO:0071375) | padj=9.80e-03 | overlap=11/89 | genes=NR4A1;IRS1;TRIB3;INHBB;PIK3R1;SORBS1;HDAC9;CPEB2;FOXO1;GCK;PCK2 - Regulation Of Fat Cell Differentiation (GO:0045598) | padj=1.01e-02 | overlap=10/75 | genes=BBS12;FRZB;NOCT;ZBTB16;LRP5;RORA;TRIB3;FOXO1;ZFP36L2;ADIG - Response To Insulin (GO:0032868) | padj=1.39e-02 | overlap=10/79 | genes=IRS1;TRIB3;INHBB;PIK3R1;SORBS1;HDAC9;CPEB2;FOXO1;GCK;PCK2 - Negative Regulation Of Peptide Hormone Secretion (GO:0090278) | p..."
+      },
+      "reason": "The paper reports GO and KEGG ORA of the exercise-contrast DEGs (S3.3, S3.4, S2.7.p1), so it is run to check its pathway claims (FoxO, PI3K-Akt, MAPK). Hallmark GSEA is not in the paper and is not run.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:44:46"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": "Primary model is a joint model over three groups, not necessarily the pairwise fits the paper used (the paper does not state its design). pydeseq2 is used in place of R DESeq2 v1.22.2. The CM group is not deposited. Table 1 and 2 are top-50 lists, so only a subset of counts and genes is checkable. Gene-symbol annotation has 27 Excel date-mangled entries; Mrtfa is annotated as Mkl1 in this matrix.",
+        "results": {
+          "deseq2_joint/grp_H_vs_C": {
+            "n_deg": 458,
+            "up": 295,
+            "down": 163,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5"
+          },
+          "deseq2_joint/grp_HM_vs_H": {
+            "n_deg": 580,
+            "up": 212,
+            "down": 368,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5"
+          },
+          "grp_HM_vs_H_pairwise": {
+            "n_deg": 534,
+            "up": 191,
+            "down": 343,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5"
+          },
+          "grp_H_vs_C_pairwise": {
+            "n_deg": 476,
+            "up": 296,
+            "down": 180,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.5"
+          }
+        },
+        "paper_counts": {
+          "deseq2_joint/grp_HM_vs_H": 563,
+          "deseq2_joint/grp_H_vs_C": 458,
+          "grp_HM_vs_H_pairwise": 563,
+          "grp_H_vs_C_pairwise": 458
+        },
+        "comparison": {
+          "deseq2_joint/grp_HM_vs_H": {
+            "ours": 580,
+            "paper": 563
+          },
+          "deseq2_joint/grp_H_vs_C": {
+            "ours": 458,
+            "paper": 458
+          },
+          "grp_HM_vs_H_pairwise": {
+            "ours": 534,
+            "paper": 563
+          },
+          "grp_H_vs_C_pairwise": {
+            "ours": 476,
+            "paper": 458
+          }
+        },
+        "paper_gene_check": {
+          "deseq2_joint/grp_H_vs_C": {
+            "BC048679": {
+              "baseMean": 1075.992,
+              "log2FoldChange": 2.8103,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Decr1": {
+              "baseMean": 8710.332,
+              "log2FoldChange": 1.138,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fabp3": {
+              "baseMean": 48067.7008,
+              "log2FoldChange": 1.7429,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Rab15": {
+              "baseMean": 572.6769,
+              "log2FoldChange": 2.2734,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ech1": {
+              "baseMean": 17482.7619,
+              "log2FoldChange": 1.3556,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Chrna2": {
+              "baseMean": 377.1493,
+              "log2FoldChange": 2.6215,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ephx2": {
+              "baseMean": 3488.2419,
+              "log2FoldChange": 1.2803,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cyp1a1": {
+              "baseMean": 97.8877,
+              "log2FoldChange": -3.2458,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Tph2": {
+              "baseMean": 76.4553,
+              "log2FoldChange": 4.2662,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Dhrs4": {
+              "baseMean": 1367.8787,
+              "log2FoldChange": 0.8928,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acadl": {
+              "baseMean": 20939.4974,
+              "log2FoldChange": 0.9404,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ubd": {
+              "baseMean": 48.9015,
+              "log2FoldChange": 5.768,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cd36": {
+              "baseMean": 35965.9886,
+              "log2FoldChange": 0.7192,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Itgad": {
+              "baseMean": 45.9489,
+              "log2FoldChange": 4.0501,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Hadhb": {
+              "baseMean": 25733.983,
+              "log2FoldChange": 1.0058,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acot1": {
+              "baseMean": 529.8418,
+              "log2FoldChange": 1.7861,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc35f5": {
+              "baseMean": 1828.1634,
+              "log2FoldChange": 0.6355,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plin5": {
+              "baseMean": 2709.5742,
+              "log2FoldChange": 1.2307,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Mmp12": {
+              "baseMean": 64.2492,
+              "log2FoldChange": 4.3176,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Oxtr": {
+              "baseMean": 86.2055,
+              "log2FoldChange": 3.6519,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc5a7": {
+              "baseMean": 66.0664,
+              "log2FoldChange": 4.4443,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plbd1": {
+              "baseMean": 1754.788,
+              "log2FoldChange": 0.8368,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc25a20": {
+              "baseMean": 5195.9712,
+              "log2FoldChange": 0.7751,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Eci2": {
+              "baseMean": 3418.0372,
+              "log2FoldChange": 0.6389,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fbp2": {
+              "baseMean": 1678.2456,
+              "log2FoldChange": 0.9091,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Btnl9": {
+              "baseMean": 633.2446,
+              "log2FoldChange": 1.2184,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Pex11a": {
+              "baseMean": 873.9461,
+              "log2FoldChange": 0.9536,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Angptl4": {
+              "baseMean": 1075.7099,
+              "log2FoldChange": 1.9644,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acaa2": {
+              "baseMean": 12367.0401,
+              "log2FoldChange": 0.9251,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Stau2": {
+              "baseMean": 2500.38,
+              "log2FoldChange": 0.5329,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc5a3": {
+              "baseMean": 558.8407,
+              "log2FoldChange": 0.844,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Mlf1": {
+              "baseMean": 3541.4982,
+              "log2FoldChange": -0.8928,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Dbi": {
+              "baseMean": 2832.4875,
+              "log2FoldChange": 0.8024,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Lgr6": {
+              "baseMean": 99.1079,
+              "log2FoldChange": 1.8519,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Hadha": {
+              "baseMean": 20369.0237,
+              "log2FoldChange": 0.7254,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Impa2": {
+              "baseMean": 321.6319,
+              "log2FoldChange": 1.0408,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acot2": {
+              "baseMean": 2381.9436,
+              "log2FoldChange": 1.233,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc4a4": {
+              "baseMean": 749.6202,
+              "log2FoldChange": -0.7672,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "G0s2": {
+              "baseMean": 1243.9375,
+              "log2FoldChange": 1.1195,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cpt2": {
+              "baseMean": 4928.9444,
+              "log2FoldChange": 0.7718,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Retsat": {
+              "baseMean": 3331.0659,
+              "log2FoldChange": 0.7745,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Rgcc": {
+              "baseMean": 4663.5097,
+              "log2FoldChange": 1.0124,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc25a34": {
+              "baseMean": 1036.1712,
+              "log2FoldChange": 1.0178,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Etfdh": {
+              "baseMean": 8797.469,
+              "log2FoldChange": 0.6413,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plin2": {
+              "baseMean": 1686.5275,
+              "log2FoldChange": 0.6936,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "C7": {
+              "baseMean": 944.2984,
+              "log2FoldChange": -1.2535,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Hsdl2": {
+              "baseMean": 5455.0085,
+              "log2FoldChange": 0.6939,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Npr3": {
+              "baseMean": 956.5176,
+              "log2FoldChange": 1.3273,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Aifm2": {
+              "baseMean": 1055.2409,
+              "log2FoldChange": 0.776,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cryab": {
+              "baseMean": 32293.1392,
+              "log2FoldChange": 0.837,
+              "padj": 0.0,
+              "pvalue": 0.0
+            }
+          },
+          "deseq2_joint/grp_HM_vs_H": {
+            "Angptl7": {
+              "baseMean": 3767.977,
+              "log2FoldChange": -1.3563,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Txnip": {
+              "baseMean": 35223.7998,
+              "log2FoldChange": -0.7759,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Pkp4": {
+              "baseMean": 2745.0664,
+              "log2FoldChange": -1.2477,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fbxo32": {
+              "baseMean": 13279.6206,
+              "log2FoldChange": -1.1359,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Sec14l5": {
+              "baseMean": 828.6847,
+              "log2FoldChange": 1.1267,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Dach1": {
+              "baseMean": 450.6647,
+              "log2FoldChange": 1.0802,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fibin": {
+              "baseMean": 1151.2125,
+              "log2FoldChange": -0.9689,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Adh1": {
+              "baseMean": 2653.2067,
+              "log2FoldChange": -1.1534,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Galnt15": {
+              "baseMean": 2867.6046,
+              "log2FoldChange": -1.3556,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Tnfrsf19": {
+              "baseMean": 430.7701,
+              "log2FoldChange": 1.1478,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Mrtfa": {
+              "baseMean": 1078.1564,
+              "log2FoldChange": 1.183,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Inmt": {
+              "baseMean": 1556.8734,
+              "log2FoldChange": -1.0364,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Apold1": {
+              "baseMean": 332.0338,
+              "log2FoldChange": 1.6457,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Klf11": {
+              "baseMean": 569.0098,
+              "log2FoldChange": -0.7934,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Xdh": {
+              "baseMean": 4551.5333,
+              "log2FoldChange": -1.1105,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cited4": {
+              "baseMean": 693.5211,
+              "log2FoldChange": 1.2933,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Pdk4": {
+              "baseMean": 57051.3341,
+              "log2FoldChange": -1.3056,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ptgfr": {
+              "baseMean": 284.8559,
+              "log2FoldChange": -1.0667,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Relt": {
+              "baseMean": 489.351,
+              "log2FoldChange": 0.9528,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ddit4l": {
+              "baseMean": 5468.6721,
+              "log2FoldChange": 1.0778,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Serinc3": {
+              "baseMean": 19277.9358,
+              "log2FoldChange": -0.5249,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Spock2": {
+              "baseMean": 1017.3816,
+              "log2FoldChange": -1.1643,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slc43a3": {
+              "baseMean": 3769.5104,
+              "log2FoldChange": -0.8685,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Tnfaip2": {
+              "baseMean": 1365.0595,
+              "log2FoldChange": 1.0398,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Errfi1": {
+              "baseMean": 3783.1535,
+              "log2FoldChange": 1.124,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Plcb4": {
+              "baseMean": 1567.2633,
+              "log2FoldChange": -0.6351,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Acvr1": {
+              "baseMean": 906.6165,
+              "log2FoldChange": 0.5995,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fmo2": {
+              "baseMean": 2508.659,
+              "log2FoldChange": -0.9717,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ret": {
+              "baseMean": 531.2391,
+              "log2FoldChange": 0.8109,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Arhgap26": {
+              "baseMean": 397.9514,
+              "log2FoldChange": -1.2251,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fam110b": {
+              "baseMean": 164.4322,
+              "log2FoldChange": 1.0123,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Nebl": {
+              "baseMean": 107.579,
+              "log2FoldChange": -1.4073,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ky": {
+              "baseMean": 5549.0796,
+              "log2FoldChange": 1.6573,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Slx4ip": {
+              "baseMean": 267.2626,
+              "log2FoldChange": -0.7772,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Fbxw7": {
+              "baseMean": 852.0958,
+              "log2FoldChange": 0.5984,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Angptl4": {
+              "baseMean": 1075.7099,
+              "log2FoldChange": -1.7418,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ucp3": {
+              "baseMean": 11099.6714,
+              "log2FoldChange": -1.5564,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cry2": {
+              "baseMean": 2227.7604,
+              "log2FoldChange": -0.518,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Lrrc38": {
+              "baseMean": 1449.1574,
+              "log2FoldChange": 0.8243,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Rora": {
+              "baseMean": 3844.18,
+              "log2FoldChange": -0.6644,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Klhl38": {
+              "baseMean": 1854.022,
+              "log2FoldChange": -1.1698,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cd163": {
+              "baseMean": 1544.1479,
+              "log2FoldChange": -1.1075,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Mturn": {
+              "baseMean": 1174.6563,
+              "log2FoldChange": -0.6701,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Scara5": {
+              "baseMean": 2363.2171,
+              "log2FoldChange": -0.573,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Trim63": {
+              "baseMean": 12568.0717,
+              "log2FoldChange": -1.2879,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Ptch1": {
+              "baseMean": 709.9841,
+              "log2FoldChange": -0.6771,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Lvrn": {
+              "baseMean": 949.6806,
+              "log2FoldChange": -1.1082,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Cd93": {
+              "baseMean": 2567.9163,
+              "log2FoldChange": 0.619,
+              "padj": 0.0,
+              "pvalue": 0.0
+            },
+            "Car8": null,
+            "Abca6": {
+              "baseMean": 458.9429,
+              "log2FoldChange": -0.9185,
+              "padj": 0.0,
+              "pvalue": 0.0
+            }
+          }
+        }
+      },
+      "reason": "Paper counts and top-50 gene lists are copied from S3.2.p1 and Tables 1-2 (TAB1, TAB2). Counts are compared on the paper's threshold only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:45:34"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9ff0752d96f475db28f8e7dd91021ca963e9ea4e2fe3dd869df1f0a98fb6b444",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58855c94e2935b646192883bbe73141dbf6fbcd6d1803dbffff2ccb484967192",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fba97030b0b43ed47d532aeea5b76362a1e1f050d68a35f20a82556d797114f1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1f6067952918e8a7874dc297f08f44ccaee65fc52ef0061cf3818ec7b347089e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5cdb6ffecf97bf2c08aea95b29f4916d9debec1c21f44bae8be428b25978cb8e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d367db7d48619263d5052e00e5151b7dd7921399ee0db5b73804ce9f224cbc53",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\deseq2_joint\\DEG_results_grp_H_vs_C.csv",
+      "role": "deg_deseq2_joint/grp_H_vs_C",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "32a054c640cc464cfe750c0288f05d535e505be0d89d9d0e21fa105c63bc00bb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\deseq2_joint\\DEG_results_grp_HM_vs_H.csv",
+      "role": "deg_deseq2_joint/grp_HM_vs_H",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "94035400f8fd85616e09288f57391d0d71c8fdb581c469703d2a1f0cf3a6541b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\grp_HM_vs_H_pairwise\\DEG_results_HM_vs_H.csv",
+      "role": "deg_grp_HM_vs_H_pairwise",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3e4c92ec3009a4840439653f6e5a287c868d7b3690cc2eb57fdf60784c279be7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\results\\grp_H_vs_C_pairwise\\DEG_results_H_vs_C.csv",
+      "role": "deg_grp_H_vs_C_pairwise",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fa85e197ab3658c9e88665dae914d73a5994fbefb9c1a1a3a3957d780a5f8e0b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\model_compare_20261103\\runs\\haiku\\PMID41835150\\GSE319603\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8ff898e792fb1ae9e14a9cfdd6212d02fc01cbb6cf6aedbedfff579b875d107f",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

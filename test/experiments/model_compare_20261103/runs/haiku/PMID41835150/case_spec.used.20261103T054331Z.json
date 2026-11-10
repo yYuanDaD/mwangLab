@@ -1,0 +1,219 @@
+{
+  "run_dir": "test/experiments/model_compare_20261103/runs/haiku/PMID41835150",
+  "request": "Analyze GSE319603 for PMID 41835150 (Transcriptomic insights into aerobic exercise-mediated attenuation of high-fat diet-induced muscle wasting.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Haiku 5.5 (claude-haiku-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE319603",
+      "accession": "GSE319603",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC12982024.paper.md"],
+        "metadata": "GSE319603/GSE319603_metadata.csv",
+        "matrix": "GSE319603/GSE319603_All_gene_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE319603"],
+            "assay": "bulk RNA-seq, mouse gastrocnemius muscle, male C57BL/6J, 21 weeks diet, GRCm38.p6 featureCounts (S2.1.p1, S2.7.p1, S2.2.p1)",
+            "sample_inclusion": "18 RNA-seq libraries from three groups, n = 6 each: C (chow), H (HFD), HM (HFD + MICT) (S2.7.p1, S3.2.p1)",
+            "sample_exclusion": "CM group (chow + MICT) is not described among the RNA-seq groups; PCA and both DEG sets name only C, H and HM (S3.2.p1). No sample exclusions are reported.",
+            "factors": [{"name": "grp", "levels": ["C", "H", "HM"], "meaning": "diet (C vs H) and exercise under HFD (H vs HM)"}],
+            "primary_estimand": "Effect of 8-week MICT on the gastrocnemius transcriptome of HFD-fed mice: HM vs H (S3.2.p1, S4.p7-S4.p8). The diet effect H vs C is the paper's first contrast (S3.2.p1).",
+            "planned_contrasts": ["grp_HM_vs_H (exercise under HFD; primary for this request; paper: 563 DEGs, S3.2.p1)", "grp_H_vs_C (HFD vs chow; paper: 458 DEGs, S3.2.p1)"],
+            "blocking_or_covariance": {"status": "not_required", "note": "independent animals; no subject, batch or time-series structure reported (S2.1.p1, S2.7.p1)"},
+            "matrix_scale": "raw counts (S2.7.p1: raw counts used as DESeq2 input)",
+            "paper_method": "DESeq2 v1.22.2 on raw counts, Benjamini-Hochberg adjustment (S2.7.p1). The paper does not state a design formula; the contrasts are the group comparisons.",
+            "paper_formula": "not_reported",
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "BH",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "effect_inclusive": true,
+              "inclusive": false,
+              "source_locator": "S3.2.p1 (adjusted P-value < 0.05 and |log2FC| >= 0.5); S2.7.p1 (BH, FDR < 0.05)"
+            },
+            "paper_enrichment": "GO and KEGG ORA of the DEGs with clusterProfiler v3.10.1 (S2.7.p1; S3.3-S3.4); no GSEA"
+          },
+          "reasoning": "The paper's exercise effect is HM vs H (MICT added to HFD). The deposited data contain exactly the three groups the paper analyses, six per group, so the exercise contrast is answerable. Paper threshold is copied from S3.2.p1 with the inclusive effect rule. The CM group is not in the deposit; that does not affect either named contrast.",
+          "locator": "S3.2.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "accession": "GSE319603",
+            "matrix_file": "GSE319603/GSE319603_All_gene_counts.csv",
+            "metadata_file": "GSE319603/GSE319603_metadata.csv",
+            "checks": "series_id GSE319603 in every metadata row; 18 GSM samples = the paper's 18 RNA-seq libraries (S2.7.p1); GSM titles match the three paper groups (control1-6; high-fat diet1-6; high-fat diet with MICT intervention1-6); 'Library name' C1-C6, H1-H6, HM1-HM6 match the matrix columns; organism Mus musculus, GPL24247; data_processing lists Trim-galore, STAR, featureCounts and GRCm38.p6 as in S2.7.p1."
+          },
+          "reasoning": "Accession, sample count, group sizes and naming match the paper's Methods and data availability statement (S8.p1)."
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "Library name: (\\w+)"]},
+          "patterns": {"grp": ["description", "Library name: (HM|H|C)\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Exact match on the library name in the metadata 'description' column (C1..C6, H1..H6, HM1..HM6) against the matrix column names. grp is derived from the same field and matches the paper's group labels. No position-based alignment."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All 26,166 x 18 values are non-negative integers (integer fraction 1.0, min 0, no missing values, no duplicated Ensembl IDs). Library sizes are 33-45 million reads per sample, which fits featureCounts output from GRCm38.p6 (S2.7.p1; GEO data_processing). The paper states raw counts were DESeq2 input. Row IDs are Ensembl gene IDs (#ID) with a Symbol annotation column. The Symbol column has 27 Excel date-mangled entries (2026-09-DD, 2026-03-DD); these affect annotation only and do not affect the counts. Ensembl IDs are used for DE."
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "C"},
+          "organism": "Mouse",
+          "planned": ["grp_H_vs_C", "grp_HM_vs_H"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multilevel",
+            "design_column": "grp",
+            "formula": "~ grp",
+            "contrasts": [
+              {"name": "grp_H_vs_C", "control": "C", "treatment": "H", "role": "primary"},
+              {"name": "grp_HM_vs_H", "control": "H", "treatment": "HM", "role": "primary"}
+            ],
+            "estimand_type": "associational"
+          },
+          "reasoning": "One control (C) with two intervention arms (H, HM). The skill requires one model with planned contrasts rather than pooled levels, so the primary analysis is a single DESeq2 model ~ grp over all 18 samples with the two planned contrasts. The exercise contrast HM vs H is the paper's second contrast. Pairwise two-arm fits are run as sensitivity. The H vs C diet effect is kept as the paper's first contrast. Estimand is associational because the groups are fixed experimental arms, not a randomized subject effect (animals independent)."
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "sex", "disposition": "excluded: constant (all male)"},
+              {"name": "time point", "disposition": "excluded: constant (25 weeks in every GEO record)"}
+            ]
+          },
+          "confounding_candidates": null,
+          "reasoning": "Independent male mice, one animal per library (S2.1.p1, S2.7.p1). The paper's model has no blocking term. No recorded covariate varies, so none is added. GEO metadata has no batch, extraction date or library-prep column per sample (all submission and processing fields are constant), so batch cannot be checked and is a caveat."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald test, joint model)",
+            "formula": "~ grp",
+            "matrix_type": "raw counts",
+            "deviations": [
+              "implementation: pydeseq2 in place of R DESeq2 v1.22.2 (same model family, not the same code)",
+              "joint model over all 18 samples with planned contrasts (skill rule for one control with several levels); pairwise two-arm fits are run as sensitivity"
+            ]
+          },
+          "transform": null,
+          "reasoning": "The matrix is raw counts, so DESeq2 is valid (matrix policy). The paper's DESeq2 route is reproduced, using pydeseq2 in place of the R package. Design is one-factor grp with planned contrasts."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "BH",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "effect_inclusive": true,
+              "inclusive": false
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "effect_inclusive": true,
+              "inclusive": false
+            }
+          },
+          "reasoning": "S3.2.p1: adjusted P-value < 0.05 and |log2FC| >= 0.5. The paper gives the effect cutoff directly as 0.5, so no fold-change conversion is needed. Strict on the adjusted p, inclusive on the effect size. The paper's FDR is BH (S2.7.p1), which is padj."
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": "Primary model is a joint model over three groups, not necessarily the pairwise fits the paper used (the paper does not state its design). pydeseq2 is used in place of R DESeq2 v1.22.2. The CM group is not deposited. Table 1 and 2 are top-50 lists, so only a subset of counts and genes is checkable. Gene-symbol annotation has 27 Excel date-mangled entries; Mrtfa is annotated as Mkl1 in this matrix."
+          },
+          "paper_counts": {
+            "deseq2_joint/grp_HM_vs_H": 563,
+            "deseq2_joint/grp_H_vs_C": 458,
+            "grp_HM_vs_H_pairwise": 563,
+            "grp_H_vs_C_pairwise": 458
+          },
+          "paper_genes": {
+            "deseq2_joint/grp_H_vs_C": ["BC048679", "Decr1", "Fabp3", "Rab15", "Ech1", "Chrna2", "Ephx2", "Cyp1a1", "Tph2", "Dhrs4", "Acadl", "Ubd", "Cd36", "Itgad", "Hadhb", "Acot1", "Slc35f5", "Plin5", "Mmp12", "Oxtr", "Slc5a7", "Plbd1", "Slc25a20", "Eci2", "Fbp2", "Btnl9", "Pex11a", "Angptl4", "Acaa2", "Stau2", "Slc5a3", "Mlf1", "Dbi", "Lgr6", "Hadha", "Impa2", "Acot2", "Slc4a4", "G0s2", "Cpt2", "Retsat", "Rgcc", "Slc25a34", "Etfdh", "Plin2", "C7", "Hsdl2", "Npr3", "Aifm2", "Cryab"],
+            "deseq2_joint/grp_HM_vs_H": ["Angptl7", "Txnip", "Pkp4", "Fbxo32", "Sec14l5", "Dach1", "Fibin", "Adh1", "Galnt15", "Tnfrsf19", "Mrtfa", "Inmt", "Apold1", "Klf11", "Xdh", "Cited4", "Pdk4", "Ptgfr", "Relt", "Ddit4l", "Serinc3", "Spock2", "Slc43a3", "Tnfaip2", "Errfi1", "Plcb4", "Acvr1", "Fmo2", "Ret", "Arhgap26", "Fam110b", "Nebl", "Ky", "Slx4ip", "Fbxw7", "Angptl4", "Ucp3", "Cry2", "Lrrc38", "Rora", "Klhl38", "Cd163", "Mturn", "Scara5", "Trim63", "Ptch1", "Lvrn", "Cd93", "Car8", "Abca6"]
+          },
+          "reasoning": "Paper counts and top-50 gene lists are copied from S3.2.p1 and Tables 1-2 (TAB1, TAB2). Counts are compared on the paper's threshold only."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "Group structure of RNA-seq",
+          "paper": "Four groups (C, CM, H, HM) with n = 12 per group in animals, RNA-seq n = 6 per group (S2.1.p1, S2.7.p1)",
+          "data": "18 libraries in three groups (C, H, HM), 6 each; no CM libraries (GSE319603 metadata)",
+          "disposition": "executable_without_change",
+          "note": "The paper's two named contrasts use only C, H and HM. CM vs C (exercise on chow) cannot be tested from this deposit; it is not analysed."
+        },
+        {
+          "item": "Analysis model structure",
+          "paper": "DESeq2 on raw counts; design formula and whether contrasts were pairwise are not stated (S2.7.p1)",
+          "data": "One joint model over 18 samples with planned contrasts (primary); pairwise two-arm fits (secondary)",
+          "disposition": "executable_without_change",
+          "note": "Both models are run, so the paper's count can be compared with either."
+        },
+        {
+          "item": "Gene symbol annotation",
+          "paper": "Table 2 lists Mrtfa as a DEG in HM vs H (TAB2)",
+          "data": "Mrtfa is absent from the Symbol column; the matrix uses Mkl1 (Mrtfa renamed to Mkl1)",
+          "disposition": "executable_without_change",
+          "note": "Ensembl ID is the join key. Mkl1 is the same gene under its current symbol. The gene lookup records this alias."
+        },
+        {
+          "item": "Gene symbol annotation (Excel corruption)",
+          "paper": "Symbols are gene names (S3.2.p1)",
+          "data": "27 Symbol values are date strings (for example 2026-09-02 00:00:00 for a Sept-family gene, 2026-03-01 00:00:00 for a March-family gene). The original names cannot be recovered with certainty. Ensembl IDs are intact.",
+          "disposition": "executable_without_change",
+          "note": "Annotation only. Counts and DE are keyed by Ensembl ID. None of the paper's named genes is affected."
+        }
+      ],
+      "executions": [
+        {
+          "name": "deseq2_joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned"},
+          "role": "primary",
+          "reasoning": "One DESeq2 model ~ grp over all 18 samples, with the two planned contrasts (grp_H_vs_C and grp_HM_vs_H), as the skill requires for one control with several levels."
+        },
+        {
+          "name": "grp_HM_vs_H_pairwise",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "H", "treatment_group": "HM", "alpha": 0.05},
+          "role": "sensitivity",
+          "reasoning": "Two-arm DESeq2 fit (H vs HM only, 12 samples). This is the form in which a paper often reports one pairwise contrast, so it shows whether the joint model changes the exercise count."
+        },
+        {
+          "name": "grp_H_vs_C_pairwise",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "C", "treatment_group": "H", "alpha": 0.05},
+          "role": "sensitivity",
+          "reasoning": "Two-arm DESeq2 fit (C vs H only, 12 samples), the pairwise form of the paper's first contrast, for sensitivity to the joint model."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "deseq2_joint/grp_HM_vs_H",
+          "ora": true,
+          "gsea": false,
+          "direction": "all",
+          "reasoning": "The paper reports GO and KEGG ORA of the exercise-contrast DEGs (S3.3, S3.4, S2.7.p1), so it is run to check its pathway claims (FoxO, PI3K-Akt, MAPK). Hallmark GSEA is not in the paper and is not run."
+        }
+      ]
+    }
+  ]
+}

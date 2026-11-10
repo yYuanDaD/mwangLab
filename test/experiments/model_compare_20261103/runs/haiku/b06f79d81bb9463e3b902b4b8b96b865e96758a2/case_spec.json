@@ -1,0 +1,230 @@
+{
+  "run_dir": "test/experiments/model_compare_20261103/runs/haiku/b06f79d81bb9463e3b902b4b8b96b865e96758a2",
+  "request": "Analyze GSE164890 for PMC9027771 (RNA Sequencing of Whole Blood Defines the Signature of High Intensity Exercise at Altitude in Elite Speed Skaters): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Haiku 5.5 (claude-haiku-5-5) agent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE164890",
+      "accession": "GSE164890",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC9027771.paper.md"],
+        "metadata": "GSE164890/GSE164890_metadata.csv",
+        "matrix": "GSE164890/GSE164890_rsem.genes.counts.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE164890"],
+            "primary_estimand": "Effect of one intense 1 h skating bout on whole-blood gene expression (after vs before exercise, same skater), on day 18 of altitude adaptation, in 7 elite female speed skaters. Paired within-subject estimand; the paper's altitude-specificity claim needs external microarray data outside this series.",
+            "sample_inclusion": "All 14 RNA-seq samples (7 skaters x before/after exercise)",
+            "sample_exclusion": "none",
+            "factors": [{"name": "time", "levels": ["before", "after"]}, {"name": "subject", "levels": ["7 skaters (blocking)"]}],
+            "planned_contrasts": ["time_after_vs_before (exercise effect, donor-blocked)"],
+            "blocking_or_covariance": {"status": "required"},
+            "matrix_scale": "RSEM expected counts (estimated counts) from the paper's RSEM gene table",
+            "paper_method": "DESeq2 with design ~ donor + exercise, on the RSEM per-gene table",
+            "paper_formula": "~ donor + exercise",
+            "paper_results": {"up": 2516, "down": 1542, "total": 4058, "up_twofold": 104, "down_twofold": 58},
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "not_reported (paper says FDR < 0.1; DESeq2 default BH applied by executor)",
+              "cutoff": 0.1,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false,
+              "source_locator": "S2.5.p1; FIG1 legend; S3.2.p2"
+            }
+          },
+          "reasoning": "S2.5.p1: DESeq2 on the RSEM per-gene table, retaining genes with FDR < 0.1, no fold-change rule. FIG1 legend: 'donor + exercise' design at 10% FDR. S3.2.p2: 2516 up and 1542 down (over 4000 in S4.p2). S3.2.p2 also gives 104 up and 58 down changing more than twofold among DEGs, reported as an audit comparison only. S3.2.p1 and S2.5.p1: ComBat donor correction is for diagnostic PCA only; the DE model keeps donor as a term.",
+          "locator": "S2.5.p1"
+        },
+        "ownership": {
+          "final": {
+            "accession": "GSE164890",
+            "matrix_file": "GSE164890_rsem.genes.counts.tsv.gz",
+            "metadata_file": "GSE164890_metadata.csv",
+            "owned": true,
+            "checks": ["series_id GSE164890 in metadata", "14 samples = paper's 14 (7 skaters x 2)", "description column 1before..7after matches the matrix column names", "organism Homo sapiens, platform GPL20301 (STAR/RSEM, GENCODE v26)"]
+          },
+          "reasoning": "S2.3.p1 and S10.p1 name GSE164890 as the deposit for these 14 samples. Metadata series_id, sample count, and before/after labels match the paper. The data_processing field states STAR + RSEM, which is the paper's pipeline (S2.4.p1)."
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {
+            "subject": ["title", "(Skater) (\\d+)"],
+            "time": ["title", "(before|after) exercise"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Exact match of matrix columns (1before, 1after, ...) to the metadata description column: 14/14, no position-based fallback. Derived subject labels are non-numeric (Skater_1 ...) on purpose: joint_contrasts treats all-numeric covariates as continuous (tools/joint_contrasts.py:71-73), which would turn the donor block into a linear trend."
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2 (rounded RSEM expected counts)",
+          "reasoning": "File is GSE164890_rsem.genes.counts.tsv.gz: RSEM expected counts (S2.4.p1, GEO data_processing). 94.5% of values are integers; the rest are fractional expected counts, not raw integer counts. TPM/FPKM are the paper's other tables and are not used for DE. The paper's DESeq2 input is this table (S2.5.p1), so the route is the paper's. Rounding is needed for DESeq2 and the paper does not state it, so it is documented as a deviation."
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "before"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_after_vs_before"],
+          "covariate_candidates": ["subject"],
+          "final": {
+            "analysis_type": "paired",
+            "design_column": "time",
+            "control": "before",
+            "treatment": "after",
+            "contrasts": [
+              {"name": "time_after_vs_before", "control": "before", "treatment": "after", "role": "primary"}
+            ],
+            "estimand_type": "within-subject exercise effect"
+          },
+          "reasoning": "Paper S2.5.p1 and FIG1: exercise contrast, after vs before, paired by skater. Each skater contributes both arms, so the design is paired with subject as the blocking unit. Rejected alternatives: an unpaired two-group test on time ignores the donor effect the paper itself found (S3.2.p1). 'Before' is the reference, so the contrast is after versus before."
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [{"name": "subject", "disposition": "included"}]
+          },
+          "confounding_candidates": ["subject"],
+          "reasoning": "S3.2.p1 shows a clear donor effect (PCA) and the paper's FIG1 model is donor + exercise. Subject is a blocking key, not a free covariate: each subject appears once before and once after."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, one joint model, via joint_contrasts.run_joint_deseq2)",
+            "formula": "~ subject + time",
+            "matrix_type": "estimated counts",
+            "rounding_documented": true,
+            "deviations": ["Rounding of RSEM expected counts to integers (DESeq2 requires integer counts; paper does not state how it was done)."]
+          },
+          "transform": null,
+          "reasoning": "DESeq2 follows the paper (S2.5.p1, FIG1). The count route needs integers, so counts are rounded to the nearest integer and recorded here (rounding_documented). Rounding is not done silently: round_estimated_counts is set in the execution. No log transform: DESeq2 is applied to counts."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "FDR",
+              "adjustment": "not_reported",
+              "cutoff": 0.1,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false,
+              "source_locator": "S2.5.p1; FIG1 legend"
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.1,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.1,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "inclusive": false
+            },
+            "deviation_note": "audit_threshold: padj < 0.1 and |log2FC| > 1 (more than twofold, S3.2.p2: 104 up, 58 down among DEGs). A labelled comparison only."
+          },
+          "reasoning": "S2.5.p1 and FIG1: FDR < 0.1, no effect-size cutoff. Applied exactly as written, no fold-change rule, so the paper's count is comparable. The twofold numbers (S3.2.p2) are reported as an audit, not as the applied rule."
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Paper and data match on accession, sample set, pairing, design, and matrix input; only the rounding of RSEM counts is added.",
+              "Our run covers the within-subject exercise effect only. The paper's altitude-specific claims (S3.5) use eight external microarray datasets, not run here.",
+              "Enrichment gene sets and their analysis are a deviation from the paper's H+CP and clusterProfiler/fGSEA route (see enrichment)."
+            ]
+          },
+          "paper_counts": {
+            "joint_deseq2_paired/time_after_vs_before": 4058
+          },
+          "paper_genes": {
+            "joint_deseq2_paired/time_after_vs_before": ["MARC1", "PHOSPHO1", "MYC", "PPBP"]
+          },
+          "reasoning": "Paper total 4058 DEGs at FDR < 0.1 (2516 up + 1542 down, S3.2.p2). Paper genes: MARC1 and PHOSPHO1 up (S3.5.p5-p6), MYC down (S3.3.p2), PPBP platelet marker (S3.5.p4)."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "Estimated (RSEM expected) counts are fractional; DESeq2 needs integers. Paper does not say how it handled this.",
+          "paper": "S2.5.p1: DESeq2 on the RSEM per-gene table",
+          "data": "94.5% integer, rest fractional expected counts",
+          "disposition": "requires_explicit_deviation"
+        },
+        {
+          "item": "Donor correction (ComBat) is applied in the paper to the rlog matrix for PCA plots only; the DE model includes donor as a term.",
+          "paper": "S2.5.p1, S3.2.p1: ComBat for diagnostic plots; FIG1: donor + exercise design",
+          "data": "not applicable",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Pathway gene sets and tools differ: paper used MSigDB H + CP with clusterProfiler (Fisher ORA) and fGSEA; the runner uses Enrichr ORA (GO/KEGG) and Hallmark GSEA.",
+          "paper": "S2.5.p1, S3.3.p1",
+          "data": "not applicable",
+          "disposition": "requires_explicit_deviation"
+        },
+        {
+          "item": "Paper's TPM >= 100 and TPM >= 10 with |log2FC| >= 0.5 subsets (582/55; 72 genes) are not produced by the runner.",
+          "paper": "S3.2.p2, S3.5.p4, FIG1d",
+          "data": "not applicable",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Altitude specificity (S3.5) needs external microarray DEG sets and a sea-level comparison that are not in this series.",
+          "paper": "S3.5.p1-p3",
+          "data": "GSE164890 has only before/after exercise; no sea-level arm",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint_deseq2_paired",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": "planned",
+            "covariates": ["subject"],
+            "alpha": 0.1,
+            "round_estimated_counts": true
+          },
+          "role": "primary",
+          "reasoning": "Paper's DESeq2 ~ donor + exercise with the time contrast; the rounding of estimated counts is set explicitly and recorded in the method gate."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "joint_deseq2_paired/time_after_vs_before",
+          "ora": true,
+          "gsea": false,
+          "direction": "up",
+          "reasoning": "Paper S3.3.p1: ORA of up DEGs (Fisher exact). Run as a separate gene set choice (deviation)."
+        },
+        {
+          "execution": "joint_deseq2_paired/time_after_vs_before",
+          "ora": true,
+          "gsea": false,
+          "direction": "down",
+          "reasoning": "Paper S3.3.p2: ORA of down DEGs."
+        },
+        {
+          "execution": "joint_deseq2_paired/time_after_vs_before",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "Paper S3.3.p3: GSEA on the full ranking, reported as in exceptional agreement with ORA."
+        }
+      ]
+    }
+  ]
+}
