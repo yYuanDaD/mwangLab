@@ -1,0 +1,163 @@
+"""Writes case_spec.json for GSE128078. Decisions are the agent's; this only keeps the JSON readable."""
+import json, math
+from pathlib import Path
+RID = "f7900835fe5a860049245a1bad8be8ffb0d6309e"
+RUN = f"test/experiments/large_run_pilot_20261019/runs_claude/{RID}"
+ROOT = Path("E:/agent/mwangLab_pdf")
+PREP = (ROOT / RUN / "prep").as_posix()
+PAPER = (ROOT / "test/experiments/paper_screen_20261019/papers/PMC6428308.paper.md").as_posix()
+META = (ROOT / "data/GSE128078/GSE128078_metadata.csv").as_posix()
+FC = math.log2(1.5)
+LITERAL = "fold change > +/-1.5, p-value < 0.05, and adjusted p-value (or FDR) < 0.1% (S2.5.1.p1)"
+PAPER_T = {"metric": "FDR", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": FC,
+           "effect_cutoff_original": "FC 1.5", "inclusive": False, "source_locator": "S2.5.1.p1; TAB4",
+           "literal_text": LITERAL,
+           "interpretation": "Methods print 'FDR < 0.1%' but every all-days DEG in TAB4 has FDR 0.02-0.10; the rule that "
+                             "generated the reported lists is FDR < 0.1 (10%). The literal 0.001 rule is carried as the audit rule."}
+APPLIED = {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": FC, "inclusive": False}
+AUDIT = {"metric": "padj", "cutoff": 0.001, "effect_metric": "log2FoldChange", "effect_cutoff": FC, "inclusive": False}
+THRESH = {"final": {"paper_threshold": PAPER_T, "threshold_source": "paper_on_deviation_route", "applied_threshold": APPLIED,
+                    "audit_threshold": AUDIT,
+                    "deviation_note": "Paper's FDR comes from Partek GSA per-gene best-model p-values; here BH on limma moderated t, "
+                                      "within each contrast. The paper's extra p<0.05 clause cannot bind except when almost all genes "
+                                      "are significant, and no contrast here comes close."},
+          "reasoning": "S2.5.1.p1 states FC>1.5, p<0.05, FDR<0.1%, yet TAB4 lists DEGs at FDR up to 0.10 and S4.p2 calls them borderline, so "
+                       "0.1% is read as 0.1 for the applied rule; literal FDR<0.001 + FC 1.5 is the audit rule so both counts are visible.",
+          "locator": "S2.5.1.p1"}
+PR = {"final": {
+    "accessions": ["GSE128078", "PRJNA526259"],
+    "primary_estimand": "Within-subject change in whole-blood expression after cardiopulmonary exercise (2 maximal CPET ~24 h apart; day 1 baseline vs days 2, 3, 7) in ME/CFS and in sedentary controls, and whether that change differs between the groups.",
+    "planned_contrasts": [
+        "Day 1 vs Day 2 / Day 3 / Day 7 within CFS and within HC (TAB3 lower block; paper 0 each)",
+        "Pre vs post in ME/CFS as compared to controls, overall (days 1,2 vs days 3,7) or at any single time point (S3.3.p2; paper 0)",
+        "ME/CFS vs controls at day 1, 2, 3, 7 (TAB3; paper 0,0,0,1) and all days (TAB3; paper 6; associational, not an exercise effect)",
+        "Low VO2 ME/CFS subset and test-retest subset vs regular repeat exercise by day (TAB3; subject labels not deposited)"],
+    "factors": {"disease": ["ME/CFS", "Control"], "day": ["1", "2", "3", "7"]},
+    "design_timing": "Blood drawn within 2 h BEFORE each CPET on day 1 and day 2, then at home on day 3 and day 7 (S2.5.p1). Day 1 is the only unexercised sample; there is no acute post-exercise sample.",
+    "repeated_measure_unit": "subject (4 samples each; S2.5.p1)",
+    "inclusion": "14 female ME/CFS, 11 matched sedentary controls (S3.1.p1); day 3 and day 7 samples of one subject removed for <40% expressed genes (S3.3.p1); subjects who completed only one CPET retained (S3.2.p2)",
+    "paper_threshold": PAPER_T,
+    "paper_method": "Partek Flow 5.0 multimodel (normal, lognormal, lognormal with shrinkage, negative binomial, Poisson; per-gene best AICc) on STAR/Cufflinks hg38 RefSeq FPKM (S2.5.1.p1)",
+    "normalization": "FPKM",
+    "paper_results": "0 DEGs before vs after exercise in either group; 6 ME/CFS vs control all days, 1 at day 7; 19 unique overall, 15 considered likely false positives (S3.3.p2, S4.p2)"},
+    "reasoning": "Study map from S2.2, S2.4, S2.5, S2.5.1, S3.3 and TAB3/TAB4.", "locator": "S2.5.1.p1", "confidence": "high"}
+OWN = {"final": {"owned": True, "checks": ["FN.p1 names GSE128078 / PRJNA526259", "metadata series_id = GSE128078",
+       "14 ME/CFS + 11 control subjects as in S3.1.p1", "days 1,2,3,7 as in S2.5.p1", "matrix file named in GEO description field"]},
+       "reasoning": "Paper data statement names the series. 99 of the paper's 100 libraries (S2.5.p1) are deposited: Sample_G12-7 is absent. The GEO processing note (hg19, TopHat2/Bowtie2, Cufflinks) differs from the paper (hg38, STAR, Cufflinks), recorded as a discrepancy.",
+       "locator": "FN.p1", "confidence": "high"}
+DISC = [
+ {"item": "FDR cutoff", "paper": "Methods: FDR < 0.1% (S2.5.1.p1)", "data": "TAB4 lists DEGs at FDR 0.02-0.10", "disposition": "applied FDR<0.1 as the operative rule; literal 0.001 kept as audit"},
+ {"item": "alignment and genome", "paper": "STAR v2.4.1, hg38, 25,278 RefSeq (S2.5.1.p1)", "data": "GEO data_processing: Bowtie2/TopHat2, hg19; file has 43,497 RefSeq isoforms", "disposition": "deposited matrix used; cannot be confirmed as the matrix behind the paper's tables"},
+ {"item": "feature level", "paper": "gene-level names in TAB4", "data": "isoform-level FPKM", "disposition": "summed FPKM over isoforms per gene symbol (prep script); 3,313 RefSeq IDs without a current symbol kept as own features"},
+ {"item": "sample count", "paper": "100 libraries (S2.5.p1), 4 per subject", "data": "99 deposited; Sample_G12-7 missing", "disposition": "G12 contributes days 1-3 only"},
+ {"item": "excluded subject identity", "paper": "one subject's day 3 and 7 removed, <40% expressed genes (S3.3.p1), ID not named", "data": "Sample_P14-3 (32% of isoforms with FPKM>0) and Sample_P14-7 (12.5%); all other samples >= 56%", "disposition": "excluded both"},
+ {"item": "TAB3 day 7 row", "paper": "TAB3 ME/CFS vs controls day 7: total 0, down 1; S3.3.p2 says 1 DEG; TAB4 lists LINC01158 at FC +1054", "data": "not resolvable", "disposition": "paper count taken as 1"},
+ {"item": "VO2 and test-retest subsets", "paper": "8 low VO2 and 7 test-retest ME/CFS subjects (S3.2.p3, TAB3)", "data": "no subject-level CPET labels in GEO or the paper", "disposition": "these 10 TAB3 rows are not executable; not run"},
+ {"item": "method", "paper": "Partek GSA multimodel", "data": "only FPKM deposited; Partek is proprietary and no executor exists", "disposition": "limma on log2(FPKM+1) as declared deviation"}]
+ALIGN_LONG = {"key_column": "title",
+    "aliases": {"subject": "characteristics_ch1.4.individual identifier", "grp": "characteristics_ch1.1.disease state", "time": "characteristics_ch1.3.timepoint (day)"},
+    "combine": {"cfs_d2": ["grp", "time"], "cfs_d3": ["grp", "time"], "cfs_d7": ["grp", "time"]},
+    "recode": {"grp": {"ME/CFS": "CFS", "Control": "HC"}, "time": {"1": "d1", "2": "d2", "3": "d3", "7": "d7"},
+               **{f"cfs_d{d}": {f"{g}_d{t}": ("1" if g == "CFS" and t == d else "0") for g in ("CFS", "HC") for t in (1, 2, 3, 7)} for d in (2, 3, 7)}},
+    "exclude_samples": {"GSM3664608": "Sample_P14-3: day 3 of the one subject removed by the paper for <40% expressed genes (S3.3.p1)",
+                        "GSM3664609": "Sample_P14-7: day 7 of the same subject (S3.3.p1)"},
+    "final": {}, "reasoning": "Exact match of matrix columns to metadata title (99/99). Subject, disease and day are explicit GEO fields. cfs_d2/d3/d7 are 0/1 indicators of ME/CFS at that day so the disease-by-time terms can be written full rank next to the subject block. P14-3/P14-7 identified from detection rates matching S3.3.p1.",
+    "locator": "S3.3.p1", "confidence": "high"}
+MATRIX = {"matrix_type": "FPKM", "recommended_method": "limma on log2(FPKM+1)",
+    "final": {"source": "GSE128078_FES_isoforms_FPKM.txt.gz summed to gene level by scripts/prep_gene_level.py", "paper_input": "FPKM from Cufflinks (S2.5.1.p1)"},
+    "reasoning": "Non-integer values up to 4.96e5, file named FPKM, data_processing says FPKM from Cufflinks, paper FN.p1 says FPKM deposited. Not counts, so count methods are out and FPKM is not rounded.",
+    "locator": "FN.p1", "confidence": "high"}
+FORMULA = "~ C(subject) + C(time) + cfs_d2 + cfs_d3 + cfs_d7"
+def vec(**k): return {("C(time)[T.%s]" % n[1:] if n.startswith("T") else n): v for n, v in k.items()}
+HC = {"d2": vec(Td2=1), "d3": vec(Td3=1), "d7": vec(Td7=1), "post": vec(Td3=.5, Td7=.5, Td2=-.5)}
+INT = {"d2": vec(cfs_d2=1), "d3": vec(cfs_d3=1), "d7": vec(cfs_d7=1), "post": vec(cfs_d3=.5, cfs_d7=.5, cfs_d2=-.5)}
+CFS = {k: {**HC[k], **INT[k]} for k in HC}
+LAB = {"d2": "time_d2_vs_d1", "d3": "time_d3_vs_d1", "d7": "time_d7_vs_d1", "post": "post_d3d7_vs_pre_d1d2"}
+CONTRASTS = []
+for k in LAB:
+    CONTRASTS += [{"name": f"{LAB[k]}_grp-CFS", "coefficients": CFS[k]}, {"name": f"{LAB[k]}_grp-HC", "coefficients": HC[k]},
+                  {"name": (f"grp_time_CFS_{k}_vs_HC_d1" if k != "post" else "grp_time_post_d3d7_vs_pre_d1d2"), "coefficients": INT[k]}]
+PAIRS = []
+for a, b in (("d3", "d2"), ("d7", "d2"), ("d7", "d3")):
+    h = {f"C(time)[T.{a}]": 1, f"C(time)[T.{b}]": -1}
+    i = {f"cfs_{a}": 1, f"cfs_{b}": -1}
+    PAIRS += [{"name": f"time_{a}_vs_{b}_grp-HC", "coefficients": h}, {"name": f"time_{a}_vs_{b}_grp-CFS", "coefficients": {**h, **i}}]
+_planned = ROOT / RUN / "scripts/planned.json"
+PLANNED = [f"time_d{d}_vs_d1_grp-{g}" for d in (2, 3, 7) for g in ("CFS", "HC")] + [f"grp_time_CFS_d{d}_vs_HC_d1" for d in (2, 3, 7)] + [f"grp_CFS_vs_HC_time-d{d}" for d in (1, 2, 3, 7)]
+LONG = {"case_id": "GSE128078", "accession": "GSE128078",
+  "inputs": {"paper": [PAPER], "metadata": META, "matrix": f"{PREP}/GSE128078_gene_FPKM.csv", "raw_tar": False,
+             "prep_scripts": [(ROOT / RUN / "scripts/prep_gene_level.py").as_posix()]},
+  "discrepancies": DISC,
+  "gates": {"paper_reconstruction": PR, "ownership": OWN, "alignment": ALIGN_LONG, "matrix": MATRIX,
+    "design": {"factors": ["grp", "time"], "references": {"grp": "HC", "time": "d1"}, "subject": "subject", "organism": "Human", "planned": PLANNED,
+      "final": {"analysis_type": "repeated measures, disease by time with subject blocking", "formula": FORMULA,
+                "contrasts": [c["name"] for c in CONTRASTS + PAIRS] + [f"grp_CFS_vs_HC at d{d} (per-day cross-sectional)" for d in (1, 2, 3, 7)],
+                "estimand_type": "within-subject change (uncontrolled pre/post); per-day group comparisons are associational",
+                "timing_note": "day 1 is pre-exercise; day 2 is ~24 h after CPET 1 and before CPET 2; days 3 and 7 are ~1 and ~5 days after CPET 2 (S2.5.p1, S2.4.p1)"},
+      "candidates": [{"value": "two-group pooled time comparison without subject", "reason_rejected": "ignores repeated measures"},
+                     {"value": "paired_change per follow-up", "reason_rejected": "valid, but separate fits per follow-up; one model also gives the overall days 1,2 vs 3,7 contrast"},
+                     {"value": "~ 0 + C(cell) + C(subject)", "reason_rejected": "rank deficient: subject is nested in disease (multifactor-design.md)"}],
+      "reasoning": "S2.5.p1: 4 samples per subject. S3.3.p2/TAB3 set the contrasts. Disease is absorbed by the subject block, so the model keeps subject, time, and disease-by-time only.", "locator": "S3.3.p2", "confidence": "high"},
+    "covariance": {"final": {"status": "required", "blocking_terms": ["subject"],
+        "covariates": [{"name": "grp", "disposition": "nested: within subject; its between-subject effect is absorbed by the block"},
+                       {"name": "library batch", "disposition": "excluded: not deposited in GEO; S2.5.p1 and S3.3.p1 report no batch clustering by PCA and randomized processing"},
+                       {"name": "age, BMI", "disposition": "excluded: matched by design (TAB1) and not deposited; absorbed by the subject block"}]},
+        "confounding_candidates": ["subject", "time"], "reasoning": "Same subject at four days. The per-day group comparisons use independent subjects, one sample each, so they carry no block.", "locator": "S2.5.p1", "confidence": "high"},
+    "method": {"transform": "log2(x+1)", "final": {"method": "limma moderated t on log2(FPKM+1), subject as fixed block", "formula": FORMULA,
+        "paper_route": {"method": "Partek Flow GSA multimodel with AICc per-gene model selection", "status": "blocked", "reason": "proprietary software with no executor here, and its count-model arms need counts; only FPKM is deposited"},
+        "deviations": ["limma on log2(FPKM+1) replaces Partek GSA", "BH FDR within each contrast", "isoform FPKM summed to genes", "no low-expression filter, as in the paper (S3.3.p2 reports DEGs with coverage below 1)"]},
+        "reasoning": "Matrix policy: FPKM goes to log2(x+1) then limma. Rounding FPKM to fit a count model is not allowed.", "locator": "S2.5.1.p1", "confidence": "high"},
+    "threshold": THRESH,
+    "study": {"final": {"route": "declared_deviation", "caveats": [
+        "No acute post-exercise sample exists: the closest is ~24 h after a maximal test.",
+        "Pre/post comparison has no non-exercising control, so day effects cannot be separated from exercise.",
+        "Low VO2 and test-retest subset rows of TAB3 not run: labels not deposited.",
+        "ME/CFS vs controls is associational."]},
+      "paper_counts": {**{f"within_subject_model/{LAB[k]}_grp-{g}": 0 for k in ("d2", "d3", "d7") for g in ("CFS", "HC")},
+                       **{f"within_subject_model/grp_time_CFS_{k}_vs_HC_d1": 0 for k in ("d2", "d3", "d7")},
+                       "within_subject_model/grp_time_post_d3d7_vs_pre_d1d2": 0,
+                       "grp_CFS_vs_HC_time-d1": 0, "grp_CFS_vs_HC_time-d2": 0, "grp_CFS_vs_HC_time-d3": 0, "grp_CFS_vs_HC_time-d7": 1},
+      "paper_genes": {"grp_CFS_vs_HC_time-d7": ["LINC01158", "PANTR1"]},
+      "reasoning": "Paper's Partek route is blocked, so limma runs as a declared deviation.", "confidence": "high"}},
+  "executions": [{"name": "within_subject_model", "tool": "tools.multigroup_tools:run_multigroup_analysis",
+      "args": {"plan": {"analysis_type": "factorial", "formula": FORMULA, "contrasts": CONTRASTS}}, "role": "primary",
+      "reasoning": "One limma model on all 97 samples with subject block: day effects within each group, disease-by-time, and the overall days 1,2 vs 3,7 contrast."}]
+    + [{"name": "exploratory_day_pairs", "tool": "tools.multigroup_tools:run_multigroup_analysis",
+        "args": {"plan": {"analysis_type": "factorial", "formula": FORMULA, "contrasts": PAIRS}}, "role": "exploratory",
+        "reasoning": "Remaining analyzable day pairs from the suitability report, same model. Not planned by the paper."}]
+    + [{"name": f"grp_CFS_vs_HC_time-d{d}", "tool": "tools.limma_tools:run_limma_analysis", "subset": {"time": [f"d{d}"]},
+        "args": {"design_column": "grp", "control_group": "HC", "treatment_group": "CFS"}, "role": "secondary",
+        "reasoning": "TAB3 ME/CFS vs controls at one day: independent subjects with one sample each, so a separate fit is valid; a shared cell-means fit would ignore within-subject correlation. Associational."} for d in (1, 2, 3, 7)],
+  "enrichment": []}
+GROUP = {"case_id": "GSE128078_subject_mean", "accession": "GSE128078",
+  "inputs": {"paper": [PAPER], "metadata": f"{PREP}/GSE128078_subject_metadata.csv", "matrix": f"{PREP}/GSE128078_subject_mean_log2FPKM.csv", "raw_tar": False,
+             "prep_scripts": [(ROOT / RUN / "scripts/prep_gene_level.py").as_posix()]},
+  "discrepancies": DISC + [{"item": "all-days unit", "paper": "'all time points combined' (S3.3.p2); handling of repeats not stated", "data": "1-4 samples per subject", "disposition": "one log2 mean per subject over available days, so the subject is the unit; P14 averages days 1-2 and G12 days 1-3"}],
+  "gates": {"paper_reconstruction": PR, "ownership": OWN,
+    "alignment": {"key_column": None, "aliases": {"grp": "disease"}, "recode": {"grp": {"ME/CFS": "CFS", "Control": "HC"}}, "final": {},
+       "reasoning": "Prep script writes one row and one column per subject, indexed by the GEO individual identifier, after removing P14-3 and P14-7.", "locator": "S3.3.p1", "confidence": "high"},
+    "matrix": {"matrix_type": "log2 FPKM", "recommended_method": "limma", "final": {"source": "mean of log2(gene FPKM+1) per subject, scripts/prep_gene_level.py", "paper_input": "FPKM (S2.5.1.p1)"},
+       "reasoning": "Log-scale by construction, maximum below 20.", "locator": "S2.5.1.p1", "confidence": "high"},
+    "design": {"factors": ["grp"], "references": {"grp": "HC"}, "organism": "Human", "planned": ["grp_CFS_vs_HC"],
+       "final": {"analysis_type": "two-group between subjects", "design_column": "grp", "control": "HC", "treatment": "CFS", "estimand_type": "associational",
+                 "contrasts": [{"name": "grp_CFS_vs_HC", "control": "HC", "treatment": "CFS", "role": "secondary"}]},
+       "candidates": [{"value": "~ grp over all 97 samples", "reason_rejected": "pseudoreplication: treats 97 samples as independent when the unit is 25 subjects"},
+                      {"value": "mixed model with a random subject effect", "reason_rejected": "no executor; duplicateCorrelation is not available in the runner"}],
+       "reasoning": "TAB3 'All days' row. Disease varies only between subjects, so the valid replicate is the subject.", "locator": "S3.3.p2", "confidence": "medium"},
+    "covariance": {"final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "time", "disposition": "excluded: averaged out within subject"}]},
+       "reasoning": "One row per subject; subjects are independent.", "confidence": "high"},
+    "method": {"final": {"method": "limma moderated t on per-subject mean log2(FPKM+1)", "formula": "~ grp",
+        "paper_route": {"method": "Partek Flow GSA multimodel", "status": "blocked", "reason": "proprietary software, no executor, and only FPKM deposited"},
+        "deviations": ["subject means replace Partek's all-time-points model"]},
+        "reasoning": "Log-scale input goes to limma.", "locator": "S2.5.1.p1", "confidence": "medium"},
+    "threshold": THRESH,
+    "study": {"final": {"route": "declared_deviation", "caveats": ["Associational, not an exercise effect.", "Unequal number of days averaged for P14 and G12."]},
+       "paper_counts": {"grp_CFS_vs_HC": 6}, "paper_genes": {"grp_CFS_vs_HC": ["HOXA9", "LOC101928767", "NRON", "RPL23A", "RPS12", "SNORA27"]},
+       "reasoning": "Separate case because the unit of analysis differs.", "confidence": "medium"}},
+  "executions": [{"name": "grp_CFS_vs_HC", "tool": "tools.limma_tools:run_limma_analysis",
+       "args": {"design_column": "grp", "control_group": "HC", "treatment_group": "CFS"}, "role": "secondary", "reasoning": "TAB3 all-days row with the subject as the unit."}],
+  "enrichment": []}
+spec = {"run_dir": RUN, "request": "Analyze GSE128078 for the paper (Whole blood human transcriptome and virome analysis of ME/CFS patients experiencing post-exertional malaise following cardiopulmonary exercise testing): how exercise affects gene expression as the paper intends.",
+        "decision_maker": "Claude Opus 5.5 session", "platform": "claude-code", "data_root": "E:/agent/mwangLab_pdf/data", "cases": [LONG, GROUP]}
+(ROOT / RUN / "case_spec.json").write_text(json.dumps(spec, indent=1), encoding="utf-8")
+print("ok", len(CONTRASTS), "contrasts; planned", len(PLANNED))

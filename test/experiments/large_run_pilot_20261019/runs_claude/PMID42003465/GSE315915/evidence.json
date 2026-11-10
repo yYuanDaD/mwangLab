@@ -1,0 +1,785 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID42003465",
+  "subject_id": "GSE315915",
+  "created_at": "2026-11-03T00:30:40",
+  "finished_at": "2026-11-03T00:31:46",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13189389.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC13189389.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-03T00:30:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "992e9c2d6494ccde27f2c4383fb102016b1d15e2cdfdc1dc5eeabd3883ee7eb2",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE315915_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE315915\\GSE315915_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:30:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "32bfa5f57656aa1268fca68dc9e9be5380df12ea0add8993c6c1ff5c9cd7316c",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script collapse_transcripts_to_genes.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\prep\\collapse_transcripts_to_genes.py",
+      "locator": null,
+      "captured_at": "2026-11-03T00:30:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "221780b0e89031c6e2938fde6f4e78e2d05eafa30cb1329ae6c5bdf0208485ff",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE315915_gene_level_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\prep\\GSE315915_gene_level_counts.csv",
+      "locator": null,
+      "captured_at": "2026-11-03T00:30:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e6af4aad886353f6e2a952ae3d1b03324fef5fefd4bdf1d2bc9ec9f341ee6813",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE315915"
+        ],
+        "primary_estimand": "Persistent effect of 3 weeks of swimming plus 1 week of rest (EHP) versus 4 weeks sedentary on the adult mouse whole-heart transcriptome, after hypertrophy has regressed",
+        "planned_contrasts": [
+          "EHP vs sedentary (S2.2.p1, FIG2; paper: 92 DEGs, Pdk4 the only DEG in glucose gene set M13879)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR (Benjamini-Hochberg adjusted P)",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "source_locator": "S2.2.p1; FIG2"
+        },
+        "paper_method": "DESeq2, BH-adjusted P (FIG2); two independent groups",
+        "sample_inclusion": "5 EHP and 5 sedentary hearts (S2.2.p1); male C57BL/6J, 8-10 weeks (S1.3.p1)",
+        "factors": {
+          "group": [
+            "sedentary",
+            "EHP"
+          ]
+        },
+        "repeated_measure_unit": null,
+        "paper_results": {
+          "n_deg": 92,
+          "direction_split": "not stated in the text (FIG2 volcano only)",
+          "genes": {
+            "Pdk4": "down in EHP, DEG (S2.2.p1, FIG2D)",
+            "Lonp1": "no significant difference (S2.5.p1)"
+          }
+        },
+        "supplement_only": "Figures S2, S11, S13, S15 use this data but are not in the available text"
+      },
+      "reason": "S2.2.p1 and FIG2 give the only RNA-seq comparison. Other results are qPCR, western, metabolomics, or perturbation arms without sequencing. Rest is 1 week, so the estimand is the memory after regression, not the acute post-training state.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:40"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\prep\\GSE315915_gene_level_counts.csv",
+        "owned": true,
+        "checks": [
+          "GEO series pubmed id 42003465 and series title match the paper",
+          "10 samples, 5 Sedentary and 5 EHP, equals S2.2.p1",
+          "treatment fields 'sedentary 4w' and 'swimming 3w + sedentary 1w' match S1.3.p1 and FIG1A",
+          "one supplementary matrix, GSE315915_mRNA_raw_count.txt.gz"
+        ],
+        "accession": "GSE315915",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE315915\\GSE315915_metadata.csv"
+      },
+      "reason": "The paper's data statement (S1.1.p1) names no accession, so ownership rests on the GEO record linking PMID 42003465 with the same title and design. The gene matrix derives only from the deposited file.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:40"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 10,
+        "n_metadata": 10,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^(Sedentary|EHP) \\d+$",
+              "recode": {
+                "Sedentary": "SED",
+                "EHP": "EHP"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\design_metadata.csv",
+          "sha256": "43692c74ee16fe446b5abc67c2523d7eb6afa8e8091fcb09791e0b0c8f01168e",
+          "levels": {
+            "grp": {
+              "SED": 5,
+              "EHP": 5
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns S1-S5, E1-E5 are the second field of GEO description ('Library name: sample 1,S1'). Group comes from title and agrees with the treatment characteristic on all 10 samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:40"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42003465/prep/GSE315915_gene_level_counts.csv",
+        "paper_input": "read count matrix from StringTie/featureCounts, then DESeq2 (GEO data_processing; FIG2)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\aligned_matrix.csv",
+          "sha256": "05ca0d12826370b68d7fb04e7b11ceae87cf70045161ef8273086f772d07642e",
+          "n_features": 22061,
+          "n_samples": 10,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3397041.0,
+          "median": 7.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Integer counts from HISAT2, StringTie and featureCounts per GEO notes. The deposit is per transcript; summed per Ensembl 102 gene (GRCm38, the assembly GEO names) by the listed script. 321 of 62384 transcripts, 0.012% of counts, have no Ensembl 102 entry and are dropped. In most genes one transcript holds nearly all counts and the others are near zero, which fits exclusive read assignment, so the sum is unlikely to double count. The exact counting options are not stated, hence medium confidence.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:41"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group",
+        "design_column": "grp",
+        "control": "SED",
+        "treatment": "EHP",
+        "contrasts": [
+          {
+            "name": "grp_EHP_vs_SED",
+            "control": "SED",
+            "treatment": "EHP",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Two randomized arms of independent mice (S1.3.p1), 5 per group, the single comparison the paper reports (S2.2.p1). No other metadata column varies; tissue and genotype are constant.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:45"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 10,
+          "n_columns": 2,
+          "columns": [
+            "Intercept",
+            "grp_SED"
+          ],
+          "rank": 2,
+          "full_rank": true,
+          "residual_df": 8,
+          "levels": {
+            "grp": {
+              "SED": 5,
+              "EHP": 5
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "EHP"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "SED"
+              ],
+              "n": 5
+            }
+          ],
+          "min_cell_size": 5,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 10,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 10,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.genotype",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.treatment",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "EHP": {
+                "sedentary 4w": 0,
+                "swimming 3w + sedentary 1w": 5
+              },
+              "SED": {
+                "sedentary 4w": 5,
+                "swimming 3w + sedentary 1w": 0
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 10,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 10,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 10,
+            "status": "sample_identifier"
+          }
+        ]
+      },
+      "reason": "Each sample is one animal in one arm, so nothing is repeated. GEO records no batch, lane, or sex column.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:45"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "DESeq2",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 rather than R DESeq2; the paper states no version or shrinkage",
+          "transcript rows summed to genes before fitting, because the paper reports genes and the deposit is per transcript"
+        ]
+      },
+      "reason": "Integer counts and the paper's own method (FIG2). Wald test with BH adjustment and MLE log2FC; the paper states no shrinkage.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:45"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR (Benjamini-Hochberg adjusted P)",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "source_locator": "S2.2.p1; FIG2"
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        }
+      },
+      "reason": "S2.2.p1 and FIG2: |log2(FC)|>0.5 and adjusted P<0.05. GEO data_processing writes the effect rule with a non-strict sign; the paper's strict form is used.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:30:45"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_EHP_vs_SED",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\results\\grp_EHP_vs_SED\\DEG_results_EHP_vs_SED.csv"
+        ],
+        "counts": {
+          "grp_EHP_vs_SED": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+              "n_tested": 10753,
+              "n_significant": 92,
+              "n_up": 78,
+              "n_down": 14,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 10753,
+              "n_significant": 122,
+              "n_up": 102,
+              "n_down": 20,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "the paper's two-group DESeq2 on this matrix",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:08"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Deposited matrix is per transcript; gene sums are my reconstruction",
+          "Only protein-coding-gene ('mRNA') rows are deposited",
+          "47% of counts sit on MT mRNAs"
+        ],
+        "results": {
+          "grp_EHP_vs_SED": {
+            "n_deg": 92,
+            "up": 78,
+            "down": 14,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.5",
+            "audit_n": 122
+          }
+        },
+        "paper_counts": {
+          "grp_EHP_vs_SED": 92
+        },
+        "comparison": {
+          "grp_EHP_vs_SED": {
+            "ours": 92,
+            "paper": 92
+          }
+        },
+        "paper_gene_check": {
+          "grp_EHP_vs_SED": {
+            "Pdk4": {
+              "baseMean": 7045.2623,
+              "log2FoldChange": -1.2297,
+              "padj": 0.0211,
+              "pvalue": 0.0002
+            },
+            "Lonp1": {
+              "baseMean": 2648.9642,
+              "log2FoldChange": -0.0467,
+              "padj": 0.8384,
+              "pvalue": 0.2914
+            }
+          }
+        }
+      },
+      "reason": "Gene level is the paper's stated unit, so this was chosen as the primary route before any model was fitted. Deviation: the paper's own gene table is not deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-03T00:31:46"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fb33d78b5c332f768153426b7f940f8cb599bd8b5c4b5b26eedcd43adbc0cb57",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1be19e78fc91122198ff10fa2e8865b52bea816dbe967280f57c1456aecf95db",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "05ca0d12826370b68d7fb04e7b11ceae87cf70045161ef8273086f772d07642e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "43692c74ee16fe446b5abc67c2523d7eb6afa8e8091fcb09791e0b0c8f01168e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "74683617dd588c89071218c40c2c980789c903c92f41cb9af4154e02d694b17a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "753db79e8a47f220b9026434c1b7c6b6abca49fbb9ebe86fa9a7f7730d503e97",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\results\\grp_EHP_vs_SED\\DEG_results_EHP_vs_SED.csv",
+      "role": "deg_grp_EHP_vs_SED",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fe0adfc1f90b374c793a298b57aa8f5668c2ee5507658f549401efae516d5547",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42003465\\GSE315915\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "12d4043920e3b50af198ac71660319bb1056a4de3a6382fa4344d68405f2ce50",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
