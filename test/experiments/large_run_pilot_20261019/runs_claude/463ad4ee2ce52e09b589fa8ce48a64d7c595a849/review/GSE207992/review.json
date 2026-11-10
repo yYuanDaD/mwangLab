@@ -1,0 +1,89 @@
+{
+ "case": "GSE207992",
+ "reviewer": "Claude (Sonnet 5.5), read-only reviewer",
+ "blind": {
+  "B1": "Yes, with a caveat. The exercise factor is scheduled voluntary wheel exercise (SVE, 6 h/24 h wheel access) vs non-scheduled (nSVE, free-running) in WT and Vipr2-/- mice; all 14 sequenced SCN samples carry the factor (S2.2.p1, S4.4.p2, S4.4.2.p1). Timed exercise is the study question (title, S2.5).",
+  "B2": "Four groups: WT nSVE n=4, WT SVE n=4, KO nSVE n=3, KO SVE n=3 (S4.4.2.p1). Reported comparisons: KO vs WT nSVE 307 DEG (S2.3.p1); WT SVE vs nSVE 795 (S2.4.p1, ZT14/CT22 vs CT14, 8 h phase difference); KO SVE vs nSVE 223 (S2.5.p1); KO SVE vs WT nSVE 557 (S2.6.p1).",
+  "B3": "No repeated measures. One laser-captured SCN sample per animal; SVE and nSVE are separate cohorts, each culled at one time point (S4.4.p4, GEO extract_protocol). The packet's key (title without treatment level, e.g. 'WT SVE 1' / 'WT non-SVE 1') only reflects the within-group index; the expression check is not_supported (same-key r 0.044 vs 0.008, permutation p 0.136).",
+  "B4": "The paper does not say whether one 4-group model or separate pairs were fitted. S4.4.2.p1 lists a gene count passing filtering 'in each pairwise analysis' (9524, 15735, 10488, 15269, 11931), which hints at per-pair analyses but per-contrast independent filtering in a joint model would also give different counts. Not stated.",
+  "B5": "FDR < 0.05 (S2.2.p2), p-value corrected by Benjamini-Hochberg (S4.4.2.p2); no fold-change cutoff. Counts: KO vs WT nSVE 307 (158 up/149 down), WT SVE vs nSVE 795 (556/239), KO SVE vs nSVE 223 (105/118), KO SVE vs WT nSVE 557 (246/311)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run decision matches B1: all 14 samples are exercise-design samples; primary estimand KO SVE vs KO nSVE (matched CT14), WT SVE vs nSVE labelled as phase-confounded (S2.4.p1).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp levels WT_nSVE 4, WT_SVE 4, KO_nSVE 3, KO_SVE 3 equal S4.4.2.p1; no exclusions (14/14 aligned by exact description AH labels); controls are the paper's controls.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Treatment = SVE (or KO) vs nSVE (or WT nSVE), as reported in S2.3-S2.6; named genes (Nr1d1/Rgs16 up, Cry1/Per2 down in WT exercise) match the paper's directions.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "The pairing_key_candidate flag is spurious: SVE and nSVE animals are different cohorts, one sample per animal (S4.4.p4); expression check not supported (p 0.136). No blocking on the key is correct.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "S4.4.2.p1 does not state joint vs pairwise; per-pair gene counts hint at pairwise analyses. Both fits are reported (joint primary: KO exercise 329, WT 772, KO genotype 457, KO SVE vs WT nSVE 557; pairwise: 33, 2047, 326, 594); neither reproduces all four paper counts (223/795/307/557). Recorded in study caveats.",
+   "fix": "Optional: note the S4.4.2.p1 per-pair filtering counts as weak evidence for pairwise fits in the discrepancy list."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "WT SVE (CT22) vs WT nSVE (CT14) phase aliasing is recorded as a caveat (S2.4.p1); all male; no batch or housing variable in metadata; singly housed in both arms (S4.4.p1).",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Deposited file is DESeq2-normalized counts; integer raw counts recovered exactly (integer within 1e-8, size factors 0.65-1.45) and DESeq2 run on them; recorded as a discrepancy with disposition executable_without_change.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj < 0.05, no fold-change rule, matches S2.2.p2/S4.4.2.p2. No alternative rule in the packet table fits the paper counts (e.g. KO exercise 223: padj<0.05 329, with lfc>0.585 273, lfc>1 183).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Each paper count is compared with the same contrast at the same rule; mismatches (KO exercise 329 vs 223, KO genotype 457 vs 307) are stated, and the pathway-direction disagreement with S2.5.p1 (Parkinson up vs our down) is disclosed in the caveats, not hidden.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy question: joint vs pairwise fits when the paper is silent; here the paper is silent and counts differ a lot, both fits are reported.",
+  "Pathway direction for KO SVE vs KO nSVE (OXPHOS/Parkinson down in ours) contradicts S2.5.p1 but agrees with S1.p4; the analysis discloses it, a person may want to adjudicate."
+ ],
+ "summary": "本案例没有重复测量：SVE 与 nSVE 是不同动物队列，每只动物仅一个 SCN 样本，机械标记 pairing_key_candidate 只是组内序号，表达检验也不支持（p=0.136）。分组、对照、方向、阈值（FDR<0.05，无倍数规则）均与论文一致，矩阵恢复为原始计数并已记录。联合与分对拟合均已报告，论文未说明用哪种，列为开放问题，总体通过。"
+}
