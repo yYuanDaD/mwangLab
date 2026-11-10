@@ -1,0 +1,86 @@
+{
+ "case": "GSE294565",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No. The sequenced samples are TA muscle after PBS or BaCl2 chemical injury in young/old male mice with vehicle or BI01 senolytic (S2.5.p1, S4.11.p1). No sample carries an exercise factor; the mechanical overload (synergist ablation, S2.6.p1/S4.3.p1) was not sequenced.",
+  "B2": "OS vs OV (old, BI01 vs vehicle) at 7 d and at 35 d after BaCl2, n=4/group, with YV as reference (S2.5.p1, FIG6). Also spatial RNA-seq at 7 d (not in this series).",
+  "B3": "Unilateral BaCl2 with PBS injected as control (ABS.p1) could mean the two TA of a mouse are sampled, but no animal ID exists; candidate key grp+replicate suffix is only the index 1-4 and the expression check does not support it. 7 d and 35 d groups are separate mice.",
+  "B4": "The paper does not say whether pairs or a joint model were fitted; S4.11.p1 says only 'Differential gene expression was analyzed using DESeq2'.",
+  "B5": "No DEG rule stated; S4.11.p1: minimum expression cutoff of 10 counts, DESeq2 in Partek Flow; counts reported only as 'hundreds of genes' (S2.5.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "packet A: no exercise words in any column; paper S2.5.p1/S4.11.p1: RNA-seq only on TA after PBS/BaCl2, OV vs OS; MOV (S2.6.p1, FIG8) histology/mass only. Refusal matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "32 libraries, 8 groups x 4 = paper n=4/group (FIG6 legend); no exclusions; no run so no wrong control used.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast executed.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp+title-suffix key is only the within-group replicate index (title/description numbers 1-4); expression check not_supported (r diff 0.064, perm p 0.087); matrix replicate numbers differ from GEO so linkage is assumed ordinal. Paper ABS.p1 says unilateral injury with PBS controls, so contralateral PBS/BaCl2 pairing is possible but undocumented and irrelevant to the refusal; would matter only for a BaCl2-vs-PBS contrast.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No model fitted; paper silent (S4.11.p1: DESeq2 in Partek Flow).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single sex (male), one strain; no OS PBS libraries deposited (recorded); no batch field to test.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer fraction 1.0, max 2.4e6, 'tab-delimited count matrix'; paper used DESeq2 on Partek E/M counts. Not used.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper states no DEG threshold ('hundreds of genes', S2.5.p1; S4.11.p1 gives only 10-count filter); recorded as not_stated.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No ours-vs-paper pairs; HANDBACK claims no counts. Discrepancies (BioProject, HISAT2 vs STAR) recorded.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Absence claim 'no exercise arm' was checked wide: metadata columns, sample titles, paper outline and Methods; MOV model confirmed absent from series.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该 case 在 design 阶段拒绝是正确的：GSE294565 只有 BaCl2/PBS 损伤后的 TA 肌肉，BI01 与载体的药物比较，没有运动组，论文的机械过载模型未测序。配对键只是组内序号，表达检验不支持，未发现 blocking 或 major 问题。"
+}

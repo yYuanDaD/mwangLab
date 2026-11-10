@@ -1,0 +1,164 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38576560",
+  "request": "Analyze GSE256152 for PMID 38576560 (Transcriptomics and metabonomics study on the effect of exercise combined with curcumin supplementation on breast cancer in mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE256152",
+      "accession": "GSE256152",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC10990956.paper.md"],
+        "metadata": "GSE256152/GSE256152_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38576560/prep/GSE256152_read_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID38576560/prep/extract_read_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE256152"],
+            "assay": "bulk RNA-seq (Illumina PE), 4T1-luc orthotopic breast tumour tissue, BALB/c mice; HISAT2 to GRCm39, HTSeq read counts, FPKM for display",
+            "sample_inclusion": "3 tumours per tumour group sequenced (S2.3.p1); 12 samples total (S3.2.p1); CK (no tumour) group not sequenced",
+            "factors": {"group": ["Tnm (tumour, vehicle gavage, no swim)", "Tnm_swim (tumour + 30-min daily swim)", "Tnm_cur (tumour + curcumin 100 mg/kg gavage)", "Tnm_union (tumour + curcumin + swim)"]},
+            "primary_estimand": "Effect of daily swimming exercise on breast-tumour gene expression: Tnm_swim vs Tnm (both vehicle gavage); secondary: combination (curcumin + swimming) vs Tnm",
+            "planned_contrasts": [
+              "Tnm_swim vs Tnm (S3.2.p3; paper: 134 DEGs, 79 up / 55 down)",
+              "Tnm_union vs Tnm (S3.2.p3; paper: 445 DEGs, 154 up / 291 down)",
+              "Tnm_cur vs Tnm (S3.2.p3; paper: 107 DEGs, 28 up / 79 down; non-exercise contrast)"
+            ],
+            "repeated_measure_unit": "none; one tumour per independent mouse",
+            "normalization": "DESeq2 size factors on HTSeq read counts (S2.3.p1; GEO data_processing)",
+            "paper_method": "DESeq2 pairwise vs Tnm (S2.3.p1); GEO data_processing says DESeq 1.30.0",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S2.3.p1"},
+            "paper_results": "S3.2.p3 counts above; S3.2.p4 union-vs-Tnm KEGG: calcium, Wnt, IL-17 signalling with CAMK1G, WNT5A, IL6"
+          },
+          "reasoning": "S2.1.p2 defines four tumour groups (2x2 of swimming x curcumin gavage). S2.3.p1: three tumours per group sequenced, DESeq2, |log2FC| > 1 and P < 0.05 (raw p-value). S3.2.p3 reports DEG counts for cur/swim/union each vs Tnm. The exercise question is Tnm_swim vs Tnm (single factor exercise, both vehicle); union vs Tnm is the combined intervention.",
+          "confidence": "high",
+          "locator": "S2.1.p2; S2.3.p1; S3.2.p3"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S7.p1 names GSE256152", "GEO extract_protocol describes Tnm/Tnm+swim/Tnm+cur/Tnm+union groups as in S2.1.p2", "12 GEO samples = 4 groups x 3, matching S2.3.p1 and S3.2.p1", "matrix columns Tnm1-3, Tnm_swim1-3, Tnm_cur1-3, Tnm_union1-3 match GEO titles"]},
+          "reasoning": "Data availability statement (S7.p1) deposits RNA-seq as GSE256152; the deposited Gene_exp_with_symbol file is the only supplementary matrix and its sample names equal the paper's group names.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(.+)-\\d+$"]},
+          "recode": {"grp": {"Tnm": "Tnm", "Tnm-swim": "swim", "Tnm-cur": "cur", "Tnm+union": "union"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "prep/extract_read_counts.py keeps the 12 ':read count' columns and renames them by name to the GEO titles (Tnm_swim1 -> Tnm-swim-1, Tnm_union1 -> Tnm+union-1, ...); alignment is then exact on metadata 'title'. grp is extracted from the title prefix. Note: GEO treatment field labels swim samples 'corn oil' (vehicle), consistent with S2.1.p2 where Tnm and Tnm_swim get vehicle gavage.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "The deposited file has paired ':read count' and ':fpkm' columns per sample; the read-count columns are all integers with no missing values (checked in prep script). GEO data_processing: HTSeq 0.9.1 read counts, FPKM only for normalization display. Paper input to DESeq2 is the read counts (S2.3.p1).",
+          "confidence": "high",
+          "candidates": [{"value": "FPKM columns", "reason_rejected": "linear-normalized; DESeq2 needs counts and the paper used counts"}]
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Tnm"},
+          "organism": "Mouse",
+          "planned": ["grp_swim_vs_Tnm", "grp_union_vs_Tnm", "grp_cur_vs_Tnm"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group, pairwise vs common control",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_swim_vs_Tnm", "control": "Tnm", "treatment": "swim", "role": "primary"},
+              {"name": "grp_union_vs_Tnm", "control": "Tnm", "treatment": "union", "role": "secondary"},
+              {"name": "grp_cur_vs_Tnm", "control": "Tnm", "treatment": "cur", "role": "secondary"},
+              {"name": "grp_union_vs_cur", "control": "cur", "treatment": "union", "role": "exploratory"}
+            ]
+          },
+          "reasoning": "One control (Tnm) with three treated levels (S3.2.p3 compares each vs Tnm). Exercise effect = swim vs Tnm (primary). Union vs Tnm is the paper's combined-treatment contrast (exercise + curcumin, not an isolated exercise effect). Cur vs Tnm is reported by the paper but is not an exercise contrast; run to compare counts. Union vs cur (exercise effect on a curcumin background) is not in the paper -> exploratory. n=3 per group.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "2x2 factorial ~ swim + cur + swim:cur", "reason_rejected": "paper does not test main effects or interaction; it compares each group to Tnm"},
+            {"value": "characteristics_ch1.4.treatment", "reason_rejected": "encodes only curcumin vs corn oil; exercise is only in the title"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice, one tumour each, randomized to groups (S2.1.p2). No batch, sex (all female BALB/c implied) or lane field recorded in GEO.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 pairwise two-group, R", "status": "reproduced_with_python_port"},
+            "deviations": ["pydeseq2 instead of R DESeq2; GEO data_processing names DESeq 1.30.0 while paper says DESeq2", "Paper's two-group comparisons are run as two-group subsets (only the two groups' samples), as in a standard pairwise DESeq2 pipeline; the exploratory union vs cur also as a subset"]
+          },
+          "transform": null,
+          "reasoning": "Raw HTSeq counts support DESeq2, which the paper used (S2.3.p1). Each paper contrast is fit on the two groups' samples only, the typical vendor pipeline behaviour; a joint 4-group model is run as sensitivity for the primary exercise contrast.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null}
+          },
+          "reasoning": "S2.3.p1: |log2FoldChange| > 1 and P-value < 0.05 (raw p, as also stated in GEO data_processing). Audit: BH padj < 0.05, no fold-change rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "n = 3 tumours per group; raw-p threshold without multiple-testing correction, so DEG lists include many expected false positives",
+              "Union vs Tnm reflects curcumin + exercise combined, not exercise alone",
+              "pydeseq2 vs R DESeq2/DESeq 1.30.0 can change raw-p DEG counts",
+              "Direction balance contradicts the paper: swim vs Tnm ours 73 up / 138 down vs paper 79 up / 55 down; cur vs Tnm ours 110 up / 54 down vs paper 28 up / 79 down; union vs Tnm ours 286 up / 237 down vs paper 154 up / 291 down. Sign convention here is treatment over Tnm; the paper's convention is not stated, and no single sign flip reconciles all three contrasts",
+              "Paper's union-vs-Tnm KEGG pathways: IL-17 signalling reproduced by ORA (adj p 0.031); Wnt (raw p 0.06) and calcium signalling (raw p 0.12) not significant in our ORA"
+            ]
+          },
+          "paper_counts": {"grp_swim_vs_Tnm": 134, "grp_union_vs_Tnm": 445, "grp_cur_vs_Tnm": 107},
+          "paper_genes": {"grp_union_vs_Tnm": ["Camk1g", "Wnt5a", "Il6"]},
+          "reasoning": "S3.2.p3 counts; S3.2.p4 / Fig. 3C genes in the combination-vs-Tnm enriched pathways.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE software", "paper": "DESeq2 (S2.3.p1)", "data": "GEO data_processing: DESeq 1.30.0", "disposition": "executable_without_change"},
+        {"item": "group size", "paper": "30 mice in 5 groups of 6 (S2.1.p2)", "data": "GEO extract protocol: 5 per group; 3 tumours per group sequenced either way", "disposition": "executable_without_change"},
+        {"item": "reference genome", "paper": "GRCm39 (S2.3.p1)", "data": "GEO protocol text mentions mm9 in one field and GRCm39 assembly in another", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "grp_swim_vs_Tnm", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Tnm", "treatment_group": "swim", "alpha": 0.05},
+         "subset": {"grp": ["Tnm", "swim"]}, "role": "primary",
+         "reasoning": "Paper's exercise contrast, two-group DESeq2 as in S2.3.p1"},
+        {"name": "grp_union_vs_Tnm", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Tnm", "treatment_group": "union", "alpha": 0.05},
+         "subset": {"grp": ["Tnm", "union"]}, "role": "secondary",
+         "reasoning": "Paper's combination contrast"},
+        {"name": "grp_cur_vs_Tnm", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Tnm", "treatment_group": "cur", "alpha": 0.05},
+         "subset": {"grp": ["Tnm", "cur"]}, "role": "secondary",
+         "reasoning": "Paper's curcumin contrast (non-exercise), for count comparison"},
+        {"name": "grp_union_vs_cur", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "cur", "treatment_group": "union", "alpha": 0.05},
+         "subset": {"grp": ["cur", "union"]}, "role": "exploratory",
+         "reasoning": "Exercise effect on curcumin background; not reported in the paper"},
+        {"name": "joint", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_swim_vs_Tnm", "grp_union_vs_Tnm"]},
+         "role": "sensitivity",
+         "reasoning": "One DESeq2 model on all 12 samples (~ grp) as sensitivity for the exercise contrasts"}
+      ],
+      "enrichment": [
+        {"execution": "grp_swim_vs_Tnm", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "Paper ran GO/KEGG on each contrast's DEGs (S3.2.p4, Figs. S1-S2)"},
+        {"execution": "grp_union_vs_Tnm", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "Paper's KEGG result (calcium, Wnt, IL-17) for the combination (S3.2.p4)"}
+      ]
+    }
+  ]
+}

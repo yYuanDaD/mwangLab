@@ -68,3 +68,8 @@ One section per case; newest last.
 
 - policy: Whether an in-vitro mechanical-stretch series counts as an exercise study (open policy).
 - policy: Which threshold to report when the paper's counts fit |lfc|>1 but the Fig6 legend states 0.5 (open policy).
+
+## ef574c2d9b2d7f168faeb39ddc5cb09258575c41 / GSE60833 (2026-11-10)
+
+- policy: Open policy: which threshold to report when the paper's rule (OPLS loadings) has no p-value equivalent and the headline counts (852/928) are far above what BH padj < 0.05 gives (0/6); the case's choice (padj 0.05 applied, p<0.01 audit) is recorded and labelled, so it is not an error.
+- policy: Open policy: the paper's headline result needs T1/T2 from GSE58608/GSE60590; whether a joint multi-accession analysis should be queued is a scoping decision for the person.

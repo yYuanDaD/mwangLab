@@ -1,0 +1,1281 @@
+[
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "paper_reconstruction",
+    "evidence": [
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accessions": [
+        "GSE256152"
+      ],
+      "assay": "bulk RNA-seq (Illumina PE), 4T1-luc orthotopic breast tumour tissue, BALB/c mice; HISAT2 to GRCm39, HTSeq read counts, FPKM for display",
+      "sample_inclusion": "3 tumours per tumour group sequenced (S2.3.p1); 12 samples total (S3.2.p1); CK (no tumour) group not sequenced",
+      "factors": {
+        "group": [
+          "Tnm (tumour, vehicle gavage, no swim)",
+          "Tnm_swim (tumour + 30-min daily swim)",
+          "Tnm_cur (tumour + curcumin 100 mg/kg gavage)",
+          "Tnm_union (tumour + curcumin + swim)"
+        ]
+      },
+      "primary_estimand": "Effect of daily swimming exercise on breast-tumour gene expression: Tnm_swim vs Tnm (both vehicle gavage); secondary: combination (curcumin + swimming) vs Tnm",
+      "planned_contrasts": [
+        "Tnm_swim vs Tnm (S3.2.p3; paper: 134 DEGs, 79 up / 55 down)",
+        "Tnm_union vs Tnm (S3.2.p3; paper: 445 DEGs, 154 up / 291 down)",
+        "Tnm_cur vs Tnm (S3.2.p3; paper: 107 DEGs, 28 up / 79 down; non-exercise contrast)"
+      ],
+      "repeated_measure_unit": "none; one tumour per independent mouse",
+      "normalization": "DESeq2 size factors on HTSeq read counts (S2.3.p1; GEO data_processing)",
+      "paper_method": "DESeq2 pairwise vs Tnm (S2.3.p1); GEO data_processing says DESeq 1.30.0",
+      "paper_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "source_locator": "S2.3.p1"
+      },
+      "paper_results": "S3.2.p3 counts above; S3.2.p4 union-vs-Tnm KEGG: calcium, Wnt, IL-17 signalling with CAMK1G, WNT5A, IL6"
+    },
+    "paper": {
+      "locator": "S2.1.p2; S2.3.p1; S3.2.p3"
+    },
+    "confidence": "high",
+    "reasoning": "S2.1.p2 defines four tumour groups (2x2 of swimming x curcumin gavage). S2.3.p1: three tumours per group sequenced, DESeq2, |log2FC| > 1 and P < 0.05 (raw p-value). S3.2.p3 reports DEG counts for cur/swim/union each vs Tnm. The exercise question is Tnm_swim vs Tnm (single factor exercise, both vehicle); union vs Tnm is the combined intervention.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:48+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "ownership",
+    "evidence": [
+      {
+        "id": "metadata:GSE256152_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE256152\\GSE256152_metadata.csv",
+        "sha256": "f4a54aa8cddd45ca3bcba7c4793e0e27bb08451143b2a31c406f3223b772bb64"
+      },
+      {
+        "id": "matrix:GSE256152_read_counts.csv",
+        "kind": "matrix",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\prep\\GSE256152_read_counts.csv",
+        "sha256": "cfa9421f9e5336d44005d94d2f0cddfffe463ea8682bf19427a9a57414c4c906"
+      },
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\prep\\GSE256152_read_counts.csv",
+      "owned": true,
+      "checks": [
+        "S7.p1 names GSE256152",
+        "GEO extract_protocol describes Tnm/Tnm+swim/Tnm+cur/Tnm+union groups as in S2.1.p2",
+        "12 GEO samples = 4 groups x 3, matching S2.3.p1 and S3.2.p1",
+        "matrix columns Tnm1-3, Tnm_swim1-3, Tnm_cur1-3, Tnm_union1-3 match GEO titles"
+      ],
+      "accession": "GSE256152",
+      "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE256152\\GSE256152_metadata.csv"
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Data availability statement (S7.p1) deposits RNA-seq as GSE256152; the deposited Gene_exp_with_symbol file is the only supplementary matrix and its sample names equal the paper's group names.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:48+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "alignment",
+    "evidence": [
+      {
+        "id": "matrix:GSE256152_read_counts.csv",
+        "kind": "matrix",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\prep\\GSE256152_read_counts.csv",
+        "sha256": "cfa9421f9e5336d44005d94d2f0cddfffe463ea8682bf19427a9a57414c4c906"
+      },
+      {
+        "id": "metadata:GSE256152_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE256152\\GSE256152_metadata.csv",
+        "sha256": "f4a54aa8cddd45ca3bcba7c4793e0e27bb08451143b2a31c406f3223b772bb64"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      },
+      {
+        "id": "tool_output:alignment_map.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\alignment_map.csv",
+        "sha256": "a1787dba9e07c92b77f515330f70090835fac823fe62cf4984378cfff84d5004"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "exact:title",
+      "n_aligned": 12,
+      "n_metadata": 12,
+      "coverage": 1.0,
+      "unmatched_matrix_columns": [],
+      "unmatched_metadata_samples": [],
+      "excluded_samples": {},
+      "derived_columns": {
+        "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_metadata.csv",
+        "columns": {
+          "grp": {
+            "source": "title",
+            "regex": "^(.+)-\\d+$",
+            "recode": {
+              "Tnm": "Tnm",
+              "Tnm-swim": "swim",
+              "Tnm-cur": "cur",
+              "Tnm+union": "union"
+            }
+          }
+        },
+        "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292",
+        "levels": {
+          "grp": {
+            "Tnm": 3,
+            "cur": 3,
+            "swim": 3,
+            "union": 3
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "prep/extract_read_counts.py keeps the 12 ':read count' columns and renames them by name to the GEO titles (Tnm_swim1 -> Tnm-swim-1, Tnm_union1 -> Tnm+union-1, ...); alignment is then exact on metadata 'title'. grp is extracted from the title prefix. Note: GEO treatment field labels swim samples 'corn oil' (vehicle), consistent with S2.1.p2 where Tnm and Tnm_swim get vehicle gavage.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:48+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "matrix",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "metadata:GSE256152_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE256152\\GSE256152_metadata.csv",
+        "sha256": "f4a54aa8cddd45ca3bcba7c4793e0e27bb08451143b2a31c406f3223b772bb64"
+      },
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "FPKM columns",
+        "reason_rejected": "linear-normalized; DESeq2 needs counts and the paper used counts"
+      }
+    ],
+    "final": {
+      "matrix_type": "raw counts",
+      "recommended_method": "DESeq2",
+      "profile": {
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6",
+        "n_features": 21899,
+        "n_samples": 12,
+        "annotation_columns_dropped": [],
+        "duplicated_feature_ids": 0,
+        "missing_values": 0,
+        "negative_values": 0,
+        "negative_fraction": 0.0,
+        "min": 0.0,
+        "max": 541131.0,
+        "median": 70.0,
+        "integer_fraction": 1.0,
+        "candidates": [
+          "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+        ]
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "The deposited file has paired ':read count' and ':fpkm' columns per sample; the read-count columns are all integers with no missing values (checked in prep script). GEO data_processing: HTSeq 0.9.1 read counts, FPKM only for normalization display. Paper input to DESeq2 is the read counts (S2.3.p1).",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:49+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      },
+      {
+        "id": "tool_output:suitability.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\suitability\\suitability.json",
+        "sha256": "5e5215bff9fd570d0ea1924eb5766d3c1b8408470660e12e70f53f9a6ea3840d"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "2x2 factorial ~ swim + cur + swim:cur",
+        "reason_rejected": "paper does not test main effects or interaction; it compares each group to Tnm"
+      },
+      {
+        "value": "characteristics_ch1.4.treatment",
+        "reason_rejected": "encodes only curcumin vs corn oil; exercise is only in the title"
+      }
+    ],
+    "final": {
+      "analysis_type": "multi-group, pairwise vs common control",
+      "design_column": "grp",
+      "contrasts": [
+        {
+          "name": "grp_swim_vs_Tnm",
+          "control": "Tnm",
+          "treatment": "swim",
+          "role": "primary"
+        },
+        {
+          "name": "grp_union_vs_Tnm",
+          "control": "Tnm",
+          "treatment": "union",
+          "role": "secondary"
+        },
+        {
+          "name": "grp_cur_vs_Tnm",
+          "control": "Tnm",
+          "treatment": "cur",
+          "role": "secondary"
+        },
+        {
+          "name": "grp_union_vs_cur",
+          "control": "cur",
+          "treatment": "union",
+          "role": "exploratory"
+        }
+      ],
+      "suitability": {
+        "verdict": "analyzable",
+        "failed": [],
+        "warnings": [],
+        "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\suitability\\suitability.md",
+        "n_comparisons": 6,
+        "n_analyzable": 6
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "One control (Tnm) with three treated levels (S3.2.p3 compares each vs Tnm). Exercise effect = swim vs Tnm (primary). Union vs Tnm is the paper's combined-treatment contrast (exercise + curcumin, not an isolated exercise effect). Cur vs Tnm is reported by the paper but is not an exercise contrast; run to compare counts. Union vs cur (exercise effect on a curcumin background) is not in the paper -> exploratory. n=3 per group.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:53+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "covariance",
+    "evidence": [
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      },
+      {
+        "id": "metadata:GSE256152_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE256152\\GSE256152_metadata.csv",
+        "sha256": "f4a54aa8cddd45ca3bcba7c4793e0e27bb08451143b2a31c406f3223b772bb64"
+      },
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "design_check": {
+        "formula_equivalent": "~ C(grp)",
+        "n_samples": 12,
+        "n_columns": 4,
+        "columns": [
+          "Intercept",
+          "grp_cur",
+          "grp_swim",
+          "grp_union"
+        ],
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 8,
+        "levels": {
+          "grp": {
+            "Tnm": 3,
+            "cur": 3,
+            "swim": 3,
+            "union": 3
+          }
+        },
+        "cells": [
+          {
+            "cell": [
+              "Tnm"
+            ],
+            "n": 3
+          },
+          {
+            "cell": [
+              "cur"
+            ],
+            "n": 3
+          },
+          {
+            "cell": [
+              "swim"
+            ],
+            "n": 3
+          },
+          {
+            "cell": [
+              "union"
+            ],
+            "n": 3
+          }
+        ],
+        "min_cell_size": 3,
+        "missing_values": {}
+      },
+      "confounding": [
+        {
+          "column": "title",
+          "n_levels": 12,
+          "status": "sample_identifier"
+        },
+        {
+          "column": "geo_accession",
+          "n_levels": 12,
+          "status": "sample_identifier"
+        },
+        {
+          "column": "status",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "submission_date",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "last_update_date",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "type",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "channel_count",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "source_name_ch1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "organism_ch1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "taxid_ch1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "characteristics_ch1.0.tissue",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "characteristics_ch1.1.cell line",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "characteristics_ch1.2.cell type",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "characteristics_ch1.3.host strain",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "characteristics_ch1.4.treatment",
+          "n_levels": 2,
+          "status": "primary_nested_in_candidate",
+          "crosstab": {
+            "Tnm": {
+              "Mice were given curcumin solution (100mg/Kg)": 0,
+              "The mice were given corn oil": 3
+            },
+            "cur": {
+              "Mice were given curcumin solution (100mg/Kg)": 3,
+              "The mice were given corn oil": 0
+            },
+            "swim": {
+              "Mice were given curcumin solution (100mg/Kg)": 0,
+              "The mice were given corn oil": 3
+            },
+            "union": {
+              "Mice were given curcumin solution (100mg/Kg)": 3,
+              "The mice were given corn oil": 0
+            }
+          }
+        },
+        {
+          "column": "molecule_ch1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "extract_protocol_ch1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "data_processing",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "platform_id",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_name",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_email",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_phone",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_institute",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_address",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_city",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_state",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_zip/postal_code",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "contact_country",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "instrument_model",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "library_selection",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "library_source",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "library_strategy",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "relation",
+          "n_levels": 12,
+          "status": "sample_identifier"
+        },
+        {
+          "column": "supplementary_file_1",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "series_id",
+          "n_levels": 1,
+          "status": "constant"
+        },
+        {
+          "column": "data_row_count",
+          "n_levels": 1,
+          "status": "constant"
+        }
+      ]
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Independent mice, one tumour each, randomized to groups (S2.1.p2). No batch, sex (all female BALB/c implied) or lane field recorded in GEO.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:53+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "method",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "raw counts",
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ grp",
+      "paper_route": {
+        "method": "DESeq2 pairwise two-group, R",
+        "status": "reproduced_with_python_port"
+      },
+      "deviations": [
+        "pydeseq2 instead of R DESeq2; GEO data_processing names DESeq 1.30.0 while paper says DESeq2",
+        "Paper's two-group comparisons are run as two-group subsets (only the two groups' samples), as in a standard pairwise DESeq2 pipeline; the exploratory union vs cur also as a subset"
+      ]
+    },
+    "paper": {},
+    "confidence": "medium",
+    "reasoning": "Raw HTSeq counts support DESeq2, which the paper used (S2.3.p1). Each paper contrast is fit on the two groups' samples only, the typical vendor pipeline behaviour; a joint 4-group model is run as sensitivity for the primary exercise contrast.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:53+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "threshold",
+    "evidence": [
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "paper_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": false
+      },
+      "audit_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.3.p1: |log2FoldChange| > 1 and P-value < 0.05 (raw p, as also stated in GEO data_processing). Audit: BH padj < 0.05, no fold-change rule.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:01:53+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "grp_swim_vs_Tnm",
+      "role": "primary",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 6,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_swim_vs_Tnm\\input\\matrix.csv",
+      "formula": "~ grp",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_swim_vs_Tnm\\DEG_results_swim_vs_Tnm.csv"
+      ],
+      "counts": {
+        "grp_swim_vs_Tnm": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 16914,
+            "n_significant": 211,
+            "n_up": 73,
+            "n_down": 138,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 12649,
+            "n_significant": 47,
+            "n_up": 25,
+            "n_down": 22,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's exercise contrast, two-group DESeq2 as in S2.3.p1",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:10+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "grp_union_vs_Tnm",
+      "role": "secondary",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 6,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_Tnm\\input\\matrix.csv",
+      "formula": "~ grp",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_Tnm\\DEG_results_union_vs_Tnm.csv"
+      ],
+      "counts": {
+        "grp_union_vs_Tnm": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 16998,
+            "n_significant": 523,
+            "n_up": 286,
+            "n_down": 237,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 13371,
+            "n_significant": 908,
+            "n_up": 520,
+            "n_down": 388,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's combination contrast",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:21+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "grp_cur_vs_Tnm",
+      "role": "secondary",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 6,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_cur_vs_Tnm\\input\\matrix.csv",
+      "formula": "~ grp",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_cur_vs_Tnm\\DEG_results_cur_vs_Tnm.csv"
+      ],
+      "counts": {
+        "grp_cur_vs_Tnm": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 16953,
+            "n_significant": 164,
+            "n_up": 110,
+            "n_down": 54,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 14651,
+            "n_significant": 45,
+            "n_up": 35,
+            "n_down": 10,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's curcumin contrast (non-exercise), for count comparison",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:33+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_deseq2_analysis",
+      "subset": "grp_union_vs_cur",
+      "role": "exploratory",
+      "tool": "tools.deseq2_tools:run_deseq2_analysis",
+      "n_samples": 6,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_cur\\input\\matrix.csv",
+      "formula": "~ grp",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_cur\\DEG_results_union_vs_cur.csv"
+      ],
+      "counts": {
+        "grp_union_vs_cur": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 16970,
+            "n_significant": 481,
+            "n_up": 153,
+            "n_down": 328,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 14009,
+            "n_significant": 2156,
+            "n_up": 1095,
+            "n_down": 1061,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Exercise effect on curcumin background; not reported in the paper",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:44+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\design_metadata.csv",
+        "sha256": "1d5072c279653d5d4508fe021c15aeef767a31d3a08e77e339fb170a73cfe292"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "run_joint_deseq2",
+      "subset": "joint",
+      "role": "sensitivity",
+      "tool": "tools.joint_contrasts:run_joint_deseq2",
+      "n_samples": 12,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+      "formula": "~ cell",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\joint\\DEG_results_grp_swim_vs_Tnm.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\joint\\DEG_results_grp_union_vs_Tnm.csv"
+      ],
+      "counts": {
+        "joint/grp_swim_vs_Tnm": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 17492,
+            "n_significant": 312,
+            "n_up": 97,
+            "n_down": 215,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 13422,
+            "n_significant": 304,
+            "n_up": 144,
+            "n_down": 160,
+            "deg_sanity": "ok"
+          }
+        },
+        "joint/grp_union_vs_Tnm": {
+          "applied": {
+            "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+            "n_tested": 17492,
+            "n_significant": 563,
+            "n_up": 292,
+            "n_down": 271,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "padj < 0.05",
+            "n_tested": 13422,
+            "n_significant": 1629,
+            "n_up": 836,
+            "n_down": 793,
+            "deg_sanity": "ok"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "One DESeq2 model on all 12 samples (~ grp) as sensitivity for the exercise contrasts",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:54+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_swim_vs_Tnm.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_swim_vs_Tnm\\DEG_results_swim_vs_Tnm.csv",
+        "sha256": "45ca998c5cf6bed60c27a8c5ea19edbcd44af867cd679080f6db748f4fc5b91f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "grp_swim_vs_Tnm",
+      "feature_id_type": "ensembl_gene",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": false
+      },
+      "direction": "all",
+      "input_threshold_source": "applied",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_swim_vs_Tnm\\ora\\DEG_results_swim_vs_Tnm_GO_Biological_Process_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_swim_vs_Tnm\\ora\\DEG_results_swim_vs_Tnm_GO_Cellular_Component_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_swim_vs_Tnm\\ora\\DEG_results_swim_vs_Tnm_GO_Molecular_Function_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_swim_vs_Tnm\\ora\\DEG_results_swim_vs_Tnm_KEGG_2019_Mouse.csv"
+      ],
+      "summary": "Enrichment analysis complete for 211 Mouse genes (direction=all, pvalue<0.05, |log2FC|>1.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Negative Regulation Of Wound Healing (GO:0061045) | padj=8.12e-03 | overlap=5/28 | genes=SERPINE2;MMRN1;ALOX5;APOE;MYOZ1 - Regulation Of Angiogenesis (GO:0045765) | padj=8.12e-03 | overlap=11/205 | genes=IL1A;IL6;PTGIS;ADAMTS1;ALOX5;APLNR;CHI3L1;TEK;CCR3;THBS4;AQP1 - Positive Regulation Of Vasculature Development (GO:1904018) | padj=4.47e-02 | overlap=7/104 | genes=IL1A;PTGIS;APLNR;CHI3L1;TEK;CCR3;AQP1 - Positive Regulation Of Cytosolic Calcium Ion Concentration Involved In Phospholipase C-activating G Protein-Coupled Signaling Pathway (GO:0051482) | padj=4.47e-02 | overlap=4/27 | genes=P2RY10;GPR55;C3AR1;F2RL2 - Negative Regulation Of Inflammatory Response (GO:0050728) | padj=4.47e-02 | overlap=7/111 | genes=IL33;PTGIS;ALOX5;NR1H3;APOE;IGF1;TEK - Positive Regulation Of Ras Protein Signal Transduction (GO:0046579) | padj=4.47e-02 | overlap=5/51 | genes=P2RY10;GPR55;IGF1;SLC6A2;F2RL2 - Positive Regulation Of Angiogenesis (GO:0045766) | padj=5.15e-02 | overlap=7/119 | genes=IL1A;PTGIS;APLNR;CHI3L1;TEK;CCR3;AQP1 - Positive Regulation Of Rho Protein Signal Transduction (GO:0035025) | padj=5.15e-02 | overlap=4/31 | genes=P2RY10;GPR55;SLC6A2;F2RL2 - Vasculogenesis (GO:0001570) | padj=5.86e-02 | overlap=4/33 | genes=SOX17;SOX18;TBX20;APLNR - Positive Regulation Of Cardiac Muscle Tissue Growth (GO:0055023) | padj=7.38e..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper ran GO/KEGG on each contrast's DEGs (S3.2.p4, Figs. S1-S2)",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:02:57+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_swim_vs_Tnm.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_swim_vs_Tnm\\DEG_results_swim_vs_Tnm.csv",
+        "sha256": "45ca998c5cf6bed60c27a8c5ea19edbcd44af867cd679080f6db748f4fc5b91f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "grp_swim_vs_Tnm",
+      "feature_id_type": "ensembl_gene",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_swim_vs_Tnm\\gsea\\DEG_results_swim_vs_Tnm_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 16861 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 18 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_HYPOXIA | NES=2.68 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=2.31 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=2.14 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_GLYCOLYSIS | NES=1.95 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.92 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANDROGEN_RESPONSE | NES=1.82 | NOM p=0.00e+00 | FDR q=1.08e-03 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.74 | NOM p=0.00e+00 | FDR q=3.24e-03 - HALLMARK_MITOTIC_SPINDLE | NES=1.65 | NOM p=0.00e+00 | FDR q=7.71e-03 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.50 | NOM p=0.00e+00 | FDR q=3.34e-02 - HALLMARK_TGF_BETA_SIGNALING | NES=1.49 | NOM p=3.27e-02 | FDR q=3.03e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_MYC_TARGETS_V2 | NES=-1.36 | NOM p=5.02e-02 | FDR q=5.97e-01 - HALLMARK_MYOGENESIS | NES=-1.29 | NOM p=5.56e-02 | FDR q=5.82e-01 - HALLMARK_COMPLEMENT | NES=-1.28 | NOM p=5.69e-02 | FDR q=4.22e-01 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=-1.20 | NOM p=1.59e-01 | FDR q=5.74e-01 - HALLMARK_NOTCH_SIGNALING | NES=-1.16 | NOM p=2.41e-01 | FDR q=6.17e-01 - HALLMARK_ALLOGRAFT_REJECTION | NES=-1.11 | NOM p=2.24e-01 | FDR q=7.54e-01 - HALLMARK_HEDGEHOG_SIGNALING | NES=-1.05 | NOM p=3.91e-01 | FDR q=8.76e-01 - HALLMARK_UV_RESPONS..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper ran GO/KEGG on each contrast's DEGs (S3.2.p4, Figs. S1-S2)",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:03:36+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_union_vs_Tnm.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_Tnm\\DEG_results_union_vs_Tnm.csv",
+        "sha256": "ee8f3020a47a6606867a44e9a3cafa3168d99657e07827c4d3a2dfb84789bbd0"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "grp_union_vs_Tnm",
+      "feature_id_type": "ensembl_gene",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": 1.0,
+        "inclusive": false
+      },
+      "direction": "all",
+      "input_threshold_source": "applied",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_union_vs_Tnm\\ora\\DEG_results_union_vs_Tnm_GO_Biological_Process_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_union_vs_Tnm\\ora\\DEG_results_union_vs_Tnm_GO_Cellular_Component_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_union_vs_Tnm\\ora\\DEG_results_union_vs_Tnm_GO_Molecular_Function_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_union_vs_Tnm\\ora\\DEG_results_union_vs_Tnm_KEGG_2019_Mouse.csv"
+      ],
+      "summary": "Enrichment analysis complete for 523 Mouse genes (direction=all, pvalue<0.05, |log2FC|>1.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Positive Regulation Of Cell Projection Organization (GO:0031346) | padj=5.80e-04 | overlap=15/118 | genes=FZD1;LTK;TENM3;BDNF;AVIL;NTRK3;WNT5A;PTN;STYXL1;PTPRD;ROR2;TOX;S100A9;EPHA3;PLXN - Regulation Of Neuron Projection Development (GO:0010975) | padj=5.80e-04 | overlap=18/174 | genes=FZD1;EPHA4;LTK;TENM3;BDNF;AVIL;NTRK3;WNT5A;CRMP1;PTN;STYXL1;NOVA2;TNR;ROR2;TOX;P - Positive Regulation Of Neuron Projection Development (GO:0010976) | padj=5.80e-04 | overlap=13/92 | genes=FZD1;LTK;TENM3;BDNF;AVIL;NTRK3;WNT5A;PTN;STYXL1;ROR2;TOX;S100A9;EPHA3 - Inflammatory Response (GO:0006954) | padj=6.33e-04 | overlap=21/236 | genes=PTGER4;AOC3;XCR1;TNFAIP6;SLC11A1;C5AR2;PLA2G4B;IL13;WNT5A;PLA2G4C;HP;ADCY1;CXCL1 - Regulation Of Lipid Biosynthetic Process (GO:0046890) | padj=2.63e-03 | overlap=7/28 | genes=MLXIPL;AVIL;GPER1;ASXL3;CREBL2;THRSP;PCK1 - Collagen Fibril Organization (GO:0030199) | padj=3.88e-03 | overlap=8/42 | genes=GREM1;TGFB2;ADAMTS3;COL27A1;COL11A1;COL5A3;COL11A2;LOXL2 - Cell-Cell Adhesion Via Plasma-Membrane Adhesion Molecules (GO:0098742) | padj=3.88e-03 | overlap=16/172 | genes=KIRREL3;TGFB2;TENM3;CADM1;AMIGO2;CLDN2;PTPRD;SELP;TRO;CDH3;SELL;MPZ;CLDN23;CDH11 - Extracellular Matrix Organization (GO:0030198) | padj=4.53e-03 | overlap=16/176 | genes=COL28A1;TGFB2;COL27A1;COL11A1;COL11A2;ADAMTS12;LOXL2;ADAMTS16;GRE..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's KEGG result (calcium, Wnt, IL-17) for the combination (S3.2.p4)",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:03:38+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_union_vs_Tnm.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\grp_union_vs_Tnm\\DEG_results_union_vs_Tnm.csv",
+        "sha256": "ee8f3020a47a6606867a44e9a3cafa3168d99657e07827c4d3a2dfb84789bbd0"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "grp_union_vs_Tnm",
+      "feature_id_type": "ensembl_gene",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\results\\enrichment_grp_union_vs_Tnm\\gsea\\DEG_results_union_vs_Tnm_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 16941 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 29 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_E2F_TARGETS | NES=3.00 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_G2M_CHECKPOINT | NES=2.89 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.32 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.01 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MITOTIC_SPINDLE | NES=1.92 | NOM p=0.00e+00 | FDR q=2.28e-04 - HALLMARK_MYC_TARGETS_V1 | NES=1.83 | NOM p=0.00e+00 | FDR q=1.33e-03 - HALLMARK_MYC_TARGETS_V2 | NES=1.81 | NOM p=1.88e-03 | FDR q=1.46e-03 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.71 | NOM p=0.00e+00 | FDR q=4.27e-03 - HALLMARK_UV_RESPONSE_DN | NES=1.55 | NOM p=1.77e-03 | FDR q=1.97e-02 - HALLMARK_ANDROGEN_RESPONSE | NES=1.55 | NOM p=5.59e-03 | FDR q=1.89e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.51 | NOM p=0.00e+00 | FDR q=1.42e-01 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=-1.49 | NOM p=1.85e-02 | FDR q=8.47e-02 - HALLMARK_COMPLEMENT | NES=-1.48 | NOM p=4.46e-03 | FDR q=6.37e-02 - HALLMARK_PANCREAS_BETA_CELLS | NES=-1.45 | NOM p=6.04e-02 | FDR q=6.05e-02 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.37 | NOM p=3.06e-02 | FDR q=1.12e-01 - HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY | NES=-1.36 | NOM p=6.00e-02 | FDR q=9.89e-02 - HALLMARK_P53_PATHWAY | NES=-1.34 | NOM p=1.29e-02 | FDR q=9..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's KEGG result (calcium, Wnt, IL-17) for the combination (S3.2.p4)",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:03:42+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE256152",
+    "stage": "study",
+    "evidence": [
+      {
+        "id": "paper:PMC10990956.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261019\\papers\\PMC10990956.paper.md",
+        "sha256": "a776b6ca2d336a8c4b42a02d110e5ebf64f8b373d8e8752b37ce7ce84d81520c"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38576560\\GSE256152\\aligned\\aligned_matrix.csv",
+        "sha256": "f40e17f618f726e8e654f72c1af9e0d8caaa7a0c14d49b16665eb8d2f9b046c6"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "route": "paper_aligned",
+      "caveats": [
+        "n = 3 tumours per group; raw-p threshold without multiple-testing correction, so DEG lists include many expected false positives",
+        "Union vs Tnm reflects curcumin + exercise combined, not exercise alone",
+        "pydeseq2 vs R DESeq2/DESeq 1.30.0 can change raw-p DEG counts"
+      ],
+      "results": {
+        "grp_swim_vs_Tnm": {
+          "n_deg": 211,
+          "up": 73,
+          "down": 138,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 47
+        },
+        "grp_union_vs_Tnm": {
+          "n_deg": 523,
+          "up": 286,
+          "down": 237,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 908
+        },
+        "grp_cur_vs_Tnm": {
+          "n_deg": 164,
+          "up": 110,
+          "down": 54,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 45
+        },
+        "grp_union_vs_cur": {
+          "n_deg": 481,
+          "up": 153,
+          "down": 328,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 2156
+        },
+        "joint/grp_swim_vs_Tnm": {
+          "n_deg": 312,
+          "up": 97,
+          "down": 215,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 304
+        },
+        "joint/grp_union_vs_Tnm": {
+          "n_deg": 563,
+          "up": 292,
+          "down": 271,
+          "rule": "pvalue < 0.05 and |log2FoldChange| > 1",
+          "audit_n": 1629
+        }
+      },
+      "paper_counts": {
+        "grp_swim_vs_Tnm": 134,
+        "grp_union_vs_Tnm": 445,
+        "grp_cur_vs_Tnm": 107
+      },
+      "comparison": {
+        "grp_swim_vs_Tnm": {
+          "ours": 211,
+          "paper": 134
+        },
+        "grp_union_vs_Tnm": {
+          "ours": 523,
+          "paper": 445
+        },
+        "grp_cur_vs_Tnm": {
+          "ours": 164,
+          "paper": 107
+        }
+      },
+      "paper_gene_check": {
+        "grp_union_vs_Tnm": {
+          "Camk1g": {
+            "baseMean": 23.5473,
+            "log2FoldChange": 1.1896,
+            "padj": 0.1788,
+            "pvalue": 0.0311
+          },
+          "Wnt5a": {
+            "baseMean": 373.8833,
+            "log2FoldChange": 1.208,
+            "padj": 0.0,
+            "pvalue": 0.0
+          },
+          "Il6": {
+            "baseMean": 33.8123,
+            "log2FoldChange": 1.2918,
+            "padj": 0.05,
+            "pvalue": 0.0034
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S3.2.p3 counts; S3.2.p4 / Fig. 3C genes in the combination-vs-Tnm enriched pathways.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-10T12:03:42+00:00"
+  }
+]

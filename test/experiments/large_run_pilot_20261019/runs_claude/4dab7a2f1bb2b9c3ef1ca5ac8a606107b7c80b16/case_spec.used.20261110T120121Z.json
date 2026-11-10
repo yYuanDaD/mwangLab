@@ -1,0 +1,100 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/4dab7a2f1bb2b9c3ef1ca5ac8a606107b7c80b16",
+  "request": "Analyze GSE327036 for the paper (Loss of STARD7 Impairs Mitochondrial Phospholipid Homeostasis and Contributes to Mitochondrial Myopathy): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE327036",
+      "accession": "GSE327036",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/4dab7a2f1bb2b9c3ef1ca5ac8a606107b7c80b16.paper.md"],
+        "metadata": "GSE327036/GSE327036_metadata.csv",
+        "matrix": "GSE327036/GSE327036_merged_from_tar.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE327036"],
+            "assay": "bulk RNA-seq (poly(A) mRNA, Illumina), mouse soleus muscle",
+            "sample_inclusion": "soleus from Stard7 flox/flox control (Cont) and Myf5-Cre; Stard7 flox/flox muscle-specific KO (mKO) mice, n = 3 biological replicates per group (S2.5.p1, FLT.p3)",
+            "factors": {"genotype": ["Cont (Stard7 flox/flox)", "mKO (Myf5-Cre; Stard7 flox/flox)"]},
+            "exercise_in_rnaseq": "none: treadmill running (S2.3.p1) and lactate tests (S2.4.p1) are phenotyping assays; the RNA-seq samples (S2.5.p1, S3.3.p1) are not described as exercised or as harvested after a bout, and no exercise arm exists in the transcriptome design",
+            "primary_estimand": "genotype effect (STARD7 mKO vs control) on soleus gene expression at baseline; not an exercise effect",
+            "planned_contrasts": ["mKO vs Cont in soleus (FLT.p3 Fig. 3B/3C; paper DEG count not stated in text; named down genes Mybpc2, Actn3, Pvalb, Mct4 (Slc16a3), Myh4; Myh7 unchanged)"],
+            "repeated_measure_unit": "none (independent animals)",
+            "normalization": "CLC Genomics Workbench counts -> TPM, log2(TPM+1) for PCA/heatmap (S2.5.p1); edgeR with filterByExpr for DE (FLT.p3)",
+            "paper_method": "edgeR (filterByExpr) mKO vs Cont, analysed in OlvTools",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "FLT.p3"},
+            "paper_results": "Fast-twitch genes Mybpc2, Actn3, Pvalb, Mct4, Myh4 down in mKO; Myh7 unchanged; GO 'muscle system process' top term (S3.3.p1)"
+          },
+          "reasoning": "The only transcriptomic experiment is soleus RNA-seq of control vs muscle-specific STARD7 KO mice (S2.5.p1, S3.3.p1, FLT.p3). Exercise appears only as an outcome/phenotyping assay (treadmill endurance S2.3.p1, lactate before/after a bout S2.4.p1) on separate cohorts (male n=6, female n=9, FLT.p2); the RNA-seq animals have no exercise vs sedentary contrast.",
+          "confidence": "high",
+          "locator": "S2.5.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GEO contact Yasuhiro Horibata, Dokkyo Medical University = corresponding author/affiliation",
+              "6 soleus samples, WT x3 and mKO x3 = paper S2.5.p1 'three biological replicates per group'",
+              "sample file names Horibata_Control_1-3 / Horibata_KO_1-3",
+              "DA.p1 says RNA-seq will be deposited in GEO (accession not named in the preprint)"
+            ]
+          },
+          "reasoning": "Submitter, tissue, genotype groups and replicate numbers match the paper; the paper does not cite the accession (DA.p1, deposited on acceptance), so ownership rests on these matching facts.",
+          "confidence": "medium"
+        },
+        "alignment": {
+          "key_column": "geo_accession",
+          "matrix_column_pattern": "^(GSM\\d+)_.*$",
+          "aliases": {"genotype": "characteristics_ch1.1.genotype"},
+          "recode": {"genotype": {"WT": "WT", "mKO": "mKO"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids with the library file stem appended; the regex keeps the GSM id and matches geo_accession exactly (6/6). The genotype column is aliased to a formula-safe name.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma (log2(TPM+1)); edgeR on counts not possible from deposited files",
+          "final": {
+            "source": "GSE327036_RAW.tar: per-sample CLC files GSM*_Horibata_*_GE_.txt.gz with columns 'Name','TPM'; merged by the runner into GSE327036_merged_from_tar.csv",
+            "paper_input": "edgeR with filterByExpr on CLC read counts (FLT.p3); TPM/log2(TPM+1) for PCA/heatmap (S2.5.p1)"
+          },
+          "reasoning": "Each per-sample file has header 'Name\\tTPM' and the values of a sample sum to 1e6; integer fraction 0.54 with fractional values. GEO data_processing says 'raw gene counts', which contradicts the file contents; the file header and per-sample sums decide: TPM. Counts for the paper's edgeR route are not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["genotype"],
+          "references": {"genotype": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {
+            "analysis_type": "none",
+            "exercise_factor": null,
+            "available_contrast": "genotype mKO vs WT (not an exercise contrast)"
+          },
+          "candidates": [
+            {"value": "genotype_mKO_vs_WT as an exercise contrast", "reason_rejected": "genotype (STARD7 KO) is not an exercise intervention; none of the 6 RNA-seq animals was assigned to exercise vs sedentary, so the exercise estimand the request asks for is not identified"},
+            {"value": "treat reduced endurance of mKO as an exercise proxy", "reason_rejected": "endurance capacity is a phenotypic outcome measured on separate cohorts (FLT.p2); it is not a manipulated exercise exposure of the sequenced samples"}
+          ],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: GSE327036 contains only WT vs STARD7 muscle-KO soleus (3 vs 3) at baseline; exercise (treadmill) was a phenotyping test on other animals, so the data cannot identify an effect of exercise on gene expression.",
+          "reasoning": "The request is the effect of exercise on gene expression as the paper intends. The paper's RNA-seq estimand is a genotype effect (S3.3.p1, FLT.p3); the only grouping column is genotype (WT 3 / mKO 3) and tissue is constant (soleus). No exercise, training, time-after-bout or sedentary label exists in metadata or paper for these samples. Refused at design.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix content", "paper": "edgeR on read counts after filterByExpr (FLT.p3)", "data": "GEO data_processing claims raw gene counts, but every per-sample file holds a single TPM column (header 'TPM', sums 1e6)", "disposition": "recorded; would block the paper's edgeR route (case stopped before method)"},
+        {"item": "reference genome and software", "paper": "GRCm38 release-94, CLC Genomics Workbench v22.0.1 (S2.5.p1)", "data": "GRCm39, CLC Genomics Workbench v23.0.2 (GEO data_processing)", "disposition": "recorded; does not affect the refusal"},
+        {"item": "sequencer", "paper": "Illumina NextSeq500, 75-bp paired-end (S2.5.p1)", "data": "Illumina NovaSeq 6000 (GEO instrument_model)", "disposition": "recorded; does not affect the refusal"},
+        {"item": "exercise estimand", "paper": "RNA-seq compares mKO vs control soleus; exercise only as phenotyping on separate cohorts", "data": "only genotype WT/mKO, no exercise arm", "disposition": "blocks the requested exercise estimand; refused at design"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

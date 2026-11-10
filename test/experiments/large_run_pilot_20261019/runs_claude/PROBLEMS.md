@@ -535,3 +535,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37872294 (GSE294565)
 
 - native.py:230 gene_chr not treated as annotation (patched after this row; inspect said 33 samples, real 32); case_runner.py:84-90 cannot map lab-code columns to GEO replicates (needed a prep script) Details: `PMID37872294/HANDBACK.md`.
+
+## 4dab7a2f1bb2b9c3ef1ca5ac8a606107b7c80b16 (GSE327036)
+
+- geo_tar.py:114-120 drops the per-sample 'TPM' header and inspect never reports the chosen column, so a TPM matrix GEO calls raw counts needed manual checking Details: `4dab7a2f1bb2b9c3ef1ca5ac8a606107b7c80b16/HANDBACK.md`.
+
+## PMID38576560 (GSE256152)
+
+- derive_columns key_patterns reject optional regex groups (patched after this row; needed rename prep script); inspect does not split paired read count/fpkm columns; pydeseq2 exp overflow warnings Details: `PMID38576560/HANDBACK.md`.

@@ -376,7 +376,7 @@ def derive_columns(metadata_csv: str | Path, out_csv: str | Path, *,
             raise NativeToolError(f"pattern source column {source!r} not in metadata")
         groups = meta[source].astype(str).str.extract(pattern, expand=True)
         # several groups are joined with "_": ("title", r"(Sed|Ex) (\d+)") gives "Sed_1"
-        extracted = groups.iloc[:, 0] if groups.shape[1] == 1 else             groups.apply(lambda row: None if row.isna().any() else "_".join(row), axis=1)
+        extracted = groups.iloc[:, 0] if groups.shape[1] == 1 else             groups.apply(lambda row: None if row.isna().all() else "_".join(row.dropna()), axis=1)
         if extracted.isna().any():
             missing = meta.index[extracted.isna()].tolist()[:5]
             raise NativeToolError(f"pattern {pattern!r} did not match every row of {source!r}: {missing}")
