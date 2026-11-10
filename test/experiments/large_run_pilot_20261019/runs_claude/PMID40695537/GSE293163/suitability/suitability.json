@@ -1,0 +1,297 @@
+{
+  "case_id": "GSE293163",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "age",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "age",
+        "time"
+      ],
+      "levels": {
+        "age": {
+          "Old": 16,
+          "Young": 14
+        },
+        "time": {
+          "Pre": 15,
+          "Post": 15
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "age"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "age",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 16,
+        "full_rank": true,
+        "residual_df": 14,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 18,
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID40695537\\GSE293163\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "age_Old_vs_Young__sex-female_time-Post",
+            "age_Old_vs_Young__sex-female_time-Pre",
+            "time_Post_vs_Pre__sex-female_age-Old",
+            "time_Post_vs_Pre__sex-female_age-Young",
+            "age_time_Old_Post_vs_Young_Pre__sex-female"
+          ],
+          "male": [
+            "time_Post_vs_Pre__sex-male_age-Old"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "age_Old_vs_Young_time-Post",
+      "kind": "simple",
+      "factor": "age",
+      "test": "Old",
+      "reference": "Young",
+      "within": {
+        "time": "Post"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "Post",
+            "age": "Old"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "Post",
+            "age": "Young"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "age_Old_vs_Young_time-Pre",
+      "kind": "simple",
+      "factor": "age",
+      "test": "Old",
+      "reference": "Young",
+      "within": {
+        "time": "Pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "Pre",
+            "age": "Old"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "time": "Pre",
+            "age": "Young"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_age-Old",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "age": "Old"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "Old",
+            "time": "Post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "age": "Old",
+            "time": "Pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_Post_vs_Pre_age-Young",
+      "kind": "simple",
+      "factor": "time",
+      "test": "Post",
+      "reference": "Pre",
+      "within": {
+        "age": "Young"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "Young",
+            "time": "Post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "age": "Young",
+            "time": "Pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "age_time_Old_Post_vs_Young_Pre",
+      "kind": "interaction",
+      "factor": "age:time",
+      "test": "Old:Post",
+      "reference": "Young:Pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "age": "Old",
+            "time": "Post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "age": "Young",
+            "time": "Post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "age": "Old",
+            "time": "Pre"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "age": "Young",
+            "time": "Pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

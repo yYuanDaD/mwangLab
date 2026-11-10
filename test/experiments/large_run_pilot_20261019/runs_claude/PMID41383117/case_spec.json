@@ -1,0 +1,83 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41383117",
+  "request": "Analyze GSE304351 for PMID 41383117 (NAD(+) Enhanced Mesenchymal Stromal Cells Effect on Muscle Atrophy by Improving SIRT1-Mediated Mitochondrial Function via NAMPT.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE304351",
+      "accession": "GSE304351",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261019/papers/PMC12699140.paper.md"],
+        "metadata": "GSE304351/GSE304351_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41383117/GSE304351_counts_renamed.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41383117/prep_strip_count_suffix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE304351"],
+            "assay": "bulk RNA-seq (Illumina NovaSeq X Plus), mouse quadriceps",
+            "factors": {"injection": ["D-gal+PBS", "D-gal+MSCs"]},
+            "sample_inclusion": "QUAD muscle of D-gal-treated male C57BL/6J mice injected with PBS or MSCs, n = 4 per arm (S3.2.p1, FIG2 legend, Figure S3 legend)",
+            "primary_estimand": "Effect of intramuscular MSC injection vs PBS on quadriceps gene expression in D-galactose-induced muscle atrophy (S3.2.p1). Not an exercise effect: treadmill running is only an outcome test given to all mice (S2.4.p1).",
+            "planned_contrasts": ["D-gal+MSCs vs D-gal+PBS, QUAD (S3.2.p1; paper: 960 DEGs, 525 up / 435 down)", "NAD+-MSCs vs MSCs, cultured human MSCs (S3.5.p1, FIG5; not deposited in GSE304351)"],
+            "repeated_measure_unit": "none (independent mice)",
+            "paper_method": "DESeq2 v1.26.0 (S2.7.p1)",
+            "paper_threshold": {"metric": "not_stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.7.p1 (DESeq2 named, DEG cutoff not given); S2.16.p1 p < 0.05 refers to GraphPad tests"},
+            "paper_results": {"QUAD MSC vs PBS": "960 DEGs (525 up, 435 down); up enriched in fatty-acid degradation, OXPHOS, PPAR"},
+            "exercise_role": "Exhaustive treadmill run (S2.4.p1) used once as a performance readout one week after the last injection, in every group; no exercise intervention or exercise-vs-sedentary arm"
+          },
+          "reasoning": "Title, abstract (ABS.p2-p3) and methods (S2.3.p1, S2.4.p1, S2.7.p1) describe D-gal-induced atrophy treated with MSCs/NAD+-MSCs. The only exercise element is a treadmill endurance test applied to all mice as an outcome measure. RNA-seq of muscle compares D-gal+MSCs with D-gal+PBS (S3.2.p1). DA.p1 names GSE304351 as the RNA-seq deposit.",
+          "confidence": "high",
+          "locator": "S2.3.p1; S2.4.p1; S2.7.p1; S3.2.p1; DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE304351", "8 GSM titles 'the quadriceps of D-gal+PBS/MSCs mice 1-4' match S3.2.p1 and n = 4 in the FIG2/Figure S3 legends", "matrix columns PBS1-4/MSC1-4 equal GEO Library names", "the MSC +/- NAD+ RNA-seq (FIG5A) is not in this series"]},
+          "reasoning": "Series, sample titles and group sizes match the paper's quadriceps RNA-seq; organism Mus musculus matches.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "libname",
+          "key_patterns": {"libname": ["description", "^Library name: ([A-Za-z0-9]+)$"]},
+          "patterns": {"grp": ["title", "D-gal[+](PBS|MSCs) mice"]},
+          "recode": {"grp": {"PBS": "PBS", "MSCs": "MSC"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Deposited matrix columns are '<Library name>_Count'; prep_strip_count_suffix.py drops only the suffix (values unchanged). Key derived from description 'Library name: PBS1'. Group from title.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"matrix_type": "raw counts", "source": "GEO data_processing: Hisat2 to GRCm39; 'xlsx file including raw counts for each sample'", "paper_input": "DESeq2 on read counts (S2.7.p1)"},
+          "reasoning": "All values integers (integer_fraction 1.0), 0 to 4.5e6, column suffix _Count, data_processing states raw counts. 12171 genes (submitter-filtered list).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "PBS"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the deposited samples differ only by MSC vs PBS injection in D-gal mice. Treadmill running was an outcome test given to all mice (S2.4.p1), not a factor, so the exercise estimand the request asks for is not identifiable.",
+          "final": {"analysis_type": "none", "design_column": "grp", "contrasts": []},
+          "candidates": [
+            {"value": "grp MSC vs PBS (paper's 960-DEG contrast)", "reason_rejected": "Valid paper contrast but it estimates a cell-therapy effect, not an exercise effect; outside the requested exercise estimand"},
+            {"value": "exercise vs sedentary", "reason_rejected": "No such factor: every mouse did the same exhaustive treadmill test and no sedentary/untested arm was sequenced"}
+          ],
+          "reasoning": "Request is how exercise affects gene expression. Paper (S2.3.p1, S2.4.p1, S3.2.p1) has no exercise intervention; the single RNA-seq factor is MSC vs PBS injection. Refused at design.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "MSC +/- NAD+ RNA-seq", "paper": "FIG5A volcano, n = 3 per arm", "data": "not deposited in GSE304351 (8 quadriceps samples only)", "disposition": "not_executable"},
+        {"item": "DEG threshold", "paper": "not stated for the 960 DEGs", "data": "n/a", "disposition": "recorded"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

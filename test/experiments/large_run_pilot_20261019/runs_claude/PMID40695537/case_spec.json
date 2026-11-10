@@ -1,0 +1,458 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID40695537",
+  "request": "Analyze GSE293163 for PMID 40695537 (Transcriptomic analyses of peripheral blood mononuclear cells reveal age-specific basal and acute exercise responsiveness differences in humans.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE293163",
+      "accession": "GSE293163",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC12352121.paper.md"
+        ],
+        "metadata": "GSE293163/GSE293163_metadata.csv",
+        "matrix": "GSE293163/GSE293163_PBMC_raw_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE293163"
+            ],
+            "assay": "bulk total RNA-seq (rRNA-depleted, stranded) of human PBMCs; STAR + featureCounts (S2.7.p2)",
+            "sample_inclusion": "Young n=7 (2M/5F, 18-30 y) and Old n=8 (4M/4F, 55-80 y); PBMC sampled immediately before and within 1 min after a 60-min interval single-leg knee-extension bout (S2.2.p1, S2.3.p1, S2.5.p1, S2.6.p1); 30 libraries",
+            "factors": {
+              "age": [
+                "Young",
+                "Old"
+              ],
+              "time": [
+                "Pre",
+                "Post"
+              ]
+            },
+            "repeated_measure_unit": "participant (pre and post sample from the same person)",
+            "primary_estimand": "acute-exercise effect (Post vs Pre) on PBMC gene expression, estimated separately within Young and within Old (S3.2.p1; S4.2.p1 'analyses were conducted separately for each age group'); secondary: baseline Old vs Young at Pre (S3.1.p1)",
+            "planned_contrasts": [
+              "Young Post vs Pre (S3.2.p1; paper: 53 DEGs, 52 up / 1 down, of 13,695 genes)",
+              "Old Post vs Pre (S3.2.p1; paper: 1,026 DEGs, text lists 359 up / 572 down, of 19,101 genes)",
+              "Baseline Old vs Young at Pre (S3.1.p1; paper: 665 DEGs, 446 up / 199 down, of 19,762 genes)"
+            ],
+            "normalization": "DESeq2 size factors; genes with zero counts in all samples or fewer than 5 reads in every sample removed (S2.7.p2)",
+            "paper_method": "DESeq2 1.40.2, apeglm LFC shrinkage (S2.7.p2); design formula and whether pairing was modelled are not stated",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.01,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S2.8.p1",
+              "note": "S2.8.p1: DEGs at p < 0.01 and FDR < 0.01; afterwards only genes with log2FC beyond the direction-specific mean log2FC were taken to g:Profiler/IPA (a downstream subset, not the DEG rule). S2.7.p2 separately says 5% FDR."
+            },
+            "paper_results": "Young 53 (52 up, 1 down: SH2D3A); Old 1,026 (359 up, 572 down); baseline 665 (446 up, 199 down); 26 genes shared up in both ages; baseline difference shrinks to 6 genes post-exercise"
+          },
+          "reasoning": "Study map from Methods S2.2-S2.8 and Results S3.1-S3.2. The paper fits separate DESeq2 analyses per age group (different gene universes 13,695 vs 19,101; S4.2.p1). The DEG threshold in S2.8.p1 is FDR < 0.01 (p < 0.01 is implied by it); S2.7.p2's 5% FDR is kept as an audit rule.",
+          "confidence": "medium",
+          "locator": "S2.7.p2; S2.8.p1; S3.1.p1; S3.2.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 names GSE293163",
+              "30 samples = 15 participants x pre/post, matches Young n=7 + Old n=8",
+              "data_processing (STAR 2.7.9a, Ensembl 110, clumpify, cutadapt 1.16, featureCounts 1.6.3) matches S2.7.p2",
+              "single deposited matrix GSE293163_PBMC_raw_counts.txt.gz"
+            ]
+          },
+          "reasoning": "Accession, sample count, age split (7 Young subjects 01-06,18; 8 Old subjects 08-14,19) and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {
+            "key": [
+              "title",
+              "^(\\S+) \\d+ (?:Pre|Post) (?:Young|Old)$"
+            ]
+          },
+          "patterns": {
+            "subject": [
+              "title",
+              "^\\S+ (\\d+) (?:Pre|Post) (?:Young|Old)$"
+            ],
+            "time": [
+              "title",
+              "^\\S+ \\d+ (Pre|Post) (?:Young|Old)$"
+            ],
+            "age": [
+              "title",
+              "^\\S+ \\d+ (?:Pre|Post) (Young|Old)$"
+            ]
+          },
+          "recode": {
+            "subject": {
+              "01": "S01",
+              "02": "S02",
+              "03": "S03",
+              "04": "S04",
+              "05": "S05",
+              "06": "S06",
+              "08": "S08",
+              "09": "S09",
+              "10": "S10",
+              "11": "S11",
+              "12": "S12",
+              "13": "S13",
+              "14": "S14",
+              "18": "S18",
+              "19": "S19"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (22719X31..60) are the library names that open each GEO title ('22719X31 01 Pre Young'); exact match on the derived key. Subject number, time and age are parsed from the same title; characteristics group (Pre/Post exercise) agrees with the parsed time.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "100% integers, max 391,352, median 0; data_processing says featureCounts output combined into one matrix; paper ran DESeq2 on these counts (S2.7.p2).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "age",
+            "time"
+          ],
+          "references": {
+            "age": "Young",
+            "time": "Pre"
+          },
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [],
+          "final": {
+            "analysis_type": "repeated-measures two-group within strata plus a cross-sectional baseline contrast",
+            "design_column": "time",
+            "contrasts": [
+              {
+                "name": "young_post_vs_pre",
+                "control": "Pre",
+                "treatment": "Post",
+                "subset": {
+                  "age": [
+                    "Young"
+                  ]
+                },
+                "role": "primary"
+              },
+              {
+                "name": "old_post_vs_pre",
+                "control": "Pre",
+                "treatment": "Post",
+                "subset": {
+                  "age": [
+                    "Old"
+                  ]
+                },
+                "role": "primary"
+              },
+              {
+                "name": "baseline_old_vs_young",
+                "design_column": "age",
+                "control": "Young",
+                "treatment": "Old",
+                "subset": {
+                  "time": [
+                    "Pre"
+                  ]
+                },
+                "role": "secondary",
+                "estimand_type": "associational"
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "value": "one joint model ~ subject + age:time with all 30 samples",
+              "reason_rejected": "paper fits separate analyses per age group (S4.2.p1, separate gene universes); kept the paper's separate fits"
+            },
+            {
+              "value": "pooled Post vs Pre across ages",
+              "reason_rejected": "paper's estimand is age-specific (S3.2.p1); pooling is not reported"
+            }
+          ],
+          "reasoning": "Paper reports exercise response separately in Young and in Old and a baseline Old vs Young comparison (S3.1.p1, S3.2.p1, S4.2.p1). Pre and Post come from the same person, so subject is the repeated-measure unit. The baseline comparison is cross-sectional (associational), not an exercise effect.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": [
+              {
+                "name": "subject",
+                "disposition": "blocking term for the within-age Post vs Pre fits (paired pre/post samples)"
+              },
+              {
+                "name": "sex",
+                "disposition": "not in GEO metadata; not modelled (paper did not adjust)"
+              }
+            ]
+          },
+          "confounding_candidates": null,
+          "reasoning": "Each participant contributes Pre and Post; blocking on subject is the correct covariance for the within-age contrasts. The paper does not state its formula; a paired fit is the standard DESeq2 route for this design and an unpaired sensitivity fit is run to see which matches the paper. The baseline fit has one sample per subject, so no blocking.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ subject + time (within each age group); ~ age (Pre samples only)",
+            "paper_route": {
+              "method": "DESeq2 1.40.2 with apeglm LFC shrinkage",
+              "status": "reproduced_with_pydeseq2",
+              "reason": "pydeseq2 Wald test reproduces the DESeq2 test; pydeseq2 lfc_shrink (apeGLM-type prior) is written as log2FoldChange_shrunk; padj is unaffected by shrinkage"
+            },
+            "deviations": [
+              "Paper low-count filter (drop genes with < 5 reads in every sample) approximated per execution as CPM >= 0.4 in at least 1 sample (5 reads / 12.7M median library size)",
+              "Paper does not state pairing; paired (~ subject + time) is primary, unpaired (~ time) is a sensitivity run",
+              "pydeseq2 instead of R DESeq2 1.40.2; shrunken LFC from pydeseq2 lfc_shrink in log2FoldChange_shrunk, MLE in log2FoldChange"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw featureCounts integers support DESeq2, the paper's method.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "padj",
+              "cutoff": 0.01,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.01,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "deviation_note": "S2.8.p1 DEG rule p < 0.01 and FDR < 0.01 (FDR < 0.01 implies p < 0.01). Audit rule = S2.7.p2's 5% FDR. The mean-log2FC subset used for g:Profiler/IPA is not applied to the DEG counts."
+          },
+          "reasoning": "S2.8.p1 states the DEG threshold; S2.7.p2 gives a conflicting 5% FDR, recorded as the audit rule.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Paper's design formula/pairing is not stated; paired fit is primary",
+              "Paper's up/down split for Old (359+572=931) does not sum to its 1,026 total; baseline 446+199=645 vs 665",
+              "Baseline Old vs Young is associational (cross-sectional), not an exercise effect",
+              "No sex covariate available in GEO metadata",
+              "Paper's reported counts (665/53/1026) most likely are the post-hoc subset of FDR<0.01 genes with log2FC beyond the direction-specific mean (FIG1 legend colours '>mean Log2 fold-change'). Applying that subset to our tables gives Young 44 (43 up/1 down SH2D3A), Old 1,301 (376/925), baseline 634 (459/175) with MLE LFC; 42/1, 386/881, 467/172 with shrunken LFC. The runner's applied counts are the plain FDR<0.01 rule (99 / 3,613 / 1,589).",
+              "Unpaired Young sensitivity fit gives 0 DEGs at FDR<0.01, so the paper's 53 Young DEGs imply a paired (subject-blocked) model."
+            ]
+          },
+          "paper_counts": {
+            "young_post_vs_pre": 53,
+            "old_post_vs_pre": 1026,
+            "baseline_old_vs_young": 665
+          },
+          "paper_genes": {
+            "young_post_vs_pre": [
+              "SH2D3A"
+            ]
+          },
+          "reasoning": "Counts from S3.1.p1 and S3.2.p1; SH2D3A is the single down-regulated gene in Young (S3.2.p1).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "DEG FDR threshold",
+          "paper": "S2.7.p2: 5% FDR; S2.8.p1: FDR < 0.01",
+          "data": "both computable",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Old up/down split",
+          "paper": "1,026 total but 359 up + 572 down = 931",
+          "data": "n/a",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Pairing",
+          "paper": "not stated",
+          "data": "subject IDs available for all 30 samples",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Low-count filter",
+          "paper": "drop genes with <5 reads in every sample",
+          "data": "runner filter is CPM-based",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "young_post_vs_pre",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "Pre",
+            "treatment_group": "Post",
+            "covariate_columns": "subject",
+            "alpha": 0.01
+          },
+          "subset": {
+            "age": [
+              "Young"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "time",
+            "levels": [
+              "Pre",
+              "Post"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 0.4,
+            "min_samples": 1
+          },
+          "role": "primary",
+          "reasoning": "Paper's Young pre vs post DESeq2, paired by subject"
+        },
+        {
+          "name": "old_post_vs_pre",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "Pre",
+            "treatment_group": "Post",
+            "covariate_columns": "subject",
+            "alpha": 0.01
+          },
+          "subset": {
+            "age": [
+              "Old"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "time",
+            "levels": [
+              "Pre",
+              "Post"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 0.4,
+            "min_samples": 1
+          },
+          "role": "primary",
+          "reasoning": "Paper's Old pre vs post DESeq2, paired by subject"
+        },
+        {
+          "name": "baseline_old_vs_young",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "age",
+            "control_group": "Young",
+            "treatment_group": "Old",
+            "alpha": 0.01
+          },
+          "subset": {
+            "time": [
+              "Pre"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 0.4,
+            "min_samples": 1
+          },
+          "role": "secondary",
+          "reasoning": "Paper's baseline Old vs Young (Pre samples, one per subject)"
+        },
+        {
+          "name": "young_post_vs_pre_unpaired",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "Pre",
+            "treatment_group": "Post",
+            "alpha": 0.01
+          },
+          "subset": {
+            "age": [
+              "Young"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 0.4,
+            "min_samples": 1
+          },
+          "role": "sensitivity",
+          "reasoning": "Paper does not state pairing; unpaired ~ time sensitivity"
+        },
+        {
+          "name": "old_post_vs_pre_unpaired",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "Pre",
+            "treatment_group": "Post",
+            "alpha": 0.01
+          },
+          "subset": {
+            "age": [
+              "Old"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 0.4,
+            "min_samples": 1
+          },
+          "role": "sensitivity",
+          "reasoning": "Paper does not state pairing; unpaired ~ time sensitivity"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "young_post_vs_pre",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports GO processes for the Young exercise response (S3.2.p1)"
+        },
+        {
+          "execution": "old_post_vs_pre",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports GO processes for the Old exercise response (S3.2.p1)"
+        }
+      ]
+    }
+  ]
+}

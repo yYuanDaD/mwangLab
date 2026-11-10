@@ -475,3 +475,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 463ad4ee2ce52e09b589fa8ce48a64d7c595a849 (GSE207992)
 
 - case_runner.py:429-443 gene lookup misses renamed symbols (Arntl,Ndufa4,Tmem254b/c); inspect misses exact raw-count recovery from DESeq2 normcounts Details: `463ad4ee2ce52e09b589fa8ce48a64d7c595a849/HANDBACK.md`.
+
+## PMID41383117 (GSE304351)
+
+- case_runner.py:294 _contained_keys misses matrix cols with a suffix (PBS1_Count vs 'Library name: PBS1'), suffix-strip prep script needed Details: `PMID41383117/HANDBACK.md`.
+
+## PMID38766755 (GSE263838)
+
+- filter_low_counts cannot do a mean-count filter (case_runner.py:668); paper comparison ignores audit/sensitivity counts (case_runner.py:846) Details: `PMID38766755/HANDBACK.md`.

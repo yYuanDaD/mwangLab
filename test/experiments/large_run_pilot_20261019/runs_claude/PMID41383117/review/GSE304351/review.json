@@ -1,0 +1,21 @@
+{"case": "GSE304351", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No. The paper is MSC / NAD+-MSC therapy in D-galactose-induced muscle atrophy mice (S2.3.p1). Exercise appears only as a one-off exhaustive treadmill performance test given to every mouse (S2.4.p1). The 8 sequenced quadriceps samples (D-gal+PBS 1-4, D-gal+MSCs 1-4) carry no exercise factor; packet A shows no exercise words in any column.",
+  "B2": "D-gal+MSCs vs D-gal+PBS, quadriceps RNA-seq, n = 4 vs 4 (S3.2.p1, FIG2 legend). The NAD+ vs control MSC RNA-seq (FIG5A, n = 3) is on cultured MSCs and not in this series.",
+  "B3": "No repeated measures: one quadriceps per mouse, each GSM is a separate mouse. The only candidate key (suffix of title, 1-4) is a numbering within each arm; the expression check is not_supported (permutation p = 0.13). Not a pairing key.",
+  "B4": "The paper does not say; two groups only, so a single two-group DESeq2 fit (S2.7.p1: DESeq2 v1.26.0).",
+  "B5": "Not stated for the DEGs. S2.7.p1 only names DESeq2. S2.16.p1 'p < 0.05' refers to GraphPad tests. Reported count: 960 DEGs, 525 up and 435 down, MSC vs PBS (S3.2.p1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "S2.4.p1 treadmill is an outcome test for all mice; GSM titles show only PBS vs MSC; no exercise words in metadata", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp PBS 4 / MSC 4 from GSM titles equals paper n = 4 per arm (FIG2 legend); no exclusions", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "no contrast was run", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "flag pairing_key_candidate is spurious: the key is only the 1-4 number within an arm, mice are independent; pairing_check not_supported (same-key r 0.155 vs -0.049, p 0.128)", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "no fit; only one two-group contrast exists", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "one sex, single tissue, no batch information; suitability found no confound", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "integer_fraction 1.0, data_processing says raw counts, DESeq2 route matches S2.7.p1", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "paper states no DEG cutoff (S2.7.p1); discrepancy recorded as such", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK claims no DE counts; the paper's 960 DEGs are quoted for the MSC vs PBS contrast only", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'no exercise contrast' is true and the check was wide enough: paper methods, all metadata columns and sample titles were inspected", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该系列是 D-gal 衰老小鼠股四头肌 MSC 与 PBS 注射的比较(各 4 只),跑步机仅为所有小鼠的结局测试,没有运动因子,因此以无运动对比为由拒绝是正确的。配对键候选标记为误报:小鼠相互独立,表达相关性检验也不支持配对。未发现需要修改的项目。"}
