@@ -9,7 +9,9 @@
       "case_id": "GSE86338",
       "accession": "GSE86338",
       "inputs": {
-        "paper": ["test/experiments/paper_screen_20261019/papers/PMC5538645.paper.md"],
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC5538645.paper.md"
+        ],
         "metadata": "GSE86338/GSE86338_metadata.csv",
         "matrix": "GSE86338/GSE86338_gene_fpkm.txt.gz",
         "raw_tar": false,
@@ -18,11 +20,24 @@
       "gates": {
         "paper_reconstruction": {
           "final": {
-            "accessions": ["GSE86338"],
+            "accessions": [
+              "GSE86338"
+            ],
             "assay": "bulk polyA RNA-seq (Illumina HiSeq2000), mouse C57BL/6 male; each library = pooled RNA from 4 animals (S4.2.p1)",
             "primary_estimand": "Effect of a swimming exercise program (ramp 10->90 min twice daily, then 2 weeks) on the inguinal WAT (iWAT) transcriptome versus room-temperature control iWAT (S2.1.p1, S4.4.p1)",
             "sample_inclusion": "iWAT series S2: control (S2CNT_1/2) and swimming (S2SWIM_1/2); CL316243 and 7-day cold iWAT share the same control and are the paper's other browning arms. BAT series (S3, S5) are separate experiments (BAT whitening at 30C, BAT cold activation) with their own controls and are not part of the exercise estimand.",
-            "factors": {"grp": ["CNT", "CL", "COLD", "SWIM"], "tissue": ["iWAT", "BAT (excluded)"]},
+            "factors": {
+              "grp": [
+                "CNT",
+                "CL",
+                "COLD",
+                "SWIM"
+              ],
+              "tissue": [
+                "iWAT",
+                "BAT (excluded)"
+              ]
+            },
             "planned_contrasts": [
               "iWAT swimming vs iWAT control (S2.2.p1; paper: 673 up + 826 down mRNAs)",
               "iWAT 4C 7d cold vs control (S2.2.p1; paper: 1062 up + 1201 down) - other browning arm, exploratory here",
@@ -60,8 +75,20 @@
         },
         "alignment": {
           "key_column": "description",
-          "patterns": {"grp": ["title", "^iWAT_(Control|Cl316243|4oC7day|swimming)_\\d$"]},
-          "recode": {"grp": {"Control": "CNT", "Cl316243": "CL", "4oC7day": "COLD", "swimming": "SWIM"}},
+          "patterns": {
+            "grp": [
+              "title",
+              "^iWAT_(Control|Cl316243|4oC7day|swimming)_\\d$"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "Control": "CNT",
+              "Cl316243": "CL",
+              "4oC7day": "COLD",
+              "swimming": "SWIM"
+            }
+          },
           "aliases": {},
           "exclude_samples": {
             "GSM2300503": "BAT experiment (S3CNT_1), separate tissue/control; not part of the iWAT exercise estimand",
@@ -85,85 +112,56 @@
           "confidence": "high"
         },
         "design": {
-          "factors": ["grp"],
-          "references": {"grp": "CNT"},
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "CNT"
+          },
           "organism": "Mouse",
-          "planned": ["grp_SWIM_vs_CNT"],
+          "planned": [
+            "grp_SWIM_vs_CNT"
+          ],
           "covariate_candidates": [],
           "final": {
             "analysis_type": "multi-level one control (iWAT browning arms vs shared control)",
             "design_column": "grp",
             "formula": "~ grp",
             "contrasts": [
-              {"name": "grp_SWIM_vs_CNT", "control": "CNT", "treatment": "SWIM", "role": "primary"},
-              {"name": "grp_COLD_vs_CNT", "control": "CNT", "treatment": "COLD", "role": "exploratory"},
-              {"name": "grp_CL_vs_CNT", "control": "CNT", "treatment": "CL", "role": "exploratory"}
+              {
+                "name": "grp_SWIM_vs_CNT",
+                "control": "CNT",
+                "treatment": "SWIM",
+                "role": "primary"
+              },
+              {
+                "name": "grp_COLD_vs_CNT",
+                "control": "CNT",
+                "treatment": "COLD",
+                "role": "exploratory"
+              },
+              {
+                "name": "grp_CL_vs_CNT",
+                "control": "CNT",
+                "treatment": "CL",
+                "role": "exploratory"
+              }
             ]
           },
           "candidates": [
-            {"value": "two-group SWIM vs CNT fit on 4 samples only", "reason_rejected": "residual df = 2; kept only as a sensitivity run. The paper's Cuffdiff run models all iWAT conditions together, so a one-model fit over the 4 iWAT groups (df = 4) is closer."},
-            {"value": "include BAT samples in one model", "reason_rejected": "different tissue and experiments with their own controls; comparisons must not cross tissue"}
+            {
+              "value": "two-group SWIM vs CNT fit on 4 samples only",
+              "reason_rejected": "residual df = 2; kept only as a sensitivity run. The paper's Cuffdiff run models all iWAT conditions together, so a one-model fit over the 4 iWAT groups (df = 4) is closer."
+            },
+            {
+              "value": "include BAT samples in one model",
+              "reason_rejected": "different tissue and experiments with their own controls; comparisons must not cross tissue"
+            }
           ],
-          "reasoning": "One control (CNT) with three iWAT treatments sharing it (S2.1.p1): one model, planned contrasts, no pooling of arms. Exercise contrast is primary; cold and CL arms are exploratory context for the paper's counts. Each arm has n=2 pooled libraries -> exploratory label per contract.",
-          "confidence": "high"
-        },
-        "covariance": {
-          "final": {
-            "status": "not_required",
-            "blocking_terms": [],
-            "covariates": []
-          },
-          "confounding_candidates": ["library_strategy (CL samples labelled RIP-Seq in GEO; mislabel, see discrepancies)", "basecalling Casava 1.5 vs 1.9 (constant within iWAT series S2)"],
-          "reasoning": "Each library is an independent pool of 4 mice; no subject repeated across conditions. All iWAT samples share age annotation (16 weeks), basecaller (Casava 1.5) and series S2. The RIP-Seq label on the CL samples is a GEO annotation error (the paper sequenced polyA RNA for all browning arms) and is aliased with grp, so it is not modelled.",
-          "confidence": "medium"
-        },
-        "method": {
-          "final": {
-            "method": "limma (limma-trend on log2(FPKM+1)), one model ~ grp over the 8 iWAT samples",
-            "formula": "~ grp",
-            "paper_route": {"method": "Cuffdiff on TopHat alignments", "status": "blocked", "reason": "only FPKM matrices deposited; no BAM/read counts in GEO supplementary; Cuffdiff needs alignments"},
-            "deviations": [
-              "limma on log2(FPKM+1) instead of Cuffdiff",
-              "matrix holds all Ensembl genes (incl. small RNAs, pseudogenes); paper counts are mRNAs only",
-              "no low-expression filter (runner filter is for raw counts only); Cuffdiff tests only genes passing its own OK status"
-            ]
-          },
-          "transform": "log2(x+1)",
-          "reasoning": "Matrix policy: FPKM -> log2(x+1) -> limma. Paper route blocked by missing alignments; never round FPKM into counts.",
-          "confidence": "high"
-        },
-        "threshold": {
-          "final": {
-            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true},
-            "threshold_source": "paper_on_deviation_route",
-            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true},
-            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
-            "deviation_note": "Paper rule (FDR <= 0.05 and |FC| >= 2, S2.2.p1) applied to limma BH-adjusted p on the deviation route."
-          },
-          "reasoning": "S2.2.p1: absolute fold-change >= 2-fold, FDR <= 0.05 -> padj <= 0.05 and |log2FC| >= 1 (inclusive).",
-          "confidence": "high"
-        },
-        "study": {
-          "final": {
-            "route": "declared_deviation",
-            "exploratory_reason": "each arm has 2 pooled libraries (< 3 replicates); residual df = 4 in the joint iWAT model",
-            "caveats": [
-              "n = 2 pooled libraries per arm (each a pool of 4 mice): pooling removes biological variance, so p-values understate between-animal variability",
-              "swimming mice have no sham-handling/water-exposure control; control is the shared room-temperature iWAT control",
-              "FPKM-based limma vs paper Cuffdiff; counts cover all Ensembl genes, paper counts are mRNAs"
-            ]
-          },
-          "paper_counts": {
-            "joint_iwat/grp_SWIM_vs_CNT": 1499,
-            "joint_iwat/grp_COLD_vs_CNT": 2263,
-            "joint_iwat/grp_CL_vs_CNT": 1518
-          },
-          "paper_genes": {
-            "joint_iwat/grp_SWIM_vs_CNT": ["Ucp1", "Elovl3", "Cidea"],
-            "joint_iwat/grp_COLD_vs_CNT": ["Ucp1", "Elovl3", "Cidea"]
-          },
-          "reasoning": "Paper route blocked (no alignments); limma on log2 FPKM runs as a declared deviation. Paper counts from S2.2.p1 (up+down). Named genes from S2.2.p1 (induced across browning conditions).",
-          "confidence": "medium"
+          "reasoning": "One control (CNT) with three iWAT treatments sharing it (S2.1.p1): one model, planned contrasts, no pooling of arms. Exercise contrast is primary; cold and CL arms are exploratory context for the paper's counts. Each arm has n=2 pooled libraries -> exploratory label per contract. Suitability report (GSE86338/suitability/suitability.md) failed sample_size for every comparison; the design is refused at this gate.",
+          "confidence": "high",
+          "decision_status": "refused",
+          "stop_reason": "Every iWAT arm has only 2 sequenced libraries (each a pool of 4 mice; S4.2.p1): SWIM n=2 vs CNT n=2. The suitability report is not_analyzable (sample_size: 0/6 comparisons have >= 3 per group), so no comparison, including the planned exercise contrast grp_SWIM_vs_CNT, meets the n >= 3 replicate rule and the contract rejects a valid design. Planned route if allowed: one limma model ~ grp on log2(FPKM+1) over the 8 iWAT samples, contrast SWIM vs CNT, paper threshold FDR<=0.05 & |log2FC|>=1 (paper: 673 up / 826 down)."
         }
       },
       "discrepancies": [
@@ -184,35 +182,16 @@
           "paper": "Cuffdiff on alignments (S4.3.1.p1)",
           "data": "only Cufflinks FPKM deposited",
           "disposition": "declared_deviation"
-        }
-      ],
-      "executions": [
-        {
-          "name": "joint_iwat",
-          "tool": "tools.joint_contrasts:run_joint_limma",
-          "args": {"comparisons": ["grp_SWIM_vs_CNT", "grp_COLD_vs_CNT", "grp_CL_vs_CNT"], "covariates": []},
-          "role": "primary",
-          "reasoning": "One limma model over the 4 iWAT groups (shared control), contrasts vs CNT; SWIM vs CNT is the exercise estimand, cold and CL arms exploratory."
         },
         {
-          "name": "swim_two_group",
-          "tool": "tools.limma_tools:run_limma_analysis",
-          "args": {"design_column": "grp", "control_group": "CNT", "treatment_group": "SWIM"},
-          "subset": {"grp": ["CNT", "SWIM"]},
-          "role": "sensitivity",
-          "reasoning": "Two-arm limma on the 4 exercise/control samples only (df = 2), to check dependence on variance pooling across arms."
+          "item": "replicates per arm",
+          "paper": "2 pooled libraries per condition, Cuffdiff run with n=2 (S4.2.p1, S2.4.p1: 18 samples)",
+          "data": "2 libraries per iWAT arm; suitability requires >= 3",
+          "disposition": "stop"
         }
       ],
-      "enrichment": [
-        {
-          "execution": "joint_iwat/grp_SWIM_vs_CNT",
-          "ora": true,
-          "gsea": true,
-          "direction": "all",
-          "ranking_metric": "stat",
-          "reasoning": "Paper reports GSEA on GOBP per browning condition (S2.2.p1, S1F Fig); Hallmark GSEA + GO ORA as comparable pathway readout."
-        }
-      ]
+      "executions": [],
+      "enrichment": []
     }
   ]
 }

@@ -155,9 +155,10 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
         absent = [key for key in STAGE_FIELDS[stage] if key not in final]
         if absent:
             errors.append(f"{source}: valid {stage} decision missing final.{', final.'.join(absent)}")
-    if stage == "paper_reconstruction" and "paper_threshold" in final \
+    # null means the paper states no rule (threshold source workflow_default)
+    if stage == "paper_reconstruction" and final.get("paper_threshold") is not None \
             and not isinstance(final["paper_threshold"], dict):
-        errors.append(f"{source}: paper_threshold must be an object")
+        errors.append(f"{source}: paper_threshold must be an object or null")
     if stage == "design" and status == "valid":
         if not (final.get("formula") or final.get("design_column")):
             errors.append(f"{source}: valid design needs final.formula or final.design_column")
@@ -187,8 +188,10 @@ def check_record(record: dict[str, Any], source: str = "record", *, legacy: bool
     if stage == "threshold" and status == "valid":
         if final.get("threshold_source") not in THRESHOLD_SOURCES:
             errors.append(f"{source}: threshold_source must be one of {sorted(THRESHOLD_SOURCES)}")
-        if not isinstance(final.get("paper_threshold"), dict):
-            errors.append(f"{source}: paper_threshold must be an object")
+        paper_rule = final.get("paper_threshold")
+        if not isinstance(paper_rule, dict) and not (
+                paper_rule is None and final.get("threshold_source") == "workflow_default"):
+            errors.append(f"{source}: paper_threshold must be an object (null only with workflow_default)")
         if not isinstance(final.get("applied_threshold"), dict):
             errors.append(f"{source}: applied_threshold must be an object")
     if stage in RUN_STAGES and record["execution_status"] == "completed" and not final.get("outputs"):

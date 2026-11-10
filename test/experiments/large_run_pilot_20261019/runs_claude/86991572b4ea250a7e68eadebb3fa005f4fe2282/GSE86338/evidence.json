@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "run_id": "86991572b4ea250a7e68eadebb3fa005f4fe2282",
   "subject_id": "GSE86338",
-  "created_at": "2026-11-10T02:08:27",
-  "finished_at": "2026-11-10T02:08:34",
-  "status": "decided_not_executed",
+  "created_at": "2026-11-10T02:09:12",
+  "finished_at": "2026-11-10T02:09:20",
+  "status": "stopped:design",
   "error": null,
   "sources": [
     {
@@ -13,7 +13,7 @@
       "label": "PMC5538645.paper.md",
       "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC5538645.paper.md",
       "locator": null,
-      "captured_at": "2026-11-10T02:08:27",
+      "captured_at": "2026-11-10T02:09:12",
       "sha256": null,
       "attributes": {
         "sha256": "f87a4e147eee88e23ca86c26ed2fcce6fba3aced5a8173d3fc329784dbab744c",
@@ -26,7 +26,7 @@
       "label": "GSE86338_metadata.csv",
       "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_metadata.csv",
       "locator": null,
-      "captured_at": "2026-11-10T02:08:27",
+      "captured_at": "2026-11-10T02:09:12",
       "sha256": null,
       "attributes": {
         "sha256": "dbf30645cb9c1399b87ef0c142857a988423d206b01559360760b3af430ea378",
@@ -39,7 +39,7 @@
       "label": "GSE86338_gene_fpkm.txt.gz",
       "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE86338\\GSE86338_gene_fpkm.txt.gz",
       "locator": null,
-      "captured_at": "2026-11-10T02:08:27",
+      "captured_at": "2026-11-10T02:09:12",
       "sha256": null,
       "attributes": {
         "sha256": "773b4f942683f7287aa51a2aa03464a8bdb6de4cdf324bdaac1fb9c9484ff763",
@@ -101,7 +101,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T02:08:27"
+      "recorded_at": "2026-11-10T02:09:12"
     },
     {
       "decision_id": "DEC-0002",
@@ -132,7 +132,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T02:08:27"
+      "recorded_at": "2026-11-10T02:09:12"
     },
     {
       "decision_id": "DEC-0003",
@@ -198,7 +198,7 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T02:08:28"
+      "recorded_at": "2026-11-10T02:09:12"
     },
     {
       "decision_id": "DEC-0004",
@@ -250,7 +250,61 @@
         "execution_status": "not_started",
         "stop_reason": null
       },
-      "recorded_at": "2026-11-10T02:08:28"
+      "recorded_at": "2026-11-10T02:09:13"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-level one control (iWAT browning arms vs shared control)",
+        "design_column": "grp",
+        "formula": "~ grp",
+        "contrasts": [
+          {
+            "name": "grp_SWIM_vs_CNT",
+            "control": "CNT",
+            "treatment": "SWIM",
+            "role": "primary"
+          },
+          {
+            "name": "grp_COLD_vs_CNT",
+            "control": "CNT",
+            "treatment": "COLD",
+            "role": "exploratory"
+          },
+          {
+            "name": "grp_CL_vs_CNT",
+            "control": "CNT",
+            "treatment": "CL",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\86991572b4ea250a7e68eadebb3fa005f4fe2282\\GSE86338\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "One control (CNT) with three iWAT treatments sharing it (S2.1.p1): one model, planned contrasts, no pooling of arms. Exercise contrast is primary; cold and CL arms are exploratory context for the paper's counts. Each arm has n=2 pooled libraries -> exploratory label per contract. Suitability report (GSE86338/suitability/suitability.md) failed sample_size for every comparison; the design is refused at this gate.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "Every iWAT arm has only 2 sequenced libraries (each a pool of 4 mice; S4.2.p1): SWIM n=2 vs CNT n=2. The suitability report is not_analyzable (sample_size: 0/6 comparisons have >= 3 per group), so no comparison, including the planned exercise contrast grp_SWIM_vs_CNT, meets the n >= 3 replicate rule and the contract rejects a valid design. Planned route if allowed: one limma model ~ grp on log2(FPKM+1) over the 8 iWAT samples, contrast SWIM vs CNT, paper threshold FDR<=0.05 & |log2FC|>=1 (paper: 673 up / 826 down)."
+      },
+      "recorded_at": "2026-11-10T02:09:20"
     }
   ],
   "artifacts": [
@@ -270,7 +324,7 @@
       "role": "paper_data_discrepancies",
       "produced_by": null,
       "media_type": "application/json",
-      "sha256": "dc0acaf615701f610b3103ee9fb408c0bc0a1e4135641466ac6722ec134465f0",
+      "sha256": "a9f87066b1471c311f226a30b9940a7a773a017741770b04ff8cad6ab194b7cd",
       "evidence_ids": [],
       "attributes": {}
     },

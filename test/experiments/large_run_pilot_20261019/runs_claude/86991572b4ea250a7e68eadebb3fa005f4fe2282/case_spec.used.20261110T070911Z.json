@@ -1,0 +1,197 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/86991572b4ea250a7e68eadebb3fa005f4fe2282",
+  "request": "Analyze GSE86338 for the paper (Dynamic transcriptome changes during adipose tissue energy expenditure reveal critical roles for long noncoding RNA regulators): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (Claude Code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE86338",
+      "accession": "GSE86338",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261019/papers/PMC5538645.paper.md"
+        ],
+        "metadata": "GSE86338/GSE86338_metadata.csv",
+        "matrix": "GSE86338/GSE86338_gene_fpkm.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE86338"
+            ],
+            "assay": "bulk polyA RNA-seq (Illumina HiSeq2000), mouse C57BL/6 male; each library = pooled RNA from 4 animals (S4.2.p1)",
+            "primary_estimand": "Effect of a swimming exercise program (ramp 10->90 min twice daily, then 2 weeks) on the inguinal WAT (iWAT) transcriptome versus room-temperature control iWAT (S2.1.p1, S4.4.p1)",
+            "sample_inclusion": "iWAT series S2: control (S2CNT_1/2) and swimming (S2SWIM_1/2); CL316243 and 7-day cold iWAT share the same control and are the paper's other browning arms. BAT series (S3, S5) are separate experiments (BAT whitening at 30C, BAT cold activation) with their own controls and are not part of the exercise estimand.",
+            "factors": {
+              "grp": [
+                "CNT",
+                "CL",
+                "COLD",
+                "SWIM"
+              ],
+              "tissue": [
+                "iWAT",
+                "BAT (excluded)"
+              ]
+            },
+            "planned_contrasts": [
+              "iWAT swimming vs iWAT control (S2.2.p1; paper: 673 up + 826 down mRNAs)",
+              "iWAT 4C 7d cold vs control (S2.2.p1; paper: 1062 up + 1201 down) - other browning arm, exploratory here",
+              "iWAT CL316243 vs control (S2.2.p1; paper: 837 up + 681 down) - other browning arm, exploratory here"
+            ],
+            "repeated_measure_unit": "none; each library is a pool of 4 independent mice (S4.2.p1); 2 pools per condition",
+            "normalization": "Cufflinks FPKM, compatible-hits-norm for DE (S4.3.1.p1)",
+            "paper_method": "Cuffdiff (Cufflinks 2.1.1) on TopHat alignments (S4.3.1.p1)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.0,
+              "inclusive": true,
+              "source_locator": "S2.2.p1 (absolute fold-change >= 2-fold, FDR <= 0.05)"
+            },
+            "paper_results": "Exercise iWAT: 673 up / 826 down mRNAs; induction of Ucp1, Elovl3, Cidea and mitochondrial genes across browning conditions (S2.2.p1, S1E Fig); GSEA GOBP up: cellular respiration, BAT gene set; down: immune processes, WAT gene set (S1F Fig)"
+          },
+          "reasoning": "S2.1.p1/S4.4.p1 describe the swimming protocol and the three iWAT browning arms sharing one control; S2.2.p1 gives the per-arm DEG counts with the threshold (|FC|>=2, FDR<=0.05); S4.3.1.p1 gives Cufflinks/Cuffdiff on FPKM; S4.2.p1 says each sequenced sample is a pool of 4 animals. GEO titles iWAT_Control_1/2 and iWAT_swimming_1/2 match.",
+          "confidence": "high",
+          "locator": "S2.2.p1, S4.2.p1, S4.3.1.p1, S4.4.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "FN.p1 and S4.2.p1 name GSE86338 as the study's deposit",
+              "18 GEO samples = 18 samples in the paper's PCA (S2.4.p1)",
+              "GSE86338_gene_fpkm.txt.gz columns S2CNT_1..S5BAT_WT_COLD_3 equal the metadata description field 18/18",
+              "data_processing: TopHat-2.0.9 + Cufflinks-2.1.1 FPKM, matching S4.3.1.p1"
+            ]
+          },
+          "reasoning": "Series is cited by the paper, sample count and processing match, matrix columns match metadata description exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {
+            "grp": [
+              "title",
+              "^iWAT_(Control|Cl316243|4oC7day|swimming)_\\d$"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "Control": "CNT",
+              "Cl316243": "CL",
+              "4oC7day": "COLD",
+              "swimming": "SWIM"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {
+            "GSM2300503": "BAT experiment (S3CNT_1), separate tissue/control; not part of the iWAT exercise estimand",
+            "GSM2300504": "BAT experiment (S3CNT_2), separate tissue/control",
+            "GSM2300505": "BAT 30C whitening (S330oC_1), separate tissue",
+            "GSM2300506": "BAT 30C whitening (S330oC_2), separate tissue",
+            "GSM2300507": "BAT control for cold (S5BAT_WT_1), separate experiment",
+            "GSM2300508": "BAT control for cold (S5BAT_WT_2), separate experiment",
+            "GSM2300509": "BAT control for cold (S5BAT_WT_3), separate experiment",
+            "GSM2300510": "BAT cold (S5BAT_WT_COLD_1), separate experiment",
+            "GSM2300511": "BAT cold (S5BAT_WT_COLD_2), separate experiment",
+            "GSM2300512": "BAT cold (S5BAT_WT_COLD_3), separate experiment"
+          },
+          "reasoning": "Matrix columns equal metadata 'description' 18/18 (inspect alignment_keys). Group derived from GEO title. BAT samples belong to different experiments with their own controls (S2.3.p1) and are excluded; comparisons never cross tissue.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM (linear, Cufflinks)",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "reasoning": "File name gene_fpkm, data_processing states Cufflinks FPKM, values are non-integer (integer fraction 0.52 driven by zeros), median 0. Paper input for Cuffdiff was the read alignments; counts were not deposited. Linear normalized expression -> log2(x+1) then limma per policy.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "CNT"
+          },
+          "organism": "Mouse",
+          "planned": [
+            "grp_SWIM_vs_CNT"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-level one control (iWAT browning arms vs shared control)",
+            "design_column": "grp",
+            "formula": "~ grp",
+            "contrasts": [
+              {
+                "name": "grp_SWIM_vs_CNT",
+                "control": "CNT",
+                "treatment": "SWIM",
+                "role": "primary"
+              },
+              {
+                "name": "grp_COLD_vs_CNT",
+                "control": "CNT",
+                "treatment": "COLD",
+                "role": "exploratory"
+              },
+              {
+                "name": "grp_CL_vs_CNT",
+                "control": "CNT",
+                "treatment": "CL",
+                "role": "exploratory"
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "value": "two-group SWIM vs CNT fit on 4 samples only",
+              "reason_rejected": "residual df = 2; kept only as a sensitivity run. The paper's Cuffdiff run models all iWAT conditions together, so a one-model fit over the 4 iWAT groups (df = 4) is closer."
+            },
+            {
+              "value": "include BAT samples in one model",
+              "reason_rejected": "different tissue and experiments with their own controls; comparisons must not cross tissue"
+            }
+          ],
+          "reasoning": "One control (CNT) with three iWAT treatments sharing it (S2.1.p1): one model, planned contrasts, no pooling of arms. Exercise contrast is primary; cold and CL arms are exploratory context for the paper's counts. Each arm has n=2 pooled libraries -> exploratory label per contract. Suitability report (GSE86338/suitability/suitability.md) failed sample_size for every comparison; the design is refused at this gate.",
+          "confidence": "high",
+          "decision_status": "refused",
+          "stop_reason": "Every iWAT arm has only 2 sequenced libraries (each a pool of 4 mice; S4.2.p1): SWIM n=2 vs CNT n=2. The suitability report is not_analyzable (sample_size: 0/6 comparisons have >= 3 per group), so no comparison, including the planned exercise contrast grp_SWIM_vs_CNT, meets the n >= 3 replicate rule and the contract rejects a valid design. Planned route if allowed: one limma model ~ grp on log2(FPKM+1) over the 8 iWAT samples, contrast SWIM vs CNT, paper threshold FDR<=0.05 & |log2FC|>=1 (paper: 673 up / 826 down)."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "library_strategy of CL316243 iWAT samples",
+          "paper": "polyA RNA-seq for all browning arms (S4.2.p1)",
+          "data": "GEO lists GSM2300497/8 as RIP-Seq / library_selection other",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "age of swimming mice",
+          "paper": "swimming started at 8 weeks, ~3-4 weeks of protocol (S4.4.p1); browning cohort 12 weeks old",
+          "data": "all iWAT samples annotated 16 weeks old",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "DE method and input",
+          "paper": "Cuffdiff on alignments (S4.3.1.p1)",
+          "data": "only Cufflinks FPKM deposited",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "replicates per arm",
+          "paper": "2 pooled libraries per condition, Cuffdiff run with n=2 (S4.2.p1, S2.4.p1: 18 samples)",
+          "data": "2 libraries per iWAT arm; suitability requires >= 3",
+          "disposition": "stop"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
