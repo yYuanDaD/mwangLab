@@ -643,3 +643,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36695573 (GSE198826;GSE198827)
 
 - inspect failed on featureCounts '#' header (tools/native.py:217; patched after this row), misleading 'found 0' error; needed a prep script Details: `PMID36695573/HANDBACK.md`.
+
+## PMID35774589 (GSE198652)
+
+- inspect used Chromosome column as feature ID (case_runner.py:393-399, native.py:284), Gene Symbol reindex prep needed (feature_column option added after this row); min_count uses >= (case_runner.py:747) Details: `PMID35774589/HANDBACK.md`.

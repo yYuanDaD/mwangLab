@@ -68,6 +68,8 @@ Each execution: `name` (also the result-table name), `tool`, `args`, `role` (`pr
 
 For separate fits per fraction, put the fraction column in `strata`, the treatment in `factors`, and give each execution a `subset` of one fraction.
 
+Inputs, optionally: `feature_column` (use that matrix column as the gene ID, e.g. `"Gene Symbol"` when the first column is a chromosome) with `feature_duplicates` (`error` default, `sum`, `first`).
+
 Per execution, optionally: `subset` (`{"tissue": ["soleus"]}` keeps those samples), `complete_pairs` (`{"subject": "subject", "condition": "time", "levels": ["pre", "post"]}`), `filter_low_counts` (`{"min_cpm": 1, "min_samples": 3}`: keep genes with CPM >= min_cpm in at least min_samples of this execution's samples, for a paper that filters low counts; raw counts only; `{"min_count": 10, "min_samples": 3}` or `{"min_mean_count": 10}` for a read-count rule; `{"min_value": 1, "min_samples": 3}` filters FPKM/TPM on the deposited values), `transform` (this execution only, for example `log2(CPM+1)` for a limma sensitivity run next to DESeq2), `matrix: "aligned"` (skip the case-level transform).
 
 Joint and multigroup executions return one table per comparison, named `<execution>/<comparison>`; use those names in `paper_counts`, `paper_genes` and `enrichment`.

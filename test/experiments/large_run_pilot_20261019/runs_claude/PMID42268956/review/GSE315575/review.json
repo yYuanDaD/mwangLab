@@ -1,0 +1,21 @@
+{"case": "GSE315575", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No for an exercise question. The 8 sequenced samples are gastrocnemius from 20/21-month-old chow-fed male Nox4 fl/fl (n=4) and Mck-Cre;Nox4 fl/fl (n=4) mice; no exercise word in any column (packet A). The paper's exercise training (12-month-old mice, Fig. 6, S2.5/S4.4.3) is not part of this series; the RNA-seq is Fig. 4 / S2.3.p4 / S4.12.",
+  "B2": "One comparison: Mck-Cre;Nox4 fl/fl vs Nox4 fl/fl, 4 vs 4 (FIG4 legend, S2.3.p4); 1023 DEGs, 580 down, 443 up (fig. S14A).",
+  "B3": "No repeated measures: one tissue (gastrocnemius) per animal, one time point. Packet A's title-suffix key (Control 1 ... KO 4) only pairs numbering across genotypes; the two genotypes are different animals, and the expression check says not_supported (r 0.2 vs -0.067, permutation p 0.125). The paper does not describe any pairing.",
+  "B4": "Only one pair of groups, so joint vs pairwise is moot. S4.12.p1: differential expression with python DESeq2 (v0.4.2), genotype comparison.",
+  "B5": "S4.12.p1: 'genes with absolute logFoldChange >0.5 and FDR <0.05 determined to be differentially expressed' (DESeq2 python v0.4.2). Reported: 1023 DEGs, 580 down, 443 up (S2.3.p4, fig. S14A). Fig. 4C heatmap asterisks use P < 0.05."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "No exercise arm in GSE315575; genotype only (S2.3.p4, FIG4, packet A exercise-word scan none). Refusal at design matches B1.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "geno CTRL 4 / KO 4 from characteristics genotype, matches n=4 per genotype in FIG4; no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "pairing_key_candidate flag is a numbering artefact (Control 1..4 vs KO 1..4); genotype is between animals, expression check not_supported (permutation p 0.125), paper describes independent animals. 'none (independent animals)' in paper_reconstruction is correct.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Single two-group comparison; no model fitted.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Batch constant (1), tissue constant, sex single (male), age constant; recorded in suitability.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer fraction 1.0, STAR feature counts per data_processing; 412 duplicated gene symbols recorded as needing handling before any model.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "paper_threshold FDR 0.05, |log2FC| > 0.5, locator S4.12.p1; matches B5 verbatim.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK claims no DEG result, lists the paper's 1023 (443 up / 580 down) as reference only; no comparison claimed.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise contrast' is established by a wide check: all columns scanned for exercise words, all 8 samples genotype-only, paper's exercise cohort (Fig. 6, 12-month-old) is qPCR/immunoblot only. Wheel running in fig. S14C is a metabolic-cage covariate for controls, not in the GEO metadata.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Policy only (not an error): whether a genotype-only series whose paper frames exercise adaptive homeostasis should be run as a labelled non-exercise genotype analysis (paper's 1023 DEGs could then be reproduced) is a separate request."],
+ "summary": "该系列8个样本只有基因型差异(Nox4 fl/fl 对 Mck-Cre;Nox4 fl/fl,各4只),没有运动组,论文的运动训练实验未测序,因此在design阶段拒绝是正确的。配对键候选只是编号巧合,表达检验不支持,论文也是独立动物;阈值FDR<0.05且|logFC|>0.5与论文一致。未发现需要修改的项。"}

@@ -1,0 +1,174 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35774589",
+  "request": "Analyze GSE198652 for PMID 35774589 (Muscle-Specific Cellular and Molecular Adaptations to Late-Life Voluntary Concurrent Exercise.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE198652",
+      "accession": "GSE198652",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9233305.paper.md"],
+        "metadata": "GSE198652/GSE198652_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35774589/prep/GSE198652_counts_by_symbol.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID35774589/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE198652 (bulk RNA-seq, soleus + plantaris, old and young)", "GSE197045 (myonuclear RRBS; not analyzed here)"],
+            "assay": "bulk RNA-seq (Novogene, NovaSeq 6000), STAR in Partek Flow, DESeq2",
+            "primary_estimand": "Effect of 8 wk progressive weighted wheel running (PoWeR) vs age-matched sedentary control on gene expression, within each muscle (soleus, plantaris) and age (old 22->24 mo; young 4-mo-start reference cohort from Englund et al.), each analyzed separately",
+            "factors": {"grp": ["Sedentary", "PoWeR"], "tissue": ["Soleus", "Plantaris"], "age": ["24 mo (old)", "6 mo at GEO / 4 mo at start in paper (young)"]},
+            "inclusion": "old: Control n=5, PoWeR n=4 for both soleus and plantaris (S2.8.p1); young: n=4/group (S2.8.p1, FIG7 legend); female mice (S2.2.p1, S3.6.p1 sex-matched)",
+            "planned_contrasts": [
+              "Old soleus PoWeR vs Sedentary (S3.6.p1, FIG7 B/D, Supp Table 2)",
+              "Old plantaris PoWeR vs Sedentary (S3.6.p1, FIG7 F/H)",
+              "Young soleus PoWeR vs Sedentary (analyzed separately with same pipeline, S2.8.p1; FIG7 A/C)",
+              "Young plantaris PoWeR vs Sedentary (S2.8.p1; FIG7 E/G)"
+            ],
+            "repeated_measure_unit": "none (independent animals; soleus and plantaris come from the same mice but are analyzed per muscle)",
+            "normalization": "DESeq2 median-ratio after excluding genes with max count <= 50 (S2.8.p1 'minimum read cutoff of 50 across all samples'; GEO data_processing)",
+            "paper_method": "DESeq2 (Partek Flow), two-group per muscle per age, BH FDR",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.10, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.8.p1; S2.10.p1"},
+            "paper_results": "DEG counts only in Supplemental Tables 2A-D (not available). Named genes: Aldh1l1 and Lrrn1 up in all four contrasts (FDR<0.05, S3.7.p1); old soleus up Agrn, Kat2a, Samd1, Zfp598 and down Ccnt(1), Gng5, Mylpf, Slc25a20 at FDR<0.10 (S3.8.p1); very few downregulated genes in old plantaris (S3.6.p1)."
+          },
+          "reasoning": "Methods S2.8.p1 describe RNA-seq of old soleus and plantaris (5 control, 4 PoWeR) and separate analysis of the young Englund cohort with the same DESeq2 pipeline; S2.10.p1 sets sequencing FDR < 0.10, no fold-change rule. Each muscle x age is a separate two-group comparison (FIG7 panels A-H).",
+          "locator": "S2.8.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S11.p1 names GSE198652 as the RNA-seq deposit", "34 samples = 9+9 old + 8+8 young, matching S2.8.p1 and FIG7 legend", "GEO treatment_protocol and data_processing (STAR, Partek, DESeq2, max count <= 50 filter) match S2.8.p1"]},
+          "reasoning": "Paper data availability (S11.p1) lists GSE198652 for RNA-seq; sample structure matches the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "normalize_keys": true,
+          "aliases": {"tissue": "source_name_ch1", "age": "characteristics_ch1.2.tag", "grp": "characteristics_ch1.1.group"},
+          "patterns": {},
+          "combine": {"stratum": ["tissue", "age"]},
+          "recode": {
+            "tissue": {"Soleus": "Sol", "Plantaris": "Pla"},
+            "age": {"24 mo": "Old", "6 mo": "Young"},
+            "grp": {"Sedentary": "Sed", "Progressive weighted wheel run (PoWeR)": "PoW"},
+            "stratum": {"Sol_Old": "SolOld", "Pla_Old": "PlaOld", "Sol_Young": "SolYoung", "Pla_Young": "PlaYoung"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix column names equal metadata `description` (e.g. Con12_s); two differ only by case (Pow12_s/Pow15_p vs PoW12_s/PoW15_p), so normalize_keys. Tissue from source_name_ch1 (title says 'Aged Soleus' for aged plantaris samples, but description suffix _p and source_name say Plantaris), age from tag, group from characteristics group.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "GEO data_processing: STAR + Partek gene counts, 'Matrix table with raw gene counts'; 74% integer values with fractional values (Partek EM-style estimated counts), median 36, max 1.45e6, no normalization. Paper input is the same counts to DESeq2. Rounded to integers for DESeq2 (documented).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Sed"},
+          "organism": "Mouse",
+          "strata": ["stratum"],
+          "planned": [
+            "grp_PoW_vs_Sed_stratum-SolOld",
+            "grp_PoW_vs_Sed_stratum-PlaOld",
+            "grp_PoW_vs_Sed_stratum-SolYoung",
+            "grp_PoW_vs_Sed_stratum-PlaYoung"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group, stratified by muscle x age (separate fits)",
+            "design_column": "grp",
+            "control": "Sed",
+            "treatment": "PoW",
+            "contrasts": [
+              {"name": "grp_PoW_vs_Sed_stratum-SolOld", "control": "Sed", "treatment": "PoW", "role": "primary"},
+              {"name": "grp_PoW_vs_Sed_stratum-PlaOld", "control": "Sed", "treatment": "PoW", "role": "primary"},
+              {"name": "grp_PoW_vs_Sed_stratum-SolYoung", "control": "Sed", "treatment": "PoW", "role": "secondary"},
+              {"name": "grp_PoW_vs_Sed_stratum-PlaYoung", "control": "Sed", "treatment": "PoW", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "one model ~ tissue*age*grp", "reason_rejected": "paper analyzed each muscle/age separately (S2.8.p1); young cohort is a different study (Englund et al., Pax7-DTA vehicle), so age is confounded with cohort/batch"},
+            {"value": "old vs young comparison", "reason_rejected": "not an exercise estimand and confounded with cohort/sequencing batch"}
+          ],
+          "reasoning": "Paper FIG7 panels A-H are PoWeR vs age-matched control per muscle per age. Old contrasts are the paper's new data (primary); young are the re-analyzed comparison cohort (secondary).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": [],
+          "reasoning": "Independent animals within each stratum; each fit uses one muscle from each mouse, so no repeated measures within a fit. No batch variable recorded within strata.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ grp",
+            "rounding_documented": true,
+            "paper_route": {"method": "DESeq2 in Partek Flow", "status": "reproduced"},
+            "deviations": ["Partek DESeq2 replaced by pydeseq2 Wald test", "fractional estimated counts rounded to integers", "max-count > 50 filter applied within each stratum's samples (paper wording 'across all samples' is ambiguous about the sample set)"]
+          },
+          "transform": "round",
+          "reasoning": "Paper used DESeq2 on Partek counts (S2.8.p1); counts are estimated (fractional) so rounded for the negative-binomial model.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.10, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.10, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.10.p1 'FDR for sequencing experiments was set at < 0.10'; S2.8.p1 BH FDR; no fold-change rule. Audit at FDR<0.05 for the Aldh1l1/Lrrn1 statement (S3.7.p1).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": ["Paper DEG counts are only in Supplemental Tables 2A-D, not available; comparison is by named genes", "Young cohort is a different study (Pax7-DTA vehicle mice, 4 mo at start; GEO tag says 6 mo), analyzed separately as in the paper", "'Ccnt' in S3.8.p1 interpreted as Ccnt1"]
+          },
+          "paper_genes": {
+            "grp_PoW_vs_Sed_stratum-SolOld": ["Aldh1l1", "Lrrn1", "Agrn", "Kat2a", "Samd1", "Zfp598", "Ccnt1", "Gng5", "Mylpf", "Slc25a20"],
+            "grp_PoW_vs_Sed_stratum-PlaOld": ["Aldh1l1", "Lrrn1"],
+            "grp_PoW_vs_Sed_stratum-SolYoung": ["Aldh1l1", "Lrrn1"],
+            "grp_PoW_vs_Sed_stratum-PlaYoung": ["Aldh1l1", "Lrrn1"]
+          },
+          "reasoning": "Paper-aligned two-group DESeq2 per muscle x age at FDR<0.10.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "young age", "paper": "4-mo-old at start (S2.8.p1, S3.6.p1)", "data": "GEO tag 6 mo (age at harvest after 8 wk)", "disposition": "executable_without_change"},
+        {"item": "aged plantaris titles", "paper": "plantaris samples", "data": "titles read 'Aged Soleus' for Con*_p/PoW*_p but source_name says Plantaris", "disposition": "executable_without_change"},
+        {"item": "matrix row ID", "paper": "gene-level counts", "data": "deposited first column is Chromosome; re-indexed by unique Gene Symbol in prep_matrix.py", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "grp_PoW_vs_Sed_stratum-SolOld", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "PoW", "alpha": 0.1},
+         "subset": {"stratum": ["SolOld"]}, "filter_low_counts": {"min_count": 50.0001, "min_samples": 1},
+         "role": "primary", "reasoning": "old soleus PoWeR vs control, paper DESeq2, max count > 50 filter"},
+        {"name": "grp_PoW_vs_Sed_stratum-PlaOld", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "PoW", "alpha": 0.1},
+         "subset": {"stratum": ["PlaOld"]}, "filter_low_counts": {"min_count": 50.0001, "min_samples": 1},
+         "role": "primary", "reasoning": "old plantaris PoWeR vs control"},
+        {"name": "grp_PoW_vs_Sed_stratum-SolYoung", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "PoW", "alpha": 0.1},
+         "subset": {"stratum": ["SolYoung"]}, "filter_low_counts": {"min_count": 50.0001, "min_samples": 1},
+         "role": "secondary", "reasoning": "young soleus, analyzed separately with the same pipeline (S2.8.p1)"},
+        {"name": "grp_PoW_vs_Sed_stratum-PlaYoung", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "Sed", "treatment_group": "PoW", "alpha": 0.1},
+         "subset": {"stratum": ["PlaYoung"]}, "filter_low_counts": {"min_count": 50.0001, "min_samples": 1},
+         "role": "secondary", "reasoning": "young plantaris, analyzed separately"}
+      ],
+      "enrichment": [
+        {"execution": "grp_PoW_vs_Sed_stratum-SolOld", "ora": true, "gsea": false, "direction": "up", "reasoning": "paper FIG7B ORA on up genes FDR<0.10"},
+        {"execution": "grp_PoW_vs_Sed_stratum-SolOld", "ora": true, "gsea": false, "direction": "down", "reasoning": "paper FIG7D ORA on down genes"},
+        {"execution": "grp_PoW_vs_Sed_stratum-PlaOld", "ora": true, "gsea": false, "direction": "up", "reasoning": "paper FIG7F"},
+        {"execution": "grp_PoW_vs_Sed_stratum-PlaOld", "ora": true, "gsea": false, "direction": "down", "reasoning": "paper FIG7H"}
+      ]
+    }
+  ]
+}

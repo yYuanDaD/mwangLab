@@ -158,3 +158,11 @@ One section per case; newest last.
 ## PMID26845575 / GSE69699 (2026-11-10)
 
 - policy: Policy: should the runner accept small-n (n=2) planned contrasts as exploratory, given the skill text says small n is not a stop but suitability.py hard-fails n<3?
+
+## PMID42268956 / GSE315575 (2026-11-10)
+
+- policy: Policy only (not an error): whether a genotype-only series whose paper frames exercise adaptive homeostasis should be run as a labelled non-exercise genotype analysis (paper's 1023 DEGs could then be reproduced) is a separate request.
+
+## PMID36695573 / GSE198827 (2026-11-10)
+
+- policy: Open policy question: whether the trained-only genotype contrast (LSD1-mKO vs WT under VWR, the paper's Fig 5 analysis) should be reported as an exercise-context result with an explicit 'no exercise factor' label, or refused as done here. Refusal is consistent with the stated rule; this is not an error.

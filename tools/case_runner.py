@@ -166,6 +166,12 @@ class Inputs(BaseModel):
     series_dir: Optional[str] = Field(
         None, description="folder with the series' downloads (set from data_root); raw_tar looks here "
                           "when the metadata is a prepared copy elsewhere")
+    feature_column: Optional[str] = Field(
+        None, description="matrix column to use as the feature ID instead of the first column "
+                          "(e.g. 'Gene Symbol' when the first column is a chromosome or row number)")
+    feature_duplicates: Literal["error", "sum", "first"] = Field(
+        "error", description="what to do when feature_column has repeated IDs: stop, sum the rows "
+                             "(raw counts), or keep the first row")
 
     @model_validator(mode="after")
     def _one_matrix(self):
@@ -663,7 +669,30 @@ class CaseRun:
     def _matrix_input(self) -> Path:
         inputs = self.spec.inputs
         if inputs.matrix:
-            return Path(inputs.matrix)
+            path = Path(inputs.matrix)
+            if not inputs.feature_column:
+                return path
+            raw = pd.read_csv(path, sep=None, engine="python") if not str(path).lower().endswith(
+                (".xlsx", ".xls")) else native.read_table(path).reset_index()
+            if inputs.feature_column not in raw.columns:
+                raise native.NativeToolError(f"inputs.feature_column {inputs.feature_column!r} not in "
+                                             f"{list(raw.columns)[:12]}")
+            raw = raw[raw[inputs.feature_column].notna()]
+            ids = raw[inputs.feature_column].astype(str)
+            dup = int(ids.duplicated().sum())
+            if dup and inputs.feature_duplicates == "error":
+                raise native.NativeToolError(f"inputs.feature_column {inputs.feature_column!r} has {dup} repeated "
+                                             "IDs; set inputs.feature_duplicates to 'sum' or 'first'")
+            table = raw.set_index(ids).drop(columns=[inputs.feature_column])
+            table = numeric_matrix(table, label=str(path))
+            table = table.groupby(level=0).sum() if inputs.feature_duplicates == "sum" else \
+                table[~table.index.duplicated(keep="first")]
+            out = self.case.dir / "input" / "matrix_feature_ids.csv"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            table.to_csv(out)
+            self.result["feature_column"] = {"column": inputs.feature_column, "repeated_ids": dup,
+                                             "handling": inputs.feature_duplicates, "n_features": int(len(table))}
+            return out
         folder = Path(inputs.metadata).parent
         if inputs.series_dir and not list(folder.glob("*_RAW.tar")):
             folder = Path(inputs.series_dir)

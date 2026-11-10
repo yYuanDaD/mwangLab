@@ -66,7 +66,12 @@ def record(paper_id, minutes, tokens):
         if not p.exists():
             rows.append([paper_id, case.name, "missing", "", minutes, tokens, ""])
             continue
-        r = json.loads(p.read_text(encoding="utf-8"))
+        raw = p.read_bytes()
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:  # a reviewer on Windows may write the local code page
+            text = raw.decode("gbk", errors="replace")
+        r = json.loads(text)
         bad = [c for c in r.get("checks", []) if c.get("verdict") in ("disagree", "unsure")
                and c.get("severity") in ("blocking", "major")]
         tag = ";".join(f"{c['id']}:{c['verdict']}:{c['severity']}" for c in bad)
