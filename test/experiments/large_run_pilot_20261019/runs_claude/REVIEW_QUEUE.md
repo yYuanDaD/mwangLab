@@ -91,3 +91,7 @@ One section per case; newest last.
 ## PMID40000838 / GSE280656_synovium (2026-11-10)
 
 - policy: Joint versus pairwise fits when the paper is silent (open policy question); the joint fit follows the iDEP default.
+
+## PMID37928906 / GSE237736 (2026-11-10)
+
+- policy: Joint limma model on all 16 samples versus the paper's pair-wise fits: the paper says 'pair-wise' but not whether the model was joint (open policy question).

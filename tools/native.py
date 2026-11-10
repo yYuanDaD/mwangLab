@@ -599,6 +599,8 @@ _ID_PATTERNS = (
     ("uniprot", re.compile(r"^([OPQ]\d[A-Z\d]{3}\d|[A-NR-Z]\d([A-Z][A-Z\d]{2}\d){1,2})(-\d+)?([;|].*)?$")),
     ("entrez", re.compile(r"^\d+$")),
     ("gene_symbol", re.compile(r"^[A-Za-z][A-Za-z0-9.\-]{0,19}$")),
+    # RIKEN clone symbols (0610005C13Rik, 1700001C19Rik) start with a digit but are gene symbols
+    ("gene_symbol", re.compile(r"^\d{7}[A-Z]\d{2}Rik$|^\d[A-Za-z0-9]{6,15}Rik\d?$")),
 )
 
 
@@ -617,7 +619,8 @@ def feature_id_report(path: str | Path, *, sample: int = 2000) -> dict:
         index = read_table(path).index.astype(str)
     else:
         index = pd.read_csv(path, index_col=0, usecols=[0], sep=None, engine="python").index.astype(str)
-    ids = list(index[:sample])
+    # an evenly spaced sample: a sorted table starts with RIKEN clones (0610005C13Rik) and numbers
+    ids = list(index[::max(1, len(index) // sample)][:sample])
     counts: dict[str, int] = {}
     for value in ids:
         kind = next((name for name, pattern in _ID_PATTERNS if pattern.match(value)), "other")

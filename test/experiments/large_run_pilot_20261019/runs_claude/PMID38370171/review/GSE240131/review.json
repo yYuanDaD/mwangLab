@@ -1,0 +1,21 @@
+{"case": "GSE240131", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Whole-heart RNA-seq, 2x2 design: saline (C), exercise (E), B16F10 tumor (T), tumor+exercise (TE); 4 wk low-intensity treadmill (S2.2.p1, FIG1A). All 12 libraries carry the factors.",
+  "B2": "Paper compares T vs C (tumor effect) and TE vs T (exercise in tumor-bearing mice), plus overlaps (S3.3.p1, FIG4A/E); E vs C appears only in FIG3 clusters. n=3 libraries per group, each library pools hearts of two mice (FIG3 legend).",
+  "B3": "No repeated measures: one tissue, pooled independent libraries (FIG3 legend); packet A lists no pairing key. The metadata 'treatment' column is the group label itself.",
+  "B4": "Paper does not say; it states edgeR with FC>=1.5 and p<0.05 and shows pairwise DEG sets (S2.4.p1, S3.3.p1).",
+  "B5": "S2.4.p1: 'fold change (FC) of >=1.5 and a p-value <0.05' (raw p, edgeR). Counts: tumor 'upregulated 741 genes', 318 repressed by exercise; 2020 genes increased after tumor, 1447 repressed by exercise (S3.3.p1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run on all 12 heart libraries; exercise arms present (E, TE).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp C/E/T/TE = 3 each, matches paper n and characteristics treatment; no exclusions. Primary TE vs T uses the tumor control, as in the paper. T1/T2 tumor-tissue contamination is recorded as a caveat.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts defined as treatment vs control: TE vs T, E vs C, T vs C; control/treatment explicit in design.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Flag unused_subject_like_column is a false positive: characteristics_ch1.4.treatment has 4 values equal to the group (max_repeat 3 = group size). Libraries pool two mice (FIG3 legend); no candidate pairing keys.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent; pairwise two-group edgeR fits, matching paper's pairwise DEG sets; deviation recorded in method.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "One sex, one tissue, no batch recorded; tumor content in T1/T2 recorded as caveat (not modellable at n=3).", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "featureCounts counts, ~7% fractional, rounded then edgeR TMM QL; p-value histogram sane (frac_p_gt_0.9 0.044, frac_p_lt_0.05 0.16).", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied p<0.05 and |log2FC|>=0.5849625, source S2.4.p1; matches verbatim rule. FDR audit recorded separately (3/2/0 DEGs).", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "T vs C ours 2629 vs paper 2020+741=2761; ours 2028 up/601 down vs 2020/741, direction of the 741 reading discrepancy recorded. Overlaps 236 vs 318 and 1389 vs 1447 stated honestly in HANDBACK, no overclaim.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; stop_claims empty.", "fix": ""}],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该案例的分组、对比方向、阈值（FC>=1.5 且原始 p<0.05）与矩阵处理均与论文一致，n=3 的合并文库无重复测量，机械标记 unused_subject_like_column 为误报（该列即分组标签）。T1/T2 含肿瘤组织的警告与 FDR 审计结果已如实记录。仅有论文计数与本分析略有差异的次要说明，整体通过。"}

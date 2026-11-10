@@ -559,3 +559,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37928906 (GSE237736)
 
 - StringTie gene_abundance _RAW.tar not mergeable (count_column_ambiguous, tools/omics_semantics.py:49; patched after this row); a prep script was needed Details: `PMID37928906/HANDBACK.md`.
+
+## PMID38012706 (GSE242861)
+
+- inspect cannot read the long-format headerless 3col.tsv.gz and calls it possible metadata (tools/analysis_policy.py:46); pivoted it with a prep script Details: `PMID38012706/HANDBACK.md`.
+
+## f719c1147eb0f406823e085b4396d05fdfa410d2 (GSE293221)
+
+- native.py:620/601 ID check read the first 2000 rows and rejected 0610005C13Rik-type symbols -> enrichment skipped (patched after this row); no Cook-off option (joint_contrasts.py:115); no old DESeq Details: `f719c1147eb0f406823e085b4396d05fdfa410d2/HANDBACK.md`.

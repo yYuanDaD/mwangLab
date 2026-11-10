@@ -1,0 +1,180 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/f719c1147eb0f406823e085b4396d05fdfa410d2",
+  "request": "Analyze GSE293221 for the paper (Exercise and Phellodendron amurense extract differentially impinge on oxidative stress response pathways in a mouse model of prostate cancer): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE293221",
+      "accession": "GSE293221",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261019/papers/PMC13076624.paper.md"],
+        "metadata": "GSE293221/GSE293221_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE293221"],
+            "assay": "bulk RNA-seq (KAPA stranded RiboErase, HiSeq 3000 50bp SE), prostate tumor tissue of male TRAMP mice (S4.6.p1)",
+            "sample_inclusion": "18 male TRAMP mice randomized 1:1:1 to control, exercise (voluntary wheel running, singly housed), Phellodendron amurense extract diet (S4.2.p1); 12-week intervention; tumors from 3 representative animals per group sequenced (S2.2.p1, S4.6.p1)",
+            "factors": {"grp": ["control", "exercise", "Phellodendron amurense extract (Nexrutine)"]},
+            "primary_estimand": "Effect of 12 weeks of voluntary wheel running vs no intervention on prostate tumor gene expression in TRAMP mice (S2.2.p1)",
+            "planned_contrasts": [
+              "exercise vs control (S2.2.p1; paper: 32 DEGs)",
+              "Phellodendron amurense extract vs control (S2.2.p2; paper: 176 DEGs, 100 down / 76 up)"
+            ],
+            "repeated_measure_unit": "none; one tumor per animal, independent animals",
+            "normalization": "DESeq size-factor normalization of HTSeq counts (S4.7.p1)",
+            "paper_method": "R package DESeq (original), group-pairwise comparisons on HTSeq counts; TopHat to UCSC genome (S4.7.p1)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "inclusive": false,
+              "extra_filter": "at least one group average RPKM > 1",
+              "source_locator": "S4.7.p1"
+            },
+            "paper_results": {
+              "exercise_vs_control": "32 DEGs; down: Lipe, Plin1, Slc7a10, Gpr83; up: Dgat2l6 (S2.2.p1, S3.p1)",
+              "pham_vs_control": "176 DEGs (100 down, 76 up); down Spink3, Spink5, Slc26a4, Slc45a3, Slc5a8, Apof, Pls1, Mmp7, Dclk3, Gstt3, Atp2c2; up Dcx, Sncb (S2.2.p2, S3.p2)",
+              "overlap": "BB123696 and Lman1l up in both (S2.2.p3)"
+            }
+          },
+          "reasoning": "S2.2.p1 and S4.6.p1: 3 tumors per group sequenced; S4.7.p1 gives method (DESeq, group-pairwise) and the three-part DEG rule (RPKM>1 in one group, FDR<0.05, FC>1.5 either way). Exercise vs control is the request's estimand; PhAm vs control is the paper's second planned contrast.",
+          "confidence": "high",
+          "locator": "S4.7.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 names GSE293221",
+              "GEO metadata: TRAMP C57BL/6 prostate tumor tissue, treatment column matches control/running wheel/Phellodendron extract arms of S4.2.p1",
+              "9 samples = 3 per group as in S4.6.p1; HTSeq-count + TopHat mm9 in data_processing matches S4.7.p1"
+            ]
+          },
+          "reasoning": "Accession, organism, tissue, arms, n and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["title", "^(Control|Exercise|Nexrutine), rep\\d+$"]},
+          "recode": {"grp": {"Control": "CON", "Exercise": "EX", "Nexrutine": "PHAM"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "raw_tar merge gives GSM-id columns that equal the metadata index; group from title (Control/Exercise/Nexrutine, rep1-3), consistent with characteristics treatment column.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {
+            "source": "per-sample HTSeq-count files in GSE293221_RAW.tar (GSM*_Genes_ReadCount.txt.gz), merged by gene symbol",
+            "paper_input": "HTSeq read counts into DESeq (S4.7.p1)"
+          },
+          "reasoning": "Integer fraction 1.0, median 61, max ~1e6, library sums 7.5-14M; data_processing states HTSeq-count read counts. Matches the paper's stated input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CON"},
+          "organism": "Mouse",
+          "planned": ["grp_EX_vs_CON", "grp_PHAM_vs_CON"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group, one model, pairwise contrasts against control",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_EX_vs_CON", "control": "CON", "treatment": "EX", "role": "primary"},
+              {"name": "grp_PHAM_vs_CON", "control": "CON", "treatment": "PHAM", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "two separate two-arm fits (EX+CON only)", "reason_rejected": "paper's DESeq was run on all groups with group-pairwise tests; one model on all 9 samples shares dispersion as the original DESeq did"},
+            {"value": "pool EX and PHAM as 'intervention'", "reason_rejected": "different interventions; paper contrasts each with control"}
+          ],
+          "reasoning": "Three independent arms with one control (S4.2.p1); paper reports each intervention vs control (S2.2.p1, S2.2.p2). One model with planned contrasts; any other listed comparison is exploratory.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one tumor each; no batch, lane or pairing recorded in GEO or paper. Housing (single for EX, group for CON/PHAM, S4.2.p1/S4.3.p1) is part of the intervention and fully aliased with arm, so it cannot and should not be modelled.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), one model ~ grp, contrasts vs CON",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq (original Bioconductor DESeq, negative-binomial exact test, group-pairwise)", "status": "blocked", "reason": "no original-DESeq executor in this repository; DESeq2 is the validated successor on the same count input"},
+            "deviations": [
+              "DESeq2 Wald test instead of original DESeq exact test",
+              "paper's 'average RPKM > 1 in at least one group' filter not applied: no gene lengths in the deposit (gene-symbol HTSeq counts, mm9); DESeq2 independent filtering used instead; a CPM>=1 in >=3 samples low-count filter is run as a sensitivity analysis"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw integer counts support the negative-binomial route; reproduce the paper's NB count model with DESeq2 as a declared deviation.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper rule FDR<0.05 and FC>1.5 either way (|log2FC|>log2(1.5)=0.5849625) applied on DESeq2; the RPKM>1 expression prefilter cannot be applied (no gene lengths)."
+          },
+          "reasoning": "S4.7.p1: FDR adjusted p < 0.05 and fold change > 1.5 (either way); ABS.p1 says >= 1.5-fold, S4.7.p1 (methods) says > 1.5, methods wording used.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "n = 3 tumors per arm, chosen as 'representative' by the authors (S2.2.p1); small study",
+              "exercise arm singly housed while control group housed: housing is aliased with exercise",
+              "original DESeq and RPKM>1 prefilter not reproduced; DEG counts are expected to differ"
+            ]
+          },
+          "paper_counts": {"joint/grp_EX_vs_CON": 32, "joint/grp_PHAM_vs_CON": 176},
+          "paper_genes": {
+            "joint/grp_EX_vs_CON": ["Lipe", "Plin1", "Slc7a10", "Gpr83", "Dgat2l6", "BB123696", "Lman1l"],
+            "joint/grp_PHAM_vs_CON": ["Spink3", "Spink5", "Slc26a4", "Slc45a3", "Slc5a8", "Apof", "Pls1", "Mmp7", "Dclk3", "Gstt3", "Atp2c2", "Dcx", "Sncb", "BB123696", "Lman1l"]
+          },
+          "reasoning": "Counts from S2.2.p1 / S2.2.p2; genes from S2.2.p1-p3, S3.p1, S3.p2. Expected directions: EX down Lipe, Plin1, Slc7a10, Gpr83; EX up Dgat2l6, BB123696, Lman1l; PHAM down Spink3..Atp2c2, up Dcx, Sncb, BB123696, Lman1l.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample count", "paper": "6 per arm randomized, 1 exercise mouse died (S2.1.p1); 3 per arm sequenced (S4.6.p1)", "data": "9 samples, 3 per arm", "disposition": "executable_without_change"},
+        {"item": "library prep", "paper": "KAPA stranded RNA-seq with RiboErase (S4.6.p1)", "data": "GEO extract protocol: Illumina stranded mRNA, molecule polyA RNA", "disposition": "executable_without_change"},
+        {"item": "DE method", "paper": "original DESeq (S4.7.p1)", "data": "raw HTSeq counts; only DESeq2 available", "disposition": "declared_deviation"},
+        {"item": "RPKM>1 prefilter", "paper": "average RPKM > 1 in at least one group (S4.7.p1)", "data": "gene-symbol counts without gene lengths", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "all", "covariates": []},
+          "role": "primary",
+          "reasoning": "One DESeq2 model ~ grp on all 9 samples; planned EX vs CON (primary) and PHAM vs CON (secondary); any other listed comparison exploratory."
+        },
+        {
+          "name": "joint_cpmfilter",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "planned", "covariates": []},
+          "filter_low_counts": {"min_cpm": 1, "min_samples": 3},
+          "role": "sensitivity",
+          "reasoning": "Stand-in for the paper's RPKM>1 expression prefilter: keep genes with CPM>=1 in >=3 samples (one group's worth)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_EX_vs_CON", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO BP/MF and gene set enrichment for exercise DEGs (S2.2.p1, Fig. 3C,D)"}
+      ]
+    }
+  ]
+}

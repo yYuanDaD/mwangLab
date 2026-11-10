@@ -1,0 +1,368 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38012706",
+  "subject_id": "GSE242861",
+  "created_at": "2026-11-10T07:23:03",
+  "finished_at": "2026-11-10T07:23:14",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10683325.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261019\\papers\\PMC10683325.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T07:23:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0e522f1632ee7695ef48cae880115aff9c239b5e56df049ae6cb0281b97f7428",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE242861_metadata.csv",
+      "uri": "data\\GSE242861\\GSE242861_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:23:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "66cc30dbe10d83e3d28f885e3ef07b1efa056bb1f4d1bd1229dd46139ec951f2",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_pivot_3col.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\prep_pivot_3col.py",
+      "locator": null,
+      "captured_at": "2026-11-10T07:23:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ed74f1be916006542c0c5289de8903d099ee1945505f5ac1c5d1ae379b63963d",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE242861_transcript_counts_wide.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861_transcript_counts_wide.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T07:23:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9e2d4b7cb2a6f4855797741c29b83364bb7456f51a18b279fbb511140d0b24a4",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE242861"
+        ],
+        "study_parts": {
+          "in_vivo_exercise_miRNA": "Gene SMART cohort, vastus lateralis biopsies at baseline and 3 h after one HIIE bout (S5.5.p1, S5.7.p1), 44 participants (24 M / 20 F), TaqMan human miRNA A+B arrays (S5.8.p1), 308 detected miRNAs; limma means model ~0 + Sex.Timepoint + BMI + Wpeak, duplicateCorrelation on participant ID (S5.9.3.p1). No GEO accession is named for these arrays (DA.p1 cites GSE242861 and Zenodo 10.5281/zenodo.8412095 only).",
+          "in_vitro_miR30_overexpression": "Primary myotubes from 3 male + 3 female donors, transfected 24 h with miR-30a mimic, miR-30c mimic or scramble (S5.9.1.p1); total RNA-seq, kallisto transcript counts, DESeq2 ~ Sex * Condition, prefilter <10 RPM in <2 samples (S5.9.2.p1). This is the part deposited as GSE242861."
+        },
+        "primary_estimand": "Paper-wide: sex differences in skeletal-muscle miRNA expression at baseline and in the miRNA response to acute HIIE (pre vs 3 h post, by sex, sex x time interaction). Exercise is an in-vivo factor of the miRNA array data only.",
+        "planned_contrasts": [
+          "miRNA arrays: male vs female at baseline (S2.1.p1; 148 miRNAs)",
+          "miRNA arrays: post vs pre exercise in females (S2.2.p1; 4 up, 0 down)",
+          "miRNA arrays: post vs pre exercise in males (S2.2.p1; 148 up, 2 down)",
+          "miRNA arrays: sex x exercise interaction (S2.2.p1; 111 miRNAs)",
+          "RNA-seq (GSE242861): male vs female donor cells, scramble (S2.7.p1; 26 genes)",
+          "RNA-seq (GSE242861): miR-30a vs scramble in males (18 up/23 down) and females (16 up/23 down) (S2.7.p2)",
+          "RNA-seq (GSE242861): miR-30c vs scramble in males (13 up/12 down) and females (10 up/11 down) (S2.8.p1)"
+        ],
+        "factors": {
+          "sex": [
+            "male",
+            "female"
+          ],
+          "treatment": [
+            "scramble",
+            "miR-30a",
+            "miR-30c"
+          ],
+          "donor": "6 donor cell lines, each with all three treatments"
+        },
+        "inclusion": "18 RNA-seq libraries = 6 donors x 3 treatments; no exercise or time factor in the RNA-seq",
+        "repeated_measure_unit": "donor cell line (RNA-seq); participant (arrays)",
+        "paper_method": "RNA-seq: DESeq2 ~ Sex * Condition on kallisto counts; arrays: limma mixed model with duplicateCorrelation",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S5.9.3.p3; FIG4; FIG5"
+        }
+      },
+      "reason": "The exercise estimand of the paper lives entirely in the TaqMan miRNA array data from in-vivo biopsies (S5.8.p1, S5.9.3.p1). The only GEO series cited (DA.p1) is GSE242861, whose 18 samples are primary myotube cultures transfected with miR-30a/miR-30c mimics or scramble (S5.9.1.p1, S5.9.2.p1); there is no exercise, time or biopsy factor in it. FDR < 0.05 with no fold-change rule (S5.9.3.p3, FIG4, FIG5).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:23:03"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861_transcript_counts_wide.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE242861",
+          "GEO series: 18 samples, Homo sapiens skeletal muscle primary cells, treatment 24h 20nM scramble / miR-30a / miR-30c, 9 MALE / 9 FEMALE, matching S5.9.1.p1 (3 male + 3 female donors x 3 treatments)",
+          "data_processing (kallisto v0.46.1, GRCh38) matches S5.9.2.p1",
+          "the in-vivo miRNA array data (pre/post HIIE) are not part of this series"
+        ],
+        "accession": "GSE242861",
+        "metadata_file": "data\\GSE242861\\GSE242861_metadata.csv"
+      },
+      "reason": "GSE242861 belongs to this paper but only to its in-vitro miR-30 overexpression experiment. The single deposited file, GSE242861_3col.tsv.gz (long format sample/transcript/count), was pivoted to wide form with prep_pivot_3col.py; values unchanged. The wide GeneCounts_RAW DATA.csv mentioned in data_processing is not in the downloaded supplementary files.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:23:03"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:sample_key",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "sex": {
+              "alias_of": "characteristics_ch1.2.Sex",
+              "recode": {
+                "MALE": "M",
+                "FEMALE": "F"
+              }
+            },
+            "donor": {
+              "source": "title",
+              "regex": "^Muscle, (SG191|SG193|FI6|FI7|SAAL|TRCO)"
+            },
+            "tx": {
+              "source": "title",
+              "regex": "(SCRAM|30a|30c)$",
+              "recode": {
+                "SCRAM": "scr",
+                "30a": "m30a",
+                "30c": "m30c"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\design_metadata.csv",
+          "sha256": "014a4ec7f7ded68aab88b95802bd77c6dc3f1945d5e6ba0feff8deea79639d07",
+          "levels": {
+            "sex": {
+              "M": 9,
+              "F": 9
+            },
+            "donor": {
+              "SG191": 3,
+              "SG193": 3,
+              "FI6": 3,
+              "FI7": 3,
+              "SAAL": 3,
+              "TRCO": 3
+            },
+            "tx": {
+              "scr": 6,
+              "m30a": 6,
+              "m30c": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (e.g. FI630a, SG191SCRAM) equal the metadata title after the 'Muscle, ' prefix; exact match on the derived key. Donor and treatment parsed from the same title; sex from characteristics.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:23:06"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE242861_3col.tsv.gz pivoted to transcript x sample (207,877 Ensembl transcripts x 18)",
+        "paper_input": "kallisto transcript counts analysed with DESeq2 (S5.9.2.p1)",
+        "matrix_type": "estimated counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\aligned_matrix.csv",
+          "sha256": "3aa390293eeaab3e8e83182b3f0947296048a48af67184cf30ba3d6d02359d2e",
+          "n_features": 207877,
+          "n_samples": 18,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1780280.0,
+          "median": 0.0,
+          "integer_fraction": 0.6358,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "data_processing: kallisto v0.46.1 'aligned raw gene counts'; values are non-negative with ~36% non-integer entries, ENST transcript IDs: kallisto estimated counts at transcript level. Compatible with the paper's DESeq2 route after rounding / gene summarisation, but no exercise factor exists to analyse.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T07:23:08"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "design_column": null,
+        "contrasts": [],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "Exercise is not a factor of any sample in GSE242861. Per the paper the miR-30 family was chosen because it showed a sex-specific exercise response in the arrays (S2.6.p1), but the RNA-seq tests overexpression, not exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "GSE242861 contains only in-vitro primary myotubes transfected with miR-30a/miR-30c mimics or scramble (6 donors x 3 treatments). There is no exercise, sedentary/trained, or pre/post-exercise factor, so the requested exercise estimand cannot be identified. The paper's exercise analysis uses in-vivo TaqMan miRNA arrays (S5.8.p1, S5.9.3.p1) that are not deposited in this series."
+      },
+      "recorded_at": "2026-11-10T07:23:14"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1bf8087de717d56c2c0c59134ebb2b8c4d0e0e35a6b1639cdac9ce4d0add4b5d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "33e27c242cf145480f9b2e80493ec0a3b7e185e4d7cdb49fb6e14887484da14a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3aa390293eeaab3e8e83182b3f0947296048a48af67184cf30ba3d6d02359d2e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "014a4ec7f7ded68aab88b95802bd77c6dc3f1945d5e6ba0feff8deea79639d07",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d38683f22b7cfca5c2df670de644471df57058b3eda9d1742987359c06587e55",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38012706\\GSE242861\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ec74f6dca7e41dc08d8c6203dcdf5f75ed6c9e87956ef9f3b9c998145d028762",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
