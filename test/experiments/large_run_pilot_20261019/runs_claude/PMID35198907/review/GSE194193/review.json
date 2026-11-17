@@ -1,0 +1,86 @@
+{
+ "case": "GSE194193",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes: VWR (voluntary wheel running, 4 wk) is the exercise factor; 30 of 62 quadriceps samples (Training) vs 32 sedentary (S4.3.2.p1, GEO training_state).",
+  "B2": "VWR main effect vs sedentary (n 30 vs 32, pooled over NR/PT), NR main (31 v 31), PT main (32 v 30); 8 cells of 7-8 mice (S2.6, S4.3.2.p1, S4.5.p1).",
+  "B3": "No repeated measures: one quadriceps per single-housed mouse. Candidate title-based key is only replicate numbering within cell; no animal ID needed.",
+  "B4": "Joint model: edgeR QL '~ group + RIN', group = 4 (or 8) combinations, effects from comparing group levels (S4.4.10.p3); does not say whether the VWR count came from 4 or 8 levels.",
+  "B5": "'Based on q-values with a cutoff of 0.05' (S2.6.p1); FDR-corrected q, no fold-change cutoff; VWR 2,245 protein-coding genes, NR 4 (Nmrk2, Art3, Myh8, Mymk), PT 0, no interactions (S2.6.p1-p3)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper S4.3.2.p1: VWR is one arm of the 2^3 factorial; metadata train SED 32 / VWR 30. Run is right; chronic training, not acute bout, is stated in HANDBACK.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "62 = 64 mice minus 2 removed (S4.3.2/S4.4.1); cells 7-8 vs paper 8 per group (S4.3.2.p1); alignment exact on title 62/62; train recode noTraining->SED, Training->VWR matches GEO field.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "VWR vs SED, NR vs Sal, PT vs noPT, treatment first; Art3/Mymk down with VWR agree with S2.6.p1-p2.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Packet candidate key (title minus NR level) is only the within-cell replicate index; mice single-housed, one quadriceps per mouse (S4.3.2.p1, S4.4.4.p1); expression check not_supported (diff 0.045, perm p 0.09). Not a repeated-measures unit.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S4.4.10.p3: edgeR QL ~ group + RIN, contrasts between group levels; primary 8-group, 4-group run as sensitivity; matches, paper's '4 (or 8)' ambiguity recorded.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "cohort crossed with all cells (4/4 per cell), recorded in covariance gate; all mice single-housed; male only.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "integer featureCounts counts (integer_fraction 1.0), edgeR TMM; p-value histogram healthy (frac_p_gt_0.9 0.059 on VWR, flat on NR/PT).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR q<0.05, no FC cutoff (S2.6.p1, S2.6.p3); applied padj<0.05. No other rule in packet B table fits 2245 better (padj<0.1 gives 2888); protein-coding-only caveat recorded.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "VWR 1911 protein-coding (8-group) vs 2245, NR 3 vs 4, PT 0 vs 0; HANDBACK states ~85% and does not overclaim; same contrasts and rule.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该案例的运行决定与论文一致：VWR主效应对比、edgeR QL ~ group + RIN、FDR<0.05且无倍数变化阈值。标记的配对键只是组内重复编号，论文为单笼饲养、每只小鼠一个样本，表达检查也不支持，因此不构成重复测量。蛋白编码基因数1911对2245已如实记录，没有过度声称。"
+}

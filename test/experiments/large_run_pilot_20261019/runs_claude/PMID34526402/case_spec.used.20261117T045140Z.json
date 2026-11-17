@@ -1,0 +1,293 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34526402",
+  "request": "Analyze GSE166322 for PMID 34526402 (Early-life midazolam exposure persistently changes chromatin accessibility to impair adult hippocampal neurogenesis and cognition.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE166322",
+      "accession": "GSE166322",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC8463898.paper.md"
+        ],
+        "metadata": "GSE166322/GSE166322_metadata.csv",
+        "matrix": "GSE166322/GSE166322_merged_from_tar.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE166322"
+            ],
+            "assay": "bulk RNA-seq (50-bp SE, HiSeq 2500) of FACS-sorted Nestin-EGFP+ dentate gyrus NSCs and progeny; ATAC-seq and Egr1 ChIP-seq in the same series are not expression data",
+            "primary_estimand": "Effect of voluntary wheel running (from weaning, P28, to 8w) on the NSC transcriptome of mice exposed to midazolam (MDZ) early in life: MDZ+RW vs MDZ at 8w (Fig. 7A-B, S7.p1)",
+            "factors": {
+              "group_8w": [
+                "Ctrl (dH2O)",
+                "MDZ",
+                "MDZ+RW"
+              ],
+              "note": "Ctrl+RW exists only for histology/behaviour (Fig. 7D-O); no Ctrl+RW RNA-seq deposited"
+            },
+            "sample_inclusion": "8w RNA-seq: Control_8w (n=3), MDZ_8w (n=3), RUN_MDZ_8w (n=3); each library pools 30,000 cells from 3-5 mice (S9.10.p1). P10 RNA-seq and in vitro Egr1/Ctrl NSC RNA-seq address other questions",
+            "planned_contrasts": [
+              "MDZ+RW vs MDZ at 8w (Fig. 7B; paper reports only overlaps: 42 MDZ-up genes reversed down, 76 MDZ-down genes reversed up; no total DEG count)",
+              "MDZ vs Ctrl at 8w (Fig. 3E, S3.p1; 604 up, 873 down; needed for the Fig. 7B overlap)"
+            ],
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "source_locator": "FIG7 legend (B): fold change > 1.5, q < 0.05; S3.p1: q < 0.05, fold change >= 1.5"
+            },
+            "paper_method": "featureCounts raw counts -> DESeq2 (S9.11.p1); TPM for display",
+            "paper_results": {
+              "MDZ_vs_Ctrl_8w": {
+                "up": 604,
+                "down": 873
+              },
+              "RW_reversal_overlap": {
+                "MDZ_up_and_RW_down": 42,
+                "MDZ_down_and_RW_up": 76
+              },
+              "named_genes": [
+                "Notch2 (MDZ up, reversed by running)"
+              ]
+            }
+          },
+          "reasoning": "Abstract and S7.p1/Fig. 7 state the exercise question: voluntary running normalizes the MDZ-perturbed transcriptome. Fig. 7B defines the comparison MDZ+RW vs MDZ with fold change > 1.5 and q < 0.05, overlapped with MDZ vs Ctrl at 8w (Fig. 3E). Methods S9.11.p1: DESeq2 on featureCounts counts. S9.15.p1: four groups randomized at weaning, but RNA-seq only for Ctrl, MDZ, MDZ+RW.",
+          "confidence": "high",
+          "locator": "S7.p1, FIG7, S3.p1, S9.11.p1, S9.15.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S13.p1 names GSE166322 for the RNA-seq, ATAC-seq and ChIP-seq of this study",
+              "sample titles Control_8w/MDZ_8w/RUN_MDZ_8w RNAseq rep1-3 match the paper's n = 3 per group at 8w",
+              "contact at NAIST, matching the authors' institute"
+            ]
+          },
+          "reasoning": "GSE166322 is the paper's own deposit; the 21 per-sample RNA-seq TPM files in GSE166322_RAW.tar are the expression data. Merged matrix built by inspect from the tar.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "matrix_column_pattern": "^(GSM\\d+)_.+$",
+          "patterns": {
+            "grp": [
+              "title",
+              "^(Control|MDZ|RUN_MDZ)_8w_RNAseq_rep\\d$"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "Control": "Ctrl",
+              "MDZ": "MDZ",
+              "RUN_MDZ": "RunMDZ"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {
+            "GSM5068520": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+            "GSM5068521": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+            "GSM5068522": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+            "GSM5068523": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+            "GSM5068524": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+            "GSM5068525": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+            "GSM5068545": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+            "GSM5068546": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+            "GSM5068547": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+            "GSM5068548": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)",
+            "GSM5068549": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)",
+            "GSM5068550": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)"
+          },
+          "reasoning": "Matrix columns are GSM<id>_<title>; the GSM prefix equals the metadata index (inspect: 21/21 match). Group is parsed from the title. P10 and in vitro samples are excluded because the exercise question concerns only the 8w libraries (Fig. 7A).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma on log2(TPM+1)",
+          "reasoning": "GEO data_processing: TXT files indicating TPM values of each sample. Values are non-integer (integer fraction 0.36, driven by zeros), median 1.74, max 55,925; per-sample files have one value column (e.g. Mrpl15 27.7). The paper ran DESeq2 on featureCounts raw counts, which were not deposited.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "estimated counts",
+              "reason_rejected": "data_processing explicitly says TPM and values are fractional at low magnitude"
+            }
+          ]
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "MDZ"
+          },
+          "organism": "Mouse",
+          "planned": [
+            "grp_RunMDZ_vs_MDZ",
+            "grp_Ctrl_vs_MDZ"
+          ],
+          "final": {
+            "analysis_type": "multilevel",
+            "design_column": "grp",
+            "contrasts": [
+              {
+                "name": "grp_RunMDZ_vs_MDZ",
+                "control": "MDZ",
+                "treatment": "RunMDZ",
+                "role": "primary"
+              },
+              {
+                "name": "grp_Ctrl_vs_MDZ",
+                "control": "MDZ",
+                "treatment": "Ctrl",
+                "role": "secondary",
+                "note": "sign reversed relative to the paper's MDZ vs Ctrl; up here = down in MDZ"
+              },
+              {
+                "name": "grp_RunMDZ_vs_Ctrl",
+                "control": "Ctrl",
+                "treatment": "RunMDZ",
+                "role": "exploratory"
+              }
+            ]
+          },
+          "reasoning": "One control-level factor with three levels at 8w; one model with planned contrasts (no pooling). Primary exercise estimand is MDZ+RW vs MDZ (Fig. 7B). MDZ vs Ctrl (Fig. 3E) is the paper's comparison that Fig. 7B overlaps with. RunMDZ vs Ctrl is exploratory (does running bring MDZ mice back to control levels). No Ctrl+RW RNA-seq, so the running main effect in unexposed mice and the MDZ x running interaction cannot be estimated; the exercise effect is conditional on MDZ exposure.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "2x2 MDZ x running factorial",
+              "reason_rejected": "Ctrl+RW RNA-seq not performed/deposited"
+            }
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Each library is an independent pool of 3-5 mice; no pairing or subject repeated across groups. No batch, sex or lane column in metadata. RUN_MDZ libraries have later GSM numbers (deposited after the ChIP samples), which hints at a separate sequencing batch, but no batch variable is recorded, so it cannot be modelled; recorded as a caveat.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (empirical Bayes) on log2(TPM+1)",
+            "formula": "~ 0 + grp",
+            "paper_route": {
+              "method": "DESeq2 on featureCounts raw counts",
+              "status": "blocked",
+              "reason": "only per-sample TPM files were deposited in GEO; raw counts unavailable; TPM must not be rounded into counts"
+            },
+            "deviations": [
+              "limma on log2(TPM+1) instead of DESeq2 on counts",
+              "low-expression filter TPM >= 1 in >= 3 of the 9 samples (paper states no filter; stands in for DESeq2 independent filtering)"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: TPM -> log2(x+1) -> limma. Run as a declared deviation from the paper's DESeq2 route.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625
+            },
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_cutoff": null
+            },
+            "deviation_note": "Paper threshold (q < 0.05, FC > 1.5) applied to limma BH-adjusted p and log2FC on log2(TPM+1)"
+          },
+          "reasoning": "FIG7 legend (B): fold change > 1.5, q < 0.05 for both MDZ vs Ctrl and MDZ+RW vs MDZ. log2(1.5) = 0.5849625. Audit rule: padj < 0.05 without fold-change cutoff.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper's DESeq2-on-counts route blocked (TPM only); limma on log2(TPM+1) used",
+              "No Ctrl+RW RNA-seq: the exercise effect is estimable only in MDZ-exposed mice; no interaction",
+              "RUN_MDZ libraries were likely sequenced separately from Ctrl/MDZ 8w (later GSM ids); running may be confounded with an unrecorded batch",
+              "n = 3 pooled libraries per group",
+              "Paper reports no total DEG count for MDZ+RW vs MDZ, only overlaps with MDZ vs Ctrl (42 and 76)",
+              "Direction balance contradicts the paper for MDZ vs Ctrl 8w: ours 1671 up / 301 down in MDZ vs paper 604 up / 873 down",
+              "Fig. 7B reversal overlaps differ: ours 80 MDZ-up genes reversed down by running (paper 42) and 16 MDZ-down genes reversed up (paper 76); both overlaps significant (hypergeometric P 5e-64, 3e-5)",
+              "Notch2 moves in the paper's direction (up in MDZ, down with running) but is not significant here (padj 0.069 and 0.48)"
+            ]
+          },
+          "paper_counts": {
+            "grp_joint/grp_Ctrl_vs_MDZ": 1477
+          },
+          "paper_genes": {
+            "grp_joint/grp_RunMDZ_vs_MDZ": [
+              "Notch2",
+              "Egr1"
+            ],
+            "grp_joint/grp_Ctrl_vs_MDZ": [
+              "Notch2",
+              "Egr1"
+            ]
+          },
+          "reasoning": "Paper: 604 up + 873 down = 1477 for MDZ vs Ctrl at 8w (sign reversed here). Notch2 is the named running-reversed gene (S7.p1).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "input matrix",
+          "paper": "featureCounts raw counts analysed with DESeq2",
+          "data": "only per-sample TPM deposited",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "Ctrl+RW group",
+          "paper": "four groups incl. Ctrl+RW for histology/behaviour",
+          "data": "no Ctrl+RW RNA-seq",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "grp_joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": [
+              "grp_RunMDZ_vs_MDZ",
+              "grp_Ctrl_vs_MDZ",
+              "grp_RunMDZ_vs_Ctrl"
+            ],
+            "covariates": []
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 3
+          },
+          "role": "primary",
+          "reasoning": "One limma model on all 9 8w samples; primary contrast RunMDZ vs MDZ, MDZ-vs-Ctrl for the paper's overlap, RunMDZ vs Ctrl exploratory."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}

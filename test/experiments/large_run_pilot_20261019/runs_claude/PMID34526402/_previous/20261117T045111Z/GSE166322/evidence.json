@@ -1,0 +1,945 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34526402",
+  "subject_id": "GSE166322",
+  "created_at": "2026-11-10T17:34:02",
+  "finished_at": "2026-11-10T17:34:19",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8463898.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC8463898.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-10T17:34:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2ad1ea6b5fd01e61cc07499227149805bc3d80ed2e0209f669fd3ce49c49445a",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE166322_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE166322\\GSE166322_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T17:34:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5cf6d99cb713410e1fc4e3ae807e3782fa84a9d766c0c47e278e668a078a0cbc",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE166322_merged_from_tar.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE166322\\GSE166322_merged_from_tar.csv",
+      "locator": null,
+      "captured_at": "2026-11-10T17:34:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c2cb64280d1babc16d18e2b7fdc1acacd921089aa973764413a7a94718cd98d4",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE166322"
+        ],
+        "assay": "bulk RNA-seq (50-bp SE, HiSeq 2500) of FACS-sorted Nestin-EGFP+ dentate gyrus NSCs and progeny; ATAC-seq and Egr1 ChIP-seq in the same series are not expression data",
+        "primary_estimand": "Effect of voluntary wheel running (from weaning, P28, to 8w) on the NSC transcriptome of mice exposed to midazolam (MDZ) early in life: MDZ+RW vs MDZ at 8w (Fig. 7A-B, S7.p1)",
+        "factors": {
+          "group_8w": [
+            "Ctrl (dH2O)",
+            "MDZ",
+            "MDZ+RW"
+          ],
+          "note": "Ctrl+RW exists only for histology/behaviour (Fig. 7D-O); no Ctrl+RW RNA-seq deposited"
+        },
+        "sample_inclusion": "8w RNA-seq: Control_8w (n=3), MDZ_8w (n=3), RUN_MDZ_8w (n=3); each library pools 30,000 cells from 3-5 mice (S9.10.p1). P10 RNA-seq and in vitro Egr1/Ctrl NSC RNA-seq address other questions",
+        "planned_contrasts": [
+          "MDZ+RW vs MDZ at 8w (Fig. 7B; paper reports only overlaps: 42 MDZ-up genes reversed down, 76 MDZ-down genes reversed up; no total DEG count)",
+          "MDZ vs Ctrl at 8w (Fig. 3E, S3.p1; 604 up, 873 down; needed for the Fig. 7B overlap)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "source_locator": "FIG7 legend (B): fold change > 1.5, q < 0.05; S3.p1: q < 0.05, fold change >= 1.5"
+        },
+        "paper_method": "featureCounts raw counts -> DESeq2 (S9.11.p1); TPM for display",
+        "paper_results": {
+          "MDZ_vs_Ctrl_8w": {
+            "up": 604,
+            "down": 873
+          },
+          "RW_reversal_overlap": {
+            "MDZ_up_and_RW_down": 42,
+            "MDZ_down_and_RW_up": 76
+          },
+          "named_genes": [
+            "Notch2 (MDZ up, reversed by running)"
+          ]
+        }
+      },
+      "reason": "Abstract and S7.p1/Fig. 7 state the exercise question: voluntary running normalizes the MDZ-perturbed transcriptome. Fig. 7B defines the comparison MDZ+RW vs MDZ with fold change > 1.5 and q < 0.05, overlapped with MDZ vs Ctrl at 8w (Fig. 3E). Methods S9.11.p1: DESeq2 on featureCounts counts. S9.15.p1: four groups randomized at weaning, but RNA-seq only for Ctrl, MDZ, MDZ+RW.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:02"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE166322\\GSE166322_merged_from_tar.csv",
+        "owned": true,
+        "checks": [
+          "S13.p1 names GSE166322 for the RNA-seq, ATAC-seq and ChIP-seq of this study",
+          "sample titles Control_8w/MDZ_8w/RUN_MDZ_8w RNAseq rep1-3 match the paper's n = 3 per group at 8w",
+          "contact at NAIST, matching the authors' institute"
+        ],
+        "accession": "GSE166322",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE166322\\GSE166322_metadata.csv"
+      },
+      "reason": "GSE166322 is the paper's own deposit; the 21 per-sample RNA-seq TPM files in GSE166322_RAW.tar are the expression data. Merged matrix built by inspect from the tar.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:02"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 21,
+        "n_metadata": 31,
+        "coverage": 0.6774,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [
+          "GSM5068532",
+          "GSM5068533",
+          "GSM5068534",
+          "GSM5068535",
+          "GSM5068536",
+          "GSM5068537",
+          "GSM5068538",
+          "GSM5068539",
+          "GSM5068540",
+          "GSM5068541"
+        ],
+        "excluded_samples": {
+          "GSM5068520": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+          "GSM5068521": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+          "GSM5068522": "P10 RNA-seq (Control); not part of the 8w exercise experiment",
+          "GSM5068523": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+          "GSM5068524": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+          "GSM5068525": "P10 RNA-seq (MDZ); not part of the 8w exercise experiment",
+          "GSM5068545": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+          "GSM5068546": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+          "GSM5068547": "in vitro cultured NSC (lentiviral Ctrl) RNA-seq; separate experiment (Fig. 5)",
+          "GSM5068548": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)",
+          "GSM5068549": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)",
+          "GSM5068550": "in vitro Egr1-transduced NSC RNA-seq; separate experiment (Fig. 5)"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^(Control|MDZ|RUN_MDZ)_8w_RNAseq_rep\\d$",
+              "recode": {
+                "Control": "Ctrl",
+                "MDZ": "MDZ",
+                "RUN_MDZ": "RunMDZ"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\design_metadata.csv",
+          "sha256": "76db549e2be59357e0ef2041b29183a94c2ee3840a1f20263b439d2de7c6fd15",
+          "levels": {
+            "grp": {
+              "Ctrl": 3,
+              "MDZ": 3,
+              "RunMDZ": 3
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are GSM<id>_<title>; the GSM prefix equals the metadata index (inspect: 21/21 match). Group is parsed from the title. P10 and in vitro samples are excluded because the exercise question concerns only the 8w libraries (Fig. 7A).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:03"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "TPM",
+        "recommended_method": "limma on log2(TPM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\aligned_matrix.csv",
+          "sha256": "d20eb471b223ccd7583f386f455b26378b526f77c450b2ba4c2c98c40093f64a",
+          "n_features": 24657,
+          "n_samples": 9,
+          "annotation_columns_dropped": [
+            "GSM5068520",
+            "GSM5068521",
+            "GSM5068522",
+            "GSM5068523",
+            "GSM5068524",
+            "GSM5068525",
+            "GSM5068545",
+            "GSM5068546",
+            "GSM5068547",
+            "GSM5068548",
+            "GSM5068549",
+            "GSM5068550"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 7350.75,
+          "median": 3.72736,
+          "integer_fraction": 0.4206,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "GEO data_processing: TXT files indicating TPM values of each sample. Values are non-integer (integer fraction 0.36, driven by zeros), median 1.74, max 55,925; per-sample files have one value column (e.g. Mrpl15 27.7). The paper ran DESeq2 on featureCounts raw counts, which were not deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:04"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multilevel",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_RunMDZ_vs_MDZ",
+            "control": "MDZ",
+            "treatment": "RunMDZ",
+            "role": "primary"
+          },
+          {
+            "name": "grp_Ctrl_vs_MDZ",
+            "control": "MDZ",
+            "treatment": "Ctrl",
+            "role": "secondary",
+            "note": "sign reversed relative to the paper's MDZ vs Ctrl; up here = down in MDZ"
+          },
+          {
+            "name": "grp_RunMDZ_vs_Ctrl",
+            "control": "Ctrl",
+            "treatment": "RunMDZ",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "One control-level factor with three levels at 8w; one model with planned contrasts (no pooling). Primary exercise estimand is MDZ+RW vs MDZ (Fig. 7B). MDZ vs Ctrl (Fig. 3E) is the paper's comparison that Fig. 7B overlaps with. RunMDZ vs Ctrl is exploratory (does running bring MDZ mice back to control levels). No Ctrl+RW RNA-seq, so the running main effect in unexposed mice and the MDZ x running interaction cannot be estimated; the exercise effect is conditional on MDZ exposure.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:09"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 9,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "grp_MDZ",
+            "grp_RunMDZ"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 6,
+          "levels": {
+            "grp": {
+              "Ctrl": 3,
+              "MDZ": 3,
+              "RunMDZ": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "Ctrl"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "MDZ"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "RunMDZ"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.genotype",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "growth_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_laboratory",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Each library is an independent pool of 3-5 mice; no pairing or subject repeated across groups. No batch, sex or lane column in metadata. RUN_MDZ libraries have later GSM numbers (deposited after the ChIP samples), which hints at a separate sequencing batch, but no batch variable is recorded, so it cannot be modelled; recorded as a caveat.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:09"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "TPM",
+        "method": "limma (empirical Bayes) on log2(TPM+1)",
+        "formula": "~ 0 + grp",
+        "paper_route": {
+          "method": "DESeq2 on featureCounts raw counts",
+          "status": "blocked",
+          "reason": "only per-sample TPM files were deposited in GEO; raw counts unavailable; TPM must not be rounded into counts"
+        },
+        "deviations": [
+          "limma on log2(TPM+1) instead of DESeq2 on counts",
+          "low-expression filter TPM >= 1 in >= 3 of the 9 samples (paper states no filter; stands in for DESeq2 independent filtering)"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Matrix policy: TPM -> log2(x+1) -> limma. Run as a declared deviation from the paper's DESeq2 route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:10"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "Paper threshold (q < 0.05, FC > 1.5) applied to limma BH-adjusted p and log2FC on log2(TPM+1)"
+      },
+      "reason": "FIG7 legend (B): fold change > 1.5, q < 0.05 for both MDZ vs Ctrl and MDZ+RW vs MDZ. log2(1.5) = 0.5849625. Audit rule: padj < 0.05 without fold-change cutoff.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:10"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "grp_joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 9,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\input\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_RunMDZ_vs_MDZ.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_Ctrl_vs_MDZ.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_RunMDZ_vs_Ctrl.csv"
+        ],
+        "counts": {
+          "grp_joint/grp_RunMDZ_vs_MDZ": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 14759,
+              "n_significant": 328,
+              "n_up": 237,
+              "n_down": 91,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 14759,
+              "n_significant": 328,
+              "n_up": 237,
+              "n_down": 91,
+              "deg_sanity": "ok"
+            }
+          },
+          "grp_joint/grp_Ctrl_vs_MDZ": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 14759,
+              "n_significant": 1972,
+              "n_up": 301,
+              "n_down": 1671,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 14759,
+              "n_significant": 1972,
+              "n_up": 301,
+              "n_down": 1671,
+              "deg_sanity": "ok"
+            }
+          },
+          "grp_joint/grp_RunMDZ_vs_Ctrl": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 14759,
+              "n_significant": 2753,
+              "n_up": 2258,
+              "n_down": 495,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 14759,
+              "n_significant": 2753,
+              "n_up": 2258,
+              "n_down": 495,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One limma model on all 9 8w samples; primary contrast RunMDZ vs MDZ, MDZ-vs-Ctrl for the paper's overlap, RunMDZ vs Ctrl exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:19"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Paper's DESeq2-on-counts route blocked (TPM only); limma on log2(TPM+1) used",
+          "No Ctrl+RW RNA-seq: the exercise effect is estimable only in MDZ-exposed mice; no interaction",
+          "RUN_MDZ libraries were likely sequenced separately from Ctrl/MDZ 8w (later GSM ids); running may be confounded with an unrecorded batch",
+          "n = 3 pooled libraries per group",
+          "Paper reports no total DEG count for MDZ+RW vs MDZ, only overlaps with MDZ vs Ctrl (42 and 76)"
+        ],
+        "results": {
+          "grp_joint/grp_RunMDZ_vs_MDZ": {
+            "n_deg": 328,
+            "up": 237,
+            "down": 91,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 328
+          },
+          "grp_joint/grp_Ctrl_vs_MDZ": {
+            "n_deg": 1972,
+            "up": 301,
+            "down": 1671,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 1972
+          },
+          "grp_joint/grp_RunMDZ_vs_Ctrl": {
+            "n_deg": 2753,
+            "up": 2258,
+            "down": 495,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 2753
+          }
+        },
+        "paper_counts": {
+          "grp_joint/grp_Ctrl_vs_MDZ": 1477
+        },
+        "comparison": {
+          "grp_joint/grp_Ctrl_vs_MDZ": {
+            "ours": 1972,
+            "paper": 1477
+          }
+        },
+        "paper_gene_check": {
+          "grp_joint/grp_RunMDZ_vs_MDZ": {
+            "Notch2": {
+              "AveExpr": 5.758,
+              "log2FoldChange": -0.4294,
+              "padj": 0.479,
+              "pvalue": 0.0637
+            },
+            "Egr1": {
+              "AveExpr": 11.0778,
+              "log2FoldChange": -0.2,
+              "padj": 0.908,
+              "pvalue": 0.393
+            }
+          },
+          "grp_joint/grp_Ctrl_vs_MDZ": {
+            "Notch2": {
+              "AveExpr": 5.758,
+              "log2FoldChange": -0.6561,
+              "padj": 0.0691,
+              "pvalue": 0.0112
+            },
+            "Egr1": {
+              "AveExpr": 11.0778,
+              "log2FoldChange": 0.1595,
+              "padj": 0.673,
+              "pvalue": 0.492
+            }
+          }
+        }
+      },
+      "reason": "Paper: 604 up + 873 down = 1477 for MDZ vs Ctrl at 8w (sign reversed here). Notch2 is the named running-reversed gene (S7.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-10T17:34:19"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ce1cca77f54c5acc1c896fce8d422aebd7f878f89b295a9587756e4de00ad8fc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f6b9b8b0886479cfdc37d46ba80da5c362ffbe9e6ae352f56b85ebe3d32af68f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d20eb471b223ccd7583f386f455b26378b526f77c450b2ba4c2c98c40093f64a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "76db549e2be59357e0ef2041b29183a94c2ee3840a1f20263b439d2de7c6fd15",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "baf5c5a3b92a6939232034685dd0735433ec370386b9597b5ef441fb54528651",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ef433de8cbeee570ee45c793d4287fee3037b557ec1f6424258d1105f5978d63",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "af682d19b016ec7e21e3c748a9368297e6b78d7194ec275730d8caa0fd25ae5c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\input\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ec83175b37f3ee75f998a492a470c12dfdacd04d6c15354f2deb46c4e434debf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_RunMDZ_vs_MDZ.csv",
+      "role": "deg_grp_joint/grp_RunMDZ_vs_MDZ",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fdded2908c4024d707ea247117d83dfa47a883b4922264fd0c97489a7902ae8c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_Ctrl_vs_MDZ.csv",
+      "role": "deg_grp_joint/grp_Ctrl_vs_MDZ",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "765d8254ca4f01563219db34617ec17d841cf9b8bff48f4f2c6efa4a9290c3de",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\results\\grp_joint\\DEG_results_grp_RunMDZ_vs_Ctrl.csv",
+      "role": "deg_grp_joint/grp_RunMDZ_vs_Ctrl",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1f05f7ccfc532b14eec00234382a5aa24e61cc741035aedcb6e8324b78f13f2c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34526402\\GSE166322\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c71a9565a4880a717bb5af02b5266d1b3770dca67ab2ea23c71caa5967a0b333",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

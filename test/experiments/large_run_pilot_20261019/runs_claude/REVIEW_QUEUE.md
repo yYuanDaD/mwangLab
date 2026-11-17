@@ -184,3 +184,8 @@ One section per case; newest last.
 ## PMID35030322 / GSE190355 (2026-11-10)
 
 - policy: Open policy: whether to try SRA re-quantification (SRP349620, GSM-labelled FASTQ) to obtain counts and a verified sample mapping; this is optional follow-up work, not an error in the record.
+
+## PMID34526402 / GSE166322 (2026-11-17)
+
+- policy: Open policy: joint vs pairwise fit when the paper is silent.
+- policy: The up/down balance of MDZ vs Ctrl is inverted relative to the paper (1671 up / 301 down vs 604 up / 873 down); cause (TPM+limma vs counts+DESeq2, or mislabelled GEO titles) cannot be settled from the files.

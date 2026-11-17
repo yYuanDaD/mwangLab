@@ -85,3 +85,6 @@ Quota stop 2026-11-10 ~16:00 local at 84/211: rows 94, 95, 96 were cut off and r
 context after the reset.
 Quota stop 2026-11-10 ~17:35 local at 95/211 (rows 105, 106 cut off). The PC then went offline until
 2026-11-16 23:48; resumed then (owner: continue, auto-resume after each reset).
+Old orchestrator stopped after row 106 (row 105's analysis had finished; recorded 2026-11-17 by the new orchestrator
+with minutes/tokens NA). New orchestrator thread resumed 2026-11-17 11:20 local (owner: "继续"): review of 105 plus
+rows 108-111, then 5 at a time from 112 onward, auto-resuming after each quota reset.

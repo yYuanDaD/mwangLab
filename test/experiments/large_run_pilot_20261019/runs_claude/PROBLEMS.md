@@ -663,3 +663,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35198907 (GSE194193)
 
 - r_de.R:206-207 edger_ql wrote unsigned F as stat (GSEA rank wrong; patched after this row) and 2^logCPM as baseMean; runner cannot express factorial main effects; no biotype support Details: `PMID35198907/HANDBACK.md`.
+
+## PMID34526402 (GSE166322)
+
+- none blocking; inspect profile labels TPM as ambiguous linear/estimated counts; paper's DESeq2 route blocked (no raw counts deposited) Details: `PMID34526402/HANDBACK.md`.
+
+## PMID34870208 (GSE180877)
+
+- inspect gave no alignment key for case/space-only differences (case_runner.py:408); duplicated_feature_ids counted on Chromosome column (case_runner.py:399) Details: `PMID34870208/HANDBACK.md`.
