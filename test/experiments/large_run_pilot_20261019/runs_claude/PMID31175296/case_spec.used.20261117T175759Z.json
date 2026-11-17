@@ -1,0 +1,143 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID31175296",
+  "request": "Analyze GSE125630 for PMID 31175296 (Transcriptome of dorsal root ganglia caudal to a spinal cord injury with modulated behavioral activity.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code subagent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE125630",
+      "accession": "GSE125630",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC6555821.paper.md"],
+        "metadata": "GSE125630/GSE125630_metadata.csv",
+        "matrix": "GSE125630/GSE125630_GeneMatrix_RawCounts_InjuryActivity.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE125630"],
+            "superseries": "GSE129704 (S3.p1; also liver and soleus, not analyzed here)",
+            "paper_type": "Scientific Data Data Descriptor: no differential-expression analysis, no DEG counts, no named DE genes, no threshold are reported",
+            "assay": "bulk polyA RNA-seq, Illumina NextSeq 500 1x75 SE, STAR 2.6 to Rn6, HTSeq 0.10.0 reverse-stranded counts on Ensembl 93 (mito genes removed, 24,613 regions) (S2.5.p1, DA.p7-p8)",
+            "tissue": "pooled bilateral T11-L4 DRG per animal (S2.3.p1)",
+            "organism_sex": "female Sprague Dawley rats, 8-9 weeks at start (S2.1.p1)",
+            "factors": {"group": ["No SCI (n=4)", "TX SCI (n=4)", "CONT SCI (n=6)", "CONT SCI + SWIM (n=5)", "CONT SCI + SWW (n=5)"]},
+            "inclusion": "all 24 animals (S2.2.p1, Table 1)",
+            "primary_estimand": "effect of exercise training (swimming; shallow water walking) on DRG gene expression in contusion-injured rats housed in locomotor-restricting cages: CONT SCI + SWIM vs CONT SCI and CONT SCI + SWW vs CONT SCI (S1.p2, S1.p3, S4.2.p1 'one appropriate for an examination of the effect of exercise on SCI')",
+            "planned_contrasts": [
+              "CONT SCI + SWIM vs CONT SCI (S4.2.p1 comparison set; paper: no DE result reported)",
+              "CONT SCI + SWW vs CONT SCI (S4.2.p1 comparison set; paper: no DE result reported)"
+            ],
+            "secondary_comparison_set": "injury severity: TX SCI vs CONT SCI vs No SCI (S4.2.p1); not exercise",
+            "repeated_measure_unit": "none; one pooled DRG sample per animal, independent animals; rats doubly housed by group (S2.2.p1) but cage pairs not recorded",
+            "timing": "sacrifice 8.5 wk post-surgery (TX), 11.5 wk (No SCI, CONT SCI), 13.5 wk (SWIM, SWW) (S2.3.p1, S4.3.p1, FIG2); exercise 10 wk, 5 d/wk, 30 min/d from 2.5 wk post-injury (S2.2.p3)",
+            "normalization": "DESeq2 RLE size factors; VST for PCA (S2.5.p1-p2, DA.p9)",
+            "paper_method": "none for DE (descriptive: DESeq2 RLE-normalized expression, plotPCA); DESeq2 would be the natural route on these counts",
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "stated": false, "source_locator": "none; no DE threshold in the paper"},
+            "paper_results": "PCA only: Fig 3b 66% variance separates CONT SCI + SWIM/SWW from No SCI/CONT SCI; Fig 3c 64% variance separates TX SCI from No SCI/CONT SCI (S4.2.p1). Paper acknowledges sacrifice time differs by condition and argues batch effects are low (S4.3.p1)."
+          },
+          "reasoning": "Data Descriptor (Sci Data). Groups and n from S2.2.p1 and Table 1; exercise comparison set from S4.2.p1; timing from S2.3.p1 / S4.3.p1 / FIG2. The paper reports no DE analysis, so there are no DEG counts or threshold to reproduce.",
+          "confidence": "high",
+          "locator": "S2.2.p1; S2.3.p1; S4.2.p1; S4.3.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S3.p1 names GSE125630 and raw HTSeq counts deposited there",
+              "GEO matrix has 24 sample columns = 24 GSMs; 24,613 Ensembl rat gene IDs = 24,613 regions in S2.5.p1",
+              "group sizes in matrix columns (4 Uninjured, 6 Contusion, 5 SWIM, 5 SWW, 4 Transection) match S2.2.p1",
+              "GEO organism Rattus norvegicus, source dorsal root ganglion, data_processing names STAR 2.6 / HTSeq 0.10.0 / Rn6 Ensembl 93"
+            ]
+          },
+          "reasoning": "File GSE125630_GeneMatrix_RawCounts_InjuryActivity.txt.gz is the paper's deposited raw HTSeq count matrix (S3.p1); metadata is the series' GSM table.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "final": {"method": "exact key derived from title on the metadata side and from the column name on the matrix side, compared case-insensitively"},
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(?:No SCI|Complete (transection) SCI|(Contusion) SCI)(?: \\+ (SWIM|SWW))?, Replicate (\\d+)$"]},
+          "matrix_column_pattern": "^(?:Uninjured|Complete_(Transection)|(Contusion))_DRG_(?:(SWIM|SWW)_)?Replicate_(\\d+)$",
+          "normalize_keys": true,
+          "patterns": {"grp": ["title", "^(No SCI|Contusion SCI|Complete transection SCI)(?: \\+ (SWIM|SWW))?, Replicate \\d+$"]},
+          "aliases": {"wpi": "characteristics_ch1.1.weeks after injury?", "injury": "characteristics_ch1.0.injury type"},
+          "recode": {
+            "grp": {"No SCI": "NoSCI", "Contusion SCI": "CONT", "Contusion SCI_SWIM": "SWIM", "Contusion SCI_SWW": "SWW", "Complete transection SCI": "TX"},
+            "wpi": {"8.5": "w8p5", "11.5": "w11p5", "13.5": "w13p5"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. Contusion_DRG_SWIM_Replicate_2) and GSM titles (e.g. 'Contusion SCI + SWIM, Replicate 2') encode the same group and replicate number but with different words for the naive group (Uninjured vs No SCI). Key = transection/contusion token + exercise token + replicate number (naive animals keyed by replicate number alone); every key is unique on both sides. No positional alignment.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"matrix_type": "raw counts"},
+          "reasoning": "integer_fraction 1.0, max 795,326, median 63, no missing; file named RawCounts; paper S3.p1 and GEO data_processing state raw HTSeq counts. Paper input = raw counts with DESeq2 RLE (S2.5.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CONT"},
+          "subject": null,
+          "organism": "Rat",
+          "planned": ["grp_SWIM_vs_CONT", "grp_SWW_vs_CONT"],
+          "covariate_candidates": ["wpi"],
+          "final": {
+            "analysis_type": "one factor, five levels; planned contrasts against CONT",
+            "design_column": "grp",
+            "estimand_type": "causal (randomized assignment to exercise, S2.2.p1)",
+            "contrasts": [
+              {"name": "grp_SWIM_vs_CONT", "control": "CONT", "treatment": "SWIM", "role": "primary"},
+              {"name": "grp_SWW_vs_CONT", "control": "CONT", "treatment": "SWW", "role": "primary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled exercise (SWIM+SWW) vs CONT", "reason_rejected": "two distinct exercise levels; skill rule: one model with planned contrasts, never pooled levels"},
+            {"value": "SWIM vs SWW", "reason_rejected": "same sacrifice time, but compares two exercise modalities; it does not estimate the effect of exercise vs no exercise"},
+            {"value": "SWIM/SWW vs No SCI", "reason_rejected": "confounds exercise with injury; not the paper's exercise comparison"}
+          ],
+          "reasoning": "S4.2.p1 defines the exercise comparison set as CONT SCI vs CONT SCI + SWIM/SWW. Exercise assignment was random among contused animals (S2.2.p1), so the design estimand is causal. The identifiability of these contrasts is tested at the covariance gate.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "confounding_candidates": ["wpi", "injury"],
+          "decision_status": "refused",
+          "stop_reason": "Exercise is completely confounded with time of sacrifice / tissue-collection session: every exercised animal (SWIM, SWW) was sacrificed at 13.5 wk post-surgery and every sedentary CONT SCI animal at 11.5 wk (GEO 'weeks after injury', S2.3.p1, S4.3.p1). No sedentary animal shares the exercised animals' collection time, so wpi cannot be adjusted and the exercise contrast cannot be separated from 2 extra weeks post-injury, ~2 weeks of age, and a separate collection session. The data show the confound dominates: on log2 CPM of the 500 most variable genes, PC1 (57% of variance; paper Fig 3b reports 66%) puts CONT (-14.6) with No SCI (-14.3) and puts SWIM (+9.9), SWW (+10.5) together with TX SCI (+10.7), which was collected at yet another time (8.5 wk). Mild swimming/wading and complete transection producing the same dominant shift while contusion vs no injury produces none fits a collection-session effect, not exercise biology. The paper's argument that batch effects are unlikely (S4.3.p1) is an assumption, not a design control. Exercise vs no-exercise is therefore not identifiable from GSE125630.",
+          "final": {
+            "status": "unresolved",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "wpi", "disposition": "aliased"},
+              {"name": "collection session (not recorded; implied by wpi and S2.3.p1)", "disposition": "aliased"},
+              {"name": "injury", "disposition": "excluded: constant (T2 Contusion) within CONT/SWIM/SWW"},
+              {"name": "cage pair (doubly housed within group, S2.2.p1)", "disposition": "nested: not recorded in metadata; nested in grp, cannot be blocked"}
+            ]
+          },
+          "reasoning": "Confounding check on grp vs wpi: TX only at 8.5, NoSCI and CONT only at 11.5, SWIM and SWW only at 13.5, so each exercise contrast against CONT crosses wpi levels with no overlap. Skill stop condition: treatment completely confounded with a known covariate. The only within-time comparison (SWIM vs SWW) does not answer the exercise question. Sequencing depth also differs (mean library 23.6M SWIM / 26.0M SWW vs 34.0M CONT) but that is handled by size factors and is not the reason for refusal.",
+          "confidence": "medium",
+          "locator": "S2.3.p1; S4.3.p1; FIG2; S4.2.p1"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "time of sacrifice vs exercise",
+          "paper": "S4.3.p1 states sacrifice time varied 8.5-13.5 wk by condition and argues batch effects are low because both 11.5 and 13.5 wk are chronic stage and the same person collected tissue",
+          "data": "GEO 'weeks after injury' is 13.5 for every SWIM/SWW animal and 11.5 for every CONT animal; PC1 (57%) separates the 11.5-wk groups (NoSCI, CONT) from the other collection times (TX, SWIM, SWW)",
+          "disposition": "blocks_estimand"
+        },
+        {
+          "item": "DE analysis",
+          "paper": "Data Descriptor; no DE analysis, DEG counts, genes, or threshold reported",
+          "data": "raw counts would support DESeq2 had the design been identifiable",
+          "disposition": "no_paper_result_to_compare"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

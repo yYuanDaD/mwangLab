@@ -1,0 +1,88 @@
+{
+ "case": "GSE125630",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Exercise factor: CONT SCI + SWIM (n=5) and CONT SCI + SWW (n=5), randomly assigned among contused rats; sedentary control CONT SCI (n=6) (S1.p2, S2.2.p1, S4.2.p1).",
+  "B2": "Exercise: SWIM vs CONT and SWW vs CONT (S4.2.p1, Fig 3b). Injury severity: TX (4) vs CONT vs NoSCI (4) (Fig 3c). No DE test is reported.",
+  "B3": "None: bilateral T11-L4 DRG pooled per animal, one sample per animal (S2.3.p1, S1.p3). No key needed.",
+  "B4": "Paper does not say; no DE model is described (S2.5 only normalization and PCA).",
+  "B5": "None reported: Data Descriptor with no DEG rule or counts. Exercise sacrificed at 13.5 wk, CONT at 11.5 wk, TX at 8.5 wk (S2.3.p1, S4.3.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S1.p2, S2.2.p1, S4.2.p1: SWIM (n=5) and SWW (n=5) vs CONT (n=6) is the paper's exercise comparison set; refusal at design is for confounding, not absence of an exercise arm. GEO fields: weeks after injury 13.5 only for SWIM/SWW (10), 11.5 only for CONT/NoSCI (10) (S2.3.p1, S4.3.p1, FIG2).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp levels CONT 6, NoSCI 4, SWIM 5, SWW 5, TX 4 match S2.2.p1 and Table 1; control for exercise is CONT SCI (S4.2.p1); no exclusions; 24/24 aligned.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Planned contrasts SWIM vs CONT and SWW vs CONT (treatment vs control); nothing was run so no sign to flip.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper: one pooled bilateral DRG sample per animal (S2.3.p1, S1.p3); no repeated measures. Packet A candidate key (title without injury level) links 12/24 and the expression check is not_supported (r -0.017, p 0.60).",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No model fitted; paper reports no DE analysis, so B4 is not stated. Planned single five-level model is reasonable.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise fully aliased with sacrifice time/collection session (wpi): SWIM/SWW only 13.5, CONT/NoSCI only 11.5, TX only 8.5 (packet A wpi levels 10/10/4). Recorded and is the stated stop reason; suitability covariance check also fails. Housing is by group (S2.2.p1, cage not recorded), recorded as nested.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer raw HTSeq counts, 24,613 x 24, matches S2.5.p1/S3.p1; DESeq2 route. Minor: the PCA used as evidence was not saved as an artifact.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Data Descriptor; paper states no DEG rule (B5) and no counts.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Recorded as no_paper_result_to_compare; HANDBACK claims no paper numbers.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Stated reason (complete confounding with collection time) is true and supported by data crosstab, wide enough (all exercised vs all sedentary contused animals differ in time). PCA pattern (TX at 8.5 wk groups with 13.5 wk exercised, CONT with NoSCI) is consistent with a collection effect, though TX also differs by injury, so it is supportive not proof. Paper's argument that batch is unlikely (S4.3.p1) is an assumption.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Policy question (not an error): whether to also report a clearly labelled descriptive SWIM/SWW vs CONT contrast despite complete aliasing with collection time."
+ ],
+ "summary": "拒绝分析的理由成立：运动组(SWIM/SWW)全部在13.5周取材，久坐的CONT全部在11.5周，运动与取材时间完全混杂，无法分离。分组、n、矩阵类型、无重复测量等均与论文一致，论文为数据描述文章，无阈值和DEG数可比。总体通过，无需修改。"
+}

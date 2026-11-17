@@ -18,18 +18,22 @@ The paper studies NAFLD mice on a high-fat diet (HFD) that did aerobic exercise 
 - **Enrichment.** ORA on up-regulated genes (Enrichr GO and KEGG) and Hallmark GSEA, for both exercise contrasts.
 
 ## Threshold
-The paper's threshold (S4.5.p1) is written as "log2FC < 1 and p-value < 1E-2". I read this as **raw p < 0.01 and |log2FC| > 1**. The literal wording cannot be right, because the paper reports both up- and down-regulated DEGs. This rule was applied as the paper's threshold. A second count at BH padj < 0.05 with no fold-change cutoff is kept as an audit.
+The paper's threshold (S4.5.p1) is written as "log2FC < 1 and p-value < 1E-2". I read this as **raw p < 0.01 and |log2FC| > 1**. The literal wording cannot be right, because the paper reports both up- and down-regulated DEGs. This rule was applied as the paper's threshold. A second count is kept as an audit: BH padj < 0.05 with |log2FC| > 1.
 
-## DEG counts vs the paper (paper's rule)
-| Contrast | Ours (joint model) | Up/Down | Pairwise sensitivity | Paper | Audit (padj<0.05) |
+The audit rule was changed after review; the first run used BH padj < 0.05 with no fold-change cutoff. The reason is that the paper's 171 DEGs for HRE vs HFD match this padj+FC rule, not the raw-p rule the paper states. This is now recorded in paper_data_discrepancies.json and in the study caveats. The raw-p rule stays the primary rule because that is what the paper's text says. The closest-rule count is reported next to it.
+
+## DEG counts vs the paper (paper's rule; closest rule alongside)
+| Contrast | Ours, joint model (raw p<0.01 & abs(log2FC)>1) | Up/Down | Pairwise sensitivity | Paper | Audit, padj<0.05 & abs(log2FC)>1: joint / pairwise |
 |---|---|---|---|---|---|
-| HAE vs HFD | 1488 | 420/1068 | 1551 | 1450 (Fig 6C) | 2082 |
-| HRE vs HFD | 467 | 120/347 | 461 | 171 (Fig 6D) | 183 |
-| HFD vs NC (run as NC vs HFD) | 2470 | 1556/914 as HFD vs NC | n/a | 2746 (Fig 6B) | 4163 |
-| HAE vs HRE | 253 | 66/187 | n/a | 625 (Fig 6E) | 24 |
+| HAE vs HFD | 1488 | 420/1068 | 1551 | 1450 (Fig 6C) | 1232 / 1390 |
+| HRE vs HFD | 467 | 120/347 | 461 | 171 (Fig 6D) | **155 / 181** (closest to the paper) |
+| HFD vs NC (run as NC vs HFD) | 2470 | 1556/914 as HFD vs NC | n/a | 2746 (Fig 6B) | 2488 / n/a |
+| HAE vs HRE | 253 | 66/187 | n/a | 625 (Fig 6E) | 20 / n/a |
+
+For HRE vs HFD, the paper's 171 falls between our audit-rule counts: 155 from the joint model and 181 from the pairwise fit. The reviewer computed 182. It does not match our 467 under the stated raw-p rule. So the paper probably applied padj for this contrast, but which rule it applied is uncertain. For the other three contrasts, the stated raw-p rule is the closer match.
 
 - **Closely reproduced:** HAE vs HFD and HFD vs NC.
-- **Not reproduced:** we find about 2.7x the paper's DEGs for HRE vs HFD, and about 0.4x for HAE vs HRE.
+- **Not reproduced under the stated rule:** we find about 2.7x the paper's DEGs for HRE vs HFD. It matches under padj<0.05 & abs(log2FC)>1 (see above). We also find about 0.4x the paper's DEGs for HAE vs HRE.
 - **Same ordering as the paper:** HAE changes liver expression more than HRE does, relative to HFD.
 - **Named genes.** All of them move in the paper's direction in both exercise contrasts:
   - Up: Hsd3b5, Cyp4a12b, Slco1a1.

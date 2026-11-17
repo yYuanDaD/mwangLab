@@ -1,0 +1,257 @@
+{
+  "case_id": "GSE269053",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "diet",
+    "virus"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "diet",
+        "virus"
+      ],
+      "levels": {
+        "diet": {
+          "HFD": 11,
+          "chow": 10
+        },
+        "virus": {
+          "Renin": 11,
+          "novirus": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(diet) + C(virus)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 18,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Mouse') or lack sex chromosomes.",
+      "metadata_sex_column": "",
+      "sexes": [],
+      "split_plan": {
+        "split": false,
+        "sexes": [],
+        "reason": "sex unknown for every sample"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "diet_HFD_vs_chow_virus-Renin",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "HFD",
+      "reference": "chow",
+      "within": {
+        "virus": "Renin"
+      },
+      "cells": [
+        {
+          "cell": {
+            "virus": "Renin",
+            "diet": "HFD"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "virus": "Renin",
+            "diet": "chow"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "diet_HFD_vs_chow_virus-novirus",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "HFD",
+      "reference": "chow",
+      "within": {
+        "virus": "novirus"
+      },
+      "cells": [
+        {
+          "cell": {
+            "virus": "novirus",
+            "diet": "HFD"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "virus": "novirus",
+            "diet": "chow"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "virus_Renin_vs_novirus_diet-HFD",
+      "kind": "simple",
+      "factor": "virus",
+      "test": "Renin",
+      "reference": "novirus",
+      "within": {
+        "diet": "HFD"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "HFD",
+            "virus": "Renin"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "diet": "HFD",
+            "virus": "novirus"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "virus_Renin_vs_novirus_diet-chow",
+      "kind": "simple",
+      "factor": "virus",
+      "test": "Renin",
+      "reference": "novirus",
+      "within": {
+        "diet": "chow"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "chow",
+            "virus": "Renin"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "diet": "chow",
+            "virus": "novirus"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "diet_virus_HFD_Renin_vs_chow_novirus",
+      "kind": "interaction",
+      "factor": "diet:virus",
+      "test": "HFD:Renin",
+      "reference": "chow:novirus",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "diet": "HFD",
+            "virus": "Renin"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "diet": "chow",
+            "virus": "Renin"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "diet": "HFD",
+            "virus": "novirus"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "diet": "chow",
+            "virus": "novirus"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

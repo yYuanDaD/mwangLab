@@ -743,3 +743,19 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41673803 (GSE286570)
 
 - GBK mojibake in metadata data_processing (geo_tools.py:36); inspect feature_examples prints huge featureCounts rows (case_runner.py:404) Details: `PMID41673803/HANDBACK.md`.
+
+## PMID39747575 (GSE269053)
+
+- native.py:539 merge_raw_tar keeps Salmon transcript IDs (119k ENSMUST) as gene_id, no tx2gene; inspect counts data_matrix analysis columns as samples (24 vs 21) Details: `PMID39747575/HANDBACK.md`.
+
+## PMID31175296 (GSE125630)
+
+- aliased-covariate refusal forced to design gate (decision_contract.py:174) vs decision-gates.md; rat sex check no_markers (suitability.py:435); no alignment key offered Details: `PMID31175296/HANDBACK.md`.
+
+## PMID36720890 (GSE214542)
+
+- case_runner.py:316-325 _column_groups reads FPKM./count. prefixes as rep suffixes; inspect mixes FPKM+count columns (int frac 0.61); mislabelled count.MPTP1_M needed prep script Details: `PMID36720890/HANDBACK.md`.
+
+## PMID36681077 (GSE216094)
+
+- inspect lists the authors' DESeq2 result table as a sample matrix without flagging it (minor) Details: `PMID36681077/HANDBACK.md`.

@@ -1,0 +1,303 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID36681077",
+  "subject_id": "GSE216094",
+  "created_at": "2026-11-17T13:03:09",
+  "finished_at": "2026-11-17T13:03:18",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9998376.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC9998376.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T13:03:09",
+      "sha256": null,
+      "attributes": {
+        "sha256": "fee1e0d86079e3ef79b9dcb3349d56ea387e89553ad2af254d082be286ff9dc1",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE216094_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE216094\\GSE216094_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:03:09",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5cabc9a34bbbe7901fd1dae5cb139842bf034aa82e3ef3023b1133b1d6be3bcf",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE216094_STAR_Gene_TPM.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE216094\\GSE216094_STAR_Gene_TPM.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-17T13:03:09",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3726ba518b9fcef85813ecec47358e88a0bdf943737c7e5866dbd16a75bb6b6b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE216094",
+          "PXD031982",
+          "PXD037731"
+        ],
+        "primary_estimand": "Paper-wide: secreted-protein (extracellular fluid proteome) changes with acute exercise, MCK-PGC1a and cold. The only RNA-seq (GSE216094) estimand is PSAP-adenovirus vs GFP-adenovirus transduction in primary iWAT adipocytes in vitro (Fig 5G/H, S5.3.20.2.p1); it is not an exercise contrast.",
+        "planned_contrasts": [
+          "RNA-seq: pAd PSAP vs pAd GFP in primary iWAT adipocytes, n=4 vs 4 (Fig 5G-H; GEO data_processing 'PSAP pAd/GFP pAd'); paper reports only GSEA Hallmark (OXPHOS q < 0.001), no DEG count",
+          "Exercise vs sedentary gastrocnemius EF proteome (S2.2.p3-p4, Fig 2E; 1322 proteins q < 0.05, TMT MS, Perseus t-test) - proteomics in PRIDE PXD031982/PXD037731, not in GSE216094"
+        ],
+        "paper_threshold": {
+          "metric": "qvalue",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S5.3.11.p1 (proteomics q < 0.05, permutation FDR); RNA-seq DEG threshold not stated (S5.3.20.2.p1), GSEA q < 0.001 Fig 5H"
+        },
+        "paper_method": "RNA-seq: STAR counts -> DESeq2 v1.22.1 (VIPER), GSEA preranked by fold change, TPM > 5 filter (S5.3.20.2.p1). Exercise data: TMT proteomics, Perseus Student t-test + permutation FDR (S5.3.11.p1).",
+        "sample_inclusion": "GSE216094: 8 primary iWAT adipocyte cultures, 4 GFP pAd, 4 PSAP pAd, WT, 3 days post transduction (GEO characteristics)",
+        "exercise_samples_in_accession": false,
+        "paper_results": "RNA-seq: top upregulated Hallmarks include oxidative phosphorylation (Fig 5G-H); no DEG count reported."
+      },
+      "reason": "S5.1.3.p1 and the key resources table (TAB1) state GSE216094 is 'RNAseq of pAd transduced iWAT cells'. Exercise appears only in the proteomics experiments (S2.2, S5.3.1), deposited to PRIDE. Fig 5 legend (FIG5 G,H) describes the RNA-seq contrast as PSAP- vs GFP-pAd in primary iWAT adipocytes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:03:09"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE216094\\GSE216094_STAR_Gene_TPM.csv.gz",
+        "owned": true,
+        "checks": [
+          "paper S5.1.3.p1 names GSE216094 as its RNA-seq deposit",
+          "GEO samples are 'iWAT pAd GFP/PSAP 1-4', primary iWAT cells, matching Fig 5G-H n=4",
+          "GSE216094_STAR_Gene_TPM.csv.gz columns GFP_1..4, PSAP_1..4 map 1:1 onto the 8 GSMs",
+          "GSE216094_PSAPvGFP.deseq_star.csv.gz is the authors' DESeq2 result table (baseMean, log2FoldChange, padj), not a sample matrix"
+        ],
+        "accession": "GSE216094",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE216094\\GSE216094_metadata.csv"
+      },
+      "reason": "The accession belongs to this paper, but its samples are an in-vitro adenoviral PSAP overexpression experiment, not exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:03:09"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 8,
+        "n_metadata": 8,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "pAd (GFP|PSAP) [0-9]+$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\design_metadata.csv",
+          "sha256": "1cabaf40536f022c44229e60bec8959dd2a2514e32b8ff1083e708e18fb0bd27",
+          "levels": {
+            "grp": {
+              "GFP": 4,
+              "PSAP": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns GFP_1..PSAP_4 equal the title-derived key '<arm>_<n>' (title 'iWAT pAd GFP 1' -> GFP_1). grp = GFP / PSAP from title, consistent with characteristics treatment 'pAd GFP'/'pAd PSAP'.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:03:10"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "TPM",
+        "recommended_method": "limma on log2(TPM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\aligned_matrix.csv",
+          "sha256": "fee09f46c919a5f225ad2599c758ed6feb2880e4408565ec0873fffeea55f962",
+          "n_features": 23637,
+          "n_samples": 8,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 101375.973171571,
+          "median": 1.06664081441927,
+          "integer_fraction": 0.3273,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "File name STAR_Gene_TPM and GEO data_processing ('STAR Gene counts TPM') say TPM; values are non-integer (integer fraction 0.33, mostly zeros), max ~1e5. Paper used DESeq2 on STAR counts (S5.3.20.2.p1), which are not deposited; only TPM and the authors' DESeq2 result table are available.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:03:10"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "The only analyzable contrast in the data is PSAP pAd vs GFP pAd (4 vs 4). It is not an exercise contrast and must not be relabelled as one. Refused at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise arm: GSE216094 contains only primary iWAT adipocytes transduced with GFP- vs PSAP-adenovirus in vitro (GEO characteristics; paper S5.1.3.p1, FIG5 G-H). The paper's exercise experiment is EF proteomics (S2.2, PRIDE PXD031982/PXD037731), not deposited in this GEO series. The requested estimand (effect of exercise on gene expression) cannot be identified from these data; a PSAP-vs-GFP contrast would answer a different question."
+      },
+      "recorded_at": "2026-11-17T13:03:18"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e8fba9db0a0e2ebcb44fff55414b89b99c9a0dea9ea89e0876e1c50a39c1ffcd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b3524a12f243fd2b4ce07258fc1f3e805f7767184b50b2c8ffcf4d4e97f91095",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fee09f46c919a5f225ad2599c758ed6feb2880e4408565ec0873fffeea55f962",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1cabaf40536f022c44229e60bec8959dd2a2514e32b8ff1083e708e18fb0bd27",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3f522ca81cfdf97584490d7f7fdaa61d01490f7f271d2260db9753457424b36b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36681077\\GSE216094\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "77cde927404b0efba54d174bfe342ff479367e2e60a9da78b51d397dc8fa4efd",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

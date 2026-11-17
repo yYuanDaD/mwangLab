@@ -267,3 +267,27 @@ One section per case; newest last.
 ## PMID37639610 / GSE233485 (2026-11-17)
 
 - policy: Open policy: whether mTG vs WT (sedentary exercise-mimic, SI Fig S3H) should be offered as a labelled genetic-proxy analysis.
+
+## PMID41673803 / GSE286570 (2026-11-17)
+
+- policy: Which threshold to report for HRE vs HFD when the paper's 171 fits padj<0.05 with FC cutoff rather than the stated raw p<0.01 (open policy question).
+
+## PMID39747575 / GSE269053 (2026-11-17)
+
+- policy: Policy question: when an exercise-question series has no exercise arm but a paper disease-model contrast is analyzable, whether to also run the paper's contrasts as a labelled non-exercise record (currently refused only).
+
+## PMID31175296 / GSE125630 (2026-11-17)
+
+- policy: Policy question (not an error): whether to also report a clearly labelled descriptive SWIM/SWW vs CONT contrast despite complete aliasing with collection time.
+
+## PMID36681077 / GSE216094 (2026-11-17)
+
+- policy: Open policy: whether an in-vitro exercise-mediator (PSAP overexpression) series should count as an exercise study; here it was refused and labelled.
+
+## PMID36720890 / GSE214542_delayed (2026-11-17)
+
+- policy: Open policy: does an in-vivo exercise-mediator (recombinant irisin injection) series count as an exercise study? Refusal is consistent with the stated rule but a person should decide whether a pharmacological irisin-vs-MPTP sensitivity run is wanted.
+
+## PMID36720890 / GSE214542_pretreatment (2026-11-17)
+
+- policy: Open policy: does an in-vivo exercise-mediator (recombinant irisin injection) series count as an exercise study? Refusal is consistent with the stated rule but a person should decide whether a pharmacological irisin-vs-MPTP sensitivity run is wanted.

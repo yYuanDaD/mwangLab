@@ -1,0 +1,22 @@
+{"case": "GSE269053", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "No for an exercise-effect question. Exercise appears only as a treadmill-exhaustion phenotype (S2.2.p4, S4.5.p1, FIG2H); the 21 LV RNA-seq samples are chow/HFD x null/AAV8-Renin (S2.4.p1, FIG4). No sequenced sample carries an exercise factor; packet A finds no exercise words in any column.",
+  "B2": "Chow null (4 in GEO) as control; DIO = HFD null (6) vs chow null; hypertension = chow Renin (6) vs chow null; HFpEF = HFD Renin (5) vs chow null (S2.4.p1, FIG4C; paper says n = 5-6).",
+  "B3": "No repeated measures: one LV per mouse. The title-suffix 'pairing key' (rep1..rep6) is a replicate label within a group, not an animal; the expression check says not_supported.",
+  "B4": "The paper does not say joint vs pairwise; S4.9.p1 only says DESeq2 'when comparing conditions of interest'.",
+  "B5": "S4.9.p1: 'FDR below 0.05 ... at least a 1.2-fold expression change (up or down)'. S2.4.p1 quotes adjusted p < 0.01 for the DIO count. Counts: DIO 839 down; Renin 927 up; HFD-Renin vs chow null 498 up / 472 down."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "No exercise arm in sequenced samples (S2.2.p4, S4.5.p1, FIG2H, packet A: no exercise words); refusal matches B1. Not an in-vitro mediator design.", "fix": ""},
+  {"id": "grouping", "verdict": "na", "severity": "none", "evidence": "Case refused at design; the recorded groups 4/6/6/5 match GEO and the paper's n = 5-6 (FIG4).", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run. Planned contrasts are each versus chow null, as in the paper.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "repeated_measure_unit = none; one LV per mouse; the candidate title key is a replicate index and the expression check is not_supported (r diff 0.057).", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Paper silent (S4.9.p1); nothing was fitted.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch/sex fields; sex inference failed (no sex markers in the matrix, probably transcript IDs). Not decisive since case stopped.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Matrix gate chooses Salmon estimated counts (integer fraction 0.61) over the FPKM data_matrix. HANDBACK notes the merge is transcript-level (119,215 rows) while the paper summarized to gene level; a tximport/gene-summary step is needed before any DESeq2 run.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "FDR < 0.05 and 1.2-fold (log2 0.2630344, inclusive) transcribed from S4.9.p1; the adjusted p < 0.01 in S2.4.p1 is recorded as a discrepancy.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK lists the paper's DEG counts per contrast and states that none measures an exercise effect and nothing was run.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise contrast in the sequenced samples' is true; checked wide enough (all metadata columns, paper methods, deposited files, no per-sample treadmill value).", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Policy question: when an exercise-question series has no exercise arm but a paper disease-model contrast is analyzable, whether to also run the paper's contrasts as a labelled non-exercise record (currently refused only)."],
+ "summary": "该系列测序的21个左心室样本只按饮食(chow/HFD)和AAV8-Renin分组,运动仅作为跑台耐力表型,没有运动组,因此在设计阶段拒绝是正确的。配对、阈值(FDR<0.05且1.2倍)、论文DEG数的记录均与论文一致,未发现阻断或重大问题。"}

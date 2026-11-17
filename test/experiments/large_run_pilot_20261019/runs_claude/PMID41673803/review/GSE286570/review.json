@@ -1,0 +1,88 @@
+{
+ "case": "GSE286570",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. In-vivo HFD mice with 12 weeks aerobic (HAE) or resistance (HRE) exercise; liver RNA-seq (S2.6.p1, S4.1.2). GEO GSE286570 has all 4 groups, 3 livers each; the exercise factor is in HAE and HRE samples.",
+  "B2": "HFD vs NC 2,746 DEGs; HAE vs HFD 1,450; HRE vs HFD 171; HAE vs HRE 625 (S2.6.p1, Fig 6B-E). RNA-seq n per group not stated; GEO has 3 each (animal groups n=8, NC 13, S4.1.1.p1).",
+  "B3": "None apparent: one liver per mouse, no repeated tissues/time points for RNA-seq. Packet A candidate keys (title suffix) link no real unit; expression check not_supported.",
+  "B4": "Paper does not say; only 'DESeq2 1.40.1' (S4.5.p1) and pairwise comparisons in figures.",
+  "B5": "S4.5.p1: 'Genes with a log2FC < 1 and a p-value < 1E-2 were identified as differentially expressed genes' - raw p (not FDR), p < 0.01, wording of FC cutoff is garbled (likely |log2FC| > 1); counts 2,746 / 1,450 / 171 / 625."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise arms HAE and HRE vs sedentary HFD in vivo (S2.6.p1); series run, in-vivo design.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp = NC/HFD/HAE/HRE, 3 each (12 samples, packet A); exercise contrasts use HFD as control (S2.6.p1, Fig 6C-D). n=3 vs animal n=8 is recorded as a discrepancy; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "disagree",
+   "severity": "minor",
+   "evidence": "Paper reports HFD vs NC (S2.6.p1, Fig 6B, 'HFD/NC'); run fitted NC vs HFD (treatment=NC, control=HFD), so log2FC signs are the reverse of the paper's. Recorded in discrepancies and HANDBACK gives up/down 'as HFD vs NC', and it is a non-exercise secondary contrast; exercise contrasts HAE/HRE vs HFD are correct.",
+   "fix": "Add contrast HFD vs NC (control NC, treatment HFD) or relabel result columns so DEG tables carry the paper's direction."
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One liver per mouse; paper says nothing about repeated sampling of the same animal for RNA-seq. Candidate 'suffix of title' pairs nothing meaningful (titles H-NC-2 etc.); expression check not_supported (diff -0.093, p=0.75). Genotype/treatment 'unused subject' flags are the group labels themselves.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper does not say joint or pairwise fit (S4.5.p1 only 'DESeq2'); run reports joint primary and pairwise sensitivity (HAE 1488/1551, HRE 467/461), as the policy requires.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All male mice; no batch/housing/run field in GEO; paper gives none. Recorded as no confound found.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "featureCounts integer counts (integer_fraction 1.0), DESeq2 as in S4.5.p1; p-value histogram fine (frac_p_gt_0.9 ~0.1-0.15).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Paper S4.5.p1: 'log2FC < 1 and a p-value < 1E-2'; run reads it as raw p<0.01 and |log2FC|>1 and records the wording typo. But packet B flags the paper's HRE vs HFD count (171) fits padj<0.05 & |lfc|>0.585 (182) or padj<0.05 & |lfc|>1 (181 pairwise) far better than the applied rule (467/461); this is not recorded as a rule discrepancy, only attributed to n=3 instability. HAE vs HFD (1450) fits the applied rule (1488) best, so the evidence is mixed.",
+   "fix": "Add to paper_data_discrepancies: HRE vs HFD paper 171 matches padj<0.05 with FC cutoff (182), not raw p<0.01 & |lfc|>1 (467); keep raw p as the primary rule per the paper's text, and report the closest-rule count next to it."
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ours vs paper compare the same contrasts at the same rule; HANDBACK says HRE and HAE-vs-HRE not reproduced. 'Closely reproduced' for HFD vs NC (2470 vs 2746) is generous but within 10%.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; run completed.",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Which threshold to report for HRE vs HFD when the paper's 171 fits padj<0.05 with FC cutoff rather than the stated raw p<0.01 (open policy question)."
+ ],
+ "summary": "这个案例整体合理：运动对照 HFD 的两个主要对比、分组、n=3、DESeq2 原始计数、联合与成对拟合都符合论文。需要修正两点：HRE vs HFD 的论文数(171)更接近 padj<0.05 加倍数阈值，这一点未作为阈值差异记录；饮食对比以 NC vs HFD 运行，符号与论文的 HFD vs NC 相反，需要在结果中标明或重排。"
+}

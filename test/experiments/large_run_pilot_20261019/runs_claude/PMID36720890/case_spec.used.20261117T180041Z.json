@@ -1,0 +1,166 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36720890",
+  "request": "Analyze GSE214542 for PMID 36720890 (Irisin exhibits neuroprotection by preventing mitochondrial damage in Parkinson's disease.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE214542_pretreatment",
+      "accession": "GSE214542",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9889817.paper.md"],
+        "metadata": "GSE214542/GSE214542_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID36720890/prep/GSE214542_1_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID36720890/prep/extract_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE214542"],
+            "assay": "bulk RNA-seq of mouse nigral/midbrain tissue (S4.16.p1); GEO series holds two experiments: irisin pre-treatment (Control/MPTP/Irisin+MPTP, n=3 each) and irisin delayed treatment (Control/Irisin/MPTP/MPTP+Irisin, n=3 each)",
+            "primary_estimand": "Effect of exogenous recombinant irisin (i.p. 200 ug/kg/d, 5 days) on the midbrain transcriptome of MPTP-treated mice (S2.5.p1, FIG4). Exercise appears only in the human cohort (S2.1.p1: 23 PD patients, 12-week exercise, serum irisin ELISA, no transcriptomics). No sequenced sample received exercise.",
+            "factors": {"treatment": ["vehicle (ddH2O)", "MPTP", "irisin+MPTP (pre)", "irisin alone (delayed experiment)", "MPTP then irisin (delayed)"]},
+            "sample_inclusion": "male C57BL/6 mice, 6 weeks (GEO characteristics); n=3 per group",
+            "planned_contrasts": [
+              "Irisin+MPTP vs MPTP (pre-treatment), GSEA only (S2.5.p1, Supplementary Fig. 3a-b, Fig. 4a); paper reports no DEG count",
+              "MPTP+Irisin vs MPTP (delayed treatment), GSEA only (S2.5.p1, Supplementary Fig. 3c-d, Fig. 4b); paper reports no DEG count"
+            ],
+            "repeated_measure_unit": "none (independent animals)",
+            "paper_method": "featureCounts read counts; downstream analysis in R (S4.16.p1), DE method not named; GEO data_processing: StringTie/edgeR expression, DE |log2FC| >= 1 and p < 0.05",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "effect_inclusive": true, "source_locator": "GEO data_processing (not in the article text); article reports GSEA only"},
+            "paper_results": "GSEA pathways (NAD(P)H oxidoreductase activity, focal adhesion, PI3K-Akt, MAPK); no DEG counts or gene lists in the article"
+          },
+          "reasoning": "The paper studies irisin as an exercise-induced myokine. Exercise is applied only to human PD patients (S2.1.p1, Table 1) whose readout is serum irisin and clinical scores. The RNA-seq (S2.5.p1, S4.16.p1, DA.p1 -> GSE214542) compares MPTP mice with and without injected recombinant irisin, so its estimand is a pharmacological irisin effect, not an exercise effect.",
+          "confidence": "high",
+          "locator": "S2.1.p1; S2.5.p1; S4.16.p1; DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE214542", "GEO: midbrain, Mus musculus C57BL/6 male, NovaSeq 6000 matches S4.16.p1", "groups Control/MPTP/Irisin_MPTP match the FIG1/FIG4 pre-treatment design", "file 1 holds the 9 pre-treatment samples (titles *_M_rep*)"]},
+          "reasoning": "Accession named in the data-availability statement; tissue, platform and group structure agree with the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(Control_M|Irisin_MPTP_M|MPTP_M)_rep\\d$"]},
+          "recode": {"grp": {"Control_M": "CTRL", "Irisin_MPTP_M": "IRISMPTP", "MPTP_M": "MPTP"}},
+          "aliases": {},
+          "exclude_samples": {
+            "GSM6611235": "delayed-treatment experiment; not in file 1",
+            "GSM6611236": "delayed-treatment experiment; not in file 1",
+            "GSM6611237": "delayed-treatment experiment; not in file 1",
+            "GSM6611238": "delayed-treatment experiment; not in file 1",
+            "GSM6611239": "delayed-treatment experiment; not in file 1",
+            "GSM6611240": "delayed-treatment experiment; not in file 1",
+            "GSM6611241": "delayed-treatment experiment; not in file 1",
+            "GSM6611242": "delayed-treatment experiment; not in file 1",
+            "GSM6611243": "delayed-treatment experiment; not in file 1",
+            "GSM6611244": "delayed-treatment experiment; not in file 1",
+            "GSM6611245": "delayed-treatment experiment; not in file 1",
+            "GSM6611246": "delayed-treatment experiment; not in file 1"
+          },
+          "reasoning": "Count columns of file 1 renamed to GEO titles by prep/extract_counts.py (count.MPTP1_M -> MPTP_M_rep1, confirmed by best log-count/FPKM correlation with FPKM.MPTP_M_rep1). Exact match on title; group from the title prefix, consistent with the characteristics treatment field.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "The deposited file mixes FPKM.* and count.* columns; the count.* columns are 100% integer with library sizes 66-76M. Paper S4.16.p1 states featureCounts read counts as input; GEO data_processing says StringTie. Integer count columns used; FPKM columns not used.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "MPTP"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: every sequenced sample is a sedentary mouse given vehicle, MPTP and/or injected recombinant irisin (GEO treatment field; S2.5.p1). Exercise exists only in the human serum cohort (S2.1.p1), which has no transcriptome. Irisin injection is not exercise; an irisin-vs-vehicle contrast would answer a different (pharmacological) estimand.",
+          "candidates": [
+            {"value": "grp IRISMPTP vs MPTP as an exercise proxy", "reason_rejected": "irisin i.p. is a pharmacological intervention, not an exercise exposure; relabelling it would misstate the estimand"},
+            {"value": "grp MPTP vs CTRL", "reason_rejected": "neurotoxin model contrast, unrelated to exercise"}
+          ],
+          "reasoning": "The request is the exercise effect as the paper intends; the paper never sequences exercised animals or people.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "expression quantification", "paper": "featureCounts read counts (S4.16.p1)", "data": "GEO data_processing: HISAT2/StringTie, mm9, FPKM + counts", "disposition": "recorded_only"},
+        {"item": "exercise in RNA-seq", "paper": "exercise only in the human cohort (S2.1.p1)", "data": "no exercise arm among the 21 GEO samples", "disposition": "blocks_estimand"}
+      ]
+    },
+    {
+      "case_id": "GSE214542_delayed",
+      "accession": "GSE214542",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9889817.paper.md"],
+        "metadata": "GSE214542/GSE214542_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID36720890/prep/GSE214542_2_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID36720890/prep/extract_counts.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE214542"],
+            "assay": "bulk RNA-seq of mouse midbrain, irisin delayed-treatment experiment (Control/Irisin/MPTP/MPTP+Irisin, n=3 each)",
+            "primary_estimand": "Effect of delayed exogenous irisin on the midbrain transcriptome of MPTP-treated mice (S2.5.p1, FIG4b). No exercise arm.",
+            "planned_contrasts": ["MPTP+Irisin vs MPTP (delayed treatment), GSEA only (S2.5.p1, Supplementary Fig. 3c-d, Fig. 4b); no DEG count reported"],
+            "paper_method": "featureCounts counts; R, method not named (S4.16.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "effect_inclusive": true, "source_locator": "GEO data_processing only"},
+            "paper_results": "GSEA only; no DEG counts"
+          },
+          "reasoning": "Same paper; second experiment of the series. Exercise appears only in the human cohort (S2.1.p1).",
+          "confidence": "high",
+          "locator": "S2.5.p1; S4.16.p1; DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE214542", "file 2 holds the 12 delayed-treatment samples (titles CONTROL/IRISIN/MPTP/MPTP_IRISIN_rep*)"]},
+          "reasoning": "Same accession; group structure matches the delayed-treatment design (FIG1, FIG4b).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(CONTROL|IRISIN|MPTP|MPTP_IRISIN)_rep\\d$"]},
+          "recode": {"grp": {"CONTROL": "CTRL", "IRISIN": "IRIS", "MPTP": "MPTP", "MPTP_IRISIN": "MPTPIRIS"}},
+          "aliases": {},
+          "exclude_samples": {
+            "GSM6611226": "pre-treatment experiment; not in file 2",
+            "GSM6611227": "pre-treatment experiment; not in file 2",
+            "GSM6611228": "pre-treatment experiment; not in file 2",
+            "GSM6611229": "pre-treatment experiment; not in file 2",
+            "GSM6611230": "pre-treatment experiment; not in file 2",
+            "GSM6611231": "pre-treatment experiment; not in file 2",
+            "GSM6611232": "pre-treatment experiment; not in file 2",
+            "GSM6611233": "pre-treatment experiment; not in file 2",
+            "GSM6611234": "pre-treatment experiment; not in file 2"
+          },
+          "reasoning": "Count columns renamed to GEO titles (prep/extract_counts.py); exact match on title.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "count.* columns of file 2 are integer read counts (FPKM.* columns ignored); paper S4.16.p1 states featureCounts counts.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "MPTP"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: groups are vehicle, irisin injection, MPTP, and MPTP followed by irisin injection (GEO treatment field). No sample was exercised; exercise appears only in the human serum cohort (S2.1.p1) without transcriptomics.",
+          "candidates": [
+            {"value": "grp IRIS vs CTRL or MPTPIRIS vs MPTP as an exercise proxy", "reason_rejected": "injected recombinant irisin is not exercise; it would answer a pharmacological estimand"}
+          ],
+          "reasoning": "The request asks for the exercise effect; the data hold none.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise in RNA-seq", "paper": "exercise only in the human cohort (S2.1.p1)", "data": "no exercise arm among the 12 delayed-experiment samples", "disposition": "blocks_estimand"}
+      ]
+    }
+  ]
+}
