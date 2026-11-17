@@ -374,3 +374,12 @@ One section per case; newest last.
 ## PMID25484259 / GSE60591 (2026-11-17)
 
 - policy: Open policy: which threshold to report when the paper's count (4076) is near raw p<0.05 on limma/FPKM (4198) rather than FDR<0.05.
+
+## PMID36780527 / GSE199429 (2026-11-17)
+
+- policy: Open policy: which test to report when limma on CPM cannot reproduce edgeR on counts (113 vs 121, 682 vs 744); recorded as declared deviation.
+
+## PMID31589602 / GSE123879 (2026-11-17)
+
+- policy: Joint 3-group limma vs the paper's pairwise fits when the paper is silent on joint modelling: open policy question.
+- policy: Which threshold to report when 900 limma DEGs vs paper 1562 (padj<0.1 gives 1456): open policy question; recorded as declared deviation.

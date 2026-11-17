@@ -819,3 +819,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID33513138 (GSE152347)
 
 - case_runner.py:828 records '~ sex,geno + time'; case_runner.py:638 design_check omits covariates; suitability has no main-effect names; loky WinError 6 at exit Details: `PMID33513138/HANDBACK.md`.
+
+## PMID36780527 (GSE199429)
+
+- suitability.py:75-81 no 'cpm' type key (CPM->not_analyzable); enrichment_tools.py:257 enrichr has no background (paper used detected genes) Details: `PMID36780527/HANDBACK.md`.
+
+## PMID31589602 (GSE123879)
+
+- native.py:616 misses ISO-date-mangled IDs; inspect profiles headerless DE lists as matrices; SuperSeries inspect gives no SubSeries pointer Details: `PMID31589602/HANDBACK.md`.

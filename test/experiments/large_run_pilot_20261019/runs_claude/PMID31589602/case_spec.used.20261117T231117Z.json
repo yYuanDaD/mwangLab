@@ -1,0 +1,141 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID31589602",
+  "request": "Analyze GSE123879 for PMID 31589602 (Dynamic enhancers control skeletal muscle identity and reprogramming.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (Claude Code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE123879",
+      "accession": "GSE123879",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC6799888.paper.md"],
+        "metadata": "GSE123878/GSE123878_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID31589602/prep/GSE123878_FpkmValues_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID31589602/prep/prep_fpkm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE123879 (SuperSeries; RNA-seq SubSeries GSE123878)"],
+            "assay": "bulk mRNA-seq (TruSeq stranded polyA, NextSeq 500 75bp SE) of quadriceps",
+            "primary_estimand": "Effect of 4 weeks voluntary wheel running (Ex, harvested 4-6 h after last bout) vs sedentary wild-type controls (Con) on quadriceps gene expression in male C57BL/6J mice",
+            "factors": {"grp": ["SED (sedentary WT control)", "EX (wheel-running WT)", "MTG (sedentary muscle-specific Pgc1a transgenic)"]},
+            "sample_inclusion": "n = 5 quadriceps per group (Fig 8A legend); all 15 deposited RNA-seq samples",
+            "planned_contrasts": [
+              "EX vs SED in quadriceps (S2.6.p1, Fig 8A left; paper: 779 up, 783 down = 1562 DEGs)",
+              "MTG vs SED in quadriceps (S2.6.p1, Fig 8A right; paper: 2843 up, 2739 down = 5582 DEGs) - non-exercise comparison, secondary"
+            ],
+            "repeated_measure_unit": "none; one quadriceps per independent mouse",
+            "paper_method": "STAR (mm10) + DESeq2 via Illumina BaseSpace DESeq2 v1.1.0 app, direct pairwise comparisons Con vs Ex and Con vs mTg (S4.7.p1)",
+            "normalization": "DESeq2 internal size factors on counts; FPKM used only for heatmaps/clustering (S4.7.p1)",
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false, "source_locator": "S4.7.p1"},
+            "paper_results": {"EX_vs_SED": {"up": 779, "down": 783}, "MTG_vs_SED": {"up": 2843, "down": 2739}, "named_genes": "Acadl up and Myh4 down with exercise (S2.7.p1, Fig 9C)"}
+          },
+          "reasoning": "S4.2.p1: male C57BL/6J mice, voluntary wheel running for 4 weeks from 8 weeks of age vs individually caged without wheels; Ex harvested 4-6 h after last bout; mTg vs WT littermates. S2.6.p1 + Fig 8A: quadriceps mRNA-seq, n=5/group, Ex and mTg each compared with sedentary wild-type controls. S4.7.p1: DESeq2, FDR-adjusted p < 0.05. S2.6.p1 writes p-value < 0.05 for the 779/783 counts, but the deposited GSE123878_ExerciseQuad_DifferentialGenes list (1562 genes = 779+783) has max padj 0.04998 and max raw p 0.0062, so the counts were made with padj < 0.05 as the Methods state. S4.11.p1 / S8.p1 name SuperSeries GSE123879.",
+          "locator": "S2.6.p1; S4.2.p1; S4.7.p1; S4.11.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.11.p1 deposits all RNA-seq/ChIP-seq/ATAC-seq in SuperSeries GSE123879", "GSE123879 is SuperSeries of GSE123878 (RNA-Seq, 15 samples: ControlQuad/ExerciseQuad/PGC1transgenic rep1-5)", "GSE123878 supplementary FpkmValues_AllSamples has 15 columns Control_1-5, Exercise_1-5, PGC1transgenic_1-5 matching the 15 GSMs", "GSE123878 data_processing restates STAR + DESeq2 FDR<0.05 as in S4.7.p1", "deposited ExerciseQuad / mTgQuad DifferentialGenes lists reproduce the paper counts 779/783 and 2843/2739"]},
+          "reasoning": "The RNA-seq samples of SuperSeries GSE123879 are exactly the 15 samples of SubSeries GSE123878; the metadata of that SubSeries (subset of the SuperSeries metadata) and its series-level FPKM matrix are used. ChIP-seq and ATAC-seq samples in the SuperSeries are not expression data and are out of scope. GSE123878_RAW.tar holds per-sample bedGraph coverage tracks only (no gene counts), so the only gene-level matrix is FPKM.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(Control|Exercise|PGC1transgenic)(?:Quad)?_RNAseq_rep(\\d)$"]},
+          "patterns": {"grp": ["title", "^(Control|Exercise|PGC1transgenic)"]},
+          "recode": {"grp": {"Control": "SED", "Exercise": "EX", "PGC1transgenic": "MTG"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "final": {},
+          "reasoning": "Matrix columns are Control_N / Exercise_N / PGC1transgenic_N; metadata titles are ControlQuad_RNAseq_repN / ExerciseQuad_RNAseq_repN / PGC1transgenic_RNAseq_repN. key is derived from title as <group>_<rep> and matched exactly. grp recoded from the title prefix, which agrees with characteristics genotype (wild type / PGC1a Tg(+)) and treatment (sedentary / exercise).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "final": {"source": "GSE123878_FpkmValues_AllSamples.xlsx (series supplementary; converted to csv; 21 Excel date-mangled gene IDs dropped by prep_fpkm.py)", "paper_input": "read counts from STAR into DESeq2 (S4.7.p1); counts not deposited"},
+          "reasoning": "File name says Fpkm; integer fraction 0.0, range 0-26392, non-integer values: linear FPKM. The paper's DESeq2 input (gene counts) is not deposited; RAW.tar contains only bedGraph tag tracks.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "organism": "Mouse",
+          "planned": ["grp_EX_vs_SED", "grp_MTG_vs_SED"],
+          "final": {
+            "analysis_type": "multi-group, one control",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_EX_vs_SED", "control": "SED", "treatment": "EX", "role": "primary"},
+              {"name": "grp_MTG_vs_SED", "control": "SED", "treatment": "MTG", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "grp_EX_vs_MTG", "reason_rejected": "not a paper comparison; the paper compares each model with sedentary controls only (S4.7.p1)"},
+            {"value": "two separate two-arm fits", "reason_rejected": "one control shared by two arms: one model with planned contrasts; difference from the paper's separate pairwise DESeq2 fits recorded as a deviation"}
+          ],
+          "reasoning": "Three groups of 5 sharing one sedentary WT control set. EX vs SED is the exercise estimand (primary); MTG vs SED is the paper's second planned comparison (genetic, not exercise) kept as secondary. All male (S4.2.p1).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "confounding_candidates": [],
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "reasoning": "Independent mice, one quadriceps each, randomly assigned to wheel/no wheel (S4.2.p1). No batch, lane or sex variation recorded in GEO metadata (all submitted Dec 14 2018, single platform). No covariates added.",
+          "confidence": "medium"
+        },
+        "method": {
+          "transform": "log2(x+1)",
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(FPKM+1)",
+            "formula": "~ 0 + grp",
+            "paper_route": {"method": "DESeq2 on STAR gene counts (BaseSpace DESeq2 v1.1.0)", "status": "blocked", "reason": "gene-level read counts not deposited in GEO; only FPKM matrix and bedGraph tracks; FPKM must not be rounded into counts"},
+            "deviations": ["limma on log2(FPKM+1) instead of DESeq2 on counts", "one joint 3-group model instead of separate pairwise fits", "21 date-mangled gene IDs dropped", "deposited FPKM matrix already restricted to 12,529 genes by the authors"]
+          },
+          "reasoning": "Matrix-method policy: FPKM -> log2(x+1) then limma. Paper route DESeq2 blocked by missing counts; run limma as a declared deviation.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false},
+            "deviation_note": "Paper rule BH padj < 0.05 (S4.7.p1; confirmed by the deposited DE list) applied to limma results. Audit rule adds |FC| > 1.5 (Fig 8A red points: absolute FC > 1.5 and adjusted p < 0.05)."
+          },
+          "reasoning": "S4.7.p1 FDR-adjusted p < 0.05, no fold-change cutoff; S2.6.p1 wording p-value < 0.05 is contradicted by the deposited list (max padj 0.04998). Fig 8A FC > 1.5 used only as a labelled audit rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["limma on log2(FPKM+1) replaces the paper's DESeq2 on counts; DEG counts are not expected to match exactly", "MTG vs SED is a genetic (Pgc1a transgene) comparison, not an exercise effect", "deposited FPKM matrix covers only 12,529 genes (pre-filtered by the authors); 21 Sept/March genes lost to Excel date conversion"]
+          },
+          "paper_counts": {"joint/grp_EX_vs_SED": 1562, "joint/grp_MTG_vs_SED": 5582},
+          "paper_genes": {"joint/grp_EX_vs_SED": ["Acadl", "Myh4", "Myh2"], "joint/grp_MTG_vs_SED": ["Ppargc1a"]},
+          "reasoning": "Paper counts from S2.6.p1 (779+783; 2843+2739). Acadl up and Myh4 down with exercise (S2.7.p1, Fig 9C); Myh2 (type IIa fibers increased by exercise, S2.6.p2) is up in the deposited Ex list; Ppargc1a is the transgene.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "threshold wording", "paper": "S2.6.p1: significantly induced ... (p-value < 0.05); S4.7.p1: FDR-adjusted p < 0.05", "data": "deposited ExerciseQuad DE list: 1562 genes, max padj 0.04998, max raw p 0.0062", "disposition": "executable_without_change"},
+        {"item": "DE input", "paper": "DESeq2 on STAR counts", "data": "only FPKM (12,529 genes) and bedGraph tracks deposited", "disposition": "declared_deviation"},
+        {"item": "gene IDs", "paper": "gene symbols", "data": "21 symbols converted to dates by Excel (2018-03-02 twice)", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "reasoning": "One limma model on log2(FPKM+1) with the three groups; planned contrasts EX vs SED (primary, exercise) and MTG vs SED (secondary)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_EX_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper runs GO/KEGG/Reactome enrichment (Metascape) on exercise DEGs (S4.7.p1, Fig 8E)."}
+      ]
+    }
+  ]
+}

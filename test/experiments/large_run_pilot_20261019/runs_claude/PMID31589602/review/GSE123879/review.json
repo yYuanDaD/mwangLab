@@ -1,0 +1,21 @@
+{"case": "GSE123879", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Exercise arm present: wild-type C57BL/6J male mice with 4 weeks voluntary wheel running (Ex) vs sedentary controls (S4.2.p1, S2.5.p1). RNA-seq of quadriceps in the SuperSeries/SubSeries: 15 samples; exercise factor carried by 5 Ex samples (ExerciseQuad rep1-5) vs 5 sedentary WT; the 5 mTg samples are a genetic (Pgc1a transgene) arm, not exercise.",
+  "B2": "Ex vs Con and mTg vs Con, direct comparisons, n = 5 per group (Fig 8A legend, S4.7.p1).",
+  "B3": "None. One quadriceps per independent mouse, mice individually caged with or without wheel (S4.2.p1). Candidate keys in packet A are only replicate numbers; expression check not supported (r diff 0.021, perm p 0.34).",
+  "B4": "S4.7.p1: 'Direct comparisons were made between control and Ex animals, as well as between control and mTg animals' - i.e. pairwise fits; joint model not mentioned.",
+  "B5": "S4.7.p1: DESeq2 'FDR-adjusted p-value < 0.05', no fold-change cutoff in Methods. S2.6.p1 writes 'p-value < 0.05' for Ex 779 up / 783 down and mTg 2,843 up / 2,739 down. Fig 8A legend: red = absolute FC > 1.5 with adjusted p < 0.05 (display only)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Exercise arm present (S4.2.p1); EX vs SED primary, MTG vs SED labelled genetic/secondary", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "SED/EX/MTG n=5 each match Fig 8A; titles and genotype/treatment fields agree; no exclusions; EX compared with its own sedentary WT control", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "EX vs SED and MTG vs SED, treatment over control; Ppargc1a log2FC +2.75, Acadl up, Myh4 down as in paper. The mechanical flag possible_reversed_contrast on MTG_vs_SED is a false positive (MTG = Pgc1a transgenic, not control)", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "S4.2.p1 independent mice; rep suffix keys only index replicate number and show no expression support (not_supported, p=0.34)", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "minor", "evidence": "Paper fits direct pairwise comparisons (S4.7.p1); analysis used one joint 3-group limma model and recorded it as a declared deviation. Open policy question", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Single sex, single platform and submission date; both exercise and sedentary mice individually caged (S4.2.p1); mTg compared with WT littermates", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Only FPKM deposited (integer fraction 0); limma on log2(FPKM+1) per policy; DESeq2 on counts blocked and recorded; p histogram plausible (frac p>0.9 0.064/0.03)", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "padj < 0.05 non-inclusive matches S4.7.p1; S2.6.p1 'p-value < 0.05' wording discrepancy recorded and resolved with the deposited list (max padj 0.04998); FC 1.5 kept as labelled audit only; closest-rule flag (padj<0.1 gives 1456 vs 1562) is a consequence of the different method and is covered by the declared deviation", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Same contrasts and same rule compared (1562 and 5582); HANDBACK states 900 vs 1562 mismatch openly and supports concordance with deposited DESeq2 lists (r 0.96, sign 100%)", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; DESeq2 route blocked for missing counts and the reason is true (only FPKM and bedGraph deposited)", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Joint 3-group limma vs the paper's pairwise fits when the paper is silent on joint modelling: open policy question.", "Which threshold to report when 900 limma DEGs vs paper 1562 (padj<0.1 gives 1456): open policy question; recorded as declared deviation."],
+ "summary": "该案例通过审查：运动组(EX)与久坐对照(SED)的比较方向、分组(每组n=5)、阈值(padj<0.05)均与论文一致，小鼠相互独立无需配对。FPKM上用limma属已声明的偏离，900与论文1562的差异已如实记录；possible_reversed_contrast标记为误报。"}

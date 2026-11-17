@@ -1,0 +1,172 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36780527",
+  "request": "Analyze GSE199429 for PMID 36780527 (Time of day determines postexercise metabolism in mouse adipose tissue.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE199429",
+      "accession": "GSE199429",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9974500.paper.md"],
+        "metadata": "GSE199429/GSE199429_metadata.csv",
+        "matrix": "GSE199429/GSE199429_processed.data.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE199429"],
+            "assay": "bulk RNA-seq (TruSeq Stranded Total RNA Ribo-Zero Gold, NextSeq500 38-bp PE) of inguinal WAT (S3.5.p1)",
+            "sample_inclusion": "male C57BL6/JBomTac mice, iWAT collected immediately (0 h) after 1-h maximal treadmill exercise or sham at ZT3 (early rest) or ZT15 (early active); n = 6 per group, 4 groups, 24 libraries (S3.1.p1, FIG1, S1.2.p1)",
+            "sample_exclusion": "not_reported",
+            "factors": {"exercise": ["SED (sham)", "RUN (exercise)"], "time_of_day": ["ZT3 early rest", "ZT15 early active"]},
+            "primary_estimand": "acute exercise (RUN vs sham SED) effect on iWAT gene expression immediately post-exercise, estimated separately at ZT15 (early active) and ZT3 (early rest)",
+            "planned_contrasts": [
+              "RUN vs SED at ZT15 (early active) (S1.2.p1; paper: 121 DEGs, mostly up)",
+              "RUN vs SED at ZT3 (early rest) (S1.2.p1; paper: 0 DEGs)",
+              "ZT15 vs ZT3 in SED (time-of-day, sedentary) (S1.2.p1; paper: 192 DEGs)",
+              "ZT15 vs ZT3 in RUN (time-of-day, exercised) (S1.2.p1; paper: 744 DEGs)"
+            ],
+            "repeated_measure_unit": "none (independent animals, one sample per mouse)",
+            "normalization": "edgeR filterByExpr (min count 10, design by group), TMM/CPM (S3.6.p1)",
+            "paper_method": "edgeR quasi-likelihood NB GLM, design ~0 + group (4 groups) (S3.6.p1)",
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false, "source_locator": "S3.6.p1"},
+            "paper_results": "121 DEGs RUN vs SED at ZT15, 0 at ZT3; 192 time-of-day DEGs in SED, 744 in RUN; named up genes at ZT15 exercise: Nr4a1, Nr4a3, Vegfa, Adrb2, Cpeb2, Cyp2b10, Pdk4, Slc25a25, Ppargc1a, Ucp1, Dio2, Gadd45g, Irf4, Zfp516, Crem (S1.2.p2, FIG2); GO MF enrichment of DNA-binding transcription activator activity, steroid hormone receptor activity, glucocorticoid receptor binding (S1.2.p2)"
+          },
+          "reasoning": "S3.6.p1 gives the DE route (edgeR QL, ~0+group, filterByExpr min count 10, FDR 0.05, no fold-change rule). S1.2.p1 gives the four contrasts and their counts. S3.1.p1/FIG1 give the 2x2 design with n = 6 per group at the 0 h time point. The fasting experiment (S1.4) is qPCR only and not in GEO.",
+          "confidence": "high",
+          "locator": "S3.6.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "paper S3.6.p1 and S8.p1 name GSE199429",
+              "metadata series_id GSE199429, 24 samples, inguinal WAT, male C57BL6",
+              "groups SED/RUN x ZT3/ZT15 with 6 per cell match FIG1 / S3.1.p1 (n = 6 per group)",
+              "submitter Lundell (author L.S.L.); paper scripts at github leonidaslundell/GSE199429"
+            ]
+          },
+          "reasoning": "Accession, tissue, sex, strain, design and n per group all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "normalize_keys": true,
+          "aliases": {"ex": "characteristics_ch1.4.exercise", "time": "characteristics_ch1.3.sampling time"},
+          "patterns": {},
+          "combine": {"grp": ["ex", "time"]},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. 13RUN_E) equal metadata titles (13Run_e) up to case; inspect reports 24/24 matches with normalize_keys. ex and time copied from GEO characteristics; grp is the paper's 4-level group (SED_ZT3, RUN_ZT3, SED_ZT15, RUN_ZT15). The _m/_e title suffix agrees with ZT3/ZT15 (morning/evening).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "CPM normalized (linear scale)",
+          "recommended_method": "limma",
+          "reasoning": "GEO data_processing: 'processed.data.csv contains cpm after filtering by expression with cutoff at 10 counts'. Profile agrees: 0.17% integers, column sums 0.84-1.19 million (CPM, likely TMM-scaled), max 78k, no negatives, 16,233 Ensembl genes already filtered. Linear normalized expression, not counts. The paper's input was featureCounts raw counts (S3.6.p1), which were not deposited (supplementary_file NONE for samples). Library sizes are not deposited either, so counts cannot be recovered and must not be reconstructed.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["ex", "time"],
+          "references": {"ex": "SED", "time": "ZT3"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["ex_RUN_vs_SED_time-ZT15", "ex_RUN_vs_SED_time-ZT3", "time_ZT15_vs_ZT3_ex-SED", "time_ZT15_vs_ZT3_ex-RUN"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "factorial 2x2 cell-means (exercise x time of day), independent animals",
+            "formula": "~ 0 + cell (cell = ex x time, equivalent to the paper's ~0 + group)",
+            "contrasts": [
+              {"name": "ex_RUN_vs_SED_time-ZT15", "control": "SED_ZT15", "treatment": "RUN_ZT15", "role": "primary"},
+              {"name": "ex_RUN_vs_SED_time-ZT3", "control": "SED_ZT3", "treatment": "RUN_ZT3", "role": "primary"},
+              {"name": "time_ZT15_vs_ZT3_ex-SED", "control": "SED_ZT3", "treatment": "SED_ZT15", "role": "secondary"},
+              {"name": "time_ZT15_vs_ZT3_ex-RUN", "control": "RUN_ZT3", "treatment": "RUN_ZT15", "role": "secondary"}
+            ]
+          },
+          "reasoning": "The paper fits one model on all four groups (S3.6.p1 ~0+group) and reports the exercise effect within each time of day plus the time-of-day effect within each exercise state (S1.2.p1). The exercise-effect contrasts answer the request; the time-of-day ones reproduce the paper's other reported counts. The exercise x time interaction (difference of exercise effects) is implied by the paper's claim of a timing-specific response but was not tested as such; it runs as exploratory from the same model. Pooling ZT3 and ZT15 into one RUN vs SED contrast is rejected because the paper's estimand is time-specific.",
+          "candidates": [
+            {"value": "pooled RUN vs SED ignoring time", "reason_rejected": "the paper's estimand is exercise effect per time of day; pooling mixes the two phases"},
+            {"value": "separate fits per time (strata)", "reason_rejected": "the paper fits one ~0+group model on all 24 samples"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "sex", "disposition": "excluded: constant (all male); the GEO filterByExpr call's '+ sex' term cannot apply"}
+            ]
+          },
+          "confounding_candidates": null,
+          "reasoning": "One iWAT sample per independent mouse; no subject, batch, or lane column in GEO. S3.1.p1 says the 0 h protocol was repeated in a subset of 24 mice; which cohort each library came from is not recorded, so a cohort term cannot be modelled (caveat). The paper's model has no covariates.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(CPM+1), joint cell-means model",
+            "formula": "~ 0 + C(cell)",
+            "transform": "log2(x+1) on deposited CPM",
+            "paper_route": {"method": "edgeR QL NB GLM on raw counts, ~0 + group", "status": "blocked", "reason": "GEO deposits only filtered CPM; raw counts and library sizes are not available, and CPM must not be converted back into integer counts"},
+            "deviations": ["limma on log2(CPM+1) instead of edgeR QL on counts", "filtering taken as deposited (authors' filterByExpr); no further filter"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized expression -> log2(x+1) then limma. The joint limma executor fits ~0 + cell on all 24 samples, the same parameterization as the paper, so each contrast shares the variance prior over all groups as in the paper.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S3.6.p1: all P values FDR-adjusted, alpha 0.05; no fold-change rule. Applied on the limma deviation route, BH within each contrast.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper's edgeR QL on counts could not run; limma on log2(CPM+1) from the deposited CPM is a declared deviation, so DEG counts are not expected to match exactly.",
+              "Cohort of origin (original vs repeated 0 h subset, S3.1.p1) is not recorded in GEO and cannot be modelled.",
+              "GEO processing notes (STAR 2.7.2b, Ensembl release 99, filterByExpr min.count 15 with + sex) differ from the paper's Methods (STAR 2.5.3a, release 92, min count 10)."
+            ]
+          },
+          "paper_counts": {
+            "joint/ex_RUN_vs_SED_time-ZT15": 121,
+            "joint/ex_RUN_vs_SED_time-ZT3": 0,
+            "joint/time_ZT15_vs_ZT3_ex-SED": 192,
+            "joint/time_ZT15_vs_ZT3_ex-RUN": 744
+          },
+          "paper_genes": {
+            "joint/ex_RUN_vs_SED_time-ZT15": ["Nr4a1", "Nr4a3", "Vegfa", "Adrb2", "Cpeb2", "Cyp2b10", "Pdk4", "Slc25a25", "Ppargc1a", "Ucp1", "Dio2", "Gadd45g", "Irf4", "Zfp516", "Crem"]
+          },
+          "reasoning": "Paper route blocked by missing counts; thresholds and contrasts follow the paper.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "deposited matrix", "paper": "featureCounts raw counts analysed with edgeR QL (S3.6.p1)", "data": "only filtered CPM deposited", "disposition": "declared_deviation: limma on log2(CPM+1)"},
+        {"item": "processing versions", "paper": "STAR 2.5.3a, Ensembl mm10 release 92, filterByExpr min count 10 (S3.6.p1)", "data": "GEO data_processing: STAR 2.7.2b, release 99, filterByExpr min.count = 15 with design ~0 + group + sex; text says cutoff 10 counts", "disposition": "executable_without_change: filtering already applied by authors; recorded"},
+        {"item": "sex covariate in GEO filter design", "paper": "all male mice (S3.1.p1)", "data": "all samples male; '+ sex' in GEO note cannot apply", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "all", "covariates": []},
+          "role": "primary",
+          "reasoning": "One ~0+cell limma model on all 24 samples (paper's ~0+group); returns the four planned contrasts plus the exercise x time interaction (exploratory)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/ex_RUN_vs_SED_time-ZT15", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO molecular-function enrichment of the ZT15 exercise DEGs (S1.2.p2, FIG2D)."}
+      ]
+    }
+  ]
+}

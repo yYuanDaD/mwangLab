@@ -1,0 +1,88 @@
+{
+ "case": "GSE199429",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes; 24 libraries of iWAT at 0 h post bout: 12 sham SED, 12 RUN, split ZT3/ZT15 (S3.1.p1, FIG1, S1.2.p1).",
+  "B2": "RUN vs SED at ZT15 (6 v 6; 121 DEG) and at ZT3 (6 v 6; 0 DEG); time-of-day ZT15 vs ZT3 in SED (192) and RUN (744) (S1.2.p1).",
+  "B3": "None; one sample per independent mouse at the 0 h time point; no candidate keys in packet A.",
+  "B4": "One edgeR QL model, design ~0 + group on all groups (S3.6.p1).",
+  "B5": "'All P-values were adjusted using false discovery rate correction, and alpha was set to 0.05' (S3.6.p1); no fold-change cutoff. Counts: 121, 0, 192, 744."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S3.1.p1/FIG1: sham vs exercise at ZT3/ZT15; metadata ex SED/RUN 12/12; analysis ran.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp 6/6/6/6 matches n=6 per group (S3.1.p1); no exclusions; control is same-time SED.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "contrasts RUN vs SED (treatment RUN, control SED) and ZT15 vs ZT3 as in S1.2.p1; 81 up/32 down at ZT15 consistent with 'mostly up-regulated'.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One iWAT sample per mouse (S3.1.p1); no repeated measures; packet A keys give no linkage.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S3.6.p1 design ~0+group on all groups; run is joint ~0+cell on 24 samples.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Original vs repeated 0 h cohort (S3.1.p1) not recorded in GEO; declared as caveat in study record. No other batch aliasing visible.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "GEO data_processing says CPM after filter; profile 0.17% integers; limma on log2(CPM+1) declared deviation from edgeR counts.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S3.6.p1 FDR 0.05, no FC cutoff; applied padj<0.05 without FC; packet B table shows no other rule fits better.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same four contrasts and rule compared (113/121, 0/0, 187/192, 682/744); HANDBACK states deviation and does not over-claim.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No stop or refusal; raw counts unavailable claim is supported (supplementary_file NONE, CPM only).",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: which test to report when limma on CPM cannot reproduce edgeR on counts (113 vs 121, 682 vs 744); recorded as declared deviation."
+ ],
+ "summary": "该案例与论文一致：24个样本分为4组各6个，对比方向正确，单模型~0+cell，阈值FDR<0.05无倍数变化限制。因GEO仅提供CPM，改用limma并已声明为偏离，DEG数与论文接近（113/121，0/0）。未发现阻断或重要问题。"
+}
