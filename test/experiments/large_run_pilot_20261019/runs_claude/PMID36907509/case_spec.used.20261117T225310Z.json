@@ -1,0 +1,80 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36907509",
+  "request": "Analyze GSE199111 for PMID 36907509 (microRNA-501 controls myogenin(+)/CD74(+) myogenic progenitor cells during muscle regeneration.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE199111",
+      "accession": "GSE199111",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC10033748.paper.md"],
+        "metadata": "GSE199111/GSE199111_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE199111"],
+            "other_accessions_not_analyzed": {"GSE200501": "scRNA-seq of pooled TA muscles (3 Pax7Cre + 3 miR-501dMP pooled), CTX regeneration; no exercise arm (S2.17.p1, S11.p1)"},
+            "assay": "bulk RNA-seq (TruSeq stranded mRNA, NovaSeq 6000, 100 bp SE; STAR + featureCounts), tibialis anterior (S2.18.p1)",
+            "primary_estimand": "Effect of myogenic-progenitor-specific miR-501 deletion (miR-501dMP vs Pax7Cre control) on TA gene expression at day 6 after cardiotoxin injury (S3.3.p1, FIG3 e). This is a genotype effect during injury-induced regeneration, not an exercise effect.",
+            "factors": {"genotype": ["Pax7Cre (control)", "miR-501dMP"]},
+            "constant_conditions": "12-week-old male mice; all TA muscles CTX-injected and harvested at day 6 (S2.2.p1, FIG3 e)",
+            "sample_inclusion": "n = 5 per genotype (FIG3 e)",
+            "planned_contrasts": ["miR-501dMP vs Pax7Cre, TA day 6 post-CTX (S3.3.p1, FIG3 e; paper: 146 up, 89 down = 235 DEGs at p<0.05)"],
+            "exercise_in_paper": "A single bout of eccentric (downhill) treadmill exercise (S2.5.p1) was applied to naive miR-501dMP and Pax7Cre mice and assessed only histologically (Evans blue dye, Table 1, FIG4 c). No sequencing was performed on exercised muscle.",
+            "repeated_measure_unit": "none (one TA per independent mouse)",
+            "paper_method": "not stated (no DE tool named; S2.18.p1 names STAR alignment and Enrichr GO only)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.3.p1"},
+            "paper_results": {"up": 146, "down": 89, "named_genes": ["Igha", "Igkc", "Jchain", "Esrrg"]}
+          },
+          "reasoning": "The data availability statement (S11.p1) assigns GSE199111 to the bulk RNA-seq in TA. The only bulk RNA-seq described is miR-501dMP vs Pax7Cre at day 6 after CTX (S3.3.p1, FIG3 e, n = 5). The eccentric exercise experiment (S2.5.p1, S3.3.p1, Table 1) was read out by EBD histology only. The paper therefore never measures how exercise changes gene expression.",
+          "confidence": "high",
+          "locator": "S3.3.p1; S11.p1; S2.5.p1; FIG3; TAB1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S11.p1 names GSE199111 for RNA-seq in TA", "GEO: Tibialis anterior, male, 12 weeks, CTX day 6, wild type 5 / miR-501 -/- 5, matching FIG3 e n = 5", "data_processing: STAR + featureCounts raw counts, matching S2.18.p1"]},
+          "reasoning": "Accession, tissue, age, sex, injury, time point, group sizes and processing all match the paper's bulk RNA-seq.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"genotype": "characteristics_ch1.1.genotype"},
+          "recode": {"genotype": {"wild type": "WT", "miR-501 -/-": "KO"}},
+          "patterns": {},
+          "exclude_samples": {},
+          "reasoning": "Merged tar columns become GSM ids; exact match on the metadata index (10/10). Genotype copied to a formula-safe column.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer (integer_fraction 1.0, max 892729); GEO data_processing: featureCounts (Rsubread), 'identifiers and raw counts'. Consistent with S2.18.p1.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["genotype"],
+          "references": {"genotype": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast in the sequenced samples. All 10 GSE199111 samples are CTX-injured TA at day 6 from sedentary mice; the only factor is genotype (wild type 5 vs miR-501 -/- 5). The paper's exercise experiment (eccentric treadmill, S2.5.p1, Table 1) was assessed by Evans blue dye histology only and was never sequenced. The request's estimand (effect of exercise on gene expression) cannot be identified from these data; the genotype contrast does not answer it and is not substituted.",
+          "candidates": [
+            {"value": "genotype KO vs WT (paper's planned bulk contrast, S3.3.p1)", "reason_rejected": "answers a genetic-deletion question during CTX regeneration, not an exercise effect; running it would be a manufactured substitute for the requested estimand"},
+            {"value": "treat CTX injury as an exercise-like insult", "reason_rejected": "CTX is a chemical myotoxin, not exercise; every sample is CTX-injured, so there is no uninjured or exercised reference either"}
+          ],
+          "reasoning": "Design gate: the request asks for exercise effects; the deposited series has no exercise (or any non-genotype) factor. Refused.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "request vs paper estimand", "paper": "bulk RNA-seq estimates miR-501dMP vs Pax7Cre after CTX injury; exercise read out by histology only", "data": "GSE199111 holds genotype x 5 at CTX day 6; no exercise samples", "disposition": "blocks_request"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

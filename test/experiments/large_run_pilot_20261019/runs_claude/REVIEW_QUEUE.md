@@ -313,3 +313,15 @@ One section per case; newest last.
 ## PMID29610328 / GSE101239 (2026-11-17)
 
 - policy: Open policy: joint three-group limma on FPKM versus the paper's per-stage pairwise Cuffdiff (paper silent on 12w model).
+
+## PMID39523700 / GSE257540_biochem (2026-11-17)
+
+- policy: Which threshold to report when the paper states BH-adjusted p without a cutoff (open policy question); workflow default padj<0.05 was used and labelled.
+
+## PMID39523700 / GSE257540_mech (2026-11-17)
+
+- policy: Which threshold to report when the paper states BH-adjusted p without a cutoff (open policy question); workflow default padj<0.05 was used and labelled.
+
+## PMID39523700 / GSE281241 (2026-11-17)
+
+- policy: Whether in-vitro surrogate-validation series count as exercise studies is the open in-vitro policy question; here the factor is genotype, not stimulation, so the refusal is consistent.

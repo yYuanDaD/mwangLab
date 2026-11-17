@@ -1,0 +1,267 @@
+{
+  "case_id": "GSE152919",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "geno",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "time"
+      ],
+      "levels": {
+        "geno": {
+          "WT": 8,
+          "KO": 7
+        },
+        "time": {
+          "CT16": 9,
+          "CT4": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(time)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 15 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 15
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34705514\\GSE152919\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_KO_vs_WT_time-CT16",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "time": "CT16"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "CT16",
+            "geno": "KO"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "time": "CT16",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_time-CT4",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "time": "CT4"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "CT4",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "time": "CT4",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_CT4_vs_CT16_geno-KO",
+      "kind": "simple",
+      "factor": "time",
+      "test": "CT4",
+      "reference": "CT16",
+      "within": {
+        "geno": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "CT4"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "CT16"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_CT4_vs_CT16_geno-WT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "CT4",
+      "reference": "CT16",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "CT4"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "CT16"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_time_KO_CT4_vs_WT_CT16",
+      "kind": "interaction",
+      "factor": "geno:time",
+      "test": "KO:CT4",
+      "reference": "WT:CT16",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "CT4"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "CT4"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "CT16"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "CT16"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

@@ -787,3 +787,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37985354 (GSE242294)
 
 - inspect found no alignment key (b92 vs 92b, -/_), derived via key_patterns+matrix_column_pattern (case_runner.py:550-569) Details: `PMID37985354/HANDBACK.md`.
+
+## PMID37178122 (GSE230102)
+
+- pydeseq2 overflow RuntimeWarning at pydeseq2/utils.py:1088 (harmless); runner cannot add post-result caveats without full re-run Details: `PMID37178122/HANDBACK.md`.
+
+## PMID34705514 (GSE152919)
+
+- matrix has Excel-mangled gene IDs (4-Mar, 2-Sep); paper.md lacks a GEO accession statement, so ownership was inferred from the sample design Details: `PMID34705514/HANDBACK.md`.
+
+## PMID36907509 (GSE199111)
+
+- metadata CSV free text mis-decoded as GBK during GEOparse download (geo_tools.py:30,36); cosmetic only Details: `PMID36907509/HANDBACK.md`.

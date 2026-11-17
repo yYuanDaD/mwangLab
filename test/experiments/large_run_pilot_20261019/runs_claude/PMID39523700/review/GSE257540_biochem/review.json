@@ -1,0 +1,88 @@
+{
+ "case": "GSE257540_biochem",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes, as an in-vitro exercise-mediator design: HB9::GFP mESC motor neuron spheroids treated with conditioned medium from optogenetically exercised C2C12 (grp EX = High intensity biochem) or spontaneously twitching C2C12 (SP = Low intensity biochem) vs control medium (C). Biochem samples C1-6, LI1-6, HI1-6 (S2.4.p1-p3, FIG7a).",
+  "B2": "Exercise/Control, Spontaneous/Control, Exercise/Spontaneous (FIG7c-e). Paper n after QC: control 5, spontaneous 4, exercise 4 (FIG7a legend). The mechanical arm (M, MC) is a separate experiment (FIG7i).",
+  "B3": "No repeated measures: independent spheroid wells; no animal or person unit. Packet A candidate key (suffix of key) has 4 duplicates in a level and links only 6/26 samples; it is a replicate number, not an animal ID.",
+  "B4": "The paper does not say whether one model or pairwise fits were used (S4.10.p1 names only DESeq2, normal prior and ashr).",
+  "B5": "Paper: DEGs from DESeq2 with Benjamini-Hochberg adjusted p (FIG7 legend; S4.10.p1: raw and BH-adjusted p reported, normal prior and ashr); no numeric cutoff or fold-change rule stated. Counts: 194 DEGs across the three biochemical comparisons (S2.4.p3, union); mechanical: 2 significant hits, both up (S2.4.p4). FIG7j heatmap uses nominal p for the top 50 genes."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Biochem arms analyzed as an in-vitro exercise-mediator design and labelled so in paper_reconstruction (S2.4.p1, FIG7)",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "C5, EX4, SP5 vs paper 5/4/4 (FIG7a). Every exclusion named with criterion (C4 rRNA, LI6, HI4, HI5 reads); 5 vs 6 exclusion discrepancy recorded; SP keeps 5 vs paper 4, recorded as executable_with_deviation. Control is the paper's control for each contrast. GEO Low=NE=spontaneous, High=S=exercise from Series_overall_design.",
+   "fix": "Optional sensitivity run dropping the next-weakest SP sample to reach n=4, if one can be justified."
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp_EX_vs_C, grp_SP_vs_C, grp_EX_vs_SP with controls C, C, SP; matches FIG7c-e orientation",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No repeated unit (paper, GEO metadata); packet A key table shows no key linking samples once per level",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One ~grp model with three planned contrasts; paper silent (S4.10.p1); recorded as a deviation",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No batch, lane or sex variable in GEO or paper; one sex; recorded in covariance gate",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer Salmon estimated counts (integer_fraction 1.0) into DESeq2 as the paper did; TPM file rejected; no-ashr deviation recorded",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper gives BH-adjusted p without cutoff (FIG7 legend); padj<0.05 applied and labelled workflow_default; nominal p<0.05 reported as audit",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper 194 is a union over three comparisons; ours are per contrast (106/128/14) with union computed separately and no claim of equality; 16 named genes checked",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Which threshold to report when the paper states BH-adjusted p without a cutoff (open policy question); workflow default padj<0.05 was used and labelled."
+ ],
+ "summary": "本案例与论文一致：生化刺激三组对比的方向、对照和样本分组均正确，排除样本均有理由，SP组保留5例（论文为4例）已记录为偏差。阈值论文未给数值，使用默认padj<0.05并已标注。整体通过。"
+}

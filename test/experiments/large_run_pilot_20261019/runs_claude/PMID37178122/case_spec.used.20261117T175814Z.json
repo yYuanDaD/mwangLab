@@ -1,0 +1,1660 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37178122",
+ "request": "Analyze GSE230102 for PMID 37178122 (Conserved multi-tissue transcriptomic adaptations to exercise training in humans and mice.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE230102_quad",
+   "accession": "GSE230102",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11352395.paper.md"
+    ],
+    "metadata": "GSE230102/GSE230102_metadata.csv",
+    "matrix": "GSE230102/GSE230102_quad.counts.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE230102"
+      ],
+      "primary_estimand": "Effect of 30 d voluntary wheel running (TRN) vs sedentary (SED) on quadriceps skeletal muscle gene expression in female HMDP mice, pooled across strains (S2.1.p1, S2.4.p3).",
+      "planned_contrasts": [
+       "TRN vs SED in quadriceps skeletal muscle across all strains (S2.4.p3; per-tissue DEG count shown only in figures, not in text)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S4.4.1.p3"
+      },
+      "paper_method": "kallisto v0.45 counts -> DESeq2 v1.28.0, corrected using limma v3.44.1 for library prep batch and sequencing flow-cell lane (S4.4.1.p2)",
+      "factors": {
+       "group": [
+        "SED",
+        "TRN"
+       ],
+       "strain": "HMDP inbred strain; mice of each strain randomized to SED or TRN (S2.1.p1)"
+      },
+      "inclusion": "female mice; GEO holds one SED and one TRN animal per strain per tissue (50 strains; the paper describes a 100-strain panel)",
+      "paper_results": "No per-tissue DEG counts in text. 'top 500 DEGs from each tissue (the average number of DEGs in a tissue)' (S2.9.p3); BAT has the most DEGs (S2.8.p1); liver and heart fewer DEGs than muscle and gWAT (S2.6.p1, S2.7.p1); Slc25a1, Acly, Ccn1 and Dusp1 DE in all tissues except liver (S2.9.p1)."
+     },
+     "reasoning": "S2.1.p1: mice from each strain randomly divided into TRN or SED, 30 d in-cage wheel. S4.3.6.1.p1: quadriceps, gWAT, heart, BAT and liver sequenced. S4.4.1.p2: kallisto + DESeq2 with limma correction for library prep batch and flow-cell lane. S4.4.1.p3 and Figure 5A/6A legends: FDR < 0.05, no fold-change rule. Each tissue is a separate TRN vs SED comparison.",
+     "locator": "S4.4.1.p2",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.1.3.p1 and TAB1 name GSE230102 as 'RNAsequencing Exc HMDP, This paper'",
+       "GEO extract protocol matches S4.3.6.1.p1; data_processing names kallisto v0.45 / Ensembl v97 as in S4.4.1.p2",
+       "matrix GSE230102_quad.counts.txt.gz columns all end with _quadriceps and equal GEO titles of this tissue"
+      ]
+     },
+     "reasoning": "The accession is the paper's own deposit for the ExcHMDP tissues; the per-tissue count file is used.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "aliases": {
+      "grp": "characteristics_ch1.3.exercise group"
+     },
+     "patterns": {
+      "strain": [
+       "title",
+       "^(\\d+)_\\d+_[A-Za-z]+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Exercised": "TRN",
+       "Sedentary": "SED"
+      },
+      "strain": {
+       "1": "S1",
+       "2": "S2",
+       "3": "S3",
+       "4": "S4",
+       "5": "S5",
+       "6": "S6",
+       "7": "S7",
+       "8": "S8",
+       "9": "S9",
+       "10": "S10",
+       "11": "S11",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25",
+       "26": "S26",
+       "27": "S27",
+       "28": "S28",
+       "29": "S29",
+       "30": "S30",
+       "31": "S31",
+       "32": "S32",
+       "33": "S33",
+       "34": "S34",
+       "35": "S35",
+       "36": "S36",
+       "37": "S37",
+       "38": "S38",
+       "39": "S39",
+       "40": "S40",
+       "41": "S41",
+       "42": "S42",
+       "43": "S43",
+       "44": "S44",
+       "45": "S45",
+       "46": "S46",
+       "47": "S47",
+       "48": "S48",
+       "49": "S49",
+       "50": "S50"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the GEO title (inspect alignment_keys). The first number of the title is the HMDP strain code (checked 1:1 with the strain characteristic across all 499 samples: 50 codes, 50 strains); recoded to S<n> so it is categorical. grp comes from the exercise-group characteristic.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "GEO data_processing: counts and TPM obtained with kallisto v0.45. The .counts file is non-integer (~74% integer, median 1), i.e. kallisto estimated counts; the paper ran DESeq2 on these counts (S4.4.1.p2). Rounded before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "subject": "strain",
+     "organism": "Mouse",
+     "planned": [
+      "grp_TRN_vs_SED"
+     ],
+     "covariate_candidates": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "TRN",
+      "contrasts": [
+       {
+        "name": "grp_TRN_vs_SED",
+        "control": "SED",
+        "treatment": "TRN",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "strain x group interaction",
+       "reason_rejected": "one animal per strain per arm; interaction not estimable and not the paper's DE estimand"
+      },
+      {
+       "value": "all tissues in one model",
+       "reason_rejected": "the paper analyses each tissue separately (S2.4-S2.8)"
+      }
+     ],
+     "reasoning": "The paper's DE estimand per tissue is TRN vs SED across strains (Figure 5A/6A legends: 'across all strains ... relative to sedentary'). Animals were randomized within strain, so strain is the matching unit (one SED and one TRN per strain).",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "strain"
+      ],
+      "covariates": [
+       {
+        "name": "strain",
+        "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"
+       },
+       {
+        "name": "library prep batch",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       },
+       {
+        "name": "flow cell lane",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "strain"
+     ],
+     "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ strain + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 + limma correction for library prep batch and flow-cell lane",
+       "status": "blocked",
+       "reason": "library prep batch and flow-cell lane are not in the GEO metadata"
+      },
+      "deviations": [
+       "batch/lane adjustment omitted (not deposited)",
+       "strain added as blocking term in the primary model; unblocked ~ grp as sensitivity",
+       "kallisto estimated counts rounded to integers for DESeq2",
+       "GEO holds 50 strains, not the 100 described"
+      ]
+     },
+     "transform": "round",
+     "reasoning": "DESeq2 is the paper's method and the matrix supports it (estimated counts, rounded).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.1.p3 and Figure 5A/6A legends: significant at FDR < 0.05; no fold-change rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
+       "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
+       "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "quad_TRN_vs_SED_strainblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1",
+       "Myoz2",
+       "Esrrb"
+      ],
+      "quad_TRN_vs_SED_unblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1",
+       "Myoz2",
+       "Esrrb"
+      ]
+     },
+     "reasoning": "The paper's estimand and method are reproduced on the deposited data with declared deviations (no batch/lane, strain blocking).",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "number of strains",
+     "paper": "100-strain HMDP (S2.1.p1)",
+     "data": "50 strains in GEO, one SED + one TRN animal per strain per tissue",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "technical covariates",
+     "paper": "limma correction for library prep batch and flow-cell lane (S4.4.1.p2)",
+     "data": "not in GEO metadata",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "quadriceps sample count",
+     "paper": "not stated",
+     "data": "99 samples; 129X1/SvJ has no SED quadriceps",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "quad_TRN_vs_SED_strainblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "covariate_columns": [
+       "strain"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ strain + grp: TRN vs SED blocked on the randomization unit."
+    },
+    {
+     "name": "quad_TRN_vs_SED_unblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "DESeq2 ~ grp: the paper's model minus the undeposited batch/lane terms."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "quad_TRN_vs_SED_strainblocked",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO enrichment of DEGs per tissue (Pantherdb, FDR < 0.05)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE230102_gWAT",
+   "accession": "GSE230102",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11352395.paper.md"
+    ],
+    "metadata": "GSE230102/GSE230102_metadata.csv",
+    "matrix": "GSE230102/GSE230102_gWAT.counts.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE230102"
+      ],
+      "primary_estimand": "Effect of 30 d voluntary wheel running (TRN) vs sedentary (SED) on gonadal white adipose tissue gene expression in female HMDP mice, pooled across strains (S2.1.p1, S2.5.p1).",
+      "planned_contrasts": [
+       "TRN vs SED in gonadal white adipose tissue across all strains (S2.5.p1; per-tissue DEG count shown only in figures, not in text)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S4.4.1.p3"
+      },
+      "paper_method": "kallisto v0.45 counts -> DESeq2 v1.28.0, corrected using limma v3.44.1 for library prep batch and sequencing flow-cell lane (S4.4.1.p2)",
+      "factors": {
+       "group": [
+        "SED",
+        "TRN"
+       ],
+       "strain": "HMDP inbred strain; mice of each strain randomized to SED or TRN (S2.1.p1)"
+      },
+      "inclusion": "female mice; GEO holds one SED and one TRN animal per strain per tissue (50 strains; the paper describes a 100-strain panel)",
+      "paper_results": "No per-tissue DEG counts in text. 'top 500 DEGs from each tissue (the average number of DEGs in a tissue)' (S2.9.p3); BAT has the most DEGs (S2.8.p1); liver and heart fewer DEGs than muscle and gWAT (S2.6.p1, S2.7.p1); Slc25a1, Acly, Ccn1 and Dusp1 DE in all tissues except liver (S2.9.p1)."
+     },
+     "reasoning": "S2.1.p1: mice from each strain randomly divided into TRN or SED, 30 d in-cage wheel. S4.3.6.1.p1: quadriceps, gWAT, heart, BAT and liver sequenced. S4.4.1.p2: kallisto + DESeq2 with limma correction for library prep batch and flow-cell lane. S4.4.1.p3 and Figure 5A/6A legends: FDR < 0.05, no fold-change rule. Each tissue is a separate TRN vs SED comparison.",
+     "locator": "S4.4.1.p2",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.1.3.p1 and TAB1 name GSE230102 as 'RNAsequencing Exc HMDP, This paper'",
+       "GEO extract protocol matches S4.3.6.1.p1; data_processing names kallisto v0.45 / Ensembl v97 as in S4.4.1.p2",
+       "matrix GSE230102_gWAT.counts.txt.gz columns all end with _gWAT and equal GEO titles of this tissue"
+      ]
+     },
+     "reasoning": "The accession is the paper's own deposit for the ExcHMDP tissues; the per-tissue count file is used.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "aliases": {
+      "grp": "characteristics_ch1.3.exercise group"
+     },
+     "patterns": {
+      "strain": [
+       "title",
+       "^(\\d+)_\\d+_[A-Za-z]+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Exercised": "TRN",
+       "Sedentary": "SED"
+      },
+      "strain": {
+       "1": "S1",
+       "2": "S2",
+       "3": "S3",
+       "4": "S4",
+       "5": "S5",
+       "6": "S6",
+       "7": "S7",
+       "8": "S8",
+       "9": "S9",
+       "10": "S10",
+       "11": "S11",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25",
+       "26": "S26",
+       "27": "S27",
+       "28": "S28",
+       "29": "S29",
+       "30": "S30",
+       "31": "S31",
+       "32": "S32",
+       "33": "S33",
+       "34": "S34",
+       "35": "S35",
+       "36": "S36",
+       "37": "S37",
+       "38": "S38",
+       "39": "S39",
+       "40": "S40",
+       "41": "S41",
+       "42": "S42",
+       "43": "S43",
+       "44": "S44",
+       "45": "S45",
+       "46": "S46",
+       "47": "S47",
+       "48": "S48",
+       "49": "S49",
+       "50": "S50"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the GEO title (inspect alignment_keys). The first number of the title is the HMDP strain code (checked 1:1 with the strain characteristic across all 499 samples: 50 codes, 50 strains); recoded to S<n> so it is categorical. grp comes from the exercise-group characteristic.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "GEO data_processing: counts and TPM obtained with kallisto v0.45. The .counts file is non-integer (~74% integer, median 1), i.e. kallisto estimated counts; the paper ran DESeq2 on these counts (S4.4.1.p2). Rounded before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "subject": "strain",
+     "organism": "Mouse",
+     "planned": [
+      "grp_TRN_vs_SED"
+     ],
+     "covariate_candidates": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "TRN",
+      "contrasts": [
+       {
+        "name": "grp_TRN_vs_SED",
+        "control": "SED",
+        "treatment": "TRN",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "strain x group interaction",
+       "reason_rejected": "one animal per strain per arm; interaction not estimable and not the paper's DE estimand"
+      },
+      {
+       "value": "all tissues in one model",
+       "reason_rejected": "the paper analyses each tissue separately (S2.4-S2.8)"
+      }
+     ],
+     "reasoning": "The paper's DE estimand per tissue is TRN vs SED across strains (Figure 5A/6A legends: 'across all strains ... relative to sedentary'). Animals were randomized within strain, so strain is the matching unit (one SED and one TRN per strain).",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "strain"
+      ],
+      "covariates": [
+       {
+        "name": "strain",
+        "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"
+       },
+       {
+        "name": "library prep batch",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       },
+       {
+        "name": "flow cell lane",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "strain"
+     ],
+     "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ strain + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 + limma correction for library prep batch and flow-cell lane",
+       "status": "blocked",
+       "reason": "library prep batch and flow-cell lane are not in the GEO metadata"
+      },
+      "deviations": [
+       "batch/lane adjustment omitted (not deposited)",
+       "strain added as blocking term in the primary model; unblocked ~ grp as sensitivity",
+       "kallisto estimated counts rounded to integers for DESeq2",
+       "GEO holds 50 strains, not the 100 described"
+      ]
+     },
+     "transform": "round",
+     "reasoning": "DESeq2 is the paper's method and the matrix supports it (estimated counts, rounded).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.1.p3 and Figure 5A/6A legends: significant at FDR < 0.05; no fold-change rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
+       "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
+       "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "gWAT_TRN_vs_SED_strainblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1",
+       "Clic4",
+       "Tomm5"
+      ],
+      "gWAT_TRN_vs_SED_unblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1",
+       "Clic4",
+       "Tomm5"
+      ]
+     },
+     "reasoning": "The paper's estimand and method are reproduced on the deposited data with declared deviations (no batch/lane, strain blocking).",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "number of strains",
+     "paper": "100-strain HMDP (S2.1.p1)",
+     "data": "50 strains in GEO, one SED + one TRN animal per strain per tissue",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "technical covariates",
+     "paper": "limma correction for library prep batch and flow-cell lane (S4.4.1.p2)",
+     "data": "not in GEO metadata",
+     "disposition": "declared_deviation"
+    }
+   ],
+   "executions": [
+    {
+     "name": "gWAT_TRN_vs_SED_strainblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "covariate_columns": [
+       "strain"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ strain + grp: TRN vs SED blocked on the randomization unit."
+    },
+    {
+     "name": "gWAT_TRN_vs_SED_unblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "DESeq2 ~ grp: the paper's model minus the undeposited batch/lane terms."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "gWAT_TRN_vs_SED_strainblocked",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO enrichment of DEGs per tissue (Pantherdb, FDR < 0.05)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE230102_liver",
+   "accession": "GSE230102",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11352395.paper.md"
+    ],
+    "metadata": "GSE230102/GSE230102_metadata.csv",
+    "matrix": "GSE230102/GSE230102_liver.counts.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE230102"
+      ],
+      "primary_estimand": "Effect of 30 d voluntary wheel running (TRN) vs sedentary (SED) on liver gene expression in female HMDP mice, pooled across strains (S2.1.p1, S2.6.p1).",
+      "planned_contrasts": [
+       "TRN vs SED in liver across all strains (S2.6.p1; per-tissue DEG count shown only in figures, not in text)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S4.4.1.p3"
+      },
+      "paper_method": "kallisto v0.45 counts -> DESeq2 v1.28.0, corrected using limma v3.44.1 for library prep batch and sequencing flow-cell lane (S4.4.1.p2)",
+      "factors": {
+       "group": [
+        "SED",
+        "TRN"
+       ],
+       "strain": "HMDP inbred strain; mice of each strain randomized to SED or TRN (S2.1.p1)"
+      },
+      "inclusion": "female mice; GEO holds one SED and one TRN animal per strain per tissue (50 strains; the paper describes a 100-strain panel)",
+      "paper_results": "No per-tissue DEG counts in text. 'top 500 DEGs from each tissue (the average number of DEGs in a tissue)' (S2.9.p3); BAT has the most DEGs (S2.8.p1); liver and heart fewer DEGs than muscle and gWAT (S2.6.p1, S2.7.p1); Slc25a1, Acly, Ccn1 and Dusp1 DE in all tissues except liver (S2.9.p1)."
+     },
+     "reasoning": "S2.1.p1: mice from each strain randomly divided into TRN or SED, 30 d in-cage wheel. S4.3.6.1.p1: quadriceps, gWAT, heart, BAT and liver sequenced. S4.4.1.p2: kallisto + DESeq2 with limma correction for library prep batch and flow-cell lane. S4.4.1.p3 and Figure 5A/6A legends: FDR < 0.05, no fold-change rule. Each tissue is a separate TRN vs SED comparison.",
+     "locator": "S4.4.1.p2",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.1.3.p1 and TAB1 name GSE230102 as 'RNAsequencing Exc HMDP, This paper'",
+       "GEO extract protocol matches S4.3.6.1.p1; data_processing names kallisto v0.45 / Ensembl v97 as in S4.4.1.p2",
+       "matrix GSE230102_liver.counts.txt.gz columns all end with _liver and equal GEO titles of this tissue"
+      ]
+     },
+     "reasoning": "The accession is the paper's own deposit for the ExcHMDP tissues; the per-tissue count file is used.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "aliases": {
+      "grp": "characteristics_ch1.3.exercise group"
+     },
+     "patterns": {
+      "strain": [
+       "title",
+       "^(\\d+)_\\d+_[A-Za-z]+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Exercised": "TRN",
+       "Sedentary": "SED"
+      },
+      "strain": {
+       "1": "S1",
+       "2": "S2",
+       "3": "S3",
+       "4": "S4",
+       "5": "S5",
+       "6": "S6",
+       "7": "S7",
+       "8": "S8",
+       "9": "S9",
+       "10": "S10",
+       "11": "S11",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25",
+       "26": "S26",
+       "27": "S27",
+       "28": "S28",
+       "29": "S29",
+       "30": "S30",
+       "31": "S31",
+       "32": "S32",
+       "33": "S33",
+       "34": "S34",
+       "35": "S35",
+       "36": "S36",
+       "37": "S37",
+       "38": "S38",
+       "39": "S39",
+       "40": "S40",
+       "41": "S41",
+       "42": "S42",
+       "43": "S43",
+       "44": "S44",
+       "45": "S45",
+       "46": "S46",
+       "47": "S47",
+       "48": "S48",
+       "49": "S49",
+       "50": "S50"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the GEO title (inspect alignment_keys). The first number of the title is the HMDP strain code (checked 1:1 with the strain characteristic across all 499 samples: 50 codes, 50 strains); recoded to S<n> so it is categorical. grp comes from the exercise-group characteristic.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "GEO data_processing: counts and TPM obtained with kallisto v0.45. The .counts file is non-integer (~74% integer, median 1), i.e. kallisto estimated counts; the paper ran DESeq2 on these counts (S4.4.1.p2). Rounded before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "subject": "strain",
+     "organism": "Mouse",
+     "planned": [
+      "grp_TRN_vs_SED"
+     ],
+     "covariate_candidates": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "TRN",
+      "contrasts": [
+       {
+        "name": "grp_TRN_vs_SED",
+        "control": "SED",
+        "treatment": "TRN",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "strain x group interaction",
+       "reason_rejected": "one animal per strain per arm; interaction not estimable and not the paper's DE estimand"
+      },
+      {
+       "value": "all tissues in one model",
+       "reason_rejected": "the paper analyses each tissue separately (S2.4-S2.8)"
+      }
+     ],
+     "reasoning": "The paper's DE estimand per tissue is TRN vs SED across strains (Figure 5A/6A legends: 'across all strains ... relative to sedentary'). Animals were randomized within strain, so strain is the matching unit (one SED and one TRN per strain).",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "strain"
+      ],
+      "covariates": [
+       {
+        "name": "strain",
+        "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"
+       },
+       {
+        "name": "library prep batch",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       },
+       {
+        "name": "flow cell lane",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "strain"
+     ],
+     "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ strain + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 + limma correction for library prep batch and flow-cell lane",
+       "status": "blocked",
+       "reason": "library prep batch and flow-cell lane are not in the GEO metadata"
+      },
+      "deviations": [
+       "batch/lane adjustment omitted (not deposited)",
+       "strain added as blocking term in the primary model; unblocked ~ grp as sensitivity",
+       "kallisto estimated counts rounded to integers for DESeq2",
+       "GEO holds 50 strains, not the 100 described"
+      ]
+     },
+     "transform": "round",
+     "reasoning": "DESeq2 is the paper's method and the matrix supports it (estimated counts, rounded).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.1.p3 and Figure 5A/6A legends: significant at FDR < 0.05; no fold-change rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
+       "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
+       "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "liver_TRN_vs_SED_strainblocked": [
+       "Mki67",
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ],
+      "liver_TRN_vs_SED_unblocked": [
+       "Mki67",
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ]
+     },
+     "reasoning": "The paper's estimand and method are reproduced on the deposited data with declared deviations (no batch/lane, strain blocking).",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "number of strains",
+     "paper": "100-strain HMDP (S2.1.p1)",
+     "data": "50 strains in GEO, one SED + one TRN animal per strain per tissue",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "technical covariates",
+     "paper": "limma correction for library prep batch and flow-cell lane (S4.4.1.p2)",
+     "data": "not in GEO metadata",
+     "disposition": "declared_deviation"
+    }
+   ],
+   "executions": [
+    {
+     "name": "liver_TRN_vs_SED_strainblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "covariate_columns": [
+       "strain"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ strain + grp: TRN vs SED blocked on the randomization unit."
+    },
+    {
+     "name": "liver_TRN_vs_SED_unblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "DESeq2 ~ grp: the paper's model minus the undeposited batch/lane terms."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "liver_TRN_vs_SED_strainblocked",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO enrichment of DEGs per tissue (Pantherdb, FDR < 0.05)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE230102_heart",
+   "accession": "GSE230102",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11352395.paper.md"
+    ],
+    "metadata": "GSE230102/GSE230102_metadata.csv",
+    "matrix": "GSE230102/GSE230102_heart.counts.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE230102"
+      ],
+      "primary_estimand": "Effect of 30 d voluntary wheel running (TRN) vs sedentary (SED) on heart gene expression in female HMDP mice, pooled across strains (S2.1.p1, S2.7.p1).",
+      "planned_contrasts": [
+       "TRN vs SED in heart across all strains (S2.7.p1; per-tissue DEG count shown only in figures, not in text)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S4.4.1.p3"
+      },
+      "paper_method": "kallisto v0.45 counts -> DESeq2 v1.28.0, corrected using limma v3.44.1 for library prep batch and sequencing flow-cell lane (S4.4.1.p2)",
+      "factors": {
+       "group": [
+        "SED",
+        "TRN"
+       ],
+       "strain": "HMDP inbred strain; mice of each strain randomized to SED or TRN (S2.1.p1)"
+      },
+      "inclusion": "female mice; GEO holds one SED and one TRN animal per strain per tissue (50 strains; the paper describes a 100-strain panel)",
+      "paper_results": "No per-tissue DEG counts in text. 'top 500 DEGs from each tissue (the average number of DEGs in a tissue)' (S2.9.p3); BAT has the most DEGs (S2.8.p1); liver and heart fewer DEGs than muscle and gWAT (S2.6.p1, S2.7.p1); Slc25a1, Acly, Ccn1 and Dusp1 DE in all tissues except liver (S2.9.p1)."
+     },
+     "reasoning": "S2.1.p1: mice from each strain randomly divided into TRN or SED, 30 d in-cage wheel. S4.3.6.1.p1: quadriceps, gWAT, heart, BAT and liver sequenced. S4.4.1.p2: kallisto + DESeq2 with limma correction for library prep batch and flow-cell lane. S4.4.1.p3 and Figure 5A/6A legends: FDR < 0.05, no fold-change rule. Each tissue is a separate TRN vs SED comparison.",
+     "locator": "S4.4.1.p2",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.1.3.p1 and TAB1 name GSE230102 as 'RNAsequencing Exc HMDP, This paper'",
+       "GEO extract protocol matches S4.3.6.1.p1; data_processing names kallisto v0.45 / Ensembl v97 as in S4.4.1.p2",
+       "matrix GSE230102_heart.counts.txt.gz columns all end with _heart and equal GEO titles of this tissue"
+      ]
+     },
+     "reasoning": "The accession is the paper's own deposit for the ExcHMDP tissues; the per-tissue count file is used.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "aliases": {
+      "grp": "characteristics_ch1.3.exercise group"
+     },
+     "patterns": {
+      "strain": [
+       "title",
+       "^(\\d+)_\\d+_[A-Za-z]+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Exercised": "TRN",
+       "Sedentary": "SED"
+      },
+      "strain": {
+       "1": "S1",
+       "2": "S2",
+       "3": "S3",
+       "4": "S4",
+       "5": "S5",
+       "6": "S6",
+       "7": "S7",
+       "8": "S8",
+       "9": "S9",
+       "10": "S10",
+       "11": "S11",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25",
+       "26": "S26",
+       "27": "S27",
+       "28": "S28",
+       "29": "S29",
+       "30": "S30",
+       "31": "S31",
+       "32": "S32",
+       "33": "S33",
+       "34": "S34",
+       "35": "S35",
+       "36": "S36",
+       "37": "S37",
+       "38": "S38",
+       "39": "S39",
+       "40": "S40",
+       "41": "S41",
+       "42": "S42",
+       "43": "S43",
+       "44": "S44",
+       "45": "S45",
+       "46": "S46",
+       "47": "S47",
+       "48": "S48",
+       "49": "S49",
+       "50": "S50"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the GEO title (inspect alignment_keys). The first number of the title is the HMDP strain code (checked 1:1 with the strain characteristic across all 499 samples: 50 codes, 50 strains); recoded to S<n> so it is categorical. grp comes from the exercise-group characteristic.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "GEO data_processing: counts and TPM obtained with kallisto v0.45. The .counts file is non-integer (~74% integer, median 1), i.e. kallisto estimated counts; the paper ran DESeq2 on these counts (S4.4.1.p2). Rounded before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "subject": "strain",
+     "organism": "Mouse",
+     "planned": [
+      "grp_TRN_vs_SED"
+     ],
+     "covariate_candidates": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "TRN",
+      "contrasts": [
+       {
+        "name": "grp_TRN_vs_SED",
+        "control": "SED",
+        "treatment": "TRN",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "strain x group interaction",
+       "reason_rejected": "one animal per strain per arm; interaction not estimable and not the paper's DE estimand"
+      },
+      {
+       "value": "all tissues in one model",
+       "reason_rejected": "the paper analyses each tissue separately (S2.4-S2.8)"
+      }
+     ],
+     "reasoning": "The paper's DE estimand per tissue is TRN vs SED across strains (Figure 5A/6A legends: 'across all strains ... relative to sedentary'). Animals were randomized within strain, so strain is the matching unit (one SED and one TRN per strain).",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "strain"
+      ],
+      "covariates": [
+       {
+        "name": "strain",
+        "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"
+       },
+       {
+        "name": "library prep batch",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       },
+       {
+        "name": "flow cell lane",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "strain"
+     ],
+     "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ strain + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 + limma correction for library prep batch and flow-cell lane",
+       "status": "blocked",
+       "reason": "library prep batch and flow-cell lane are not in the GEO metadata"
+      },
+      "deviations": [
+       "batch/lane adjustment omitted (not deposited)",
+       "strain added as blocking term in the primary model; unblocked ~ grp as sensitivity",
+       "kallisto estimated counts rounded to integers for DESeq2",
+       "GEO holds 50 strains, not the 100 described"
+      ]
+     },
+     "transform": "round",
+     "reasoning": "DESeq2 is the paper's method and the matrix supports it (estimated counts, rounded).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.1.p3 and Figure 5A/6A legends: significant at FDR < 0.05; no fold-change rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
+       "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
+       "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "heart_TRN_vs_SED_strainblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ],
+      "heart_TRN_vs_SED_unblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ]
+     },
+     "reasoning": "The paper's estimand and method are reproduced on the deposited data with declared deviations (no batch/lane, strain blocking).",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "number of strains",
+     "paper": "100-strain HMDP (S2.1.p1)",
+     "data": "50 strains in GEO, one SED + one TRN animal per strain per tissue",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "technical covariates",
+     "paper": "limma correction for library prep batch and flow-cell lane (S4.4.1.p2)",
+     "data": "not in GEO metadata",
+     "disposition": "declared_deviation"
+    }
+   ],
+   "executions": [
+    {
+     "name": "heart_TRN_vs_SED_strainblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "covariate_columns": [
+       "strain"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ strain + grp: TRN vs SED blocked on the randomization unit."
+    },
+    {
+     "name": "heart_TRN_vs_SED_unblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "DESeq2 ~ grp: the paper's model minus the undeposited batch/lane terms."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "heart_TRN_vs_SED_strainblocked",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO enrichment of DEGs per tissue (Pantherdb, FDR < 0.05)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE230102_BAT",
+   "accession": "GSE230102",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11352395.paper.md"
+    ],
+    "metadata": "GSE230102/GSE230102_metadata.csv",
+    "matrix": "GSE230102/GSE230102_BAT.counts.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE230102"
+      ],
+      "primary_estimand": "Effect of 30 d voluntary wheel running (TRN) vs sedentary (SED) on brown adipose tissue gene expression in female HMDP mice, pooled across strains (S2.1.p1, S2.8.p1).",
+      "planned_contrasts": [
+       "TRN vs SED in brown adipose tissue across all strains (S2.8.p1; per-tissue DEG count shown only in figures, not in text)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S4.4.1.p3"
+      },
+      "paper_method": "kallisto v0.45 counts -> DESeq2 v1.28.0, corrected using limma v3.44.1 for library prep batch and sequencing flow-cell lane (S4.4.1.p2)",
+      "factors": {
+       "group": [
+        "SED",
+        "TRN"
+       ],
+       "strain": "HMDP inbred strain; mice of each strain randomized to SED or TRN (S2.1.p1)"
+      },
+      "inclusion": "female mice; GEO holds one SED and one TRN animal per strain per tissue (50 strains; the paper describes a 100-strain panel)",
+      "paper_results": "No per-tissue DEG counts in text. 'top 500 DEGs from each tissue (the average number of DEGs in a tissue)' (S2.9.p3); BAT has the most DEGs (S2.8.p1); liver and heart fewer DEGs than muscle and gWAT (S2.6.p1, S2.7.p1); Slc25a1, Acly, Ccn1 and Dusp1 DE in all tissues except liver (S2.9.p1)."
+     },
+     "reasoning": "S2.1.p1: mice from each strain randomly divided into TRN or SED, 30 d in-cage wheel. S4.3.6.1.p1: quadriceps, gWAT, heart, BAT and liver sequenced. S4.4.1.p2: kallisto + DESeq2 with limma correction for library prep batch and flow-cell lane. S4.4.1.p3 and Figure 5A/6A legends: FDR < 0.05, no fold-change rule. Each tissue is a separate TRN vs SED comparison.",
+     "locator": "S4.4.1.p2",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.1.3.p1 and TAB1 name GSE230102 as 'RNAsequencing Exc HMDP, This paper'",
+       "GEO extract protocol matches S4.3.6.1.p1; data_processing names kallisto v0.45 / Ensembl v97 as in S4.4.1.p2",
+       "matrix GSE230102_BAT.counts.txt.gz columns all end with _BAT and equal GEO titles of this tissue"
+      ]
+     },
+     "reasoning": "The accession is the paper's own deposit for the ExcHMDP tissues; the per-tissue count file is used.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "aliases": {
+      "grp": "characteristics_ch1.3.exercise group"
+     },
+     "patterns": {
+      "strain": [
+       "title",
+       "^(\\d+)_\\d+_[A-Za-z]+$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Exercised": "TRN",
+       "Sedentary": "SED"
+      },
+      "strain": {
+       "1": "S1",
+       "2": "S2",
+       "3": "S3",
+       "4": "S4",
+       "5": "S5",
+       "6": "S6",
+       "7": "S7",
+       "8": "S8",
+       "9": "S9",
+       "10": "S10",
+       "11": "S11",
+       "12": "S12",
+       "13": "S13",
+       "14": "S14",
+       "15": "S15",
+       "16": "S16",
+       "17": "S17",
+       "18": "S18",
+       "19": "S19",
+       "20": "S20",
+       "21": "S21",
+       "22": "S22",
+       "23": "S23",
+       "24": "S24",
+       "25": "S25",
+       "26": "S26",
+       "27": "S27",
+       "28": "S28",
+       "29": "S29",
+       "30": "S30",
+       "31": "S31",
+       "32": "S32",
+       "33": "S33",
+       "34": "S34",
+       "35": "S35",
+       "36": "S36",
+       "37": "S37",
+       "38": "S38",
+       "39": "S39",
+       "40": "S40",
+       "41": "S41",
+       "42": "S42",
+       "43": "S43",
+       "44": "S44",
+       "45": "S45",
+       "46": "S46",
+       "47": "S47",
+       "48": "S48",
+       "49": "S49",
+       "50": "S50"
+      }
+     },
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the GEO title (inspect alignment_keys). The first number of the title is the HMDP strain code (checked 1:1 with the strain characteristic across all 499 samples: 50 codes, 50 strains); recoded to S<n> so it is categorical. grp comes from the exercise-group characteristic.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "DESeq2",
+     "reasoning": "GEO data_processing: counts and TPM obtained with kallisto v0.45. The .counts file is non-integer (~74% integer, median 1), i.e. kallisto estimated counts; the paper ran DESeq2 on these counts (S4.4.1.p2). Rounded before DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "SED"
+     },
+     "subject": "strain",
+     "organism": "Mouse",
+     "planned": [
+      "grp_TRN_vs_SED"
+     ],
+     "covariate_candidates": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "SED",
+      "treatment": "TRN",
+      "contrasts": [
+       {
+        "name": "grp_TRN_vs_SED",
+        "control": "SED",
+        "treatment": "TRN",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "strain x group interaction",
+       "reason_rejected": "one animal per strain per arm; interaction not estimable and not the paper's DE estimand"
+      },
+      {
+       "value": "all tissues in one model",
+       "reason_rejected": "the paper analyses each tissue separately (S2.4-S2.8)"
+      }
+     ],
+     "reasoning": "The paper's DE estimand per tissue is TRN vs SED across strains (Figure 5A/6A legends: 'across all strains ... relative to sedentary'). Animals were randomized within strain, so strain is the matching unit (one SED and one TRN per strain).",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "strain"
+      ],
+      "covariates": [
+       {
+        "name": "strain",
+        "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"
+       },
+       {
+        "name": "library prep batch",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       },
+       {
+        "name": "flow cell lane",
+        "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "strain"
+     ],
+     "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ strain + grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 + limma correction for library prep batch and flow-cell lane",
+       "status": "blocked",
+       "reason": "library prep batch and flow-cell lane are not in the GEO metadata"
+      },
+      "deviations": [
+       "batch/lane adjustment omitted (not deposited)",
+       "strain added as blocking term in the primary model; unblocked ~ grp as sensitivity",
+       "kallisto estimated counts rounded to integers for DESeq2",
+       "GEO holds 50 strains, not the 100 described"
+      ]
+     },
+     "transform": "round",
+     "reasoning": "DESeq2 is the paper's method and the matrix supports it (estimated counts, rounded).",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S4.4.1.p3 and Figure 5A/6A legends: significant at FDR < 0.05; no fold-change rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
+       "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
+       "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "BAT_TRN_vs_SED_strainblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ],
+      "BAT_TRN_vs_SED_unblocked": [
+       "Slc25a1",
+       "Acly",
+       "Ccn1",
+       "Dusp1"
+      ]
+     },
+     "reasoning": "The paper's estimand and method are reproduced on the deposited data with declared deviations (no batch/lane, strain blocking).",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "number of strains",
+     "paper": "100-strain HMDP (S2.1.p1)",
+     "data": "50 strains in GEO, one SED + one TRN animal per strain per tissue",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "technical covariates",
+     "paper": "limma correction for library prep batch and flow-cell lane (S4.4.1.p2)",
+     "data": "not in GEO metadata",
+     "disposition": "declared_deviation"
+    }
+   ],
+   "executions": [
+    {
+     "name": "BAT_TRN_vs_SED_strainblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "covariate_columns": [
+       "strain"
+      ],
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "DESeq2 ~ strain + grp: TRN vs SED blocked on the randomization unit."
+    },
+    {
+     "name": "BAT_TRN_vs_SED_unblocked",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "SED",
+      "treatment_group": "TRN",
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "DESeq2 ~ grp: the paper's model minus the undeposited batch/lane terms."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "BAT_TRN_vs_SED_strainblocked",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO enrichment of DEGs per tissue (Pantherdb, FDR < 0.05)."
+    }
+   ]
+  }
+ ]
+}

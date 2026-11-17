@@ -1,0 +1,88 @@
+{
+ "case": "GSE257540_mech",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes, as in-vitro mechanical stimulation (MagMA actuation mimicking contraction stretch) of motor neuron spheroids; factor = M1-4 (grp MS) vs MC1-4 (MC) (S2.3, S2.4.p4, FIG7i).",
+  "B2": "Mechanical stimulation vs mechanical control: 4 vs 3 samples after QC (FIG7i legend; one of MC1-4 excluded).",
+  "B3": "No repeated measures; independent spheroids. Packet A candidate keys have duplicates or link 0 samples.",
+  "B4": "The paper shows the mechanical experiment on its own PCA (FIG7i) but does not state the model composition.",
+  "B5": "Paper: DEGs from DESeq2 with Benjamini-Hochberg adjusted p (FIG7 legend; S4.10.p1: raw and BH-adjusted p reported, normal prior and ashr); no numeric cutoff or fold-change rule stated. Counts: 194 DEGs across the three biochemical comparisons (S2.4.p3, union); mechanical: 2 significant hits, both up (S2.4.p4). FIG7j heatmap uses nominal p for the top 50 genes."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run as in-vitro mechanical-exercise mimic and labelled as such",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "MS 4 (M1-4), MC 3 (MC1,2,4) matches FIG7i. MC3 excluded by inference (613K reads, high gene count), not by a criterion the paper names; the paper does not say which control was dropped, and the GEO grp column lists it as MC. Reason stated in the alignment gate.",
+   "fix": "Optional sensitivity: vary which MC sample is dropped."
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "MS vs MC, control MC, treatment MS (FIG7i; S2.4.p4 'increased in response to mechanical stimulation')",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Independent wells; no unit in GEO or paper",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Separate two-group fit for a separate experiment; paper silent; recorded as deviation",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No batch or lane variable available; recorded",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer Salmon counts into DESeq2 as the paper; no-ashr deviation recorded; p-value fractions (gt0.9 0.109, lt0.05 0.013) plausible for a near-null contrast",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "BH padj<0.05 labelled workflow_default; paper gives no cutoff; nominal p audit (413) recorded, consistent with the paper's nominal-p heatmap FIG7j",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Ours 0 vs paper 2 DEGs (S2.4.p4), same contrast and rule family; HANDBACK attributes the gap to pydeseq2/R/ashr differences without evidence; the paper's two hits are unnamed so unverifiable",
+   "fix": "In HANDBACK say the 0 vs 2 difference is unexplained rather than attributing it to implementation."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Which threshold to report when the paper states BH-adjusted p without a cutoff (open policy question); workflow default padj<0.05 was used and labelled."
+ ],
+ "summary": "机械刺激（MS 4例 vs MC 3例）的分组、方向、方法均与论文FIG7i一致，MC3被排除属于推断但已说明理由。padj<0.05下0个DEG，论文为2个，已如实记录。整体通过。"
+}

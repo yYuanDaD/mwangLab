@@ -1,0 +1,176 @@
+{
+  "case_id": "GSE230102_gWAT",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "SED": 50,
+          "TRN": 50
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "strain"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "strain",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "strain",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "strain",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 98,
+        "min_cell_size": 50
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_TRN_vs_SED"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 100 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "unknown": 62,
+        "male": 38
+      },
+      "mismatched": [],
+      "uncertain": [
+        "GSM7186965",
+        "GSM7186966",
+        "GSM7186970",
+        "GSM7186971",
+        "GSM7186973",
+        "GSM7186978",
+        "GSM7186979",
+        "GSM7186980",
+        "GSM7186981",
+        "GSM7186984",
+        "GSM7186985",
+        "GSM7186987",
+        "GSM7186989",
+        "GSM7186991",
+        "GSM7186993",
+        "GSM7186994",
+        "GSM7186996",
+        "GSM7186998",
+        "GSM7187000",
+        "GSM7187001",
+        "GSM7187002",
+        "GSM7187003",
+        "GSM7187007",
+        "GSM7187010",
+        "GSM7187011",
+        "GSM7187013",
+        "GSM7187016",
+        "GSM7187019",
+        "GSM7187022",
+        "GSM7187023",
+        "GSM7187024",
+        "GSM7187025",
+        "GSM7187035",
+        "GSM7187037",
+        "GSM7187039",
+        "GSM7187044",
+        "GSM7187045",
+        "GSM7187051"
+      ],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37178122\\GSE230102_gWAT\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_TRN_vs_SED",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TRN",
+      "reference": "SED",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "TRN"
+          },
+          "n": 50
+        },
+        {
+          "cell": {
+            "grp": "SED"
+          },
+          "n": 50
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

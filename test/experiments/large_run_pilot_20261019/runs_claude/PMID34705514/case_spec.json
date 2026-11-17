@@ -1,0 +1,121 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34705514",
+  "request": "Analyze GSE152919 for PMID 34705514 (REV-ERB nuclear receptors in the suprachiasmatic nucleus control circadian period and restrict diet-induced obesity.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE152919",
+      "accession": "GSE152919",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC8550249.paper.md"],
+        "metadata": "GSE152919/GSE152919_metadata.csv",
+        "matrix": "GSE152919/GSE152919_CT4_CT16_SCN_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE152919"],
+            "assay": "bulk RNA-seq (Illumina TruSeq Stranded Total RNA), SCN punches pooled 3-4 per biological replicate (FIG4, S4.14.p1)",
+            "primary_estimand": "Effect of SCN-specific REV-ERBalpha/beta double knockout (SCN-DKO vs floxed control) on SCN gene expression, and the CT4-vs-CT16 circadian time difference within each genotype, in mice held 3 weeks in constant darkness (S2.3.p1). No exercise intervention is part of any RNA-seq experiment.",
+            "factors": {
+              "genotype": ["control", "SCN-DKO (REV-ERBs DKO)"],
+              "time": ["CT4", "CT16"]
+            },
+            "planned_contrasts": [
+              "CT4 vs CT16 within control (S2.3.p1; paper: 807 DEGs)",
+              "CT4 vs CT16 within SCN-DKO (S2.3.p1; paper: 406 DEGs)",
+              "SCN-DKO vs control at CT4 (FIG4 E, S2.3.p2; paper: 286 DEGs, n=3 vs 3)",
+              "SCN-DKO vs control at ZT4 (FIG4 D, S2.3.p2; paper: 56 DEGs, n=2 vs 2; LD-housed samples, not in this series)"
+            ],
+            "sample_inclusion": "SCN of male control and SCN-DKO mice, 8-12 weeks, DD 3 weeks, harvested at CT4 or CT16 (S2.3.p1, S4 methods)",
+            "repeated_measure_unit": "none; each replicate is a pool of 3-4 independent SCN punches from different animals (FIG4)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "expression_filter": "TPM > 0.1",
+              "source_locator": "FIG4 B/D/E legend (FC > 1.5, FDR < 0.05, TPM > 0.1); S4.14.p1 (FDR < 0.05, > 0.1 TPM)"
+            },
+            "paper_method": "STAR + featureCounts, TPM < 0.1 genes removed, DESeq2 (S4.14.p1)",
+            "exercise_role": "Wheel running is used only as a readout of locomotor activity rhythm and free-running period (FIG1 C, FIG2 F, S4 methods S99/S103); it is not an experimental arm, and no RNA-seq sample is defined by exercise exposure."
+          },
+          "reasoning": "S2.3.p1 and S2.3.p2 define the only transcriptomic comparisons: time-of-day (CT4 vs CT16) within genotype and genotype (SCN-DKO vs control) at CT4/ZT4. S4.14.p1 gives DESeq2 with FDR < 0.05 and TPM > 0.1; the Fig. 4 legend adds FC > 1.5. The paper's only exercise-related element is home-cage wheel running, used as a circadian behavioural measurement in all mice.",
+          "confidence": "high",
+          "locator": "S2.3.p1; S2.3.p2; FIG4; S4.14.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GEO samples are SCN from C57BL/6 control vs REV-ERBS DKO mice at CT4/CT16, matching S2.3.p1",
+              "CT4 group sizes 3 KO / 3 WT match FIG4 E (n = 3 vs 3)",
+              "data_processing: STAR mm10 + featureCounts + DESeq2, matching S4.14.p1",
+              "The paper markdown does not print the GEO accession; ownership rests on the sample-design match. The ZT4 (LD) samples of FIG4 D are not in this series."
+            ]
+          },
+          "reasoning": "Design, tissue, genotype labels, time points, replicate numbers at CT4, and processing pipeline all match the paper's SCN RNA-seq; the series is the paper's CT4/CT16 dataset.",
+          "confidence": "medium"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "geno": ["title", "^CT\\d+_(KO|WT)\\d+$"],
+            "time": ["title", "^(CT\\d+)_(?:KO|WT)\\d+$"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "inspect: title equals matrix column names for 15/15 samples (e.g. CT16_KO1). geno and time are parsed from the title; they agree with characteristics genotype and time point.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer (integer_fraction 1.0, max 608230, median 204), featureCounts annotation columns (Chr/Start/End/Strand/Length) present, data_processing states featureCounts then DESeq2; this matches the paper's stated DESeq2 input. Note: some gene IDs are Excel-mangled dates (e.g. 4-Mar, 2-Sep), which would need repair before any gene-level reporting.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "time"],
+          "references": {"geno": "WT", "time": "CT16"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast exists. The series has two factors, genotype (SCN REV-ERB DKO vs control) and circadian time (CT4 vs CT16); every mouse was housed identically in constant darkness. No sample is exercised versus sedentary, and the paper's wheel running is a circadian activity readout given to all mice, not an intervention arm (S2.3.p1, FIG1, S4 methods). The requested estimand (effect of exercise on gene expression) is not identified by these data, and the paper itself never frames any transcriptomic comparison as an exercise effect; substituting the genotype or time contrast would manufacture an exercise result.",
+          "candidates": [
+            {"value": "geno_KO_vs_WT (SCN-DKO vs control at CT4 or CT16)", "reason_rejected": "genetic knockout effect, not exercise"},
+            {"value": "time_CT4_vs_CT16 within genotype", "reason_rejected": "circadian time-of-day effect, not exercise"}
+          ],
+          "reasoning": "The only paper-defined contrasts are genotype and circadian time. Wheel running appears only as a behavioural measurement of locomotor period. Refused at design per the skill rule that a sequenced sample set with no exercise arm is refused at design.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "Requested estimand vs paper estimand",
+          "paper": "Transcriptomic estimands are REV-ERB deletion and circadian time (S2.3.p1-p2)",
+          "data": "GSE152919 factors: genotype x time point; no exercise variable",
+          "disposition": "blocks_estimand"
+        },
+        {
+          "item": "ZT4 samples",
+          "paper": "FIG4 D: SCN-DKO vs control at ZT4 (n = 2 vs 2, 56 DEGs)",
+          "data": "Not in GSE152919 (only CT4/CT16)",
+          "disposition": "not_applicable_after_refusal"
+        },
+        {
+          "item": "Gene identifiers",
+          "paper": "gene symbols",
+          "data": "Excel-mangled IDs in the count matrix (4-Mar, 2-Sep, ...)",
+          "disposition": "not_applicable_after_refusal"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
