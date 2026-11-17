@@ -76,7 +76,7 @@ def matrix_family(value: Any) -> str:
         return "estimated_counts"
     if "beta" in text and "m-value" not in text and "m_value" not in text:
         return "methylation_beta"
-    if "log" in text or "rma" in text or "m-value" in text or "m_value" in text:
+    if "log" in text or re.search(r"\brma\b", text) or "m-value" in text or "m_value" in text:
         return "log_scale"
     if any(k in text for k in ("fpkm", "tpm", "rpkm", "linear", "intensity")):
         return "linear_normalized"

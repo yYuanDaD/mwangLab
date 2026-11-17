@@ -1,0 +1,255 @@
+{
+  "case_id": "GSE150620",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "act_raw",
+    "lip_raw"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "linear normalized CPM (floored at 1)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "linear normalized CPM (floored at 1)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "act_raw",
+        "lip_raw"
+      ],
+      "levels": {
+        "act_raw": {
+          "sed": 11,
+          "wheel": 11
+        },
+        "lip_raw": {
+          "pbs": 12,
+          "clo": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "lip_raw",
+          "decision": "omit",
+          "reason": "same grouping as design factor lip_raw (its source column)"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(act_raw) + C(lip_raw)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 19,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": [
+        "act_raw_wheel_vs_sed"
+      ]
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 22 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 22
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33123481\\GSE150620\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "female"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "act_raw_wheel_vs_sed_lip_raw-clo",
+      "kind": "simple",
+      "factor": "act_raw",
+      "test": "wheel",
+      "reference": "sed",
+      "within": {
+        "lip_raw": "clo"
+      },
+      "cells": [
+        {
+          "cell": {
+            "lip_raw": "clo",
+            "act_raw": "wheel"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "lip_raw": "clo",
+            "act_raw": "sed"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_raw_wheel_vs_sed_lip_raw-pbs",
+      "kind": "simple",
+      "factor": "act_raw",
+      "test": "wheel",
+      "reference": "sed",
+      "within": {
+        "lip_raw": "pbs"
+      },
+      "cells": [
+        {
+          "cell": {
+            "lip_raw": "pbs",
+            "act_raw": "wheel"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "lip_raw": "pbs",
+            "act_raw": "sed"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "lip_raw_clo_vs_pbs_act_raw-sed",
+      "kind": "simple",
+      "factor": "lip_raw",
+      "test": "clo",
+      "reference": "pbs",
+      "within": {
+        "act_raw": "sed"
+      },
+      "cells": [
+        {
+          "cell": {
+            "act_raw": "sed",
+            "lip_raw": "clo"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "act_raw": "sed",
+            "lip_raw": "pbs"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "lip_raw_clo_vs_pbs_act_raw-wheel",
+      "kind": "simple",
+      "factor": "lip_raw",
+      "test": "clo",
+      "reference": "pbs",
+      "within": {
+        "act_raw": "wheel"
+      },
+      "cells": [
+        {
+          "cell": {
+            "act_raw": "wheel",
+            "lip_raw": "clo"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "act_raw": "wheel",
+            "lip_raw": "pbs"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "act_raw_lip_raw_wheel_clo_vs_sed_pbs",
+      "kind": "interaction",
+      "factor": "act_raw:lip_raw",
+      "test": "wheel:clo",
+      "reference": "sed:pbs",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "act_raw": "wheel",
+            "lip_raw": "clo"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "act_raw": "sed",
+            "lip_raw": "clo"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "act_raw": "wheel",
+            "lip_raw": "pbs"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "act_raw": "sed",
+            "lip_raw": "pbs"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

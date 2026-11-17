@@ -1,0 +1,88 @@
+{
+ "case": "GSE142678_across_durations",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. GSE142678 is RiboTag-seq of female Nes-CreERT2::RiboTag mice, voluntary running vs sedentary at 11/18/27 days (S4.2.1.p1, S2.1.p2, Fig 1B). All 24 libraries (12 IP, 12 IN) carry the running factor (group_raw Run/Sed); none excluded.",
+  "B2": "Running vs sedentary within each duration (11, 18, 27 d), separately for IP (new neurons) and IN (DG tissue); n=2 pooled libraries per arm per cell (24 = 2 fractions x 3 durations x 2 arms x 2). Counts in text: IP 27d 544 (508+36), IN 27d 124 (88+36), IP 18d 460 (S4.3.8.p1), others only in Fig 1E (S2.1.p3). Fig 3A volcano: 'across all three time points' (S2.3.p1), pooling not defined.",
+  "B3": "Each library is a pool of dentate gyri from 2-4 mice (S4.3.7.p1), so no animal is shared across running/sedentary or durations. IP and IN of one replicate come from the same lysate (title key 'ra'/'inra'), but fractions are different RNA populations and are analysed separately. The 'pair' letter a-f is a replicate label, not an animal. pairing_check: not_supported (r 0.039 vs -0.005, p 0.25).",
+  "B4": "Paper does not state a model beyond EBSeq in RSEM and the PPEE cutoff; DEGs are reported per time point and fraction, i.e. each running-vs-sedentary pair fitted alone (S2.1.p2-p3). Nothing on a joint model.",
+  "B5": "'cutoff of 0.05 of PPEE (posterior probability estimated by EBSeq that a gene/transcript is equally expressed)' (S2.1.p2, S4.3.7.p1); no fold-change cutoff for DEG calls. Fig 3A volcano display rule only: >1.5 fold and p<0.05 (FIG3 legend). Counts: IP 27d 544, IN 27d 124, IP 18d 460."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "GSE142678 has running vs sedentary in all 24 libraries (metadata group column; S4.2.1.p1).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "6 Run vs 6 Sed pools per fraction, matches 2 per cell x 3 durations; no exclusions; IP and IN split into separate fits (S2.1.p2).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run (treatment) vs Sed (control), as the paper reports running vs sedentary.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Pools of 2-4 mice (S4.3.7.p1); pair letter a-f is a replicate label crossed with group, not an animal; IP/IN same-lysate key is moot since fractions are fitted separately; pairing_check not_supported (p=0.25).",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "Paper fits each running-vs-sedentary pair within a time point (S2.1.p3). This case pools durations with an additive duration term (6 vs 6) as the Fig 3A estimand; the case records that the pooling is inferred from 'across all three time points' (S2.3.p1). Fig 3E uses 18-day mice, so Fig 3A may be a single-duration volcano.",
+   "fix": "Keep the caveat; optionally also report the per-duration fits once the sibling case is unblocked."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Duration crossed 4 Run/4 Sed per level; single sex (female); running mice singly housed with sedentary in identical cages (S4.2.1.p1); no batch effect per S2.1.p2.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Deposited TPM (columns sum to 1e6) analysed by limma on log2(TPM+1); EBSeq on expected counts not possible; recorded as declared deviation.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper PPEE<0.05 with no fold change (S2.1.p2) recorded; applied BH padj<0.05 labelled declared deviation; Fig 3A rule (p<0.05, FC>1.5) kept as audit only.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No paper counts were compared (paper_counts empty); caveats state 460/544/124 are not reproduced and counts are not expected to match.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Whether Fig 3A pools the three durations or shows one duration is not stated; the paper's own estimand per time point is in the sibling case."
+ ],
+ "summary": "该案例的分组、方向、阈值转写和矩阵方法都与论文一致，TPM 上用 limma 属已声明的偏差。跨时长合并是对 Fig 3A 的推断，已在 caveat 中说明，仅记为 minor。没有需要阻断的问题。"
+}

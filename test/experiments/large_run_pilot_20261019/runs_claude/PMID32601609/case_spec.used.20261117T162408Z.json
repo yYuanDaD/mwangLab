@@ -1,0 +1,163 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID32601609",
+  "request": "Analyze GSE77178 for PMID 32601609 (Exercise rejuvenates quiescent skeletal muscle stem cells in old mice through restoration of Cyclin D1.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE77178",
+      "accession": "GSE77178",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7323974.paper.md"],
+        "metadata": "GSE77178/GSE77178_metadata.csv",
+        "matrix": "GSE77178/GSE77178_ExerciseAgingCcnd1_MuSCRNASeq.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_column": "Gene_Symbol",
+        "feature_duplicates": "first"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE77178"],
+            "assay": "bulk RNA-seq (SMARTer Ultra Low Input, HiSeq 2000) of FACS-isolated quiescent MuSCs, one mouse per profile (S1.19.p1, FIG11 a)",
+            "organism": "Mouse, male C57BL/6",
+            "factors": {"age": ["young 3 mo", "old 18 mo"], "activity": ["-Ex (locked wheel)", "+Ex (3 weeks voluntary wheel running)"], "ccnd1": ["WT", "HET", "KO (separate young Ccnd1 genotype experiment, S0.p15)"]},
+            "sample_inclusion": "Exercise experiment: Y(-Ex), Y(+Ex), O(-Ex), O(+Ex) quiescent MuSCs (S0.p7, FIG11). The Ccnd1 genotype series (Y(WT)/Y(HET)/Y(KO)/O(WT), S0.p15) is a separate experiment and not an exercise estimand.",
+            "primary_estimand": "Effect of voluntary wheel running on the quiescent MuSC transcriptome in old mice: O(+Ex) vs O(-Ex) (S0.p7, S0.p9, FIG11 c)",
+            "planned_contrasts": [
+              "O(+Ex) vs O(-Ex) (S0.p7; paper: 248 DEGs at 10% FDR; Ccnd1 top hit, up with exercise, S0.p9)",
+              "Y(+Ex) vs Y(-Ex) (S0.p7; paper: 35 DEGs at 10% FDR)",
+              "O(-Ex) vs Y(-Ex) aging reference used to call 130 of the 248 genes 'rejuvenated' (S0.p7; count not reported)"
+            ],
+            "repeated_measure_unit": "none; each profile is an individual mouse (FIG11 a)",
+            "normalization": "genes lacking Entrez ID or raw FPKM >= 1.5 in >= 3 samples removed (11,337 genes); raw counts normalized with RUVs k=6 for library prep and sample collection batch (S1.19.p3)",
+            "paper_method": "edgeR negative binomial GLM likelihood ratio test, Cox-Reid tagwise dispersion, on RUVs-normalized raw counts, genes with normalized FPKM >= 6 in >= 3 samples; BH q-values (S1.19.p3)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.10, "effect_metric": null, "effect_cutoff": null, "source_locator": "S0.p7, S1.19.p3"},
+            "paper_results": {"O(+Ex)_vs_O(-Ex)": 248, "Y(+Ex)_vs_Y(-Ex)": 35, "named_genes": ["Ccnd1 (top hit, increased by exercise in old MuSCs)"]},
+            "paper_enrichment": "GSEA Hallmark, Signal2Noise ranking, gene permutation (S1.19.p3, S0.p8, FIG5 b)"
+          },
+          "reasoning": "S0.p7 defines the exercise comparisons and the 10% FDR counts; S1.19.p3 defines filtering, RUVs normalization, edgeR LRT and BH q-values; S0.p9 and FIG11 c name Ccnd1 as the top O(+Ex) vs O(-Ex) hit.",
+          "confidence": "high",
+          "locator": "S0.p7, S1.19.p3"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO series GSE77178 contact lab Thomas A. Rando (paper's lab), MuSC RNA-seq, mouse male, titles O(-Ex)/O(+Ex)/Y(-Ex)/Y(+Ex) and Y(WT)/Y(HET)/Y(KO)/O(WT) match the paper's groups (S0.p7, S0.p15)", "the deposited file holds 11,337 genes, the exact number the paper states after filtering (S1.19.p3)", "metadata 36 samples = 36 matrix sample columns"]},
+          "reasoning": "The supplementary file is the paper's processed table (11,337 genes, normalized FPKM plus Ccnd1 correlation coefficients described in S1.19.p4); group labels and the 2016/2018 submission split match the exercise and Ccnd1 experiments.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(.+) replicate (\\d+)$"]},
+          "patterns": {"grp": ["title", "^([OY])\\(([^)]+)\\) replicate"]},
+          "recode": {"grp": {"O_-Ex": "OSed", "O_+Ex": "OEx", "Y_-Ex": "YSed", "Y_+Ex": "YEx"}},
+          "aliases": {},
+          "exclude_samples": {
+            "GSM3197069": "Ccnd1 genotype experiment (Y(WT), 2018 submission batch), not part of the exercise estimand (S0.p15)",
+            "GSM3197070": "Ccnd1 genotype experiment (Y(WT), 2018 batch)",
+            "GSM3197071": "Ccnd1 genotype experiment (Y(WT), 2018 batch)",
+            "GSM3197072": "Ccnd1 genotype experiment (Y(HET), 2018 batch)",
+            "GSM3197073": "Ccnd1 genotype experiment (Y(HET), 2018 batch)",
+            "GSM3197074": "Ccnd1 genotype experiment (Y(HET), 2018 batch)",
+            "GSM3197075": "Ccnd1 genotype experiment (Y(HET), 2018 batch)",
+            "GSM3197076": "Ccnd1 genotype experiment (Y(KO), 2018 batch)",
+            "GSM3197077": "Ccnd1 genotype experiment (Y(KO), 2018 batch)",
+            "GSM3197078": "Ccnd1 genotype experiment (Y(KO), 2018 batch)",
+            "GSM3197079": "Ccnd1 genotype experiment (Y(KO), 2018 batch)",
+            "GSM3197080": "Ccnd1 genotype experiment (Y(KO), 2018 batch)",
+            "GSM3197081": "Ccnd1 genotype experiment (O(WT), 2018 batch)",
+            "GSM3197082": "Ccnd1 genotype experiment (O(WT), 2018 batch)",
+            "GSM3197083": "Ccnd1 genotype experiment (O(WT), 2018 batch)"
+          },
+          "final": {"key": "title 'O(-Ex) replicate 1' -> 'O(-Ex)_1', equal to the matrix column names", "kept": "21 exercise-experiment samples"},
+          "reasoning": "Matrix columns are 'O(-Ex)_1' style; GEO titles are 'O(-Ex) replicate 1'. Deriving a key from title gives an exact match for all 36 samples. The 15 Ccnd1-genotype samples (submitted 2018, separate experiment S0.p15) are excluded so the exercise contrasts do not borrow variance from another batch; grp is the age x activity cell from the title.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "normalized FPKM",
+          "recommended_method": "limma",
+          "final": {"source": "GSE77178_ExerciseAgingCcnd1_MuSCRNASeq.txt.gz: 'Tab-delimited .txt file containing normalized FPKMs and Ccnd1 correlation coefficients for each gene' (GEO data_processing)", "paper_input": "edgeR on RUVs-normalized raw counts (S1.19.p3); raw counts are not deposited (supplementary_file NONE per sample)"},
+          "reasoning": "Values are non-integer (integer fraction 0), positive, median ~5.8, max ~10,500, consistent with FPKM; GEO data_processing says normalized FPKMs after RUVs k=6. Not counts, so edgeR/DESeq2 cannot run; log2(x+1) limma is the supported route.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "OSed"},
+          "organism": "Mouse",
+          "planned": ["grp_OEx_vs_OSed", "grp_YEx_vs_YSed", "grp_OSed_vs_YSed"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_OEx_vs_OSed", "control": "OSed", "treatment": "OEx", "role": "primary"},
+              {"name": "grp_YEx_vs_YSed", "control": "YSed", "treatment": "YEx", "role": "secondary"},
+              {"name": "grp_OSed_vs_YSed", "control": "YSed", "treatment": "OSed", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Four age x activity cells from one experiment (S0.p7, FIG11 a); the paper compares O(+Ex) vs O(-Ex), Y(+Ex) vs Y(-Ex), and O(-Ex) vs Y(-Ex) pairwise. One cell-means model on the 21 samples with planned contrasts, no pooling of levels. ccnd1 column is constant WT in these samples; activity alone would pool ages and is rejected.",
+          "candidates": [
+            {"value": "characteristics_ch1.3.activity alone (Exercise vs No Exercise)", "reason_rejected": "pools young and old, while the paper's estimand is exercise within age"},
+            {"value": "include the 2018 Ccnd1 samples as extra controls", "reason_rejected": "separate experiment and submission batch; paper analyzes them separately (S0.p15)"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "RUVs factors (k=6)", "disposition": "not available as columns; already removed in the deposited normalized FPKM, cannot be re-entered in the model"}]},
+          "confidence": "medium",
+          "confounding_candidates": null,
+          "reasoning": "Each profile is a separate mouse (FIG11 a), so no blocking unit. The paper's batch adjustment (RUVs, S1.19.p3) is already applied to the deposited values; its W factors are not deposited, so the residual degrees of freedom are not reduced for them (possible mild anti-conservatism). No batch column in GEO metadata for these 21 samples."
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(FPKM+1)",
+            "formula": "~ 0 + grp",
+            "paper_route": {"method": "edgeR NB GLM LRT with Cox-Reid tagwise dispersion on RUVs-normalized raw counts", "status": "blocked", "reason": "raw counts and RUVs W factors are not deposited; only RUVs-normalized FPKM is available"},
+            "deviations": ["limma-trend style moderated t on log2(normalized FPKM+1) instead of edgeR LRT on counts", "expression filter normalized FPKM >= 6 in >= 3 of the 21 exercise samples (paper: >= 3 samples, set unclear)", "5 duplicated gene symbols (same Entrez, different Ensembl locus) kept first occurrence"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: FPKM goes to limma on log scale. The paper's edgeR route needs counts that are not deposited, so it is a declared deviation.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.10, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.10, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper's 10% BH FDR applied to limma BH-adjusted p; audit rule is the workflow default BH < 0.05."
+          },
+          "reasoning": "S0.p7: 'At a 10% false discovery rate'; S1.19.p3: Benjamini-Hochberg q-values; no fold-change cutoff stated.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["limma on deposited RUVs-normalized FPKM instead of edgeR LRT on counts; counts not comparable one-to-one", "Y(+Ex) has n=3"]},
+          "paper_counts": {"limma_joint/grp_OEx_vs_OSed": 248, "limma_joint/grp_YEx_vs_YSed": 35},
+          "paper_genes": {"limma_joint/grp_OEx_vs_OSed": ["Ccnd1"], "limma_joint/grp_OSed_vs_YSed": ["Ccnd1"]},
+          "reasoning": "Paper's counts at 10% FDR (S0.p7) and its named top hit Ccnd1 (S0.p9: decreased with aging, restored by exercise).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method and input", "paper": "edgeR NB GLM LRT on RUVs-normalized raw counts (S1.19.p3)", "data": "only RUVs-normalized FPKM deposited", "disposition": "declared_deviation"},
+        {"item": "sample set", "paper": "exercise experiment analyzed separately from Ccnd1 genotype series", "data": "one file holds both (36 samples)", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "limma_joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": []},
+          "role": "primary",
+          "filter_low_counts": {"min_value": 6, "min_samples": 3},
+          "reasoning": "One limma cell-means model on the 21 exercise-experiment samples with the paper's three pairwise contrasts; paper's FPKM >= 6 in >= 3 samples expression filter."
+        }
+      ],
+      "enrichment": [
+        {"execution": "limma_joint/grp_OEx_vs_OSed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper ran Hallmark GSEA for O(+Ex) vs O(-Ex) (S0.p8, FIG5 b)."},
+        {"execution": "limma_joint/grp_YEx_vs_YSed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper ran Hallmark GSEA for Y(+Ex) vs Y(-Ex) (FIG5 b)."},
+        {"execution": "limma_joint/grp_OSed_vs_YSed", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper ran Hallmark GSEA for O(-Ex) vs Y(-Ex) (S0.p8, FIG5 b)."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33123481",
+  "request": "Analyze GSE150620 for PMID 33123481 (Translating Preclinical Research for Exercise Oncology: Take It to the VO(2max).): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE150620",
+      "accession": "GSE150620",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261027/papers/PMC7573565.paper.md"],
+        "metadata": "GSE150620/GSE150620_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID33123481/input/GSE150620_cpm_dedup.csv",
+        "raw_tar": false,
+        "prep_scripts": ["E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID33123481/prep_merge_cpm.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE150620"],
+            "other_accessions_not_analyzed": {"GSE129508": "human window-of-opportunity RCT (Ligibel et al.), analyzed in S3.p5 / Fig 1A-B; not the requested series"},
+            "assay": "Lexogen QuantSeq 3' FWD RNA-seq of mouse left 4th mammary tissue with engrafted EO771 tumor cells; GEO deposits per-sample CPM",
+            "primary_estimand": "Effect of 2 weeks of voluntary wheel running (before EO771 engraftment) vs sedentary housing on mammary-tissue gene expression, read out in the paper as a hypoxia signature score (lower in wheel runners)",
+            "factors": {"activity": ["Control (hub shelter, sedentary)", "Wheel (Fast-Trac wheel)"], "liposome (GEO only, not mentioned in paper)": ["PBS liposomes", "Clodronate liposomes"]},
+            "sample_inclusion": "Paper says 'mice randomized to exercise vs. control in GSE150620' (FIG1 C) and 'compared to sedentary control mice that also received mammary cancer' (S3.p6); it does not state n, nor whether the 10 clodronate-liposome (macrophage-depleted) mice were included",
+            "planned_contrasts": ["Wheel vs Control (sedentary) mammary tissue (S3.p6, FIG1 C; paper reports a hypoxia-signature TRA P = 0.003, no DEG count)"],
+            "repeated_measure_unit": "none; one mammary sample per mouse",
+            "paper_method": "Transcriptome representation analysis (TRA) of a Buffa et al. hypoxia gene set (Supplementary Data File 1) on log2 expression; group difference in mean gene expression scores (FIG1 C). No gene-level DE model described.",
+            "normalization": "GEO data_processing: STAR 2.5.3a normalized abundance, CPM per sample",
+            "paper_threshold": {"metric": "none", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.p6", "note": "the paper reports no gene-level DE threshold; only gene-set TRA P values"},
+            "paper_results": {"GSE150620": "wheel-running mice had less hypoxia gene expression than sedentary controls (P = 0.003)", "deg_counts": "none reported"}
+          },
+          "reasoning": "Perspective article; the only GSE150620 analysis is S3.p6 + FIG1 C: hypoxia-signature TRA, exercise vs control, P = 0.003, lower hypoxia with wheel running. No DEG list, no threshold, no sample counts. The GEO series is a 2x2 (activity x liposome) design from the same lab (contact D. Lamkin = first author); the paper does not mention the clodronate arm.",
+          "confidence": "medium",
+          "locator": "S3.p6"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S3.p6, FIG1 C and S5.p1 name GSE150620", "GEO contact Donald M. Lamkin (UCLA) = author DL; ethics statement S6.p1 names UCLA IACUC", "GEO tissue 'Mammary tissue with engrafted EO771 cells', wheel vs hub-shelter for two weeks before engraftment, matches S3.p6", "22 per-sample CPM files in GSE150620_RAW.tar, one per GSM in the metadata"]},
+          "reasoning": "Paper, accession, lab and protocol agree.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"act_raw": "characteristics_ch1.1.activity", "lip_raw": "characteristics_ch1.2.treatment"},
+          "patterns": {},
+          "recode": {
+            "act_raw": {"Control": "sed", "Wheel": "wheel"},
+            "lip_raw": {"PBS liposomes": "pbs", "Clodronate liposomes": "clo"}
+          },
+          "combine": {"cell": ["act_raw", "lip_raw"]},
+          "exclude_samples": {},
+          "reasoning": "Prep script renamed matrix columns to GSM accessions, so exact match on the metadata index (inspect: 22/22 on index and geo_accession). act = activity (Control->sed, Wheel->wheel); lip = liposome (PBS->pbs, Clodronate->clo); cell = act_lip for the cell-means model. Titles agree with the characteristics (Control_1-6 = sed/pbs, Wheel_7-12 = wheel/pbs, Clodronate_13-18 = sed/clo, WheelClodronate_19-24 = wheel/clo).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear normalized CPM (floored at 1)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "GEO data_processing: 'Tab-delimited text files include CPM values for each Sample'. Column sums ~1.037e6 (1e6 plus the floor), minimum exactly 1.0 in ~74% of entries, non-integer otherwise: linear CPM with values below 1 set to 1. No raw counts deposited, so count models (DESeq2/edgeR/voom) are not available. Paper analyzed log2 expression (FIG1 C 'on log2 scale').",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["act_raw", "lip_raw"],
+          "references": {"act_raw": "sed", "lip_raw": "pbs"},
+          "organism": "Mouse",
+          "planned": ["act_raw_wheel_vs_sed"],
+          "covariate_candidates": ["lip_raw"],
+          "final": {
+            "analysis_type": "factorial (2x2 activity x liposome) cell-means model, limma",
+            "formula": "~ 0 + C(cell)",
+            "contrasts": [
+              {"name": "wheel_vs_sed_pbs", "role": "primary", "definition": "wheel_pbs - sed_pbs (exercise effect with intact macrophages, 6 vs 6)"},
+              {"name": "wheel_vs_sed_avg", "role": "secondary", "definition": "0.5*(wheel_pbs + wheel_clo) - 0.5*(sed_pbs + sed_clo) (exercise main effect averaged over liposome, all 22 mice)"},
+              {"name": "wheel_vs_sed_clo", "role": "exploratory", "definition": "wheel_clo - sed_clo (exercise effect after macrophage depletion, 5 vs 5)"},
+              {"name": "interaction_act_x_lip", "role": "exploratory", "definition": "(wheel_clo - sed_clo) - (wheel_pbs - sed_pbs)"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool all 22 mice by activity, ignoring liposome (11 vs 11)", "reason_rejected": "clodronate is a randomized design factor with 10/22 mice; ignoring it would inflate residual variance and mix two conditions; the averaged-cell contrast keeps the all-mice estimand without that"},
+            {"value": "PBS-only 6 vs 6 two-group fit", "reason_rejected": "same estimand as the primary cell-means contrast; fitting all 22 samples in one model gives a better variance estimate"}
+          ],
+          "reasoning": "Paper (S3.p6) asks wheel vs sedentary control; it does not mention clodronate, so which mice entered FIG1 C is unknown. Primary = wheel vs sed within PBS liposomes (the untouched-physiology exercise effect, the paper's stated question); secondary = activity main effect averaged over liposome (uses all randomized mice, closest to a pooled reading of the paper); clodronate-arm and interaction contrasts exploratory. One cell-means model on all 22 samples.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "lip_raw", "disposition": "design factor, modeled in the cell-means formula (not a nuisance covariate)"},
+              {"name": "characteristics_ch1.4.replicate", "disposition": "excluded: within-group running index 1-6 (titles show distinct animals Control_1..WheelClodronate_24); not a pairing or batch key"},
+              {"name": "characteristics_ch1.3.experiment #", "disposition": "constant (1); no batch"}
+            ]
+          },
+          "confounding_candidates": ["characteristics_ch1.4.replicate"],
+          "reasoning": "Independent mice, one sample each, one experiment; no subject or batch blocking.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(CPM+1)",
+            "formula": "~ 0 + C(cell)",
+            "paper_route": {"method": "TRA of the Buffa hypoxia gene set (Supplementary Data File 1)", "status": "blocked", "reason": "gene set file (Table_1.XLS) not available locally and TRA is not an executor in this workflow; gene-level limma plus Hallmark-hypoxia GSEA used as the declared alternative"},
+            "deviations": ["gene-level limma DE instead of the paper's gene-set TRA", "hypoxia direction checked with MSigDB Hallmark HYPOXIA (GSEA) instead of the Buffa signature", "duplicated gene symbols collapsed by highest mean CPM; 4 duplicated Excel-date IDs dropped (prep_merge_cpm.py)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Linear CPM -> log2(x+1) -> limma (matrix policy). A cell-means design keeps both randomized factors and gives all four contrasts from one fit.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "none", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper reports no gene-level DE rule; workflow default BH padj < 0.05, no fold-change cutoff. Raw p < 0.05 shown only as a labelled audit count."
+          },
+          "reasoning": "S3.p6 / FIG1 C give only gene-set TRA P values.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper reports no DEG counts; comparison with the paper is the direction of hypoxia gene expression (expected lower in wheel runners), checked by Hallmark HYPOXIA GSEA",
+              "Paper does not say whether clodronate-liposome mice were in its exercise-vs-control comparison; both readings are run (PBS-only primary, liposome-averaged secondary)",
+              "Hypoxia signature differs from the paper's (Hallmark vs Buffa et al.)"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {"analysis/wheel_vs_sed_pbs": ["Vegfa", "Slc2a1", "Pgk1", "Ldha", "Ndrg1", "Adm", "Car9", "P4ha1"], "analysis/wheel_vs_sed_avg": ["Vegfa", "Slc2a1", "Pgk1", "Ldha", "Ndrg1", "Adm", "Car9", "P4ha1"]},
+          "reasoning": "Paper genes listed are canonical hypoxia-signature genes (Buffa metagene members) used only to read direction; the paper itself names no genes for GSE150620.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "clodronate-liposome arm", "paper": "not mentioned; 'mice randomized to exercise vs. control'", "data": "2x2 design, 10/22 mice received clodronate liposomes", "disposition": "executable_with_declared_choice: PBS-only primary + liposome-averaged secondary from one model"},
+        {"item": "analysis method", "paper": "TRA of a Buffa hypoxia gene set", "data": "CPM matrix; gene set file not available locally", "disposition": "declared deviation: limma DE + Hallmark hypoxia GSEA"},
+        {"item": "duplicated gene symbols", "paper": "n/a", "data": "106 duplicated symbols in deposited files (incl. Excel-date IDs)", "disposition": "prep script: highest-mean row kept, duplicated date IDs dropped"}
+      ],
+      "executions": [
+        {
+          "name": "analysis",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "multilevel",
+              "formula": "~ 0 + C(cell)",
+              "contrasts": [
+                {"name": "wheel_vs_sed_pbs", "coefficients": {"C(cell)[wheel_pbs]": 1, "C(cell)[sed_pbs]": -1}},
+                {"name": "wheel_vs_sed_avg", "coefficients": {"C(cell)[wheel_pbs]": 0.5, "C(cell)[wheel_clo]": 0.5, "C(cell)[sed_pbs]": -0.5, "C(cell)[sed_clo]": -0.5}},
+                {"name": "wheel_vs_sed_clo", "coefficients": {"C(cell)[wheel_clo]": 1, "C(cell)[sed_clo]": -1}},
+                {"name": "interaction_act_x_lip", "coefficients": {"C(cell)[wheel_clo]": 1, "C(cell)[sed_clo]": -1, "C(cell)[wheel_pbs]": -1, "C(cell)[sed_pbs]": 1}}
+              ]
+            }
+          },
+          "role": "primary",
+          "reasoning": "One limma cell-means fit on all 22 mice; wheel_vs_sed_pbs is the primary contrast, wheel_vs_sed_avg secondary, the clodronate-arm and interaction contrasts exploratory."
+        }
+      ],
+      "enrichment": [
+        {"execution": "analysis/wheel_vs_sed_pbs", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper's readout is a hypoxia signature; Hallmark HYPOXIA NES sign is the comparable result"},
+        {"execution": "analysis/wheel_vs_sed_avg", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "same check on the all-mice reading"}
+      ]
+    }
+  ]
+}

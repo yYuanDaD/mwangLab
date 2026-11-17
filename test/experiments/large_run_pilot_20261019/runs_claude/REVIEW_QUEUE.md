@@ -189,3 +189,28 @@ One section per case; newest last.
 
 - policy: Open policy: joint vs pairwise fit when the paper is silent.
 - policy: The up/down balance of MDZ vs Ctrl is inverted relative to the paper (1671 up / 301 down vs 604 up / 873 down); cause (TPM+limma vs counts+DESeq2, or mislabelled GEO titles) cannot be settled from the files.
+
+## PMID34870208 / GSE180877 (2026-11-17)
+
+- policy: Policy: whether adding the 3 later-deposited PoW samples to match the paper's counts is acceptable when the paper says triplicate (it is documented and run as sensitivity).
+
+## PMID32601609 / GSE77178 (2026-11-17)
+
+- policy: Joint versus pairwise fits when the paper is silent (open policy question); DEG counts differ 4-12x from the paper.
+- policy: Which threshold to report is not in question here: no alternative rule reproduces 248/35.
+
+## PMID42051351 / GSE313585 (2026-11-17)
+
+- policy: Optional: the PMID-linked series holds rat vascular smooth muscle cells, not the paper's C2C12; authors could be asked whether the wrong dataset was deposited.
+
+## PMID33123481 / GSE150620 (2026-11-17)
+
+- policy: Open policy: paper likely used all 22 mice (only the pooled/averaged readings reproduce hypoxia significance); which reading is reported as primary (PBS-only vs all-mice) is a choice for the person.
+
+## PMID32755589 / GSE142678_across_durations (2026-11-17)
+
+- policy: Whether Fig 3A pools the three durations or shows one duration is not stated; the paper's own estimand per time point is in the sibling case.
+
+## PMID32755589 / GSE142678_per_duration (2026-11-17)
+
+- policy: Policy: can the decision contract accept a not_analyzable(sample_size) verdict as exploratory when the paper itself analysed n=2 per cell? Currently blocks the paper's primary estimand.

@@ -1,0 +1,89 @@
+{
+ "case": "GSE77178",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Voluntary wheel running (3 weeks, locked-wheel controls; S1.2.p1, S0.p7). Exercise-carrying samples: GEO activity=Exercise, 8 samples (O(+Ex) 5, Y(+Ex) 3), with 13 sedentary (O 7, Y 6) as controls = 21 samples (2016 submission). The 15 Ccnd1 genotype samples (2018 submission) are a separate non-exercise experiment (S0.p15).",
+  "B2": "O(+Ex) vs O(-Ex) (248 DEGs, S0.p7), Y(+Ex) vs Y(-Ex) (35 DEGs), O(-Ex) vs Y(-Ex) as the aging reference (130 of 248 rejuvenated). Group sizes from GEO: OEx 5, OSed 7, YEx 3, YSed 6; the paper text does not give RNA-seq n per group (Fig 2 legend gives only RT-qPCR n).",
+  "B3": "None: each profile is MuSCs from an individual mouse (S1.19.p1, Fig 2a legend). No repeated sampling; no pairing key needed (candidate keys in packet A are only title-derived and not animal IDs).",
+  "B4": "Paper does not say joint versus pairwise. S1.19.p3: RUVs k=6 on raw counts, edgeR with Cox-Reid tagwise dispersion and NB GLM likelihood ratio tests, BH q-values.",
+  "B5": "S0.p7: 'At a 10% false discovery rate (FDR)'; S1.19.p3: Benjamini-Hochberg q-values; no fold-change cutoff stated. Counts: 248 (O+Ex vs O-Ex), 35 (Y+Ex vs Y-Ex); Ccnd1 top hit; 633/530 for the Ccnd1 HET/KO series (not exercise)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run on exercise arm (8 Ex samples); Ccnd1 genotype series excluded with reason (S0.p15); matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp OSed 7 / OEx 5 / YSed 6 / YEx 3 equals the GEO titles and activity/age columns; 15 exclusions named with reason; control for each contrast is the matching-age sedentary group.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts OEx vs OSed, YEx vs YSed, OSed vs YSed with treatment first; Ccnd1 up with exercise (log2FC +1.14) and lower in old than young, as in S0.p9.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One mouse per profile (S1.19.p1; Fig 2a legend); no blocking needed.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "Paper silent (B4). Joint limma cell-means model only; DEG counts are 4-12x the paper (1064 vs 248, 442 vs 35) and no pairwise fit is reported next to it. Likely cause is the RUVs k=6 factors not being modelled, which is recorded as a caveat.",
+   "fix": "Optionally add a pairwise-subset limma fit per contrast as a sensitivity run."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All 21 exercise samples from one 2016 submission, male, same strain; individually housed in both arms (S1.2.p1); no batch column. RUVs batch factors unavailable, recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Deposited table is RUVs-normalized FPKM (GEO data_processing), correctly sent to limma on log2(x+1) not edgeR; p-value histogram right-skewed (frac p<0.05 0.26/0.19, frac p>0.9 ~0.06), consistent with inflation noted. Minor: reasoning quotes median ~5.8 vs profile median 6.04, and 11,332 vs 11,337 genes (5 duplicate symbols), both explained.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.1 with no FC cutoff, BH, matches B5; audit 0.05 recorded separately; no other rule in the packet table fits 248/35 (nearest padj<0.05 with |lfc|>1 gives 10/8, far off).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same contrasts at the same rule; HANDBACK states 1064 vs 248 and 442 vs 35 openly and discloses GSEA direction conflicts (E2F/G2M, IFN); no overclaim.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; edgeR route recorded as blocked because raw counts and RUVs W are not deposited, which is true (supplementary_file NONE, only the FPKM table).",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Joint versus pairwise fits when the paper is silent (open policy question); DEG counts differ 4-12x from the paper.",
+  "Which threshold to report is not in question here: no alternative rule reproduces 248/35."
+ ],
+ "summary": "该案例的样本分组、对比方向、阈值（BH FDR 10%，无倍数变化阈值）和矩阵路线（RUVs标准化FPKM走limma）均与论文一致，每个样本是独立小鼠，无需配对。DEG数量比论文多4到12倍，原因是RUVs因子未入模，已作为偏差记录；联合模型与分对模型的选择属于开放政策问题，仅作次要提示。"
+}

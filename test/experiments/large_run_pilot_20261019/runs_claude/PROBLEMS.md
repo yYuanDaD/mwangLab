@@ -671,3 +671,27 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34870208 (GSE180877)
 
 - inspect gave no alignment key for case/space-only differences (case_runner.py:408); duplicated_feature_ids counted on Chromosome column (case_runner.py:399) Details: `PMID34870208/HANDBACK.md`.
+
+## PMID41611847 (GSE256241)
+
+- inspect left matrix type ambiguous (linear_normalized vs estimated_counts) for 89%-integer StringTie counts Details: `PMID41611847/HANDBACK.md`.
+
+## PMID32601609 (GSE77178)
+
+- suitability.md lists same pairs both ways after reversed planned names (suitability.py:241-257); no way to remove residual df for RUV factors removed pre-deposit Details: `PMID32601609/HANDBACK.md`.
+
+## PMID33123481 (GSE150620)
+
+- geo_tar.py:127 silently drops duplicated gene IDs; case-spec.md:63 lists alpha for run_limma_analysis, which rejects it (TypeError); factorial suitability names undocumented Details: `PMID33123481/HANDBACK.md`.
+
+## PMID42051351 (GSE313585)
+
+- geo_tools.py:58-61 supplementary download fails on 403 from the suppl/ listing though the file URL works, so inspect found no matrix; FPKM fetched by hand Details: `PMID42051351/HANDBACK.md`.
+
+## PMID32755589 (GSE142678)
+
+- suitability.py:259/502 + decision_contract.py:172 block all-n=2 designs despite skill's small-n rule; case_runner.py:426 leaves stale case dir on rerun Details: `PMID32755589/HANDBACK.md`.
+
+## PMID30071007 (GSE114062)
+
+- decision_contract.py:79 substring 'rma' classes any 'normalized' matrix_type as log_scale and blocks edgeR; inspect misses Cuffnorm size-factor count signature Details: `PMID30071007/HANDBACK.md`.

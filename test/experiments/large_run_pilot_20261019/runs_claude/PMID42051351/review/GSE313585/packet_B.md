@@ -1,0 +1,105 @@
+# Review packet B (the analysis' decisions): GSE313585
+
+## Mechanical flags
+
+- none
+
+## Stop reasons
+
+- ownership (refused; claim type: other): GSE313585 does not hold the paper's samples (rat primary vascular smooth muscle cells, NextSeq 500, rat Ensembl IDs vs the paper's mouse C2C12 myotubes, NovaSeq 6000, GRCm39), and neither the deposit nor the paper's transcriptome has an exercise contrast (Icariin vs control only). The exercise estimand cannot be identified.
+## Gates
+
+### paper_reconstruction (valid, not_started)
+
+final: {"accessions": ["GSE313585"], "assay": "bulk RNA-seq, Illumina NovaSeq 6000, 150 bp paired-end, Lianchuan Biotechnology; aligned to mouse GRCm39 (S2.8.p1)", "samples": "C2C12 mouse myotubes treated with 20 uM Icariin or vehicle for 24 h, n = 3 per group (S2.8.p1, S3.3.p1); no caffeine/exercise-mimetic stimulation is stated for the sequenced cells", "factors": {"treatment": ["vehicle", "Icariin 20 uM"]}, "exercise_factor_in_transcriptome": "none: the in vivo exercise tests (S2.2) used mice that were not sequenced; the caffeine 'exercise-like stress' model (S2.4.p2) is not part of the RNA-seq description (S2.8.p1)", "primary_estimand": "Effect of Icariin (20 uM, 24 h) versus vehicle on the C2C12 myotube transcriptome; a drug effect, not an exercise effect", "planned_contrasts": ["Icariin vs vehicle in C2C12 myotubes (S3.3.p1; paper: 1919 DEGs, 1134 up / 785 down)"], "repeated_measure_unit": "none (independent cultures)", "paper_method": "DESeq2 (S2.8.p1)", "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "source_locator": "S2.8.p1"}, "paper_results": "1919 DEGs (1134 up, 785 down) at |log2FC| > 1 and padj < 0.05 (S3.3.p1); GO up: regulation of mitophagy, mitochondrial degradation involved in mitophagy, oxidative phosphorylation, mitochondrial inner membrane; GSEA positive for mitophagy sets (S3.3.p2); qPCR Pink1, Parkin, Bnip3, Ulk1 up (S3.3.p3)"}
+
+reasoning: S2.8.p1 and S3.3.p1 define the only transcriptome: mouse C2C12 myotubes, Icariin 20 uM vs vehicle, n = 3/group, DESeq2, |log2FC| > 1 and adjusted p < 0.05. DA.p1 names GSE313585. The exercise experiments (S2.2, S3.1) are mouse physiology without sequencing, so the paper itself defines no exercise contrast in expression data.
+
+### ownership (refused, not_started)
+
+final: {"matrix_file": "GSE313585/GSE313585_fpkm.txt.gz", "accession": "GSE313585", "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE313585\\GSE313585_metadata.csv", "owned": false, "checks": {"series_pubmed_id": "42051351 (matches the paper; DA.p1 names GSE313585)", "organism": "GEO: Rattus norvegicus (taxid 10116); paper: mouse C2C12 aligned to GRCm39 -> mismatch", "cell_type": "GEO: primary rat microvascular vascular smooth muscle cells; paper: C2C12 myotubes -> mismatch", "platform": "GEO: GPL20084 Illumina NextSeq 500, BGI Dr. Tom pipeline, RSEM, GRCr8; paper: NovaSeq 6000 150 bp PE by Lianchuan, GRCm39 -> mismatch", "feature_ids": "matrix rows are rat Ensembl IDs (ENSRNOG...) -> not mouse", "timing": "GEO overall design: controls harvested 24 h, Icariin 48 h post-treatment (time aliased with treatment); paper: 24 h for both arms -> mismatch", "sample_count_and_groups": "6 samples, Control 3 / Icariin 3 -> matches the paper's n = 3 per group in count only", "exercise_arm": "none in GEO (treatment: Control / treated with Icariin) and none in the paper's sequenced samples"}}
+
+reasoning: The series is linked to PMID 42051351, but every sample-level fact contradicts the paper's RNA-seq (S2.8.p1): the deposit is rat primary vascular smooth muscle cells on NextSeq 500 quantified against rat GRCr8 (ENSRNOG IDs), not mouse C2C12 myotubes on NovaSeq 6000 against GRCm39. Only the 3 vs 3 group size agrees. The deposited files therefore do not belong to the paper's samples, and any DEG count from them could not be compared with the paper's 1919. Independently of ownership, neither the deposit nor the paper's transcriptome contains an exercise arm (Icariin vs control only), so the requested exercise estimand is not identifiable and a correct re-deposit would not change that for the ex ... [16 more characters]
+
+rejected alternatives: [{"value": "owned: true (accession and PMID link, 3 vs 3 Icariin/control)", "reason_rejected": "organism, cell type, platform, reference genome and harvest timing all contradict S2.8.p1; matrix features are rat Ensembl IDs"}, {"value": "manual_review (ask authors for the C2C12 data)", "reason_rejected": "even the paper's own C2C12 RNA-seq is Icariin vs vehicle with no exercise or exercise-mimetic arm, so no obtainable file would identify an exercise effect on expression"}]
+
+
+## Recorded paper-data discrepancies
+
+[
+  {
+    "item": "organism",
+    "paper": "mouse (C2C12, GRCm39) S2.8.p1",
+    "data": "Rattus norvegicus, GRCr8, ENSRNOG IDs",
+    "disposition": "blocks_ownership"
+  },
+  {
+    "item": "cell type",
+    "paper": "C2C12 myotubes S2.8.p1",
+    "data": "primary rat microvascular vascular smooth muscle cells",
+    "disposition": "blocks_ownership"
+  },
+  {
+    "item": "platform / provider",
+    "paper": "Illumina NovaSeq 6000, 150 bp PE, Lianchuan S2.8.p1",
+    "data": "GPL20084 NextSeq 500; BGI SOAPnuke/Bowtie2/RSEM pipeline",
+    "disposition": "blocks_ownership"
+  },
+  {
+    "item": "harvest time",
+    "paper": "24 h Icariin or vehicle S2.8.p1",
+    "data": "control 24 h, Icariin 48 h (GEO overall design): time aliased with treatment",
+    "disposition": "blocks_ownership"
+  },
+  {
+    "item": "exercise arm",
+    "paper": "no exercise factor in the sequenced samples (S2.8.p1); exercise only in unsequenced mice (S2.2)",
+    "data": "treatment Control / Icariin only",
+    "disposition": "blocks_estimand"
+  },
+  {
+    "item": "matrix type",
+    "paper": "DESeq2 implies counts",
+    "data": "only FPKM deposited (GSE313585_fpkm.txt.gz)",
+    "disposition": "not_evaluated_case_stopped"
+  }
+]
+
+## HANDBACK.md (start)
+
+# HANDBACK: PMID42051351 / GSE313585
+
+**Status: refused at `ownership`.** I made no DE call. Validator: 2 records, 0 errors. `summary.csv` reads `stopped:ownership`.
+
+## What ran
+1. `tools.case_runner inspect GSE313585`. The first pass found no matrix because the supplementary download failed with a 403 error (see Tool problems below).
+2. I downloaded `GSE313585_fpkm.txt.gz` from GEO over HTTPS (URL from `!Series_supplementary_file` in the SOFT file) into `data/GSE313585/`, then ran inspect again. The file has 26,407 rows x 6 samples, the IDs are rat Ensembl (`ENSRNOG...`), and the values are linear FPKM-like.
+3. Read the paper (`PMC13111376.paper.md`).
+4. Wrote `case_spec.json` with two gates (paper_reconstruction = valid, ownership = refused). Ran `tools.case_runner execute`.
+
+## Paper vs data
+- **Paper's transcriptome (S2.8.p1, S3.3.p1):**
+  - Samples: mouse C2C12 myotubes, 20 uM Icariin vs vehicle for 24 h, n = 3 per group.
+  - Sequencing: NovaSeq 6000, 150 bp paired-end, Lianchuan; aligned to GRCm39.
+  - Method: DESeq2.
+  - Threshold: |log2FC| > 1 and padj < 0.05.
+  - Result: **1919 DEGs (1134 up / 785 down)**.
+- **No exercise contrast in the paper's sequencing.** Exercise appears only in unsequenced mouse physiology (S2.2, S3.1). The caffeine "exercise-like" model (S2.4.p2) is not part of the RNA-seq.
+- **GSE313585 deposit:**
+  - Samples: primary rat microvascular vascular smooth muscle cells (Rattus norvegicus).
+  - Sequencing and quantification: GPL20084 NextSeq 500, BGI SOAPnuke/Bowtie2/RSEM pipeline, GRCr8.
+  - Groups: Control 3 vs Icariin 3.
+  - Harvest time differs by group: controls at 24 h, Icariin at 48 h, so time is aliased with treatment.
+  - Only FPKM was deposited.
+- The PubMed link and the 3 vs 3 group size are the only things that match. Organism, cell type, platform, reference genome, feature IDs and harvest timing all contradict the paper.
+
+## DEG counts vs paper
+- **Ours:** none (the case stopped before design).
+- **Paper:** 1919 at padj < 0.05 and |log2FC| > 1 (S2.8.p1 / S3.3.p1).
+- Even if the files were owned, that contrast is a drug effect, not an exercise effect.
+
+## Deviations
+- I downloaded the series FPKM file by hand, because the repository downloader failed on the directory listing.
+- The refusal is recorded at `ownership`, not at `design`. `ownership` is the first gate that fails. The ownership reasoning also records that there is no exercise arm, so the exercise estimand would also be refused at `design`.
+
+## Tool proble ... [989 more characters]

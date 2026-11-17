@@ -1,0 +1,88 @@
+{
+ "case": "GSE180877",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. GSE180877 is the RNA-seq deposit (DA.p1) of whole plantaris from male HSA-GFP mice; PoWeR (progressive weighted wheel running) is the exercise factor (S2.5.p1, S4.p2). Exercise-carrying samples: 6M PoW (trained) and 9M PoW+DT (trained then detrained); controls 6M UT and 9M UT. GSE180433 is RRBS, out of scope.",
+  "B2": "6M PoW vs 6M UT (179 up/118 down, FDR<0.05, S2.5.p1) and 9M PoW+DT vs 9M UT (no PoWeR-altered gene stays DE). Paper says biological triplicate per group (S4.p2); GEO has 6 PoW6 (incl. LD1-3 deposited later), 3 UT6, 3 UT9, 3 DT9.",
+  "B3": "None stated: one plantaris per independent mouse, one time point per mouse; no pairing key in packet A (grpx key has no linked samples).",
+  "B4": "Paper does not say whether all groups were fitted in one model or by pair (S4.p3: DESeq with FDR step-up in Partek).",
+  "B5": "FDR < 0.05 (BH/step-up), no fold-change cutoff (S2.5.p1, S4.1.p1); low-count filter min read 50 (S4.p3). Counts: 179 up, 118 down for PoWeR; none persisting after detraining."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise arm present (PoWeR); run matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Groups from titles (agree with matrix headers); GEO treatment field swapped/wrong and recorded. 6 PoW6 vs paper 'triplicate' (S4.p2) recorded as discrepancy; pooled 6v3 gives 180/118 vs paper 179/118, triplicate gives 61/34. Inclusion of LD1-3 is inferred from count match rather than stated by the paper, but is named, justified and run both ways.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "PoW6 vs UT6 and DT9 vs UT9, treatment vs control; control age-matched.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No repeated measures; independent mice.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent; pairwise primary and joint all-sample sensitivity both reported (298 vs 386).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Deposit date (possible sequencing batch) lies only inside PoW6 arm, recorded and triplicate sensitivity run; not aliased with treatment.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Estimated non-integer Partek counts rounded for DESeq2; max>50 filter as paper; p histogram healthy (frac p>0.9 0.072).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.05 no FC, matches B5; audit FC 1.5 labelled as reference only.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "298 (180/118) vs 297 (179/118), same contrast and rule; HANDBACK notes Dusp7 opposite-sign exception honestly.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stops or refusals.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Policy: whether adding the 3 later-deposited PoW samples to match the paper's counts is acceptable when the paper says triplicate (it is documented and run as sensitivity)."
+ ],
+ "summary": "该案例通过复核：PoWeR 对年龄匹配未训练对照的比较方向、阈值（FDR<0.05，无倍数变化）和方法均与论文一致，主结果 298 (180/118) 与论文 297 (179/118) 几乎一致。6 只 PoW 样本与论文的“三个生物学重复”不符，但已记录并同时跑了三重复敏感性分析。无重复测量，无阻断性或重要问题。"
+}

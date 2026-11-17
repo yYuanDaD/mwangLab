@@ -1,0 +1,88 @@
+{
+ "case": "GSE142678_per_duration",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. GSE142678 is RiboTag-seq of female Nes-CreERT2::RiboTag mice, voluntary running vs sedentary at 11/18/27 days (S4.2.1.p1, S2.1.p2, Fig 1B). All 24 libraries (12 IP, 12 IN) carry the running factor (group_raw Run/Sed); none excluded.",
+  "B2": "Running vs sedentary within each duration (11, 18, 27 d), separately for IP (new neurons) and IN (DG tissue); n=2 pooled libraries per arm per cell (24 = 2 fractions x 3 durations x 2 arms x 2). Counts in text: IP 27d 544 (508+36), IN 27d 124 (88+36), IP 18d 460 (S4.3.8.p1), others only in Fig 1E (S2.1.p3). Fig 3A volcano: 'across all three time points' (S2.3.p1), pooling not defined.",
+  "B3": "Each library is a pool of dentate gyri from 2-4 mice (S4.3.7.p1), so no animal is shared across running/sedentary or durations. IP and IN of one replicate come from the same lysate (title key 'ra'/'inra'), but fractions are different RNA populations and are analysed separately. The 'pair' letter a-f is a replicate label, not an animal. pairing_check: not_supported (r 0.039 vs -0.005, p 0.25).",
+  "B4": "Paper does not state a model beyond EBSeq in RSEM and the PPEE cutoff; DEGs are reported per time point and fraction, i.e. each running-vs-sedentary pair fitted alone (S2.1.p2-p3). Nothing on a joint model.",
+  "B5": "'cutoff of 0.05 of PPEE (posterior probability estimated by EBSeq that a gene/transcript is equally expressed)' (S2.1.p2, S4.3.7.p1); no fold-change cutoff for DEG calls. Fig 3A volcano display rule only: >1.5 fold and p<0.05 (FIG3 legend). Counts: IP 27d 544, IN 27d 124, IP 18d 460."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Series has running vs sedentary arms; case proceeded through paper/ownership/alignment/matrix and stopped only at design.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Per-duration cells Run vs Sed n=2 each, IP and IN separate; matches the paper's 2 replicates per cell (S4.3.7.p1).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run vs Sed in all six planned contrasts.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Flagged 'pair' and title-minus-fraction keys are replicate letters and same-lysate IP/IN links; fractions are separate fits, pools of 2-4 mice (S4.3.7.p1); expression check not_supported.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Within-fraction cell-means model with per-duration contrasts matches the paper's per-time-point comparisons (S2.1.p3) while sharing variance.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single sex, identical cages except wheel locked (S4.2.1.p1); no batch effect (S2.1.p2).",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "TPM -> log2(x+1) -> limma recorded as declared deviation from EBSeq on expected counts.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "PPEE<0.05, no fold change, recorded (S2.1.p2); BH padj deviation declared; Fig 3A display rule audit only.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Nothing executed, so no counts compared; paper counts 460/544/124 listed as targets.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "The stop reason (all cells n=2, 0/22 comparisons reach n>=3) is true, but the skill states small n alone is not a stop, and the case itself notes that run_joint_limma can take planned small-n contrasts. The paper's own primary estimand (per-duration IP and IN, 544/460/124 DEGs) was therefore not run at all, while only the secondary pooled contrast was.",
+   "fix": "Execute the six per-duration contrasts with run_joint_limma (cell-means ~0+cell per fraction, 6 df) labelled exploratory n=2 per arm, and compare to paper counts 460/544/124 under the paper's rule; if the contract/suitability gate cannot allow it, record as policy item."
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Policy: can the decision contract accept a not_analyzable(sample_size) verdict as exploratory when the paper itself analysed n=2 per cell? Currently blocks the paper's primary estimand."
+ ],
+ "summary": "该案例在设计阶段因每组 n=2 而停止，理由属实，但技能规定仅凭小样本不应停止，论文的主要估计量（每个时长的 IP 和 IN 对比）因此完全没有执行。建议以探索性标注运行六个对比，并与论文的 460/544/124 对照。其余检查均一致。"
+}

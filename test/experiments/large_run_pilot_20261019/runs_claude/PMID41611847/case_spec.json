@@ -1,0 +1,76 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41611847",
+  "request": "Analyze GSE256241 for PMID 41611847 (An integrated drug repositioning analysis identifies rosiglitazone as a treatment for sarcopenia.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE256241",
+      "accession": "GSE256241",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC13022187.paper.md"],
+        "metadata": "GSE256241/GSE256241_metadata.csv",
+        "matrix": "GSE256241/GSE256241_raw_count.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE256241"],
+            "assay": "bulk RNA-seq (polyA, Illumina NovaSeq 6000 PE150) of gastrocnemius from aged male C57BL/6JRj mice (S2.8.p1, S4.11.p1)",
+            "sample_inclusion": "12 mice randomized at 17 months to rosiglitazone diet (0.6 mg/kg/d in AIN-93M, n=6) or plain AIN-93M control diet (n=6) (S4.6.p1; FIG5 C n=6 per group). WGCNA used 5 rosiglitazone + 6 control (FIG5 D, Fig. S3).",
+            "factors": {"treatment": ["control", "rosiglitazone"]},
+            "primary_estimand": "Effect of dietary rosiglitazone vs control diet on gastrocnemius gene expression in aged mice. No exercise intervention exists: treadmill (S4.7.p1), rotarod (S4.8.p1) and grip tests (S4.9.p1) are phenotyping assays applied to both groups, not a training arm.",
+            "planned_contrasts": ["rosiglitazone vs control (S2.8.p1; paper: 383 up + 100 down = 483 DEGs)"],
+            "repeated_measure_unit": "none (one gastrocnemius per independent mouse)",
+            "normalization": "DESeq2 size factors; pre-filter genes with >1 count per sample and total >12 (S4.13.p1)",
+            "paper_method": "DESeq2 1.34.0 ~ treatment, BH adjustment (S4.13.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": true, "inclusive": false, "source_locator": "FIG5 C caption; S4.13.p1 item (3)"},
+            "paper_results": "383 up / 100 down DEGs; Igf1 up; Foxo4, Fbxo32, Trim63 down; fgsea PI3K-Akt up NES 1.68 (S2.8.p1)"
+          },
+          "reasoning": "The paper is a drug-repositioning study. Its only transcriptomic experiment (S2.8.p1, S4.11-S4.13) compares rosiglitazone-fed with control-fed aged mice. Exercise appears only as an outcome measure (treadmill exhaustion test, S4.7.p1) and as background in the introduction (S1.p4).",
+          "confidence": "high",
+          "locator": "S2.8.p1; S4.6.p1; S4.7.p1; S4.13.p1; FIG5"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S9.p1 names GSE256241 as the mouse skeletal muscle RNA-seq", "12 GSM samples, skeletal muscle, Mus musculus, treatment rosiglitazone 6 / control 6 matches S4.6.p1", "data_processing fastp/HISAT2/StringTie matches S4.12.p1"]},
+          "reasoning": "Data availability (S9.p1) names GSE256241; sample count, tissue, organism, groups and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"grp": "characteristics_ch1.1.treatment"},
+          "recode": {"grp": {"control": "CTRL", "rosiglitazone": "ROSI"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (C3..C15, A6..A25) equal the GEO title field exactly for 12/12 samples (inspect alignment_keys). Treatment comes from characteristics_ch1.1.treatment; the A/C prefixes agree with it.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2 after documented rounding",
+          "reasoning": "GSE256241_raw_count.txt.gz: values 0 to 1.75e6, 89.4% integer overall; about 21% of expressed entries are fractional (e.g. 13985.99, 43.85), the signature of StringTie/RSEM-style estimated counts rather than featureCounts integers. data_processing says HISAT2 + StringTie and the file is described as raw counts; the paper used it in DESeq2 (S4.13.p1). Annotation columns gene_name/description/length and empty Unnamed columns are not samples.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CTRL"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast exists. The only factor is diet treatment (rosiglitazone 6 vs control 6, characteristics_ch1.1.treatment; S4.6.p1). Every mouse was sedentary apart from treadmill/rotarod/grip phenotyping tests given to both groups (S4.7-S4.9), so exercise is neither a factor nor separable from anything. The requested estimand (effect of exercise on gene expression) is not identifiable; the paper's own rosiglitazone-vs-control contrast does not answer the request and is not run as a substitute.",
+          "reasoning": "Request is exercise effect; paper and GEO metadata contain only a drug-vs-control arm. Rejected alternative: running rosiglitazone vs control as an 'exercise-capacity' proxy - rejected because improved treadmill performance is a drug outcome, not an exercise exposure.",
+          "candidates": [{"value": "grp_ROSI_vs_CTRL", "reason_rejected": "drug intervention, not exercise; does not answer the requested estimand"}],
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "requested estimand", "paper": "rosiglitazone vs control diet in aged mice; exercise only as treadmill phenotyping", "data": "treatment: rosiglitazone 6 / control 6; no exercise field", "disposition": "blocks_estimand"},
+        {"item": "WGCNA sample set", "paper": "5 rosiglitazone + 6 control for WGCNA (FIG5 D); 6+6 for DESeq2", "data": "12 samples deposited", "disposition": "not_relevant_after_stop"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
