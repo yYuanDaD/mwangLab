@@ -1,0 +1,86 @@
+{
+ "case": "GSE145263",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Exercise arm: SED1-3 vs EXE1-3 (GSM4310328-33), male C57BL/6J, 6-wk progressive treadmill (S2.1.p1, S4.2.p1). The other 25 samples are aging, HFD and TAC experiments with no exercise factor.",
+  "B2": "Paper has five comparisons, each vs its own control: EXE vs SED, Aged vs Young, HFD vs Chow, TAC 2wk vs Sham, TAC 7wk vs Sham; N=3-4 male mice/group (FIG2 legend). Exercise: 3 v 3 from GEO.",
+  "B3": "No repeated measures: one FACS-sorted EC sample per mouse; no animal ID needed; packet A candidate keys link 0 samples.",
+  "B4": "Each experiment analysed separately against its own control (S2.1.p1, FIG2A-E, MA plot per experiment); the paper does not give an explicit sentence on a joint model.",
+  "B5": "'we have set the FDR (p adj.) cutoff as less than or equal to 0.05 (FDR/p-adj <= 0.05)' (S4.15.p1); FIG2 legend: BH FDR threshold 0.05; no fold-change cutoff. Counts only in FIG2A image, not in text."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Series is the paper's own deposit; EXE vs SED (3 v 3, male, 10 wk start, 6 wk treadmill) in S2.1.p1/S4.2.p1; run is correct.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EXE n=3 / SED n=3 match FIG2 legend (N=3-4) and GEO titles; the 25 other-experiment samples are excluded with a named reason (each model vs own control, S2.1.p1).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EXE treatment vs SED control; Serpinh1/Vwa1/Mest/Fhl3 all negative log2FC, matching S2.3.p1 (down with exercise).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Independent mice, one EC sample per animal (FACS-sorted, one per mouse); packet A keys link 0/31 and no animal ID is needed; no repeated measures.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper fits each experiment separately vs its own control (S2.1.p1, FIG2A-E); run fits EXE vs SED alone, ~grp; matches.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "SED/EXE all male, same submission date, no batch recorded; the paper states none. Not aliased.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer HTSeq counts (integer_fraction 1.0), DESeq2 route as in S4.15.p1; pydeseq2 deviation recorded.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR (BH) <= 0.05, no fold-change cutoff, inclusive (S4.15.p1, FIG2 legend); applied rule padj <= 0.05 transcribed exactly; |log2FC|>1 audit labelled as audit only.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper count lives only in the FIG2A image; recorded as not_comparable, HANDBACK claims only named-gene concordance and direction. No overclaim.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No stops or refusals; stop_claims empty.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "本案例的分组、方向、模型、阈值与论文一致:EXE 对 SED(各 3 只雄性小鼠,独立样本,无重复测量),DESeq2 Wald + BH,FDR<=0.05 且无倍数变化阈值。论文的 DEG 数目只在 FIG2A 图片中,已如实记为不可比较;四个论文基因均与论文方向一致。未发现阻断或重要问题。"
+}

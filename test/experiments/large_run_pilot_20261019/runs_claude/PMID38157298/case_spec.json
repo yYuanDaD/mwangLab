@@ -1,0 +1,201 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38157298",
+  "request": "Analyze GSE245760 for PMID 38157298 (CHCHD4-TRIAP1 regulation of innate immune signaling mediates skeletal muscle adaptation to exercise.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE245760",
+      "accession": "GSE245760",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC10851177.paper.md"],
+        "metadata": "GSE245760/GSE245760_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID38157298/prep/GSE245760_rsem_expected_counts_symbol.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID38157298/prep/prep_matrix.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE245760"],
+            "assay": "bulk RNA-seq (STAR 2.7.8a + RSEM 1.3.2 expected counts, GENCODE M25/mm10), skeletal muscle (tibialis anterior per FIG1C legend)",
+            "organism": "Mouse (C57BL/6, male, 16-20 weeks)",
+            "factors": {"genotype": ["WT", "CHCHD4 Tg (ROSA26-driven overexpression)"], "training": ["no training (-ET)", "4 weeks treadmill training (+ET)"]},
+            "sample_inclusion": "2x2 factorial, n = 4 per group, 16 samples, all deposited (FIG1C: n = 4)",
+            "repeated_measure_unit": "none; independent animals per group",
+            "primary_estimand": "Effect of 4 weeks of treadmill exercise training on skeletal-muscle gene expression in WT mice (trained vs untrained), and the same training effect in CHCHD4 Tg mice, whose comparison shows which training responses depend on CHCHD4 downregulation (S2.7.p5, Tables S4 and S5)",
+            "planned_contrasts": [
+              "WT trained vs WT untrained (S2.7.p5; Table S4 by context; paper DEG count not available, supplementary table not in hand)",
+              "CHCHD4 Tg trained vs Tg untrained (S2.7.p5; Table S5 by context; count not available)",
+              "Tg vs WT within untrained and within trained (S2.1.p2, FIG1C volcano, Tables S1-S3) - genotype contrasts, not exercise effects; not run here"
+            ],
+            "paper_method": "edgeR exactTest (S4.3.8.p1), pairwise two-group",
+            "normalization": "not stated (edgeR default TMM assumed)",
+            "paper_threshold": {
+              "metric": "not_stated",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S4.3.8.p1 states no DEG cutoff; FIG1C draws a p = 0.01 display line on the Tg/WT volcano only"
+            },
+            "paper_results": "Training increased mt-Nd3, Atp1a3, Rrad, Plac8, Cidea and Myh7 in WT but not Tg (S2.7.p5, S2.1.p2); GO of changed genes: muscle contraction terms (FIG S4B)"
+          },
+          "reasoning": "S2.1.p2 describes RNA-seq of skeletal muscle from Tg and WT mice with or without exercise training (four groups). S2.7.p5 states exercise training increased MT-ND3/ATP1A3/RRAD/PLAC8/CIDEA in WT but not Tg (Tables S4 and S5), i.e. within-genotype trained-vs-untrained comparisons. S4.3.8.p1: STAR/RSEM expected counts, edgeR exactTest. FIG1C: n = 4, tibialis anterior. No DEG significance rule is stated; the p = 0.01 line is a volcano display line for Tg/WT.",
+          "confidence": "medium",
+          "locator": "S2.1.p2; S2.7.p5; S4.3.8.p1; FIG1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.1.3.p1 and key resources table name GEO GSE245760", "GEO contact Paul M. Hwang (NHLBI) matches the authors' institute and S4.3.8.p1 NHLBI core", "16 samples = 2 genotypes x 2 training states x 4, matching FIG1C n = 4", "data_processing text (STAR 2.7.8a, GENCODE M25, RSEM 1.3.2) matches S4.3.8.p1 verbatim", "Chchd4 counts ~2.7-fold higher in B/D (Tg) columns than A/C (WT), confirming genotype labels"]},
+          "reasoning": "Paper names GSE245760 as its RNA-seq deposit; processing and design match; Tg labels confirmed by Chchd4 expression.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "matrix_column_pattern": "^([A-D][0-9])\\.Aligned",
+          "aliases": {"geno": "characteristics_ch1.1.genotype", "trt": "characteristics_ch1.2.treatment"},
+          "recode": {
+            "geno": {"WT": "WT", "CHCHD4 Tg": "TG"},
+            "trt": {"Treadmill training": "EX", "No training": "SED"}
+          },
+          "combine": {"grp": ["geno", "trt"]},
+          "patterns": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are '<A1..D4>.Aligned.toTranscriptome.out.bam.rsem.genes.results'; the GEO description field holds A1..D4 exactly (A = exercised WT, B = exercised Tg, C = unexercised WT, D = unexercised Tg per titles). Exact key match after stripping the suffix.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "edgeR",
+          "reasoning": "File is the RSEM genes.results expected_count table (87.5% integer, non-integer remainder, column sums 41-62 M consistent with read counts, not TPM/FPKM). data_processing: 'expected counts were quantified using RSEM'. The paper ran edgeR on these expected counts (S4.3.8.p1). Rows renamed to gene symbols by prep_matrix.py without changing values.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["trt"],
+          "references": {"trt": "SED"},
+          "strata": ["geno"],
+          "organism": "Mouse",
+          "planned": ["trt_EX_vs_SED_geno-WT", "trt_EX_vs_SED_geno-TG"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group within genotype stratum",
+            "design_column": "trt",
+            "control": "SED",
+            "treatment": "EX",
+            "contrasts": [
+              {"name": "trt_EX_vs_SED_geno-WT", "control": "SED", "treatment": "EX", "stratum": {"geno": "WT"}, "role": "primary"},
+              {"name": "trt_EX_vs_SED_geno-TG", "control": "SED", "treatment": "EX", "stratum": {"geno": "TG"}, "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled trained vs untrained across genotypes", "reason_rejected": "the paper's estimand is the training effect per genotype (S2.7.p5); pooling mixes WT and Tg responses that the paper says differ"},
+            {"value": "Tg vs WT within each training state (Tables S1-S3, FIG1C)", "reason_rejected": "genotype contrasts, not exercise effects; outside the requested estimand"},
+            {"value": "genotype x training interaction as the primary estimand", "reason_rejected": "the paper never tests an interaction on the RNA-seq; it compares the two within-genotype results. Run only as exploratory"}
+          ],
+          "reasoning": "2x2 factorial with independent animals. The paper's exercise comparisons are trained vs untrained within WT and within Tg, each by pairwise exactTest. Genotype is a stratum so comparisons never cross genotype.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice per group, no batch, lane or pairing information in GEO or the paper; all male (S4.2.1.p1). No covariate added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR (TMM, quasi-likelihood GLM F-test, inmoose)",
+            "formula": "~ trt (within genotype)",
+            "rounding_documented": true,
+            "paper_route": {"method": "edgeR exactTest", "status": "blocked", "reason": "the repository's edgeR executor (tools/edger_tools.py) implements only the GLM quasi-likelihood test; no exactTest executor exists"},
+            "deviations": ["edgeR glmQLFTest instead of exactTest on the same 8-sample two-group comparison", "RSEM expected counts rounded to integers before edgeR (paper presumably passed them to edgeR as is; edgeR accepts non-integer counts)", "no low-count filter (paper states none; executor drops all-zero genes only)"]
+          },
+          "transform": "round",
+          "reasoning": "Paper used edgeR on RSEM expected counts. exactTest is unavailable, so the closest validated route is edgeR TMM + QL F-test per pairwise comparison (8 samples, the comparison's own arms). Rounding is documented. DESeq2 per stratum runs as a sensitivity analysis.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not_stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "The paper states no DEG rule; applied BH padj < 0.05 (workflow default). Audit p < 0.01 mirrors the FIG1C volcano display line, which the paper drew for the Tg/WT plot only."
+          },
+          "reasoning": "S4.3.8.p1 gives no cutoff; FIG1C shows p = 0.01 as a display line.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper DEG counts for Tables S4/S5 are not available (supplementary tables not in hand), so only named-gene directions can be compared.",
+              "edgeR QL F-test replaces exactTest; counts from QL are usually more conservative.",
+              "GEO says 'skeletal muscles'; FIG1C says tibialis anterior."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "edgeR_WT_EX_vs_SED": ["mt-Nd3", "Atp1a3", "Rrad", "Plac8", "Cidea", "Myh7"],
+            "edgeR_TG_EX_vs_SED": ["mt-Nd3", "Atp1a3", "Rrad", "Plac8", "Cidea", "Myh7"]
+          },
+          "reasoning": "Paper reports these genes increased by training in WT but not in Tg (S2.7.p5; Myh7 S2.1.p2).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE test", "paper": "edgeR exactTest", "data": "only edgeR QL GLM executor available", "disposition": "declared_deviation"},
+        {"item": "tissue", "paper": "tibialis anterior (FIG1C)", "data": "GEO: skeletal muscles", "disposition": "executable_without_change"},
+        {"item": "DEG threshold", "paper": "not stated", "data": "n/a", "disposition": "workflow_default applied"}
+      ],
+      "executions": [
+        {
+          "name": "edgeR_WT_EX_vs_SED",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "trt", "control_group": "SED", "treatment_group": "EX"},
+          "subset": {"geno": ["WT"]},
+          "role": "primary",
+          "reasoning": "Paper's WT training effect (Table S4), pairwise edgeR on the 8 WT samples"
+        },
+        {
+          "name": "edgeR_TG_EX_vs_SED",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "trt", "control_group": "SED", "treatment_group": "EX"},
+          "subset": {"geno": ["TG"]},
+          "role": "secondary",
+          "reasoning": "Paper's Tg training effect (Table S5), pairwise edgeR on the 8 Tg samples"
+        },
+        {
+          "name": "DESeq2_WT_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "trt", "control_group": "SED", "treatment_group": "EX", "alpha": 0.05},
+          "subset": {"geno": ["WT"]},
+          "role": "sensitivity",
+          "reasoning": "Method sensitivity for the primary contrast"
+        },
+        {
+          "name": "DESeq2_TG_EX_vs_SED",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "trt", "control_group": "SED", "treatment_group": "EX", "alpha": 0.05},
+          "subset": {"geno": ["TG"]},
+          "role": "sensitivity",
+          "reasoning": "Method sensitivity for the Tg training contrast"
+        },
+        {
+          "name": "limma_interaction",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {"plan": {"analysis_type": "multilevel", "formula": "~ 0 + C(grp)",
+                            "contrasts": [
+                              {"name": "trainingXgenotype_WTresp_minus_TGresp", "coefficients": {"C(grp)[WT_EX]": 1, "C(grp)[WT_SED]": -1, "C(grp)[TG_EX]": -1, "C(grp)[TG_SED]": 1}}
+                            ]}},
+          "transform": "log2(CPM+1)",
+          "role": "exploratory",
+          "reasoning": "The paper's narrative claim is that training responses differ between WT and Tg; this tests that difference directly (not done in the paper)"
+        }
+      ],
+      "enrichment": [
+        {"execution": "edgeR_WT_EX_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO enrichment of changed genes (FIG S4B)"},
+        {"execution": "edgeR_TG_EX_vs_SED", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paired with the WT training enrichment for comparison"}
+      ]
+    }
+  ]
+}

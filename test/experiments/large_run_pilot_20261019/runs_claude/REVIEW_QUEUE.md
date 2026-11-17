@@ -247,3 +247,11 @@ One section per case; newest last.
 
 - policy: Policy (open): whether this in-vitro C2C12 optogenetic stimulation series counts as an exercise study.
 - policy: Policy (open): joint ~grp model versus pairwise fits when the paper is silent; paper has no numeric DEG counts to discriminate.
+
+## PMID39144140 / GSE272213 (2026-11-17)
+
+- policy: Open policy: which threshold to report when the paper's 22 DEGs fit no tested rule (FDR 0 hits, raw p 223/123); case reports the stated rule and labels the raw-p audit.
+
+## PMID35282369 / GSE193432 (2026-11-17)
+
+- policy: Which threshold to report: paper's counts fit padj rule while results text says raw P (open policy question, recorded as audit).

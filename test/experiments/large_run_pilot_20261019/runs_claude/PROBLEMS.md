@@ -727,3 +727,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID33661096 (GSE145263)
 
 - GSEA ranking keeps ~7.2k baseMean<1 genes, 25% tied stats (enrichment_tools.py:348-397) Details: `PMID33661096/HANDBACK.md`.
+
+## PMID38157298 (GSE245760)
+
+- edger_tools.py:106 astype(int) truncates est. counts; no exactTest (edger_tools.py:125), ~5 min/call; inspect types ENSMUSG_Symbol IDs as other (case_runner.py:405) Details: `PMID38157298/HANDBACK.md`.

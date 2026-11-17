@@ -1,0 +1,21 @@
+{"case": "GSE272213", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. GSE272213 is a murine 4T1 tumour model; exercise = 21 days voluntary wheel running (E, n=5) vs non-exercise (NE, n=5); all 10 tumour RNA-seq samples carry the factor (S2.2.p1, S3.1.p1; packet A grp E/NE, treatment 'voluntary exercise condition').",
+  "B2": "E vs NE, 5 vs 5, tumour tissue at day 21 (S2.2.p1, S3.1.p1, Fig 1C-D n=5).",
+  "B3": "No repeated measures: one tumour per animal. S3.1.p1 says 'five matched pairs' but S2.2.p1 describes random allocation to two groups; packet A lists no candidate pairing key (none), titles E1-E5/NE1-NE5 only.",
+  "B4": "Paper does not say how the DE model was fitted; only that data were TMM-normalised (S2.3.p1). Two groups only, so joint vs pairwise is moot.",
+  "B5": "S2.3.p2: 'mRNAs exhibiting a fold change of >= 2 and an FDR <= 0.05 were identified as differentially expressed.' Reports 22 DEGs (S3.1.p1); Cd300e 46% of NE, p = 0.008."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run; E vs NE exercise arm present in all 10 samples (S2.2.p1).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp E 5 / NE 5 from title prefix, matches S2.2.p1 and GEO treatment column; no exclusions; NE is the control.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "E vs NE, NE reference; Cd300e log2FC -1.09 (down in E) matches S3.1.p1.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "'five matched pairs' (S3.1.p1) conflicts with random allocation (S2.2.p1); packet A has no candidate key, so E_i/NE_i pairing would be positional. Recorded as a discrepancy in paper_data_discrepancies.json.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Single ~grp model on two groups; paper silent on model.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "One sex, one tissue; no batch/lane/housing fields in GEO; suitability sex check pass.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Read-count columns (integers, 15-23M) used; FPKM columns dropped; edgeR TMM primary and DESeq2 sensitivity; p-value histogram frac_p_gt_0.9 0.09-0.13, no pile-up.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "S2.3.p2 transcribed as padj<=0.05 and |log2FC|>=1 inclusive; raw-p audit labelled. Neither rule reproduces 22 (raw p + |lfc|>=1 gives 223/123), recorded in study caveats.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Same contrast E vs NE; 0 vs 22 stated honestly as not reproducible; Cd300e direction and magnitude agree.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: which threshold to report when the paper's 22 DEGs fit no tested rule (FDR 0 hits, raw p 223/123); case reports the stated rule and labels the raw-p audit."],
+ "summary": "该案例分析的是E与NE各5只小鼠的肿瘤RNA-seq，分组、方向、阈值转录和矩阵路径均与论文一致。论文提到的“五对配对”没有配对键支持，案例已记录为差异且未做配对分析，合理。按论文FDR规则得到0个DEG（论文22个），已如实说明，整体通过。"}
