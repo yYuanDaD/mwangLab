@@ -1,0 +1,157 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID29610328",
+  "request": "Analyze GSE101239 for PMID 29610328 (Ectopic neurogenesis induced by prenatal antiepileptic drug exposure augments seizure susceptibility in adult mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE101239",
+      "accession": "GSE101239",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC5910824.paper.md"],
+        "metadata": "GSE101239/GSE101239_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE101239"],
+            "assay": "bulk RNA-seq (50-bp SE, HiSeq 2500) of FACS-sorted Nestin-EGFP+ NS/PCs; forebrain at E15, dentate gyrus at P5 and 12w",
+            "primary_estimand": "Effect of 8 wk voluntary wheel running on the adult (12w) dentate-gyrus NS/PC transcriptome of prenatally VPA-exposed mice: VPA+RW vs VPA (S1.4.p2, Fig. 5). Exercise was only given to VPA mice; there is no Ctrl+RW arm, so the exercise effect is identifiable only within VPA-exposed animals.",
+            "planned_contrasts": [
+              "VPA+RW vs VPA at 12w (S1.4.p2, Fig. 5B-E; exercise estimand; paper reports no DEG count, only that running mostly amended VPA-distorted genes incl. Cxcr4)",
+              "VPA vs Ctrl at 12w (S1.2.p1, Fig. 2B/3; defines the VPA-DEG set that running normalizes; 12w count not stated in text, hundreds per S2.p2)",
+              "VPA+RW vs Ctrl at 12w (implicit normalization check in Fig. 5B box plots)"
+            ],
+            "factors": {"treatment": ["Ctrl (methylcellulose)", "VPA (300 mg/kg/day E12-14)", "VPA+RW (8 wk wheel)"], "stage": ["E15", "P5", "12w"]},
+            "inclusion": "Exercise estimand uses the 9 12w DG samples (3 Ctrl, 3 VPA, 3 VPA+Run); E15 and P5 samples are VPA-only developmental comparisons without exercise and were analysed per stage in the paper (S1.2.p1).",
+            "repeated_measure_unit": "none; independent animals",
+            "normalization": "Cufflinks FPKM",
+            "paper_method": "Cuffdiff (Cufflinks) per developmental stage (GEO data_processing)",
+            "paper_threshold": {"metric": "q-value", "cutoff": 0.05, "effect_metric": "fold change", "effect_cutoff": 1.5, "effect_inclusive": true, "source_locator": "S1.2.p1"},
+            "paper_results": "E15 VPA vs Ctrl: 248 DEGs (235 up). 12w VPA vs Ctrl: Cxcr4 and Cntn2 down (Fig. 3D-E). Running normalizes VPA-DEGs incl. Cxcr4 (Fig. 5)."
+          },
+          "reasoning": "Paper S1.4.p1-p2 and Fig. 5 define the exercise question: VPA mice with vs without 8 wk running at 12w. Threshold q<0.05 and FC>=1.5 at S1.2.p1; Cuffdiff in GEO data_processing. GSE101239 cited in the JATS data-availability statement.",
+          "confidence": "high",
+          "locator": "S1.4.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper JATS names GSE101239", "21 samples: Ctrl/VPA at E15, P5, 12w plus VPA+Run 12w match Fig. 2A and Fig. 5A", "treatment_protocol matches VPA 300 mg/kg E12-14; Nestin-EGFP genotype matches S1.2.p1"]},
+          "reasoning": "Accession cited by the paper; sample structure and protocol match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["title", "^(Control|VPA\\+Run|VPA) 12w rep\\d$"]},
+          "recode": {"grp": {"Control": "Ctrl", "VPA": "VPA", "VPA+Run": "VPARun"}},
+          "aliases": {},
+          "exclude_samples": {
+            "GSM2700529": "E15 forebrain; no exercise arm at this stage; paper analyses each stage separately (S1.2.p1)",
+            "GSM2700530": "E15 forebrain; no exercise arm",
+            "GSM2700531": "E15 forebrain; no exercise arm",
+            "GSM2700532": "E15 forebrain; no exercise arm",
+            "GSM2700533": "E15 forebrain; no exercise arm",
+            "GSM2700534": "E15 forebrain; no exercise arm",
+            "GSM2700535": "P5 DG; no exercise arm at this stage",
+            "GSM2700536": "P5 DG; no exercise arm",
+            "GSM2700537": "P5 DG; no exercise arm",
+            "GSM2700538": "P5 DG; no exercise arm",
+            "GSM2700539": "P5 DG; no exercise arm",
+            "GSM2700540": "P5 DG; no exercise arm"
+          },
+          "reasoning": "Tar per-sample files are named by GSM; exact match to the metadata index (21/21). Group derived from title (Control/VPA/VPA+Run at 12w). Per-sample file headers (Ctrl_12w_n_FPKM, VPA_12w_n_FPKM, VPA_12w_RUNn_FPKM) agree with the GSM titles.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma on log2(FPKM+1)",
+          "final": {"source": "GSE101239_RAW.tar per-sample Cufflinks gene FPKM (12w headers end in _FPKM)", "paper_input": "Cuffdiff on aligned reads; not deposited"},
+          "reasoning": "Per-sample file headers end in _FPKM (12w) and data_processing names Cufflinks/Cuffdiff; integer fraction 0.36 with decimals, per-sample totals ~4.8e5 (not counts). Counts are not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Ctrl"},
+          "organism": "Mouse",
+          "planned": ["grp_VPARun_vs_VPA", "grp_VPA_vs_Ctrl"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_VPARun_vs_VPA", "control": "VPA", "treatment": "VPARun", "role": "primary"},
+              {"name": "grp_VPA_vs_Ctrl", "control": "Ctrl", "treatment": "VPA", "role": "secondary"},
+              {"name": "grp_VPARun_vs_Ctrl", "control": "Ctrl", "treatment": "VPARun", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool Ctrl and VPA as sedentary vs VPA+Run", "reason_rejected": "pools levels with different prenatal exposure; confounds exercise with VPA"},
+            {"value": "include E15/P5 samples in one model with stage", "reason_rejected": "different tissue/stage, no exercise arm; paper analysed within stage"},
+            {"value": "VPA x exercise factorial", "reason_rejected": "no Ctrl+RW arm; interaction not identifiable"}
+          ],
+          "reasoning": "One-way three-level model on the 12w samples; primary exercise contrast VPA+Run vs VPA (Fig. 5). VPA vs Ctrl is the paper's 12w DEG set that running normalizes; VPA+Run vs Ctrl is the normalization check (exploratory).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals per group; no batch, sex or pairing recorded in GEO or paper.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (log2(FPKM+1), one-way model)",
+            "formula": "~ grp",
+            "paper_route": {"method": "Cuffdiff on aligned reads", "status": "blocked", "reason": "Cuffdiff needs read-level input; GEO deposits only per-sample FPKM"},
+            "deviations": ["limma on log2(FPKM+1) replaces Cuffdiff", "BH-adjusted limma p instead of Cuffdiff q", "three 12w groups fitted in one model (shared variance) instead of pairwise Cuffdiff"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: FPKM -> log2(x+1) -> limma. Never round FPKM for a count model.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "deviation_note": "q<0.05 and FC>=1.5 (S1.2.p1) converted exactly to padj<0.05 and |log2FC|>=log2(1.5)=0.5849625, applied on the limma route. Paper defined DEGs for VPA vs Ctrl; it never counted VPA+RW vs VPA DEGs."
+          },
+          "reasoning": "S1.2.p1: q-value < 0.05, fold change >= 1.5.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["Exercise effect is identifiable only in VPA-exposed mice (no Ctrl+RW arm).", "n = 3 per group; limma on FPKM replaces Cuffdiff.", "Paper gives no DEG count for VPA+RW vs VPA or for 12w VPA vs Ctrl in the text."]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "limma_12w/grp_VPARun_vs_VPA": ["Cxcr4", "Cntn2"],
+            "limma_12w/grp_VPA_vs_Ctrl": ["Cxcr4", "Cntn2"]
+          },
+          "reasoning": "Paper: Cxcr4 and Cntn2 down in VPA vs Ctrl at 12w (Fig. 3D-E); running restores Cxcr4 (Fig. 5E), so expected up in VPA+RW vs VPA.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method", "paper": "Cuffdiff on reads", "data": "only per-sample FPKM deposited", "disposition": "declared_deviation"},
+        {"item": "P5 file names", "paper": "Control", "data": "tar file names say Contol (typo); stage excluded anyway", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "limma_12w",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": ["grp_VPARun_vs_VPA", "grp_VPA_vs_Ctrl", "grp_VPARun_vs_Ctrl"], "covariates": []},
+          "role": "primary",
+          "reasoning": "One limma model on log2(FPKM+1) of the 9 12w samples; primary exercise contrast VPA+Run vs VPA, VPA vs Ctrl secondary, VPA+Run vs Ctrl exploratory."
+        }
+      ],
+      "enrichment": [
+        {"execution": "limma_12w/grp_VPARun_vs_VPA", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper interprets running via cell-migration GO terms (Fig. 5C-D); GSEA uses the full ranking."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,981 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID29610328",
+  "subject_id": "GSE101239",
+  "created_at": "2026-11-17T13:12:30",
+  "finished_at": "2026-11-17T13:12:57",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC5910824.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC5910824.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T13:12:30",
+      "sha256": null,
+      "attributes": {
+        "sha256": "223e97dacb1ac7548b087a87aa67c0d30dbd0f748c60d3e0b04014145ac74936",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE101239_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE101239\\GSE101239_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:12:30",
+      "sha256": null,
+      "attributes": {
+        "sha256": "41748c42f26969b27243a6fd957bbca028c4b18ccb887066ebf684242b8e4fb1",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:12:34",
+      "sha256": null,
+      "attributes": {
+        "sha256": "35fca8314a3b255ccd1a1e737d774f24453aba35083a24b020354e41dfbc9366",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE101239"
+        ],
+        "assay": "bulk RNA-seq (50-bp SE, HiSeq 2500) of FACS-sorted Nestin-EGFP+ NS/PCs; forebrain at E15, dentate gyrus at P5 and 12w",
+        "primary_estimand": "Effect of 8 wk voluntary wheel running on the adult (12w) dentate-gyrus NS/PC transcriptome of prenatally VPA-exposed mice: VPA+RW vs VPA (S1.4.p2, Fig. 5). Exercise was only given to VPA mice; there is no Ctrl+RW arm, so the exercise effect is identifiable only within VPA-exposed animals.",
+        "planned_contrasts": [
+          "VPA+RW vs VPA at 12w (S1.4.p2, Fig. 5B-E; exercise estimand; paper reports no DEG count, only that running mostly amended VPA-distorted genes incl. Cxcr4)",
+          "VPA vs Ctrl at 12w (S1.2.p1, Fig. 2B/3; defines the VPA-DEG set that running normalizes; 12w count not stated in text, hundreds per S2.p2)",
+          "VPA+RW vs Ctrl at 12w (implicit normalization check in Fig. 5B box plots)"
+        ],
+        "factors": {
+          "treatment": [
+            "Ctrl (methylcellulose)",
+            "VPA (300 mg/kg/day E12-14)",
+            "VPA+RW (8 wk wheel)"
+          ],
+          "stage": [
+            "E15",
+            "P5",
+            "12w"
+          ]
+        },
+        "inclusion": "Exercise estimand uses the 9 12w DG samples (3 Ctrl, 3 VPA, 3 VPA+Run); E15 and P5 samples are VPA-only developmental comparisons without exercise and were analysed per stage in the paper (S1.2.p1).",
+        "repeated_measure_unit": "none; independent animals",
+        "normalization": "Cufflinks FPKM",
+        "paper_method": "Cuffdiff (Cufflinks) per developmental stage (GEO data_processing)",
+        "paper_threshold": {
+          "metric": "q-value",
+          "cutoff": 0.05,
+          "effect_metric": "fold change",
+          "effect_cutoff": 1.5,
+          "effect_inclusive": true,
+          "source_locator": "S1.2.p1"
+        },
+        "paper_results": "E15 VPA vs Ctrl: 248 DEGs (235 up). 12w VPA vs Ctrl: Cxcr4 and Cntn2 down (Fig. 3D-E). Running normalizes VPA-DEGs incl. Cxcr4 (Fig. 5)."
+      },
+      "reason": "Paper S1.4.p1-p2 and Fig. 5 define the exercise question: VPA mice with vs without 8 wk running at 12w. Threshold q<0.05 and FC>=1.5 at S1.2.p1; Cuffdiff in GEO data_processing. GSE101239 cited in the JATS data-availability statement.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:34"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "paper JATS names GSE101239",
+          "21 samples: Ctrl/VPA at E15, P5, 12w plus VPA+Run 12w match Fig. 2A and Fig. 5A",
+          "treatment_protocol matches VPA 300 mg/kg E12-14; Nestin-EGFP genotype matches S1.2.p1"
+        ],
+        "accession": "GSE101239",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE101239\\GSE101239_metadata.csv"
+      },
+      "reason": "Accession cited by the paper; sample structure and protocol match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:34"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 21,
+        "n_metadata": 21,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM2700529": "E15 forebrain; no exercise arm at this stage; paper analyses each stage separately (S1.2.p1)",
+          "GSM2700530": "E15 forebrain; no exercise arm",
+          "GSM2700531": "E15 forebrain; no exercise arm",
+          "GSM2700532": "E15 forebrain; no exercise arm",
+          "GSM2700533": "E15 forebrain; no exercise arm",
+          "GSM2700534": "E15 forebrain; no exercise arm",
+          "GSM2700535": "P5 DG; no exercise arm at this stage",
+          "GSM2700536": "P5 DG; no exercise arm",
+          "GSM2700537": "P5 DG; no exercise arm",
+          "GSM2700538": "P5 DG; no exercise arm",
+          "GSM2700539": "P5 DG; no exercise arm",
+          "GSM2700540": "P5 DG; no exercise arm"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^(Control|VPA\\+Run|VPA) 12w rep\\d$",
+              "recode": {
+                "Control": "Ctrl",
+                "VPA": "VPA",
+                "VPA+Run": "VPARun"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\design_metadata.csv",
+          "sha256": "5f820b1cfad66d57df08702d8305108f50620878140757fc1799395aadfded22",
+          "levels": {
+            "grp": {
+              "Ctrl": 3,
+              "VPA": 3,
+              "VPARun": 3
+            }
+          }
+        }
+      },
+      "reason": "Tar per-sample files are named by GSM; exact match to the metadata index (21/21). Group derived from title (Control/VPA/VPA+Run at 12w). Per-sample file headers (Ctrl_12w_n_FPKM, VPA_12w_n_FPKM, VPA_12w_RUNn_FPKM) agree with the GSM titles.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:35"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE101239_RAW.tar per-sample Cufflinks gene FPKM (12w headers end in _FPKM)",
+        "paper_input": "Cuffdiff on aligned reads; not deposited",
+        "matrix_type": "FPKM",
+        "recommended_method": "limma on log2(FPKM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\aligned_matrix.csv",
+          "sha256": "35fca8314a3b255ccd1a1e737d774f24453aba35083a24b020354e41dfbc9366",
+          "n_features": 24322,
+          "n_samples": 9,
+          "annotation_columns_dropped": [
+            "GSM2700529",
+            "GSM2700530",
+            "GSM2700531",
+            "GSM2700532",
+            "GSM2700533",
+            "GSM2700534",
+            "GSM2700535",
+            "GSM2700536",
+            "GSM2700537",
+            "GSM2700538",
+            "GSM2700539",
+            "GSM2700540"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 41092.7,
+          "median": 2.08375,
+          "integer_fraction": 0.4298,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Per-sample file headers end in _FPKM (12w) and data_processing names Cufflinks/Cuffdiff; integer fraction 0.36 with decimals, per-sample totals ~4.8e5 (not counts). Counts are not deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:36"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_VPARun_vs_VPA",
+            "control": "VPA",
+            "treatment": "VPARun",
+            "role": "primary"
+          },
+          {
+            "name": "grp_VPA_vs_Ctrl",
+            "control": "Ctrl",
+            "treatment": "VPA",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_VPARun_vs_Ctrl",
+            "control": "Ctrl",
+            "treatment": "VPARun",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "One-way three-level model on the 12w samples; primary exercise contrast VPA+Run vs VPA (Fig. 5). VPA vs Ctrl is the paper's 12w DEG set that running normalizes; VPA+Run vs Ctrl is the normalization check (exploratory).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:42"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 9,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "grp_VPA",
+            "grp_VPARun"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 6,
+          "levels": {
+            "grp": {
+              "Ctrl": 3,
+              "VPA": 3,
+              "VPARun": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "Ctrl"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "VPA"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "VPARun"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.cell type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.4.genotype",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_laboratory",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Independent animals per group; no batch, sex or pairing recorded in GEO or paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:42"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "FPKM",
+        "method": "limma (log2(FPKM+1), one-way model)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "Cuffdiff on aligned reads",
+          "status": "blocked",
+          "reason": "Cuffdiff needs read-level input; GEO deposits only per-sample FPKM"
+        },
+        "deviations": [
+          "limma on log2(FPKM+1) replaces Cuffdiff",
+          "BH-adjusted limma p instead of Cuffdiff q",
+          "three 12w groups fitted in one model (shared variance) instead of pairwise Cuffdiff"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Matrix policy: FPKM -> log2(x+1) -> limma. Never round FPKM for a count model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:43"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null
+        },
+        "deviation_note": "q<0.05 and FC>=1.5 (S1.2.p1) converted exactly to padj<0.05 and |log2FC|>=log2(1.5)=0.5849625, applied on the limma route. Paper defined DEGs for VPA vs Ctrl; it never counted VPA+RW vs VPA DEGs."
+      },
+      "reason": "S1.2.p1: q-value < 0.05, fold change >= 1.5.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:43"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "limma_12w",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 9,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\transformed\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPARun_vs_VPA.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPA_vs_Ctrl.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPARun_vs_Ctrl.csv"
+        ],
+        "counts": {
+          "limma_12w/grp_VPARun_vs_VPA": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+              "n_tested": 19868,
+              "n_significant": 4,
+              "n_up": 1,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 19868,
+              "n_significant": 4,
+              "n_up": 1,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          },
+          "limma_12w/grp_VPA_vs_Ctrl": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+              "n_tested": 19868,
+              "n_significant": 3,
+              "n_up": 2,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 19868,
+              "n_significant": 3,
+              "n_up": 2,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          },
+          "limma_12w/grp_VPARun_vs_Ctrl": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+              "n_tested": 19868,
+              "n_significant": 1,
+              "n_up": 0,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 19868,
+              "n_significant": 1,
+              "n_up": 0,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One limma model on log2(FPKM+1) of the 9 12w samples; primary exercise contrast VPA+Run vs VPA, VPA vs Ctrl secondary, VPA+Run vs Ctrl exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:50"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "limma_12w/grp_VPARun_vs_VPA",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false,
+          "effect_inclusive": true
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "execution_error": "Only 4 valid genes after filtering / ID conversion. Enrichment requires at least ~5 genes for meaningful results."
+      },
+      "reason": "Paper interprets running via cell-migration GO terms (Fig. 5C-D); GSEA uses the full ranking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:51"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "limma_12w/grp_VPARun_vs_VPA",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\enrichment_limma_12w_grp_VPARun_vs_VPA\\gsea\\DEG_results_grp_VPARun_vs_VPA_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 19868 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 14 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_E2F_TARGETS | NES=2.30 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_G2M_CHECKPOINT | NES=2.16 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=2.03 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=1.56 | NOM p=0.00e+00 | FDR q=2.51e-02 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.55 | NOM p=9.06e-03 | FDR q=2.14e-02 - HALLMARK_MYC_TARGETS_V2 | NES=1.45 | NOM p=8.22e-03 | FDR q=4.05e-02 - HALLMARK_MITOTIC_SPINDLE | NES=1.42 | NOM p=0.00e+00 | FDR q=4.70e-02 - HALLMARK_PANCREAS_BETA_CELLS | NES=1.34 | NOM p=8.80e-02 | FDR q=9.34e-02 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=1.25 | NOM p=3.47e-02 | FDR q=1.89e-01 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.22 | NOM p=6.72e-02 | FDR q=2.08e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=-1.54 | NOM p=0.00e+00 | FDR q=1.03e-01 - HALLMARK_COAGULATION | NES=-1.50 | NOM p=1.17e-02 | FDR q=8.17e-02 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=-1.46 | NOM p=2.72e-03 | FDR q=8.12e-02 - HALLMARK_APICAL_JUNCTION | NES=-1.23 | NOM p=6.29e-02 | FDR q=6.20e-01 - HALLMARK_P53_PATHWAY | NES=-1.22 | NOM p=8.58e-02 | FDR q=5.19e-01 - HALLMARK_COMPLEMENT | NES=-1.18 | NOM p=1.36e-01 | FDR q=6.24e-01 - HALLMARK_INFLAMMATORY_RESPONSE | NES=-1.17 | NOM p=1.46e-01 | FDR q=5.68e-01 - HALLMARK_KRAS_SIG..."
+      },
+      "reason": "Paper interprets running via cell-migration GO terms (Fig. 5C-D); GSEA uses the full ranking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:57"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Exercise effect is identifiable only in VPA-exposed mice (no Ctrl+RW arm).",
+          "n = 3 per group; limma on FPKM replaces Cuffdiff.",
+          "Paper gives no DEG count for VPA+RW vs VPA or for 12w VPA vs Ctrl in the text."
+        ],
+        "results": {
+          "limma_12w/grp_VPARun_vs_VPA": {
+            "n_deg": 4,
+            "up": 1,
+            "down": 3,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+            "audit_n": 4
+          },
+          "limma_12w/grp_VPA_vs_Ctrl": {
+            "n_deg": 3,
+            "up": 2,
+            "down": 1,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+            "audit_n": 3
+          },
+          "limma_12w/grp_VPARun_vs_Ctrl": {
+            "n_deg": 1,
+            "up": 0,
+            "down": 1,
+            "rule": "padj < 0.05 and |log2FoldChange| >= 0.584963",
+            "audit_n": 1
+          }
+        },
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {
+          "limma_12w/grp_VPARun_vs_VPA": {
+            "Cxcr4": {
+              "AveExpr": 5.3424,
+              "log2FoldChange": 1.2729,
+              "padj": 0.346,
+              "pvalue": 0.00862
+            },
+            "Cntn2": {
+              "AveExpr": 3.912,
+              "log2FoldChange": 1.1357,
+              "padj": 0.234,
+              "pvalue": 0.0016
+            }
+          },
+          "limma_12w/grp_VPA_vs_Ctrl": {
+            "Cxcr4": {
+              "AveExpr": 5.3424,
+              "log2FoldChange": -0.9609,
+              "padj": 0.816,
+              "pvalue": 0.0285
+            },
+            "Cntn2": {
+              "AveExpr": 3.912,
+              "log2FoldChange": -0.7265,
+              "padj": 0.724,
+              "pvalue": 0.0142
+            }
+          }
+        }
+      },
+      "reason": "Paper: Cxcr4 and Cntn2 down in VPA vs Ctrl at 12w (Fig. 3D-E); running restores Cxcr4 (Fig. 5E), so expected up in VPA+RW vs VPA.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:12:57"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f289112bf48ee59b1c800c3ed889cab8b94d4e44b359091c27ffb35085b2b57e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a5d9cdc35a942eddb79b8d4e3f9516956b43755d8ab49e8c7ea37c0a284c0d96",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "35fca8314a3b255ccd1a1e737d774f24453aba35083a24b020354e41dfbc9366",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5f820b1cfad66d57df08702d8305108f50620878140757fc1799395aadfded22",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "12c596dac34d04ddc80010178a6ba32c9ef38abcdb08d3872d06028ee1eaa519",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d74662831e4935813402f1ca0f5692ca619dad3e7f60c8d7221e6d733e4f54ac",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "aefb2bfaf056a49c6fc6b13665715399751e28b8b28fc348c31ca6f452d626a5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPARun_vs_VPA.csv",
+      "role": "deg_limma_12w/grp_VPARun_vs_VPA",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bce5f380d1d89431e1a3d44c7f481b5a06e6ab04672aba8b4486787c406643fe",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPA_vs_Ctrl.csv",
+      "role": "deg_limma_12w/grp_VPA_vs_Ctrl",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "81545434e744441ab9ff1f05851e7491bbf952825e6418212faf114c68cf669a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\results\\limma_12w\\DEG_results_grp_VPARun_vs_Ctrl.csv",
+      "role": "deg_limma_12w/grp_VPARun_vs_Ctrl",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "674f40dfd997480e1a26d7505220c5374030c20720736edc450a71bce3612c74",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID29610328\\GSE101239\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b2f61ac34a29f7b0f33a065e88354771b68423d06d5deea0dff035fa9467724b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

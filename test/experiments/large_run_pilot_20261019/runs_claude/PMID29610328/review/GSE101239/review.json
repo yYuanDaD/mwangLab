@@ -1,0 +1,88 @@
+{
+ "case": "GSE101239",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes, but only through the VPA arm: 12w DG NS/PCs have Ctrl, VPA and VPA+RW (8 wk voluntary running), 3 each (S1.4.p1-p2, Fig.5A). E15/P5 samples have no exercise. No Ctrl+RW arm.",
+  "B2": "Within each stage VPA vs Ctrl (Fig.2, S1.2.p1); at 12w Ctrl, VPA, VPA+RW compared (Fig.5B-E). GEO: 3 samples per group.",
+  "B3": "No repeated measures indicated; each sample is an independent FACS-sorted pool per group/stage. Packet A candidate keys link no samples across levels (title suffix rep1-3 is only a replicate label).",
+  "B4": "Paper does not say how the 12w three-group data were fitted; DEGs defined within each developmental stage (S1.2.p1). GEO data_processing names Cuffdiff.",
+  "B5": "S1.2.p1: 'q-value < 0.05, fold change >= 1.5'. Counts: 248 DEGs at E15 (235 up); only one DEG persists across stages; 'hundreds' per stage (S2.p2); no 12w or VPA+RW counts."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S1.4.p1-p2, Fig.5A: VPA+RW exists only at 12w DG; decision analyses 9 12w samples, excludes E15/P5 with reason; no Ctrl+RW arm stated.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ctrl/VPA/VPARun 3 each matches titles and Fig.5A; E15/P5 exclusions named. Control for exercise is VPA (the paper's comparison), not Ctrl.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "VPARun (treatment) vs VPA (control); Cxcr4 and Cntn2 signs in the check match the paper (Fig.3E, 5E).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Independent FACS-sorted animals per group; packet A candidate keys link no samples across levels; paper reports no repeated sampling for RNA-seq.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on model beyond Cuffdiff per stage; analysis records the joint three-group limma as a declared deviation from pairwise Cuffdiff.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single tissue/age/strain/genotype at 12w; sex inferred all female; no batch info in GEO or paper. Recorded in covariance.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Per-sample Cufflinks FPKM, not counts; log2(FPKM+1) then limma is the matching route; FPKM not rounded. Unfiltered vs FPKM>=1 filtered sensitivity reported.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S1.2.p1: q-value < 0.05, fold change >= 1.5; transcribed as padj<0.05 and |log2FC|>=log2(1.5), inclusive effect cutoff. Deviation (BH p for Cuffdiff q) declared.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper gives no DEG counts for 12w contrasts; none compared; HANDBACK states this and cites Cxcr4 only as directional agreement at nominal p.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; ORA failure (4 genes) is a true execution limit and GSEA was run instead.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: joint three-group limma on FPKM versus the paper's per-stage pairwise Cuffdiff (paper silent on 12w model)."
+ ],
+ "summary": "该案例决策与论文一致：只分析12周的9个样本，主对比为VPA+RW对VPA，阈值按论文q<0.05、FC>=1.5转换，FPKM走log2+limma并声明了偏差。没有发现阻断或重要问题；联合模型与逐对Cuffdiff的选择属于开放策略问题。"
+}

@@ -295,3 +295,21 @@ One section per case; newest last.
 ## PMID36481702 / GSE176563 (2026-11-17)
 
 - policy: 论文数字(774)与单独的 P<0.01(794)最接近,而非其声明的 P<0.01 且 FC>2:该情形下应报告哪条阈值属开放政策问题,本案已记录两条论文规则,未发现违反技能规则。
+
+## PMID36611093 / GSE208714 (2026-11-17)
+
+- stop_reason (unsure, major): The claim 'no key in any source' covers GEO, SOFT, SRA, BioSample and the CUT&RUN series, a wide search, but the paper's Supplementary Data 2 (per-sample RNA yields) was not opened because the download was not authorised. It is the most likely holder of lab-ID to condition rows. NT (6) / TG (14) prefix split is not a group label, which is consistent with the stop. The 3 PCA outliers are also unnamed, so the 2 vs 3 set cannot be rebuilt even with a key
+- policy: Supplementary Data 2 was never opened; a person must authorise the download or ask the authors to settle whether lab-ID to condition key exists
+- policy: Which 2 sedentary and 1 ELE SIT samples were PCA outliers is unnamed in the paper
+
+## PMID36620222 / GSE218103 (2026-11-17)
+
+- policy: Pre/post pool correspondence is undocumented; whether to run a labelled pool-blocked sensitivity is optional.
+
+## PMID36620222 / GSE219099 (2026-11-17)
+
+- policy: Policy (open): whether in-vitro exercise-mediator series such as miR-486 mimic count as exercise studies.
+
+## PMID29610328 / GSE101239 (2026-11-17)
+
+- policy: Open policy: joint three-group limma on FPKM versus the paper's per-stage pairwise Cuffdiff (paper silent on 12w model).

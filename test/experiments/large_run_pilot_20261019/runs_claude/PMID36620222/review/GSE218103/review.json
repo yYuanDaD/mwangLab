@@ -1,0 +1,88 @@
+{
+ "case": "GSE218103",
+ "blind": {
+  "B1": "Yes, a human exercise study: EV small RNA from plasma; exercise arm = TD EX and CP EX (S2.3, S2.6.p1). Per GEO, 6 of 12 samples carry the exercise factor (EX groups, 3 each). Note S2.6.p1 says pre and post samples were pooled to N=3 per timepoint per group, so the 'control/exercise' GEO labels may correspond to pre/post pools (the 'time' column pre 6/post 6) rather than separate unexercised people.",
+  "B2": "Main comparisons are CP vs TD at baseline and post exercise (Fig 2A,C; S3.3.p1); exercise effect (post vs pre) within group is in Supp Table 1 and found null. n=3 pools per group per timepoint (S2.6.p1). Four groups x3 = 12.",
+  "B3": "Yes: pre and post samples come from the same participants pooled into the same 3 pools per group (S2.6.p1), so pool k pre pairs with pool k post. Candidate key: suffix of title within geno (pairs each sample once across treatment). Expression check not supported (153 genes, p=0.09), so weak; paper does not name pairing in the DESeq2 model.",
+  "B4": "One joint model with genotype and activity (S2.9.p2: 'A model taking into account the genotype (TD or CP) and activity (EX or CON) was built'). Pairwise not stated.",
+  "B5": "S2.9.p2: DESeq2, miRNAs with <10 counts removed, model with genotype (TD/CP) and activity (EX/CON), significant at adjusted p<0.05 (FDR Benjamini-Hochberg). No fold-change cutoff stated. Counts: reports no DEG total; S3.3.p1 gives miR-486, let-7a/b/e (baseline CP vs TD), miR-100, miR-877, miR-4433 (post-exercise CP vs TD); exercise did not affect EV cargo in any group."
+ },
+ "reviewer": "Claude Code subagent (claude-sonnet-5-5)",
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.3, S2.6.p1: EX groups carry the exercise factor; run is right.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "GEO CON recoded pre, EX post; matches S2.6.p1 (only TD EX/CP EX sequenced, 3 pools per timepoint) and my blind reading; discrepancy recorded in packet B.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "post vs pre and CP vs TD, as in S3.3.p1/FIG2 (miR-486 up in CP).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "S2.6.p1 pools pre/post of the same participants; key 'suffix of title within geno' links all 12 but expression check not supported (p=0.09, 153 genes); paper model has no pool term (S2.9.p2). Not blocking: unpaired fit is as in the paper, caveat recorded.",
+   "fix": "Optional: add a labelled sensitivity run ~ pool + cell with pool = title suffix within genotype, next to the primary."
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One joint model, as S2.9.p2 genotype + activity.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sex/GMFCS pooling not labelled per pool; recorded as excluded covariates.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer raw counts, DESeq2 as in S2.9.p2; p>0.9 fraction ~0.2 reflects low-count miRNAs, not a model fault.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.05 BH, no FC, as S2.9.p2; the padj<0.1 fit for CP vs TD post (4 vs 1) is recorded in study caveats.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper counts (0,0,4,4) inferred from named miRNAs, same contrasts; HANDBACK states 1 vs 4 honestly.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Pre/post pool correspondence is undocumented; whether to run a labelled pool-blocked sensitivity is optional."
+ ],
+ "summary": "分析合理：CON 重编码为 pre、EX 为 post 与论文 S2.6.p1 一致，使用与论文相同的 DESeq2 联合模型和 padj<0.05。唯一待注意的是 pre/post 池配对未被表达数据支持，已作为警示记录。"
+}

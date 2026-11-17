@@ -1,0 +1,86 @@
+{
+ "case": "GSE219100",
+ "blind": {
+  "B1": "The superseries combining the 12 human EV miRNA samples (GSE218103) and the 6 C2C12 samples (GSE219099). The paper names GSE219100 as data for both the EV miRNA-seq and C2C12 RNA-seq (S2.6.p1, S2.8.p1). Exercise carriers: TD EX, CP EX (6 samples). The C2C12 part is not an exercise series, and the two parts differ in organism, platform and assay, so must not be analyzed together.",
+  "B2": "Human: CP vs TD at baseline and post exercise, n=3 pools each; pre vs post within groups. C2C12: miR-486 vs scramble, n=3 each.",
+  "B3": "Human part: pre/post pools of the same participants (S2.6.p1); title suffix within group would pair them (weak expression support). C2C12: none.",
+  "B4": "Human: joint genotype+activity DESeq2 model (S2.9.p2). C2C12: not stated.",
+  "B5": "S2.9.p2: DESeq2, miRNAs with <10 counts removed, model with genotype (TD/CP) and activity (EX/CON), significant at adjusted p<0.05 (FDR Benjamini-Hochberg). No fold-change cutoff stated. Counts: reports no DEG total; S3.3.p1 gives miR-486, let-7a/b/e (baseline CP vs TD), miR-100, miR-877, miR-4433 (post-exercise CP vs TD); exercise did not affect EV cargo in any group. C2C12 rule not stated."
+ },
+ "reviewer": "Claude Code subagent (claude-sonnet-5-5)",
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "SuperSeries of GSE218103 (exercise, run there) + GSE219099 (no exercise); refusing the union is right.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Not run.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Not run.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Candidate keys here are spurious across two assays; expression check not supported.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Not run.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Species, platform and assay fully aliased with sub-series; recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Matrix stacks human miRNA and mouse Ensembl counts; recorded.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.05 BH transcribed from S2.9.p2.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No numbers compared.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Reason is true (organism/series_id/source_name split 18 samples exactly; exercise arm already analyzed in GSE218103). Mechanical flag refusal_vs_exercise_words fires only because claim type is labelled exercise_arm although the reason is not 'no exercise arm'.",
+   "fix": "Relabel claim type to superseries_union."
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "拒绝理由属实：超系列 GSE219100 是 GSE218103（人 EV miRNA，含运动）与 GSE219099（小鼠 C2C12）的并集，无法用单一设计建模，运动对比已在 GSE218103 完成。仅有次要问题：claim type 标记为 exercise_arm 容易引起误解。"
+}

@@ -1,0 +1,89 @@
+{
+ "case": "GSE208714",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Emx1-NuTRAP male mice, ELE (voluntary wheel P21-41) vs sedentary, TRAP-seq at P42 (S4.1.5.p1, S4.1.6.p1). In GSE208714 all 20 NuTRAP samples carry the exercise factor (SIT 4+4, separate 6+6); the 24 wild-type OLM samples are a separate memory experiment (S2.6).",
+  "B2": "SIT TRAP-seq ELE vs sedentary, n=3 vs 2 after outlier removal (FIG4a legend; S2.4.p1: 297 up, 338 down). Separate isolation ELE vs sedentary, n=3 mice per group, also by left and right hemisphere (FIG3 legend, S2.3.p1). OLM groups (S2.6) from the wild-type matrix.",
+  "B3": "Separate isolation: left and right hemispheres from the same mouse (S4.1.7.p1, S4.1.8.p1; one for TRAP, one for INTACT); the hemisphere comparison (S2.3, S4.1.16.1.p3) would then involve repeated mice. SIT combines both hemispheres per sample. Packet A lists no candidate pairing key.",
+  "B4": "DESeq2 default negative binomial with Wald test per ELE vs sedentary comparison (S4.1.16.1.p2); the hemisphere effect used a joint LRT with hemisphere + exercise + hemisphere:exercise (S4.1.16.1.p3). The paper does not say whether ELE vs sedentary was fitted jointly or per subset.",
+  "B5": "'absolute value of the Log2 fold change greater than 0.3875 and a Wald p value of less than 0.05' (S4.1.16.1.p2); S2.4.p1 '>30% expression increase with a p value < 0.05'; FIG4 legend 0.3785. Raw p, not padj. Reported 297 up and 338 down for SIT."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B1: the series is an in-vivo exercise study (voluntary wheel running P21-41 vs sedentary, S4.1.5.p1); the stop is at alignment, not a refusal of the question",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no groups were built, case stopped; recorded n 2 sed vs 3 ELE after outlier removal matches FIG4 legend",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no contrast run",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "B3: no animal sampled repeatedly in the SIT contrast; the separate-isolation design uses left and right hemispheres of the same mouse (S4.1.7.p1, S4.1.8.p1) and the paper's LRT uses hemisphere+exercise, but no pairing key exists in packet A and nothing was run",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no fit run; the paper fits DESeq2 Wald on ELE vs sedentary (S4.1.16.1.p2)",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "not assessable without the key; hemisphere and isolation method are crossed with exercise by design",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "integer counts, 20 columns, 55,335 Ensembl features per ownership gate; nothing contradicts that",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "B5: Wald raw p < 0.05 and |log2FC| > 0.3785 (=log2 1.3) (S2.4.p1, FIG4 legend); S4.1.16.1.p2 prints 0.3875; counts 297 up / 338 down. The discrepancy record transcribes this correctly and treats 0.3875 as a typo",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no ours-vs-paper comparison was made",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "unsure",
+   "severity": "major",
+   "evidence": "The claim 'no key in any source' covers GEO, SOFT, SRA, BioSample and the CUT&RUN series, a wide search, but the paper's Supplementary Data 2 (per-sample RNA yields) was not opened because the download was not authorised. It is the most likely holder of lab-ID to condition rows. NT (6) / TG (14) prefix split is not a group label, which is consistent with the stop. The 3 PCA outliers are also unnamed, so the 2 vs 3 set cannot be rebuilt even with a key",
+   "fix": "Download Supplementary Data 2 (MOESM xlsx) with permission and check whether it lists lab IDs against exercise/isolation/hemisphere; if it does, rerun with that key as documented provenance; otherwise ask the authors. Restate the stop reason as 'key not found in deposited records; supplementary table unchecked' until then"
+  }
+ ],
+ "overall": "human",
+ "human_items": [
+  "Supplementary Data 2 was never opened; a person must authorise the download or ask the authors to settle whether lab-ID to condition key exists",
+  "Which 2 sedentary and 1 ELE SIT samples were PCA outliers is unnamed in the paper"
+ ],
+ "summary": "案例在 alignment 处正确停止：矩阵列名是实验室小鼠编号，GEO/SRA/BioSample 中均无对应表，禁止按顺序或前缀猜测。但该停止理由没有检查论文的 Supplementary Data 2（未获下载授权），所以“任何来源都没有”这个说法尚未完全成立。阈值已正确记录（原始 p<0.05，|log2FC|>0.3785，另记录 0.3875 笔误），建议人工授权下载补充表后再判断。"
+}

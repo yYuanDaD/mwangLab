@@ -775,3 +775,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36611093 (GSE208714)
 
 - inspect searches only GEO metadata for alignment keys; SRA/BioSample checked by hand Details: `PMID36611093/HANDBACK.md`.
+
+## PMID29610328 (GSE101239)
+
+- ORA skipped with <5 DEGs (enrichment_tools.py:250); GSEA ranking 19% ties, low-expr genes not filtered (enrichment_tools.py:348); filter sensitivity drops all DEGs Details: `PMID29610328/HANDBACK.md`.
+
+## PMID39523700 (GSE257540;GSE281241)
+
+- MyGene 502 on 1 batch, partial symbol map (enrichment_tools.py:150); 27% tied GSEA ranks; mech summary says n_aligned 26 (case_runner.py:588) Details: `PMID39523700/HANDBACK.md`.

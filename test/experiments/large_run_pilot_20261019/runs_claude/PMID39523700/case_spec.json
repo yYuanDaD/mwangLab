@@ -1,0 +1,715 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39523700",
+ "request": "Analyze GSE257540 and GSE281241 for PMID 39523700 (Actuating Extracellular Matrices Decouple the Mechanical and Biochemical Effects of Muscle Contraction on Motor Neurons.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE257540_biochem",
+   "accession": "GSE257540",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11874633.paper.md"
+    ],
+    "metadata": "GSE257540/GSE257540_metadata.csv",
+    "matrix": "GSE257540/GSE257540_expression_data_counts.tsv.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE257540",
+       "GSE281241"
+      ],
+      "primary_estimand": "Transcriptomic effect on HB9::GFP mESC-derived motor neuron spheroids of (a) biochemical stimulation with conditioned medium from optogenetically exercised C2C12 muscle (1 Hz light, 30 min/day) or from spontaneously twitching (unstimulated) muscle, versus unconditioned control medium, and (b) mechanical stimulation by magnetic matrix actuation (MagMA) versus non-actuated MagMA controls (S2.4.p1-p4, FIG7, S4.6, S4.7).",
+      "planned_contrasts": [
+       "Exercise CM vs Control (FIG7c; S2.4.p3)",
+       "Spontaneous-twitch CM vs Control (FIG7d)",
+       "Exercise CM vs Spontaneous-twitch CM (FIG7e)",
+       "Mechanical stimulation vs mechanical control (FIG7i; S2.4.p4: only 2 significant hits, both up)"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": "not_reported",
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "FIG7 legend; S4.10.p1"
+      },
+      "factors": {
+       "biochemical": [
+        "Control",
+        "Spontaneous twitch CM (GEO: Low intensity biochem, NE1-6)",
+        "Exercise CM (GEO: High intensity biochem, S1-6)"
+       ],
+       "mechanical": [
+        "Mechanical control (MC1-4)",
+        "Mechanical stimulation (M1-4)"
+       ]
+      },
+      "sample_inclusion": "QC exclusion of samples with <500K reads, rRNA >20% or exon/intron ratio <10 (n = 5, S4.10.p1); final n: control 5, spontaneous 4, exercise 4 (FIG7a); mechanical control 3, mechanical 4 (FIG7i)",
+      "repeated_measure_unit": "not_reported (independent spheroid wells; no pairing described)",
+      "normalization": "DESeq2 size factors; log TPM for visualization only (S4.10.p1)",
+      "paper_method": "DESeq2 (R 4.2.0) Wald test, normal prior and ashr LFC shrinkage, BH-adjusted p (S4.10.p1); GSEA 3.0 on LFC/Wald stat vs MSigDB c2-c6 v7.0 (S4.11.p1)",
+      "paper_results": "194 DEGs across the biochemical comparisons (union, FIG7b; S2.4.p3); mechanical vs control: 2 DEGs, both up, RNA-degradation markers (S2.4.p4); named up genes in Exercise and Spontaneous: Ntn1, Iqgap1, Wls, Lamb1, Itgb1, Serpinh1; Exercise only: Sema3b, Sema3d, Cdh1, Lamc1, Nid1, Nid2, Bgn, Col18a1, Aebp1, Loxl1",
+      "GSE281241_in_paper": "not_reported: the paper text cites only GSE257540 (S4.8.p2, DA.p1); GSE281241 is linked to PMID 39523700 in GEO (same SuperSeries GSE281242) and compares unstimulated ChR2 vs WT C2C12 muscle."
+     },
+     "reasoning": "Built from S2.4.p1-p5, FIG7 legend, S4.6-S4.11 and DA.p1. Paper's DE threshold is BH-adjusted p with no stated numeric cutoff or fold-change rule (FIG7 legend: p-values used to determine DEGs were Benjamini-Hochberg adjusted).",
+     "locator": "S2.4; FIG7; S4.10.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.8.p2 and DA.p1 cite GSE257540",
+       "GEO Series_pubmed_id 39523700",
+       "26 GSMs = HB9::GFP motor neuron spheroids with treatment labels matching the paper's 5 arms",
+       "matrix columns C/L/H/M/MC map 1:1 to GSM titles C/LI/HI/M/MC"
+      ]
+     },
+     "reasoning": "Paper names GSE257540 as its RNA-seq deposit; samples and arms match FIG7."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^(MC|M|C|L|H)I?(\\d+)$"
+      ]
+     },
+     "normalize_keys": true,
+     "patterns": {
+      "grp": [
+       "characteristics_ch1.4.treatment",
+       "^(.+)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Biochemical control": "C",
+       "Low intensity biochem": "SP",
+       "High intensity biochem": "EX",
+       "Mechanical control": "MC",
+       "Mechanical stimulation": "MS"
+      }
+     },
+     "exclude_samples": {
+      "GSM8107917": "QC (S4.10.p1): rRNA fraction 0.78 of counts (>20%)",
+      "GSM8107913": "QC (S4.10.p1): 1,536 assigned reads (<500K)",
+      "GSM8107923": "QC (S4.10.p1): 243,510 assigned reads (<500K)",
+      "GSM8107924": "QC (S4.10.p1): 495,044 assigned reads (<500K)",
+      "GSM8107906": "QC (S4.10.p1): 613K reads, 10x below other mechanical libraries, with 31.7K detected genes (highest of all samples), consistent with the low exon/intron coverage criterion; paper keeps 3 mechanical controls (FIG7i)",
+      "GSM8107900": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107901": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107902": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107903": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107904": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107905": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)",
+      "GSM8107907": "mechanical-stimulation experiment with its own controls, analyzed in case GSE257540_mech (paper analyzes the two experiments separately, FIG7a vs FIG7i)"
+     },
+     "reasoning": "Matrix columns abbreviate titles (L1 = LI1, H1 = HI1). key_patterns strips the I and normalize_keys matches L_1 to L1; exact otherwise, never positional. GEO Low intensity biochem = NE1-6 (media from unstimulated, spontaneously twitching optogenetic muscle) and High intensity biochem = S1-6 (media from optically stimulated, exercised muscle) per Series_overall_design, recoded SP and EX. QC exclusions follow S4.10.p1 criteria computed from the deposited counts. FIG7a reports 4 spontaneous replicates; only LI6 fails a criterion computable from the counts, so 5 SP samples are kept (see discrepancies)."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (nf-core STAR/Salmon gene-level counts, deposited as integers)",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE257540_expression_data_counts.tsv.txt.gz (GEO supplementary)",
+      "paper_input": "Gene-level expression tables from STAR/Salmon (S4.10.p1), tested with DESeq2",
+      "rounding_documented": true
+     },
+     "reasoning": "All values are non-negative integers (integer fraction 1.0), max 1.1M, Ensembl gene rows with GeneSymbol/Biotype annotation. GEO data_processing: nf-core/rnaseq 3.11.1, gene-level raw counts and TPM generated by Salmon. Salmon gene counts are estimated counts; the submitter deposited them already rounded to integers, which is the count input the paper gave DESeq2 (S4.10.p1). The deposited integers are used unchanged (no further rounding). The companion _tpms file is TPM and is not used for DE.",
+     "candidates": [
+      {
+       "value": "GSE257540_expression_data_tpms.tsv.txt.gz",
+       "reason_rejected": "TPM, used by the paper for visualization only; DESeq2 needs counts"
+      }
+     ]
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "C"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_EX_vs_C",
+      "grp_SP_vs_C",
+      "grp_EX_vs_SP"
+     ],
+     "final": {
+      "analysis_type": "multi-group (one control, two stimulation arms)",
+      "design_column": "grp",
+      "contrasts": [
+       {
+        "name": "grp_EX_vs_C",
+        "control": "C",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "grp_SP_vs_C",
+        "control": "C",
+        "treatment": "SP",
+        "role": "secondary"
+       },
+       {
+        "name": "grp_EX_vs_SP",
+        "control": "SP",
+        "treatment": "EX",
+        "role": "secondary"
+       }
+      ],
+      "estimand_type": "causal (randomized in vitro treatment)"
+     },
+     "reasoning": "FIG7c-e: three pairwise comparisons among Control, Spontaneous and Exercise CM. One 3-level DESeq2 model with planned contrasts (not pooled levels). Exercise CM vs Control is the primary exercise estimand; Exercise vs Spontaneous isolates contraction intensity.",
+     "candidates": [
+      {
+       "value": "pool SP+EX vs C",
+       "reason_rejected": "paper reports the arms separately"
+      },
+      {
+       "value": "single model with mechanical samples",
+       "reason_rejected": "separate experiment with its own controls; paper shows separate PCA and analyses"
+      }
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent spheroid wells per arm; no donor/subject, pairing, batch or lane variable in GEO metadata or paper. Nothing to block on."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, one model ~ grp)",
+      "formula": "~ grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 Wald with normal-prior/ashr LFC shrinkage (R 4.2.0)",
+       "status": "reproduced_without_shrinkage",
+       "reason": "pydeseq2 has no ashr; shrinkage changes LFC estimates only, not the Wald p/padj used for DEG calls"
+      },
+      "deviations": [
+       "no ashr/normal-prior LFC shrinkage",
+       "pydeseq2 instead of R DESeq2",
+       "biochemical samples fitted without the mechanical samples (paper's model composition not stated)"
+      ]
+     },
+     "reasoning": "Paper's method (S4.10.p1) on the deposited counts."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": "not_reported",
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "FIG7 legend; S4.10.p1"
+      },
+      "threshold_source": "workflow_default",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "Paper defines DEGs by BH-adjusted p without stating the cutoff; the workflow default BH padj < 0.05 with no fold-change rule is applied (same metric and adjustment). Nominal p < 0.05 is reported as an audit count because the paper used nominal p for its FIG7j mechanical heatmap."
+     },
+     "reasoning": "FIG7 legend and S4.10.p1 name BH-adjusted p-values but no numeric cutoff; no effect-size rule stated."
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Paper's 194 DEGs is a union over the three biochemical comparisons; per-contrast counts are not reported.",
+       "Spontaneous arm keeps 5 samples vs paper's 4 (second excluded sample not identifiable from deposited counts)."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "joint/grp_EX_vs_C": [
+       "Ntn1",
+       "Iqgap1",
+       "Wls",
+       "Lamb1",
+       "Itgb1",
+       "Sema3b",
+       "Sema3d",
+       "Cdh1",
+       "Lamc1",
+       "Serpinh1",
+       "Nid1",
+       "Nid2",
+       "Bgn",
+       "Col18a1",
+       "Aebp1",
+       "Loxl1"
+      ],
+      "joint/grp_SP_vs_C": [
+       "Ntn1",
+       "Iqgap1",
+       "Wls",
+       "Lamb1",
+       "Itgb1",
+       "Serpinh1"
+      ]
+     },
+     "reasoning": "Paper reports a union count (194) and named up-regulated genes; union computed separately for HANDBACK."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "QC exclusions",
+     "paper": "n = 5 excluded (S4.10.p1) but FIG7a/i imply 6 (18->13 biochemical, 8->7 mechanical)",
+     "data": "5 samples fail criteria computable from counts (C4, LI6, HI4, HI5, MC3); no second spontaneous sample fails",
+     "disposition": "executable_with_deviation: keep 5 SP samples"
+    },
+    {
+     "item": "Group naming",
+     "paper": "spontaneous twitch / exercised muscle CM",
+     "data": "GEO Low / High intensity biochem (NE / S in overall design)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "joint",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "planned"
+     },
+     "role": "primary",
+     "reasoning": "One DESeq2 model on C/SP/EX, three planned contrasts (FIG7c-e)."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "joint/grp_EX_vs_C",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Paper reports GSEA on Wald stat (S4.11.p1, FIG7f); Hallmark used here, paper used c2-c6."
+    },
+    {
+     "execution": "joint/grp_SP_vs_C",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "FIG7g"
+    },
+    {
+     "execution": "joint/grp_EX_vs_SP",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "FIG7h"
+    }
+   ]
+  },
+  {
+   "case_id": "GSE257540_mech",
+   "accession": "GSE257540",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11874633.paper.md"
+    ],
+    "metadata": "GSE257540/GSE257540_metadata.csv",
+    "matrix": "GSE257540/GSE257540_expression_data_counts.tsv.txt.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE257540",
+       "GSE281241"
+      ],
+      "primary_estimand": "Transcriptomic effect on HB9::GFP mESC-derived motor neuron spheroids of (a) biochemical stimulation with conditioned medium from optogenetically exercised C2C12 muscle (1 Hz light, 30 min/day) or from spontaneously twitching (unstimulated) muscle, versus unconditioned control medium, and (b) mechanical stimulation by magnetic matrix actuation (MagMA) versus non-actuated MagMA controls (S2.4.p1-p4, FIG7, S4.6, S4.7).",
+      "planned_contrasts": [
+       "Exercise CM vs Control (FIG7c; S2.4.p3)",
+       "Spontaneous-twitch CM vs Control (FIG7d)",
+       "Exercise CM vs Spontaneous-twitch CM (FIG7e)",
+       "Mechanical stimulation vs mechanical control (FIG7i; S2.4.p4: only 2 significant hits, both up)"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": "not_reported",
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "FIG7 legend; S4.10.p1"
+      },
+      "factors": {
+       "biochemical": [
+        "Control",
+        "Spontaneous twitch CM (GEO: Low intensity biochem, NE1-6)",
+        "Exercise CM (GEO: High intensity biochem, S1-6)"
+       ],
+       "mechanical": [
+        "Mechanical control (MC1-4)",
+        "Mechanical stimulation (M1-4)"
+       ]
+      },
+      "sample_inclusion": "QC exclusion of samples with <500K reads, rRNA >20% or exon/intron ratio <10 (n = 5, S4.10.p1); final n: control 5, spontaneous 4, exercise 4 (FIG7a); mechanical control 3, mechanical 4 (FIG7i)",
+      "repeated_measure_unit": "not_reported (independent spheroid wells; no pairing described)",
+      "normalization": "DESeq2 size factors; log TPM for visualization only (S4.10.p1)",
+      "paper_method": "DESeq2 (R 4.2.0) Wald test, normal prior and ashr LFC shrinkage, BH-adjusted p (S4.10.p1); GSEA 3.0 on LFC/Wald stat vs MSigDB c2-c6 v7.0 (S4.11.p1)",
+      "paper_results": "194 DEGs across the biochemical comparisons (union, FIG7b; S2.4.p3); mechanical vs control: 2 DEGs, both up, RNA-degradation markers (S2.4.p4); named up genes in Exercise and Spontaneous: Ntn1, Iqgap1, Wls, Lamb1, Itgb1, Serpinh1; Exercise only: Sema3b, Sema3d, Cdh1, Lamc1, Nid1, Nid2, Bgn, Col18a1, Aebp1, Loxl1",
+      "GSE281241_in_paper": "not_reported: the paper text cites only GSE257540 (S4.8.p2, DA.p1); GSE281241 is linked to PMID 39523700 in GEO (same SuperSeries GSE281242) and compares unstimulated ChR2 vs WT C2C12 muscle."
+     },
+     "reasoning": "Built from S2.4.p1-p5, FIG7 legend, S4.6-S4.11 and DA.p1. Paper's DE threshold is BH-adjusted p with no stated numeric cutoff or fold-change rule (FIG7 legend: p-values used to determine DEGs were Benjamini-Hochberg adjusted).",
+     "locator": "S2.4; FIG7; S4.10.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S4.8.p2 and DA.p1 cite GSE257540",
+       "GEO Series_pubmed_id 39523700",
+       "26 GSMs = HB9::GFP motor neuron spheroids with treatment labels matching the paper's 5 arms",
+       "matrix columns C/L/H/M/MC map 1:1 to GSM titles C/LI/HI/M/MC"
+      ]
+     },
+     "reasoning": "Paper names GSE257540 as its RNA-seq deposit; samples and arms match FIG7."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^(MC|M|C|L|H)I?(\\d+)$"
+      ]
+     },
+     "normalize_keys": true,
+     "patterns": {
+      "grp": [
+       "characteristics_ch1.4.treatment",
+       "^(.+)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Biochemical control": "C",
+       "Low intensity biochem": "SP",
+       "High intensity biochem": "EX",
+       "Mechanical control": "MC",
+       "Mechanical stimulation": "MS"
+      }
+     },
+     "exclude_samples": {
+      "GSM8107906": "QC (S4.10.p1): 613K reads, 10x below other mechanical libraries, with 31.7K detected genes (highest of all samples), consistent with the low exon/intron coverage criterion; paper keeps 3 mechanical controls (FIG7i)",
+      "GSM8107914": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107915": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107916": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107917": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107918": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107919": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107908": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107909": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107910": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107911": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107912": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107913": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107920": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107921": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107922": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107923": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107924": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem",
+      "GSM8107925": "biochemical-stimulation experiment with its own controls, analyzed in case GSE257540_biochem"
+     },
+     "reasoning": "Same key derivation as the biochemical case. Keeps the mechanical experiment only (M1-4, MC1/2/4). MC3 excluded by the S4.10.p1 QC criteria (paper keeps 3 controls, FIG7i)."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (nf-core STAR/Salmon gene-level counts, deposited as integers)",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE257540_expression_data_counts.tsv.txt.gz (GEO supplementary)",
+      "paper_input": "Gene-level expression tables from STAR/Salmon (S4.10.p1), tested with DESeq2",
+      "rounding_documented": true
+     },
+     "reasoning": "All values are non-negative integers (integer fraction 1.0), max 1.1M, Ensembl gene rows with GeneSymbol/Biotype annotation. GEO data_processing: nf-core/rnaseq 3.11.1, gene-level raw counts and TPM generated by Salmon. Salmon gene counts are estimated counts; the submitter deposited them already rounded to integers, which is the count input the paper gave DESeq2 (S4.10.p1). The deposited integers are used unchanged (no further rounding). The companion _tpms file is TPM and is not used for DE.",
+     "candidates": [
+      {
+       "value": "GSE257540_expression_data_tpms.tsv.txt.gz",
+       "reason_rejected": "TPM, used by the paper for visualization only; DESeq2 needs counts"
+      }
+     ]
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "MC"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_MS_vs_MC"
+     ],
+     "final": {
+      "analysis_type": "two-group",
+      "design_column": "grp",
+      "control": "MC",
+      "treatment": "MS",
+      "contrasts": [
+       {
+        "name": "grp_MS_vs_MC",
+        "control": "MC",
+        "treatment": "MS",
+        "role": "primary"
+       }
+      ],
+      "estimand_type": "causal (randomized in vitro treatment)"
+     },
+     "reasoning": "FIG7i: mechanically actuated MagMA spheroids vs non-actuated MagMA controls on the same hydrogel type (S2.3, FIG5d). n = 4 vs 3."
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Independent spheroid wells per arm; no donor/subject, pairing, batch or lane variable in GEO metadata or paper. Nothing to block on."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald, ~ grp)",
+      "formula": "~ grp",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "DESeq2 Wald with normal-prior/ashr LFC shrinkage (R 4.2.0)",
+       "status": "reproduced_without_shrinkage",
+       "reason": "pydeseq2 has no ashr; shrinkage changes LFC only"
+      },
+      "deviations": [
+       "no ashr/normal-prior LFC shrinkage",
+       "pydeseq2 instead of R DESeq2"
+      ]
+     },
+     "reasoning": "Paper's method (S4.10.p1) on the deposited counts."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": "not_reported",
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "FIG7 legend; S4.10.p1"
+      },
+      "threshold_source": "workflow_default",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "Paper defines DEGs by BH-adjusted p without stating the cutoff; the workflow default BH padj < 0.05 with no fold-change rule is applied (same metric and adjustment). Nominal p < 0.05 is reported as an audit count because the paper used nominal p for its FIG7j mechanical heatmap."
+     },
+     "reasoning": "FIG7 legend and S4.10.p1 name BH-adjusted p-values but no numeric cutoff; no effect-size rule stated."
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Small arms (4 vs 3)."
+      ]
+     },
+     "paper_counts": {
+      "grp_MS_vs_MC": 2
+     },
+     "paper_genes": {},
+     "reasoning": "S2.4.p4: two significant hits, both up (RNA-degradation markers, unnamed)."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "QC exclusions",
+     "paper": "mechanical control n = 3 (FIG7i)",
+     "data": "MC3 is the only mechanical library failing the depth/coverage pattern",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_MS_vs_MC",
+     "tool": "tools.deseq2_tools:run_deseq2_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "MC",
+      "treatment_group": "MS",
+      "alpha": 0.05
+     },
+     "role": "primary",
+     "reasoning": "Paper's two-group DESeq2 for the mechanical experiment."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "grp_MS_vs_MC",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "Paper's key mechanical claim is GSEA (FIG7k); ORA skipped (2 DEGs in paper)."
+    }
+   ]
+  },
+  {
+   "case_id": "GSE281241",
+   "accession": "GSE281241",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC11874633.paper.md"
+    ],
+    "metadata": "GSE281241/GSE281241_metadata.csv",
+    "matrix": "GSE281241/GSE281241_salmon.merged.gene_counts.tsv.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE257540",
+       "GSE281241"
+      ],
+      "primary_estimand": "Transcriptomic effect on HB9::GFP mESC-derived motor neuron spheroids of (a) biochemical stimulation with conditioned medium from optogenetically exercised C2C12 muscle (1 Hz light, 30 min/day) or from spontaneously twitching (unstimulated) muscle, versus unconditioned control medium, and (b) mechanical stimulation by magnetic matrix actuation (MagMA) versus non-actuated MagMA controls (S2.4.p1-p4, FIG7, S4.6, S4.7).",
+      "planned_contrasts": [
+       "Exercise CM vs Control (FIG7c; S2.4.p3)",
+       "Spontaneous-twitch CM vs Control (FIG7d)",
+       "Exercise CM vs Spontaneous-twitch CM (FIG7e)",
+       "Mechanical stimulation vs mechanical control (FIG7i; S2.4.p4: only 2 significant hits, both up)"
+      ],
+      "paper_threshold": {
+       "metric": "padj",
+       "adjustment": "BH",
+       "cutoff": "not_reported",
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "FIG7 legend; S4.10.p1"
+      },
+      "factors": {
+       "biochemical": [
+        "Control",
+        "Spontaneous twitch CM (GEO: Low intensity biochem, NE1-6)",
+        "Exercise CM (GEO: High intensity biochem, S1-6)"
+       ],
+       "mechanical": [
+        "Mechanical control (MC1-4)",
+        "Mechanical stimulation (M1-4)"
+       ]
+      },
+      "sample_inclusion": "QC exclusion of samples with <500K reads, rRNA >20% or exon/intron ratio <10 (n = 5, S4.10.p1); final n: control 5, spontaneous 4, exercise 4 (FIG7a); mechanical control 3, mechanical 4 (FIG7i)",
+      "repeated_measure_unit": "not_reported (independent spheroid wells; no pairing described)",
+      "normalization": "DESeq2 size factors; log TPM for visualization only (S4.10.p1)",
+      "paper_method": "DESeq2 (R 4.2.0) Wald test, normal prior and ashr LFC shrinkage, BH-adjusted p (S4.10.p1); GSEA 3.0 on LFC/Wald stat vs MSigDB c2-c6 v7.0 (S4.11.p1)",
+      "paper_results": "194 DEGs across the biochemical comparisons (union, FIG7b; S2.4.p3); mechanical vs control: 2 DEGs, both up, RNA-degradation markers (S2.4.p4); named up genes in Exercise and Spontaneous: Ntn1, Iqgap1, Wls, Lamb1, Itgb1, Serpinh1; Exercise only: Sema3b, Sema3d, Cdh1, Lamc1, Nid1, Nid2, Bgn, Col18a1, Aebp1, Loxl1",
+      "GSE281241_in_paper": "not_reported: the paper text cites only GSE257540 (S4.8.p2, DA.p1); GSE281241 is linked to PMID 39523700 in GEO (same SuperSeries GSE281242) and compares unstimulated ChR2 vs WT C2C12 muscle."
+     },
+     "reasoning": "Built from S2.4.p1-p5, FIG7 legend, S4.6-S4.11 and DA.p1. Paper's DE threshold is BH-adjusted p with no stated numeric cutoff or fold-change rule (FIG7 legend: p-values used to determine DEGs were Benjamini-Hochberg adjusted).",
+     "locator": "S2.4; FIG7; S4.10.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "GEO Series_pubmed_id 39523700; SuperSeries GSE281242 shared with GSE257540",
+       "same submitter/core",
+       "paper text does not cite or analyze GSE281241"
+      ]
+     },
+     "reasoning": "Linked to the paper by GEO, but the article reports no analysis of it (only GSE257540 is cited, S4.8.p2, DA.p1)."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^(O|W)T?(\\d+)$"
+      ]
+     },
+     "normalize_keys": true,
+     "patterns": {
+      "grp": [
+       "characteristics_ch1.3.genotype",
+       "^(.+)$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "ChR2::tdTomato": "ChR2",
+       "Wild-Type": "WT"
+      }
+     },
+     "reasoning": "Matrix W1-6 = titles WT1-6, O1-6 = O1-6; exact match after stripping T and normalizing."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (nf-core Salmon gene_counts, non-integer)",
+     "recommended_method": "DESeq2 after documented rounding",
+     "final": {
+      "source": "GSE281241_salmon.merged.gene_counts.tsv.gz",
+      "paper_input": "not_reported (dataset not analyzed in the paper)"
+     },
+     "reasoning": "92% integers with a non-integer remainder: Salmon estimated counts (GEO data_processing)."
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "WT"
+     },
+     "organism": "Mouse",
+     "planned": [],
+     "final": {
+      "analysis_type": "none",
+      "design_column": "grp",
+      "contrasts": []
+     },
+     "decision_status": "refused",
+     "stop_reason": "No exercise contrast: all 12 samples are unstimulated C2C12 myotubes after 6 days of differentiation; the only factor is genotype (ChR2::tdTomato optogenetic line vs wild-type), a cell-line characterization (Series_summary). There is no light-stimulation or contraction arm, and the paper reports no analysis of this series.",
+     "reasoning": "Series_overall_design: transcriptomic comparison of wild-type C2C12 and ChR2-optogenetic C2C12 under the same culture conditions. Genotype is not exercise; manufacturing a contrast would not answer how exercise affects expression."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "dataset use",
+     "paper": "not cited",
+     "data": "GEO links it to PMID 39523700",
+     "disposition": "refused_at_design"
+    }
+   ],
+   "executions": [],
+   "enrichment": []
+  }
+ ]
+}
