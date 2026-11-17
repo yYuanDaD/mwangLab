@@ -1,0 +1,952 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID25484259",
+ "request": "Analyze GSE58608, GSE60590 and GSE60591 for PMID 25484259 (An integrative analysis reveals coordinated reprogramming of the epigenome and the transcriptome in human skeletal muscle after training.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE58608",
+   "accession": "GSE58608",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC4622000.paper.md"
+    ],
+    "metadata": "GSE58608/GSE58608_metadata.csv",
+    "raw_tar": true,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE58608",
+       "GSE60590",
+       "GSE60591"
+      ],
+      "accession_roles": {
+       "GSE58608": "RNA-seq, pre-training biopsies of both legs (T1 = leg to be trained, U1 = untrained leg) for 12 subjects; S5.4.p2 notes a baseline subset (n=12) analyzed earlier",
+       "GSE60590": "RNA-seq, 22 post-training trained-leg biopsies (T2) plus 11 pre-training T1 biopsies of the other 11 subjects",
+       "GSE60591": "GEO SuperSeries joining GSE58608 + GSE60590 (57 samples); not named in the paper but holds exactly the two cited series",
+       "GSE60655": "DNA methylation 450K (S5.6.p1); not part of this gene-expression request"
+      },
+      "assay": "bulk RNA-seq, Illumina HiSeq2000, 2x100 bp, vastus lateralis (S5.4.p1, S3.1.p1)",
+      "primary_estimand": "Within-subject change in trained-leg skeletal-muscle gene expression after 3 months of supervised one-legged endurance knee-extension training: T2 (24 h after last session) vs T1 (pre-training), trained leg (S3.1.p1, S3.1.p2, S5.1.p1, S5.4.p2)",
+      "planned_contrasts": [
+       "T2 vs T1, trained leg, individual and library preparation as covariates (S5.4.p2; paper: 4076 DEGs, S3.1.p2)"
+      ],
+      "factors": {
+       "group": [
+        "T1 pre-training trained leg",
+        "T2 post-training trained leg"
+       ],
+       "individual": "23 subjects (12 M, 11 F; TAB1)",
+       "library_preparation": "covariate named in S5.4.p2; not annotated in GEO"
+      },
+      "sample_inclusion": "23 sedentary young subjects; biopsies from both legs before and after training (S3.1.p1). RNA-seq DE is trained leg T2 vs T1 (S3.1.p2, S5.4.p2). The untrained leg is an intraindividual control used for physiology and methylation validation, not in the RNA-seq DEG model.",
+      "repeated_measure_unit": "individual (subject)",
+      "paper_method": "edgeR on gene counts after QC, trimming, mapping, PCR-duplicate removal and gene count summarization; model with group (T2 vs T1) + library preparation + individual (S5.4.p2)",
+      "normalization": "edgeR normalization on gene counts (S5.4.p2)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S5.4.p2"
+      },
+      "paper_results": {
+       "n_DEG_T2_vs_T1": 4076,
+       "locator": "S3.1.p2, S4.p2",
+       "named_up": [
+        "COL4A1",
+        "COL4A2",
+        "A2M",
+        "THBS4",
+        "PDGFRB",
+        "LAMA4",
+        "CS",
+        "SDHA",
+        "HADHA",
+        "COX7A2",
+        "ATP5B",
+        "MDH1",
+        "NDUFA8",
+        "KDR"
+       ],
+       "named_down": [
+        "MDM2",
+        "ZNF638",
+        "UACA",
+        "CUL3",
+        "PPP1R12A",
+        "TRDN",
+        "MEF2A",
+        "MYH3",
+        "TNNT2",
+        "RYR1",
+        "SH3GLB1"
+       ],
+       "named_locators": "S3.5.p1, S3.5.p2, S4.p10, S4.p11"
+      },
+      "enrichment": "goseq GO and KEGG (pathview) on DEGs (S5.4.p2, Table S10): oxidative phosphorylation, ECM, angiogenesis themes (S3.5.p1)"
+     },
+     "reasoning": "S5.4.p2 gives the RNA-seq DE: edgeR, group T2 vs T1 with library preparation and individual as covariates, FDR<0.05; S3.1.p2 reports 4076 DEGs. Design (one-legged training, biopsies pre/post) from S3.1.p1 and S5.1.p1. S5.6.p1 names GSE58608 and GSE60590 for expression.",
+     "confidence": "high",
+     "locator": "S5.4.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.6.p1 cites GSE58608",
+       "24 samples = 12 subjects x {T1, U1}, all exercise status 'untrained' (pre-training)",
+       "series_id GSE58608,GSE60591"
+      ]
+     },
+     "reasoning": "S5.6.p1 names GSE58608 and GSE60590 as the gene-expression series. GSE58608 metadata: Homo sapiens skeletal muscle, KTH/SciLifeLab, HiSeq2000 RNA-seq, original sample IDs <subject><T|U><1|2> matching the paper's T1/T2 and trained/untrained leg scheme.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "patterns": {
+      "subject": [
+       "supplementary_file_1",
+       "_(\\d+)[TU][12]\\.fpkm"
+      ],
+      "grp": [
+       "supplementary_file_1",
+       "_\\d+([TU][12])\\.fpkm"
+      ]
+     },
+     "recode": {
+      "subject": {
+       "4": "s04",
+       "7": "s07",
+       "9": "s09",
+       "11": "s11",
+       "12": "s12",
+       "13": "s13",
+       "15": "s15",
+       "16": "s16",
+       "18": "s18",
+       "19": "s19",
+       "20": "s20",
+       "21": "s21"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns are GSM ids (raw_tar). subject and grp (T1/U1) parsed from the per-sample file name in supplementary_file_1 (<subject><T|U><1|2>.fpkm), which equals 'original sample id'. Subject 7: biopsy location (7T1 right leg) disagrees with publication id 8L and with GSE60590 7T2 left leg; the T/U code is used as the arm label."
+    },
+    "matrix": {
+     "matrix_type": "FPKM",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GEO per-sample Cufflinks genes.fpkm_tracking files in the _RAW.tar, merged on gene_id (FPKM column)",
+      "paper_input": "gene read counts for edgeR (S5.4.p2); not deposited"
+     },
+     "reasoning": "Per-sample files are Cufflinks genes.fpkm_tracking (FPKM, FPKM_conf_lo/hi, FPKM_status); data_processing: TopHat 2.0.4 + Cufflinks 2.0.2. Values are non-integer (integer fraction about 0.58, almost all zeros), max about 85,700: linear FPKM. No read counts deposited, so edgeR on counts cannot be reproduced; FPKM must not be rounded into counts. Route: log2(FPKM+1), then limma.",
+     "confidence": "high"
+    },
+    "design": {
+     "decision_status": "refused",
+     "stop_reason": "GSE58608 holds only pre-training biopsies (T1 and U1, all 'untrained'); no post-training sample exists in this series, so the paper's T2 vs T1 training estimand cannot be identified from it alone. U1 vs T1 is a baseline leg comparison, not an exercise contrast. Its 12 T1 samples are analyzed with the post-training samples in the GSE60591 SuperSeries case.",
+     "final": {
+      "analysis_type": "none"
+     },
+     "reasoning": "Metadata exercise status 'untrained' for all 24 samples; ids are T1/U1 only (S3.1.p1: T2 is the post-training biopsy).",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "series content",
+     "paper": "T2 vs T1 DE (S5.4.p2)",
+     "data": "baseline-only T1/U1 biopsies",
+     "disposition": "refused standalone; samples analyzed in GSE60591"
+    }
+   ]
+  },
+  {
+   "case_id": "GSE60590",
+   "accession": "GSE60590",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC4622000.paper.md"
+    ],
+    "metadata": "GSE60590/GSE60590_metadata.csv",
+    "raw_tar": true,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE58608",
+       "GSE60590",
+       "GSE60591"
+      ],
+      "accession_roles": {
+       "GSE58608": "RNA-seq, pre-training biopsies of both legs (T1 = leg to be trained, U1 = untrained leg) for 12 subjects; S5.4.p2 notes a baseline subset (n=12) analyzed earlier",
+       "GSE60590": "RNA-seq, 22 post-training trained-leg biopsies (T2) plus 11 pre-training T1 biopsies of the other 11 subjects",
+       "GSE60591": "GEO SuperSeries joining GSE58608 + GSE60590 (57 samples); not named in the paper but holds exactly the two cited series",
+       "GSE60655": "DNA methylation 450K (S5.6.p1); not part of this gene-expression request"
+      },
+      "assay": "bulk RNA-seq, Illumina HiSeq2000, 2x100 bp, vastus lateralis (S5.4.p1, S3.1.p1)",
+      "primary_estimand": "Within-subject change in trained-leg skeletal-muscle gene expression after 3 months of supervised one-legged endurance knee-extension training: T2 (24 h after last session) vs T1 (pre-training), trained leg (S3.1.p1, S3.1.p2, S5.1.p1, S5.4.p2)",
+      "planned_contrasts": [
+       "T2 vs T1, trained leg, individual and library preparation as covariates (S5.4.p2; paper: 4076 DEGs, S3.1.p2)"
+      ],
+      "factors": {
+       "group": [
+        "T1 pre-training trained leg",
+        "T2 post-training trained leg"
+       ],
+       "individual": "23 subjects (12 M, 11 F; TAB1)",
+       "library_preparation": "covariate named in S5.4.p2; not annotated in GEO"
+      },
+      "sample_inclusion": "23 sedentary young subjects; biopsies from both legs before and after training (S3.1.p1). RNA-seq DE is trained leg T2 vs T1 (S3.1.p2, S5.4.p2). The untrained leg is an intraindividual control used for physiology and methylation validation, not in the RNA-seq DEG model.",
+      "repeated_measure_unit": "individual (subject)",
+      "paper_method": "edgeR on gene counts after QC, trimming, mapping, PCR-duplicate removal and gene count summarization; model with group (T2 vs T1) + library preparation + individual (S5.4.p2)",
+      "normalization": "edgeR normalization on gene counts (S5.4.p2)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S5.4.p2"
+      },
+      "paper_results": {
+       "n_DEG_T2_vs_T1": 4076,
+       "locator": "S3.1.p2, S4.p2",
+       "named_up": [
+        "COL4A1",
+        "COL4A2",
+        "A2M",
+        "THBS4",
+        "PDGFRB",
+        "LAMA4",
+        "CS",
+        "SDHA",
+        "HADHA",
+        "COX7A2",
+        "ATP5B",
+        "MDH1",
+        "NDUFA8",
+        "KDR"
+       ],
+       "named_down": [
+        "MDM2",
+        "ZNF638",
+        "UACA",
+        "CUL3",
+        "PPP1R12A",
+        "TRDN",
+        "MEF2A",
+        "MYH3",
+        "TNNT2",
+        "RYR1",
+        "SH3GLB1"
+       ],
+       "named_locators": "S3.5.p1, S3.5.p2, S4.p10, S4.p11"
+      },
+      "enrichment": "goseq GO and KEGG (pathview) on DEGs (S5.4.p2, Table S10): oxidative phosphorylation, ECM, angiogenesis themes (S3.5.p1)"
+     },
+     "reasoning": "S5.4.p2 gives the RNA-seq DE: edgeR, group T2 vs T1 with library preparation and individual as covariates, FDR<0.05; S3.1.p2 reports 4076 DEGs. Design (one-legged training, biopsies pre/post) from S3.1.p1 and S5.1.p1. S5.6.p1 names GSE58608 and GSE60590 for expression.",
+     "confidence": "high",
+     "locator": "S5.4.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.6.p1 cites GSE60590",
+       "22 trained-leg post-training T2 + 11 pre-training T1 samples",
+       "series_id GSE60590,GSE60591"
+      ]
+     },
+     "reasoning": "S5.6.p1 names GSE58608 and GSE60590 as the gene-expression series. GSE60590 metadata: Homo sapiens skeletal muscle, KTH/SciLifeLab, HiSeq2000 RNA-seq, original sample IDs <subject><T|U><1|2> matching the paper's T1/T2 and trained/untrained leg scheme.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "patterns": {
+      "subject": [
+       "supplementary_file_1",
+       "_(\\d+)[TU][12]\\.fpkm"
+      ],
+      "grp": [
+       "supplementary_file_1",
+       "_\\d+([TU][12])\\.fpkm"
+      ]
+     },
+     "recode": {
+      "subject": {
+       "1": "s01",
+       "2": "s02",
+       "3": "s03",
+       "4": "s04",
+       "5": "s05",
+       "7": "s07",
+       "9": "s09",
+       "11": "s11",
+       "12": "s12",
+       "14": "s14",
+       "15": "s15",
+       "16": "s16",
+       "18": "s18",
+       "19": "s19",
+       "20": "s20",
+       "21": "s21",
+       "22": "s22",
+       "23": "s23",
+       "24": "s24",
+       "26": "s26",
+       "27": "s27",
+       "28": "s28"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns are GSM ids. subject and grp (T1/T2) parsed from the per-sample file name in supplementary_file_1, equal to 'original sample id'. grp T2 = trained / post-training period 1, T1 = untrained / pre-training period 1 for all 33."
+    },
+    "matrix": {
+     "matrix_type": "FPKM",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GEO per-sample Cufflinks genes.fpkm_tracking files in the _RAW.tar, merged on gene_id (FPKM column)",
+      "paper_input": "gene read counts for edgeR (S5.4.p2); not deposited"
+     },
+     "reasoning": "Per-sample files are Cufflinks genes.fpkm_tracking (FPKM, FPKM_conf_lo/hi, FPKM_status); data_processing: TopHat 2.0.4 + Cufflinks 2.0.2. Values are non-integer (integer fraction about 0.58, almost all zeros), max about 85,700: linear FPKM. No read counts deposited, so edgeR on counts cannot be reproduced; FPKM must not be rounded into counts. Route: log2(FPKM+1), then limma.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "T1"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "grp_T2_vs_T1"
+     ],
+     "final": {
+      "analysis_type": "paired",
+      "design_column": "grp",
+      "control": "T1",
+      "treatment": "T2",
+      "contrasts": [
+       {
+        "name": "grp_T2_vs_T1",
+        "control": "T1",
+        "treatment": "T2",
+        "role": "sensitivity"
+       }
+      ]
+     },
+     "reasoning": "Within-series sensitivity: only 11 subjects have both T1 and T2 in GSE60590 (the other 11 T2 baselines are in GSE58608). Paired T2 vs T1 on the 11 complete pairs avoids any cross-series (library-prep) effect. The full paper estimand runs in the GSE60591 case.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "included"
+       },
+       {
+        "name": "library_preparation",
+        "disposition": "excluded: not deposited; single series in this case"
+       },
+       {
+        "name": "sex",
+        "disposition": "excluded: constant within subject, absorbed by the subject block"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "subject"
+     ],
+     "reasoning": "The paper models individual (S5.4.p2). Subject is the blocking term for repeated biopsies.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "limma (moderated t, eBayes) on log2(FPKM+1) with subject block",
+      "formula": "~ Treatment + C(subject)",
+      "paper_route": {
+       "method": "edgeR on gene counts, ~ group + library preparation + individual",
+       "status": "blocked",
+       "reason": "GEO holds only Cufflinks FPKM per sample; neither read counts nor library-preparation labels were deposited"
+      },
+      "deviations": [
+       "limma on log2(FPKM+1) instead of edgeR on counts",
+       "no library-prep covariate (single series)",
+       "11 complete pairs only"
+      ]
+     },
+     "transform": "log2(x+1)",
+     "reasoning": "The paper route (edgeR on counts) is blocked: only Cufflinks FPKM is deposited. Validated alternative for linear FPKM: log2(FPKM+1), then limma (moderated t, eBayes) with subject as a fixed block, matching the paper's individual covariate. Genes are filtered to FPKM>=1 in at least as many samples as the smaller arm (analogous to the usual edgeR CPM filter) so the near-zero loci among the 61,779 Cufflinks genes are not tested.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S5.4.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625,
+       "inclusive": false
+      },
+      "deviation_note": "The paper's FDR<0.05 (no fold-change cutoff) is applied unchanged to limma BH-adjusted p on log2(FPKM+1) because edgeR on counts is blocked. The audit rule adds |log2FC|>log2(1.5) only as a labelled comparison."
+     },
+     "reasoning": "S5.4.p2: DEG were selected if FDR<0.05; no effect-size rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "Sensitivity on 11 within-series pairs, not the paper's full cohort",
+       "FPKM with limma instead of counts with edgeR"
+      ]
+     },
+     "paper_counts": {
+      "grp_T2_vs_T1_pairs": 4076
+     },
+     "paper_genes": {
+      "grp_T2_vs_T1_pairs": [
+       "COL4A1",
+       "COL4A2",
+       "A2M",
+       "THBS4",
+       "PDGFRB",
+       "LAMA4",
+       "CS",
+       "SDHA",
+       "HADHA",
+       "COX7A2",
+       "ATP5B",
+       "MDH1",
+       "NDUFA8",
+       "KDR",
+       "MDM2",
+       "ZNF638",
+       "UACA",
+       "CUL3",
+       "PPP1R12A",
+       "TRDN",
+       "MEF2A",
+       "MYH3",
+       "TNNT2",
+       "RYR1",
+       "SH3GLB1"
+      ]
+     },
+     "reasoning": "The paper's 4076 DEGs come from the full cohort; compared for scale only.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "DE method",
+     "paper": "edgeR on counts (S5.4.p2)",
+     "data": "Cufflinks FPKM only",
+     "disposition": "declared_deviation: limma on log2(FPKM+1)"
+    },
+    {
+     "item": "sample set",
+     "paper": "23 subjects T1 + 22 T2 trained leg",
+     "data": "11 complete pairs in this series",
+     "disposition": "sensitivity; full set in GSE60591"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_T2_vs_T1_pairs",
+     "tool": "tools.limma_tools:run_limma_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "T1",
+      "treatment_group": "T2",
+      "covariate_columns": "subject"
+     },
+     "role": "sensitivity",
+     "complete_pairs": {
+      "subject": "subject",
+      "condition": "grp",
+      "levels": [
+       "T1",
+       "T2"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 11
+     },
+     "reasoning": "Paired T2 vs T1 within GSE60590 only (no cross-series batch); FPKM>=1 in >=11 samples (one arm)."
+    }
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE60591",
+   "accession": "GSE60591",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC4622000.paper.md"
+    ],
+    "metadata": "GSE60591/GSE60591_metadata.csv",
+    "raw_tar": true,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE58608",
+       "GSE60590",
+       "GSE60591"
+      ],
+      "accession_roles": {
+       "GSE58608": "RNA-seq, pre-training biopsies of both legs (T1 = leg to be trained, U1 = untrained leg) for 12 subjects; S5.4.p2 notes a baseline subset (n=12) analyzed earlier",
+       "GSE60590": "RNA-seq, 22 post-training trained-leg biopsies (T2) plus 11 pre-training T1 biopsies of the other 11 subjects",
+       "GSE60591": "GEO SuperSeries joining GSE58608 + GSE60590 (57 samples); not named in the paper but holds exactly the two cited series",
+       "GSE60655": "DNA methylation 450K (S5.6.p1); not part of this gene-expression request"
+      },
+      "assay": "bulk RNA-seq, Illumina HiSeq2000, 2x100 bp, vastus lateralis (S5.4.p1, S3.1.p1)",
+      "primary_estimand": "Within-subject change in trained-leg skeletal-muscle gene expression after 3 months of supervised one-legged endurance knee-extension training: T2 (24 h after last session) vs T1 (pre-training), trained leg (S3.1.p1, S3.1.p2, S5.1.p1, S5.4.p2)",
+      "planned_contrasts": [
+       "T2 vs T1, trained leg, individual and library preparation as covariates (S5.4.p2; paper: 4076 DEGs, S3.1.p2)"
+      ],
+      "factors": {
+       "group": [
+        "T1 pre-training trained leg",
+        "T2 post-training trained leg"
+       ],
+       "individual": "23 subjects (12 M, 11 F; TAB1)",
+       "library_preparation": "covariate named in S5.4.p2; not annotated in GEO"
+      },
+      "sample_inclusion": "23 sedentary young subjects; biopsies from both legs before and after training (S3.1.p1). RNA-seq DE is trained leg T2 vs T1 (S3.1.p2, S5.4.p2). The untrained leg is an intraindividual control used for physiology and methylation validation, not in the RNA-seq DEG model.",
+      "repeated_measure_unit": "individual (subject)",
+      "paper_method": "edgeR on gene counts after QC, trimming, mapping, PCR-duplicate removal and gene count summarization; model with group (T2 vs T1) + library preparation + individual (S5.4.p2)",
+      "normalization": "edgeR normalization on gene counts (S5.4.p2)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S5.4.p2"
+      },
+      "paper_results": {
+       "n_DEG_T2_vs_T1": 4076,
+       "locator": "S3.1.p2, S4.p2",
+       "named_up": [
+        "COL4A1",
+        "COL4A2",
+        "A2M",
+        "THBS4",
+        "PDGFRB",
+        "LAMA4",
+        "CS",
+        "SDHA",
+        "HADHA",
+        "COX7A2",
+        "ATP5B",
+        "MDH1",
+        "NDUFA8",
+        "KDR"
+       ],
+       "named_down": [
+        "MDM2",
+        "ZNF638",
+        "UACA",
+        "CUL3",
+        "PPP1R12A",
+        "TRDN",
+        "MEF2A",
+        "MYH3",
+        "TNNT2",
+        "RYR1",
+        "SH3GLB1"
+       ],
+       "named_locators": "S3.5.p1, S3.5.p2, S4.p10, S4.p11"
+      },
+      "enrichment": "goseq GO and KEGG (pathview) on DEGs (S5.4.p2, Table S10): oxidative phosphorylation, ECM, angiogenesis themes (S3.5.p1)"
+     },
+     "reasoning": "S5.4.p2 gives the RNA-seq DE: edgeR, group T2 vs T1 with library preparation and individual as covariates, FDR<0.05; S3.1.p2 reports 4076 DEGs. Design (one-legged training, biopsies pre/post) from S3.1.p1 and S5.1.p1. S5.6.p1 names GSE58608 and GSE60590 for expression.",
+     "confidence": "high",
+     "locator": "S5.4.p2"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "SuperSeries of GSE58608 + GSE60590 (series_id), both cited in S5.6.p1",
+       "57 samples = 24 (GSE58608) + 33 (GSE60590), no overlap",
+       "23 subjects with T1, 22 with T2 (subject 13 has no T2)"
+      ]
+     },
+     "reasoning": "S5.6.p1 names GSE58608 and GSE60590 as the gene-expression series. GSE60591 metadata: Homo sapiens skeletal muscle, KTH/SciLifeLab, HiSeq2000 RNA-seq, original sample IDs <subject><T|U><1|2> matching the paper's T1/T2 and trained/untrained leg scheme.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "patterns": {
+      "subject": [
+       "supplementary_file_1",
+       "_(\\d+)[TU][12]\\.fpkm"
+      ],
+      "grp": [
+       "supplementary_file_1",
+       "_\\d+([TU][12])\\.fpkm"
+      ],
+      "batch": [
+       "series_id",
+       "^(GSE\\d+),"
+      ]
+     },
+     "recode": {
+      "subject": {
+       "1": "s01",
+       "2": "s02",
+       "3": "s03",
+       "4": "s04",
+       "5": "s05",
+       "7": "s07",
+       "9": "s09",
+       "11": "s11",
+       "12": "s12",
+       "13": "s13",
+       "14": "s14",
+       "15": "s15",
+       "16": "s16",
+       "18": "s18",
+       "19": "s19",
+       "20": "s20",
+       "21": "s21",
+       "22": "s22",
+       "23": "s23",
+       "24": "s24",
+       "26": "s26",
+       "27": "s27",
+       "28": "s28"
+      },
+      "batch": {
+       "GSE58608": "b1",
+       "GSE60590": "b2"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {
+      "GSM1415127": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415129": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415131": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415133": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415135": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415137": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415139": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415141": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415143": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415145": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415147": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)",
+      "GSM1415149": "U1 = untrained control leg before training; not part of the paper's RNA-seq T2 vs T1 trained-leg model (S3.1.p2, S5.4.p2)"
+     },
+     "reasoning": "Matrix columns are GSM ids. subject and grp parsed from the supplementary_file_1 file name (<subject><T|U><1|2>); batch from the sub-series in series_id (GSE58608 -> b1, GSE60590 -> b2). The 12 U1 samples are excluded. Subject 7 biopsy-location conflict noted; the T/U code is used."
+    },
+    "matrix": {
+     "matrix_type": "FPKM",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GEO per-sample Cufflinks genes.fpkm_tracking files in the _RAW.tar, merged on gene_id (FPKM column)",
+      "paper_input": "gene read counts for edgeR (S5.4.p2); not deposited"
+     },
+     "reasoning": "Per-sample files are Cufflinks genes.fpkm_tracking (FPKM, FPKM_conf_lo/hi, FPKM_status); data_processing: TopHat 2.0.4 + Cufflinks 2.0.2. Values are non-integer (integer fraction about 0.58, almost all zeros), max about 85,700: linear FPKM. No read counts deposited, so edgeR on counts cannot be reproduced; FPKM must not be rounded into counts. Route: log2(FPKM+1), then limma.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "T1"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "planned": [
+      "grp_T2_vs_T1"
+     ],
+     "covariate_candidates": [
+      "batch"
+     ],
+     "final": {
+      "analysis_type": "paired",
+      "design_column": "grp",
+      "control": "T1",
+      "treatment": "T2",
+      "contrasts": [
+       {
+        "name": "grp_T2_vs_T1",
+        "control": "T1",
+        "treatment": "T2",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "Paper estimand: T2 vs T1, trained leg, all subjects, individual as covariate (S5.4.p2). 45 samples: 23 T1 + 22 T2. Sexes pooled as in the paper; sex is constant within subject.",
+     "candidates": [
+      {
+       "value": "grp with U1 as a third level",
+       "reason_rejected": "U1 is the untrained leg at baseline; the paper's RNA-seq DE is T2 vs T1 only"
+      }
+     ],
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "subject",
+        "disposition": "included"
+       },
+       {
+        "name": "batch",
+        "disposition": "included"
+       },
+       {
+        "name": "sex",
+        "disposition": "excluded: constant within subject, absorbed by the subject block"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "batch",
+      "subject"
+     ],
+     "reasoning": "The paper includes individual and library preparation (S5.4.p2). Library preparation is not deposited; the sub-series (b1 = GSE58608 baseline samples, b2 = GSE60590) is the only available proxy. All T2 are in b2, but 11 subjects have both T1 and T2 within b2, so batch is estimable alongside subject (not aliased). A sensitivity without batch is run.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "limma (moderated t, eBayes) on log2(FPKM+1) with subject block and series batch",
+      "formula": "~ Treatment + C(subject) + C(batch)",
+      "paper_route": {
+       "method": "edgeR on gene counts, ~ group + library preparation + individual",
+       "status": "blocked",
+       "reason": "GEO holds only Cufflinks FPKM per sample; neither read counts nor library-preparation labels were deposited"
+      },
+      "deviations": [
+       "limma on log2(FPKM+1) instead of edgeR on counts",
+       "sub-series used as proxy for library preparation"
+      ]
+     },
+     "transform": "log2(x+1)",
+     "reasoning": "The paper route (edgeR on counts) is blocked: only Cufflinks FPKM is deposited. Validated alternative for linear FPKM: log2(FPKM+1), then limma (moderated t, eBayes) with subject as a fixed block, matching the paper's individual covariate. Genes are filtered to FPKM>=1 in at least as many samples as the smaller arm (analogous to the usual edgeR CPM filter) so the near-zero loci among the 61,779 Cufflinks genes are not tested.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S5.4.p2"
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5849625,
+       "inclusive": false
+      },
+      "deviation_note": "The paper's FDR<0.05 (no fold-change cutoff) is applied unchanged to limma BH-adjusted p on log2(FPKM+1) because edgeR on counts is blocked. The audit rule adds |log2FC|>log2(1.5) only as a labelled comparison."
+     },
+     "reasoning": "S5.4.p2: DEG were selected if FDR<0.05; no effect-size rule stated.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "FPKM with limma replaces counts with edgeR; DEG counts are not expected to match exactly",
+       "Library preparation approximated by sub-series; with subject blocking the batch term leaves the training effect informed mainly by the 11 within-series pairs",
+       "Subject 13 has no T2 sample (22 T2 vs 23 T1)"
+      ]
+     },
+     "paper_counts": {
+      "grp_T2_vs_T1": 4076,
+      "grp_T2_vs_T1_nobatch": 4076
+     },
+     "paper_genes": {
+      "grp_T2_vs_T1": [
+       "COL4A1",
+       "COL4A2",
+       "A2M",
+       "THBS4",
+       "PDGFRB",
+       "LAMA4",
+       "CS",
+       "SDHA",
+       "HADHA",
+       "COX7A2",
+       "ATP5B",
+       "MDH1",
+       "NDUFA8",
+       "KDR",
+       "MDM2",
+       "ZNF638",
+       "UACA",
+       "CUL3",
+       "PPP1R12A",
+       "TRDN",
+       "MEF2A",
+       "MYH3",
+       "TNNT2",
+       "RYR1",
+       "SH3GLB1"
+      ],
+      "grp_T2_vs_T1_nobatch": [
+       "COL4A1",
+       "COL4A2",
+       "A2M",
+       "THBS4",
+       "PDGFRB",
+       "LAMA4",
+       "CS",
+       "SDHA",
+       "HADHA",
+       "COX7A2",
+       "ATP5B",
+       "MDH1",
+       "NDUFA8",
+       "KDR",
+       "MDM2",
+       "ZNF638",
+       "UACA",
+       "CUL3",
+       "PPP1R12A",
+       "TRDN",
+       "MEF2A",
+       "MYH3",
+       "TNNT2",
+       "RYR1",
+       "SH3GLB1"
+      ]
+     },
+     "reasoning": "Paper: 4076 DEGs at FDR<0.05 (S3.1.p2); named genes from S3.5.p1-p2 and S4.p10-p11.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "DE method",
+     "paper": "edgeR on gene counts (S5.4.p2)",
+     "data": "only Cufflinks FPKM deposited",
+     "disposition": "declared_deviation: limma on log2(FPKM+1)"
+    },
+    {
+     "item": "library preparation covariate",
+     "paper": "included (S5.4.p2)",
+     "data": "not annotated in GEO",
+     "disposition": "proxy: sub-series batch; sensitivity without it"
+    },
+    {
+     "item": "accession",
+     "paper": "GSE58608 and GSE60590 (S5.6.p1)",
+     "data": "GSE60591 SuperSeries holds both",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "subject 7 biopsy leg",
+     "paper": "publication id 8L for 7T1",
+     "data": "GSE58608 biopsy location 'right leg' for 7T1; GSE60590 7T2 'left leg'",
+     "disposition": "executable_without_change: T/U code defines the arm"
+    },
+    {
+     "item": "sample count",
+     "paper": "23 subjects (TAB1)",
+     "data": "23 T1, 22 T2 (subject 13 has no T2)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "grp_T2_vs_T1",
+     "tool": "tools.limma_tools:run_limma_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "T1",
+      "treatment_group": "T2",
+      "covariate_columns": "subject,batch"
+     },
+     "role": "primary",
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 22
+     },
+     "reasoning": "Paper estimand: T2 vs T1 trained leg with individual and library-prep (proxy) covariates."
+    },
+    {
+     "name": "grp_T2_vs_T1_nobatch",
+     "tool": "tools.limma_tools:run_limma_analysis",
+     "args": {
+      "design_column": "grp",
+      "control_group": "T1",
+      "treatment_group": "T2",
+      "covariate_columns": "subject"
+     },
+     "role": "sensitivity",
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 22
+     },
+     "reasoning": "Sensitivity to the library-prep proxy: subject block only."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "grp_T2_vs_T1",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "The paper reports GO/KEGG enrichment of DEGs (S5.4.p2; S3.5.p1: OXPHOS, ECM, angiogenesis)."
+    }
+   ]
+  }
+ ]
+}

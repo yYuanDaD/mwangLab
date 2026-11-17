@@ -1,0 +1,86 @@
+{
+ "case": "GSE60590",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B2": "Main RNA-seq comparison: T2 (after 3 months training) vs T1 (before), trained leg, 23 subjects (S3.1.p1, S3.1.p2, S5.4.p2; 4076 DEGs). Untrained leg is an intraindividual control used for validation (S3.1.p1, S3.1.p4); per-group RNA-seq n not stated beyond 23 subjects (TAB1).",
+  "B4": "One joint edgeR model on all samples: 'We included the group (T2 vs. T1), the library preparation and the individual as covariates' (S5.4.p2).",
+  "B5": "'DEG were selected if FDR<0.05' (S5.4.p2); no fold-change cutoff; 4076 DEGs (S3.1.p2, S4.p2).",
+  "B1": "Yes, exercise series: 22 post-training T2 (trained leg) and 11 pre-training T1 samples; exercise factor = T2 vs T1.",
+  "B3": "Yes: person sampled before and after; `subject` links 11 subjects with both T1 and T2 (11 other T2 have their T1 in GSE58608); 11 singletons. Key pairs once per level."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run is a within-series sensitivity on 11 complete pairs; full estimand in GSE60591 (S5.6.p1 names this series).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "T2 22, T1 11 match metadata; T/U code parsed from file name; paper n (23 subjects) cannot be met within one series, recorded as discrepancy.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "treatment T2, control T1; COL4A1/A2, A2M, THBS4 up as in S3.5.p1.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "~ Treatment + C(subject), subject as category, rank 23 full, residual df 10; matches 'individual as covariate' (S5.4.p2).",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Joint model on all 33 samples within series, as paper's one model; singleton T2s absorbed by subject.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single series (all one batch); library prep not deposited, recorded; sex absorbed by subject.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Cufflinks FPKM, log2(FPKM+1), limma; edgeR on counts blocked, declared. p histogram frac_p_gt_0.9 0.052 ok.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR<0.05, no FC, from S5.4.p2; audit |lfc|>log2(1.5) labelled; no other rule fits 4076 (padj<0.1 gives 2367, p<0.05 3462).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sensitivity 1428 vs paper 4076 labelled 'for scale only' with caveats; same contrast T2 vs T1.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no stop",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "GSE60590 的11对内部配对敏感性分析按受试者分块、方向与阈值均符合论文,偏差(FPKM+limma、样本不全)均已声明。无分歧。"
+}

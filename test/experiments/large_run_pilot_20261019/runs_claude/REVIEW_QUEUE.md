@@ -362,3 +362,15 @@ One section per case; newest last.
 ## PMID38110408 / GSE239729 (2026-11-17)
 
 - policy: Policy only: whether a sedentary genotype contrast in an exercise paper should ever be run as a labelled non-exercise secondary result (current rule: refuse).
+
+## PMID33513138 / GSE152347 (2026-11-17)
+
+- policy: Which threshold to report when the paper's genotype count (56) is close to padj<0.05 & |lfc|>0.585 (52) although the paper states FDR 5% only (open policy question).
+
+## PMID34252634 / GSE144133 (2026-11-17)
+
+- policy: Open policy question: the paper's 817 DEGs are matched by raw p < 0.05 with |log2FC| > 0.585 (811) rather than the stated FDR < 0.1 (16); which rule to report is not settled.
+
+## PMID25484259 / GSE60591 (2026-11-17)
+
+- policy: Open policy: which threshold to report when the paper's count (4076) is near raw p<0.05 on limma/FPKM (4198) rather than FDR<0.05.

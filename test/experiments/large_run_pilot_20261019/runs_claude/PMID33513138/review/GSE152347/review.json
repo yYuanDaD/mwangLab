@@ -1,0 +1,21 @@
+{"case": "GSE152347", "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Soleus RNA-seq of 12-week WT and mD3AKO mice at rest (sham treadmill) vs 60 min after a 30-min treadmill bout (S4.3.p1, S2.2.p2). All 25 samples are sequenced; the exercise factor is the 60 vs rest timepoint, crossed with genotype and sex.",
+  "B2": "Exercise main effect (60 min vs rest, pooled over genotype and sex), genotype main effect (KO vs WT), genotype x exercise interaction (S2.2.p2, S4.17.p1). Fig 2 legend: n = 5-7 per group; GEO cells WT rest 5, WT ex60 7, KO rest 7, KO ex60 6.",
+  "B3": "No repeated measures: one soleus per mouse, N = individual animals (S4.17.p1). Titles carry a unique mouse number 1-25. source_name_ch1 repeats within levels and is a group label, not an animal.",
+  "B4": "Joint model: DE tested for main effects of genotype, exercise and their interaction (S4.17.p1: 'analysed for a main effect of genotype, a main effect of exercise and a genotype/exercise interaction'). Software and sex handling not stated (ref [34]).",
+  "B5": "S4.17.p1: 'A false discovery rate (FDR) of less than 5% was considered significant.' No fold-change cutoff stated. Counts: 1615 exercise DEGs, 56 genotype DEGs, 0 interaction DEGs (S2.2.p2, FDR 5%)."},
+ "checks": [
+  {"id":"run_or_refuse","verdict":"agree","severity":"none","evidence":"Ran; B1 gives a real in-vivo exercise arm (S4.3.p1); metadata time column ex60/rest.","fix":""},
+  {"id":"grouping","verdict":"agree","severity":"none","evidence":"time ex60 13 / rest 12 parsed from title, matches characteristics timepoint; cell n 5/7/7/6 within Fig 2 range 5-7; no exclusions; control is rest.","fix":""},
+  {"id":"direction","verdict":"agree","severity":"none","evidence":"ex60 vs rest and KO vs WT with explicit control/treatment; Nr4a3, Ppargc1a, Hk2, Atf3 up after exercise as in S2.2.p2.","fix":""},
+  {"id":"pairing","verdict":"agree","severity":"none","evidence":"One soleus per mouse (S4.17.p1); no repeated unit; source_name_ch1 flag is a group label (0/25 linked).","fix":""},
+  {"id":"model_fit","verdict":"agree","severity":"none","evidence":"Single model on all 25 samples with genotype and exercise main effects plus joint cell-means model for the interaction, as S4.17.p1. Sex added, recorded as a deviation.","fix":""},
+  {"id":"confounding","verdict":"agree","severity":"none","evidence":"Sex crossed with every time and geno level (ex60 F7/M6, rest F5/M7); female WT rest n=2 recorded; housing is group-housed per S4.2 with no batch column.","fix":""},
+  {"id":"matrix_method","verdict":"agree","severity":"minor","evidence":"Integer featureCounts counts, DESeq2 appropriate. p-values piled near 1 (frac p>0.9 about 0.21-0.23) is the usual result of independent filtering on low-count genes; sensitivity with CPM filter recorded.","fix":""},
+  {"id":"threshold","verdict":"unsure","severity":"minor","evidence":"Transcribed correctly (padj<0.05, no FC, source paper). Flag: genotype 130 vs paper 56, padj<0.05 & |lfc|>0.585 gives 52; but the paper states no FC cutoff, the exercise count does not fit that rule, and the DE package differs, so the fit is likely coincidental. The caveats do not mention this alternative rule.","fix":"Optionally add to discrepancies that |lfc|>0.585 gives 52 for genotype but is not the paper's stated rule."},
+  {"id":"paper_match","verdict":"agree","severity":"none","evidence":"Same contrasts (exercise main 2232 vs 1615, genotype 130 vs 56, interaction 0 vs 0); HANDBACK states the count differences and the declared deviation (route declared_deviation).","fix":""},
+  {"id":"stop_reason","verdict":"na","severity":"none","evidence":"No stop or refusal claims (stop_claims empty).","fix":""}],
+ "overall": "pass",
+ "human_items": ["Which threshold to report when the paper's genotype count (56) is close to padj<0.05 & |lfc|>0.585 (52) although the paper states FDR 5% only (open policy question)."],
+ "summary": "该案例的运行决定、分组、方向、模型结构和阈值转录均与论文一致，没有重复测量，性别与各因素交叉，不构成混杂。总体通过；仅有一个次要项：基因型 130 对 56 的差异与 |lfc|>0.585 规则相近，但论文未写该规则，建议在差异记录中补充一句。"}

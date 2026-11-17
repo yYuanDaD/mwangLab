@@ -1,0 +1,388 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID25484259",
+  "subject_id": "GSE58608",
+  "created_at": "2026-11-17T17:59:20",
+  "finished_at": "2026-11-17T18:00:02",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC4622000.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC4622000.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T17:59:20",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e648e17c7c9e597b17fc78fc16c931d7b0218233db4701763ee409cb6f5c95af",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE58608_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE58608\\GSE58608_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T17:59:20",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f1ce64021a8adeab506913165d3ac45628e65e28264b47d994a833b04a6714a1",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T17:59:46",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c24bd6eebb1cefa00c677215be3a5598360477083c84df7fe14d866685f9c5f7",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE58608",
+          "GSE60590",
+          "GSE60591"
+        ],
+        "accession_roles": {
+          "GSE58608": "RNA-seq, pre-training biopsies of both legs (T1 = leg to be trained, U1 = untrained leg) for 12 subjects; S5.4.p2 notes a baseline subset (n=12) analyzed earlier",
+          "GSE60590": "RNA-seq, 22 post-training trained-leg biopsies (T2) plus 11 pre-training T1 biopsies of the other 11 subjects",
+          "GSE60591": "GEO SuperSeries joining GSE58608 + GSE60590 (57 samples); not named in the paper but holds exactly the two cited series",
+          "GSE60655": "DNA methylation 450K (S5.6.p1); not part of this gene-expression request"
+        },
+        "assay": "bulk RNA-seq, Illumina HiSeq2000, 2x100 bp, vastus lateralis (S5.4.p1, S3.1.p1)",
+        "primary_estimand": "Within-subject change in trained-leg skeletal-muscle gene expression after 3 months of supervised one-legged endurance knee-extension training: T2 (24 h after last session) vs T1 (pre-training), trained leg (S3.1.p1, S3.1.p2, S5.1.p1, S5.4.p2)",
+        "planned_contrasts": [
+          "T2 vs T1, trained leg, individual and library preparation as covariates (S5.4.p2; paper: 4076 DEGs, S3.1.p2)"
+        ],
+        "factors": {
+          "group": [
+            "T1 pre-training trained leg",
+            "T2 post-training trained leg"
+          ],
+          "individual": "23 subjects (12 M, 11 F; TAB1)",
+          "library_preparation": "covariate named in S5.4.p2; not annotated in GEO"
+        },
+        "sample_inclusion": "23 sedentary young subjects; biopsies from both legs before and after training (S3.1.p1). RNA-seq DE is trained leg T2 vs T1 (S3.1.p2, S5.4.p2). The untrained leg is an intraindividual control used for physiology and methylation validation, not in the RNA-seq DEG model.",
+        "repeated_measure_unit": "individual (subject)",
+        "paper_method": "edgeR on gene counts after QC, trimming, mapping, PCR-duplicate removal and gene count summarization; model with group (T2 vs T1) + library preparation + individual (S5.4.p2)",
+        "normalization": "edgeR normalization on gene counts (S5.4.p2)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S5.4.p2"
+        },
+        "paper_results": {
+          "n_DEG_T2_vs_T1": 4076,
+          "locator": "S3.1.p2, S4.p2",
+          "named_up": [
+            "COL4A1",
+            "COL4A2",
+            "A2M",
+            "THBS4",
+            "PDGFRB",
+            "LAMA4",
+            "CS",
+            "SDHA",
+            "HADHA",
+            "COX7A2",
+            "ATP5B",
+            "MDH1",
+            "NDUFA8",
+            "KDR"
+          ],
+          "named_down": [
+            "MDM2",
+            "ZNF638",
+            "UACA",
+            "CUL3",
+            "PPP1R12A",
+            "TRDN",
+            "MEF2A",
+            "MYH3",
+            "TNNT2",
+            "RYR1",
+            "SH3GLB1"
+          ],
+          "named_locators": "S3.5.p1, S3.5.p2, S4.p10, S4.p11"
+        },
+        "enrichment": "goseq GO and KEGG (pathview) on DEGs (S5.4.p2, Table S10): oxidative phosphorylation, ECM, angiogenesis themes (S3.5.p1)"
+      },
+      "reason": "S5.4.p2 gives the RNA-seq DE: edgeR, group T2 vs T1 with library preparation and individual as covariates, FDR<0.05; S3.1.p2 reports 4076 DEGs. Design (one-legged training, biopsies pre/post) from S3.1.p1 and S5.1.p1. S5.6.p1 names GSE58608 and GSE60590 for expression.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:59:46"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "S5.6.p1 cites GSE58608",
+          "24 samples = 12 subjects x {T1, U1}, all exercise status 'untrained' (pre-training)",
+          "series_id GSE58608,GSE60591"
+        ],
+        "accession": "GSE58608",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE58608\\GSE58608_metadata.csv"
+      },
+      "reason": "S5.6.p1 names GSE58608 and GSE60590 as the gene-expression series. GSE58608 metadata: Homo sapiens skeletal muscle, KTH/SciLifeLab, HiSeq2000 RNA-seq, original sample IDs <subject><T|U><1|2> matching the paper's T1/T2 and trained/untrained leg scheme.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:59:46"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 24,
+        "n_metadata": 24,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "supplementary_file_1",
+              "regex": "_(\\d+)[TU][12]\\.fpkm",
+              "recode": {
+                "4": "s04",
+                "7": "s07",
+                "9": "s09",
+                "11": "s11",
+                "12": "s12",
+                "13": "s13",
+                "15": "s15",
+                "16": "s16",
+                "18": "s18",
+                "19": "s19",
+                "20": "s20",
+                "21": "s21"
+              }
+            },
+            "grp": {
+              "source": "supplementary_file_1",
+              "regex": "_\\d+([TU][12])\\.fpkm"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\design_metadata.csv",
+          "sha256": "e0e825a1fb72670f17555fc77450d12249323a227d2c7a42755a949c8c31b10b",
+          "levels": {
+            "subject": {
+              "s11": 2,
+              "s12": 2,
+              "s13": 2,
+              "s15": 2,
+              "s16": 2,
+              "s18": 2,
+              "s19": 2,
+              "s20": 2,
+              "s21": 2,
+              "s04": 2,
+              "s07": 2,
+              "s09": 2
+            },
+            "grp": {
+              "T1": 12,
+              "U1": 12
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are GSM ids (raw_tar). subject and grp (T1/U1) parsed from the per-sample file name in supplementary_file_1 (<subject><T|U><1|2>.fpkm), which equals 'original sample id'. Subject 7: biopsy location (7T1 right leg) disagrees with publication id 8L and with GSE60590 7T2 left leg; the T/U code is used as the arm label.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:59:49"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GEO per-sample Cufflinks genes.fpkm_tracking files in the _RAW.tar, merged on gene_id (FPKM column)",
+        "paper_input": "gene read counts for edgeR (S5.4.p2); not deposited",
+        "matrix_type": "FPKM",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\aligned_matrix.csv",
+          "sha256": "52e50109082f8c16077499c5813f3d63b8fe1c5fd1d3f9a29bf5f08022cdcf9a",
+          "n_features": 61779,
+          "n_samples": 24,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 79750.4,
+          "median": 0.0,
+          "integer_fraction": 0.5798,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Per-sample files are Cufflinks genes.fpkm_tracking (FPKM, FPKM_conf_lo/hi, FPKM_status); data_processing: TopHat 2.0.4 + Cufflinks 2.0.2. Values are non-integer (integer fraction about 0.58, almost all zeros), max about 85,700: linear FPKM. No read counts deposited, so edgeR on counts cannot be reproduced; FPKM must not be rounded into counts. Route: log2(FPKM+1), then limma.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:59:50"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\suitability\\suitability.md",
+          "n_comparisons": 0,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "Metadata exercise status 'untrained' for all 24 samples; ids are T1/U1 only (S3.1.p1: T2 is the post-training biopsy).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "GSE58608 holds only pre-training biopsies (T1 and U1, all 'untrained'); no post-training sample exists in this series, so the paper's T2 vs T1 training estimand cannot be identified from it alone. U1 vs T1 is a baseline leg comparison, not an exercise contrast. Its 12 T1 samples are analyzed with the post-training samples in the GSE60591 SuperSeries case."
+      },
+      "recorded_at": "2026-11-17T18:00:02"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ccac0fca51dc30278615c8fb2a7cc7be64b63df6d00f846bbfadd3aa2e111aa8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "1409c3339fd6ddf8bb18b303da232f9c1a535b6fb67d8c4468d3994729477a69",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "52e50109082f8c16077499c5813f3d63b8fe1c5fd1d3f9a29bf5f08022cdcf9a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e0e825a1fb72670f17555fc77450d12249323a227d2c7a42755a949c8c31b10b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "cb7d377f8991fb0a796ccf6e8be63919bc3b2f56fef02b64c668bf28f5768d41",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE58608\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7b13f181eb9fead98d256670ada5cc9bb56670438458f92809b5472cce164978",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

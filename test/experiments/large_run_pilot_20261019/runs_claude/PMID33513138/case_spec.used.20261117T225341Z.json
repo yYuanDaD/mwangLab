@@ -1,0 +1,168 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33513138",
+  "request": "Analyze GSE152347 for PMID 33513138 (Ablation of DNA-methyltransferase 3A in skeletal muscle does not affect energy metabolism or exercise capacity.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE152347",
+      "accession": "GSE152347",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7875352.paper.md"],
+        "metadata": "GSE152347/GSE152347_metadata.csv",
+        "matrix": "GSE152347/GSE152347_RNA_counts.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE152349 (SuperSeries, S4.16.p1)", "GSE152347 (RNA-seq SubSeries)"],
+            "assay": "Total RNA-seq (TruSeq Stranded Total RNA, Ribo-Zero Gold), 75-bp PE, soleus muscle (S4.9.p1, S2.1.p1)",
+            "sample_inclusion": "12-week-old male and female WT (Dnmt3a flox/flox) and mD3AKO mice; RNA-seq on 'rest' (sham treadmill) and 60 min after a 30-min treadmill bout only (S4.3.p1); n = 5-7 per genotype x exercise group (FIG2)",
+            "factors": {"exercise": ["rest", "60 min post exercise"], "genotype": ["WT", "mD3AKO"], "sex": ["male", "female"]},
+            "primary_estimand": "Main effect of acute exercise (60 min after 30-min treadmill run vs rest) on soleus gene expression, pooled over genotype and sex (S2.2.p2, S4.17.p1)",
+            "planned_contrasts": [
+              "exercise main effect: 60 min post vs rest (S2.2.p2; paper: 1615 DEGs, FDR 5%)",
+              "genotype main effect: mD3AKO vs WT (S2.2.p2, S2.6.p1; paper: 56 DEGs, 43 up / 13 down)",
+              "genotype x exercise interaction (S2.2.p2; paper: 0 DEGs)"
+            ],
+            "repeated_measure_unit": "none (one soleus per mouse; independent animals)",
+            "normalization": "not_reported in this article ('processed as previously described [34]', S4.11.p1); expression threshold leaves 17389 genes (S4.9.p1), rule not stated",
+            "paper_method": "Differential expression for a main effect of genotype, a main effect of exercise and a genotype/exercise interaction (S4.17.p1); software and model details deferred to ref [34] (S4.11.p1), not reported here. Sex handling in the RNA-seq model not reported.",
+            "paper_threshold": {"metric": "FDR", "adjustment": "not_reported (FDR)", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S4.17.p1"},
+            "paper_results": {"exercise_DEGs": 1615, "genotype_DEGs": 56, "interaction_DEGs": 0, "exercise_genes_up": ["Nr4a3", "Ppargc1a", "Hk2", "Atf3"], "locators": ["S2.2.p2", "FIG2", "S2.6.p1"]}
+          },
+          "reasoning": "Paper-first: the RNA-seq arm (S4.3.p1) is soleus from 12-week mice at rest vs 60 min after 30-min treadmill running, in both genotypes and both sexes. S4.17.p1 says DE was tested for main effects of genotype and exercise plus their interaction, FDR < 5%. S2.2.p2 reports 1615 exercise DEGs, 56 genotype DEGs, 0 interaction DEGs. No fold-change cutoff is stated. The DE software is not named (ref [34]).",
+          "locator": "S4.17.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": [
+            "metadata series_id = 'GSE152347,GSE152349'; paper data availability names SuperSeries GSE152349 (S4.16.p1)",
+            "25 soleus samples, C57BL/6 mice, Sex Male/Female, genotype WT/KO, timepoint Bas/60 match S4.3.p1 (rest and 60 min) and FIG2 n = 5-7 per group",
+            "data_processing: STAR to mm10 + GENCODE vM15 + featureCounts matches S4.11.p1 (GENCODE M15)",
+            "contact Lars Roed Ingerslev, Copenhagen (author lab)"
+          ]},
+          "reasoning": "GSE152347 is the RNA-seq SubSeries of the paper's GSE152349; sample groups and processing match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^(.+)_RNA-seq$"]},
+          "patterns": {
+            "sex": ["title", "^\\d+_([MF])_"],
+            "geno": ["title", "^\\d+_[MF]_(KO|WT)_"],
+            "time": ["title", "_(Bas|60)_RNA-seq$"]
+          },
+          "recode": {"time": {"Bas": "rest", "60": "ex60"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. 10_M_KO_60) equal the metadata title minus '_RNA-seq' for 25/25 samples (inspect alignment_keys). Sex, genotype and exercise state are parsed from the title; they agree with characteristics Sex/genotype/timepoint. 'Bas' is the rested/sham group, '60' is 60 min post exercise (S4.3.p1).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values are integers (integer_fraction 1.0, max 5.4e6). GEO data_processing: featureCounts fragment counts, 'Values are observed fragments'. Annotation columns Chr/Start/End/Strand/Length are dropped. The paper's input is the same featureCounts pipeline (S4.11.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time", "geno"],
+          "references": {"time": "rest", "geno": "WT"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["time_ex60_vs_rest"],
+          "covariate_candidates": ["sex"],
+          "final": {
+            "analysis_type": "two-group with additive covariates (factorial 2x2 plus sex)",
+            "design_column": "time",
+            "control": "rest",
+            "treatment": "ex60",
+            "formula": "~ sex + geno + time",
+            "contrasts": [
+              {"name": "time_ex60_vs_rest", "control": "rest", "treatment": "ex60", "role": "primary", "note": "exercise main effect, additive model pooled over genotype and sex"},
+              {"name": "geno_KO_vs_WT", "control": "WT", "treatment": "KO", "role": "secondary", "note": "genotype main effect; not an exercise estimand, kept for comparison with the paper's 56 DEGs"},
+              {"name": "interaction geno x time", "role": "secondary", "note": "from a joint cell-means model with sex"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool genotypes and test time alone (~ time)", "reason_rejected": "the paper models genotype as a main effect; leaving it and sex out inflates residual variance (sex separates samples on MDS, S2.2.p3)"},
+            {"value": "exercise within WT only", "reason_rejected": "the paper's estimand is the main effect over both genotypes; per-genotype contrasts are run as exploratory"}
+          ],
+          "reasoning": "S4.17.p1: main effects of genotype and exercise plus interaction. The primary exercise estimand is the main effect, which the additive model ~ sex + geno + time estimates (the paper found no interaction). The interaction and per-genotype exercise contrasts come from one joint model. Sex is added because the MDS shows sex separation (S2.2.p3) and both sexes are in every genotype x time cell.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "sex", "disposition": "included"},
+              {"name": "geno", "disposition": "included"}
+            ]
+          },
+          "confounding_candidates": ["sex", "geno"],
+          "reasoning": "One soleus per mouse; no repeated measures, so no blocking term. Genotype is a design factor of the paper (S4.17.p1). Sex is a biological covariate: both sexes appear in every genotype x exercise cell, so it is not confounded with exercise. No batch, cage or litter column is recorded.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald test)",
+            "formula": "~ sex + geno + time",
+            "paper_route": {"method": "not_reported (ref [34]); main effects genotype and exercise + interaction", "status": "not_reported", "reason": "the article does not name the DE software"},
+            "deviations": ["DE software chosen by the workflow (DESeq2) because the article does not name it", "the paper's expression filter (17389 genes kept) is not specified; DESeq2 independent filtering used in the primary; a CPM >= 1 in >= 3 samples filter is run as sensitivity"]
+          },
+          "transform": null,
+          "reasoning": "Raw featureCounts counts support a count model. The article does not name the package, so DESeq2 is used with the paper's model structure (main effects plus sex). The interaction is tested in a joint DESeq2 cell-means model with sex as covariate.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S4.17.p1 and S2.2.p2: FDR < 5%, no fold-change cutoff.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["DE package not named in the article; DESeq2 used", "expression filter rule not stated"]},
+          "paper_counts": {"exercise_main": 1615, "genotype_main": 56, "joint/time_x_geno_interaction": 0},
+          "paper_genes": {"exercise_main": ["Nr4a3", "Ppargc1a", "Hk2", "Atf3"]},
+          "reasoning": "The model structure follows the paper; the DE package and filter are workflow choices, so the route is a declared deviation."
+        }
+      },
+      "discrepancies": [
+        {"item": "DE software", "paper": "not named; 'processed as previously described [34]' (S4.11.p1)", "data": "raw featureCounts counts", "disposition": "executable_without_change"},
+        {"item": "expression filter", "paper": "17389 genes survive the expression threshold (S4.9.p1), rule not stated", "data": "52636 GENCODE features", "disposition": "executable_without_change"},
+        {"item": "sample sizes", "paper": "n = 5-7 per genotype x exercise group (FIG2)", "data": "WT rest 5, WT ex60 7, KO rest 7, KO ex60 6 (Female WT rest has 2)", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "exercise_main", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "rest", "treatment_group": "ex60", "covariate_columns": "sex,geno", "alpha": 0.05},
+         "role": "primary", "reasoning": "Paper's exercise main effect, ~ sex + geno + time (S4.17.p1, S2.2.p2)"},
+        {"name": "genotype_main", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "KO", "covariate_columns": "sex,time", "alpha": 0.05},
+         "role": "secondary", "reasoning": "Paper's genotype main effect (56 DEGs), same additive model"},
+        {"name": "joint", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": "all", "covariates": ["sex"], "alpha": 0.05},
+         "role": "secondary", "reasoning": "Genotype x exercise interaction (paper: 0 DEGs) and per-genotype exercise effects from one model of all 25 samples with sex"},
+        {"name": "exercise_main_cpmfilter", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "rest", "treatment_group": "ex60", "covariate_columns": "sex,geno", "alpha": 0.05},
+         "filter_low_counts": {"min_cpm": 1, "min_samples": 3},
+         "role": "sensitivity", "reasoning": "Paper applies an unstated expression threshold (17389 genes kept); CPM >= 1 in >= 3 samples approximates it"},
+        {"name": "exercise_male", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "rest", "treatment_group": "ex60", "covariate_columns": "geno", "alpha": 0.05},
+         "subset": {"sex": ["M"]},
+         "role": "exploratory", "reasoning": "Per-sex exploratory analysis (both sexes present; paper pooled them)"},
+        {"name": "exercise_female", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "rest", "treatment_group": "ex60", "covariate_columns": "geno", "alpha": 0.05},
+         "subset": {"sex": ["F"]},
+         "role": "exploratory", "reasoning": "Per-sex exploratory analysis (both sexes present; paper pooled them)"}
+      ],
+      "enrichment": []
+    }
+  ]
+}

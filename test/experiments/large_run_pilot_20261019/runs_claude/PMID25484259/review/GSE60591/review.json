@@ -1,0 +1,88 @@
+{
+ "case": "GSE60591",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B2": "Main RNA-seq comparison: T2 (after 3 months training) vs T1 (before), trained leg, 23 subjects (S3.1.p1, S3.1.p2, S5.4.p2; 4076 DEGs). Untrained leg is an intraindividual control used for validation (S3.1.p1, S3.1.p4); per-group RNA-seq n not stated beyond 23 subjects (TAB1).",
+  "B4": "One joint edgeR model on all samples: 'We included the group (T2 vs. T1), the library preparation and the individual as covariates' (S5.4.p2).",
+  "B5": "'DEG were selected if FDR<0.05' (S5.4.p2); no fold-change cutoff; 4076 DEGs (S3.1.p2, S4.p2).",
+  "B1": "Yes: SuperSeries of GSE58608+GSE60590; 23 T1 and 22 T2 trained-leg samples carry the exercise contrast; 12 U1 untrained-leg pre-training samples are not part of the paper's RNA-seq T2 vs T1.",
+  "B3": "Yes: 22 subjects have T1 and T2; s13 only T1. Key `subject` (packet A shows description key only for sample pairs; subject derived from file name). Library prep (batch) also repeated across series."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Primary result: 23 T1 vs 22 T2, trained leg, as S3.1.p2/S5.4.p2.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "T1 23, T2 22 match design (s13 no T2 recorded); 12 U1 excluded with named reason (control leg, not in paper's DE).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "T2 vs T1; OXPHOS/collagen genes up as in S3.5.p1.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "~ subject, batch + grp; subject categorical, rank 24 full, residual df 21.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One joint model on all 45 samples, as paper (S5.4.p2).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Batch proxy (sub-series b1=T1 only for 12 subjects, b2) is partly aliased with training; estimable via 11 b2 pairs, full rank checked, sensitivity without batch run, caveat recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FPKM log2(FPKM+1) limma, edgeR counts blocked and declared; p histogram ok (frac_p_gt_0.9 0.054).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "disagree",
+   "severity": "minor",
+   "evidence": "Flag other_rule_matches_paper: nobatch table p<0.05 gives 4198 vs paper 4076, applied padj<0.05 gives 2576; discrepancy list does not mention that another rule matches the paper's count. Paper rule transcribed correctly (FDR<0.05, no FC, S5.4.p2).",
+   "fix": "Add a discrepancy record: paper FDR<0.05 gives 4076 with edgeR counts; on FPKM/limma the count (4198) is reached only at raw p<0.05; applied rule stays padj<0.05."
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ours 1608 / 2576 vs paper 4076 same contrast and rule, declared deviation, not claimed to match.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no stop",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: which threshold to report when the paper's count (4076) is near raw p<0.05 on limma/FPKM (4198) rather than FDR<0.05."
+ ],
+ "summary": "GSE60591 以23个T1对22个T2、subject为区组并用子系列代理文库批次,方向、分组与论文一致,偏差均已声明。唯一小问题是 raw p<0.05 的4198与论文4076接近这一事实未写入差异记录,属政策待定项。"
+}

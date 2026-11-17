@@ -1,0 +1,89 @@
+{
+ "case": "GSE230102_quad",
+ "reviewer": "Claude Sonnet 5.5 (read-only review)",
+ "blind": {
+  "B1": "Yes. GSE230102 is the paper's own ExcHMDP RNA-seq deposit (S4.1.3.p1). In the quadriceps series the exercise factor is 30 d in-cage voluntary wheel running (TRN) vs sedentary (SED) female HMDP mice (S2.1.p1, S4.2.2.p1); all 99 sequenced samples carry it.",
+  "B2": "TRN vs SED in quadriceps, pooled across strains (Fig 5A/6A legends 'across all strains relative to sedentary'); n = 50 TRN/49 SED, one animal per strain per arm in GEO (50 strains; paper describes a 100-strain panel).",
+  "B3": "No animal is sampled twice within a series (one tissue per series; different mice in SED and TRN). Mice of one tissue are matched by inbred strain, not by animal; the same mouse appears in the other tissue series, which are analysed separately. Strain is the candidate matching/blocking factor (packet A pairing keys: 50 strains, each once per level).",
+  "B4": "S4.4.1.p2: 'Samples were analyzed for differential expression using DeSeq2 ... and were corrected using limma ... accounting for library prep batch and sequencing flow cell lane.' One model per tissue on all samples; the paper does not say whether strain was in the model.",
+  "B5": "S4.4.1.p3: 'A false discovery rate (FDR) < 0.05 was considered significant'; no fold-change cutoff. Per-tissue DEG counts are not in the text (figures S11A/S12A/S13A); S2.9.p3 gives an average of about 500 DEGs per tissue (top 500 DEGs)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run decision matches B1: TRN vs SED arms present in all 99 samples.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp TRN/SED from the exercise-group characteristic, n=50 TRN/49 SED; control is SED, the paper's control. Quadriceps lacks the SED sample of strain 129X1/SvJ and says so (HANDBACK).",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrast grp_TRN_vs_SED, SED reference, matching 'relative to the sedentary group'. The possible_reversed_contrast flag is a false positive (it reads 'SED' as an exercise word).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Strain (one SED + one TRN animal per strain) is a blocking term in the primary model (~ strain + grp), coded categorical (S<n>), full rank, residual df 49; unblocked sensitivity also run. Animals are not repeated; strain is a matching factor.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper is silent on strain; counts differ greatly (blocked 4057 vs unblocked 378) and both fits are reported. One joint model per tissue as the paper. Which fit the paper's own counts follow is an open policy item (human_items).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "Paper S4.2.2.p1: 'Sedentary mice were housed 1-4 animals per cage. Exercised mice were individually housed.' Housing is aliased with the exercise factor and cannot be separated; no gate, caveat or HANDBACK mentions it. Library prep batch and flow-cell lane are recorded as not deposited.",
+   "fix": "Add a caveat to the covariance/study gates: exercise arm singly housed vs SED group-housed (1-4 per cage), aliased with TRN vs SED and not separable; results are TRN-plus-housing effects."
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "kallisto estimated counts (integer fraction ~0.7, median 1), rounded for DESeq2 with rounding documented; same data type the paper fed to DESeq2.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj < 0.05, no fold-change cutoff, matches S4.4.1.p3 and legends; non-inclusive.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "minor",
+   "evidence": "The paper gives no per-tissue counts; comparison is qualitative only. HANDBACK says 'Liver and heart have the fewest DEGs in both models', but unblocked gWAT=15 < liver=60. The unblocked average (about 498 over five tissues) fits the paper's 'average ~500' while the blocked average (about 1734) does not; this is not noted.",
+   "fix": "Correct the HANDBACK sentence and note that the unblocked counts average about 500 (S2.9.p3)."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; all five tissues ran.",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.",
+  "Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question."
+ ],
+ "summary": "quadriceps：分组、方向、阈值、矩阵处理与论文一致，以 strain 作为区组项并同时报告未分块的敏感性分析，合理。主要问题是未记录饲养方式混杂：运动组单笼饲养而久坐组 1-4 只同笼，与运动因素完全重叠（S4.2.2.p1）。另有次要问题：HANDBACK 中关于 DEG 数量的比较表述不准确。"
+}

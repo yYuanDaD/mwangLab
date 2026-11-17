@@ -1,0 +1,1170 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID25484259",
+  "subject_id": "GSE60590",
+  "created_at": "2026-11-17T18:00:02",
+  "finished_at": "2026-11-17T18:01:41",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC4622000.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC4622000.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T18:00:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e648e17c7c9e597b17fc78fc16c931d7b0218233db4701763ee409cb6f5c95af",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE60590_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE60590\\GSE60590_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T18:00:02",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ff02d8e5376e23b089ead74b8902770d49ad21d0000aad3e6a39b4c8d87521d6",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T18:00:41",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8afb469ed809d645950e1b088ee1f19faff75dcde855dec183b8e74825592c7d",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE58608",
+          "GSE60590",
+          "GSE60591"
+        ],
+        "accession_roles": {
+          "GSE58608": "RNA-seq, pre-training biopsies of both legs (T1 = leg to be trained, U1 = untrained leg) for 12 subjects; S5.4.p2 notes a baseline subset (n=12) analyzed earlier",
+          "GSE60590": "RNA-seq, 22 post-training trained-leg biopsies (T2) plus 11 pre-training T1 biopsies of the other 11 subjects",
+          "GSE60591": "GEO SuperSeries joining GSE58608 + GSE60590 (57 samples); not named in the paper but holds exactly the two cited series",
+          "GSE60655": "DNA methylation 450K (S5.6.p1); not part of this gene-expression request"
+        },
+        "assay": "bulk RNA-seq, Illumina HiSeq2000, 2x100 bp, vastus lateralis (S5.4.p1, S3.1.p1)",
+        "primary_estimand": "Within-subject change in trained-leg skeletal-muscle gene expression after 3 months of supervised one-legged endurance knee-extension training: T2 (24 h after last session) vs T1 (pre-training), trained leg (S3.1.p1, S3.1.p2, S5.1.p1, S5.4.p2)",
+        "planned_contrasts": [
+          "T2 vs T1, trained leg, individual and library preparation as covariates (S5.4.p2; paper: 4076 DEGs, S3.1.p2)"
+        ],
+        "factors": {
+          "group": [
+            "T1 pre-training trained leg",
+            "T2 post-training trained leg"
+          ],
+          "individual": "23 subjects (12 M, 11 F; TAB1)",
+          "library_preparation": "covariate named in S5.4.p2; not annotated in GEO"
+        },
+        "sample_inclusion": "23 sedentary young subjects; biopsies from both legs before and after training (S3.1.p1). RNA-seq DE is trained leg T2 vs T1 (S3.1.p2, S5.4.p2). The untrained leg is an intraindividual control used for physiology and methylation validation, not in the RNA-seq DEG model.",
+        "repeated_measure_unit": "individual (subject)",
+        "paper_method": "edgeR on gene counts after QC, trimming, mapping, PCR-duplicate removal and gene count summarization; model with group (T2 vs T1) + library preparation + individual (S5.4.p2)",
+        "normalization": "edgeR normalization on gene counts (S5.4.p2)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S5.4.p2"
+        },
+        "paper_results": {
+          "n_DEG_T2_vs_T1": 4076,
+          "locator": "S3.1.p2, S4.p2",
+          "named_up": [
+            "COL4A1",
+            "COL4A2",
+            "A2M",
+            "THBS4",
+            "PDGFRB",
+            "LAMA4",
+            "CS",
+            "SDHA",
+            "HADHA",
+            "COX7A2",
+            "ATP5B",
+            "MDH1",
+            "NDUFA8",
+            "KDR"
+          ],
+          "named_down": [
+            "MDM2",
+            "ZNF638",
+            "UACA",
+            "CUL3",
+            "PPP1R12A",
+            "TRDN",
+            "MEF2A",
+            "MYH3",
+            "TNNT2",
+            "RYR1",
+            "SH3GLB1"
+          ],
+          "named_locators": "S3.5.p1, S3.5.p2, S4.p10, S4.p11"
+        },
+        "enrichment": "goseq GO and KEGG (pathview) on DEGs (S5.4.p2, Table S10): oxidative phosphorylation, ECM, angiogenesis themes (S3.5.p1)"
+      },
+      "reason": "S5.4.p2 gives the RNA-seq DE: edgeR, group T2 vs T1 with library preparation and individual as covariates, FDR<0.05; S3.1.p2 reports 4076 DEGs. Design (one-legged training, biopsies pre/post) from S3.1.p1 and S5.1.p1. S5.6.p1 names GSE58608 and GSE60590 for expression.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:41"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "S5.6.p1 cites GSE60590",
+          "22 trained-leg post-training T2 + 11 pre-training T1 samples",
+          "series_id GSE60590,GSE60591"
+        ],
+        "accession": "GSE60590",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE60590\\GSE60590_metadata.csv"
+      },
+      "reason": "S5.6.p1 names GSE58608 and GSE60590 as the gene-expression series. GSE60590 metadata: Homo sapiens skeletal muscle, KTH/SciLifeLab, HiSeq2000 RNA-seq, original sample IDs <subject><T|U><1|2> matching the paper's T1/T2 and trained/untrained leg scheme.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:41"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 33,
+        "n_metadata": 33,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "source": "supplementary_file_1",
+              "regex": "_(\\d+)[TU][12]\\.fpkm",
+              "recode": {
+                "1": "s01",
+                "2": "s02",
+                "3": "s03",
+                "4": "s04",
+                "5": "s05",
+                "7": "s07",
+                "9": "s09",
+                "11": "s11",
+                "12": "s12",
+                "14": "s14",
+                "15": "s15",
+                "16": "s16",
+                "18": "s18",
+                "19": "s19",
+                "20": "s20",
+                "21": "s21",
+                "22": "s22",
+                "23": "s23",
+                "24": "s24",
+                "26": "s26",
+                "27": "s27",
+                "28": "s28"
+              }
+            },
+            "grp": {
+              "source": "supplementary_file_1",
+              "regex": "_\\d+([TU][12])\\.fpkm"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\design_metadata.csv",
+          "sha256": "b22107a87034cd433c71a2eac11a6411265d72221f989cfe52807d0497d2674b",
+          "levels": {
+            "subject": {
+              "s14": 2,
+              "s01": 2,
+              "s22": 2,
+              "s23": 2,
+              "s24": 2,
+              "s26": 2,
+              "s27": 2,
+              "s28": 2,
+              "s02": 2,
+              "s03": 2,
+              "s05": 2,
+              "s11": 1,
+              "s12": 1,
+              "s15": 1,
+              "s16": 1,
+              "s18": 1,
+              "s19": 1,
+              "s20": 1,
+              "s21": 1,
+              "s04": 1,
+              "s07": 1,
+              "s09": 1
+            },
+            "grp": {
+              "T2": 22,
+              "T1": 11
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are GSM ids. subject and grp (T1/T2) parsed from the per-sample file name in supplementary_file_1, equal to 'original sample id'. grp T2 = trained / post-training period 1, T1 = untrained / pre-training period 1 for all 33.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:44"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GEO per-sample Cufflinks genes.fpkm_tracking files in the _RAW.tar, merged on gene_id (FPKM column)",
+        "paper_input": "gene read counts for edgeR (S5.4.p2); not deposited",
+        "matrix_type": "FPKM",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\aligned_matrix.csv",
+          "sha256": "ba072c57cd4c7bba1ae576c7b849b3a528267f693aba41374d75841ce1fa6c5b",
+          "n_features": 61779,
+          "n_samples": 33,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 85707.6,
+          "median": 0.0,
+          "integer_fraction": 0.5911,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Per-sample files are Cufflinks genes.fpkm_tracking (FPKM, FPKM_conf_lo/hi, FPKM_status); data_processing: TopHat 2.0.4 + Cufflinks 2.0.2. Values are non-integer (integer fraction about 0.58, almost all zeros), max about 85,700: linear FPKM. No read counts deposited, so edgeR on counts cannot be reproduced; FPKM must not be rounded into counts. Route: log2(FPKM+1), then limma.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:46"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired",
+        "design_column": "grp",
+        "control": "T1",
+        "treatment": "T2",
+        "contrasts": [
+          {
+            "name": "grp_T2_vs_T1",
+            "control": "T1",
+            "treatment": "T2",
+            "role": "sensitivity"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Within-series sensitivity: only 11 subjects have both T1 and T2 in GSE60590 (the other 11 T2 baselines are in GSE58608). Paired T2 vs T1 on the 11 complete pairs avoids any cross-series (library-prep) effect. The full paper estimand runs in the GSE60591 case.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:50"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "included"
+          },
+          {
+            "name": "library_preparation",
+            "disposition": "excluded: not deposited; single series in this case"
+          },
+          {
+            "name": "sex",
+            "disposition": "excluded: constant within subject, absorbed by the subject block"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp) + C(subject)",
+          "n_samples": 33,
+          "n_columns": 23,
+          "columns": [
+            "Intercept",
+            "grp_T2",
+            "subject_s02",
+            "subject_s03",
+            "subject_s04",
+            "subject_s05",
+            "subject_s07",
+            "subject_s09",
+            "subject_s11",
+            "subject_s12",
+            "subject_s14",
+            "subject_s15",
+            "subject_s16",
+            "subject_s18",
+            "subject_s19",
+            "subject_s20",
+            "subject_s21",
+            "subject_s22",
+            "subject_s23",
+            "subject_s24",
+            "subject_s26",
+            "subject_s27",
+            "subject_s28"
+          ],
+          "rank": 23,
+          "full_rank": true,
+          "residual_df": 10,
+          "levels": {
+            "grp": {
+              "T2": 22,
+              "T1": 11
+            },
+            "subject": {
+              "s14": 2,
+              "s01": 2,
+              "s22": 2,
+              "s23": 2,
+              "s24": 2,
+              "s26": 2,
+              "s27": 2,
+              "s28": 2,
+              "s02": 2,
+              "s03": 2,
+              "s05": 2,
+              "s11": 1,
+              "s12": 1,
+              "s15": 1,
+              "s16": 1,
+              "s18": 1,
+              "s19": 1,
+              "s20": 1,
+              "s21": 1,
+              "s04": 1,
+              "s07": 1,
+              "s09": 1
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "T1",
+                "s01"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s02"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s03"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T1",
+                "s28"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s01"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s02"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s03"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s04"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s05"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s07"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s09"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s14"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s24"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "T2",
+                "s28"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "subject",
+            "n_levels": 22,
+            "status": "crossed",
+            "crosstab": {
+              "T1": {
+                "s01": 1,
+                "s02": 1,
+                "s03": 1,
+                "s04": 0,
+                "s05": 1,
+                "s07": 0,
+                "s09": 0,
+                "s11": 0,
+                "s12": 0,
+                "s14": 1,
+                "s15": 0,
+                "s16": 0,
+                "s18": 0,
+                "s19": 0,
+                "s20": 0,
+                "s21": 0,
+                "s22": 1,
+                "s23": 1,
+                "s24": 1,
+                "s26": 1,
+                "s27": 1,
+                "s28": 1
+              },
+              "T2": {
+                "s01": 1,
+                "s02": 1,
+                "s03": 1,
+                "s04": 1,
+                "s05": 1,
+                "s07": 1,
+                "s09": 1,
+                "s11": 1,
+                "s12": 1,
+                "s14": 1,
+                "s15": 1,
+                "s16": 1,
+                "s18": 1,
+                "s19": 1,
+                "s20": 1,
+                "s21": 1,
+                "s22": 1,
+                "s23": 1,
+                "s24": 1,
+                "s26": 1,
+                "s27": 1,
+                "s28": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "The paper models individual (S5.4.p2). Subject is the blocking term for repeated biopsies.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:50"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "FPKM",
+        "method": "limma (moderated t, eBayes) on log2(FPKM+1) with subject block",
+        "formula": "~ Treatment + C(subject)",
+        "paper_route": {
+          "method": "edgeR on gene counts, ~ group + library preparation + individual",
+          "status": "blocked",
+          "reason": "GEO holds only Cufflinks FPKM per sample; neither read counts nor library-preparation labels were deposited"
+        },
+        "deviations": [
+          "limma on log2(FPKM+1) instead of edgeR on counts",
+          "no library-prep covariate (single series)",
+          "11 complete pairs only"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "The paper route (edgeR on counts) is blocked: only Cufflinks FPKM is deposited. Validated alternative for linear FPKM: log2(FPKM+1), then limma (moderated t, eBayes) with subject as a fixed block, matching the paper's individual covariate. Genes are filtered to FPKM>=1 in at least as many samples as the smaller arm (analogous to the usual edgeR CPM filter) so the near-zero loci among the 61,779 Cufflinks genes are not tested.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:53"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S5.4.p2"
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "deviation_note": "The paper's FDR<0.05 (no fold-change cutoff) is applied unchanged to limma BH-adjusted p on log2(FPKM+1) because edgeR on counts is blocked. The audit rule adds |log2FC|>log2(1.5) only as a labelled comparison."
+      },
+      "reason": "S5.4.p2: DEG were selected if FDR<0.05; no effect-size rule stated.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:00:53"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_limma_analysis",
+        "subset": "grp_T2_vs_T1_pairs",
+        "role": "sensitivity",
+        "tool": "tools.limma_tools:run_limma_analysis",
+        "n_samples": 22,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\results\\grp_T2_vs_T1_pairs\\input\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ subject + grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\results\\grp_T2_vs_T1_pairs\\DEG_results_T2_vs_T1.csv"
+        ],
+        "counts": {
+          "grp_T2_vs_T1_pairs": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 12376,
+              "n_significant": 1428,
+              "n_up": 899,
+              "n_down": 529,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 12376,
+              "n_significant": 203,
+              "n_up": 150,
+              "n_down": 53,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paired T2 vs T1 within GSE60590 only (no cross-series batch); FPKM>=1 in >=11 samples (one arm).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:01:12"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Sensitivity on 11 within-series pairs, not the paper's full cohort",
+          "FPKM with limma instead of counts with edgeR"
+        ],
+        "results": {
+          "grp_T2_vs_T1_pairs": {
+            "n_deg": 1428,
+            "up": 899,
+            "down": 529,
+            "rule": "padj < 0.05",
+            "audit_n": 203
+          }
+        },
+        "paper_counts": {
+          "grp_T2_vs_T1_pairs": 4076
+        },
+        "comparison": {
+          "grp_T2_vs_T1_pairs": {
+            "ours": 1428,
+            "paper": 4076
+          }
+        },
+        "paper_gene_check": {
+          "grp_T2_vs_T1_pairs": {
+            "COL4A1": {
+              "AveExpr": 4.0562,
+              "log2FoldChange": 1.5962,
+              "padj": 0.000405,
+              "pvalue": 1.31e-07
+            },
+            "COL4A2": {
+              "AveExpr": 4.0581,
+              "log2FoldChange": 1.6112,
+              "padj": 0.000405,
+              "pvalue": 1.01e-07
+            },
+            "A2M": {
+              "AveExpr": 5.5829,
+              "log2FoldChange": 0.734,
+              "padj": 0.00201,
+              "pvalue": 7.92e-06
+            },
+            "THBS4": {
+              "AveExpr": 4.2214,
+              "log2FoldChange": 1.3822,
+              "padj": 0.000788,
+              "pvalue": 5.73e-07
+            },
+            "PDGFRB": {
+              "AveExpr": 3.7534,
+              "log2FoldChange": 0.4591,
+              "padj": 0.025,
+              "pvalue": 0.00174
+            },
+            "LAMA4": {
+              "AveExpr": 2.3194,
+              "log2FoldChange": 0.8601,
+              "padj": 0.00604,
+              "pvalue": 9.86e-05
+            },
+            "CS": {
+              "AveExpr": 7.4963,
+              "log2FoldChange": 0.2329,
+              "padj": 0.0442,
+              "pvalue": 0.00466
+            },
+            "SDHA": {
+              "AveExpr": 7.1638,
+              "log2FoldChange": 0.2864,
+              "padj": 0.0132,
+              "pvalue": 0.000548
+            },
+            "HADHA": {
+              "AveExpr": 6.6009,
+              "log2FoldChange": 0.3661,
+              "padj": 0.00689,
+              "pvalue": 0.00013
+            },
+            "COX7A2": {
+              "AveExpr": 6.6931,
+              "log2FoldChange": 0.5196,
+              "padj": 0.00751,
+              "pvalue": 0.00016
+            },
+            "ATP5B": null,
+            "MDH1": {
+              "AveExpr": 8.1381,
+              "log2FoldChange": 0.4999,
+              "padj": 0.0045,
+              "pvalue": 5.44e-05
+            },
+            "NDUFA8": {
+              "AveExpr": 6.3997,
+              "log2FoldChange": 0.5061,
+              "padj": 0.00266,
+              "pvalue": 1.69e-05
+            },
+            "KDR": {
+              "AveExpr": 1.7874,
+              "log2FoldChange": 0.8205,
+              "padj": 0.00201,
+              "pvalue": 7.68e-06
+            },
+            "MDM2": {
+              "AveExpr": 3.064,
+              "log2FoldChange": -0.3538,
+              "padj": 0.0697,
+              "pvalue": 0.0105
+            },
+            "ZNF638": {
+              "AveExpr": 4.0598,
+              "log2FoldChange": -0.4709,
+              "padj": 0.0533,
+              "pvalue": 0.00656
+            },
+            "UACA": {
+              "AveExpr": 5.0954,
+              "log2FoldChange": -0.8757,
+              "padj": 0.0224,
+              "pvalue": 0.00146
+            },
+            "CUL3": {
+              "AveExpr": 4.7688,
+              "log2FoldChange": -0.2479,
+              "padj": 0.0339,
+              "pvalue": 0.00299
+            },
+            "PPP1R12A": {
+              "AveExpr": 2.7158,
+              "log2FoldChange": -0.214,
+              "padj": 0.359,
+              "pvalue": 0.162
+            },
+            "TRDN": {
+              "AveExpr": 8.1914,
+              "log2FoldChange": -0.7863,
+              "padj": 0.0362,
+              "pvalue": 0.00338
+            },
+            "MEF2A": {
+              "AveExpr": 4.0108,
+              "log2FoldChange": -0.1795,
+              "padj": 0.291,
+              "pvalue": 0.115
+            },
+            "MYH3": {
+              "AveExpr": 3.709,
+              "log2FoldChange": -0.324,
+              "padj": 0.0915,
+              "pvalue": 0.0165
+            },
+            "TNNT2": {
+              "AveExpr": 1.231,
+              "log2FoldChange": -0.4114,
+              "padj": 0.222,
+              "pvalue": 0.0729
+            },
+            "RYR1": {
+              "AveExpr": 8.8096,
+              "log2FoldChange": -0.3276,
+              "padj": 0.019,
+              "pvalue": 0.00108
+            },
+            "SH3GLB1": {
+              "AveExpr": 5.2396,
+              "log2FoldChange": -0.1082,
+              "padj": 0.428,
+              "pvalue": 0.219
+            }
+          }
+        }
+      },
+      "reason": "The paper's 4076 DEGs come from the full cohort; compared for scale only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:01:41"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ccac0fca51dc30278615c8fb2a7cc7be64b63df6d00f846bbfadd3aa2e111aa8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "91228b4e035d8583dd284af2f1d347fa59b7718c467aeee430d491166233a8f7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ba072c57cd4c7bba1ae576c7b849b3a528267f693aba41374d75841ce1fa6c5b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b22107a87034cd433c71a2eac11a6411265d72221f989cfe52807d0497d2674b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "86b8a6f7da2c448c20c112ed1282e4c8dc5ce96569a258be845138413bb00faf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6490beac490355bf031fdb60f2f43558181843f84bea30ab21f32763fab8ccb5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "83d8b8d16393393857d84b0c278d8feba652f9ec82b516efc33b9bd65dcebad9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\results\\grp_T2_vs_T1_pairs\\input\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7a18af77f4503649ae7544e73223891cd21c0a588c2f8ff85694c7f400745bde",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\results\\grp_T2_vs_T1_pairs\\DEG_results_T2_vs_T1.csv",
+      "role": "deg_grp_T2_vs_T1_pairs",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3bbecdbc5e34a660470c42162b838150b1421b744b9e7ce59f276fa23a3030dc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID25484259\\GSE60590\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "3147024a78ea56531818df85ed02bf48a670f9b2aac03cd3a9a706088ecbc392",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

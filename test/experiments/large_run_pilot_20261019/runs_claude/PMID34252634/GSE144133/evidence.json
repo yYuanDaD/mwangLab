@@ -1,0 +1,1164 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34252634",
+  "subject_id": "GSE144133",
+  "created_at": "2026-11-17T17:56:08",
+  "finished_at": "2026-11-17T17:57:00",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8355925.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC8355925.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T17:56:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "044a1e92bedadfcd32c22a1b3ccc9748dbe73d95beffeeac330b71a65b8b7556",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE144133_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE144133\\GSE144133_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T17:56:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "58e91c3edf60d72c40db9f4a2c8e568a7029c81849d88e0d5d8d5c2046e0747b",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE144133_abundance_full.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE144133\\GSE144133_abundance_full.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-17T17:56:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7c1be70b7540e3e9e938e527493ca09ed5db6cd29c5413f02f880b6b88845057",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE144134 (SuperSeries, S4.1.p1)",
+          "GSE144133 (RNA-seq SubSeries)"
+        ],
+        "assay": "total RNA-seq (Ribo-Zero), human vastus lateralis biopsies (S2.4.p1)",
+        "subjects": "8 young sedentary Caucasian males, biopsy before and after 6 weeks of endurance training (S2.1.p1, S2.2.p1)",
+        "factors": {
+          "training": [
+            "untrained (pre)",
+            "trained (post)"
+          ],
+          "participant": "P1-P8 (blocking)"
+        },
+        "sample_inclusion": "16 biopsies; P6_2 and P8_2 excluded from DE for dermis contamination (S2.4.p1)",
+        "primary_estimand": "within-participant change in skeletal muscle gene expression after 6 weeks endurance training (trained vs untrained), paired by participant",
+        "planned_contrasts": [
+          "trained vs untrained, ~participant + training (S2.4.p1; S3.1.p2: 641 up, 176 down, FDR<0.1, of 13,108 detected genes)"
+        ],
+        "repeated_measure_unit": "participant",
+        "normalization": "kallisto v0.46 transcript quantification, summed to genes by sleuth (S2.4.p1)",
+        "paper_method": "sleuth v0.30 likelihood ratio test ~participant vs ~participant + training; fold changes from Wald test (S2.4.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S3.1.p2; FIG1 (C)"
+        },
+        "paper_results": {
+          "up": 641,
+          "down": 176,
+          "total": 817,
+          "validated_up_genes_qPCR": [
+            "COL5A1",
+            "EMILIN1",
+            "SLC9C1",
+            "FSCN1",
+            "NID1"
+          ],
+          "trend_up": [
+            "COL4A2",
+            "RASSF2"
+          ]
+        }
+      },
+      "reason": "Methods S2.4.p1 define the RNA-seq DE: kallisto + sleuth LRT comparing ~participant to ~participant + training, P6_2 and P8_2 excluded. Results S3.1.p2 report 641 up and 176 down at FDR < 0.1 with no fold-change cutoff. Methods mention 'Bonferroni corrected q-values' but results and Figure 1C state FDR < 0.1; recorded as a discrepancy and the FDR rule is used.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:08"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE144133\\GSE144133_abundance_full.csv.gz",
+        "owned": true,
+        "checks": [
+          "paper S4.1.p1 names SuperSeries GSE144134; GSE144133 metadata series_id = 'GSE144133,GSE144134'",
+          "16 samples P1-P8 x {1,2} = 8 participants pre/post, matching S2.1.p1",
+          "data_processing text reproduces S2.4.p1 (kallisto 0.46, sleuth 0.30, ~Participant + Training)",
+          "tissue vastus lateralis, Homo sapiens, total RNA"
+        ],
+        "accession": "GSE144133",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE144133\\GSE144133_metadata.csv"
+      },
+      "reason": "GSE144133 is the RNA-seq SubSeries of the paper's SuperSeries GSE144134; its processing description is the paper's methods text.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:08"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 16,
+        "n_metadata": 16,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM4281963": "P6_2: excluded by the paper for high dermis-gene expression (S2.4.p1)",
+          "GSM4281967": "P8_2: excluded by the paper for high dermis-gene expression (S2.4.p1)"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "subject": {
+              "alias_of": "characteristics_ch1.1.participant"
+            },
+            "train": {
+              "alias_of": "characteristics_ch1.2.training",
+              "recode": {
+                "Untrained": "pre",
+                "Trained": "post"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\design_metadata.csv",
+          "sha256": "05faa22b18c143945c5c3562ba5bebf56aed3cdec401f7b9ac0cde59a3b6e988",
+          "levels": {
+            "subject": {
+              "P1": 2,
+              "P2": 2,
+              "P3": 2,
+              "P4": 2,
+              "P5": 2,
+              "P7": 2,
+              "P6": 1,
+              "P8": 1
+            },
+            "train": {
+              "pre": 8,
+              "post": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (P1_1 ... P8_2) equal the title prefix before _R1_RNA; exact match on that derived key. Suffix _1/_2 agrees with the training column (Untrained/Trained) for every sample. Participant and training state come from the GEO characteristics.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:08"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "linear normalized abundance (sleuth-normalized gene-level kallisto estimates, scaled reads per base)",
+        "recommended_method": "limma",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\aligned_matrix.csv",
+          "sha256": "9d87166c1b02b28d906ec54ffe9441e63047c8d1b18310ca1eb94af38bd323ff",
+          "n_features": 12900,
+          "n_samples": 14,
+          "annotation_columns_dropped": [
+            "GSM4281963",
+            "GSM4281967"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 59451.19008,
+          "median": 6.0826752705,
+          "integer_fraction": 0.0061,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "GEO: 'csv file with estimated abundances' from kallisto 0.46 summed to genes by sleuth 0.30; semicolon-delimited, 12,900 Ensembl genes (paper: 13,108 detected), already filtered. Profile: 1.3% integer values; median-of-ratios size factors across the 16 samples are 0.93-1.17, i.e. already normalized; within the 8 pre samples the variance/mean ratio is 0.21 (mean 0.5-1), 0.32 (1-2), 0.52 (2-5), 0.88 (5-10): sub-Poisson, impossible for read counts, so the values are scaled abundances, not counts. Column sums up to 1.65e6 on a gene subset rule out TPM. Sleuth itself models log(x+0.5) of these normalized values, so a log-scale linear model is the matching route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:08"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired two-group (repeated measures, participant blocking)",
+        "design_column": "train",
+        "control": "pre",
+        "treatment": "post",
+        "contrasts": [
+          {
+            "name": "train_post_vs_pre",
+            "control": "pre",
+            "treatment": "post",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Paper estimand: trained vs untrained within participant (S2.4.p1 ~participant + training). Interventional pre/post design; no control group, so the effect is a within-subject pre-post change. Single male sex; no sex split.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:15"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "subject",
+            "disposition": "blocking term for repeated biopsies (paper ~participant)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(train) + C(subject)",
+          "n_samples": 14,
+          "n_columns": 9,
+          "columns": [
+            "Intercept",
+            "train_pre",
+            "subject_P2",
+            "subject_P3",
+            "subject_P4",
+            "subject_P5",
+            "subject_P6",
+            "subject_P7",
+            "subject_P8"
+          ],
+          "rank": 9,
+          "full_rank": true,
+          "residual_df": 5,
+          "levels": {
+            "train": {
+              "pre": 8,
+              "post": 6
+            },
+            "subject": {
+              "P1": 2,
+              "P2": 2,
+              "P3": 2,
+              "P4": 2,
+              "P5": 2,
+              "P7": 2,
+              "P6": 1,
+              "P8": 1
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "post",
+                "P1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "P2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "P3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "P4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "P5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "P7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P5"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "P8"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.participant",
+            "n_levels": 8,
+            "status": "crossed",
+            "crosstab": {
+              "post": {
+                "P1": 1,
+                "P2": 1,
+                "P3": 1,
+                "P4": 1,
+                "P5": 1,
+                "P6": 0,
+                "P7": 1,
+                "P8": 0
+              },
+              "pre": {
+                "P1": 1,
+                "P2": 1,
+                "P3": 1,
+                "P4": 1,
+                "P5": 1,
+                "P6": 1,
+                "P7": 1,
+                "P8": 1
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.2.training",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "post": {
+                "Trained": 6,
+                "Untrained": 0
+              },
+              "pre": {
+                "Trained": 0,
+                "Untrained": 8
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_laboratory",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_department",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "key",
+            "n_levels": 14,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "subject",
+            "n_levels": 8,
+            "status": "crossed",
+            "crosstab": {
+              "post": {
+                "P1": 1,
+                "P2": 1,
+                "P3": 1,
+                "P4": 1,
+                "P5": 1,
+                "P6": 0,
+                "P7": 1,
+                "P8": 0
+              },
+              "pre": {
+                "P1": 1,
+                "P2": 1,
+                "P3": 1,
+                "P4": 1,
+                "P5": 1,
+                "P6": 1,
+                "P7": 1,
+                "P8": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Each participant contributes pre and post biopsies; the paper blocks on participant (S2.4.p1). P6 and P8 keep only their pre sample after the paper's exclusion; as in the paper's ~participant model they absorb their own participant term and do not inform the training effect.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:15"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "linear normalized abundance (sleuth-normalized gene-level kallisto estimates, scaled reads per base)",
+        "method": "limma (moderated t, empirical Bayes) on log2(x+0.5) sleuth-normalized abundances",
+        "formula": "~ subject + train",
+        "paper_route": {
+          "method": "sleuth LRT ~participant + training vs ~participant",
+          "status": "blocked",
+          "reason": "sleuth needs per-sample kallisto abundance.h5 with bootstraps, which are not deposited; only the gene-level normalized abundance table is available"
+        },
+        "deviations": [
+          "limma moderated t on log2(x+0.5) replaces the sleuth LRT on log(x+0.5) with bootstrap-informed technical variance; same model terms (~participant + training) and same pseudocount"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "sleuth fits a linear model on log(x+0.5) of normalized abundances with shrunken variance; limma on log2(x+0.5) with participant blocking is the closest available executor. DESeq2 rejected because the values are not counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:16"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "deviation_note": "paper FDR < 0.1 applied to limma BH-adjusted p; audit at workflow default padj < 0.05"
+      },
+      "reason": "S3.1.p2 and Figure 1C: FDR < 0.1, no fold-change cutoff.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:16"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_limma_analysis",
+        "subset": "train_post_vs_pre",
+        "role": "primary",
+        "tool": "tools.limma_tools:run_limma_analysis",
+        "n_samples": 14,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\transformed\\log2_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ subject + train",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\train_post_vs_pre\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "train_post_vs_pre": {
+            "applied": {
+              "rule": "padj < 0.1",
+              "n_tested": 12900,
+              "n_significant": 16,
+              "n_up": 16,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 12900,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper's ~participant + training contrast on the paper's 14-sample set, limma in place of sleuth",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:23"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_limma_analysis",
+        "subset": "train_post_vs_pre_complete_pairs",
+        "role": "sensitivity",
+        "tool": "tools.limma_tools:run_limma_analysis",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\train_post_vs_pre_complete_pairs\\input\\paired\\paired_matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ subject + train",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\train_post_vs_pre_complete_pairs\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "train_post_vs_pre_complete_pairs": {
+            "applied": {
+              "rule": "padj < 0.1",
+              "n_tested": 12900,
+              "n_significant": 16,
+              "n_up": 16,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 12900,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "restrict to the 6 complete pre/post pairs to check that the unpaired P6_1/P8_1 singletons do not drive dispersion estimates",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:25"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "train_post_vs_pre",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "up",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\enrichment_train_post_vs_pre\\ora_up\\DEG_results_post_vs_pre_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\enrichment_train_post_vs_pre\\ora_up\\DEG_results_post_vs_pre_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\enrichment_train_post_vs_pre\\ora_up\\DEG_results_post_vs_pre_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\enrichment_train_post_vs_pre\\ora_up\\DEG_results_post_vs_pre_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 16 Human genes (direction=up, padj<0.1, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Endodermal Cell Differentiation (GO:0035987) | padj=1.46e-02 | overlap=2/31 | genes=COL4A2;ITGA5 - Actin Filament Bundle Assembly (GO:0051017) | padj=1.46e-02 | overlap=2/33 | genes=MYO1B;FSCN1 - Actin Filament Bundle Organization (GO:0061572) | padj=1.46e-02 | overlap=2/33 | genes=MYO1B;FSCN1 - Endoderm Formation (GO:0001706) | padj=1.46e-02 | overlap=2/35 | genes=COL4A2;ITGA5 - Extracellular Structure Organization (GO:0043062) | padj=5.14e-02 | overlap=2/109 | genes=COL4A2;PXDN - External Encapsulating Structure Organization (GO:0045229) | padj=5.14e-02 | overlap=2/110 | genes=COL4A2;PXDN - Positive Regulation Of Podosome Assembly (GO:0071803) | padj=5.14e-02 | overlap=1/5 | genes=FSCN1 - Positive Regulation Of Cholesterol Storage (GO:0010886) | padj=5.14e-02 | overlap=1/5 | genes=MSR1 - Kidney Morphogenesis (GO:0060993) | padj=5.14e-02 | overlap=1/5 | genes=PRKX - Endothelin Receptor Signaling Pathway (GO:0086100) | padj=5.14e-02 | overlap=1/5 | genes=EDNRB ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - 5'-Flap Endonuclease Activity (GO:0017108) | padj=3.98e-02 | overlap=1/5 | genes=FSCN1 - cAMP-dependent Protein Kinase Activity (GO:0004691) | padj=3.98e-02 | overlap=1/5 | genes=PRKX - Flap Endonuclease Activity (GO:0048256) | padj=3.98e-02 | overlap=1/6 | genes=FSCN1 - Cyclic Nucleotide-..."
+      },
+      "reason": "paper runs GO enrichment on upregulated genes (S2.4.p2, FIG1 D)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:56:28"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "train_post_vs_pre",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\enrichment_train_post_vs_pre\\gsea\\DEG_results_post_vs_pre_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 12426 Human genes ranked by 'stat'. 50 Hallmark sets tested, 35 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.52 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.17 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANGIOGENESIS | NES=1.98 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.97 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.97 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=1.93 | NOM p=0.00e+00 | FDR q=1.25e-04 - HALLMARK_APOPTOSIS | NES=1.93 | NOM p=0.00e+00 | FDR q=1.10e-04 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.88 | NOM p=0.00e+00 | FDR q=1.95e-04 - HALLMARK_KRAS_SIGNALING_UP | NES=1.87 | NOM p=0.00e+00 | FDR q=1.76e-04 ### Top 8 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.81 | NOM p=0.00e+00 | FDR q=1.05e-02 - HALLMARK_MYC_TARGETS_V2 | NES=-1.64 | NOM p=2.56e-02 | FDR q=2.28e-02 - HALLMARK_MYC_TARGETS_V1 | NES=-1.60 | NOM p=0.00e+00 | FDR q=2.45e-02 - HALLMARK_SPERMATOGENESIS | NES=-1.33 | NOM p=4.65e-02 | FDR q=1.07e-01 - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.22 | NOM p=7.14e-02 | FDR q=1.69e-01 - HALLMARK_MTORC1_SIGNALING | NES=-1.03 | NOM p=3.33e-01 | FDR q=5.26e-01 - HALLMARK_HEME_METABOLISM | NES=-0.98 | NOM p=4.62e-01 | FDR q=5.80e-01 - H..."
+      },
+      "reason": "full-ranking Hallmark GSEA as supporting pathway view",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:57:00"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "sleuth LRT replaced by limma on log2(x+0.5) sleuth-normalized abundances (sleuth bootstraps not deposited)",
+          "pre-post design without a non-exercising control: change includes time effects",
+          "matrix scale inferred from value profile (normalized abundances, not counts)"
+        ],
+        "results": {
+          "train_post_vs_pre": {
+            "n_deg": 16,
+            "up": 16,
+            "down": 0,
+            "rule": "padj < 0.1",
+            "audit_n": 0
+          },
+          "train_post_vs_pre_complete_pairs": {
+            "n_deg": 16,
+            "up": 16,
+            "down": 0,
+            "rule": "padj < 0.1",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "train_post_vs_pre": 817
+        },
+        "comparison": {
+          "train_post_vs_pre": {
+            "ours": 16,
+            "paper": 817
+          }
+        },
+        "paper_gene_check": {
+          "train_post_vs_pre": {
+            "COL5A1": {
+              "AveExpr": 1.6165,
+              "log2FoldChange": 2.1223,
+              "padj": 0.131,
+              "pvalue": 0.000309
+            },
+            "EMILIN1": {
+              "AveExpr": 0.6252,
+              "log2FoldChange": 1.1049,
+              "padj": 0.162,
+              "pvalue": 0.0013
+            },
+            "SLC9C1": {
+              "AveExpr": 1.0132,
+              "log2FoldChange": 1.0282,
+              "padj": 0.145,
+              "pvalue": 0.000564
+            },
+            "FSCN1": {
+              "AveExpr": 1.1029,
+              "log2FoldChange": 1.4347,
+              "padj": 0.086,
+              "pvalue": 3.78e-05
+            },
+            "NID1": {
+              "AveExpr": 1.679,
+              "log2FoldChange": 1.1143,
+              "padj": 0.119,
+              "pvalue": 0.000229
+            },
+            "COL4A2": {
+              "AveExpr": 4.9763,
+              "log2FoldChange": 1.5623,
+              "padj": 0.086,
+              "pvalue": 4.67e-05
+            },
+            "RASSF2": {
+              "AveExpr": 0.6153,
+              "log2FoldChange": 0.807,
+              "padj": 0.145,
+              "pvalue": 0.000576
+            },
+            "LTBP2": {
+              "AveExpr": 1.8927,
+              "log2FoldChange": 0.6412,
+              "padj": 0.171,
+              "pvalue": 0.00151
+            },
+            "FBN1": {
+              "AveExpr": 4.302,
+              "log2FoldChange": 1.2653,
+              "padj": 0.22,
+              "pvalue": 0.00612
+            },
+            "COL4A1": {
+              "AveExpr": 3.5035,
+              "log2FoldChange": 1.3917,
+              "padj": 0.11,
+              "pvalue": 0.000156
+            }
+          }
+        }
+      },
+      "reason": "Paper: 641 up + 176 down = 817 at FDR < 0.1; qPCR-validated upregulated genes and enhancer-linked genes (S3.1.p2, S3.3.p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T17:57:00"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a424a0997924989e59d051350414fabdbff19ca906d5aef6fc93c916607d1988",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ab942c13c957892578dbe474c8be81a910e702f04e9ed71586e50954e9e3e81e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9d87166c1b02b28d906ec54ffe9441e63047c8d1b18310ca1eb94af38bd323ff",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "05faa22b18c143945c5c3562ba5bebf56aed3cdec401f7b9ac0cde59a3b6e988",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "35baea46e3d3724bd90ef7697585a077bc0eb1f449b9606ff745d69889c3b16f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7521e8d737c1c1c5fde8160b3d5a63c57d0aaffd05b69e0fd6f76b837a832907",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4fc0e0b2c9d0c66a3736dbf1eb3fab3ce9b9f0bace3d08c0cd1d8c8de5949a8c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\train_post_vs_pre\\DEG_results_post_vs_pre.csv",
+      "role": "deg_train_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4e3a7af59bf747be2749076cb518957760d2ef27a47c07d56804d84d675ff261",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\results\\train_post_vs_pre_complete_pairs\\DEG_results_post_vs_pre.csv",
+      "role": "deg_train_post_vs_pre_complete_pairs",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "cb589ae0ac91add72e51a04dd15013cc7005363fff05ae736aa66d036bb7b36e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34252634\\GSE144133\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "084fb5107ea103b9b070176df6d322330ab20170b0bf9e9efa4b966c88e779b7",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -51,6 +51,15 @@ Pathways (separate from the DE result):
 
 All cases are recorded with route `declared_deviation`.
 
+## Confounding: housing is aliased with exercise (added after review; attempt 3)
+- S4.2.2.p1: SED mice were group-housed (1-4 per cage) and TRN mice were housed individually with a wheel.
+- Housing is therefore completely aliased with TRN vs SED. No model can separate the two, and GEO does not record housing.
+- Every DE and pathway result above is a TRN-plus-single-housing effect, not the effect of wheel running alone.
+- Where this is recorded, in all five tissue cases:
+  - the covariance gate: as a covariate with disposition "fully aliased, not estimable", and in the gate's reasoning;
+  - the study gate caveats.
+- `execute` was re-run. Attempt 2 moved to `_previous/20261117T225616Z`. The validator found 65 records and 0 errors. DEG counts are unchanged.
+
 ## Tool problems
 - No blocking problems.
 - pydeseq2 emits `RuntimeWarning: overflow encountered in exp` at `.venv-pdf/Lib/site-packages/pydeseq2/utils.py:1088` during the 50-level strain fits (33 times in `execute_stderr.log`). The fits completed and the counts were the same in both attempts.

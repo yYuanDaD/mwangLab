@@ -98,9 +98,10 @@ for cid, stem, suf, label, loc, genes in tissues:
                           "covariates": [
                               {"name": "strain", "disposition": "blocking term in the primary model (randomization unit; transcriptomes cluster by strain, S2.9.p3)"},
                               {"name": "library prep batch", "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"},
-                              {"name": "flow cell lane", "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"}]},
+                              {"name": "flow cell lane", "disposition": "not in GEO metadata; the paper adjusted for it (S4.4.1.p2); cannot be reproduced"},
+                              {"name": "housing (single vs group)", "disposition": "fully aliased with grp (S4.2.2.p1: TRN singly housed, SED 1-4 per cage); not estimable; caveat, not a covariate"}]},
                 "confounding_candidates": ["strain"],
-                "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis.",
+                "reasoning": "Each inbred strain contributes one SED and one TRN animal, so strain is a pairing/blocking unit; S2.9.p3 shows transcriptomes cluster by strain rather than group. The paper's batch and lane covariates are not deposited. The unblocked ~ grp model runs as a sensitivity analysis. CAVEAT: Housing is aliased with exercise: TRN mice were individually housed with a wheel, SED mice were group-housed 1-4 per cage (S4.2.2.p1). Housing cannot be separated from TRN vs SED in any model, so every result is a TRN-plus-single-housing effect, not wheel running alone.",
                 "confidence": "medium"},
             "method": {
                 "final": {"method": "DESeq2 (pydeseq2 Wald)", "formula": "~ strain + grp",
@@ -126,7 +127,8 @@ for cid, stem, suf, label, loc, genes in tissues:
                           "caveats": [
                               "The paper gives no per-tissue DEG count in the text (figures S11A/S12A only): only an average of ~500 DEGs per tissue, BAT the most, liver and heart fewer.",
                               "The paper's batch and flow-cell lane adjustment cannot be reproduced.",
-                              "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains."]
+                              "The GEO deposit has 50 strains x 1 animal per arm per tissue; the paper describes 100 strains.",
+                              "Housing is aliased with exercise: TRN mice were individually housed with a wheel, SED mice were group-housed 1-4 per cage (S4.2.2.p1). Housing cannot be separated from TRN vs SED in any model, so every result is a TRN-plus-single-housing effect, not wheel running alone."]
                               + RESULT_CAVEATS.get(cid, [])},
                 "paper_counts": {},
                 "paper_genes": {prim: genes, sens: genes},

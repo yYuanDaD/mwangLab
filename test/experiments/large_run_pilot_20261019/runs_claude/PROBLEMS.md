@@ -807,3 +807,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38110408 (GSE239729)
 
 - suitability.py:332-358 lists constant columns as candidate covariates and fails 0/0 sample_size when no factors given; matrix columns A..C1 have no metadata key, manual rename needed Details: `PMID38110408/HANDBACK.md`.
+
+## PMID34252634 (GSE144133)
+
+- native.py:268 no count-dispersion check (DESeq2 on normalized values passed as ok); case_runner.py:654 records log2(x+1) despite pseudocount 0.5; limma executor lacks trend option Details: `PMID34252634/HANDBACK.md`.
+
+## PMID25484259 (GSE58608;GSE60590;GSE60591)
+
+- case_runner.py:478-486 gene lookup misses retired symbols (ATP5B); suitability for refused GSE58608 says sample_size failed; geo_tar.py:121 sums dup Cufflinks gene_ids silently Details: `PMID25484259/HANDBACK.md`.
+
+## PMID33513138 (GSE152347)
+
+- case_runner.py:828 records '~ sex,geno + time'; case_runner.py:638 design_check omits covariates; suitability has no main-effect names; loky WinError 6 at exit Details: `PMID33513138/HANDBACK.md`.

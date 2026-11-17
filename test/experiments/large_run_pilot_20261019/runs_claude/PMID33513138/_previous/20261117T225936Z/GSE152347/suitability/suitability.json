@@ -1,0 +1,275 @@
+{
+  "case_id": "GSE152347",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "time",
+    "geno"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time",
+        "geno"
+      ],
+      "levels": {
+        "time": {
+          "ex60": 13,
+          "rest": 12
+        },
+        "geno": {
+          "KO": 13,
+          "WT": 12
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "sex"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(geno) + C(sex)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 21,
+        "min_cell_size": 2
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": [
+        "time_ex60_vs_rest"
+      ]
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 25 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "predicted": {
+        "male": 13,
+        "female": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33513138\\GSE152347\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_ex60_vs_rest__sex-female_geno-KO",
+            "geno_KO_vs_WT__sex-female_time-ex60"
+          ],
+          "male": [
+            "time_ex60_vs_rest__sex-male_geno-KO",
+            "time_ex60_vs_rest__sex-male_geno-WT",
+            "geno_KO_vs_WT__sex-male_time-ex60",
+            "geno_KO_vs_WT__sex-male_time-rest",
+            "time_geno_ex60_KO_vs_rest_WT__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_ex60_vs_rest_geno-KO",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ex60",
+      "reference": "rest",
+      "within": {
+        "geno": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "ex60"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "time": "rest"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_ex60_vs_rest_geno-WT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "ex60",
+      "reference": "rest",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "ex60"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "time": "rest"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_time-ex60",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "time": "ex60"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "ex60",
+            "geno": "KO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "time": "ex60",
+            "geno": "WT"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_time-rest",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "time": "rest"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "rest",
+            "geno": "KO"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "rest",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_geno_ex60_KO_vs_rest_WT",
+      "kind": "interaction",
+      "factor": "time:geno",
+      "test": "ex60:KO",
+      "reference": "rest:WT",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "ex60",
+            "geno": "KO"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "time": "rest",
+            "geno": "KO"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "ex60",
+            "geno": "WT"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "rest",
+            "geno": "WT"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
