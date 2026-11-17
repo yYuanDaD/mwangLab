@@ -1,0 +1,106 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37985354",
+  "request": "Analyze GSE242294 for PMID 37985354 (MicroRNA-92b in the skeletal muscle regulates exercise capacity via modulation of glucose metabolism.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code subagent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE242294",
+      "accession": "GSE242294",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC10751421.paper.md"],
+        "metadata": "GSE242294/GSE242294_metadata.csv",
+        "matrix": "GSE242294/GSE242294_raw_counts_GAS.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE242294"],
+            "accessions_reanalyzed_not_deposited_by_paper": ["GSE95735", "GSE209880", "GSE58248"],
+            "assay": "bulk RNA-seq (Illumina NovaSeq 6000), gastrocnemius muscle",
+            "primary_estimand": "Effect of global miR-92b knockout (M92KO) versus wild-type C57BL/6 on gastrocnemius gene expression in untreated (no exercise) 8-week-old male mice. The paper's RNA-seq is a genotype contrast, not an exercise contrast; exercise enters the paper only through qPCR of miR-92b in trained vs untrained mice (FIG1C-D) and functional running tests, never through this RNA-seq.",
+            "planned_contrasts": ["M92KO vs WT, Gas muscle, n = 3 per group (S3.5.p1, FIG6A-B; paper: 2165 DEGs, 1119 up / 1046 down in M92KO)"],
+            "sample_inclusion": "Gas muscle from WT and M92KO mice, n = 3 each (FIG6A); GEO: 8 weeks-old mice without treatment",
+            "factors": {"genotype": ["WT", "M92KO"]},
+            "exercise_factor_in_rnaseq": "none (GEO characteristics: treatment = '8 weeks-old mice without treatment')",
+            "repeated_measure_unit": "none (independent animals)",
+            "normalization": "CLC Genomics Workbench read count extraction and normalization (GEO data_processing)",
+            "paper_method": "not_reported (CLC Genomics Workbench per GEO; test not stated)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S3.5.p1; FIG6 legend (P < 0.05)"},
+            "paper_results": {"n_deg": 2165, "up": 1119, "down": 1046, "named_genes": ["Ugp2", "Slc16a3"]}
+          },
+          "reasoning": "S3.5.p1: 'we performed RNA-seq of Gas muscle samples from WT and M92KO mice ... 2165 DEGs, with a p-value of <0.05 ... 1119 upregulated, 1046 downregulated, in the M92KO mice'. FIG6 legend: n = 3, P < 0.05. S10.p1 deposits GSE242294. S2.1.p1: 8- and 10-week-old male miR-92b-/- mice vs age-matched C57BL/6 WT. The exercise data in the paper (FIG1B-D treadmill training, n = 6) were measured by qPCR only; GSE95735/GSE58248 are reanalyzed external human datasets, not this accession.",
+          "confidence": "high",
+          "locator": "S3.5.p1; FIG6; S10.p1; S2.1.p1; FIG1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S10.p1 names GSE242294 as the paper's deposited sequencing data",
+              "metadata series_id = GSE242294; 6 GSM samples (GSM7757800-805)",
+              "genotype WT x3 and miR-92b knockout x3, gastrocnemius, matches FIG6 n = 3 WT vs M92KO Gas",
+              "matrix file GSE242294_raw_counts_GAS.txt.gz is the series' only expression file; GSM description names 'raw_counts GAS.txt'"
+            ]
+          },
+          "reasoning": "The accession, tissue, genotype groups and n per group all match the paper's RNA-seq description (S3.5.p1, FIG6, S10.p1).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^(C57|92)b?-8W-GAS-(\\d),"]},
+          "matrix_column_pattern": "^b?(C57|92)_8W_GAS_(\\d)$",
+          "patterns": {},
+          "aliases": {"genotype_raw": "characteristics_ch1.1.genotype"},
+          "recode": {"genotype_raw": {"WT": "WT", "miR-92b knockout": "KO"}},
+          "exclude_samples": {},
+          "reasoning": "No direct key: matrix columns are C57_8W_GAS_n and b92_8W_GAS_n; GSM descriptions are 'C57-8W-GAS-n,raw_counts GAS.txt' and '92b-8W-GAS-n,raw_counts GAS.txt'. The stem C57 vs 92b/b92 (prefix/suffix 'b' transposed) and replicate number identify each sample uniquely, so both sides are reduced to '<C57|92>_<rep>' by regex (no position-based matching). C57 = WT and 92b = miR-92b knockout agrees with the GSM titles ('WT muscles repN' / 'M92KO muscle repN') and the genotype characteristic. Medium confidence because the KO stem is written 'b92' in the matrix and '92b' in GEO.",
+          "confidence": "medium"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "integer_fraction 1.0, range 0-1,393,071, median 4; GEO data_processing: 'Supplementary files format and content: tab-delimited text file includes raw counts for each Sample' (CLC Genomics Workbench). The paper does not state the DE input or test.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["genotype_raw"],
+          "references": {"genotype_raw": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: GSE242294 contains only untreated (no exercise) WT vs miR-92b knockout gastrocnemius (GEO treatment '8 weeks-old mice without treatment'; paper S3.5.p1/FIG6). Every sample is sedentary, so the effect of exercise on gene expression is not identifiable from these data. The only analyzable contrast (KO vs WT) is a genotype effect and is not the requested estimand; the paper's exercise evidence (FIG1 trained vs untrained) is qPCR of miR-92b only and was not sequenced.",
+          "final": {
+            "analysis_type": "none",
+            "requested_estimand": "exercise vs no exercise",
+            "available_contrast": "genotype KO vs WT, all sedentary (not an exercise estimand)"
+          },
+          "candidates": [
+            {"value": "genotype_raw KO vs WT as an exercise proxy", "reason_rejected": "A knockout that changes exercise capacity is not an exercise exposure; reporting it as 'how exercise affects gene expression' would misstate the estimand."}
+          ],
+          "reasoning": "Request asks for the effect of exercise. Metadata has one grouping column (genotype) and a constant treatment field 'without treatment'; paper S3.5.p1 and FIG6 describe the RNA-seq as WT vs M92KO only; exercise appears only in qPCR (FIG1B-D) and functional tests. Refused at design per the skill's stop rule (sequenced sample set with no exercise arm).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "sample label of knockout animals",
+          "paper": "M92KO (FIG6)",
+          "data": "matrix columns 'b92_8W_GAS_n'; GEO description '92b-8W-GAS-n'",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "exercise in the sequenced samples",
+          "paper": "paper title and question concern exercise capacity; exercise training only in qPCR experiments (FIG1)",
+          "data": "all six GEO samples untreated (no exercise)",
+          "disposition": "blocks_requested_estimand"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

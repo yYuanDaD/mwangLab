@@ -1,0 +1,316 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID39746949",
+  "subject_id": "GSE273694",
+  "created_at": "2026-11-17T13:17:11",
+  "finished_at": "2026-11-17T13:17:20",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC11695632.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC11695632.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T13:17:11",
+      "sha256": null,
+      "attributes": {
+        "sha256": "700e2b8e1c159f50b47695a456ca79a15976c559ff1cd3c0b1f8b80d49ff57aa",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE273694_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE273694\\GSE273694_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:17:11",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7f1aace24c6fc62841dad60ed3f31cdf60a4ac72f0f6a47c49900cb77cbd5314",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE273694_gene_count_matrix.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE273694\\GSE273694_gene_count_matrix.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:17:11",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c298e57083d9925f4b9acfefa4aa62113d9a563e49ded26a8089466f53b6377b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE273694"
+        ],
+        "assay": "bulk RNA-seq (BGI DNBSEQ), mouse gastrocnemius",
+        "sample_inclusion": "male PanK4 WT and PanK4 mKO mice, 28 weeks old, glucose-injected 40 min before euthanasia (S4.1.1.4.p1); no exercise arm in the RNA-seq experiment",
+        "factors": {
+          "genotype": [
+            "PanK4 WT",
+            "PanK4 mKO"
+          ]
+        },
+        "primary_estimand": "Genotype effect (PanK4 mKO vs WT) on gastrocnemius gene expression under glucose injection, used to check BCAA-catabolism genes (S2.6.p5, Fig. S9A-C). The paper's exercise data (Fig. 1A-C, Fig. 4E-H, Fig. S7) are phosphoproteomics, Western blots and glucose uptake, not transcriptomics.",
+        "planned_contrasts": [
+          "PanK4 mKO vs PanK4 WT (S2.6.p5; paper reports no DEG count, only 'no significant alterations in genes encoding enzymes related to BCAA catabolism')"
+        ],
+        "repeated_measure_unit": "none (one muscle per mouse)",
+        "normalization": "StringTie FPKM (S4.1.1.4.p1); GEO deposits prepDE.py read counts",
+        "paper_method": "DESeq2 v1.34.0 ~ genotype (S4.1.1.4.p1)",
+        "paper_threshold": {
+          "metric": "not stated",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S4.1.1.4.p1 (no cutoff given)"
+        },
+        "paper_results": "No DEG count stated; BCAA catabolism genes not significantly altered (S2.6.p5, Fig. S9A-C, supplementary data 2)"
+      },
+      "reason": "S11.p1 deposits the whole-genome RNA-seq as GSE273694. S4.1.1.4.p1 defines the experiment: gastrocnemius from male PanK4 WT and mKO mice injected with glucose 40 min before euthanasia, DESeq2. Exercise appears in the paper only as human phosphoproteomics/Western (S2.1.p1-p2, S4.1.1.1-2) and mouse treadmill glucose uptake/metabolites (S2.6.p4); none of it was sequenced.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:17:11"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE273694\\GSE273694_gene_count_matrix.csv",
+        "owned": true,
+        "checks": [
+          "paper S11.p1 names GSE273694",
+          "GEO: gastrocnemius, male, C57BL/6J, PanK4 WT/mKO, 4-h fast then glucose injection, STAR + StringTie prepDE.py, GRCm39.110 - all match S4.1.1.4.p1",
+          "14 samples (8 WT, 6 mKO); Fig. 1E uses n = 8 WT from this transcriptome"
+        ],
+        "accession": "GSE273694",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE273694\\GSE273694_metadata.csv"
+      },
+      "reason": "Accession, tissue, genotype, glucose-injection protocol, aligner and assembly all match the paper's methods.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:17:11"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 14,
+        "n_metadata": 14,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "genotype": {
+              "alias_of": "characteristics_ch1.3.genotype",
+              "recode": {
+                "PanK4 WT": "WT",
+                "PanK4 mKO": "mKO"
+              }
+            },
+            "treatment": {
+              "alias_of": "characteristics_ch1.4.treatment"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\design_metadata.csv",
+          "sha256": "e0b108b4d9f12d4047f9952d393520e362e3e2fb77a44e0ea7ad8d3085e462f8",
+          "levels": {
+            "genotype": {
+              "WT": 8,
+              "mKO": 6
+            },
+            "treatment": {
+              "4-h fast then glucose injection": 14
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns M1-M14 equal the metadata description field exactly (inspect alignment_keys: 14/14). Genotype and treatment aliased to formula-safe names.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:17:12"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\aligned_matrix.csv",
+          "sha256": "502d517cd4e9953867b2287db106b24c805e56ef667e1b7f9757505794927d85",
+          "n_features": 56847,
+          "n_samples": 14,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1765819.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values are integers (integer_fraction 1.0, max 1.77e6); GEO data_processing says 'Read count extraction via STRINGTIE v2.2.1 and prepDE.py ... raw counts'. prepDE.py derives read counts from coverage, so these are count-scale. The paper mentions FPKM for abundance but ran DESeq2, which needs counts, consistent with this file.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:17:12"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Request asks for exercise effects on expression; the dataset has no exercise or sedentary arm (S4.1.1.4.p1; GEO characteristics). Refused at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast exists in GSE273694. Every sample is resting gastrocnemius after a 4-h fast and glucose injection (treatment constant across all 14 samples); the only factor is PanK4 genotype (8 WT vs 6 mKO). The paper's exercise experiments (human p-PanK4 Ser63, mouse treadmill glucose uptake) were not sequenced. A genotype contrast is not an exercise effect, so the requested estimand cannot be identified from these data."
+      },
+      "recorded_at": "2026-11-17T13:17:20"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7226cbede46b1d7d209029d9fe94a64d13895372df6d54c7e7d4c0fdd54b7599",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6b9bc529baa72b9fb78c4a5f2a64154971cdd0de9a4b86137e683e47ce659096",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "502d517cd4e9953867b2287db106b24c805e56ef667e1b7f9757505794927d85",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e0b108b4d9f12d4047f9952d393520e362e3e2fb77a44e0ea7ad8d3085e462f8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5498d1eeeef51944fa667ed136021ed97cf47838364784c8973b71b89cd7bb97",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39746949\\GSE273694\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6d02e52e1070eb71630bc3793de206960942b0694ab27a70cea960ef97461455",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

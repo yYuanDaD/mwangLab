@@ -783,3 +783,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39523700 (GSE257540;GSE281241)
 
 - MyGene 502 on 1 batch, partial symbol map (enrichment_tools.py:150); 27% tied GSEA ranks; mech summary says n_aligned 26 (case_runner.py:588) Details: `PMID39523700/HANDBACK.md`.
+
+## PMID37985354 (GSE242294)
+
+- inspect found no alignment key (b92 vs 92b, -/_), derived via key_patterns+matrix_column_pattern (case_runner.py:550-569) Details: `PMID37985354/HANDBACK.md`.
