@@ -1,0 +1,1200 @@
+[
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "paper_reconstruction",
+    "evidence": [
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "accessions": [
+        "GSE114062"
+      ],
+      "assay": "bulk RNA-seq (Illumina HiSeq 2000, 100 nt PE), cerebellum and striatum, male Hsd:ICR mice, generation 66 of a selection experiment",
+      "primary_estimand": "Associational difference in brain gene expression between a line selectively bred for high voluntary wheel running (Hi, line 7) and a non-selected control line (Co, line 1), within cerebellum (CeHi-CeCo) and striatum (StHi-StCo), plus the line-by-region interaction. All mice had 6 days of wheel access before sampling, so the contrast is genetic line (dominated by 66 generations of selection) with the running amount co-varying; it is not a randomized exercise intervention (S2.1.p3, S4.p3).",
+      "factors": {
+        "line": [
+          "Co (control line 1)",
+          "Hi (high-runner line 7)"
+        ],
+        "region": [
+          "Ce (cerebellum)",
+          "St (striatum)"
+        ]
+      },
+      "sample_inclusion": "16 samples (4 per line-region cell); one StHi sample removed as PCA outlier (S2.2.p1) -> 15 analysed; GEO deposits exactly these 15.",
+      "planned_contrasts": [
+        "CeHi vs CeCo within cerebellum (S2.2.p2; Table 1/Table 3; reported as CeCo-CeHi)",
+        "StHi vs StCo within striatum (S2.2.p2; Table 1/Table 4; reported as StCo-StHi)",
+        "line-by-region interaction (S2.2.p2, S3.2.p1: 86 genes at FDR < 0.05; 334 at raw P < 0.005)",
+        "StHi vs CeHi (third orthogonal contrast, S2.2.p2; no count reported)",
+        "main effect of line Hi vs Co across regions (S2.2.p2, S3.6.p1; Table 5; 144 genes |log2FC|>1 in Table E, 122 genes after removing interaction genes; p rule not stated)",
+        "main effect of region St vs Ce (S2.2.p2, S3.7.p1; 243 genes at FDR < 1e-15 excluding interaction genes)"
+      ],
+      "repeated_measure_unit": "not stated; paper says 16 individual mouse samples and fits no animal term",
+      "normalization": "Cuffnorm v2.2.1 library-size normalized gene counts; genes with >= 1 CPM in >= 3 samples kept (15,213 genes); TMM (S2.2.p1)",
+      "paper_method": "edgeR 3.14.0 GLM ~ line + region + line:region, robust tagwise dispersion, quasi-likelihood F-test, BH FDR (S2.2.p2)",
+      "paper_threshold": {
+        "metric": "FDR",
+        "cutoff": 0.05,
+        "effect_metric": null,
+        "effect_cutoff": null,
+        "source_locator": "S3.2.p1"
+      },
+      "paper_results": "Interaction: 86 genes FDR < 0.05 (76 also FDR < 0.05 in a within-region line contrast); Table 1 top interaction genes; Table 5 top line main-effect genes; Tables 3-4 GSEA: oxidative phosphorylation and ribosome enriched among genes higher in Co than Hi in both regions"
+    },
+    "paper": {
+      "locator": "S2.2.p2"
+    },
+    "confidence": "high",
+    "reasoning": "Study map from S2.1.p1-p4 (design, 2x2 factorial, line 7 vs line 1, wheel access for all), S2.2.p1 (samples, filter, outlier removal), S2.2.p2 (edgeR QL model and contrasts), S3.2.p1 (FDR < 0.05 significance rule, 86 interaction genes), S3.6.p1/Table 5 (line main effect), S3.7.p1 (region effect). The paper's tables report Co minus Hi (log2(Co/Hi)); this run reports Hi vs Co, so signs are flipped when comparing.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:54+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "ownership",
+    "evidence": [
+      {
+        "id": "metadata:GSE114062_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_metadata.csv",
+        "sha256": "cdf6aaafac03a3781e3ab16aba55144cce7c2cd5c815cc7acece5105aed32c20"
+      },
+      {
+        "id": "matrix:GSE114062_Cere_Stri_FPKM.csv.gz",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_Cere_Stri_FPKM.csv.gz",
+        "sha256": "db2717b8bb5ad8d48299943a3c6221cb95318a59767d0d40a2fcbf23144689a6"
+      },
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_Cere_Stri_FPKM.csv.gz",
+      "owned": true,
+      "checks": [
+        "S2.1.p4 and S6.p1 name GSE114062",
+        "GEO: Mus musculus Hsd:ICR, male, cerebellum and striatum, Control vs Selected, contact Rodriguez Zas (UIUC) = paper's group",
+        "15 GSM samples = 16 minus the removed StHi outlier (S2.2.p1): striatum Selected has 3 samples",
+        "matrix GSE114062_Cere_Stri_FPKM.csv.gz has exactly the 15 sample titles"
+      ],
+      "accession": "GSE114062",
+      "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_metadata.csv"
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Accession named in the paper; organism, strain, sex, tissues, conditions and sample count match the paper's design after the documented outlier removal.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:54+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "alignment",
+    "evidence": [
+      {
+        "id": "matrix:GSE114062_Cere_Stri_FPKM.csv.gz",
+        "kind": "matrix",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_Cere_Stri_FPKM.csv.gz",
+        "sha256": "db2717b8bb5ad8d48299943a3c6221cb95318a59767d0d40a2fcbf23144689a6"
+      },
+      {
+        "id": "metadata:GSE114062_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_metadata.csv",
+        "sha256": "cdf6aaafac03a3781e3ab16aba55144cce7c2cd5c815cc7acece5105aed32c20"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\design_metadata.csv",
+        "sha256": "95871d966ceed328757ba129d703b6e72eac835d84b7e466285a82644f6b0d9e"
+      },
+      {
+        "id": "tool_output:alignment_map.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\alignment_map.csv",
+        "sha256": "992f35ca46da2ae0cfb1303fb7a5764081f655d1d5747fbe3fb4f239399b2d4c"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "exact:title",
+      "n_aligned": 15,
+      "n_metadata": 15,
+      "coverage": 1.0,
+      "unmatched_matrix_columns": [],
+      "unmatched_metadata_samples": [],
+      "excluded_samples": {},
+      "derived_columns": {
+        "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_metadata.csv",
+        "columns": {
+          "region": {
+            "source": "title",
+            "regex": "^(cerebellum|striatum)_",
+            "recode": {
+              "cerebellum": "Ce",
+              "striatum": "St"
+            }
+          },
+          "line": {
+            "source": "title",
+            "regex": "_(Control|Selected)_\\d+$",
+            "recode": {
+              "Control": "Co",
+              "Selected": "Hi"
+            }
+          }
+        },
+        "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\design_metadata.csv",
+        "sha256": "95871d966ceed328757ba129d703b6e72eac835d84b7e466285a82644f6b0d9e",
+        "levels": {
+          "region": {
+            "Ce": 8,
+            "St": 7
+          },
+          "line": {
+            "Co": 8,
+            "Hi": 7
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Matrix column names equal the metadata title for all 15 samples (inspect alignment_keys: title 15/15). line and region are parsed from the title and agree with characteristics condition/tissue; recoded to the paper's labels Co/Hi and Ce/St.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:54+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "matrix",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f"
+      },
+      {
+        "id": "metadata:GSE114062_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_metadata.csv",
+        "sha256": "cdf6aaafac03a3781e3ab16aba55144cce7c2cd5c815cc7acece5105aed32c20"
+      },
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "FPKM (linear normalized) -> log2(x+1) + limma",
+        "reason_rejected": "values are quantized fragment counts with column sums ~ total fragments, not length-normalized FPKM; the paper analysed them with edgeR"
+      },
+      {
+        "value": "reconstruct raw integer counts by dividing by the per-sample unit",
+        "reason_rejected": "possible but not the paper's input; size factors 0.84-1.30 change the NB scale little; noted as a possible sensitivity check"
+      }
+    ],
+    "final": {
+      "source": "GSE114062_Cere_Stri_FPKM.csv.gz (only deposited matrix)",
+      "paper_input": "Cuffnorm library-size-normalized gene counts, then TMM in edgeR (S2.2.p1)",
+      "matrix_type": "library-size-normalized counts (Cuffnorm count table: fragment counts divided by a per-sample size factor; file labelled FPKM)",
+      "recommended_method": "edgeR",
+      "profile": {
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f",
+        "n_features": 26628,
+        "n_samples": 15,
+        "annotation_columns_dropped": [],
+        "duplicated_feature_ids": 0,
+        "missing_values": 0,
+        "negative_values": 0,
+        "negative_fraction": 0.0,
+        "min": 0.0,
+        "max": 255767.0,
+        "median": 82.49135,
+        "integer_fraction": 0.284,
+        "candidates": [
+          "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+        ]
+      }
+    },
+    "paper": {},
+    "confidence": "medium",
+    "reasoning": "Despite the FPKM label, column sums are 38-44 million per sample (FPKM sums would not track fragment totals like this), and within each sample the non-zero values are integer multiples of one per-sample unit (e.g. 0.891534, 0.931986; 0.84-1.30, the mode value occurring ~900 times = one fragment): 81-96% of non-zero values are within 0.01 of an integer multiple, the rest are large values limited by 6-significant-digit printing. This is the Cuffnorm genes.count_table (counts scaled by geometric-mean size factors), which matches the paper's stated input (S2.2.p1 'Cuffnorm ... normalize the gene counts for library size'). Count-scale values on a near-unit scale are suitable for edgeR, which accepts non-integer counts; no rounding needed.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:55+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "design",
+    "evidence": [
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\design_metadata.csv",
+        "sha256": "95871d966ceed328757ba129d703b6e72eac835d84b7e466285a82644f6b0d9e"
+      },
+      {
+        "id": "tool_output:suitability.json",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\suitability\\suitability.json",
+        "sha256": "b511d4efba53511b6c91265eb090893ddd0e3019b5786ab4587d1cf7f0d3e8a3"
+      }
+    ],
+    "candidates": [
+      {
+        "value": "separate two-group fits per region",
+        "reason_rejected": "the paper fits one model with interaction; the interaction needs both regions in one model"
+      },
+      {
+        "value": "pool regions and compare lines only (~ line)",
+        "reason_rejected": "region is a dominant factor and the paper's primary interest is region-dependent line effects"
+      }
+    ],
+    "final": {
+      "analysis_type": "factorial 2x2 (line x region), one model on all 15 samples",
+      "estimand_type": "associational",
+      "formula": "~ line * region",
+      "contrasts": [
+        {
+          "name": "line_Hi_vs_Co_region-Ce",
+          "expression": "lineHi",
+          "role": "primary"
+        },
+        {
+          "name": "line_Hi_vs_Co_region-St",
+          "expression": "lineHi + lineHi.regionSt",
+          "role": "primary"
+        },
+        {
+          "name": "line_region_Hi_St_vs_Co_Ce",
+          "expression": "lineHi.regionSt",
+          "role": "primary"
+        },
+        {
+          "name": "line_Hi_vs_Co_avg",
+          "expression": "lineHi + 0.5*lineHi.regionSt",
+          "role": "secondary"
+        },
+        {
+          "name": "region_St_vs_Ce_HiLine",
+          "expression": "regionSt + lineHi.regionSt",
+          "role": "secondary"
+        },
+        {
+          "name": "region_St_vs_Ce_avg",
+          "expression": "regionSt + 0.5*lineHi.regionSt",
+          "role": "secondary"
+        }
+      ],
+      "suitability": {
+        "verdict": "analyzable",
+        "failed": [],
+        "warnings": [],
+        "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\suitability\\suitability.md",
+        "n_comparisons": 5,
+        "n_analyzable": 5
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.1.p1 and S2.2.p1-p2 define a 2x2 factorial (activity line x brain region) fitted in one edgeR model with the interaction. The exercise-relevant estimand is Hi vs Co line within each region and the line-by-region interaction (S2.2.p2: 'patterns of particular interest'); the line main effect and the third orthogonal contrast StHi-CeHi plus the region main effect are secondary, as in the paper. The comparison is associational (selected line vs control line, both with wheel access; S2.1.p3, S4.p3), not a randomized exercise effect. Main effects are taken as averages over the other factor's levels because the model contains the interaction.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:58+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "covariance",
+    "evidence": [
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\design_metadata.csv",
+        "sha256": "95871d966ceed328757ba129d703b6e72eac835d84b7e466285a82644f6b0d9e"
+      },
+      {
+        "id": "metadata:GSE114062_metadata.csv",
+        "kind": "metadata",
+        "path": "E:\\agent\\mwangLab_pdf\\data\\GSE114062\\GSE114062_metadata.csv",
+        "sha256": "cdf6aaafac03a3781e3ab16aba55144cce7c2cd5c815cc7acece5105aed32c20"
+      },
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        {
+          "name": "animal (possible Ce/St from the same mouse)",
+          "disposition": "not modelled: no animal ID in GEO; paper fits no animal term"
+        },
+        {
+          "name": "locomotor measures",
+          "disposition": "excluded per paper (S2.2.p2): between-line variation dominates, no covariate"
+        }
+      ],
+      "design_check": {
+        "formula_equivalent": "~ C(line) + C(region)",
+        "n_samples": 15,
+        "n_columns": 3,
+        "columns": [
+          "Intercept",
+          "line_Hi",
+          "region_St"
+        ],
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 12,
+        "levels": {
+          "line": {
+            "Co": 8,
+            "Hi": 7
+          },
+          "region": {
+            "Ce": 8,
+            "St": 7
+          }
+        },
+        "cells": [
+          {
+            "cell": [
+              "Co",
+              "Ce"
+            ],
+            "n": 4
+          },
+          {
+            "cell": [
+              "Co",
+              "St"
+            ],
+            "n": 4
+          },
+          {
+            "cell": [
+              "Hi",
+              "Ce"
+            ],
+            "n": 4
+          },
+          {
+            "cell": [
+              "Hi",
+              "St"
+            ],
+            "n": 3
+          }
+        ],
+        "min_cell_size": 3,
+        "missing_values": {}
+      },
+      "confounding": [
+        {
+          "column": "region",
+          "n_levels": 2,
+          "status": "crossed",
+          "crosstab": {
+            "Co": {
+              "Ce": 4,
+              "St": 4
+            },
+            "Hi": {
+              "Ce": 4,
+              "St": 3
+            }
+          }
+        }
+      ]
+    },
+    "paper": {},
+    "confidence": "medium",
+    "reasoning": "All mice are male, same age and generation; no batch or RIN column in GEO. S2.2.p2 states no covariate was included. Whether cerebellum and striatum came from the same 8 mice is not stated (S2.2.p1 '16 individual mouse samples'); GEO has no animal key, and the paper's model has none, so no blocking. Within-region line contrasts compare different animals either way; if regions were paired, region and interaction tests would be conservative-to-misestimated, which is recorded as a caveat.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:58+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "method",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f"
+      },
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "matrix_type": "library-size-normalized counts (Cuffnorm count table: fragment counts divided by a per-sample size factor; file labelled FPKM)",
+      "method": "edgeR QL F-test (R edgeR glmQLFit/glmQLFTest, robust), TMM",
+      "formula": "~ line * region",
+      "paper_route": {
+        "method": "edgeR 3.14.0 QL F-test, robust tagwise dispersion, ~ line*region",
+        "status": "reproduced",
+        "reason": "same model and test; edgeR version 4.10.7 here vs 3.14.0 in the paper"
+      },
+      "deviations": [
+        "edgeR 4.10.7 (R 4.6) instead of 3.14.0 (R 3.3.1); glmQLFit defaults changed in edgeR 4 (legacy=FALSE)",
+        "low-count filter (>= 1 CPM in >= 3 samples) applied on the deposited normalized counts"
+      ]
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "The paper's method (S2.2.p2) runs directly on the deposited count-scale matrix through tools.r_de_tools engine edger_ql (estimateDisp robust, glmQLFit robust, glmQLFTest per contrast, BH FDR). Contrasts are model-column vectors over ~ line * region with Co and Ce as references.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:58+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "threshold",
+    "evidence": [
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "paper_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null,
+        "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null,
+        "inclusive": false
+      },
+      "audit_threshold": {
+        "metric": "pvalue",
+        "cutoff": 0.005,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null,
+        "inclusive": false
+      },
+      "deviation_note": "Audit rule raw P < 0.005 reproduces the paper's extended interaction list (Table A, 334 genes; S3.2.p1). Table 1 (FDR < 0.01, |log2FC| > 1.25), Table 5 (FDR < 0.01, |log2FC| > 4) and Table 6 are display filters, not DEG definitions."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S3.2.p1: significance is 'FDR-adjusted P-value < 0.05' (86 interaction genes); no fold-change rule in the DEG definition.",
+    "decision_status": "valid",
+    "execution_status": "not_started",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:26:58+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "execution",
+    "evidence": [
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f"
+      },
+      {
+        "id": "tool_output:design_metadata.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\design_metadata.csv",
+        "sha256": "95871d966ceed328757ba129d703b6e72eac835d84b7e466285a82644f6b0d9e"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "method": "edgeR QL F-test (R), TMM, ~ line * region",
+      "subset": "edgeR_QL",
+      "role": "primary",
+      "tool": "tools.r_de_tools:run_r_de",
+      "n_samples": 15,
+      "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\input\\matrix_filtered.csv",
+      "formula": "~ line * region",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_Hi_vs_Co_region-Ce.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_Hi_vs_Co_region-St.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_region_Hi_St_vs_Co_Ce.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_Hi_vs_Co_avg.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_region_St_vs_Ce_HiLine.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_region_St_vs_Ce_avg.csv"
+      ],
+      "counts": {
+        "edgeR_QL/line_Hi_vs_Co_region-Ce": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 964,
+            "n_up": 452,
+            "n_down": 512,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 1149,
+            "n_up": 539,
+            "n_down": 610,
+            "deg_sanity": "ok"
+          }
+        },
+        "edgeR_QL/line_Hi_vs_Co_region-St": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 448,
+            "n_up": 244,
+            "n_down": 204,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 767,
+            "n_up": 408,
+            "n_down": 359,
+            "deg_sanity": "ok"
+          }
+        },
+        "edgeR_QL/line_region_Hi_St_vs_Co_Ce": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 75,
+            "n_up": 39,
+            "n_down": 36,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 349,
+            "n_up": 167,
+            "n_down": 182,
+            "deg_sanity": "ok"
+          }
+        },
+        "edgeR_QL/line_Hi_vs_Co_avg": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 1327,
+            "n_up": 684,
+            "n_down": 643,
+            "deg_sanity": "ok"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 1391,
+            "n_up": 717,
+            "n_down": 674,
+            "deg_sanity": "ok"
+          }
+        },
+        "edgeR_QL/region_St_vs_Ce_HiLine": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 10763,
+            "n_up": 5353,
+            "n_down": 5410,
+            "deg_sanity": "implausible_sig_fraction=71%(10763/15213)"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 9209,
+            "n_up": 4680,
+            "n_down": 4529,
+            "deg_sanity": "implausible_sig_fraction=61%(9209/15213)"
+          }
+        },
+        "edgeR_QL/region_St_vs_Ce_avg": {
+          "applied": {
+            "rule": "padj < 0.05",
+            "n_tested": 15213,
+            "n_significant": 12205,
+            "n_up": 6011,
+            "n_down": 6194,
+            "deg_sanity": "implausible_sig_fraction=80%(12205/15213)"
+          },
+          "audit": {
+            "rule": "pvalue < 0.005",
+            "n_tested": 15213,
+            "n_significant": 11009,
+            "n_up": 5436,
+            "n_down": 5573,
+            "deg_sanity": "implausible_sig_fraction=72%(11009/15213)"
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "Paper's edgeR QL model with interaction (S2.2.p2) and CPM filter (S2.2.p1); all six paper contrasts from one fit.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:27:09+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_line_Hi_vs_Co_region-Ce.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_Hi_vs_Co_region-Ce.csv",
+        "sha256": "e3bcbfddb236eda23bc828f34ac5052b5f8caa19dcf2919ebde69b4d8288cc16"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "edgeR_QL/line_Hi_vs_Co_region-Ce",
+      "feature_id_type": "gene_symbol",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_Hi_vs_Co_region-Ce\\gsea\\DEG_results_line_Hi_vs_Co_region-Ce_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 15213 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 21 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=1.94 | NOM p=0.00e+00 | FDR q=6.72e-03 - HALLMARK_ADIPOGENESIS | NES=1.93 | NOM p=0.00e+00 | FDR q=4.48e-03 - HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY | NES=1.88 | NOM p=2.17e-03 | FDR q=4.58e-03 - HALLMARK_MTORC1_SIGNALING | NES=1.65 | NOM p=0.00e+00 | FDR q=2.81e-02 - HALLMARK_PEROXISOME | NES=1.55 | NOM p=1.55e-02 | FDR q=5.34e-02 - HALLMARK_BILE_ACID_METABOLISM | NES=1.42 | NOM p=4.44e-02 | FDR q=1.21e-01 - HALLMARK_GLYCOLYSIS | NES=1.36 | NOM p=1.84e-02 | FDR q=1.72e-01 - HALLMARK_ESTROGEN_RESPONSE_LATE | NES=1.30 | NOM p=5.21e-02 | FDR q=2.39e-01 - HALLMARK_MYC_TARGETS_V1 | NES=1.28 | NOM p=4.92e-02 | FDR q=2.41e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-1.58 | NOM p=1.36e-02 | FDR q=1.40e-01 - HALLMARK_G2M_CHECKPOINT | NES=-1.54 | NOM p=1.98e-03 | FDR q=1.09e-01 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=-1.42 | NOM p=2.82e-02 | FDR q=2.12e-01 - HALLMARK_MYOGENESIS | NES=-1.34 | NOM p=2.04e-02 | FDR q=2.82e-01 - HALLMARK_E2F_TARGETS | NES=-1.33 | NOM p=3.76e-02 | FDR q=2.62e-01 - HALLMARK_ANGIOGENESIS | NES=-1.32 | NOM p=1.34e-01 | FDR q=2.29e-01 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=-1.30 | NOM p=7.20e-02 | FDR q=2.29e-01 - HALLMARK_H..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.3.p1/Table 3: GSEA on the CeHi-CeCo ranking (paper used GO/KEGG; repository uses MSigDB Hallmark)",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:27:14+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_line_Hi_vs_Co_region-St.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_Hi_vs_Co_region-St.csv",
+        "sha256": "9b04ce3af552bb3a6e7c54540c87012051a4ccdf3d653efb39985ae7549d446f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "edgeR_QL/line_Hi_vs_Co_region-St",
+      "feature_id_type": "gene_symbol",
+      "method": "GSEA preranked (gseapy prerank)",
+      "gene_sets": "MSigDB Hallmark",
+      "ranking_metric": "stat",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_Hi_vs_Co_region-St\\gsea\\DEG_results_line_Hi_vs_Co_region-St_GSEA_Hallmark.csv"
+      ],
+      "summary": "GSEA complete on 15213 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 13 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_ADIPOGENESIS | NES=1.89 | NOM p=0.00e+00 | FDR q=1.88e-02 - HALLMARK_BILE_ACID_METABOLISM | NES=1.78 | NOM p=1.96e-03 | FDR q=2.87e-02 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=1.76 | NOM p=0.00e+00 | FDR q=2.21e-02 - HALLMARK_P53_PATHWAY | NES=1.65 | NOM p=4.00e-03 | FDR q=3.70e-02 - HALLMARK_XENOBIOTIC_METABOLISM | NES=1.62 | NOM p=4.07e-03 | FDR q=3.95e-02 - HALLMARK_FATTY_ACID_METABOLISM | NES=1.44 | NOM p=1.93e-02 | FDR q=1.33e-01 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.41 | NOM p=1.46e-02 | FDR q=1.45e-01 - HALLMARK_PEROXISOME | NES=1.37 | NOM p=5.09e-02 | FDR q=1.65e-01 - HALLMARK_COAGULATION | NES=1.36 | NOM p=5.39e-02 | FDR q=1.56e-01 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.29 | NOM p=1.06e-01 | FDR q=2.21e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_PANCREAS_BETA_CELLS | NES=-1.53 | NOM p=3.43e-02 | FDR q=2.40e-01 - HALLMARK_PROTEIN_SECRETION | NES=-1.49 | NOM p=2.60e-02 | FDR q=1.84e-01 - HALLMARK_UV_RESPONSE_DN | NES=-1.47 | NOM p=9.56e-03 | FDR q=1.44e-01 - HALLMARK_ALLOGRAFT_REJECTION | NES=-1.23 | NOM p=1.11e-01 | FDR q=6.76e-01 - HALLMARK_INFLAMMATORY_RESPONSE | NES=-1.16 | NOM p=1.87e-01 | FDR q=8.58e-01 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-1.11 | NOM p=2.93e-01 | FDR q=9.68e-01 - HALLMARK_G2M_CHECKPOINT | NES=-1.10 | NOM p=2.57e-01 | FDR q=8.72e-01 - HALLMARK_TN..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.3.p1/Table 4: GSEA on the StHi-StCo ranking",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:27:17+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "enrichment",
+    "evidence": [
+      {
+        "id": "tool_output:DEG_results_line_region_Hi_St_vs_Co_Ce.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\edgeR_QL\\DEG_results_line_region_Hi_St_vs_Co_Ce.csv",
+        "sha256": "37b528c0e5e8ebdbc92b2138f5c06a647a5782b13b0434a1f9a5dca21bbe3e02"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "organism": "Mouse",
+      "subset": "edgeR_QL/line_region_Hi_St_vs_Co_Ce",
+      "feature_id_type": "gene_symbol",
+      "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+      "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+      "input_threshold": {
+        "metric": "padj",
+        "cutoff": 0.05,
+        "effect_metric": "log2FoldChange",
+        "effect_cutoff": null,
+        "inclusive": false
+      },
+      "direction": "all",
+      "input_threshold_source": "applied",
+      "outputs": [
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_region_Hi_St_vs_Co_Ce\\ora\\DEG_results_line_region_Hi_St_vs_Co_Ce_GO_Biological_Process_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_region_Hi_St_vs_Co_Ce\\ora\\DEG_results_line_region_Hi_St_vs_Co_Ce_GO_Cellular_Component_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_region_Hi_St_vs_Co_Ce\\ora\\DEG_results_line_region_Hi_St_vs_Co_Ce_GO_Molecular_Function_2023.csv",
+        "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\results\\enrichment_edgeR_QL_line_region_Hi_St_vs_Co_Ce\\ora\\DEG_results_line_region_Hi_St_vs_Co_Ce_KEGG_2019_Mouse.csv"
+      ],
+      "summary": "Enrichment analysis complete for 75 Mouse genes (direction=all, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Epithelium Development (GO:0060429) | padj=1.88e-01 | overlap=4/154 | genes=KANK2;KRT25;ANXA7;WNT3 - Regulation Of Ras Protein Signal Transduction (GO:0046578) | padj=1.88e-01 | overlap=3/76 | genes=KANK2;SYDE1;ARHGEF2 - Generation Of Neurons (GO:0048699) | padj=1.88e-01 | overlap=4/172 | genes=FZD7;EN2;PCSK9;WNT3 - Neuron Differentiation (GO:0030182) | padj=1.88e-01 | overlap=4/173 | genes=FZD7;EN2;PCSK9;WNT3 - Central Nervous System Neuron Differentiation (GO:0021953) | padj=1.88e-01 | overlap=2/31 | genes=NPY;CBLN1 - Regulation Of Cytoskeleton Organization (GO:0051493) | padj=1.88e-01 | overlap=3/114 | genes=SYDE1;PHLDB1;FSCN1 - Regulation Of Small GTPase Mediated Signal Transduction (GO:0051056) | padj=1.88e-01 | overlap=3/118 | genes=SYDE1;PLEKHG1;ARHGEF2 - Cellular Response To Retinoic Acid (GO:0071300) | padj=1.88e-01 | overlap=2/41 | genes=FZD7;WNT3 - Collagen Fibril Organization (GO:0030199) | padj=1.88e-01 | overlap=2/42 | genes=COL5A2;PXDN - Epithelial Cell Differentiation (GO:0030855) | padj=1.88e-01 | overlap=3/132 | genes=FZD7;KRT25;ANXA7 ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - Frizzled Binding (GO:0005109) | padj=2.45e-01 | overlap=2/33 | genes=FZD7;WNT3 - Myosin Binding (GO:0017022) | padj=2.45e-01 | overlap=2/54 | genes=RAB3B;NPHS1 - 5'-Flap Endonuclease Activity (G..."
+    },
+    "paper": {},
+    "confidence": "high",
+    "reasoning": "S2.3.p1/Table 2: functional enrichment (DAVID in the paper) of interaction genes; here Enrichr GO/KEGG ORA at the applied threshold",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:27:18+00:00"
+  },
+  {
+    "contract_version": "3",
+    "case_id": "GSE114062",
+    "stage": "study",
+    "evidence": [
+      {
+        "id": "paper:PMC6072066.paper.md",
+        "kind": "paper",
+        "path": "test\\experiments\\paper_screen_20261027\\papers\\PMC6072066.paper.md",
+        "sha256": "fda3d4ca6f1bc3f89e0b53355e48c74f405906cc61189b936fd5d520119cdd8e"
+      },
+      {
+        "id": "tool_output:aligned_matrix.csv",
+        "kind": "tool_output",
+        "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\aligned\\aligned_matrix.csv",
+        "sha256": "a35165a2835f763d37cd170aa70f761270a3c2fff4b77f2313d9686dffa3043f"
+      }
+    ],
+    "candidates": [],
+    "final": {
+      "route": "paper_aligned",
+      "caveats": [
+        "Associational: selected high-runner line vs control line, both given 6 days of wheel access; differences reflect genetic selection plus differing running amounts and cannot be read as an effect of exercise per se (S4.p3).",
+        "Paper reports log2(Co/Hi); this run reports Hi vs Co, so paper signs are inverted here.",
+        "No animal ID: if Ce and St came from the same mice, region and interaction tests ignore that pairing (the paper did too).",
+        "edgeR 4.x QL defaults differ from edgeR 3.14; counts are not expected to match exactly."
+      ],
+      "results": {
+        "edgeR_QL/line_Hi_vs_Co_region-Ce": {
+          "n_deg": 964,
+          "up": 452,
+          "down": 512,
+          "rule": "padj < 0.05",
+          "audit_n": 1149
+        },
+        "edgeR_QL/line_Hi_vs_Co_region-St": {
+          "n_deg": 448,
+          "up": 244,
+          "down": 204,
+          "rule": "padj < 0.05",
+          "audit_n": 767
+        },
+        "edgeR_QL/line_region_Hi_St_vs_Co_Ce": {
+          "n_deg": 75,
+          "up": 39,
+          "down": 36,
+          "rule": "padj < 0.05",
+          "audit_n": 349
+        },
+        "edgeR_QL/line_Hi_vs_Co_avg": {
+          "n_deg": 1327,
+          "up": 684,
+          "down": 643,
+          "rule": "padj < 0.05",
+          "audit_n": 1391
+        },
+        "edgeR_QL/region_St_vs_Ce_HiLine": {
+          "n_deg": 10763,
+          "up": 5353,
+          "down": 5410,
+          "rule": "padj < 0.05",
+          "audit_n": 9209
+        },
+        "edgeR_QL/region_St_vs_Ce_avg": {
+          "n_deg": 12205,
+          "up": 6011,
+          "down": 6194,
+          "rule": "padj < 0.05",
+          "audit_n": 11009
+        }
+      },
+      "paper_counts": {
+        "edgeR_QL/line_region_Hi_St_vs_Co_Ce": 86
+      },
+      "comparison": {
+        "edgeR_QL/line_region_Hi_St_vs_Co_Ce": {
+          "ours": 75,
+          "paper": 86
+        }
+      },
+      "paper_gene_check": {
+        "edgeR_QL/line_region_Hi_St_vs_Co_Ce": {
+          "Krt25": {
+            "baseMean": 2.1091,
+            "log2FoldChange": 4.999,
+            "padj": 1.95e-05,
+            "pvalue": 1.28e-09
+          },
+          "Lamc2": {
+            "baseMean": 5.0155,
+            "log2FoldChange": -2.1581,
+            "padj": 3.75e-05,
+            "pvalue": 7.05e-09
+          },
+          "Fam124a": {
+            "baseMean": 18.338,
+            "log2FoldChange": 1.3825,
+            "padj": 3.75e-05,
+            "pvalue": 9.85e-09
+          },
+          "Npsr1": {
+            "baseMean": 2.0109,
+            "log2FoldChange": 5.9138,
+            "padj": 3.75e-05,
+            "pvalue": 9.2e-09
+          },
+          "Myo18b": {
+            "baseMean": 1.5464,
+            "log2FoldChange": -2.4154,
+            "padj": 0.000342,
+            "pvalue": 1.35e-07
+          },
+          "Vdr": {
+            "baseMean": 1.2455,
+            "log2FoldChange": 2.9837,
+            "padj": 0.000509,
+            "pvalue": 2.34e-07
+          },
+          "Rab37": {
+            "baseMean": 12.8806,
+            "log2FoldChange": 1.3737,
+            "padj": 0.000705,
+            "pvalue": 3.7e-07
+          },
+          "Necab1": {
+            "baseMean": 107.6097,
+            "log2FoldChange": 2.3758,
+            "padj": 0.00181,
+            "pvalue": 1.07e-06
+          },
+          "Pcsk9": {
+            "baseMean": 2.5786,
+            "log2FoldChange": -2.6681,
+            "padj": 0.00186,
+            "pvalue": 1.22e-06
+          },
+          "Tifa": {
+            "baseMean": 7.5181,
+            "log2FoldChange": 1.2854,
+            "padj": 0.00603,
+            "pvalue": 7.13e-06
+          },
+          "Creb3l1": {
+            "baseMean": 3.8152,
+            "log2FoldChange": -1.1966,
+            "padj": 0.00735,
+            "pvalue": 1.01e-05
+          },
+          "Col5a2": {
+            "baseMean": 7.6489,
+            "log2FoldChange": 1.5668,
+            "padj": 0.00666,
+            "pvalue": 8.32e-06
+          },
+          "En2": {
+            "baseMean": 109.7948,
+            "log2FoldChange": 1.8479,
+            "padj": 0.00946,
+            "pvalue": 1.43e-05
+          },
+          "Cd300lf": {
+            "baseMean": 0.7503,
+            "log2FoldChange": -3.1083,
+            "padj": 0.01,
+            "pvalue": 1.59e-05
+          },
+          "Npy": {
+            "baseMean": 42.5421,
+            "log2FoldChange": -1.3965,
+            "padj": 0.0127,
+            "pvalue": 2.18e-05
+          }
+        },
+        "edgeR_QL/line_Hi_vs_Co_region-Ce": {
+          "Npsr1": {
+            "baseMean": 2.0109,
+            "log2FoldChange": -6.4716,
+            "padj": 2.82e-08,
+            "pvalue": 3.33e-11
+          },
+          "Vdr": {
+            "baseMean": 1.2455,
+            "log2FoldChange": -3.3702,
+            "padj": 5.17e-08,
+            "pvalue": 6.92e-11
+          },
+          "Necab1": {
+            "baseMean": 107.6097,
+            "log2FoldChange": -2.6922,
+            "padj": 1.99e-06,
+            "pvalue": 5.61e-09
+          },
+          "Pcsk9": {
+            "baseMean": 2.5786,
+            "log2FoldChange": 3.211,
+            "padj": 2.88e-06,
+            "pvalue": 9.27e-09
+          },
+          "Krt25": {
+            "baseMean": 2.1091,
+            "log2FoldChange": -1.9796,
+            "padj": 2.26e-06,
+            "pvalue": 6.84e-09
+          },
+          "Lamc2": {
+            "baseMean": 5.0155,
+            "log2FoldChange": 1.5669,
+            "padj": 3.19e-06,
+            "pvalue": 1.06e-08
+          },
+          "Npy": {
+            "baseMean": 42.5421,
+            "log2FoldChange": 1.2848,
+            "padj": 0.000229,
+            "pvalue": 2.13e-06
+          },
+          "Tifa": {
+            "baseMean": 7.5181,
+            "log2FoldChange": -1.5827,
+            "padj": 6.58e-07,
+            "pvalue": 1.56e-09
+          }
+        },
+        "edgeR_QL/line_Hi_vs_Co_region-St": {
+          "Krt25": {
+            "baseMean": 2.1091,
+            "log2FoldChange": 3.0194,
+            "padj": 0.000108,
+            "pvalue": 4.32e-07
+          },
+          "Cd300lf": {
+            "baseMean": 0.7503,
+            "log2FoldChange": -4.2307,
+            "padj": 1.04e-06,
+            "pvalue": 1.71e-09
+          },
+          "Rab37": {
+            "baseMean": 12.8806,
+            "log2FoldChange": 1.6056,
+            "padj": 2.01e-06,
+            "pvalue": 3.96e-09
+          },
+          "En2": {
+            "baseMean": 109.7948,
+            "log2FoldChange": 1.5404,
+            "padj": 0.00284,
+            "pvalue": 2.69e-05
+          },
+          "Col5a2": {
+            "baseMean": 7.6489,
+            "log2FoldChange": 1.3076,
+            "padj": 0.000219,
+            "pvalue": 1.04e-06
+          },
+          "Spp1": {
+            "baseMean": 12.4265,
+            "log2FoldChange": 2.2048,
+            "padj": 0.000222,
+            "pvalue": 1.06e-06
+          }
+        },
+        "edgeR_QL/line_Hi_vs_Co_avg": {
+          "Zfp33b": {
+            "baseMean": 2.4319,
+            "log2FoldChange": 4.4627,
+            "padj": 1.6e-12,
+            "pvalue": 6.31e-16
+          },
+          "Ms4a2": {
+            "baseMean": 2.8077,
+            "log2FoldChange": -8.2049,
+            "padj": 2.78e-14,
+            "pvalue": 5.47e-18
+          },
+          "Hist1h2al": {
+            "baseMean": 0.9858,
+            "log2FoldChange": -5.061,
+            "padj": 2.56e-11,
+            "pvalue": 2.02e-14
+          },
+          "Arhgap8": {
+            "baseMean": 1.5047,
+            "log2FoldChange": 5.1256,
+            "padj": 3.84e-09,
+            "pvalue": 5.91e-12
+          },
+          "Ms4a3": {
+            "baseMean": 1.9748,
+            "log2FoldChange": -8.1564,
+            "padj": 4.84e-10,
+            "pvalue": 6.09e-13
+          },
+          "Cyp11a1": {
+            "baseMean": 0.8832,
+            "log2FoldChange": 5.2879,
+            "padj": 3.26e-10,
+            "pvalue": 3.85e-13
+          },
+          "Lipo2": {
+            "baseMean": 0.5823,
+            "log2FoldChange": -4.2957,
+            "padj": 5.45e-10,
+            "pvalue": 7.88e-13
+          },
+          "Gif": {
+            "baseMean": 0.6939,
+            "log2FoldChange": -8.2508,
+            "padj": 1.56e-05,
+            "pvalue": 1.17e-07
+          },
+          "Krt12": {
+            "baseMean": 1.7808,
+            "log2FoldChange": 4.4431,
+            "padj": 7.5e-05,
+            "pvalue": 7.64e-07
+          },
+          "Shox2": {
+            "baseMean": 0.593,
+            "log2FoldChange": 5.3366,
+            "padj": 0.000998,
+            "pvalue": 1.84e-05
+          }
+        },
+        "edgeR_QL/region_St_vs_Ce_avg": {
+          "Homer3": {
+            "baseMean": 143.9127,
+            "log2FoldChange": -5.4667,
+            "padj": 3.53e-21,
+            "pvalue": 1.62e-24
+          },
+          "Car8": {
+            "baseMean": 688.0232,
+            "log2FoldChange": -7.0882,
+            "padj": 3.16e-21,
+            "pvalue": 8.3e-25
+          },
+          "Cbln3": {
+            "baseMean": 873.1745,
+            "log2FoldChange": -10.7919,
+            "padj": 3.16e-21,
+            "pvalue": 6.81e-25
+          },
+          "Gabra6": {
+            "baseMean": 702.5779,
+            "log2FoldChange": -11.5244,
+            "padj": 7.33e-21,
+            "pvalue": 4.34e-24
+          },
+          "Foxg1": {
+            "baseMean": 78.0944,
+            "log2FoldChange": 9.398,
+            "padj": 6.04e-20,
+            "pvalue": 5.16e-23
+          },
+          "Pcp2": {
+            "baseMean": 107.6612,
+            "log2FoldChange": -10.48,
+            "padj": 1.72e-19,
+            "pvalue": 2.04e-22
+          },
+          "Adora2a": {
+            "baseMean": 138.3206,
+            "log2FoldChange": 7.3989,
+            "padj": 6.77e-19,
+            "pvalue": 1.57e-21
+          },
+          "Chrm4": {
+            "baseMean": 44.697,
+            "log2FoldChange": 5.9262,
+            "padj": 1.24e-17,
+            "pvalue": 8.22e-20
+          }
+        }
+      }
+    },
+    "paper": {},
+    "confidence": "medium",
+    "reasoning": "Paper's model, test, filter and threshold reproduced on the deposited matrix; only the interaction has a paper count under the FDR < 0.05 rule. Within-region line counts are only in S1 Figure A (not available); line main-effect counts (144/122) use an unstated p rule with |log2FC| > 1.",
+    "decision_status": "valid",
+    "execution_status": "completed",
+    "stop_reason": null,
+    "recorded_at": "2026-11-17T16:27:19+00:00"
+  }
+]

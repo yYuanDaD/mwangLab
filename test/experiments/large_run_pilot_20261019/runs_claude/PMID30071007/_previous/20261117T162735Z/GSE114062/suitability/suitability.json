@@ -1,0 +1,270 @@
+{
+  "case_id": "GSE114062",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "line",
+    "region"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "library-size-normalized counts (Cuffnorm count table: fragment counts divided by a per-sample size factor; file labelled FPKM)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "library-size-normalized counts (Cuffnorm count table: fragment counts divided by a per-sample size factor; file labelled FPKM)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "line",
+        "region"
+      ],
+      "levels": {
+        "line": {
+          "Co": 8,
+          "Hi": 7
+        },
+        "region": {
+          "Ce": 8,
+          "St": 7
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(line) + C(region)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 12,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "line_Hi_vs_Co_region-Ce",
+        "line_Hi_vs_Co_region-St",
+        "line_region_Hi_St_vs_Co_Ce"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 15 samples.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "predicted": {
+        "male": 15
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID30071007\\GSE114062\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "line_Hi_vs_Co_region-Ce",
+      "kind": "simple",
+      "factor": "line",
+      "test": "Hi",
+      "reference": "Co",
+      "within": {
+        "region": "Ce"
+      },
+      "cells": [
+        {
+          "cell": {
+            "region": "Ce",
+            "line": "Hi"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "region": "Ce",
+            "line": "Co"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_Hi_vs_Co_region-St",
+      "kind": "simple",
+      "factor": "line",
+      "test": "Hi",
+      "reference": "Co",
+      "within": {
+        "region": "St"
+      },
+      "cells": [
+        {
+          "cell": {
+            "region": "St",
+            "line": "Hi"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "region": "St",
+            "line": "Co"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "region_St_vs_Ce_line-Co",
+      "kind": "simple",
+      "factor": "region",
+      "test": "St",
+      "reference": "Ce",
+      "within": {
+        "line": "Co"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "Co",
+            "region": "St"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "line": "Co",
+            "region": "Ce"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "region_St_vs_Ce_line-Hi",
+      "kind": "simple",
+      "factor": "region",
+      "test": "St",
+      "reference": "Ce",
+      "within": {
+        "line": "Hi"
+      },
+      "cells": [
+        {
+          "cell": {
+            "line": "Hi",
+            "region": "St"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "line": "Hi",
+            "region": "Ce"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "line_region_Hi_St_vs_Co_Ce",
+      "kind": "interaction",
+      "factor": "line:region",
+      "test": "Hi:St",
+      "reference": "Co:Ce",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "line": "Hi",
+            "region": "St"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "line": "Co",
+            "region": "St"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "line": "Hi",
+            "region": "Ce"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "line": "Co",
+            "region": "Ce"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

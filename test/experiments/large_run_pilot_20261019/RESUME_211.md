@@ -88,3 +88,8 @@ Quota stop 2026-11-10 ~17:35 local at 95/211 (rows 105, 106 cut off). The PC the
 Old orchestrator stopped after row 106 (row 105's analysis had finished; recorded 2026-11-17 by the new orchestrator
 with minutes/tokens NA). New orchestrator thread resumed 2026-11-17 11:20 local (owner: "继续"): review of 105 plus
 rows 108-111, then 5 at a time from 112 onward, auto-resuming after each quota reset.
+
+Owner 2026-11-17 11:42 local: "不要边跑边修。跑完一圈再汇总结果" — no more tool patches during the run. Tool
+problems are only recorded (PROBLEMS.md via finish_paper.py); patches and a summary of results and problems come
+after the full round. The two patches made earlier on 2026-11-17 (rows 112, 114 in PATCHES_211.md) stay.
+Row 112 stays INVALID after its fix (execution matrix_type text names FPKM); left for the end-of-round summary.

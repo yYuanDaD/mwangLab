@@ -1,0 +1,182 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID30071007",
+  "request": "Analyze GSE114062 for PMID 30071007 (Brain region-dependent gene networks associated with selective breeding for increased voluntary wheel-running behavior.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE114062",
+      "accession": "GSE114062",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC6072066.paper.md"],
+        "metadata": "GSE114062/GSE114062_metadata.csv",
+        "matrix": "GSE114062/GSE114062_Cere_Stri_FPKM.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE114062"],
+            "assay": "bulk RNA-seq (Illumina HiSeq 2000, 100 nt PE), cerebellum and striatum, male Hsd:ICR mice, generation 66 of a selection experiment",
+            "primary_estimand": "Associational difference in brain gene expression between a line selectively bred for high voluntary wheel running (Hi, line 7) and a non-selected control line (Co, line 1), within cerebellum (CeHi-CeCo) and striatum (StHi-StCo), plus the line-by-region interaction. All mice had 6 days of wheel access before sampling, so the contrast is genetic line (dominated by 66 generations of selection) with the running amount co-varying; it is not a randomized exercise intervention (S2.1.p3, S4.p3).",
+            "factors": {"line": ["Co (control line 1)", "Hi (high-runner line 7)"], "region": ["Ce (cerebellum)", "St (striatum)"]},
+            "sample_inclusion": "16 samples (4 per line-region cell); one StHi sample removed as PCA outlier (S2.2.p1) -> 15 analysed; GEO deposits exactly these 15.",
+            "planned_contrasts": [
+              "CeHi vs CeCo within cerebellum (S2.2.p2; Table 1/Table 3; reported as CeCo-CeHi)",
+              "StHi vs StCo within striatum (S2.2.p2; Table 1/Table 4; reported as StCo-StHi)",
+              "line-by-region interaction (S2.2.p2, S3.2.p1: 86 genes at FDR < 0.05; 334 at raw P < 0.005)",
+              "StHi vs CeHi (third orthogonal contrast, S2.2.p2; no count reported)",
+              "main effect of line Hi vs Co across regions (S2.2.p2, S3.6.p1; Table 5; 144 genes |log2FC|>1 in Table E, 122 genes after removing interaction genes; p rule not stated)",
+              "main effect of region St vs Ce (S2.2.p2, S3.7.p1; 243 genes at FDR < 1e-15 excluding interaction genes)"
+            ],
+            "repeated_measure_unit": "not stated; paper says 16 individual mouse samples and fits no animal term",
+            "normalization": "Cuffnorm v2.2.1 library-size normalized gene counts; genes with >= 1 CPM in >= 3 samples kept (15,213 genes); TMM (S2.2.p1)",
+            "paper_method": "edgeR 3.14.0 GLM ~ line + region + line:region, robust tagwise dispersion, quasi-likelihood F-test, BH FDR (S2.2.p2)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.2.p1"},
+            "paper_results": "Interaction: 86 genes FDR < 0.05 (76 also FDR < 0.05 in a within-region line contrast); Table 1 top interaction genes; Table 5 top line main-effect genes; Tables 3-4 GSEA: oxidative phosphorylation and ribosome enriched among genes higher in Co than Hi in both regions"
+          },
+          "reasoning": "Study map from S2.1.p1-p4 (design, 2x2 factorial, line 7 vs line 1, wheel access for all), S2.2.p1 (samples, filter, outlier removal), S2.2.p2 (edgeR QL model and contrasts), S3.2.p1 (FDR < 0.05 significance rule, 86 interaction genes), S3.6.p1/Table 5 (line main effect), S3.7.p1 (region effect). The paper's tables report Co minus Hi (log2(Co/Hi)); this run reports Hi vs Co, so signs are flipped when comparing.",
+          "confidence": "high",
+          "locator": "S2.2.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.1.p4 and S6.p1 name GSE114062", "GEO: Mus musculus Hsd:ICR, male, cerebellum and striatum, Control vs Selected, contact Rodriguez Zas (UIUC) = paper's group", "15 GSM samples = 16 minus the removed StHi outlier (S2.2.p1): striatum Selected has 3 samples", "matrix GSE114062_Cere_Stri_FPKM.csv.gz has exactly the 15 sample titles"]},
+          "reasoning": "Accession named in the paper; organism, strain, sex, tissues, conditions and sample count match the paper's design after the documented outlier removal.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"region": ["title", "^(cerebellum|striatum)_"], "line": ["title", "_(Control|Selected)_\\d+$"]},
+          "recode": {"region": {"cerebellum": "Ce", "striatum": "St"}, "line": {"Control": "Co", "Selected": "Hi"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names equal the metadata title for all 15 samples (inspect alignment_keys: title 15/15). line and region are parsed from the title and agree with characteristics condition/tissue; recoded to the paper's labels Co/Hi and Ce/St.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "size-factor-scaled fragment counts (Cuffnorm count table; the file name says otherwise, see reasoning)",
+          "recommended_method": "edgeR",
+          "final": {"source": "GSE114062_Cere_Stri_FPKM.csv.gz (only deposited matrix)", "paper_input": "Cuffnorm library-size-normalized gene counts, then TMM in edgeR (S2.2.p1)"},
+          "reasoning": "Despite the FPKM label, column sums are 38-44 million per sample (FPKM sums would not track fragment totals like this), and within each sample the non-zero values are integer multiples of one per-sample unit (e.g. 0.891534, 0.931986; 0.84-1.30, the mode value occurring ~900 times = one fragment): 81-96% of non-zero values are within 0.01 of an integer multiple, the rest are large values limited by 6-significant-digit printing. This is the Cuffnorm genes.count_table (counts scaled by geometric-mean size factors), which matches the paper's stated input (S2.2.p1 'Cuffnorm ... normalize the gene counts for library size'). Count-scale values on a near-unit scale are suitable for edgeR, which accepts non-integer counts; no rounding needed.",
+          "confidence": "medium",
+          "candidates": [
+            {"value": "FPKM (linear normalized) -> log2(x+1) + limma", "reason_rejected": "values are quantized fragment counts with column sums ~ total fragments, not length-normalized FPKM; the paper analysed them with edgeR"},
+            {"value": "reconstruct raw integer counts by dividing by the per-sample unit", "reason_rejected": "possible but not the paper's input; size factors 0.84-1.30 change the NB scale little; noted as a possible sensitivity check"}
+          ]
+        },
+        "design": {
+          "factors": ["line", "region"],
+          "references": {"line": "Co", "region": "Ce"},
+          "organism": "Mouse",
+          "planned": ["line_Hi_vs_Co_region-Ce", "line_Hi_vs_Co_region-St", "line_region_Hi_St_vs_Co_Ce"],
+          "final": {
+            "analysis_type": "factorial 2x2 (line x region), one model on all 15 samples",
+            "estimand_type": "associational",
+            "formula": "~ line * region",
+            "contrasts": [
+              {"name": "line_Hi_vs_Co_region-Ce", "expression": "lineHi", "role": "primary"},
+              {"name": "line_Hi_vs_Co_region-St", "expression": "lineHi + lineHi.regionSt", "role": "primary"},
+              {"name": "line_region_Hi_St_vs_Co_Ce", "expression": "lineHi.regionSt", "role": "primary"},
+              {"name": "line_Hi_vs_Co_avg", "expression": "lineHi + 0.5*lineHi.regionSt", "role": "secondary"},
+              {"name": "region_St_vs_Ce_HiLine", "expression": "regionSt + lineHi.regionSt", "role": "secondary"},
+              {"name": "region_St_vs_Ce_avg", "expression": "regionSt + 0.5*lineHi.regionSt", "role": "secondary"}
+            ]
+          },
+          "reasoning": "S2.1.p1 and S2.2.p1-p2 define a 2x2 factorial (activity line x brain region) fitted in one edgeR model with the interaction. The exercise-relevant estimand is Hi vs Co line within each region and the line-by-region interaction (S2.2.p2: 'patterns of particular interest'); the line main effect and the third orthogonal contrast StHi-CeHi plus the region main effect are secondary, as in the paper. The comparison is associational (selected line vs control line, both with wheel access; S2.1.p3, S4.p3), not a randomized exercise effect. Main effects are taken as averages over the other factor's levels because the model contains the interaction.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "separate two-group fits per region", "reason_rejected": "the paper fits one model with interaction; the interaction needs both regions in one model"},
+            {"value": "pool regions and compare lines only (~ line)", "reason_rejected": "region is a dominant factor and the paper's primary interest is region-dependent line effects"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "animal (possible Ce/St from the same mouse)", "disposition": "not modelled: no animal ID in GEO; paper fits no animal term"}, {"name": "locomotor measures", "disposition": "excluded per paper (S2.2.p2): between-line variation dominates, no covariate"}]},
+          "confounding_candidates": ["region"],
+          "reasoning": "All mice are male, same age and generation; no batch or RIN column in GEO. S2.2.p2 states no covariate was included. Whether cerebellum and striatum came from the same 8 mice is not stated (S2.2.p1 '16 individual mouse samples'); GEO has no animal key, and the paper's model has none, so no blocking. Within-region line contrasts compare different animals either way; if regions were paired, region and interaction tests would be conservative-to-misestimated, which is recorded as a caveat.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR QL F-test (R edgeR glmQLFit/glmQLFTest, robust), TMM",
+            "formula": "~ line * region",
+            "paper_route": {"method": "edgeR 3.14.0 QL F-test, robust tagwise dispersion, ~ line*region", "status": "reproduced", "reason": "same model and test; edgeR version 4.10.7 here vs 3.14.0 in the paper"},
+            "deviations": ["edgeR 4.10.7 (R 4.6) instead of 3.14.0 (R 3.3.1); glmQLFit defaults changed in edgeR 4 (legacy=FALSE)", "low-count filter (>= 1 CPM in >= 3 samples) applied on the deposited normalized counts"]
+          },
+          "transform": null,
+          "reasoning": "The paper's method (S2.2.p2) runs directly on the deposited count-scale matrix through tools.r_de_tools engine edger_ql (estimateDisp robust, glmQLFit robust, glmQLFTest per contrast, BH FDR). Contrasts are model-column vectors over ~ line * region with Co and Ce as references.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.005, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Audit rule raw P < 0.005 reproduces the paper's extended interaction list (Table A, 334 genes; S3.2.p1). Table 1 (FDR < 0.01, |log2FC| > 1.25), Table 5 (FDR < 0.01, |log2FC| > 4) and Table 6 are display filters, not DEG definitions."
+          },
+          "reasoning": "S3.2.p1: significance is 'FDR-adjusted P-value < 0.05' (86 interaction genes); no fold-change rule in the DEG definition.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Associational: selected high-runner line vs control line, both given 6 days of wheel access; differences reflect genetic selection plus differing running amounts and cannot be read as an effect of exercise per se (S4.p3).",
+              "Paper reports log2(Co/Hi); this run reports Hi vs Co, so paper signs are inverted here.",
+              "No animal ID: if Ce and St came from the same mice, region and interaction tests ignore that pairing (the paper did too).",
+              "edgeR 4.x QL defaults differ from edgeR 3.14; counts are not expected to match exactly."
+            ]
+          },
+          "paper_counts": {"edgeR_QL/line_region_Hi_St_vs_Co_Ce": 86},
+          "paper_genes": {
+            "edgeR_QL/line_region_Hi_St_vs_Co_Ce": ["Krt25", "Lamc2", "Fam124a", "Npsr1", "Myo18b", "Vdr", "Rab37", "Necab1", "Pcsk9", "Tifa", "Creb3l1", "Col5a2", "En2", "Cd300lf", "Npy"],
+            "edgeR_QL/line_Hi_vs_Co_region-Ce": ["Npsr1", "Vdr", "Necab1", "Pcsk9", "Krt25", "Lamc2", "Npy", "Tifa"],
+            "edgeR_QL/line_Hi_vs_Co_region-St": ["Krt25", "Cd300lf", "Rab37", "En2", "Col5a2", "Spp1"],
+            "edgeR_QL/line_Hi_vs_Co_avg": ["Zfp33b", "Ms4a2", "Hist1h2al", "Arhgap8", "Ms4a3", "Cyp11a1", "Lipo2", "Gif", "Krt12", "Shox2"],
+            "edgeR_QL/region_St_vs_Ce_avg": ["Homer3", "Car8", "Cbln3", "Gabra6", "Foxg1", "Pcp2", "Adora2a", "Chrm4"]
+          },
+          "reasoning": "Paper's model, test, filter and threshold reproduced on the deposited matrix; only the interaction has a paper count under the FDR < 0.05 rule. Within-region line counts are only in S1 Figure A (not available); line main-effect counts (144/122) use an unstated p rule with |log2FC| > 1.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix label", "paper": "Cuffnorm normalized gene counts analysed in edgeR", "data": "file named FPKM; values are size-factor-scaled fragment counts", "disposition": "executable_without_change"},
+        {"item": "sample count", "paper": "16 samples, one StHi removed -> 15", "data": "15 samples deposited (St Selected n=3)", "disposition": "executable_without_change"},
+        {"item": "gene count after filter", "paper": "15,213 genes (>= 1 CPM in >= 3 samples)", "data": "26,628 features deposited; same filter applied at execution", "disposition": "executable_without_change"},
+        {"item": "sign convention", "paper": "log2(Co/Hi), CeCo-CeHi, StCo-StHi", "data": "results are Hi vs Co", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "edgeR_QL",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {
+            "engine": "edger_ql",
+            "design": "~ line * region",
+            "levels": {"line": ["Co", "Hi"], "region": ["Ce", "St"]},
+            "contrasts": [
+              {"name": "line_Hi_vs_Co_region-Ce", "coef": "lineHi"},
+              {"name": "line_Hi_vs_Co_region-St", "expr": "lineHi + lineHi.regionSt"},
+              {"name": "line_region_Hi_St_vs_Co_Ce", "coef": "lineHi.regionSt"},
+              {"name": "line_Hi_vs_Co_avg", "expr": "lineHi + 0.5*lineHi.regionSt"},
+              {"name": "region_St_vs_Ce_HiLine", "expr": "regionSt + lineHi.regionSt"},
+              {"name": "region_St_vs_Ce_avg", "expr": "regionSt + 0.5*lineHi.regionSt"}
+            ],
+            "normalization": "TMM",
+            "label": "edgeR_QL_line_x_region",
+            "method_label": "edgeR QL F-test (R), TMM, ~ line * region"
+          },
+          "filter_low_counts": {"min_cpm": 1, "min_samples": 3},
+          "role": "primary",
+          "reasoning": "Paper's edgeR QL model with interaction (S2.2.p2) and CPM filter (S2.2.p1); all six paper contrasts from one fit."
+        }
+      ],
+      "enrichment": [
+        {"execution": "edgeR_QL/line_Hi_vs_Co_region-Ce", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "S2.3.p1/Table 3: GSEA on the CeHi-CeCo ranking (paper used GO/KEGG; repository uses MSigDB Hallmark)"},
+        {"execution": "edgeR_QL/line_Hi_vs_Co_region-St", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "S2.3.p1/Table 4: GSEA on the StHi-StCo ranking"},
+        {"execution": "edgeR_QL/line_region_Hi_St_vs_Co_Ce", "ora": true, "gsea": false, "direction": "all", "reasoning": "S2.3.p1/Table 2: functional enrichment (DAVID in the paper) of interaction genes; here Enrichr GO/KEGG ORA at the applied threshold"}
+      ]
+    }
+  ]
+}

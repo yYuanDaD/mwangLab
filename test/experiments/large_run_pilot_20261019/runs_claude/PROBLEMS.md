@@ -707,3 +707,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35470975 (GSE185957)
 
 - suitability.py:458 sex_split_plan ignores design strata (proposed female comparison pooling lean+obese); paper edgeR route blocked (only CPM deposited) Details: `PMID35470975/HANDBACK.md`.
+
+## PMID35379817 (GSE186105)
+
+- inspect profiles Read_Count+FPKM+TPM columns together (integer_fraction 0.58), so its matrix type guess is mixed Details: `PMID35379817/HANDBACK.md`.
