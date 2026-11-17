@@ -325,3 +325,40 @@ One section per case; newest last.
 ## PMID39523700 / GSE281241 (2026-11-17)
 
 - policy: Whether in-vitro surrogate-validation series count as exercise studies is the open in-vitro policy question; here the factor is genotype, not stimulation, so the refusal is consistent.
+
+## PMID37178122 / GSE230102_BAT (2026-11-17)
+
+- policy: Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.
+- policy: Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question.
+
+## PMID37178122 / GSE230102_gWAT (2026-11-17)
+
+- policy: Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.
+- policy: Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question.
+
+## PMID37178122 / GSE230102_heart (2026-11-17)
+
+- policy: Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.
+- policy: Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question.
+
+## PMID37178122 / GSE230102_liver (2026-11-17)
+
+- policy: Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.
+- policy: Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question.
+
+## PMID37178122 / GSE230102_quad (2026-11-17)
+
+- policy: Primary model choice when the paper is silent: strain-blocked gives many more DEGs than unblocked, and the paper's 'average ~500 DEGs per tissue' (S2.9.p3) fits the unblocked counts; which to report as primary is open.
+- policy: Whether the paper's per-tissue counts (Figures S11A/S12A/S13A) can be obtained to settle the model question.
+
+## PMID36907509 / GSE199111 (2026-11-17)
+
+- policy: Policy question (open): whether the genotype contrast (miR-501dMP vs Pax7Cre, paper's own DEG comparison) should still be run as a labelled non-exercise reference; refusal is consistent with the current rule.
+
+## PMID35847876 / GSE205173 (2026-11-17)
+
+- policy: Open policy: joint vs pairwise fit when paper is silent (both reported here).
+
+## PMID38110408 / GSE239729 (2026-11-17)
+
+- policy: Policy only: whether a sedentary genotype contrast in an exercise paper should ever be run as a labelled non-exercise secondary result (current rule: refuse).

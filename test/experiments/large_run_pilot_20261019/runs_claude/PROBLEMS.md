@@ -799,3 +799,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36907509 (GSE199111)
 
 - metadata CSV free text mis-decoded as GBK during GEOparse download (geo_tools.py:30,36); cosmetic only Details: `PMID36907509/HANDBACK.md`.
+
+## PMID35847876 (GSE205173)
+
+- paper_counts cannot hold a union-only paper count (comparison empty); pydeseq2 overflow RuntimeWarning utils.py:1088 (benign) Details: `PMID35847876/HANDBACK.md`.
+
+## PMID38110408 (GSE239729)
+
+- suitability.py:332-358 lists constant columns as candidate covariates and fails 0/0 sample_size when no factors given; matrix columns A..C1 have no metadata key, manual rename needed Details: `PMID38110408/HANDBACK.md`.

@@ -1,0 +1,134 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35847876",
+  "request": "Analyze GSE205173 for PMID 35847876 (Swimming Impedes Intestinal Microbiota and Lipid Metabolites of Tumorigenesis in Colitis-Associated Cancer.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE205173",
+      "accession": "GSE205173",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9285133.paper.md"],
+        "metadata": "GSE205173/GSE205173_metadata.csv",
+        "matrix": "GSE205173/GSE205173_Raw_gene_counts_matrix.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE205173"],
+            "assay": "bulk RNA-seq (TruSeq stranded mRNA) of colorectal tissue, male C57BL/6 mice",
+            "factors": {"disease": ["vehicle (water)", "AOM/DSS CAC model"], "swim": ["no swim (shallow-water sham)", "swimming pretreatment, 2 months before and throughout the experiment"]},
+            "groups": ["Ctrl", "Ctrl_Swim", "Model", "Model_Swim"],
+            "sample_inclusion": "Animals: Ctrl n=5, Ctrl_Swim n=5, Model n=10, Model_Swim n=10 (S2.3.p1); GEO deposits 3 colons per group (12 samples). Paper does not state how the sequenced subset was chosen.",
+            "primary_estimand": "Effect of swimming pretreatment on colonic gene expression in AOM/DSS-induced CAC mice (Model_Swim vs Model); secondary: swimming in healthy mice (Ctrl_Swim vs Ctrl) and disease effect (Model vs Ctrl), which together define the paper's swim-reversed STEM profiles (S3.2.p1).",
+            "planned_contrasts": [
+              "Model_Swim vs Model (S3.2.p1, S3.4.p2 pair list; paper gives no per-contrast count)",
+              "Ctrl_Swim vs Ctrl (S3.4.p2 pair list; no per-contrast count)",
+              "Model vs Ctrl (S3.2.p1; no per-contrast count)",
+              "Model_Swim vs Ctrl_Swim (S3.4.p2 pair list; no per-contrast count)",
+              "Union of pairwise DEGs = 1403 genes (S3.2.p1), 279 STEM-selected, 48 inflammation/immune genes (S3.2.p1, Fig 3K)"
+            ],
+            "repeated_measure_unit": "none; one colon per independent animal",
+            "normalization": "paper: HISAT2 + HTSeq-count read counts, Cufflinks FPKM (S2.7.p1)",
+            "paper_method": "DESeq2 pairwise between groups (S2.7.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "source_locator": "S2.7.p1", "text": "q value < 0.05, fold change > 2, or fold change < 0.5"},
+            "paper_results": {"union_DEGs_all_pairwise": 1403, "STEM_clustered": 1054, "STEM_selected_swim_reversed": 279, "inflammation_immune_genes": 48, "named_genes": {"up_in_Model_down_with_swim": ["Ptger2", "Pla2g4f", "Ptges"], "lowest_in_Model": ["Fzd9", "Cldn15", "Tfrc"]}}
+          },
+          "reasoning": "Four-group 2x2 design (S2.3.p1). Transcriptome DE by DESeq2 with q<0.05 and FC>2 or <0.5 (S2.7.p1). The paper reports only the union (1403) of pairwise DEG sets, not which pairs were included nor per-pair counts (S3.2.p1); the metabolomics section lists the four pairs Ctrl/Ctrl_Swim, Ctrl/Model, Ctrl_Swim/Model_Swim, Model_Swim/Model (S3.4.p2), which I take as the planned pairs. The exercise question is Model_Swim vs Model (title, S3.2.p1, Fig 3I differential genes caused by swimming in AOM/DSS-induced CAC mice).",
+          "confidence": "medium",
+          "locator": "S2.7.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.7.p1 and S5.p1 name GSE205173", "GEO organism Mus musculus, colorectal tissue, matches S2.4.p1", "four treatment levels NC / swim only / AOM/DSS / AOM/DSS+swimming pretreatment match the paper's four groups", "contact institute Shanghai Tong Ren Hospital matches the authors"]},
+          "reasoning": "Paper deposits RNA-seq as GSE205173 (S2.7.p1, S5.p1); GEO sample annotation matches the four groups. Raw gene count matrix (integers) chosen over the FPKM/RPKM file because the paper's DESeq2 used read counts.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(Ctrl_Swim|Ctrl|Model|Swim)\\d+$"]},
+          "recode": {"grp": {"Ctrl": "Ctrl", "Ctrl_Swim": "CtrlSwim", "Model": "Model", "Swim": "ModelSwim"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column names equal metadata title exactly (12/12). Group from title prefix; cross-checked against characteristics treatment: Ctrl=NC, Ctrl_Swim=swim only, Model=AOM/DSS treated, Swim=AOM/DSS treated+swimming pretreatment. Swim titles are the Model_Swim group, recoded ModelSwim.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Raw_gene_counts_matrix: integer fraction 1.0, max 392826, library sizes 17.3-19.5M per sample: unnormalized read counts. GEO data_processing says counts and RPKM came from CLC Genomics Workbench (the FPKM file is the RPKM output), while the paper says HISAT2/HTSeq-count; both are read counts, so the DESeq2 input is the same kind as the paper's. Gene IDs are symbols; 12 symbols are Excel-mangled (1-Mar..11-Mar, 15-Sep) but unique, kept as-is (none is a paper-named gene).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "Ctrl"},
+          "organism": "Mouse",
+          "planned": ["grp_ModelSwim_vs_Model", "grp_CtrlSwim_vs_Ctrl", "grp_Model_vs_Ctrl", "grp_ModelSwim_vs_CtrlSwim"],
+          "final": {
+            "analysis_type": "multi-group (2x2 factorial expressed as 4-level cell-means factor), pairwise planned contrasts",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_ModelSwim_vs_Model", "control": "Model", "treatment": "ModelSwim", "role": "primary"},
+              {"name": "grp_CtrlSwim_vs_Ctrl", "control": "Ctrl", "treatment": "CtrlSwim", "role": "secondary"},
+              {"name": "grp_Model_vs_Ctrl", "control": "Ctrl", "treatment": "Model", "role": "secondary"},
+              {"name": "grp_ModelSwim_vs_CtrlSwim", "control": "CtrlSwim", "treatment": "ModelSwim", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Paper analyzes four groups pairwise (S3.2.p1, S3.4.p2). One DESeq2 model on all 12 samples with planned pairwise contrasts; the exercise estimand is ModelSwim vs Model (interventional, randomized assignment S2.3.p1), with CtrlSwim vs Ctrl as the swim effect without disease. Model vs Ctrl and ModelSwim vs CtrlSwim are disease contrasts kept because the paper's union includes them. n=3 per group. All male (S2.1.p1). The swim x disease interaction is not a paper contrast and is not run.",
+          "candidates": [
+            {"value": "two factors disease + swim additive", "reason_rejected": "additive model would force the swim effect to be equal in healthy and CAC mice; paper compares groups pairwise"},
+            {"value": "pool Ctrl and Ctrl_Swim as one control", "reason_rejected": "pools levels of the factor of interest"}
+          ],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, one colon each; no batch, lane, or sex variable (all male, single submission/platform). No covariate column in metadata.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald)", "formula": "~ grp", "paper_route": {"method": "DESeq2", "status": "reproduced"}, "deviations": ["one model fitted on all 12 samples (shared dispersion) rather than per-pair fits; a per-pair two-arm fit for the primary contrast is run as sensitivity", "counts from CLC Genomics Workbench (GEO) rather than the paper's stated HISAT2/HTSeq-count"]},
+          "transform": null,
+          "reasoning": "Raw counts support the paper's DESeq2 route (S2.7.p1).",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.7.p1: q value < 0.05 and fold change > 2 or < 0.5 = padj < 0.05 and |log2FC| > 1 (strict). Audit: padj < 0.05 without effect cutoff.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["Paper reports only the union of pairwise DEGs (1403) with no per-contrast counts, so per-table comparison is not possible; union across our four planned tables is reported in HANDBACK.md.", "n=3 per group; paper does not say how 3 of 5/10 animals per group were chosen for sequencing.", "Counts are CLC Genomics Workbench output (GEO) although the paper states HISAT2/HTSeq.", "Named genes, ModelSwim vs Model: Pla2g4f and Ptges lower with swimming and Fzd9, Cldn15, Tfrc higher (directions agree with the paper) but none passes padj < 0.05; Ptger2 is unchanged (log2FC +0.07), so the paper's swim-reduced Ptger2/EP2 is not reproduced at the gene level.", "Named genes, Model vs Ctrl: Pla2g4f and Ptges up, Fzd9, Cldn15, Tfrc down, all padj < 0.05 (agree with the paper); Ptger2 not significantly up (log2FC +0.32, padj 0.42), contrary to the paper's AOM/DSS-induced Ptger2 up-regulation.", "Top KEGG ORA term for ModelSwim vs Model is Pancreatic secretion (plus protein/fat/carbohydrate digestion and absorption), in line with the paper's digestion-and-absorption KEGG terms (S3.2.p1), but pancreatic-enzyme genes in colon tissue may reflect tissue composition rather than swimming biology."]},
+          "paper_counts": {},
+          "paper_genes": {
+            "de/grp_ModelSwim_vs_Model": ["Ptger2", "Pla2g4f", "Ptges", "Fzd9", "Cldn15", "Tfrc"],
+            "de/grp_Model_vs_Ctrl": ["Ptger2", "Pla2g4f", "Ptges", "Fzd9", "Cldn15", "Tfrc"]
+          },
+          "reasoning": "Paper-aligned DESeq2 with the paper threshold; named genes from S3.2.p1 (Ptger2/Pla2g4f/Ptges up in Model and reduced by swimming; Fzd9/Cldn15/Tfrc lowest in Model).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "alignment/quantification pipeline", "paper": "Trimmomatic, HISAT2, HTSeq-count, Cufflinks FPKM (S2.7.p1)", "data": "GEO data_processing: CLC Genomics Workbench 11 mapping, counts and RPKM", "disposition": "executable_without_change"},
+        {"item": "sequenced sample size", "paper": "Ctrl 5, Ctrl_Swim 5, Model 10, Model_Swim 10 animals (S2.3.p1)", "data": "3 samples per group in GEO", "disposition": "executable_without_change"},
+        {"item": "sequencer", "paper": "Illumina HiSeq X Ten (S2.7.p1)", "data": "GEO instrument Illumina NovaSeq 6000", "disposition": "executable_without_change"},
+        {"item": "per-contrast DEG counts", "paper": "only union 1403 across pairwise comparisons, pairs not listed (S3.2.p1)", "data": "four planned pairwise tables", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "de", "tool": "tools.joint_contrasts:run_joint_deseq2", "args": {"comparisons": "planned"}, "role": "primary", "reasoning": "One DESeq2 ~grp model on all 12 samples; four planned pairwise contrasts, primary ModelSwim vs Model."},
+        {"name": "pair_ModelSwim_vs_Model", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "grp", "control_group": "Model", "treatment_group": "ModelSwim", "alpha": 0.05}, "subset": {"grp": ["Model", "ModelSwim"]}, "role": "sensitivity", "reasoning": "Per-pair two-arm DESeq2 fit (only the 6 samples of the pair), as a vendor pairwise pipeline would do."}
+      ],
+      "enrichment": [
+        {"execution": "de/grp_ModelSwim_vs_Model", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports GO/KEGG enrichment of swimming-affected genes (S2.7.p1, Fig 3J)."}
+      ]
+    }
+  ]
+}
