@@ -1,0 +1,504 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41326383",
+  "request": "Analyze GSE302582 for PMID 41326383 (Sprint interval exercise disrupts mitochondrial ultrastructure driving a unique mitochondrial stress response and remodelling in men.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE302582",
+      "accession": "GSE302582",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC12769668.paper.md"
+        ],
+        "metadata": "GSE302582/GSE302582_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE302582"
+            ],
+            "assay": "bulk RNA-seq (BGI DNBseq, 100 bp PE), human vastus lateralis; STAR 2.7.3a + RSEM (S4.9.1.p1)",
+            "design": "parallel-group randomized trial (S2.1.p1, S4.5.p1, S4.6.p1): healthy men allocated to SIE or MICE; RNA-seq on 12 per group (Fig. 1D: n = 12 per group; S4.9.1.p1: 72 samples = 24 participants x 3 timepoints) at rest (pre), early recovery (+3 h from start of exercise) and late recovery (+24 h) (S2.2.p1)",
+            "factors": {
+              "grp": [
+                "MICE",
+                "SIE"
+              ],
+              "time": [
+                "pre",
+                "h3",
+                "h24"
+              ]
+            },
+            "repeated_measure_unit": "participant (3 biopsies per participant; participants nested within exercise group)",
+            "sample_inclusion": "all 72 RNA-seq samples (24 participants x 3 timepoints); no exclusions stated",
+            "primary_estimand": "within-group exercise response at +3 h and +24 h vs rest, for MICE and SIE separately (S2.2.p2, Fig. 1E), and the between-group difference in exercise response (time x group interaction) at +3 h and +24 h (S2.3.p1)",
+            "planned_contrasts": [
+              "MICE +3h vs rest (S2.2.p2; paper: 1462 DEGs)",
+              "SIE +3h vs rest (S2.2.p2; paper: 1338 DEGs)",
+              "MICE +24h vs rest (S2.2.p2; paper: 5632 DEGs)",
+              "SIE +24h vs rest (S2.2.p2; paper: 3230 DEGs)",
+              "SIE vs MICE difference in response at +3h (S2.3.p1; paper: 207 transcripts, 116 larger up in SIE, 91 larger up in MICE)",
+              "SIE vs MICE difference in response at +24h (S2.3.p1; paper: 16 transcripts)"
+            ],
+            "normalization": "not stated beyond 'following previously published guidelines' (S4.9.1.p1); 13,295 transcripts detected across samples (S2.2.p1) implies a low-expression filter",
+            "paper_method": "limma and DESeq2 on RSEM read counts in R (S4.9.1.p1); which package produced which count is not stated; fGSEA for the mitostress gene set",
+            "paper_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S4.10.p1"
+            },
+            "paper_results": {
+              "named_genes_3h_SIE_gt_MICE": [
+                "DDIT3",
+                "HSPD1"
+              ],
+              "qPCR_only": [
+                "HSPE1",
+                "PPP1R15A"
+              ],
+              "ORA": "SIE-larger-up genes at 3 h enriched for protein folding / UPR terms (Fig. 2B)",
+              "GSEA": "mitostress set enriched only after SIE (NES 1.50, FDR < 0.01)"
+            }
+          },
+          "reasoning": "S2.2.p1-p2 and S2.3.p1 give the six contrasts and their counts; S4.9.1.p1 gives the pipeline (STAR/RSEM, limma and DESeq2); S4.10.p1 'For RNA-sequencing and proteomics, an adjusted p value (p < 0.05) was used' with no fold-change rule. Participants were randomized to one group (parallel design, S2.1.p1/S4.5.p1/S4.6.p1), so subjects are nested in group.",
+          "confidence": "high",
+          "locator": "S2.2.p1-p2, S2.3.p1, S4.9.1.p1, S4.10.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S4.9.1.p1 names GSE302582",
+              "GEO Series_pubmed_id = 41326383",
+              "72 samples = 24 participants x 3 timepoints, as in S4.9.1.p1",
+              "vastus lateralis, Homo sapiens, BGISEQ-500, STAR/RSEM in data_processing"
+            ]
+          },
+          "reasoning": "The paper deposits RNA-seq under GSE302582 (S4.9.1.p1); the series cites PMID 41326383; the per-sample RSEM genes.results files in GSE302582_RAW.tar cover all 72 GSMs.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": [
+              "title",
+              "(MICE|SIE) group"
+            ],
+            "time": [
+              "title",
+              "^Muscle, (baseline|\\+2\\.5h|\\+24h),"
+            ],
+            "subject": [
+              "title",
+              "(MICE|SIE) group, Participant #(\\d+)$"
+            ]
+          },
+          "recode": {
+            "time": {
+              "baseline": "pre",
+              "+2.5h": "h3",
+              "+24h": "h24"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Tar columns become GSM ids, matched exactly to the metadata index (72/72). grp and time from the title; time '+2.5h' (GEO) is the paper's '+3 h' biopsy (S2.2.p1 counts from exercise start), recoded h3. Participant numbers restart within each group (Participant #1 exists in both MICE and SIE, each with 3 samples) and the paper is parallel-group, so the subject key is group + participant number (e.g. MICE_1), 24 subjects with 3 samples each.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts (RSEM expected_count)",
+          "recommended_method": "DESeq2 on rounded expected counts; limma on log2(CPM+1)",
+          "reasoning": "Each GSM file is an RSEM genes.results table (gene_id, transcript_id(s), length, effective_length, expected_count, TPM, FPKM); the merged matrix holds the expected_count column (A1BG 6.00 in GSM9106607 equals expected_count, not TPM 0.25/FPKM 0.14), 91.6% integers with fractional values from multi-mapping, max 1.23e6, library sizes 10.1-15.5 M. data_processing: STAR, RSEM, limma/edgeR. Paper S4.9.1.p1 used 'read counts' from RSEM. Matches the paper's input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp",
+            "time"
+          ],
+          "references": {
+            "grp": "MICE",
+            "time": "pre"
+          },
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [
+            "time_h3_vs_pre_grp-MICE",
+            "time_h24_vs_pre_grp-MICE",
+            "time_h3_vs_pre_grp-SIE",
+            "time_h24_vs_pre_grp-SIE",
+            "grp_time_SIE_h3_vs_MICE_pre",
+            "grp_time_SIE_h24_vs_MICE_pre"
+          ],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "repeated-measures 2 (group, between-subject) x 3 (time, within-subject) design",
+            "formula": "within group: ~ subject + time; between-group response difference: limma on within-subject changes (followup - pre) ~ 0 + grp",
+            "contrasts": [
+              {
+                "name": "time_h3_vs_pre_grp-MICE",
+                "control": "MICE pre",
+                "treatment": "MICE h3",
+                "role": "primary"
+              },
+              {
+                "name": "time_h24_vs_pre_grp-MICE",
+                "control": "MICE pre",
+                "treatment": "MICE h24",
+                "role": "primary"
+              },
+              {
+                "name": "time_h3_vs_pre_grp-SIE",
+                "control": "SIE pre",
+                "treatment": "SIE h3",
+                "role": "primary"
+              },
+              {
+                "name": "time_h24_vs_pre_grp-SIE",
+                "control": "SIE pre",
+                "treatment": "SIE h24",
+                "role": "primary"
+              },
+              {
+                "name": "grp_time_SIE_h3_vs_MICE_pre",
+                "control": "MICE (h3 - pre)",
+                "treatment": "SIE (h3 - pre)",
+                "role": "primary"
+              },
+              {
+                "name": "grp_time_SIE_h24_vs_MICE_pre",
+                "control": "MICE (h24 - pre)",
+                "treatment": "SIE (h24 - pre)",
+                "role": "primary"
+              }
+            ]
+          },
+          "reasoning": "S2.2.p2 reports within-group responses at each recovery time vs rest; S2.3.p1 reports transcripts 'upregulated to a larger extent' in SIE vs MICE, i.e. a difference in the exercise response (time x group interaction), not a cross-sectional group difference. Each cell has 12 participants. Exploratory: h24 vs h3 within each group and SIE vs MICE at each single timepoint (between-subject, cross-sectional).",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "SIE vs MICE at +3 h as a cross-sectional group comparison",
+              "reason_rejected": "the paper's 'upregulated to a larger extent following SIE' is a response difference; a cross-sectional comparison mixes baseline differences between different people; kept only as exploratory"
+            },
+            {
+              "value": "pool MICE and SIE for a common exercise effect",
+              "reason_rejected": "the paper reports per-group responses and their overlap (S2.2.p3), not a pooled effect"
+            }
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Each participant contributes pre, +3 h and +24 h biopsies, so participant is a blocking unit for the within-subject time contrasts (DESeq2 ~ subject + time within each group) and is removed by differencing in the interaction (limma on followup - pre per participant). Subjects are nested in group, so a single additive ~ subject + grp:time DESeq2 model is not full rank in the runner; the two routes avoid that aliasing. No batch or other covariate is recorded; none added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald) for within-group time contrasts; limma (moderated t) on within-subject log2(CPM+1) changes for the group x time interaction",
+            "formula": "DESeq2: ~ subject + cell(time) fitted per group; limma paired change: (log2CPM followup - log2CPM pre) ~ 0 + C(grp)",
+            "rounding_documented": true,
+            "paper_route": {
+              "method": "limma and DESeq2 (R), exact model unstated",
+              "status": "partially_reproduced",
+              "reason": "the paper names both packages without saying which produced which result or the model formula; DESeq2 with subject blocking is used for the within-group responses and limma for the response difference"
+            },
+            "deviations": [
+              "RSEM expected counts rounded to integers for DESeq2",
+              "low-expression filter CPM >= 1 in >= 12 samples of each fit (one timepoint cell = 12 participants) as an approximation of the paper's unstated filter (13,295 detected transcripts)",
+              "interaction estimated with limma on log2(CPM+1) within-subject changes (paired change), not a DESeq2 interaction term",
+              "pydeseq2 instead of R DESeq2"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Estimated counts support DESeq2 after documented rounding and limma on log2(CPM+1). The paper used both packages (S4.9.1.p1). The runner cannot fit the nested-subject DESeq2 interaction model, so the response difference uses limma on per-participant changes, which removes subject effects exactly.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": null,
+              "effect_cutoff": null
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": null,
+              "effect_cutoff": null
+            }
+          },
+          "reasoning": "S4.10.p1: 'For RNA-sequencing and proteomics, an adjusted p value (p < 0.05) was used to establish statistical significance'; S2.3.p1 'Adj. p < 0.05'. No fold-change rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "the paper's exact DE model and low-count filter are unstated (S4.9.1.p1); within-group DESeq2 counts are 1.3-1.8x the paper's",
+              "SIE vs MICE response difference (interaction) at +3 h: 102 transcripts vs paper 207; at +24 h: 0 vs paper 16",
+              "paper-named UPRmt genes DDIT3 and HSPD1 have the paper's direction (larger rise after SIE) in the interaction but padj 0.19 and 0.23 (not significant); they are significant (padj 0.018 and 0.0005) in the exploratory cross-sectional SIE vs MICE comparison at +3 h, which gives 294 DEGs; the paper's 207 may have been a between-group comparison at +3 h rather than a difference in change",
+              "ORA of the SIE-larger-up genes at +3 h recovers heat acclimation / cellular response to heat / chaperone-mediated refolding terms (HSPA1A, HSPA1B, HSPA6, DNAJA4, BAG3), consistent in direction with the paper's protein folding / UPR enrichment (Fig. 2B)",
+              "the paper's mitostress GSEA set (Quiros 2017) is not available here; Hallmark GSEA is a substitute and not a reproduction"
+            ]
+          },
+          "paper_counts": {
+            "deseq2_MICE/time_h3_vs_pre_grp-MICE": 1462,
+            "deseq2_MICE/time_h24_vs_pre_grp-MICE": 5632,
+            "deseq2_SIE/time_h3_vs_pre_grp-SIE": 1338,
+            "deseq2_SIE/time_h24_vs_pre_grp-SIE": 3230,
+            "limma_change_h3/SIE_vs_MICE_response": 207,
+            "limma_change_h24/SIE_vs_MICE_response": 16
+          },
+          "paper_genes": {
+            "limma_change_h3/SIE_vs_MICE_response": [
+              "DDIT3",
+              "HSPD1",
+              "HSPE1",
+              "PPP1R15A"
+            ],
+            "deseq2_SIE/time_h3_vs_pre_grp-SIE": [
+              "DDIT3",
+              "HSPD1",
+              "HSPE1",
+              "PPP1R15A"
+            ],
+            "deseq2_between/grp_SIE_vs_MICE_time-h3": [
+              "DDIT3",
+              "HSPD1",
+              "HSPE1",
+              "PPP1R15A"
+            ]
+          },
+          "reasoning": "Planned contrasts all run on the paper's samples and threshold; method details are partially specified by the paper.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "early recovery timepoint label",
+          "paper": "+3 h from start of exercise (S2.2.p1)",
+          "data": "+2.5h in GEO titles",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "participants",
+          "paper": "14 per group randomized (S4.5.p1, S4.6.p1)",
+          "data": "12 per group with RNA-seq; Fig. 1D and S4.9.1.p1 also state 12 per group / 24 participants",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "participant numbering",
+          "paper": "parallel groups (different people)",
+          "data": "Participant #1-#12 reused in both groups",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "DE method",
+          "paper": "limma and DESeq2, model unstated (S4.9.1.p1)",
+          "data": "RSEM expected counts",
+          "disposition": "executable_with_declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "deseq2_MICE",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": [
+              "time_h3_vs_pre_grp-MICE",
+              "time_h24_vs_pre_grp-MICE",
+              "time_h24_vs_h3_grp-MICE"
+            ],
+            "covariates": [
+              "subject"
+            ],
+            "round_estimated_counts": true,
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "MICE"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 1,
+            "min_samples": 12
+          },
+          "role": "primary",
+          "reasoning": "MICE within-group responses (S2.2.p2), one DESeq2 model with participant blocking on the 36 MICE samples; h24 vs h3 exploratory"
+        },
+        {
+          "name": "deseq2_SIE",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": [
+              "time_h3_vs_pre_grp-SIE",
+              "time_h24_vs_pre_grp-SIE",
+              "time_h24_vs_h3_grp-SIE"
+            ],
+            "covariates": [
+              "subject"
+            ],
+            "round_estimated_counts": true,
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "SIE"
+            ]
+          },
+          "filter_low_counts": {
+            "min_cpm": 1,
+            "min_samples": 12
+          },
+          "role": "primary",
+          "reasoning": "SIE within-group responses (S2.2.p2), one DESeq2 model with participant blocking on the 36 SIE samples; h24 vs h3 exploratory"
+        },
+        {
+          "name": "limma_change_h3",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "paired_change",
+              "subject_column": "subject",
+              "time_column": "time",
+              "baseline_level": "pre",
+              "followup_levels": [
+                "h3"
+              ],
+              "group_column": "grp",
+              "formula": "~ 0 + C(grp)",
+              "contrasts": [
+                {
+                  "name": "SIE_vs_MICE_response",
+                  "coefficients": {
+                    "C(grp)[SIE]": 1,
+                    "C(grp)[MICE]": -1
+                  }
+                },
+                {
+                  "name": "MICE_response",
+                  "coefficients": {
+                    "C(grp)[MICE]": 1
+                  }
+                },
+                {
+                  "name": "SIE_response",
+                  "coefficients": {
+                    "C(grp)[SIE]": 1
+                  }
+                }
+              ]
+            }
+          },
+          "transform": "log2(CPM+1)",
+          "filter_low_counts": {
+            "min_cpm": 1,
+            "min_samples": 12
+          },
+          "role": "primary",
+          "reasoning": "SIE vs MICE difference in the exercise response at +3 h (S2.3.p1) with limma on per-participant changes (followup - pre, log2(CPM+1)); one execution per follow-up because the runner keys paired-change tables by contrast name only (tools/case_runner.py:871); within-group limma responses are a sensitivity check of the DESeq2 counts"
+        },
+        {
+          "name": "limma_change_h24",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "paired_change",
+              "subject_column": "subject",
+              "time_column": "time",
+              "baseline_level": "pre",
+              "followup_levels": [
+                "h24"
+              ],
+              "group_column": "grp",
+              "formula": "~ 0 + C(grp)",
+              "contrasts": [
+                {
+                  "name": "SIE_vs_MICE_response",
+                  "coefficients": {
+                    "C(grp)[SIE]": 1,
+                    "C(grp)[MICE]": -1
+                  }
+                },
+                {
+                  "name": "MICE_response",
+                  "coefficients": {
+                    "C(grp)[MICE]": 1
+                  }
+                },
+                {
+                  "name": "SIE_response",
+                  "coefficients": {
+                    "C(grp)[SIE]": 1
+                  }
+                }
+              ]
+            }
+          },
+          "transform": "log2(CPM+1)",
+          "filter_low_counts": {
+            "min_cpm": 1,
+            "min_samples": 12
+          },
+          "role": "primary",
+          "reasoning": "SIE vs MICE difference in the exercise response at +24 h (S2.3.p1) with limma on per-participant changes (followup - pre, log2(CPM+1)); one execution per follow-up because the runner keys paired-change tables by contrast name only (tools/case_runner.py:871); within-group limma responses are a sensitivity check of the DESeq2 counts"
+        },
+        {
+          "name": "deseq2_between",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": [
+              "grp_SIE_vs_MICE_time-pre",
+              "grp_SIE_vs_MICE_time-h3",
+              "grp_SIE_vs_MICE_time-h24"
+            ],
+            "covariates": [],
+            "round_estimated_counts": true,
+            "alpha": 0.05
+          },
+          "filter_low_counts": {
+            "min_cpm": 1,
+            "min_samples": 12
+          },
+          "role": "exploratory",
+          "reasoning": "cross-sectional SIE vs MICE at each timepoint (between different people); exploratory, not the paper's response-difference estimand"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "limma_change_h3/SIE_vs_MICE_response",
+          "ora": true,
+          "gsea": false,
+          "direction": "up",
+          "reasoning": "paper ORA on transcripts upregulated to a larger extent after SIE at 3 h (S2.3.p1, Fig. 2B)"
+        },
+        {
+          "execution": "limma_change_h3/SIE_vs_MICE_response",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper GSEA (mitostress set, unavailable) on the SIE vs MICE response; Hallmark GSEA on the full ranking as a substitute"
+        }
+      ]
+    }
+  ]
+}

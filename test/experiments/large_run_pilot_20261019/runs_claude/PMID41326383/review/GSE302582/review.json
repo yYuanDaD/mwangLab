@@ -1,0 +1,89 @@
+{
+ "case": "GSE302582",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Human vastus lateralis RNA-seq, GSE302582 (S4.9.1.p1). Exercise bouts MICE and SIE; all 72 samples (24 men x pre/+3h/+24h) carry the exercise factor via biopsy time.",
+  "B2": "Parallel-group RCT, 12 per group with RNA-seq (Fig1D, S4.9.1.p1): within-group +3h and +24h vs rest in MICE and SIE (S2.2.p2: 1462/1338/5632/3230 DEGs); SIE vs MICE difference at +3h (207) and +24h (16) (S2.3.p1).",
+  "B3": "Yes: each man has 3 biopsies. Participant #1-12 restarts in each group (different people), so the unit is group+participant (subject column, 24 units, 3 samples each); characteristics_ch1.3.participant alone is not a unit (S2.2.p1 parallel-group design; S4.9.1.p1).",
+  "B4": "Paper does not say (S4.9.1.p1: limma and DESeq2 'following previously published guidelines'; S4.10.p1 covers only Prism tests).",
+  "B5": "S4.10.p1: 'For RNA-sequencing and proteomics, an adjusted p value (p < 0.05) was used to establish statistical significance'; S2.3.p1 'Adj. p < 0.05'. No fold-change cutoff. Counts: 1462/1338 (+3h), 5632/3230 (+24h), 207 and 16 SIE vs MICE."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Series is an exercise study (B1); analyzed.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "grp/time from titles, 12 per group x 3 times, +2.5h recoded h3 and recorded as discrepancy; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Each time contrast is follow-up vs pre; interaction is SIE minus MICE change, matching 'larger following SIE' (S2.3.p1).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "subject=group+participant (24 units, 3 samples each) is correct for the parallel design (B3); DESeq2 ~subject+cell per group, limma on within-subject changes; numeric IDs are strings; participant-number reuse across groups recorded.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper silent (B4). Per-group DESeq2 plus limma within-group sensitivity both reported, but counts are 1.3-1.8x the paper and no joint model was fitted; caveat states the model is unstated.",
+   "fix": "Optional: add a joint limma-duplicateCorrelation or joint DESeq2 fit as a sensitivity run."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One sex only, no batch recorded; suitability report records this. Group is between-subject and handled by differencing.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM expected_count (91.6% integers) rounded for DESeq2 with deviation recorded; limma on log2(CPM+1); p-value histograms sane for the interaction tables.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "padj<0.05 without FC matches S4.10.p1 exactly. Packet B shows padj<0.1 gives 208 vs paper 207 at +3h, and 17 at +24h with p<0.05&|lfc|>1 vs 16; the study caveats record the count gap but not that these alternative rules fit.",
+   "fix": "Add a sentence to the study record that padj<0.1 reproduces 207 (208) at +3h, as a discrepancy, without changing the applied rule."
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Pairs compare the same contrasts (S2.2.p2, S2.3.p1). HANDBACK says the pattern matches and lists the count gaps; the 1.5-1.8x inflation of within-group DESeq2 counts is acknowledged in caveats.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Which threshold to report when padj<0.1 reproduces the paper's 207 although the paper states padj<0.05 (open policy question).",
+  "Joint versus pairwise fits: paper silent, analysis fitted per group plus limma change scores."
+ ],
+ "summary": "该案例设计与论文一致：并行分组、每组12人、三个时间点，以 group+participant 作为重复测量单位并正确分块。阈值 padj<0.05 与论文完全一致；仅有次要备注（模型未说明、padj<0.1 恰好复现207个DEG未记录）。总体通过。"
+}

@@ -695,3 +695,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID30071007 (GSE114062)
 
 - decision_contract.py:79 substring 'rma' classes any 'normalized' matrix_type as log_scale and blocks edgeR; inspect misses Cuffnorm size-factor count signature Details: `PMID30071007/HANDBACK.md`.
+
+## PMID40388671 (GSE226005)
+
+- geo_tar.py:100 sniffer misreads title line and skips all 12 tar members (native.py:551 no mergeable files); merged via prep script Details: `PMID40388671/HANDBACK.md`.
+
+## PMID41326383 (GSE302582)
+
+- geo_tools.py:58-61 suppl dir listing 403 (RAW.tar fetched by hand); case_runner.py:871 paired-change tables keyed by contrast only, h3 overwritten by h24 Details: `PMID41326383/HANDBACK.md`.
+
+## PMID35470975 (GSE185957)
+
+- suitability.py:458 sex_split_plan ignores design strata (proposed female comparison pooling lean+obese); paper edgeR route blocked (only CPM deposited) Details: `PMID35470975/HANDBACK.md`.

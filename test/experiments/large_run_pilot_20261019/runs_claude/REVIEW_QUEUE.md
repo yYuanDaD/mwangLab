@@ -214,3 +214,22 @@ One section per case; newest last.
 ## PMID32755589 / GSE142678_per_duration (2026-11-17)
 
 - policy: Policy: can the decision contract accept a not_analyzable(sample_size) verdict as exploratory when the paper itself analysed n=2 per cell? Currently blocks the paper's primary estimand.
+
+## PMID30071007 / GSE114062 (2026-11-17)
+
+- policy: Policy: whether a selectively bred high-runner line vs control line (both wheel-exposed) counts as an exercise study; the run labels it associational.
+- policy: Whether the primary should be paired when the paper's own model is unpaired (joint vs paper-faithful) is for the person to decide; the sensitivity run is requested.
+
+## PMID40388671 / GSE226005 (2026-11-17)
+
+- policy: Open policy question: the exercise snRNA-seq SubSeries of GSE226008 was not examined; whether to route it as a separate case is for the person.
+
+## PMID35470975 / GSE185957 (2026-11-17)
+
+- policy: Obese post vs pre gives 0 DEGs (min padj 0.32) on every limma route vs paper 104; the paper's exact obese rule or model (maybe raw-count edgeR, or a different threshold) cannot be determined from the files.
+- policy: Sex inferred from X/Y (lean 4F, obese 2M2F) disagrees with S2.1.p1 (lean 2M2F, obese 4F) and Table 1 (2F2M each); lean counts match so labels are kept, but a possible group-label issue is not excluded.
+
+## PMID41326383 / GSE302582 (2026-11-17)
+
+- policy: Which threshold to report when padj<0.1 reproduces the paper's 207 although the paper states padj<0.05 (open policy question).
+- policy: Joint versus pairwise fits: paper silent, analysis fitted per group plus limma change scores.

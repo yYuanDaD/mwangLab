@@ -1,0 +1,443 @@
+{
+  "case_id": "GSE302582",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp",
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts (RSEM expected_count)",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts (RSEM expected_count)",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp",
+        "time"
+      ],
+      "levels": {
+        "grp": {
+          "MICE": 36,
+          "SIE": 36
+        },
+        "time": {
+          "pre": 24,
+          "h3": 24,
+          "h24": 24
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [
+        "grp"
+      ],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "grp",
+          "decision": "between_subjects",
+          "reason": "constant within each subject: fit within-subject differences (paired_change) or a mixed model; not subject + factor in one fixed model"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 26,
+        "full_rank": true,
+        "residual_df": 46,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_h3_vs_pre_grp-MICE",
+        "time_h24_vs_pre_grp-MICE",
+        "time_h3_vs_pre_grp-SIE",
+        "time_h24_vs_pre_grp-SIE",
+        "grp_time_SIE_h3_vs_MICE_pre",
+        "grp_time_SIE_h24_vs_MICE_pre"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 72 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 72
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41326383\\GSE302582\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_SIE_vs_MICE_time-h24",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "SIE",
+      "reference": "MICE",
+      "within": {
+        "time": "h24"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h24",
+            "grp": "SIE"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "time": "h24",
+            "grp": "MICE"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_SIE_vs_MICE_time-h3",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "SIE",
+      "reference": "MICE",
+      "within": {
+        "time": "h3"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h3",
+            "grp": "SIE"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "time": "h3",
+            "grp": "MICE"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_SIE_vs_MICE_time-pre",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "SIE",
+      "reference": "MICE",
+      "within": {
+        "time": "pre"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "SIE"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "time": "pre",
+            "grp": "MICE"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_h24_grp-MICE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "h24",
+      "within": {
+        "grp": "MICE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h24"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h24_vs_pre_grp-MICE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h24",
+      "reference": "pre",
+      "within": {
+        "grp": "MICE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h24"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_pre_grp-MICE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "pre",
+      "within": {
+        "grp": "MICE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_h24_grp-SIE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "h24",
+      "within": {
+        "grp": "SIE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h24"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h24_vs_pre_grp-SIE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h24",
+      "reference": "pre",
+      "within": {
+        "grp": "SIE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h24"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h3_vs_pre_grp-SIE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h3",
+      "reference": "pre",
+      "within": {
+        "grp": "SIE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_time_SIE_h24_vs_MICE_pre",
+      "kind": "interaction",
+      "factor": "grp:time",
+      "test": "SIE:h24",
+      "reference": "MICE:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h24"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h24"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "pre"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_time_SIE_h3_vs_MICE_pre",
+      "kind": "interaction",
+      "factor": "grp:time",
+      "test": "SIE:h3",
+      "reference": "MICE:pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "h3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "SIE",
+            "time": "pre"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "grp": "MICE",
+            "time": "pre"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

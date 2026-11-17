@@ -1,0 +1,89 @@
+{
+ "case": "GSE185957",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Human vastus lateralis RNA-seq, single bout of single-leg cycling (30 min, 70% VO2peak), biopsy at rest and 3.5 h after (S2.3.p1). All 16 libraries (8 subjects x pre/post) carry the exercise factor as time; BMI status (lean/obese) is a second factor.",
+  "B2": "Post vs pre in lean (n=4 pairs; 419 up, 132 down) and in obese (n=4 pairs; 82 up, 22 down) (S3.2.p1, FIG2). Baseline obese vs lean (97 up/65 down, S3.1.p1) is not an exercise contrast.",
+  "B3": "Yes: each person is biopsied twice (pre and post). GEO subject field (characteristics_ch1.0.subject) pairs every sample once in the time factor (packet A pairing table).",
+  "B4": "Paper does not say: 'negative binomial generalized log-linear model in the edgeR R package' (S2.4.p1); no design or blocking stated; results reported per group (FIG2 A/B).",
+  "B5": "Stated for baseline: 'adjusted p-value < 0.05, log2(fold-change) > +/-0.5' (S3.1.p1); FIG2 axes -log10(FDR); no separate exercise rule given. Counts: lean 419 up/132 down, obese 82 up/22 down (S3.2.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single-bout exercise, pre vs 3.5 h post biopsy (S2.3.p1); run is right.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "16 samples = 4 lean + 4 obese x pre/post (ABS, S2.1.p1; GSE group field); paper n=4 per group. Sex inferred from X/Y disagrees with S2.1.p1/Table 1 text, recorded; lean DEG count 554 vs 551 argues the GEO labels are the analysed ones.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "post vs pre, control=pre; FIG2 positive log2FC = increase after exercise; OXPHOS down in lean matches S3.2.p2.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "subject pairs each pre/post once (packet A key, 8 keys in every level once); model ~ subject + time; unpaired sensitivity also run.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper only says edgeR NB GLM (S2.4.p1), design not stated; per-stratum fits primary plus pooled-variance joint fit as sensitivity, both reported.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Leg and day aliased with time by design, recorded as caveat; sex absorbed by subject block.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Deposited file is edgeR norm CPM (non-integer, column sums ~1e6), not counts; limma-trend on log2(CPM+1); declared deviation. p-value histograms plausible (frac p>0.9 0.07-0.09).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper states FDR<0.05 and |log2FC|>0.5 only for baseline (S3.1.p1); Fig2 gives FDR. Carrying it to exercise contrasts is recorded as an assumption, and lean 554 vs 551 supports it. No other rule reproduces obese 104 (p<0.05&|lfc|>0.585 gives 222).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Lean/obese compared at the same contrast and rule; HANDBACK states lean reproduced and obese 0 vs 104 not reproduced, without overclaiming.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Obese post vs pre gives 0 DEGs (min padj 0.32) on every limma route vs paper 104; the paper's exact obese rule or model (maybe raw-count edgeR, or a different threshold) cannot be determined from the files.",
+  "Sex inferred from X/Y (lean 4F, obese 2M2F) disagrees with S2.1.p1 (lean 2M2F, obese 4F) and Table 1 (2F2M each); lean counts match so labels are kept, but a possible group-label issue is not excluded."
+ ],
+ "summary": "该案例的运行决策、分组、方向、按受试者配对和CPM矩阵处理都与论文一致,没有阻断或重大问题。阈值沿用论文基线比较的规则并已记录为假设;瘦人组554对551基本复现,肥胖组0对104未复现,已如实在HANDBACK中说明。肥胖组差异和性别推断不一致留给人工判断。"
+}

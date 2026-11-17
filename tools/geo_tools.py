@@ -58,17 +58,25 @@ def download_supplementary_files(geo_accession: str, base_dir: str = "./data") -
     ftp_url = f"https://ftp.ncbi.nlm.nih.gov/geo/series/{prefix}/{geo_accession}/suppl/"
 
     try:
-        response = requests.get(ftp_url, timeout=60)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
+        # The suppl/ directory listing sometimes answers 403 while the files themselves download
+        # fine; then take the file names from the series record (!Series_supplementary_file).
+        try:
+            response = requests.get(ftp_url, timeout=60)
+            response.raise_for_status()
+            hrefs = [link.get("href") for link in BeautifulSoup(response.text, "html.parser").find_all("a")]
+        except requests.RequestException:
+            soft = requests.get("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi", timeout=60,
+                                params={"acc": geo_accession, "targ": "self", "form": "text", "view": "brief"})
+            soft.raise_for_status()
+            hrefs = [line.split("=", 1)[1].strip().rsplit("/", 1)[-1] for line in soft.text.splitlines()
+                     if line.startswith("!Series_supplementary_file")]
 
         downloaded_files = []
         converted_files = []
         skipped_files = []
         oversize_files = []
 
-        for link in soup.find_all("a"):
-            href = link.get("href")
+        for href in hrefs:
             if href and href.startswith(geo_accession):
                 file_url = ftp_url + href
                 file_path = os.path.join(target_dir, href)

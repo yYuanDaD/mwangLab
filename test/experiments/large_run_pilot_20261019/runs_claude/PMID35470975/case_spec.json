@@ -1,0 +1,436 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35470975",
+  "request": "Analyze GSE185957 for PMID 35470975 (Impact of obesity on the molecular response to a single bout of exercise in a preliminary human cohort.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (Claude Code subagent)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE185957",
+      "accession": "GSE185957",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC9048146.paper.md"
+        ],
+        "metadata": "GSE185957/GSE185957_metadata.csv",
+        "matrix": "GSE185957/GSE185957_norm_cpm.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE185957"
+            ],
+            "assay": "bulk RNA-seq (polyA, Illumina HiSeq 4000), human vastus lateralis biopsies (S2.4.p1)",
+            "sample_inclusion": "4 lean + 4 obese adults, each biopsied at rest (pre) and 3.5 h after 30 min single-leg cycling at 70% VO2peak (post); 16 libraries (ABS.p2, S2.1.p1, S2.3.p1)",
+            "factors": {
+              "status": [
+                "lean",
+                "obese"
+              ],
+              "time": [
+                "pre",
+                "post"
+              ]
+            },
+            "repeated_measure_unit": "subject (pre and post biopsy from the same person; rest biopsy right leg, post biopsy exercised left leg, separate days) (S2.3.p1)",
+            "primary_estimand": "Within-person transcriptional response to a single bout of endurance exercise (post vs pre), estimated separately in lean and in obese participants (S3.2.p1, FIG2)",
+            "planned_contrasts": [
+              "lean: post vs pre (S3.2.p1; paper: 419 up, 132 down = 551 DEGs)",
+              "obese: post vs pre (S3.2.p1; paper: 82 up, 22 down = 104 DEGs)",
+              "baseline obese vs lean pre (S3.1.p1; 97 up, 65 down) - not an exercise contrast, out of scope"
+            ],
+            "paper_method": "edgeR negative-binomial GLM on featureCounts gene counts (S2.4.p1); design terms and subject blocking not stated",
+            "paper_normalization": "edgeR (deposited file is edgeR-normalized CPM, GEO data_processing)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "source_locator": "S3.1.p1 (adjusted p < 0.05, log2(fold-change) > +/-0.5); FIG2/FIG7 report FDR / adjusted p = 0.05"
+            },
+            "paper_results": {
+              "lean_post_vs_pre": {
+                "up": 419,
+                "down": 132
+              },
+              "obese_post_vs_pre": {
+                "up": 82,
+                "down": 22
+              },
+              "overlap": {
+                "up": 54,
+                "down": 9
+              },
+              "transcripts_identified": 13175
+            },
+            "paper_pathways": "GSEA: lean post-exercise downregulation of mitochondrial translation and OXPHOS gene sets, upregulation of RTK signaling; obese: no regulated transcript gene sets (S3.2.p2)"
+          },
+          "reasoning": "Paper-first reconstruction. The exercise estimand is the paired pre/post change within each BMI group (S3.2.p1, FIG2 volcano plots per group). The explicit DE threshold (adjusted p<0.05 and |log2FC|>0.5) is stated in S3.1.p1 for the baseline comparison and is the only stated threshold; FIG2 uses FDR on the y-axis, so the same rule is taken for the exercise contrasts (medium confidence). edgeR GLM on counts is the paper's method; whether subject was blocked is not stated.",
+          "confidence": "medium",
+          "locator": "S2.4.p1; S3.1.p1; S3.2.p1"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S2.4.p1 names GSE185957",
+              "GEO: Homo sapiens skeletal muscle, Mayo Clinic, STAR/hg38/featureCounts/edgeR matches S2.4.p1",
+              "16 samples = 8 subjects x pre/post, groups leanpre/leanpost/obesepre/obesepost 4 each matches N=4+4 (ABS.p2)"
+            ]
+          },
+          "reasoning": "Accession cited in the paper; processing description and sample structure match the paper's RNA-seq cohort.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "status": [
+              "characteristics_ch1.1.group",
+              "^(lean|obese)(?:pre|post)$"
+            ],
+            "time": [
+              "characteristics_ch1.1.group",
+              "^(?:lean|obese)(pre|post)$"
+            ]
+          },
+          "recode": {},
+          "aliases": {
+            "subject": "characteristics_ch1.0.subject"
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (subject5post, ...) equal the metadata title column exactly for 16/16 samples (inspect alignment_keys). status and time are parsed from the GEO group field; subject from the subject characteristic (each subject has exactly one pre and one post).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear normalized CPM (edgeR-normalized counts per million)",
+          "recommended_method": "limma on log2(CPM+1) with subject blocking",
+          "reasoning": "File is GSE185957_norm_cpm.txt.gz; data_processing says 'Supplementary_files_format_and_content: norm_cpm.txt'. Values are non-integer (integer fraction 0.636 driven by zeros), column sums 0.84-1.12 million (CPM on TMM-adjusted library sizes). The paper's input (raw featureCounts counts for edgeR) was not deposited, and library sizes are not given, so counts cannot be recovered.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "raw counts",
+              "reason_rejected": "non-integer, column sums ~1e6: CPM, not counts"
+            }
+          ]
+        },
+        "design": {
+          "factors": [
+            "time"
+          ],
+          "references": {
+            "time": "pre"
+          },
+          "subject": "subject",
+          "strata": [
+            "status"
+          ],
+          "organism": "Human",
+          "planned": [
+            "time_post_vs_pre_status-lean",
+            "time_post_vs_pre_status-obese"
+          ],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "paired two-timepoint, stratified by BMI group",
+            "design_column": "time",
+            "control": "pre",
+            "treatment": "post",
+            "contrasts": [
+              {
+                "name": "time_post_vs_pre_status-lean",
+                "control": "pre",
+                "treatment": "post",
+                "role": "primary",
+                "stratum": {
+                  "status": "lean"
+                }
+              },
+              {
+                "name": "time_post_vs_pre_status-obese",
+                "control": "pre",
+                "treatment": "post",
+                "role": "primary",
+                "stratum": {
+                  "status": "obese"
+                }
+              }
+            ]
+          },
+          "reasoning": "The paper reports exercise effects separately per BMI group (S3.2.p1, FIG2 A/B), so status is a stratum and time (post vs pre) is the factor, with subject as the repeated-measure key. n=4 pairs per group (small; paper calls itself preliminary, S5.p1). The baseline obese-vs-lean and obesity-by-exercise interaction are not exercise-effect contrasts asked for here and were not separately quantified as DEG counts for the interaction in the paper; they are left out. Suitability split_plan proposes a female-only exploratory comparison; within strata it is either identical to the lean analysis (all lean are female) or has 2 pairs (obese females), so it is not run.",
+          "confidence": "high",
+          "candidates": [
+            {
+              "value": "pooled post vs pre across all 8 subjects",
+              "reason_rejected": "paper analyzes lean and obese separately (S3.2.p1); pooling changes the estimand"
+            },
+            {
+              "value": "one model ~ subject + status:time",
+              "reason_rejected": "equivalent fixed-effect estimand to per-stratum paired fits but pools residual variance across groups; paper's per-group reporting favors separate fits"
+            }
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Each subject contributes a pre and a post biopsy (S2.3.p1); subject is the blocking unit. Sex is not in GEO metadata and is not added as a covariate (it is constant within subject and absorbed by the subject block). Leg (rest right / exercise left) and day are completely aliased with time by design (S2.2.p1, S2.3.p1: not randomized) and cannot be separated; recorded as a caveat, not a covariate.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend on log2(CPM+1), subject blocking)",
+            "formula": "~ subject + time",
+            "paper_route": {
+              "method": "edgeR negative-binomial GLM on featureCounts counts",
+              "status": "blocked",
+              "reason": "Only edgeR-normalized CPM is deposited (GSE185957_norm_cpm.txt.gz); raw counts and library sizes are not available, so a count-based NB GLM cannot be fitted. CPM must not be rounded into counts."
+            },
+            "deviations": [
+              "limma on log2(CPM+1) instead of edgeR NB GLM on counts",
+              "low-expression filter CPM >= 1 in >= 4 of the 8 samples per stratum (paper's filter not stated; paper reports 13,175 transcripts identified)",
+              "subject blocking assumed (paper does not state its GLM design)"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized expression -> log2(x+1) then limma. Paired design via subject term. Filter on deposited CPM values approximates the usual edgeR filterByExpr/CPM filter.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "inclusive": false
+            },
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_cutoff": null
+            },
+            "deviation_note": "Paper rule applied to the limma-on-log2CPM deviation route; rule stated in S3.1.p1 and assumed to carry to the exercise contrasts (FIG2 uses FDR)."
+          },
+          "reasoning": "S3.1.p1: adjusted p-value < 0.05, log2(fold-change) > +/-0.5. Audit: BH < 0.05 without fold-change cutoff.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper's edgeR-on-counts route blocked: only normalized CPM deposited; limma on log2(CPM+1) runs instead.",
+              "Exercise is aliased with leg (rest right leg, exercise left leg) and with day; not randomized (S2.2.p1, S2.3.p1). The post-vs-pre contrast estimates exercise + leg + day.",
+              "n = 4 pairs per group; preliminary study (S5.p1). Results are low-powered.",
+              "Sex: X/Y inference (suitability sex check) gives lean subjects 1-4 all female and obese subjects 5,6 male / 7,8 female; paper text says lean 2F/2M and obese 4F (S2.1.p1) or 2F/2M each (Table 1). Pre/post of every subject agree in sex, and our lean count matches the paper's lean count, so GEO group labels are taken as the labels the paper analyzed. Per-sex exploratory split not run: female-only lean equals the lean analysis, female-only obese has 2 pairs (< 3), males have 2 pairs (< 3).",
+              "Obese post vs pre: 0 DEGs (padj<0.05 & |log2FC|>0.5) in paired, unpaired and pooled-variance paired-change limma fits, vs 104 in the paper; min padj 0.32. Paper's count not reproduced on the deposited CPM; the paper's edgeR NB GLM on raw counts may have more power, and its exact model is not stated.",
+              "GSEA (Hallmark, not the paper's library): lean shows OXIDATIVE_PHOSPHORYLATION negatively enriched, consistent with the paper's lean mitochondrial/OXPHOS downregulation (S3.2.p2); obese shows one set (INTERFERON_ALPHA_RESPONSE, negative) where the paper reports none."
+            ]
+          },
+          "paper_counts": {
+            "lean_post_vs_pre": 551,
+            "obese_post_vs_pre": 104
+          },
+          "paper_genes": {},
+          "reasoning": "Paper counts from S3.2.p1 (lean 419 up + 132 down; obese 82 up + 22 down). No individual transcripts are named for the exercise contrasts in the text."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "method input",
+          "paper": "edgeR NB GLM on featureCounts counts (S2.4.p1)",
+          "data": "only edgeR-normalized CPM deposited",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "participant sex",
+          "paper": "S2.1.p1: lean 2M/2F, obese 4F; Table 1: 2F/2M in each group",
+          "data": "no sex in GEO metadata; X/Y inference: lean 4F, obese 2M/2F; each subject's pre/post agree",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "low-expression filter",
+          "paper": "not stated; 13,175 transcripts identified (S3.1.p1)",
+          "data": "64,253 features in CPM file",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "obese exercise DEG count",
+          "paper": "104 (82 up, 22 down) (S3.2.p1)",
+          "data": "0 under the paper rule on every limma route tried",
+          "disposition": "declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "lean_post_vs_pre",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post",
+            "covariate_columns": "subject"
+          },
+          "subset": {
+            "status": [
+              "lean"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "time",
+            "levels": [
+              "pre",
+              "post"
+            ]
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "role": "primary",
+          "reasoning": "Paired exercise effect in lean (S3.2.p1, FIG2A)."
+        },
+        {
+          "name": "obese_post_vs_pre",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post",
+            "covariate_columns": "subject"
+          },
+          "subset": {
+            "status": [
+              "obese"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "time",
+            "levels": [
+              "pre",
+              "post"
+            ]
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "role": "primary",
+          "reasoning": "Paired exercise effect in obese (S3.2.p1, FIG2B)."
+        },
+        {
+          "name": "lean_post_vs_pre_unpaired",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post"
+          },
+          "subset": {
+            "status": [
+              "lean"
+            ]
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "role": "sensitivity",
+          "reasoning": "Paper does not state whether its edgeR GLM blocked on subject; unpaired fit tests that alternative. Not the primary estimand (ignores pairing)."
+        },
+        {
+          "name": "obese_post_vs_pre_unpaired",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {
+            "design_column": "time",
+            "control_group": "pre",
+            "treatment_group": "post"
+          },
+          "subset": {
+            "status": [
+              "obese"
+            ]
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 4
+          },
+          "role": "sensitivity",
+          "reasoning": "As above for obese; checks whether the paper's 104 obese DEGs could come from an unblocked model."
+        },
+        {
+          "name": "joint_paired_change",
+          "tool": "tools.multigroup_tools:run_multigroup_analysis",
+          "args": {
+            "plan": {
+              "analysis_type": "paired_change",
+              "subject_column": "subject",
+              "time_column": "time",
+              "baseline_level": "pre",
+              "followup_levels": [
+                "post"
+              ],
+              "group_column": "status",
+              "formula": "~ 0 + C(status)",
+              "contrasts": [
+                {
+                  "name": "lean_post_vs_pre",
+                  "coefficients": {
+                    "C(status)[lean]": 1
+                  }
+                },
+                {
+                  "name": "obese_post_vs_pre",
+                  "coefficients": {
+                    "C(status)[obese]": 1
+                  }
+                }
+              ]
+            }
+          },
+          "filter_low_counts": {
+            "min_value": 1,
+            "min_samples": 8
+          },
+          "role": "sensitivity",
+          "reasoning": "Within-subject post-pre differences for all 8 subjects in one limma model with a group mean per BMI status: same paired estimand per group but residual variance pooled across both groups (6 df instead of 3), closer to a single edgeR GLM fitted on all 16 libraries."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "lean_post_vs_pre",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "Paper ran GSEA on the exercise comparison (S2.7.p1, S3.2.p2); Hallmark used here as available gene-set library."
+        },
+        {
+          "execution": "obese_post_vs_pre",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "Paper ran GSEA on the exercise comparison (S2.7.p1, S3.2.p2)."
+        }
+      ]
+    }
+  ]
+}
