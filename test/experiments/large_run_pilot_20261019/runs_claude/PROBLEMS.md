@@ -731,3 +731,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38157298 (GSE245760)
 
 - edger_tools.py:106 astype(int) truncates est. counts; no exactTest (edger_tools.py:125), ~5 min/call; inspect types ENSMUSG_Symbol IDs as other (case_runner.py:405) Details: `PMID38157298/HANDBACK.md`.
+
+## PMID37395281 (GSE185154)
+
+- suitability.py:332-358 lists constant columns as candidate_covariate when factors is empty; suitability reports a no-estimand case as a sample_size failure Details: `PMID37395281/HANDBACK.md`.
+
+## PMID37639610 (GSE233485)
+
+- case_runner.py ~547-590 can't take group labels from matrix column names (needed substitute metadata); geo_tools.py:30 GEOparse GBK mojibake; inspect gives no TPM column-sum check Details: `PMID37639610/HANDBACK.md`.
+
+## PMID41673803 (GSE286570)
+
+- GBK mojibake in metadata data_processing (geo_tools.py:36); inspect feature_examples prints huge featureCounts rows (case_runner.py:404) Details: `PMID41673803/HANDBACK.md`.

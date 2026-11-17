@@ -1,0 +1,88 @@
+{
+ "case": "GSE245760",
+ "reviewer": "Claude (Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. 2x2 GEO series (WT/CHCHD4 Tg x treadmill training/none), n=4 each; all 16 samples carry the exercise factor (S2.1.p2, FIG1C, S2.7.p5).",
+  "B2": "FIG1C: Tg vs WT within -ET and within +ET, n=4 (genotype contrasts, Tables S1-S3); exercise effect within WT and within Tg (Tables S4/S5, S2.7.p5), 4 vs 4.",
+  "B3": "None: independent mice per group; title 'rep N' only labels replicates; candidate keys are not animal IDs and the expression check does not support pairing.",
+  "B4": "S4.3.8.p1: 'Differentially analysis were performed using the edgeR exactTest function' - a pairwise two-group test; no joint model.",
+  "B5": "No DEG rule stated in Methods; FIG1C legend: 'Red dashed line indicates p = 0.01' (raw p, volcano display for Tg/WT); paper DEG counts not in text (supplementary tables)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "B1: 16 samples, all with exercise factor (training x genotype); title/trt fields. Decision to run matches.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "packet B: trt EX 8/SED 8, grp 4 each; stratified by geno, 4 vs 4 per contrast, matching FIG1C n=4; no exclusions; control = same-genotype SED.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EX vs SED (treatment EX, control SED) in each genotype; matches S2.7.p5 'training increased' wording.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Independent animals (n=4 per group); candidate key (title suffix) is only a rep label, expression check not_supported (r 0.10 vs -0.01, p=0.13); no animal sampled twice.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S4.3.8.p1 edgeR exactTest = pairwise two-group; analysis fits each genotype alone (8 samples) as pairwise; exactTest vs QL F-test deviation declared; DESeq2 sensitivity added.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All male (S4.2.1.p1), 16-20 weeks; no batch/lane/housing information in paper or GEO; recorded as none available.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM expected counts (87.5% integer), rounded then edgeR TMM; matches S4.3.8.p1 and data_processing; rounding documented.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "B5: paper states no DEG rule; FIG1C p=0.01 red line is a display line on the Tg/WT volcano. Analysis applied BH padj<0.05 as workflow default and kept raw p<0.01 as audit; recorded as discrepancy. Wording only: audit rule could be noted as 'unconfirmed as the paper's rule'.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No paper DEG counts available (Tables S4/S5 not in hand); HANDBACK makes no count claim and compares named-gene directions only. Note the paper's main reported counts/plots (FIG1C, Tables S1-S3) are Tg vs WT genotype contrasts, correctly not used as exercise comparisons.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; all contrasts executed.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: which threshold to report when the paper states none but draws p=0.01 on a volcano (BH padj<0.05 applied, raw p<0.01 audit)."
+ ],
+ "summary": "该案例的分组、方向、模型结构（每个基因型内两两比较，对应 edgeR exactTest）和矩阵方法均与论文一致，没有重复测量。论文未给出 DEG 阈值，分析使用默认 padj<0.05 并保留 p<0.01 作审计，已记录。总体通过，无阻断或重大问题。"
+}

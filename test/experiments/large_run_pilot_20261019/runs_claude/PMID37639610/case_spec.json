@@ -1,0 +1,113 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37639610",
+  "request": "Analyze GSE233485 for PMID 37639610 (Impaired age-associated mitochondrial translation is mitigated by exercise and PGC-1alpha.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE233485",
+      "accession": "GSE233485",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC10483666.paper.md"],
+        "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37639610/sample_sheet_from_matrix_columns.csv",
+        "matrix": "GSE233485/GSE233485_WT_mKO_mTG_3-24mo_Count_Matrix_TPM.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID37639610/prep_metadata.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE233485"],
+            "assay": "bulk RNA-seq (TruSeq v2, HiSeq 2500 single-end, salmon v1.1.0, GRCm38) of gastrocnemius muscle (S3.6.p1, FIG1)",
+            "samples": "WT, PGC-1a mKO and PGC-1a mTG male mice at 3 mo and 24 mo; n = 6 per group except mKO 3 mo n = 5 (FIG1 legend)",
+            "factors": {"genotype": ["WT", "mKO", "mTG"], "age": ["3 mo", "24 mo"]},
+            "primary_estimand": "For GSE233485: age (24 vs 3 mo) and PGC-1a loss/gain-of-function effects on muscle transcription (S1.1.p1). The paper's exercise evidence is NOT in this series: exercise effects come from proteomics (wheel-running cohorts from ref 21, FIG4C; treadmill-trained vs sedentary 25 mo mice, TMT16plex, MassIVE MSV000092099, FIG4D, S3.15) and the RNA-seq is used only to show that mTG mimics the exercise pattern in the sedentary state (S1.4.p1, SI Fig S3H).",
+            "planned_contrasts": [
+              "WT 24 mo vs WT 3 mo (aging; S1.1.p1, FIG1E FDR<0.05 markers; no DEG count reported)",
+              "mKO vs WT and mTG vs WT within age (PGC-1a dependence; S1.1.p1)",
+              "No exercise contrast exists in GSE233485 (exercise = proteomics, FIG4C/D, S3.2, S3.15, DA.p1)"
+            ],
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.7.p1"},
+            "paper_method": "edgeR on the count matrix, genes with >= 1 CPM in all 5-6 replicates (S3.7.p1; GEO data_processing); PCA/z-score clustering on log2 TPM (S3.8.p1)",
+            "paper_results": "860 genes aligned with PC1/PC2; cluster 1 of mitochondrial genes; top GO terms include translation (S1.1.p1). No exercise DEG list from RNA-seq."
+          },
+          "reasoning": "S0.p2 and S1.1.p1 describe the RNA-seq as young/old x WT/mKO/mTG. S1.4.p1 and the FIG4 legend: exercise results are proteomic (ref 21 data for wheel running; own TMT proteomics for treadmill in 25 mo mice, limma empirical Bayes). DA.p1 deposits RNA-seq in GSE233485 and proteomics in MassIVE MSV000092099. FDR < 0.01 (S3.7.p1) applies to the RNA-seq edgeR analysis; the FIG1 legend marks genes at FDR < 0.05.",
+          "locator": "S1.1.p1; S1.4.p1; S3.7.p1; DA.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "DA.p1 names GSE233485 as the paper's RNA-seq deposit",
+              "GEO series: 35 gastrocnemius samples, WT/mKO/mTG x 3/24 mo, male, salmon GRCm38 release 100, matching S3.6.p1 and FIG1 (n=6, mKO 3 mo n=5)",
+              "Matrix GSE233485_WT_mKO_mTG_3-24mo_Count_Matrix_TPM.tsv.gz: 35 columns whose group prefixes match the GEO group counts exactly",
+              "The metadata input is a sample sheet derived from the matrix column names (prep_metadata.py) because the GEO records do not carry the animal IDs used as matrix column names"
+            ]
+          },
+          "reasoning": "Series, tissue, design and n match the paper; the only deposited matrix is the TPM file.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"geno": "genotype", "agegrp": "age"},
+          "recode": {"agegrp": {"3mo": "Y", "24mo": "O"}},
+          "patterns": {},
+          "exclude_samples": {},
+          "final": {
+            "mapping_level": "group (genotype x age) from matrix column prefixes; GSM-level mapping not determinable",
+            "prefix_rules": {"WT_n": "WT 3 mo", "MCK_n": "mTG 3 mo", "MKO_n": "mKO 3 mo", "WSO_n": "WT 24 mo", "MCK_SO_n": "mTG 24 mo", "MKO_SO_n": "mKO 24 mo"}
+          },
+          "candidates": [
+            {"value": "align matrix columns to GSM ids via GEO description (WT_3mo_1 ...)", "reason_rejected": "matrix columns are animal IDs (MCK_3874, MKO_SO_23) absent from every GEO field; matching rep numbers would be position-based"},
+            {"value": "align by column order", "reason_rejected": "position-based alignment is forbidden"}
+          ],
+          "reasoning": "The matrix columns encode genotype and age in their prefixes (MCK = muscle creatine kinase promoter PGC-1a transgene = mTG; MKO = muscle knockout; _SO / WSO = old). prep_metadata.py decodes them and verifies that the six group sizes equal the GEO counts (6/6/5/6/6/6; the unique n=5 group is mKO 3 mo, as in FIG1). Group labels are therefore reliable; individual GSM ids are not assigned.",
+          "confidence": "medium"
+        },
+        "matrix": {
+          "matrix_type": "TPM",
+          "recommended_method": "limma (log2(TPM+1))",
+          "final": {
+            "source": "GEO supplementary GSE233485_WT_mKO_mTG_3-24mo_Count_Matrix_TPM.tsv.gz",
+            "paper_input": "edgeR on salmon counts (S3.7.p1); counts are not deposited, only TPM",
+            "evidence": "every column sums to 1e6; non-zero values are non-integer (0.016% integers); 60.7% zeros explain the 0.607 integer fraction; file name and data_processing state TPM"
+          },
+          "reasoning": "Column sums are 1e6 and data_processing says the count matrix is comprised of TPM values. The paper's edgeR route would need counts, which are not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["geno", "agegrp"],
+          "references": {"geno": "WT", "agegrp": "Y"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": [],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "none",
+            "exercise_contrast": "absent",
+            "available_factors": "genotype (WT/mKO/mTG) x age (3/24 mo), all sedentary"
+          },
+          "decision_status": "refused",
+          "stop_reason": "GSE233485 contains no exercised animals: all 35 samples are sedentary WT/PGC-1a mKO/mTG mice at 3 or 24 mo. The paper's exercise effects are proteomic (wheel running, ref 21; treadmill 25 mo, MassIVE MSV000092099; FIG4C/D, S1.4.p1). An mTG-vs-WT or age contrast is a genetic or aging estimand and must not be reported as an exercise effect.",
+          "candidates": [
+            {"value": "mTG vs WT as an exercise proxy (S1.4.p1, SI Fig S3H)", "reason_rejected": "PGC-1a overexpression is a genetic model, not exercise; the paper itself only uses it as a sedentary-state comparison"},
+            {"value": "24 mo vs 3 mo WT", "reason_rejected": "aging estimand, not exercise"}
+          ],
+          "reasoning": "S0.p2, S1.1.p1 and FIG1: the RNA-seq design is age x genotype. S3.2 describes the exercise cohorts, which were profiled by proteomics (S3.15, FIG4C/D legend). The request asks for exercise effects on gene expression; this series cannot identify that estimand.",
+          "locator": "S1.4.p1; FIG4; S3.2; DA.p1",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise data modality", "paper": "exercise effects measured by proteomics (FIG4C/D; MassIVE MSV000092099; ref 21)", "data": "GSE233485 holds only sedentary genotype x age RNA-seq", "disposition": "blocks_estimand"},
+        {"item": "matrix type", "paper": "edgeR on count matrix (S3.7.p1)", "data": "only TPM deposited", "disposition": "would_require_method_deviation"},
+        {"item": "sample identifiers", "paper": "n per group (FIG1)", "data": "matrix uses animal IDs not present in GEO records; groups decodable from prefixes, GSM mapping not", "disposition": "group_level_only"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

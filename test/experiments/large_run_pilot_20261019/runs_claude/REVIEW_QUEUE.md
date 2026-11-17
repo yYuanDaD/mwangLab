@@ -255,3 +255,15 @@ One section per case; newest last.
 ## PMID35282369 / GSE193432 (2026-11-17)
 
 - policy: Which threshold to report: paper's counts fit padj rule while results text says raw P (open policy question, recorded as audit).
+
+## PMID38157298 / GSE245760 (2026-11-17)
+
+- policy: Open policy: which threshold to report when the paper states none but draws p=0.01 on a volcano (BH padj<0.05 applied, raw p<0.01 audit).
+
+## PMID37395281 / GSE185154 (2026-11-17)
+
+- policy: Open policy: whether genotype-only series in an exercise paper should be listed as non-exercise (done here) - no change needed.
+
+## PMID37639610 / GSE233485 (2026-11-17)
+
+- policy: Open policy: whether mTG vs WT (sedentary exercise-mimic, SI Fig S3H) should be offered as a labelled genetic-proxy analysis.
