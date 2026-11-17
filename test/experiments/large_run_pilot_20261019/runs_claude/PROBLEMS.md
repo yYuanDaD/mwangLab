@@ -659,3 +659,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35030322 (GSE190355)
 
 - case_runner.py:582 ran align_to_metadata before reading the manual_review gate (patched after this row); inspect missed .xls.gz TSV matrix (patched) Details: `PMID35030322/HANDBACK.md`.
+
+## PMID35198907 (GSE194193)
+
+- r_de.R:206-207 edger_ql wrote unsigned F as stat (GSEA rank wrong; patched after this row) and 2^logCPM as baseMean; runner cannot express factorial main effects; no biotype support Details: `PMID35198907/HANDBACK.md`.

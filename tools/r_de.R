@@ -204,7 +204,9 @@ if (engine == "deseq2") {
       v <- contrast_vector(con, colnames(design))
       tt <- topTags(glmQLFTest(fit, contrast = v), n = Inf, sort.by = "none")$table
       df <- data.frame(baseMean = 2^tt$logCPM, log2FoldChange = tt$logFC, logCPM = tt$logCPM,
-                       stat = tt$F, pvalue = tt$PValue, padj = tt$FDR, row.names = rownames(tt))
+                       # one-df contrast: signed sqrt(F) is the t-like statistic GSEA ranks by
+                       stat = sign(tt$logFC) * sqrt(tt$F), pvalue = tt$PValue, padj = tt$FDR,
+                       row.names = rownames(tt))
       outputs[[length(outputs) + 1]] <- list(name = con$name, path = write_table(df, con$name))
     }
   } else {

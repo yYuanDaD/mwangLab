@@ -180,3 +180,7 @@ One section per case; newest last.
 
 - policy: Open policy: which threshold/filter reading to treat as primary when the paper's numbers fit another reading (literal all-sample count>10 filter vs total count>10 sensitivity; padj<0.1 closest for scWAT rescue).
 - policy: Open policy: joint (~ grp) vs pairwise fits when the paper is silent; only the joint fit is reported.
+
+## PMID35030322 / GSE190355 (2026-11-10)
+
+- policy: Open policy: whether to try SRA re-quantification (SRP349620, GSM-labelled FASTQ) to obtain counts and a verified sample mapping; this is optional follow-up work, not an error in the record.

@@ -1,0 +1,24 @@
+{"case": "GSE190355", "reviewer": "Claude Sonnet 5.5 (read-only decision review)",
+ "blind": {
+  "B1": "Yes, in principle: GSE190355 is rat tMCAO ipsilateral striatum RNA-seq at day 35 with a 2x2 design (vehicle, vehicle+PE, NPCs, NPCs+PE); the exercise factor is PE (forced wheel running from day 7, S4.4.p1) vs stationary wheel. Exercise-carrying samples: vehicle+PE (n=4) and NPCs+PE (n=4). Locators: FIG5 legend, S4.4.p1, S4.16.p1.",
+  "B2": "Fig 5A vehicle+PE vs vehicle (4 vs 3); 5B NPCs vs vehicle (3 vs 3); 5C NPCs+PE vs vehicle (4 vs 3); 5D NPCs+PE vs NPCs (4 vs 3). Exercise contrasts: 5A and 5D (FIG5 legend).",
+  "B3": "One striatum per animal at day 35 (S4.15/S4.16), 14 animals, 14 GSMs; no repeated measures. Packet A lists no candidate pairing keys.",
+  "B4": "Paper says nothing on joint vs pairwise fitting; S4.16.p1 only says alignment by HISAT 2.0.5 and DEGseq 1.18.0 (pairwise two-group tool by design).",
+  "B5": "S4.16.p1 states no DEG cutoff (no FDR/p, no fold change); Fig 5 shows heatmaps and GO terms only, no DEG counts. GEO data_processing (not the paper) gives q<=0.05 and |log2 ratio|>=1 with DESeq2."
+ },
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Series has real in-vivo exercise arms (PE groups); the case did not refuse the series, it stopped at alignment for a different reason", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "paper_reconstruction gives 3/4/3/4 matching FIG5 legend; no samples analyzed; GSM-to-group mapping from title/source_name is consistent with 4+3+3+4. Metadata typo (GSM5720388 source_name says PE+Vehicle-2, title rep4) is recorded", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast was run", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One tissue per animal, independent samples; packet A has no pairing candidates", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Paper silent (S4.16.p1 DEGseq pairwise); not reached", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Not reached; paper notes cell transplantation batches (S4.2.p1) but no batch field in GEO; not aliasing evidence", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Only GSE190355_fpkm.anno.xls.gz (FPKM) is deposited, no counts; recorded as discrepancy with data_processing", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "paper_threshold stated=false with source locator S4.16.p1 and the GEO q<=0.05/|log2|>=1 rule recorded separately; matches my B5", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No ours-vs-paper comparison claimed; HANDBACK states the paper gives no counts", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "Claim 'no key' was tested across index, title, source_name, treatment and relation, exact and substring, plus SRA runinfo LibraryName; metadata columns hold no MPST/MST/R codes (checked all varying columns: title, source_name, treatment, relation). The 7 R* columns cannot be split between vehicle and vehicle+PE without a position guess, so the Fig 5A exercise contrast is truly unidentifiable. Rejection of the MPST/MST decode is justified (replicate numbers mismatch).", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Open policy: whether to try SRA re-quantification (SRP349620, GSM-labelled FASTQ) to obtain counts and a verified sample mapping; this is optional follow-up work, not an error in the record."],
+ "summary": "该案例在对齐阶段因矩阵列名（MPST/MST/R*）与GEO样本之间没有任何可验证的键而停止，未做任何差异分析。停止理由属实：已检查title、source_name、treatment、relation及SRA LibraryName，均无对应编码；R*七列无法区分vehicle与vehicle+PE，因此Fig 5A运动对比确实无法识别。论文未给出DEG阈值和数量，记录与论文一致，未发现需要修改的决定。"
+}

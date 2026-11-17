@@ -83,3 +83,5 @@ Quota stop 2026-11-10 ~11:00 local at 73/211: row 80 and the reviews of rows 81,
 resumed with their context after the reset.
 Quota stop 2026-11-10 ~16:00 local at 84/211: rows 94, 95, 96 were cut off and resumed with their
 context after the reset.
+Quota stop 2026-11-10 ~17:35 local at 95/211 (rows 105, 106 cut off). The PC then went offline until
+2026-11-16 23:48; resumed then (owner: continue, auto-resume after each reset).
