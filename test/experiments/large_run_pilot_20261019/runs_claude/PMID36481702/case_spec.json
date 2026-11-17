@@ -1,0 +1,255 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36481702",
+  "request": "Analyze GSE126001 and GSE176563 for PMID 36481702 (Genome-wide analysis of a cellular exercise model based on electrical pulse stimulation.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code subagent session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE176563",
+      "accession": "GSE176563",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9731977.paper.md"],
+        "metadata": "GSE176563/GSE176563_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE176563", "GSE126001"],
+            "assay": "bulk RNA-seq (HiSeq 2500, 2x100 PE, STAR to GRCm38), C2C12 myotubes",
+            "primary_estimand": "Effect of 24 h electrical pulse stimulation (in vitro exercise model) vs unstimulated control on C2C12 myotube gene expression",
+            "factors": {"grp": ["CTRL (unstimulated, n=3)", "EPS (24 h EPS, n=4)"]},
+            "sample_inclusion": "all 7 deposited samples; control n=3, EPS n=4 (FIG1 legend b,c)",
+            "planned_contrasts": ["EPS vs control (S2.1.p1, FIG1; paper: 774 DEGs, 406 up / 368 down)"],
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "source_locator": "S2.1.p1; FIG1"},
+            "paper_threshold_methods_variant": {"metric": "pvalue", "cutoff": 0.001, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "effect_inclusive": true, "source_locator": "S4.6.p1"},
+            "paper_method": "edgeR negative-binomial test on count data (S4.6.p1, S4.8.p1); CPM log2-transformed and quantile-normalized for expression display",
+            "repeated_measure_unit": "none (independent culture wells)",
+            "paper_results": "774 DEGs (406 up, 368 down); Table 2 up-regulated secreted genes incl. Prl2c2 logFC 8.80, Areg 2.99, Cxcl1, Cxcl5, Il1b, Gdf15; exercise signature up: Mt1, Mt2, Atf3; down: Myh4, Fam78a, Ppapdc3, Chrne, Kctd12, Il12a (FIG3a,b, S2.2.p3)",
+            "secondary_use_of_GSE126001": "public in vivo dataset (TAB1: 20-week WT C57BL/6J male, 5 weeks treadmill, gastrocnemius) used only as classifier test set and for cross-dataset direction of EPS genes (S2.1.p3, S2.2.p2, FIG3a,b); no DEG count reported"
+          },
+          "reasoning": "S2.1.p1 and FIG1 define the primary contrast (control n=3 vs EPS n=4) and the 774-DEG count with 'P < 0.01, fold change > 2'. S4.6.p1 states edgeR on counts but a different rule (P < 0.001, fold difference >= 2). The Results/Figure rule is the one tied to the reported 774 count, so it is the paper_threshold; the Methods rule is carried as audit_threshold. DA.p1 names GSE176563 as the paper's own data.",
+          "confidence": "high",
+          "locator": "S2.1.p1; FIG1; S4.6.p1; DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 and S4.6.p1 name GSE176563", "GEO source C2C12 cell, EPS vs No treatment, 3+4 samples matches FIG1 n", "contact Seon-Kyu Kim, KRIBB = author S.K.K. (BK2.p1)", "submission Jun 2021, public Dec 2022 = paper publication"]},
+          "reasoning": "Own deposit of the paper; sample counts and treatment labels match FIG1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["characteristics_ch1.1.electrical pulse stimulation", "^(No treatment|treated by electrical pulse stimulation)$"]},
+          "recode": {"grp": {"No treatment": "CTRL", "treated by electrical pulse stimulation": "EPS"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Tar-merged matrix columns become GSM ids and match the metadata index exactly (7/7). Group from the EPS characteristic; titles CL* = control, L* = EPS agree.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear_normalized (CPM)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "Per-sample files are named *_CPM.txt.gz; GEO Supplementary_files_format_and_content: 'CPM values of mRNA'; every column sums to exactly 1e6; values non-integer (integer fraction 0.39 from zeros). No raw counts or library sizes deposited, so the paper's edgeR input is unavailable. Paper input is counts for edgeR (S4.6.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CTRL"},
+          "organism": "Mouse",
+          "planned": ["grp_EPS_vs_CTRL"],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "CTRL",
+            "treatment": "EPS",
+            "estimand_type": "causal (randomized in vitro stimulation)",
+            "contrasts": [{"name": "grp_EPS_vs_CTRL", "control": "CTRL", "treatment": "EPS", "role": "primary"}]
+          },
+          "reasoning": "Single two-level factor exactly as in FIG1; no other varying metadata column.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent culture wells; no batch, lane or pairing recorded in GEO or paper.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(CPM+1)",
+            "formula": "~ grp",
+            "paper_route": {"method": "edgeR negative-binomial on counts", "status": "blocked", "reason": "only CPM deposited in GSE176563 (no counts, no library sizes); CPM cannot be converted back to counts and must not be rounded"},
+            "deviations": ["limma-trend style limma on log2(CPM+1) instead of edgeR on counts", "no quantile normalization (paper S4.6.p1 mentions log2 + quantile for expression data; limma run on log2 CPM only)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized expression -> log2(x+1) -> limma. Since values are CPM, log2(x+1) = log2(CPM+1).",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.001, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "effect_inclusive": true},
+            "deviation_note": "Paper rule applied on the limma deviation route. Methods (S4.6.p1) rule P < 0.001 and FC >= 2 is the audit rule."
+          },
+          "reasoning": "S2.1.p1/FIG1: P < 0.01, fold change > 2 -> raw p < 0.01 and |log2FC| > 1, tied to the 774 count. S4.6.p1 alternative is recorded as audit.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["edgeR on counts blocked (CPM only); limma on log2(CPM+1) used", "paper reports two different thresholds (S2.1.p1 vs S4.6.p1); Results rule applied, Methods rule audited", "n=3 vs 4"]
+          },
+          "paper_counts": {"grp_EPS_vs_CTRL": 774},
+          "paper_genes": {"grp_EPS_vs_CTRL": ["Prl2c2", "Prl2c3", "F13a1", "Areg", "Cxcl1", "Cxcl5", "Il1b", "Gdf15", "Mt1", "Mt2", "Atf3", "Myh4", "Fam78a", "Ppapdc3", "Chrne", "Kctd12", "Il12a"]},
+          "reasoning": "Up expected: Prl2c2..Gdf15 (TAB2), Mt1, Mt2, Atf3 (FIG3a); down expected: Myh4, Fam78a, Ppapdc3, Chrne, Kctd12, Il12a (FIG3b).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DEG threshold", "paper": "S2.1.p1/FIG1: P < 0.01 and FC > 2 (774 DEGs); S4.6.p1: P < 0.001 and FC >= 2", "data": "n/a", "disposition": "Results rule applied (tied to 774); Methods rule as audit_threshold"},
+        {"item": "DE input", "paper": "edgeR on count data (S4.6.p1)", "data": "GEO holds CPM only (columns sum to 1e6)", "disposition": "declared deviation: limma on log2(CPM+1)"}
+      ],
+      "executions": [
+        {"name": "grp_EPS_vs_CTRL", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "CTRL", "treatment_group": "EPS"},
+         "role": "primary", "reasoning": "Paper's EPS vs control contrast on the deviation route (limma, log2(CPM+1))."},
+        {"name": "grp_EPS_vs_CTRL_cpmfilt", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "grp", "control_group": "CTRL", "treatment_group": "EPS"},
+         "filter_low_counts": {"min_value": 1, "min_samples": 3},
+         "role": "sensitivity", "reasoning": "Sensitivity: drop genes with CPM < 1 in fewer than 3 samples (edgeR-style expression filter), since near-zero genes can produce large log2FC with few reads."}
+      ],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE126001",
+      "accession": "GSE126001",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9731977.paper.md"],
+        "metadata": "GSE126001/GSE126001_metadata.csv",
+        "matrix": "GSE126001/GSE126001_Knudsen_GEO_Processed.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE126001"],
+            "assay": "bulk RNA-seq, gastrocnemius (public dataset, not generated by the authors)",
+            "primary_estimand": "Effect of 5 weeks of daily treadmill endurance training vs untrained on WT mouse gastrocnemius gene expression, used to test whether EPS genes change in the same direction in vivo",
+            "factors": {"train": ["UT (untrained)", "TR (5 weeks endurance exercise)"], "geno": ["WT", "Il13-/-"]},
+            "sample_inclusion": "TAB1 describes the dataset as 20-week WT C57BL/6J male mice -> WT samples only (n=4 vs 4); Il13-/- samples not used by the paper",
+            "planned_contrasts": ["WT trained vs WT untrained (TAB1; used for classifier testing S2.1.p3 and gene-direction comparison S2.2.p2/FIG3a,b; no DEG count reported)"],
+            "paper_threshold": {"metric": "none", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "note": "no DE threshold for public datasets; FIG3 legend only excludes genes with log2 CPM < 1 and sorts by fold difference", "source_locator": "FIG3"},
+            "paper_method": "not stated for public datasets (fold difference of log2 CPM between groups, FIG3 legend)",
+            "repeated_measure_unit": "none (one muscle per mouse)",
+            "paper_results": "classifier: 83% sed predicted control, 67% ex predicted EPS across 9 datasets (S2.1.p3); exercise signature genes Mt1, Mt2, Atf3 up and Myh4, Fam78a, Ppapdc3, Chrne, Kctd12, Il12a down in at least six datasets (S2.2.p2, FIG3a,b)"
+          },
+          "reasoning": "GSE126001 is one of nine public in vivo datasets (TAB1, S4.9.p1). The paper did no formal DE on it; it was used for the DBN classifier and gene-direction comparison. A WT trained vs untrained DE is the closest executable estimand to the paper's use.",
+          "confidence": "medium",
+          "locator": "TAB1; S2.1.p3; S2.2.p2; FIG3; S3.p4; S4.9.p1"
+        },
+        "ownership": {
+          "final": {"owned": false, "role": "public reference dataset reused by the paper", "checks": ["TAB1 and S4.9.p1 name GSE126001 as a public dataset", "GEO: gastrocnemius, 20-week male C57Bl6/J, 5 weeks treadmill, matching TAB1", "submitter Knudsen / Chih-Hao Lee lab (Harvard), not the paper's authors", "matrix columns carry mouse ids W100..W149 matching metadata mouse id 16/16"]},
+          "reasoning": "Not the paper's own deposit, but it is the exact accession and sample description the paper cites in TAB1, so the files belong to the dataset the paper analyzed.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "characteristics_ch1.6.mouse id",
+          "matrix_column_pattern": "^(W\\d+)_",
+          "patterns": {"geno": ["title", "^(WT|Il13-KO)_"], "train": ["title", "_(Untrained|Trained)\\d+$"]},
+          "recode": {"geno": {"WT": "WT", "Il13-KO": "KO"}, "train": {"Untrained": "UT", "Trained": "TR"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns like 'W100_S25_R1_001 trimmed (GE) - RPKM' contain the mouse id that is the metadata 'mouse id' characteristic; exact match after extracting ^(W\\d+)_. Genotype and training from title; titles agree with genotype/treatment characteristics.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear_normalized (RPKM, CLC Genomics Workbench)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "Column labels end in '- RPKM'; data_processing: CLC Genomics Workbench expression values, normalized by scaling; non-integer values, max 19257. Linear normalized; no raw counts deposited. Paper input: their own processing to log2 CPM (FIG3 legend) not reproducible from RPKM.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["train"],
+          "references": {"train": "UT", "geno": "WT"},
+          "strata": ["geno"],
+          "organism": "Mouse",
+          "planned": ["train_TR_vs_UT_geno-WT"],
+          "final": {
+            "analysis_type": "two-group within genotype stratum",
+            "design_column": "train",
+            "control": "UT",
+            "treatment": "TR",
+            "estimand_type": "causal (randomized training in mice)",
+            "contrasts": [
+              {"name": "train_TR_vs_UT_geno-WT", "control": "UT", "treatment": "TR", "subset": {"geno": ["WT"]}, "role": "primary"},
+              {"name": "train_TR_vs_UT_geno-KO", "control": "UT", "treatment": "TR", "subset": {"geno": ["KO"]}, "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled WT+KO trained vs untrained", "reason_rejected": "paper's TAB1 uses WT only; pooling would mix in an Il13 loss-of-function effect on the training response"},
+            {"value": "genotype x training factorial", "reason_rejected": "interaction is the original study's question, not this paper's"}
+          ],
+          "reasoning": "Paper uses the WT exercise vs sedentary comparison (TAB1). Genotype is a stratum; the Il13-KO training contrast is exploratory only.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice, one muscle each; no batch recorded; genotype handled by stratification.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, empirical Bayes) on log2(RPKM+1)",
+            "formula": "~ train",
+            "deviations": ["paper used fold differences of its own log2 CPM values without a stated test; limma on deposited RPKM is used"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized -> log2(x+1) -> limma.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "none", "cutoff": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "deviation_note": "Paper states no DE threshold for public datasets; workflow default BH < 0.05. Audit uses the paper's EPS rule (P < 0.01, FC > 2) for comparability only."
+          },
+          "reasoning": "No threshold stated for GSE126001 (FIG3 legend only describes an expression filter).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["paper did not perform DE on GSE126001; no paper DEG count to compare", "RPKM only; limma on log2(RPKM+1)", "n=4 vs 4", "Il13-KO stratum is exploratory"]
+          },
+          "paper_counts": {},
+          "paper_genes": {"train_TR_vs_UT_geno-WT": ["Mt1", "Mt2", "Atf3", "Myh4", "Fam78a", "Ppapdc3", "Chrne", "Kctd12", "Il12a", "Areg"]},
+          "reasoning": "Expected from FIG3a,b: Mt1, Mt2, Atf3 up; Myh4, Fam78a, Ppapdc3, Chrne, Kctd12, Il12a down in most in vivo datasets (not necessarily GSE126001 individually).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "dataset use", "paper": "public dataset used for classifier testing and gene-direction comparison only", "data": "2x2 genotype x training, n=4 per cell", "disposition": "WT stratum trained vs untrained as the paper-implied estimand; KO stratum exploratory"},
+        {"item": "expression units", "paper": "log2 CPM (FIG3 legend)", "data": "RPKM from CLC", "disposition": "limma on log2(RPKM+1)"}
+      ],
+      "executions": [
+        {"name": "train_TR_vs_UT_geno-WT", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "train", "control_group": "UT", "treatment_group": "TR"},
+         "subset": {"geno": ["WT"]},
+         "role": "primary", "reasoning": "WT trained vs untrained, the dataset as described in TAB1."},
+        {"name": "train_TR_vs_UT_geno-KO", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "train", "control_group": "UT", "treatment_group": "TR"},
+         "subset": {"geno": ["KO"]},
+         "role": "exploratory", "reasoning": "Il13-/- training response; not used by the paper."}
+      ],
+      "enrichment": []
+    }
+  ]
+}

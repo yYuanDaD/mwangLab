@@ -759,3 +759,19 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36681077 (GSE216094)
 
 - inspect lists the authors' DESeq2 result table as a sample matrix without flagging it (minor) Details: `PMID36681077/HANDBACK.md`.
+
+## PMID36481702 (GSE126001;GSE176563)
+
+- inspect alignment_keys missed mouse-id inside matrix column names (case_runner.py:332 _contained_keys); paper edgeR route blocked (CPM only deposited) Details: `PMID36481702/HANDBACK.md`.
+
+## PMID39056292 (GSE246428)
+
+- metadata CSV mojibake in extract_protocol_ch1 (GBK decode of UTF-8 apostrophe); inspect reports n_samples 19 for norm+DE file with 9 samples Details: `PMID39056292/HANDBACK.md`.
+
+## PMID36620222 (GSE219100;GSE218103;GSE219099)
+
+- suitability.py:234 interaction name reads like a simple contrast; case_runner.py:628 refused design gets misleading sample_size fail; mixed matrix labelled ensembl_gene Details: `PMID36620222/HANDBACK.md`.
+
+## PMID36611093 (GSE208714)
+
+- inspect searches only GEO metadata for alignment keys; SRA/BioSample checked by hand Details: `PMID36611093/HANDBACK.md`.

@@ -291,3 +291,7 @@ One section per case; newest last.
 ## PMID36720890 / GSE214542_pretreatment (2026-11-17)
 
 - policy: Open policy: does an in-vivo exercise-mediator (recombinant irisin injection) series count as an exercise study? Refusal is consistent with the stated rule but a person should decide whether a pharmacological irisin-vs-MPTP sensitivity run is wanted.
+
+## PMID36481702 / GSE176563 (2026-11-17)
+
+- policy: 论文数字(774)与单独的 P<0.01(794)最接近,而非其声明的 P<0.01 且 FC>2:该情形下应报告哪条阈值属开放政策问题,本案已记录两条论文规则,未发现违反技能规则。

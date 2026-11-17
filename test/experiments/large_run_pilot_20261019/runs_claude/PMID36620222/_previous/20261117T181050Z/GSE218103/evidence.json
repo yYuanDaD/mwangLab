@@ -1,0 +1,986 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID36620222",
+  "subject_id": "GSE218103",
+  "created_at": "2026-11-17T13:08:54",
+  "finished_at": "2026-11-17T13:09:18",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9811128.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC9811128.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T13:08:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "13fd624659e709f3e55ed6c4a431da97b4b8850d7282c0045e15b88da38e2bde",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE218103_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE218103\\GSE218103_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:08:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "91bc1be6dd36b003f531287f67327389a69054bffd95b6e48783242fa1a0f900",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T13:08:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "da2b05a72ef289470f1539d454b7a5e2ead70d87cc4c90bb10b75fe987ecd2db",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE219100 (SuperSeries)",
+          "GSE218103 (EV small-RNA-seq, human)",
+          "GSE219099 (C2C12 miR-486 mimic RNA-seq, mouse)"
+        ],
+        "assay": "small RNA-seq of plasma extracellular-vesicle RNA (miRBase v22, featureCounts raw counts)",
+        "primary_estimand": "Effect of one acute aerobic exercise bout (45 min cycling in TD, 45 min Frame Running in CP) on EV microRNA cargo: 30 min post vs pre within TD EX and within CP EX; secondary (associational) CP vs TD at baseline and post-exercise",
+        "sample_inclusion": "Only TD EX (n=10) and CP EX (n=9) participants were sequenced; pre and post samples pooled to N=3 pools per timepoint per group (TD: 2 pools of 3 men, 1 pool of 4 women; CP: 3 pools by GMFCS II/III/IV) (S2.6.p1). TD CON participants (no-exercise controls) were NOT sequenced.",
+        "factors": {
+          "genotype": [
+            "TD",
+            "CP"
+          ],
+          "time": [
+            "pre",
+            "post (30 min)"
+          ]
+        },
+        "repeated_measure_unit": "pool of participants; the same pools are sampled pre and post, but which GEO pool index corresponds across timepoints is not documented",
+        "planned_contrasts": [
+          "TD post vs pre (S3.3.p1 'Exercise did not affect EV cargo in any of the groups', Supp Fig S2; paper: 0 DE miRNAs)",
+          "CP post vs pre (S3.3.p1, S4.p7; paper: 0 DE miRNAs)",
+          "CP vs TD at baseline (S3.3.p1, FIG2A/B: miR-486 up; let-7a, let-7b, let-7e down)",
+          "CP vs TD post-exercise (S3.3.p1, FIG2C/D: miR-486, miR-100 up; miR-877, miR-4433 down)"
+        ],
+        "normalization": "DESeq2 size factors; miRNAs with < 10 counts removed (S2.9.p2)",
+        "paper_method": "DESeq2 in R 3.6.2, model with genotype (TD/CP) and activity (EX/CON = pre/post); no pool/pairing term stated (S2.9.p2)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false,
+          "source_locator": "S2.9.p2"
+        },
+        "paper_results": "No exercise effect on EV miRNA cargo in any group (S3.3.p1, S4.p7)"
+      },
+      "reason": "S2.6.p1 describes the pooling (N=3 per timepoint per group for TD EX and CP EX) and names GSE219100. S2.9.p2 gives DESeq2 on raw featureCounts counts, <10-count filter, genotype + activity model, BH-adjusted p < 0.05 with no fold-change rule. S3.3.p1/S4.p7 state exercise did not change EV miRNA cargo; FIG2 gives the CP vs TD miRNAs. The C2C12 miR-486 mimic experiment (S2.8.p1, GSE219099) is a mechanistic follow-up, not an exercise contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:08:54"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "series_id = GSE218103,GSE219100 (sub-series of the SuperSeries the paper names in S2.6.p1/DA.p1)",
+          "12 samples = 2 genotypes (TD, CP) x 2 timepoints x 3 pools, matching S2.6.p1",
+          "source: Extracellular vesicles from plasma; small RNA-seq on NextSeq 500 as in S2.9.p2",
+          "data_processing: miRBase v22 / featureCounts raw counts / DESeq2, matching S2.9.p2"
+        ],
+        "accession": "GSE218103",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE218103\\GSE218103_metadata.csv"
+      },
+      "reason": "GSE218103 is the EV small-RNA-seq sub-series of GSE219100 (named in S2.6.p1 and DA.p1); sample structure and processing match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:08:54"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "geno": {
+              "source": "characteristics_ch1.1.group",
+              "regex": "^(TD|CP) (?:CON|EX)$"
+            },
+            "time": {
+              "source": "characteristics_ch1.1.group",
+              "regex": "^(?:TD|CP) (CON|EX)$",
+              "recode": {
+                "CON": "pre",
+                "EX": "post"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\design_metadata.csv",
+          "sha256": "d9b3dad4e61101a4e8c9a2c5fad625f5c51686b56fe6997e9072ecfff750d750",
+          "levels": {
+            "geno": {
+              "TD": 6,
+              "CP": 6
+            },
+            "time": {
+              "pre": 6,
+              "post": 6
+            }
+          }
+        }
+      },
+      "reason": "Tar columns become GSM ids and match the metadata index exactly (12/12). GEO 'CON' (treatment: control) denotes the pre-exercise (rest) sample, not the paper's TD CON no-exercise group: S2.6.p1 says only TD EX and CP EX were sequenced, pre and post, as N=3 pools per timepoint; a 'CP CON' group does not exist in the study design (S2.1.p1), and treatment_protocol reads 'Blood was collected before and 30 minutes after a bout of aerobic exercise'. So CON -> pre, EX -> post.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:08:54"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\aligned_matrix.csv",
+          "sha256": "da2b05a72ef289470f1539d454b7a5e2ead70d87cc4c90bb10b75fe987ecd2db",
+          "n_features": 399,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 206977.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integer (integer_fraction 1.0, max 206977); data_processing: 'Raw counts were acquired with featurecounts ... used as input ... using DESeq2'; per-sample files hold miRNA ID + one count column. Matches the paper's stated input (S2.9.p2). Library sizes are small (10k-285k mapped miRNA reads, 399 miRNAs).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:08:54"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "factorial (genotype x time), one model on all 12 pooled samples",
+        "formula": "~ grp (4 cells: geno x time)",
+        "contrasts": [
+          {
+            "name": "TD post vs pre",
+            "role": "primary"
+          },
+          {
+            "name": "CP post vs pre",
+            "role": "primary"
+          },
+          {
+            "name": "CP vs TD at pre",
+            "role": "secondary",
+            "estimand_type": "associational"
+          },
+          {
+            "name": "CP vs TD at post",
+            "role": "secondary",
+            "estimand_type": "associational"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "The exercise estimand is the within-genotype time effect (post vs pre), which the paper reports as null (S3.3.p1, S4.p7). The paper's model includes genotype and activity (S2.9.p2) and reports between-genotype comparisons at each time (FIG2), so one model over the four geno x time cells with the four pairwise contrasts reproduces it. CP vs TD is a cross-sectional comparison (associational), not an exercise effect. n = 3 pools per cell.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:00"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "pool (repeated pre/post)",
+            "disposition": "excluded: the pre and post samples come from the same participant pools, but GEO does not document which pre pool matches which post pool (titles are only 'control 1..3' / 'exercise 1..3'; no sex/GMFCS label per pool) and the profiles show no index correspondence (pre/post log-CPM correlations do not peak on the diagonal); the paper's DESeq2 model has no pool term (S2.9.p2). Ignoring positive within-pool correlation makes the post-vs-pre test conservative, not anti-conservative."
+          },
+          {
+            "name": "sex",
+            "disposition": "excluded: pooled by sex in TD only (2 male pools, 1 female pool) and not labelled per pool; not recorded in metadata"
+          },
+          {
+            "name": "GMFCS level",
+            "disposition": "excluded: defines the CP pools only, not labelled per sample"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(geno) + C(time)",
+          "n_samples": 12,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "geno_TD",
+            "time_pre"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 9,
+          "levels": {
+            "geno": {
+              "TD": 6,
+              "CP": 6
+            },
+            "time": {
+              "pre": 6,
+              "post": 6
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "CP",
+                "post"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "CP",
+                "pre"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "TD",
+                "post"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "TD",
+                "pre"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.group",
+            "n_levels": 4,
+            "status": "nested_in_primary",
+            "crosstab": {
+              "CP": {
+                "CP CON": 3,
+                "CP EX": 3,
+                "TD CON": 0,
+                "TD EX": 0
+              },
+              "TD": {
+                "CP CON": 0,
+                "CP EX": 0,
+                "TD CON": 3,
+                "TD EX": 3
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.2.treatment",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "CP": {
+                "aerobic exercise": 3,
+                "control": 3
+              },
+              "TD": {
+                "aerobic exercise": 3,
+                "control": 3
+              }
+            }
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 12,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "time",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "CP": {
+                "post": 3,
+                "pre": 3
+              },
+              "TD": {
+                "post": 3,
+                "pre": 3
+              }
+            }
+          }
+        ]
+      },
+      "reason": "The paper's model (S2.9.p2) has genotype and activity only. A pool blocking term would be preferable, but the cross-timepoint pool mapping is not identifiable from GEO, and guessing it by index would risk a wrong subject mapping. The unpaired fit follows the paper and is conservative for the exercise contrasts; this is recorded as a caveat.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:00"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, one model on all 12 samples)",
+        "formula": "~ grp (geno x time cells)",
+        "paper_route": {
+          "method": "DESeq2 (R 3.6.2) genotype + activity model, rows with < 10 counts removed",
+          "status": "reproduced",
+          "reason": "pydeseq2 instead of R DESeq2; low-count filter applied as total count >= 10 across the 12 samples"
+        },
+        "deviations": [
+          "pydeseq2 port instead of Bioconductor DESeq2",
+          "'less than 10 counts' read as row total < 10 (the DESeq2 vignette idiom rowSums >= 10), encoded as mean count >= 0.8333 over 12 samples"
+        ]
+      },
+      "reason": "Raw integer counts support DESeq2, which is the paper's method (S2.9.p2).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:00"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "adjustment": "BH",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "S2.9.p2: 'statistically significant at an adjusted p < 0.05 (FDR: Benjamini-Hochberg)'; no fold-change rule. Raw p < 0.05 is reported only as a labelled audit count.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:00"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\input\\matrix_filtered.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_CP_vs_TD_time-post.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_CP_vs_TD_time-pre.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_time_post_vs_pre_geno-CP.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_time_post_vs_pre_geno-TD.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_time_CP_post_vs_TD_pre.csv"
+        ],
+        "counts": {
+          "joint/geno_CP_vs_TD_time-post": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 297,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 297,
+              "n_significant": 13,
+              "n_up": 7,
+              "n_down": 6,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/geno_CP_vs_TD_time-pre": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 297,
+              "n_significant": 4,
+              "n_up": 1,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 297,
+              "n_significant": 20,
+              "n_up": 8,
+              "n_down": 12,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post_vs_pre_geno-CP": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 297,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 297,
+              "n_significant": 9,
+              "n_up": 2,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/time_post_vs_pre_geno-TD": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 297,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 297,
+              "n_significant": 10,
+              "n_up": 4,
+              "n_down": 6,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint/geno_time_CP_post_vs_TD_pre": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 297,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 297,
+              "n_significant": 4,
+              "n_up": 1,
+              "n_down": 3,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One DESeq2 model over the four geno x time cells, all pairwise comparisons the suitability report lists; the within-genotype time contrasts are the exercise estimand, the between-genotype ones are associational.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:18"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Pre and post samples are the same participant pools; pool correspondence is undocumented, so the model treats them as independent (as the paper's model does). The exercise tests are conservative.",
+          "Each cell has only 3 pools of 3-4 participants; library sizes are small (10k-285k miRNA reads; CPE2 has ~10k).",
+          "CP vs TD contrasts are associational (cross-sectional genotype difference), not exercise effects."
+        ],
+        "results": {
+          "joint/geno_CP_vs_TD_time-post": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 13
+          },
+          "joint/geno_CP_vs_TD_time-pre": {
+            "n_deg": 4,
+            "up": 1,
+            "down": 3,
+            "rule": "padj < 0.05",
+            "audit_n": 20
+          },
+          "joint/time_post_vs_pre_geno-CP": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 9
+          },
+          "joint/time_post_vs_pre_geno-TD": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 10
+          },
+          "joint/geno_time_CP_post_vs_TD_pre": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 4
+          }
+        },
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {}
+      },
+      "reason": "Method, model, filter and threshold follow S2.9.p2; the pool-pairing limitation is shared with the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T13:09:18"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "2f4a33ab3f270b7cdf68b4b32e055d0df104ae7a5e7252caea16a62c66d9f6d5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f3a2f94236e15e231ed5b932f022d484deacfbab7a6a325e41854f0f72fb449b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "da2b05a72ef289470f1539d454b7a5e2ead70d87cc4c90bb10b75fe987ecd2db",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d9b3dad4e61101a4e8c9a2c5fad625f5c51686b56fe6997e9072ecfff750d750",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "06f635a1199785a1609e0cee1f8eb91c4cbea1b5cf7db378b1464427367b6db8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "81311f4bc454d79a862b7e2aca179af0e3d69e1e914be82f3158708533f915b2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_CP_vs_TD_time-post.csv",
+      "role": "deg_joint/geno_CP_vs_TD_time-post",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "289f904f358dcad5340baec63dd710b318269cbbbdee2121e1c125af51079d2e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_CP_vs_TD_time-pre.csv",
+      "role": "deg_joint/geno_CP_vs_TD_time-pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d8af886d77f88747e91c92ce90402ead0a8403f9c2da6289ee3cd3fbcad1958e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_time_post_vs_pre_geno-CP.csv",
+      "role": "deg_joint/time_post_vs_pre_geno-CP",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "629507b591e9806525d306fa83301f8c3ccd5a53ae5d1e285dc3ce6cc4c407e4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_time_post_vs_pre_geno-TD.csv",
+      "role": "deg_joint/time_post_vs_pre_geno-TD",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7618fe89a5a86ccfdfe9734008753067604f625f1d2cb84acc7423fc2cf963bb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\results\\joint\\DEG_results_geno_time_CP_post_vs_TD_pre.csv",
+      "role": "deg_joint/geno_time_CP_post_vs_TD_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e322a26172be6842ab7bfdd5e201d16a4e2958d791bb3816bce7ea7e62d894f8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36620222\\GSE218103\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9372201ae66ea6c379cfd465911bf7c44cc7f1c5c07387a82cae69374792f622",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

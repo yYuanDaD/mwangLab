@@ -1,0 +1,268 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36620222",
+  "request": "Analyze GSE219100, GSE218103 and GSE219099 for PMID 36620222 (Extracellular vesicle characteristics and microRNA content in cerebral palsy and typically developed individuals at rest and in response to aerobic exercise.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Code session (claude-opus-5-5)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE218103",
+      "accession": "GSE218103",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9811128.paper.md"],
+        "metadata": "GSE218103/GSE218103_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE219100 (SuperSeries)", "GSE218103 (EV small-RNA-seq, human)", "GSE219099 (C2C12 miR-486 mimic RNA-seq, mouse)"],
+            "assay": "small RNA-seq of plasma extracellular-vesicle RNA (miRBase v22, featureCounts raw counts)",
+            "primary_estimand": "Effect of one acute aerobic exercise bout (45 min cycling in TD, 45 min Frame Running in CP) on EV microRNA cargo: 30 min post vs pre within TD EX and within CP EX; secondary (associational) CP vs TD at baseline and post-exercise",
+            "sample_inclusion": "Only TD EX (n=10) and CP EX (n=9) participants were sequenced; pre and post samples pooled to N=3 pools per timepoint per group (TD: 2 pools of 3 men, 1 pool of 4 women; CP: 3 pools by GMFCS II/III/IV) (S2.6.p1). TD CON participants (no-exercise controls) were NOT sequenced.",
+            "factors": {"genotype": ["TD", "CP"], "time": ["pre", "post (30 min)"]},
+            "repeated_measure_unit": "pool of participants; the same pools are sampled pre and post, but which GEO pool index corresponds across timepoints is not documented",
+            "planned_contrasts": [
+              "TD post vs pre (S3.3.p1 'Exercise did not affect EV cargo in any of the groups', Supp Fig S2; paper: 0 DE miRNAs)",
+              "CP post vs pre (S3.3.p1, S4.p7; paper: 0 DE miRNAs)",
+              "CP vs TD at baseline (S3.3.p1, FIG2A/B: miR-486 up; let-7a, let-7b, let-7e down)",
+              "CP vs TD post-exercise (S3.3.p1, FIG2C/D: miR-486, miR-100 up; miR-877, miR-4433 down)"
+            ],
+            "normalization": "DESeq2 size factors; miRNAs with < 10 counts removed (S2.9.p2)",
+            "paper_method": "DESeq2 in R 3.6.2, model with genotype (TD/CP) and activity (EX/CON = pre/post); no pool/pairing term stated (S2.9.p2)",
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S2.9.p2"},
+            "paper_results": "No exercise effect on EV miRNA cargo in any group (S3.3.p1, S4.p7)"
+          },
+          "reasoning": "S2.6.p1 describes the pooling (N=3 per timepoint per group for TD EX and CP EX) and names GSE219100. S2.9.p2 gives DESeq2 on raw featureCounts counts, <10-count filter, genotype + activity model, BH-adjusted p < 0.05 with no fold-change rule. S3.3.p1/S4.p7 state exercise did not change EV miRNA cargo; FIG2 gives the CP vs TD miRNAs. The C2C12 miR-486 mimic experiment (S2.8.p1, GSE219099) is a mechanistic follow-up, not an exercise contrast.",
+          "confidence": "high",
+          "locator": "S2.6.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["series_id = GSE218103,GSE219100 (sub-series of the SuperSeries the paper names in S2.6.p1/DA.p1)", "12 samples = 2 genotypes (TD, CP) x 2 timepoints x 3 pools, matching S2.6.p1", "source: Extracellular vesicles from plasma; small RNA-seq on NextSeq 500 as in S2.9.p2", "data_processing: miRBase v22 / featureCounts raw counts / DESeq2, matching S2.9.p2"]},
+          "reasoning": "GSE218103 is the EV small-RNA-seq sub-series of GSE219100 (named in S2.6.p1 and DA.p1); sample structure and processing match the paper.",
+          "confidence": "high",
+          "locator": "S2.6.p1"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "geno": ["characteristics_ch1.1.group", "^(TD|CP) (?:CON|EX)$"],
+            "time": ["characteristics_ch1.1.group", "^(?:TD|CP) (CON|EX)$"]
+          },
+          "recode": {"time": {"CON": "pre", "EX": "post"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Tar columns become GSM ids and match the metadata index exactly (12/12). GEO 'CON' (treatment: control) denotes the pre-exercise (rest) sample, not the paper's TD CON no-exercise group: S2.6.p1 says only TD EX and CP EX were sequenced, pre and post, as N=3 pools per timepoint; a 'CP CON' group does not exist in the study design (S2.1.p1), and treatment_protocol reads 'Blood was collected before and 30 minutes after a bout of aerobic exercise'. So CON -> pre, EX -> post.",
+          "confidence": "high",
+          "candidates": [{"value": "GEO CON = paper's TD CON no-exercise group", "reason_rejected": "the paper has no CP CON group and states only TD EX and CP EX were sequenced (S2.1.p1, S2.6.p1)"}]
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer (integer_fraction 1.0, max 206977); data_processing: 'Raw counts were acquired with featurecounts ... used as input ... using DESeq2'; per-sample files hold miRNA ID + one count column. Matches the paper's stated input (S2.9.p2). Library sizes are small (10k-285k mapped miRNA reads, 399 miRNAs).",
+          "confidence": "high",
+          "locator": "S2.9.p2"
+        },
+        "design": {
+          "factors": ["geno", "time"],
+          "references": {"geno": "TD", "time": "pre"},
+          "organism": "Human",
+          "planned": ["time_post_vs_pre_geno-TD", "time_post_vs_pre_geno-CP"],
+          "final": {
+            "analysis_type": "factorial (genotype x time), one model on all 12 pooled samples",
+            "formula": "~ grp (4 cells: geno x time)",
+            "contrasts": [
+              {"name": "TD post vs pre", "role": "primary"},
+              {"name": "CP post vs pre", "role": "primary"},
+              {"name": "CP vs TD at pre", "role": "secondary", "estimand_type": "associational"},
+              {"name": "CP vs TD at post", "role": "secondary", "estimand_type": "associational"}
+            ]
+          },
+          "reasoning": "The exercise estimand is the within-genotype time effect (post vs pre), which the paper reports as null (S3.3.p1, S4.p7). The paper's model includes genotype and activity (S2.9.p2) and reports between-genotype comparisons at each time (FIG2), so one model over the four geno x time cells with the four pairwise contrasts reproduces it. CP vs TD is a cross-sectional comparison (associational), not an exercise effect. n = 3 pools per cell.",
+          "confidence": "medium",
+          "locator": "S2.9.p2",
+          "candidates": [
+            {"value": "additive ~ geno + time", "reason_rejected": "the paper reports group-specific exercise and time-specific genotype comparisons, which need the cell-means (interaction) parameterisation"},
+            {"value": "pool exercise samples of TD and CP vs all pre samples", "reason_rejected": "pools biologically distinct groups; the paper analyses exercise within group"}
+          ]
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {"name": "pool (repeated pre/post)", "disposition": "excluded: the pre and post samples come from the same participant pools, but GEO does not document which pre pool matches which post pool (titles are only 'control 1..3' / 'exercise 1..3'; no sex/GMFCS label per pool) and the profiles show no index correspondence (pre/post log-CPM correlations do not peak on the diagonal); the paper's DESeq2 model has no pool term (S2.9.p2). Ignoring positive within-pool correlation makes the post-vs-pre test conservative, not anti-conservative."},
+              {"name": "sex", "disposition": "excluded: pooled by sex in TD only (2 male pools, 1 female pool) and not labelled per pool; not recorded in metadata"},
+              {"name": "GMFCS level", "disposition": "excluded: defines the CP pools only, not labelled per sample"}
+            ]
+          },
+          "confounding_candidates": null,
+          "reasoning": "The paper's model (S2.9.p2) has genotype and activity only. A pool blocking term would be preferable, but the cross-timepoint pool mapping is not identifiable from GEO, and guessing it by index would risk a wrong subject mapping. The unpaired fit follows the paper and is conservative for the exercise contrasts; this is recorded as a caveat.",
+          "confidence": "medium",
+          "candidates": [{"value": "~ pool + grp with pool = index within genotype", "reason_rejected": "pool correspondence across timepoints is undocumented and not supported by the expression correlations; a wrong mapping would invalidate the blocking"}]
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, one model on all 12 samples)",
+            "formula": "~ grp (geno x time cells)",
+            "paper_route": {"method": "DESeq2 (R 3.6.2) genotype + activity model, rows with < 10 counts removed", "status": "reproduced", "reason": "pydeseq2 instead of R DESeq2; low-count filter applied as total count >= 10 across the 12 samples"},
+            "deviations": ["pydeseq2 port instead of Bioconductor DESeq2", "'less than 10 counts' read as row total < 10 (the DESeq2 vignette idiom rowSums >= 10), encoded as mean count >= 0.8333 over 12 samples"]
+          },
+          "transform": null,
+          "reasoning": "Raw integer counts support DESeq2, which is the paper's method (S2.9.p2).",
+          "confidence": "high",
+          "locator": "S2.9.p2"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.9.p2: 'statistically significant at an adjusted p < 0.05 (FDR: Benjamini-Hochberg)'; no fold-change rule. Raw p < 0.05 is reported only as a labelled audit count.",
+          "confidence": "high",
+          "locator": "S2.9.p2"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Pre and post samples are the same participant pools; pool correspondence is undocumented, so the model treats them as independent (as the paper's model does). The exercise tests are conservative.",
+              "Each cell has only 3 pools of 3-4 participants; library sizes are small (10k-285k miRNA reads; CPE2 has ~10k).",
+              "CP vs TD contrasts are associational (cross-sectional genotype difference), not exercise effects."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Method, model, filter and threshold follow S2.9.p2; the pool-pairing limitation is shared with the paper."
+        }
+      },
+      "discrepancies": [
+        {"item": "meaning of GEO 'control' samples", "paper": "TD CON = separate no-exercise participants (S2.1.p1), not sequenced (S2.6.p1)", "data": "GEO 'TD CON'/'CP CON' with treatment 'control' = pre-exercise pools", "disposition": "executable_without_change"},
+        {"item": "pre/post pool pairing", "paper": "same participants pooled at each timepoint (S2.6.p1); model without pool term (S2.9.p2)", "data": "pool index correspondence not documented", "disposition": "executable_without_change"},
+        {"item": "accession naming", "paper": "S2.8.p1 says the C2C12 data are also in GSE219100", "data": "GSE219100 is a SuperSeries; C2C12 data are in sub-series GSE219099, EV data in GSE218103", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "all", "alpha": 0.05},
+          "filter_low_counts": {"min_mean_count": 0.8333},
+          "role": "primary",
+          "reasoning": "One DESeq2 model over the four geno x time cells, all pairwise comparisons the suitability report lists; the within-genotype time contrasts are the exercise estimand, the between-genotype ones are associational."
+        }
+      ],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE219099",
+      "accession": "GSE219099",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9811128.paper.md"],
+        "metadata": "GSE219099/GSE219099_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE219100 (SuperSeries)", "GSE219099 (C2C12 miR-486 mimic vs scramble)"],
+            "assay": "poly-A RNA-seq of C2C12 mouse myoblasts (STAR mm10, raw counts)",
+            "primary_estimand": "miR-486 mimic vs scramble miRNA transfection in C2C12 myoblasts (S2.8.p1, S3.3.p2) - a mechanistic follow-up, not an exercise contrast",
+            "planned_contrasts": ["miR-486 mimic vs scramble (S3.3.p2, FIG3; DEG count only in Supp Table S2)"],
+            "paper_threshold": {"metric": "not_reported", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.3.p2"},
+            "paper_method": "not_reported for the C2C12 data (S2.9.p2 describes the miRNA analysis only)"
+          },
+          "reasoning": "S2.8.p1 and S3.3.p2: C2C12 cells transfected with a miR-486 mimic or scramble control; no exercise factor. The request is the exercise effect.",
+          "confidence": "high",
+          "locator": "S2.8.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["series_id = GSE219099,GSE219100 (sub-series of the SuperSeries named in S2.8.p1/DA.p1)", "6 samples: 3 scramble control, 3 miR-486 mimic; C2C12; HiSeq, matching S2.8.p1"]},
+          "reasoning": "Sub-series of GSE219100 holding the C2C12 experiment described in S2.8.p1.",
+          "confidence": "high",
+          "locator": "S2.8.p1"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"grp": "characteristics_ch1.2.treatment"},
+          "recode": {"grp": {"Control scramble miRNA": "scr", "miR-486": "mir486"}},
+          "exclude_samples": {},
+          "reasoning": "Tar columns become GSM ids; exact match on the metadata index (6/6).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Integer values, Ensembl mouse gene ids; data_processing: STAR mm10 alignment, raw counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the only factor is miR-486 mimic vs scramble miRNA transfection in C2C12 myoblasts (S2.8.p1). It tests a miRNA's effect in vitro, not exercise, so it cannot answer how exercise affects gene expression.",
+          "reasoning": "S2.8.p1, S3.3.p2; metadata treatment = 'Control scramble miRNA' / 'miR-486' only.",
+          "confidence": "high",
+          "locator": "S2.8.p1"
+        }
+      },
+      "discrepancies": [],
+      "executions": [],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE219100",
+      "accession": "GSE219100",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9811128.paper.md"],
+        "metadata": "GSE219100/GSE219100_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE219100 (SuperSeries of GSE218103 + GSE219099)"],
+            "primary_estimand": "Exercise effect on EV miRNA cargo (analysed in case GSE218103) plus the non-exercise C2C12 miR-486 experiment (case GSE219099)",
+            "planned_contrasts": ["see cases GSE218103 and GSE219099"],
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": false, "source_locator": "S2.9.p2"}
+          },
+          "reasoning": "S2.6.p1, S2.8.p1 and DA.p1 cite GSE219100 for both experiments.",
+          "confidence": "high",
+          "locator": "DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["18 samples = the 12 GSE218103 EV samples (Homo sapiens) + the 6 GSE219099 C2C12 samples (Mus musculus); series_id lists each sub-series"]},
+          "reasoning": "The paper's own SuperSeries; every sample also belongs to one of the two sub-series.",
+          "confidence": "high",
+          "locator": "DA.p1"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Tar columns become GSM ids; exact match on the metadata index (18/18).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Integer counts, but the merged tar matrix stacks human miRNA counts (12 EV samples) and mouse Ensembl gene counts (6 C2C12 samples) - two assays and species in one table, each valid only within its sub-series.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "SuperSeries: its samples are the union of GSE218103 (human EV miRNA, exercise) and GSE219099 (mouse C2C12, no exercise). No single design spans two species and assays; the exercise contrast is identical to and analysed in case GSE218103, so re-running it here would duplicate it.",
+          "reasoning": "series_id, organism_ch1 and source_name_ch1 split the 18 samples exactly into the two sub-series.",
+          "confidence": "high",
+          "locator": "DA.p1"
+        }
+      },
+      "discrepancies": [],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

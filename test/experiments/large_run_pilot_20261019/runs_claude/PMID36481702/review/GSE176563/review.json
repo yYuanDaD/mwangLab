@@ -1,0 +1,88 @@
+{
+ "case": "GSE176563",
+ "reviewer": "Claude Sonnet 5.5 (claude-sonnet-5-5)",
+ "blind": {
+  "B1": "Yes, as an in-vitro exercise model (EPS, 24 h, C2C12 myotubes), the paper's own deposit (DA.p1, S4.6.p1). No animals; EPS stands in for exercise. Samples: EPS 4, control 3 (FIG1 legend).",
+  "B2": "EPS (n=4) vs unstimulated control (n=3): 774 DEGs, 406 up, 368 down (S2.1.p1, FIG1).",
+  "B3": "No repeated measures; independent culture wells; no pairing key in packet A.",
+  "B4": "Paper states edgeR NB test on count data (S4.6.p1); does not say joint vs pairwise (only two groups).",
+  "B5": "Results/FIG1: P < 0.01 and fold change > 2 (774 DEGs). Methods S4.6.p1: P-value < 0.001 and fold difference >= 2 (edgeR). The two statements disagree; 774 is attached to the Results rule."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ran EPS vs CTRL; in-vitro EPS model is the paper's primary design (FIG1).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EPS 4 / CTRL 3 matches FIG1 n; titles L* / CL* agree with characteristic; 7/7 aligned, no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EPS (treatment) vs CTRL; DEG_results_EPS_vs_CTRL.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Independent wells, no unit.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single two-group fit, ~grp; paper's edgeR on counts blocked because only CPM deposited, declared deviation.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Only one varying factor; no batch recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "CPM columns sum to 1e6, no counts deposited; not rounded back to counts; limma on log2(CPM+1) declared, plus CPM-filter sensitivity.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Results rule (P<0.01, |log2FC|>1, strict) applied, Methods rule (P<0.001, >=) as audit; both discrepancies in the record. Flag: raw p<0.01 alone gives 794 vs 774 but that is a count coincidence on a different method.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "218 vs 774 reported with caveats (limma on CPM, +1 offset compresses fold change); HANDBACK does not claim agreement.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; edgeR route 'blocked' reason (CPM only, no counts) is true per matrix gate.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "论文数字(774)与单独的 P<0.01(794)最接近,而非其声明的 P<0.01 且 FC>2:该情形下应报告哪条阈值属开放政策问题,本案已记录两条论文规则,未发现违反技能规则。"
+ ],
+ "summary": "EPS 对 CTRL(4 vs 3)对比、方向、分组与论文一致;论文结果与方法两处阈值不一致,已分别作为主规则和审计规则记录。因只有 CPM 无计数,edgeR 路线受阻,改用 limma(log2(CPM+1))并作声明偏离,218 对 774 的差异已如实说明。"
+}
