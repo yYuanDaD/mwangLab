@@ -1,0 +1,764 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID33661096",
+  "subject_id": "GSE145263",
+  "created_at": "2026-11-17T11:51:58",
+  "finished_at": "2026-11-17T11:54:05",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8043751.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261027\\papers\\PMC8043751.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T11:51:58",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ff2723bfa8ef752816b513417012617b2bae4b7789c20ad2323ff3d9254455ab",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE145263_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE145263\\GSE145263_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T11:51:58",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c164833304de583988b984d2372ef255bb8fca94da1300a60ccffa4fbd447374",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T11:52:16",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ca60cc93c8af4fd2d8551cbeac05ecb5aab76139c31238080beae204db9b9c6a",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE145263"
+        ],
+        "assay": "bulk RNA-seq (SMARTer Stranded Total RNA-Seq Pico v2) of FACS-sorted cardiac endothelial cells (CD31+CD140a-CD45-Ter119-DAPI-), NextSeq 550 single-end",
+        "primary_estimand": "Effect of 6-week progressive treadmill exercise training vs sedentary on the cardiac endothelial-cell transcriptome in young adult (10-week-old at start) male C57BL/6J mice",
+        "planned_contrasts": [
+          "EXE vs SED (S2.1.p1, FIG2A; DEG count shown only in the MA-plot image, not in text)"
+        ],
+        "other_experiments_in_series": "Aged vs Young, HFD vs Chow, TAC 2wk vs Sham, TAC 7wk vs Sham (each with its own control; not exercise; out of scope)",
+        "sample_inclusion": "SED1-3 (n=3) and EXE1-3 (n=3) male mice; FIG2 legend N=3-4 male mice/group",
+        "factors": {
+          "group": [
+            "SED (reference)",
+            "EXE"
+          ]
+        },
+        "repeated_measure_unit": "none (independent animals, one EC sample per mouse)",
+        "normalization": "DESeq2 size factors on HTSeq raw counts (S4.15.p1)",
+        "paper_method": "DESeq2 (Chipster v3.12.2) two-group, ~ group, Wald test, BH FDR (S4.15.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true,
+          "source_locator": "S4.15.p1; FIG2 legend"
+        },
+        "paper_results": "Exercise affected fewer genes than the risk factors (S2.1.p2, S3.p2). Serpinh1, Vwa1, Mest and Fhl3 significantly DOWN-regulated by exercise (S2.3.p1, FIG4A-C). PANTHER ORA of up/down genes (S2.2.p1, S4.16.p1)."
+      },
+      "reason": "S2.1.p1 defines exercise training (6 wk treadmill) vs sedentary as one of five experiments; S4.2.p1: 10-wk-old male mice used for RNA-seq; S4.15.p1: HTSeq counts -> DESeq2 Wald + BH, FDR <= 0.05; FIG2 legend: FDR (BH) threshold 0.05, n=3-4/group. No fold-change cutoff is stated. The exercise DEG count appears only inside the FIG2A image, which is not in the text, so no numeric paper count is available.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:16"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "S4.15.p1 and S11.p1 name GSE145263",
+          "GEO titles SED1-3/EXE1-3 with treatment Sedentary/Exercise training match the paper's groups",
+          "data_processing: HISAT2 GRCm38.90 + HTSeq-count, as in S4.15.p1",
+          "metadata gender Male matches S4.1.p1"
+        ],
+        "accession": "GSE145263",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE145263\\GSE145263_metadata.csv"
+      },
+      "reason": "Series is the paper's own deposit (S11.p1, S11.p3; same authors Kivela and Hemanthakumar). Per-sample HTSeq count files in GSE145263_RAW.tar are the only matrix.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:16"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 31,
+        "n_metadata": 31,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM4310334": "separate experiment (YOUNG: Young (2 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310335": "separate experiment (YOUNG: Young (2 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310336": "separate experiment (YOUNG: Young (2 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310337": "separate experiment (AGED: Aged (18 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310338": "separate experiment (AGED: Aged (18 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310339": "separate experiment (AGED: Aged (18 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310340": "separate experiment (CHOW: Standard chow diet); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310341": "separate experiment (CHOW: Standard chow diet); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310342": "separate experiment (CHOW: Standard chow diet); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310343": "separate experiment (HFD: High fat diet feeding); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310344": "separate experiment (HFD: High fat diet feeding); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310345": "separate experiment (HFD: High fat diet feeding); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310346": "separate experiment (SHAM: Sham Operated); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310347": "separate experiment (SHAM: Sham Operated); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310348": "separate experiment (SHAM: Sham Operated); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310349": "separate experiment (TAC2: Trans-aortic contriction (27G needle; 2 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310350": "separate experiment (TAC2: Trans-aortic contriction (27G needle; 2 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310351": "separate experiment (TAC2: Trans-aortic contriction (27G needle; 2 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310352": "separate experiment (TAC7: Trans-aortic contriction (27G needle; 7 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310353": "separate experiment (TAC7: Trans-aortic contriction (27G needle; 7 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4310354": "separate experiment (TAC7: Trans-aortic contriction (27G needle; 7 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4767053": "separate experiment (YOUNG: Young (2 months old)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4767056": "separate experiment (SHAM: Sham Operated); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4767058": "separate experiment (TAC2: Trans-aortic contriction (27G needle; 2 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand",
+          "GSM4767061": "separate experiment (TAC7: Trans-aortic contriction (27G needle; 7 weeks)); the paper analyses each model only against its own control (S2.1.p1, FIG2 A-E); not part of the exercise-vs-sedentary estimand"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.2.treatment",
+              "recode": {
+                "Sedentary": "SED",
+                "Exercise training": "EXE",
+                "Young (2 months old)": "YOUNG",
+                "Aged (18 months old)": "AGED",
+                "Standard chow diet": "CHOW",
+                "High fat diet feeding": "HFD",
+                "Sham Operated": "SHAM",
+                "Trans-aortic contriction (27G needle; 2 weeks)": "TAC2",
+                "Trans-aortic contriction (27G needle; 7 weeks)": "TAC7"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\design_metadata.csv",
+          "sha256": "b139f68675916cdcce6dea057bf0c49c54e3fca5b554c1611876552bc22271de",
+          "levels": {
+            "grp": {
+              "SED": 3,
+              "EXE": 3
+            }
+          }
+        }
+      },
+      "reason": "Tar-merged columns are GSM ids that equal the metadata index exactly (31/31). Group column 'grp' is derived by recoding the GEO treatment characteristic. The 25 samples of the aging/HFD/TAC experiments are excluded because the paper compares each intervention only with its own control; using them would change the estimand.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:18"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\aligned_matrix.csv",
+          "sha256": "ca60cc93c8af4fd2d8551cbeac05ecb5aab76139c31238080beae204db9b9c6a",
+          "n_features": 52636,
+          "n_samples": 6,
+          "annotation_columns_dropped": [
+            "GSM4310334",
+            "GSM4310335",
+            "GSM4310336",
+            "GSM4310337",
+            "GSM4310338",
+            "GSM4310339",
+            "GSM4310340",
+            "GSM4310341",
+            "GSM4310342",
+            "GSM4310343",
+            "GSM4310344",
+            "GSM4310345",
+            "GSM4310346",
+            "GSM4310347",
+            "GSM4310348",
+            "GSM4310349",
+            "GSM4310350",
+            "GSM4310351",
+            "GSM4310352",
+            "GSM4310353",
+            "GSM4310354",
+            "GSM4767053",
+            "GSM4767056",
+            "GSM4767058",
+            "GSM4767061"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 5418076.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values are integers (integer_fraction 1.0, max 5.4M, many zeros); GEO data_processing and S4.15.p1 state HTSeq-count read counts per gene; paper used these raw counts as DESeq2 input. No HTSeq '__' summary rows remain in the merged matrix.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:19"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group",
+        "design_column": "grp",
+        "control": "SED",
+        "treatment": "EXE",
+        "contrasts": [
+          {
+            "name": "grp_EXE_vs_SED",
+            "control": "SED",
+            "treatment": "EXE",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Independent-group comparison of trained vs sedentary male mice, n=3 vs 3, exactly as FIG2A. Causal estimand (randomised intervention vs sedentary control).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:25"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 6,
+          "n_columns": 2,
+          "columns": [
+            "Intercept",
+            "grp_SED"
+          ],
+          "rank": 2,
+          "full_rank": true,
+          "residual_df": 4,
+          "levels": {
+            "grp": {
+              "SED": 3,
+              "EXE": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "EXE"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "SED"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "One sample per animal, no pairing or batch variable recorded for the SED/EXE samples (all submitted Feb 13 2020; the Sep 2020 additions belong to other experiments and are excluded). All male. No covariate is added.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:25"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, BH)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "DESeq2 ~ group (Chipster v3.12.2, R DESeq2)",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 implementation instead of R DESeq2 in Chipster; same model (NB GLM, empirical-Bayes dispersion shrinkage, Wald test, BH). Small numerical differences expected, especially from independent filtering and outlier handling."
+        ]
+      },
+      "reason": "Raw counts support DESeq2, the paper's method (S4.15.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:25"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true,
+          "source_locator": "S4.15.p1; FIG2 legend"
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false
+        }
+      },
+      "reason": "S4.15.p1: FDR (p adj.) <= 0.05; FIG2 legend: BH-adjusted p threshold 0.05; no fold-change rule. Audit adds |log2FC| > 1 for reference only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:25"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "grp_EXE_vs_SED",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 6,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\aligned_matrix.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\grp_EXE_vs_SED\\DEG_results_EXE_vs_SED.csv"
+        ],
+        "counts": {
+          "grp_EXE_vs_SED": {
+            "applied": {
+              "rule": "padj <= 0.05",
+              "n_tested": 13154,
+              "n_significant": 139,
+              "n_up": 48,
+              "n_down": 91,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 1",
+              "n_tested": 13154,
+              "n_significant": 28,
+              "n_up": 4,
+              "n_down": 24,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper's two-group DESeq2 Wald test, EXE vs SED (S4.15.p1, FIG2A)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:55"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_EXE_vs_SED",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "direction": "up",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_up\\DEG_results_EXE_vs_SED_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_up\\DEG_results_EXE_vs_SED_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_up\\DEG_results_EXE_vs_SED_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_up\\DEG_results_EXE_vs_SED_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 48 Mouse genes (direction=up, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - RNA Splicing, Via Transesterification Reactions With Bulged Adenosine As Nucleophile (GO:0000377) | padj=1.27e-01 | overlap=4/180 | genes=SNRNP70;TRA2A;PRPF4B;RBM5 - Regulation Of mRNA Splicing, Via Spliceosome (GO:0048024) | padj=1.27e-01 | overlap=3/94 | genes=RBM25;TRA2A;RBM5 - mRNA Splicing, Via Spliceosome (GO:0000398) | padj=1.27e-01 | overlap=4/211 | genes=SNRNP70;TRA2A;PRPF4B;RBM5 - mRNA Processing (GO:0006397) | padj=1.27e-01 | overlap=4/214 | genes=SNRNP70;TRA2A;PRPF4B;RBM5 - Regulation Of Cell Morphogenesis (GO:0022604) | padj=1.32e-01 | overlap=2/31 | genes=PHIP;MYO9A - miRNA Processing (GO:0035196) | padj=1.32e-01 | overlap=2/32 | genes=ZC3H7A;AGO3 - Regulatory ncRNA Processing (GO:0070918) | padj=1.35e-01 | overlap=2/35 | genes=ZC3H7A;AGO3 - mRNA Destabilization (GO:0061157) | padj=1.59e-01 | overlap=2/43 | genes=ROCK1;AGO3 - protein-RNA Complex Assembly (GO:0022618) | padj=1.59e-01 | overlap=3/150 | genes=AGO3;RBM5;LUC7L2 - Regulation Of Alternative mRNA Splicing, Via Spliceosome (GO:0000381) | padj=1.59e-01 | overlap=2/53 | genes=RBM25;RBM5 ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - RNA Binding (GO:0003723) | padj=9.02e-09 | overlap=19/1411 | genes=ZCCHC7;PNISR;RBM25;PRPF38B;RBM26;UPF3B;PRPF4B;RSRC2;BCLAF1;ZC3H7A;AGO3;SNRNP70;G - mRNA Binding (GO:0003729) | padj=1.35e-02..."
+      },
+      "reason": "paper runs over-representation analysis on up-regulated DEGs (S2.2.p1, S4.16.p1; PANTHER, here Enrichr GO/KEGG)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:52:58"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_EXE_vs_SED",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": true
+        },
+        "direction": "down",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_down\\DEG_results_EXE_vs_SED_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_down\\DEG_results_EXE_vs_SED_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_down\\DEG_results_EXE_vs_SED_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\ora_down\\DEG_results_EXE_vs_SED_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 84 Mouse genes (direction=down, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Extracellular Structure Organization (GO:0043062) | padj=2.21e-02 | overlap=5/109 | genes=ADAMTS4;COL15A1;COL4A2;COL4A1;PXDN - Extracellular Matrix Organization (GO:0030198) | padj=2.21e-02 | overlap=6/176 | genes=ADAMTS4;COL15A1;COL4A2;COL4A1;PXDN;SERPINH1 - External Encapsulating Structure Organization (GO:0045229) | padj=2.21e-02 | overlap=5/110 | genes=ADAMTS4;COL15A1;COL4A2;COL4A1;PXDN - Negative Regulation Of Actin Filament Polymerization (GO:0030837) | padj=2.21e-02 | overlap=3/23 | genes=MYADM;PFN1;TMSB10 - Actin Filament Bundle Organization (GO:0061572) | padj=4.46e-02 | overlap=3/33 | genes=DPYSL3;RFLNB;FSCN1 - Coronary Vasculature Development (GO:0060976) | padj=4.46e-02 | overlap=2/7 | genes=APLNR;APLN - Negative Regulation Of Gene Expression (GO:0010629) | padj=5.62e-02 | overlap=7/336 | genes=SLC7A5;ZFP36;APLNR;MYADM;CALR;CD34;APLN - Basement Membrane Organization (GO:0071711) | padj=7.11e-02 | overlap=2/10 | genes=COL4A1;PXDN - Negative Regulation Of Macromolecule Metabolic Process (GO:0010605) | padj=9.25e-02 | overlap=5/186 | genes=SLC7A5;APLNR;MYADM;CD34;APLN - Regulation Of Programmed Cell Death (GO:0043067) | padj=1.03e-01 | overlap=5/195 | genes=BIK;BCL3;SEPTIN4;CALR;ACTB ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - Actin Binding (GO:0003779) | padj=1.53e-03 | overl..."
+      },
+      "reason": "paper runs over-representation analysis on down-regulated DEGs (S2.2.p1, S4.16.p1)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:53:01"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "grp_EXE_vs_SED",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\gsea\\DEG_results_EXE_vs_SED_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 27719 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 44 significant at FDR q < 0.25. ### Top 5 UP (NES > 0, enriched in treatment): - HALLMARK_UV_RESPONSE_DN | NES=1.40 | NOM p=1.68e-02 | FDR q=1.18e-01 - HALLMARK_PROTEIN_SECRETION | NES=1.19 | NOM p=1.47e-01 | FDR q=3.22e-01 - HALLMARK_ANGIOGENESIS | NES=1.12 | NOM p=2.69e-01 | FDR q=3.61e-01 - HALLMARK_APICAL_SURFACE | NES=0.98 | NOM p=4.90e-01 | FDR q=6.42e-01 - HALLMARK_PANCREAS_BETA_CELLS | NES=0.81 | NOM p=7.79e-01 | FDR q=8.94e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-2.52 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=-2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-2.27 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=-2.27 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=-2.15 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=-2.11 | NOM p=0.00e+00 | FDR q=2.47e-04 - HALLMARK_P53_PATHWAY | NES=-2.10 | NOM p=0.00e+00 | FDR q=2.16e-04 - HALLMARK_MYC_TARGETS_V1 | NES=-2.10 | NOM p=0.00e+00 | FDR q=1.92e-04 - HALLMARK_GLYCOLYSIS | NES=-1.98 | NOM p=0.00e+00 | FDR q=3.45e-04 Full results saved to: test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\enrichment_grp_EXE_vs_SED\\gsea\\DEG_results_EXE_vs_..."
+      },
+      "reason": "exploratory Hallmark GSEA on the full Wald-stat ranking (paper discusses TGF-beta/IFN/TNF pathways)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:54:05"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Paper's exercise DEG count is only in the FIG2A image and could not be read; no numeric count comparison.",
+          "n=3 per group; results are sensitive to single animals."
+        ],
+        "results": {
+          "grp_EXE_vs_SED": {
+            "n_deg": 139,
+            "up": 48,
+            "down": 91,
+            "rule": "padj <= 0.05",
+            "audit_n": 28
+          }
+        },
+        "paper_counts": {},
+        "comparison": {},
+        "paper_gene_check": {
+          "grp_EXE_vs_SED": {
+            "Serpinh1": {
+              "baseMean": 12605.181,
+              "log2FoldChange": -0.5003,
+              "padj": 0.0416,
+              "pvalue": 0.000381
+            },
+            "Vwa1": {
+              "baseMean": 4105.5847,
+              "log2FoldChange": -0.595,
+              "padj": 0.00448,
+              "pvalue": 1.36e-05
+            },
+            "Mest": {
+              "baseMean": 1192.2842,
+              "log2FoldChange": -0.4293,
+              "padj": 0.0405,
+              "pvalue": 0.000362
+            },
+            "Fhl3": {
+              "baseMean": 178.7594,
+              "log2FoldChange": -1.0092,
+              "padj": 0.00988,
+              "pvalue": 3.38e-05
+            }
+          }
+        }
+      },
+      "reason": "Paper-aligned two-group DESeq2; named genes from S2.3.p1/FIG4 (all down in EXE) are checked.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T11:54:05"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "2655a84b392581807a92879c1b3b05e437c06ddd59ab786617ce5342f484250c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "11ca7e394bfb215bdb81ce389ac1b0db8da846ca9e0ec14efeb2cceb8245510d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ca60cc93c8af4fd2d8551cbeac05ecb5aab76139c31238080beae204db9b9c6a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b139f68675916cdcce6dea057bf0c49c54e3fca5b554c1611876552bc22271de",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0854a423ff1f918bce00f4cebdfacdf03f1056dc74b13852fd83848c8fffbd8b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0475e72784c870700faefe7d01f8355202e84f3646514bd7249ad1cb6a41cae2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\results\\grp_EXE_vs_SED\\DEG_results_EXE_vs_SED.csv",
+      "role": "deg_grp_EXE_vs_SED",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7b4c8d030f177cfebfaaceb973c8ba565e048e687121feecaf5a818902cd05fe",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33661096\\GSE145263\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "2973241b0ae6b17fd2188a5d3f134fc2b1aa535c64c1a51ebaf17b72bf484a2b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

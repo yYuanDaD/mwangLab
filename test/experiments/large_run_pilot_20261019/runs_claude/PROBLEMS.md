@@ -723,3 +723,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39144140 (GSE272213)
 
 - case_runner.py:319 _column_groups misses ':'-joined read count/fpkm columns; :285 _key_matches finds no key for 'E1:read count'; edger_tools.py:146 prints fixed rule Details: `PMID39144140/HANDBACK.md`.
+
+## PMID33661096 (GSE145263)
+
+- GSEA ranking keeps ~7.2k baseMean<1 genes, 25% tied stats (enrichment_tools.py:348-397) Details: `PMID33661096/HANDBACK.md`.
