@@ -93,3 +93,5 @@ Owner 2026-11-17 11:42 local: "不要边跑边修。跑完一圈再汇总结果"
 problems are only recorded (PROBLEMS.md via finish_paper.py); patches and a summary of results and problems come
 after the full round. The two patches made earlier on 2026-11-17 (rows 112, 114 in PATCHES_211.md) stay.
 Row 112 stays INVALID after its fix (execution matrix_type text names FPKM); left for the end-of-round summary.
+Quota stop 2026-11-17 ~12:20 local: rows 105-119, 121 recorded (reviews still owed for 119, 121); rows 120 and 122
+were cut off mid-run (resume their subagents with context after the reset, not restart). Next new row: 123.

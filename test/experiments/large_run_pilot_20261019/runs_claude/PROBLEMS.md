@@ -711,3 +711,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35379817 (GSE186105)
 
 - inspect profiles Read_Count+FPKM+TPM columns together (integer_fraction 0.58), so its matrix type guess is mixed Details: `PMID35379817/HANDBACK.md`.
+
+## PMID42272974 (GSE306842;GSE306857)
+
+- case_runner.py:454-458 ignores threshold effect_metric (shrunk LFC col unused); run_joint_deseq2 lacks LFC shrinkage; gseapy ~20% tied zero stats (minor) Details: `PMID42272974/HANDBACK.md`.
+
+## PMID35282369 (GSE193432)
+
+- enrichment_tools.py:40-44 checks only first 20 IDs for Ensembl; Novel.* IDs broke BAIBA ORA/GSEA; case_runner.log overwritten on rerun Details: `PMID35282369/HANDBACK.md`.
+
+## PMID39144140 (GSE272213)
+
+- case_runner.py:319 _column_groups misses ':'-joined read count/fpkm columns; :285 _key_matches finds no key for 'E1:read count'; edger_tools.py:146 prints fixed rule Details: `PMID39144140/HANDBACK.md`.

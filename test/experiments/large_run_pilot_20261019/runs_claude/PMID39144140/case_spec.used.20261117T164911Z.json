@@ -1,0 +1,151 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID39144140",
+  "request": "Analyze GSE272213 for PMID 39144140 (Exercise-downregulated CD300E acted as a negative prognostic implication and tumor-promoted role in pan-cancer.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE272213",
+      "accession": "GSE272213",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC11321962.paper.md"],
+        "metadata": "GSE272213/GSE272213_metadata.csv",
+        "matrix": "GSE272213/GSE272213_expression-TPL2024031661.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE272213"],
+            "assay": "bulk mRNA-seq (paired-end TruSeq) of 4T1 subcutaneous mammary tumours",
+            "organism": "Mouse (female BALB/c, 5-6 weeks)",
+            "sample_inclusion": "5 exercise (E, 21 days voluntary wheel running) + 5 non-exercise (NE) tumour-bearing mice; tumours collected at day 21 (S2.2.p1, S3.1.p1)",
+            "factors": {"group": ["NE (non-exercise, reference)", "E (voluntary running)"]},
+            "primary_estimand": "Effect of 21 days of voluntary wheel running on gene expression in 4T1 breast tumours: E vs NE (S2.2.p1, S3.1.p1, Figure 1B-D)",
+            "planned_contrasts": ["E vs NE in tumour tissue (S3.1.p1; paper: 22 DEGs; Cd300e down, 46% of NE, p = 0.008)"],
+            "repeated_measure_unit": "none; one tumour per animal, animals randomised into two independent groups (S2.2.p1). S3.1.p1 says 'five matched pairs' but no pairing variable exists and animals were randomised independently",
+            "normalization": "HISAT2 -> StringTie FPKM; TMM normalisation for library size (S2.3.p1)",
+            "paper_method": "TMM-normalised differential expression (tool not named; TMM implies edgeR); DEG = fold change >= 2 and FDR <= 0.05 (S2.3.p1-p2)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "inclusive": true, "effect_metric": "fold change", "effect_cutoff": 1.0, "effect_note": "FC >= 2 -> |log2FC| >= 1", "source_locator": "S2.3.p2"},
+            "paper_results": {"n_deg": 22, "named_genes": {"Cd300e": "down in E, 46% of NE, p = 0.008"}, "pathways": ["KEGG MicroRNAs in cancer", "KEGG Calcium signaling pathway", "GO extracellular components"]},
+            "paper_enrichment": "KEGG/GO on DEGs and GSEA (S2.3.p2, S3.1.p1)"
+          },
+          "reasoning": "Single exercise RNA-seq experiment in the paper (S2.2.p1, S2.3.p1-p2, S3.1.p1). Pan-cancer and cell experiments use public TCGA/GTEx data or in-vitro assays and are not part of GSE272213. The paper reports mapping to 'Rnor 6.0' (rat) although the mice are BALB/c; the deposited matrix uses ENSMUSG IDs, so this is a methods-text error recorded as a discrepancy.",
+          "confidence": "high",
+          "locator": "S2.3.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S6.p1 names GSE272213", "GEO organism Mus musculus, tissue mammary cancer tissue", "10 GEO samples titled E1-E5 and NE1-NE5 match the paper's 5 E + 5 NE design", "matrix columns E1..E5, NE1..NE5 match GEO titles"]},
+          "reasoning": "Data availability statement S6.p1 cites GSE272213; sample names and group sizes match S2.2.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "matrix_column_pattern": "^(.+):read count$",
+          "patterns": {"grp": ["title", "^(E|NE)\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "The matrix has paired '<title>:read count' and '<title>:fpkm' columns plus annotation columns; only the read-count columns are kept and their prefix equals GEO title. grp derives from the title prefix (E = exercise, NE = non-exercise), consistent with characteristics treatment (voluntary exercise condition / without intervention).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "reasoning": "The kept columns are labelled 'read count'; all values are non-negative integers with no missing values and library sizes 15-23 M. The FPKM columns are dropped. The paper used StringTie FPKM with TMM normalisation (S2.3.p1); raw read counts are the appropriate input for a TMM-based count model.",
+          "confidence": "high",
+          "candidates": [{"value": "FPKM columns with limma", "reason_rejected": "raw read counts for the same samples are deposited, and the paper's TMM normalisation is a count-based step"}]
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "NE"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_E_vs_NE"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "NE",
+            "treatment": "E",
+            "contrasts": [{"name": "grp_E_vs_NE", "control": "NE", "treatment": "E", "role": "primary"}],
+            "estimand_type": "interventional"
+          },
+          "reasoning": "Randomised two-arm intervention (S2.2.p1): E vs NE, NE as reference. All mice female so no sex split. 'Five matched pairs' (S3.1.p1) is not supported by any pairing variable and the design text describes independent random allocation, so no subject block.",
+          "confidence": "high",
+          "candidates": [{"value": "paired E_i vs NE_i blocking", "reason_rejected": "no pairing key in GEO or the paper; animals were randomised independently (S2.2.p1); pairing by sample number would be positional"}]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": [],
+          "reasoning": "Independent animals, one tumour each; no batch, lane, or sex variation recorded in GEO.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR (TMM, QL F-test, inmoose)",
+            "formula": "~ grp",
+            "paper_route": {"method": "TMM-normalised DE (edgeR implied)", "status": "reproduced", "reason": "paper names TMM normalisation; tool not named"},
+            "deviations": ["No low-count filter (paper states none)", "Raw read counts used instead of StringTie FPKM as input; TMM computed by edgeR"]
+          },
+          "transform": null,
+          "reasoning": "S2.3.p1 states TMM normalisation, the edgeR normalisation, so edgeR on raw counts is the closest reproduction. DESeq2 runs as a sensitivity analysis.",
+          "confidence": "medium",
+          "candidates": [{"value": "DESeq2 as primary", "reason_rejected": "paper names TMM; DESeq2 kept as sensitivity"}]
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true, "label": "raw-p audit: the paper names Cd300e as DE with p = 0.008 (S3.1.p1), suggesting its 22 DEGs may rest on raw p; this is a comparison rule, not the paper's stated rule"}
+          },
+          "reasoning": "S2.3.p2: fold change >= 2 and FDR <= 0.05 -> BH padj <= 0.05 and |log2FC| >= 1 (inclusive). Audit: raw p <= 0.05 and |log2FC| >= 1, labelled as a comparison with the paper's apparent raw-p reporting (Cd300e p = 0.008 in S3.1.p1).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Paper says reads were mapped to Rnor 6.0 (rat) but the deposited matrix uses mouse Ensembl IDs; we use the deposited mouse matrix.",
+              "Paper's DE tool is not named; edgeR is inferred from 'TMM'.",
+              "Paper reports Cd300e p = 0.008, which is a raw p-value; it is not clear whether Cd300e passed the paper's FDR rule.",
+              "At the paper's stated rule (FDR <= 0.05, |log2FC| >= 1) no gene is DE in our edgeR or DESeq2 fit (paper: 22). Cd300e direction and size agree with the paper (log2FC -1.09, about 47% of NE; edgeR p = 0.0035, FDR 0.82), but it does not pass FDR. The paper's 22 DEGs are not reproducible under its stated FDR rule and likely used raw p."
+            ]
+          },
+          "paper_counts": {"grp_E_vs_NE": 22, "grp_E_vs_NE_deseq2": 22},
+          "paper_genes": {"grp_E_vs_NE": ["Cd300e"], "grp_E_vs_NE_deseq2": ["Cd300e"]},
+          "reasoning": "Primary edgeR contrast compared with the paper's 22 DEGs and Cd300e direction (down in E).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "reference genome", "paper": "Rnor 6.0 (rat) per S2.3.p1", "data": "ENSMUSG mouse gene IDs; GEO organism Mus musculus", "disposition": "executable_without_change"},
+        {"item": "pairing", "paper": "'five matched pairs' (S3.1.p1)", "data": "no pairing variable; S2.2.p1 random allocation into two groups", "disposition": "executable_without_change"},
+        {"item": "input scale", "paper": "StringTie FPKM, TMM-normalised", "data": "read count and FPKM columns both deposited; read counts used", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_E_vs_NE",
+          "tool": "tools.edger_tools:run_edger_analysis",
+          "args": {"design_column": "grp", "control_group": "NE", "treatment_group": "E"},
+          "role": "primary",
+          "reasoning": "Paper's TMM-normalised two-group comparison, E vs NE."
+        },
+        {
+          "name": "grp_E_vs_NE_deseq2",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "NE", "treatment_group": "E", "alpha": 0.05},
+          "role": "sensitivity",
+          "reasoning": "Method sensitivity: the paper's DE tool is not named."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_E_vs_NE", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports KEGG/GO on DEGs and GSEA (S2.3.p2, S3.1.p1)."}
+      ]
+    }
+  ]
+}

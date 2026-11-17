@@ -233,3 +233,17 @@ One section per case; newest last.
 
 - policy: Which threshold to report when padj<0.1 reproduces the paper's 207 although the paper states padj<0.05 (open policy question).
 - policy: Joint versus pairwise fits: paper silent, analysis fitted per group plus limma change scores.
+
+## PMID35379817 / GSE186105 (2026-11-17)
+
+- policy: Open policy: whether a genotype-only series from an exercise paper should be refused (as done) or analyzed as a labelled non-exercise KO vs WT contrast.
+
+## PMID42272974 / GSE306842 (2026-11-17)
+
+- policy: Policy (open): whether this in-vitro C2C12 optogenetic stimulation series counts as an exercise study.
+- policy: Policy (open): joint ~grp model versus pairwise fits when the paper is silent; paper has no numeric DEG counts to discriminate.
+
+## PMID42272974 / GSE306857 (2026-11-17)
+
+- policy: Policy (open): whether this in-vitro C2C12 optogenetic stimulation series counts as an exercise study.
+- policy: Policy (open): joint ~grp model versus pairwise fits when the paper is silent; paper has no numeric DEG counts to discriminate.

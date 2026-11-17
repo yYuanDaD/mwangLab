@@ -1,0 +1,737 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42272974",
+ "request": "Analyze GSE306842 and GSE306857 for PMID 42272974 (Physiological and functional characterization for high-throughput optogenetic skeletal muscle exercise assays.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE306842",
+   "accession": "GSE306842",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC13247415.paper.md"
+    ],
+    "metadata": "GSE306842/GSE306842_metadata.csv",
+    "matrix": "GSE306842/GSE306842_salmon.merged.gene_counts.tsv.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE306860 (SuperSeries, S10.p1)",
+       "GSE306842"
+      ],
+      "experiment": "30-min daily optical exercise experiment (S2.2.p2); RNA extracted DM day 14 (S5.6.p1); 0.6 mL media (S5.2.p1)",
+      "assay": "bulk poly(A) RNA-seq, Singular G4 50-bp PE; nf-core/rnaseq 3.11.1, GRCm39/Ensembl (S5.6.p2-p3)",
+      "system": "C2C12 ChR2(H134R)-tdTomato mouse myotube 2D monolayers on grooved fibrin, 24-well plates (S2.2.p1, S5.2.p1)",
+      "factors": {
+       "stimulation": [
+        "unstimulated control",
+        "1 Hz",
+        "4 Hz",
+        "10 Hz"
+       ]
+      },
+      "sample_inclusion": "6 biological replicates (wells) per condition, 24 samples per experiment (FIG2 caption, S2.2.p2, S5.4.p1)",
+      "primary_estimand": "effect of ~2 weeks of daily 30-min optogenetic exercise at 1, 4 or 10 Hz vs unstimulated control on muscle gene expression, within the 30-min experiment",
+      "planned_contrasts": [
+       "1 Hz vs control (30 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)",
+       "4 Hz vs control (30 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)",
+       "10 Hz vs control (30 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)"
+      ],
+      "repeated_measure_unit": "none: each well is one independent sample",
+      "paper_method": "DESeq2 (R 4.2.0) with apeglm LFC shrinkage, BH-adjusted p (S5.6.p4); each condition vs control within its experiment (FIG2 d caption)",
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false,
+       "effect_note": "log2(fold change) > 0.5 on the apeglm-shrunken LFC; up and down both counted",
+       "source_locator": "FIG2 d caption; S2.3.p1"
+      },
+      "paper_results": "1 and 4 Hz give comparable up/down DEG numbers; 10 Hz the fewest in both experiments (S2.3.p1). 30 min: Myog, Myod1, Myh1/2/4/7 up at 1 and 4 Hz, not at 10 Hz (S2.3.p2-p3). 60 min: muscle genes down vs control; Myh2 the most significantly down gene at 10 Hz 60 min (S2.3.p1, S2.3.p3). GSEA Hallmark/GO prerank, FDR q < 0.25 (S5.6.p4).",
+      "enrichment_plan": "GSEApy prerank on DESeq2 LFC and p, MSigDB Hallmark and C5 GO, FDR q < 0.25 (S5.6.p4)"
+     },
+     "reasoning": "S2.2.p2 and FIG2 describe two separate experiments (30 and 60 min), each with its own unstimulated control (n=6) and 1/4/10 Hz arms (n=6). GSE306842 is the 30-min experiment. FIG2 d caption gives the DEG rule: log2FC > 0.5 and padj < 0.05, each condition vs control. S5.6.p4: DESeq2 + apeglm. The DEG counts are drawn as bars only; no numbers appear in the text.",
+     "locator": "S2.2.p2; FIG2; S2.3.p1; S5.6.p4"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "metadata series_id = 'GSE306842,GSE306860'; the paper's data statement names SuperSeries GSE306860 (S10.p1)",
+       "titles 'Muscle.30mins.<Control|x1Hz|x4Hz|x10Hz>.<1-6>' match the 30-min design of S2.2.p2",
+       "cell line C2C12, genotype ChR2::tdTomato, organism Mus musculus match S5.2.p1",
+       "GEO contact Ritu Raman, MIT = senior author",
+       "matrix has 24 columns (6 per condition) matching the 24 GSMs; the other experiment is GSE306857 (60 min)"
+      ]
+     },
+     "reasoning": "GEO series is a SubSeries of the paper's SuperSeries; sample labels, cell line, genotype and design agree with the paper."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^Muscle\\.30mins\\.(.+)$"
+      ]
+     },
+     "normalize_keys": true,
+     "patterns": {
+      "grp": [
+       "title",
+       "^Muscle\\.30mins\\.(Control|x1Hz|x4Hz|x10Hz)[.-]\\d$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Control": "CTRL",
+       "x1Hz": "F1",
+       "x4Hz": "F4",
+       "x10Hz": "F10"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns are condition labels (X1Hz.1 / x1Hz.1, Control.1); the GSM title carries the same label after 'Muscle.<n>mins.'. key = that suffix, matched ignoring case and separators ('x1Hz-1' = 'X1Hz.1'). Not positional. grp recoded to formula-safe levels CTRL/F1/F4/F10."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (Salmon gene-level counts from nf-core/rnaseq)",
+     "recommended_method": "DESeq2",
+     "final": {
+      "paper_input": "nf-core/rnaseq output into DESeq2 (S5.6.p3-p4)"
+     },
+     "candidates": [
+      {
+       "value": "GSE306842_salmon.merged.gene_tpm.tsv.gz",
+       "reason_rejected": "TPM is length-normalized; DESeq2 needs counts"
+      }
+     ],
+     "reasoning": "File name salmon.merged.gene_counts; data_processing: 'Gene-level raw counts and TPM generated by Salmon'; ~91% integer values, the rest fractional; 56,941 Ensembl genes: Salmon estimated counts. Rounded before DESeq2 (the paper does not state its import method)."
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "CTRL"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_F1_vs_CTRL",
+      "grp_F4_vs_CTRL",
+      "grp_F10_vs_CTRL"
+     ],
+     "final": {
+      "analysis_type": "one control, several stimulation levels (one model, planned contrasts vs control)",
+      "design_column": "grp",
+      "formula": "~ grp",
+      "contrasts": [
+       {
+        "name": "grp_F1_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F1",
+        "role": "primary"
+       },
+       {
+        "name": "grp_F4_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F4",
+        "role": "primary"
+       },
+       {
+        "name": "grp_F10_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F10",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "pool 1/4/10 Hz vs control",
+       "reason_rejected": "paper reports each frequency separately (FIG2 d); levels must not be pooled"
+      },
+      {
+       "value": "30 min vs 60 min across GSE306842/GSE306857",
+       "reason_rejected": "duration is aliased with experiment: separate cultures, harvest day 14 vs 16, media 0.6 vs 1.5 mL (S2.2.p3, S5.6.p1); the paper compares DE only within an experiment"
+      },
+      {
+       "value": "pairwise frequency contrasts (F1 vs F4 etc.)",
+       "reason_rejected": "not a paper estimand; not run"
+      }
+     ],
+     "reasoning": "Within one experiment, wells were assigned to control or one stimulation frequency; each frequency vs unstimulated control is the paper's estimand (FIG2 d). Controls twitch spontaneously (S3.1.p2): the contrast is optical stimulation vs none."
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Each sample is an independent well; no plate, batch, lane or pairing recorded in GEO; the paper models none (S5.6.p4). No covariate added from column names."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (R, Wald) with apeglm LFC shrinkage",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2 + apeglm (R)",
+       "status": "reproduced"
+      },
+      "rounding_documented": true,
+      "deviations": [
+       "Salmon estimated counts rounded to integers (paper's import method unstated)",
+       "R 4.6 / DESeq2 1.51 instead of R 4.2.0",
+       "results() alpha = 0.05 (paper FDR cutoff); the paper does not state it"
+      ]
+     },
+     "transform": null,
+     "reasoning": "S5.6.p4: DESeq2 with apeglm shrinkage; the matrix holds counts so the route runs as stated. One model on all 24 samples, contrasts vs CTRL; apeglm shrinks each grp coefficient (log2FoldChange = shrunken, MLE kept as log2FoldChange_mle). pydeseq2 joint model (MLE LFC) runs as a sensitivity check."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null
+      }
+     },
+     "reasoning": "FIG2 d caption and S2.3.p1: log2(FC) > 0.5 and padj < 0.05 (bars show up and down, so |log2FC| > 0.5), on the apeglm-shrunken LFC carried in log2FoldChange of the primary tables. Audit: padj < 0.05 alone."
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Paper DEG counts are only drawn as bars in Fig. 2d; no numeric comparison is possible, only the qualitative ordering (10 Hz fewest).",
+       "Controls are unstimulated but twitch spontaneously (S3.1.p2): the estimand is optical stimulation vs none, not exercise vs sedentary.",
+       "Duration (30 vs 60 min) is aliased with experiment/culture batch and is not compared."
+      ]
+     },
+     "paper_counts": {
+      "deseq2_apeglm/grp_F1_vs_CTRL": "not stated numerically (Fig. 2d bar chart)",
+      "deseq2_apeglm/grp_F4_vs_CTRL": "not stated numerically (Fig. 2d bar chart)",
+      "deseq2_apeglm/grp_F10_vs_CTRL": "not stated numerically (Fig. 2d bar chart)"
+     },
+     "paper_genes": {
+      "deseq2_apeglm/grp_F1_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ],
+      "deseq2_apeglm/grp_F4_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ],
+      "deseq2_apeglm/grp_F10_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ]
+     },
+     "reasoning": "Paper-aligned route: DESeq2 + apeglm, paper threshold, each frequency vs control."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "reference genome",
+     "paper": "BWA-MEM against mm39 for QC (S5.6.p3)",
+     "data": "GEO data_processing: bwa against mm10 for QC; counts from nf-core/rnaseq on GRCm39/Ensembl 110",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "count import",
+     "paper": "DESeq2 on nf-core output; import method not stated",
+     "data": "Salmon estimated counts (fractional)",
+     "disposition": "executable_with_declared_deviation: rounded"
+    },
+    {
+     "item": "ChR2 transgene counts",
+     "paper": "custom reference with ChR2-tdTomato-WPRE (S2.8.p1)",
+     "data": "deposited matrix has Ensembl mouse genes only",
+     "disposition": "ChR2 expression result not reproducible; not run"
+    }
+   ],
+   "executions": [
+    {
+     "name": "deseq2_apeglm",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "deseq2",
+      "design": "~ grp",
+      "levels": {
+       "grp": [
+        "CTRL",
+        "F1",
+        "F4",
+        "F10"
+       ]
+      },
+      "contrasts": [
+       {
+        "name": "grp_F1_vs_CTRL",
+        "factor": "grp",
+        "test": "F1",
+        "ref": "CTRL"
+       },
+       {
+        "name": "grp_F4_vs_CTRL",
+        "factor": "grp",
+        "test": "F4",
+        "ref": "CTRL"
+       },
+       {
+        "name": "grp_F10_vs_CTRL",
+        "factor": "grp",
+        "test": "F10",
+        "ref": "CTRL"
+       }
+      ],
+      "shrink": "apeglm",
+      "alpha": 0.05,
+      "round_estimated_counts": true
+     },
+     "role": "primary",
+     "reasoning": "paper route: R DESeq2 ~ grp on all 24 samples, apeglm shrinkage per frequency coefficient"
+    },
+    {
+     "name": "pydeseq2_mle",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "planned",
+      "round_estimated_counts": true,
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "pydeseq2 joint model, MLE LFC (no shrinkage): shows how much the count depends on shrinkage and implementation"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "deseq2_apeglm/grp_F1_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    },
+    {
+     "execution": "deseq2_apeglm/grp_F4_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    },
+    {
+     "execution": "deseq2_apeglm/grp_F10_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    }
+   ]
+  },
+  {
+   "case_id": "GSE306857",
+   "accession": "GSE306857",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC13247415.paper.md"
+    ],
+    "metadata": "GSE306857/GSE306857_metadata.csv",
+    "matrix": "GSE306857/GSE306857_salmon.merged.gene_counts.tsv.gz",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE306860 (SuperSeries, S10.p1)",
+       "GSE306857"
+      ],
+      "experiment": "60-min daily optical exercise experiment (S2.2.p2); RNA extracted DM day 16 (S5.6.p1); 1.5 mL media (S5.2.p1)",
+      "assay": "bulk poly(A) RNA-seq, Singular G4 50-bp PE; nf-core/rnaseq 3.11.1, GRCm39/Ensembl (S5.6.p2-p3)",
+      "system": "C2C12 ChR2(H134R)-tdTomato mouse myotube 2D monolayers on grooved fibrin, 24-well plates (S2.2.p1, S5.2.p1)",
+      "factors": {
+       "stimulation": [
+        "unstimulated control",
+        "1 Hz",
+        "4 Hz",
+        "10 Hz"
+       ]
+      },
+      "sample_inclusion": "6 biological replicates (wells) per condition, 24 samples per experiment (FIG2 caption, S2.2.p2, S5.4.p1)",
+      "primary_estimand": "effect of ~2 weeks of daily 60-min optogenetic exercise at 1, 4 or 10 Hz vs unstimulated control on muscle gene expression, within the 60-min experiment",
+      "planned_contrasts": [
+       "1 Hz vs control (60 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)",
+       "4 Hz vs control (60 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)",
+       "10 Hz vs control (60 min) (FIG2 d; S2.3.p1; paper count only in a bar chart)"
+      ],
+      "repeated_measure_unit": "none: each well is one independent sample",
+      "paper_method": "DESeq2 (R 4.2.0) with apeglm LFC shrinkage, BH-adjusted p (S5.6.p4); each condition vs control within its experiment (FIG2 d caption)",
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false,
+       "effect_note": "log2(fold change) > 0.5 on the apeglm-shrunken LFC; up and down both counted",
+       "source_locator": "FIG2 d caption; S2.3.p1"
+      },
+      "paper_results": "1 and 4 Hz give comparable up/down DEG numbers; 10 Hz the fewest in both experiments (S2.3.p1). 30 min: Myog, Myod1, Myh1/2/4/7 up at 1 and 4 Hz, not at 10 Hz (S2.3.p2-p3). 60 min: muscle genes down vs control; Myh2 the most significantly down gene at 10 Hz 60 min (S2.3.p1, S2.3.p3). GSEA Hallmark/GO prerank, FDR q < 0.25 (S5.6.p4).",
+      "enrichment_plan": "GSEApy prerank on DESeq2 LFC and p, MSigDB Hallmark and C5 GO, FDR q < 0.25 (S5.6.p4)"
+     },
+     "reasoning": "S2.2.p2 and FIG2 describe two separate experiments (30 and 60 min), each with its own unstimulated control (n=6) and 1/4/10 Hz arms (n=6). GSE306857 is the 60-min experiment. FIG2 d caption gives the DEG rule: log2FC > 0.5 and padj < 0.05, each condition vs control. S5.6.p4: DESeq2 + apeglm. The DEG counts are drawn as bars only; no numbers appear in the text.",
+     "locator": "S2.2.p2; FIG2; S2.3.p1; S5.6.p4"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "metadata series_id = 'GSE306857,GSE306860'; the paper's data statement names SuperSeries GSE306860 (S10.p1)",
+       "titles 'Muscle.60mins.<Control|x1Hz|x4Hz|x10Hz>.<1-6>' match the 60-min design of S2.2.p2",
+       "cell line C2C12, genotype ChR2::tdTomato, organism Mus musculus match S5.2.p1",
+       "GEO contact Ritu Raman, MIT = senior author",
+       "matrix has 24 columns (6 per condition) matching the 24 GSMs; the other experiment is GSE306842 (30 min)"
+      ]
+     },
+     "reasoning": "GEO series is a SubSeries of the paper's SuperSeries; sample labels, cell line, genotype and design agree with the paper."
+    },
+    "alignment": {
+     "key_column": "key",
+     "key_patterns": {
+      "key": [
+       "title",
+       "^Muscle\\.60mins\\.(.+)$"
+      ]
+     },
+     "normalize_keys": true,
+     "patterns": {
+      "grp": [
+       "title",
+       "^Muscle\\.60mins\\.(Control|x1Hz|x4Hz|x10Hz)[.-]\\d$"
+      ]
+     },
+     "recode": {
+      "grp": {
+       "Control": "CTRL",
+       "x1Hz": "F1",
+       "x4Hz": "F4",
+       "x10Hz": "F10"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns are condition labels (X1Hz.1 / x1Hz.1, Control.1); the GSM title carries the same label after 'Muscle.<n>mins.'. key = that suffix, matched ignoring case and separators ('x1Hz-1' = 'X1Hz.1'). Not positional. grp recoded to formula-safe levels CTRL/F1/F4/F10."
+    },
+    "matrix": {
+     "matrix_type": "estimated counts (Salmon gene-level counts from nf-core/rnaseq)",
+     "recommended_method": "DESeq2",
+     "final": {
+      "paper_input": "nf-core/rnaseq output into DESeq2 (S5.6.p3-p4)"
+     },
+     "candidates": [
+      {
+       "value": "GSE306857_salmon.merged.gene_tpm.tsv.gz",
+       "reason_rejected": "TPM is length-normalized; DESeq2 needs counts"
+      }
+     ],
+     "reasoning": "File name salmon.merged.gene_counts; data_processing: 'Gene-level raw counts and TPM generated by Salmon'; ~91% integer values, the rest fractional; 56,941 Ensembl genes: Salmon estimated counts. Rounded before DESeq2 (the paper does not state its import method)."
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "CTRL"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "grp_F1_vs_CTRL",
+      "grp_F4_vs_CTRL",
+      "grp_F10_vs_CTRL"
+     ],
+     "final": {
+      "analysis_type": "one control, several stimulation levels (one model, planned contrasts vs control)",
+      "design_column": "grp",
+      "formula": "~ grp",
+      "contrasts": [
+       {
+        "name": "grp_F1_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F1",
+        "role": "primary"
+       },
+       {
+        "name": "grp_F4_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F4",
+        "role": "primary"
+       },
+       {
+        "name": "grp_F10_vs_CTRL",
+        "control": "CTRL",
+        "treatment": "F10",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "pool 1/4/10 Hz vs control",
+       "reason_rejected": "paper reports each frequency separately (FIG2 d); levels must not be pooled"
+      },
+      {
+       "value": "30 min vs 60 min across GSE306842/GSE306857",
+       "reason_rejected": "duration is aliased with experiment: separate cultures, harvest day 14 vs 16, media 0.6 vs 1.5 mL (S2.2.p3, S5.6.p1); the paper compares DE only within an experiment"
+      },
+      {
+       "value": "pairwise frequency contrasts (F1 vs F4 etc.)",
+       "reason_rejected": "not a paper estimand; not run"
+      }
+     ],
+     "reasoning": "Within one experiment, wells were assigned to control or one stimulation frequency; each frequency vs unstimulated control is the paper's estimand (FIG2 d). Controls twitch spontaneously (S3.1.p2): the contrast is optical stimulation vs none."
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Each sample is an independent well; no plate, batch, lane or pairing recorded in GEO; the paper models none (S5.6.p4). No covariate added from column names."
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (R, Wald) with apeglm LFC shrinkage",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2 + apeglm (R)",
+       "status": "reproduced"
+      },
+      "rounding_documented": true,
+      "deviations": [
+       "Salmon estimated counts rounded to integers (paper's import method unstated)",
+       "R 4.6 / DESeq2 1.51 instead of R 4.2.0",
+       "results() alpha = 0.05 (paper FDR cutoff); the paper does not state it"
+      ]
+     },
+     "transform": null,
+     "reasoning": "S5.6.p4: DESeq2 with apeglm shrinkage; the matrix holds counts so the route runs as stated. One model on all 24 samples, contrasts vs CTRL; apeglm shrinks each grp coefficient (log2FoldChange = shrunken, MLE kept as log2FoldChange_mle). pydeseq2 joint model (MLE LFC) runs as a sensitivity check."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 0.5,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null
+      }
+     },
+     "reasoning": "FIG2 d caption and S2.3.p1: log2(FC) > 0.5 and padj < 0.05 (bars show up and down, so |log2FC| > 0.5), on the apeglm-shrunken LFC carried in log2FoldChange of the primary tables. Audit: padj < 0.05 alone."
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Paper DEG counts are only drawn as bars in Fig. 2d; no numeric comparison is possible, only the qualitative ordering (10 Hz fewest).",
+       "Controls are unstimulated but twitch spontaneously (S3.1.p2): the estimand is optical stimulation vs none, not exercise vs sedentary.",
+       "Duration (30 vs 60 min) is aliased with experiment/culture batch and is not compared."
+      ]
+     },
+     "paper_counts": {
+      "deseq2_apeglm/grp_F1_vs_CTRL": "not stated numerically (Fig. 2d bar chart)",
+      "deseq2_apeglm/grp_F4_vs_CTRL": "not stated numerically (Fig. 2d bar chart)",
+      "deseq2_apeglm/grp_F10_vs_CTRL": "not stated numerically (Fig. 2d bar chart)"
+     },
+     "paper_genes": {
+      "deseq2_apeglm/grp_F1_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ],
+      "deseq2_apeglm/grp_F4_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ],
+      "deseq2_apeglm/grp_F10_vs_CTRL": [
+       "Myog",
+       "Myod1",
+       "Myh1",
+       "Myh2",
+       "Myh4",
+       "Myh7",
+       "Myh3",
+       "Myh8",
+       "Pax7"
+      ]
+     },
+     "reasoning": "Paper-aligned route: DESeq2 + apeglm, paper threshold, each frequency vs control."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "reference genome",
+     "paper": "BWA-MEM against mm39 for QC (S5.6.p3)",
+     "data": "GEO data_processing: bwa against mm10 for QC; counts from nf-core/rnaseq on GRCm39/Ensembl 110",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "count import",
+     "paper": "DESeq2 on nf-core output; import method not stated",
+     "data": "Salmon estimated counts (fractional)",
+     "disposition": "executable_with_declared_deviation: rounded"
+    },
+    {
+     "item": "ChR2 transgene counts",
+     "paper": "custom reference with ChR2-tdTomato-WPRE (S2.8.p1)",
+     "data": "deposited matrix has Ensembl mouse genes only",
+     "disposition": "ChR2 expression result not reproducible; not run"
+    }
+   ],
+   "executions": [
+    {
+     "name": "deseq2_apeglm",
+     "tool": "tools.r_de_tools:run_r_de",
+     "args": {
+      "engine": "deseq2",
+      "design": "~ grp",
+      "levels": {
+       "grp": [
+        "CTRL",
+        "F1",
+        "F4",
+        "F10"
+       ]
+      },
+      "contrasts": [
+       {
+        "name": "grp_F1_vs_CTRL",
+        "factor": "grp",
+        "test": "F1",
+        "ref": "CTRL"
+       },
+       {
+        "name": "grp_F4_vs_CTRL",
+        "factor": "grp",
+        "test": "F4",
+        "ref": "CTRL"
+       },
+       {
+        "name": "grp_F10_vs_CTRL",
+        "factor": "grp",
+        "test": "F10",
+        "ref": "CTRL"
+       }
+      ],
+      "shrink": "apeglm",
+      "alpha": 0.05,
+      "round_estimated_counts": true
+     },
+     "role": "primary",
+     "reasoning": "paper route: R DESeq2 ~ grp on all 24 samples, apeglm shrinkage per frequency coefficient"
+    },
+    {
+     "name": "pydeseq2_mle",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": "planned",
+      "round_estimated_counts": true,
+      "alpha": 0.05
+     },
+     "role": "sensitivity",
+     "reasoning": "pydeseq2 joint model, MLE LFC (no shrinkage): shows how much the count depends on shrinkage and implementation"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "deseq2_apeglm/grp_F1_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    },
+    {
+     "execution": "deseq2_apeglm/grp_F4_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    },
+    {
+     "execution": "deseq2_apeglm/grp_F10_vs_CTRL",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "S5.6.p4 / FIG3 / Fig. S5: preranked GSEA on Hallmark per condition vs control; Wald stat carries LFC sign and p"
+    }
+   ]
+  }
+ ]
+}
