@@ -883,3 +883,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34880498 (GSE164401)
 
 - native.py:392 key_patterns must match all metadata rows; free-text confounding_candidates gives bare KeyError; GEO treatment mislabels 31 LPS GSMs as RP; 27 Excel-mangled gene rows dropped Details: `PMID34880498/HANDBACK.md`.
+
+## PMID35482926 (GSE198229)
+
+- gseapy prerank NES=±1/NOM p=1 degenerate rows (enrichment_tools.py:423); voom floors counts (limma_voom_tools.py:131); B6 matrix cols unmappable; no TMM in voom Details: `PMID35482926/HANDBACK.md`.

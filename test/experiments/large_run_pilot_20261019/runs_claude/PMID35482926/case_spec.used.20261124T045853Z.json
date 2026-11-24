@@ -1,0 +1,732 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35482926",
+ "request": "Analyze GSE198229 for PMID 35482926 (Mitochondrial mutations alter endurance exercise response and determinants in mice.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE198229_soleus",
+   "accession": "GSE198229",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC9170171.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35482926/prep/GSE198229_soleus_metadata.csv",
+    "matrix": "GSE198229/GSE198229_skeletal_muscle_expected_counts_matrix.tsv.gz",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID35482926/prep/split_metadata_by_tissue.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE198229"
+      ],
+      "assay": "bulk poly-A RNA-seq, STAR + RSEM expected counts (mm10, Gencode M17)",
+      "tissue": "soleus muscle",
+      "factors": {
+       "strain": [
+        "B6 control",
+        "ND5S204F",
+        "ND6P25L",
+        "CO1V421A",
+        "ANT1-/-"
+       ],
+       "treatment": [
+        "exercised (8 wk treadmill, every 2nd day, 45 min at 50% max)",
+        "non-exercised (handled)"
+       ]
+      },
+      "sample_inclusion": "60 soleus muscle samples: per strain 6 non-exercised + 6 exercised (3 responders + 3 non-responders) (S3.8.1.p1)",
+      "primary_estimand": "effect of 8-wk endurance exercise training on gene expression, exercised vs non-exercised within each strain",
+      "planned_contrasts": [
+       "B6 exercised vs non-exercised (S3.8.1.p3)",
+       "ANT1 exercised vs non-exercised (S3.8.1.p3)",
+       "ND5 exercised vs non-exercised (S3.8.1.p3)",
+       "ND6 exercised vs non-exercised (S3.8.1.p3)",
+       "CO1 exercised vs non-exercised (S3.8.1.p3)"
+      ],
+      "repeated_measure_unit": "none: one sample per mouse per tissue; independent mice",
+      "normalization": "voom on RSEM expected counts",
+      "paper_method": "limma-voom, exercised vs non-exercised within each strain",
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false,
+       "source_locator": "S3.8.1.p3"
+      },
+      "paper_results": "Soleus (S1.2.1.p1, S1.2.2.p1, S1.2.3.p1, S1.2.4.p1, S1.2.5.p1): B6 no major differences except modest IFN-gamma signaling up; ND5 strongest transcriptional response (OxPhos and stress-response genes up); ND6 no induction of mitochondrial genes; CO1 only a few glycolytic genes up; ANT1 no change in glycolytic genes. No DEG counts in the main text (Datasets S1-S11 not available here)."
+     },
+     "reasoning": "Methods S3.8.1.p3 describe within-strain exercised vs non-exercised limma-voom on RSEM expected counts; S3.8.1.p1 gives the sample design; DA.p1 deposits GSE198229.",
+     "locator": "S3.8.1.p3"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 and S3.8.2.p7 name GSE198229",
+       "matrix GSE198229_skeletal_muscle_expected_counts_matrix.tsv.gz has 60 columns matching the 60 soleus muscle samples (48 by animal ID; 12 B6 columns are numbered)",
+       "strain x treatment counts in GEO (6/6 per strain) match S3.8.1.p1/S3.8.2.p1"
+      ]
+     },
+     "reasoning": "Paper's own deposit; tissue-specific matrix."
+    },
+    "alignment": {
+     "key_column": "animal",
+     "aliases": {
+      "strain": "characteristics_ch1.3.strain",
+      "trt": "characteristics_ch1.0.treatment"
+     },
+     "recode": {
+      "strain": {
+       "ANT1-/-": "ANT1",
+       "ND5S204F": "ND5",
+       "ND6P25L": "ND6",
+       "CO1V421A": "CO1",
+       "B6 control": "B6"
+      },
+      "trt": {
+       "exercised": "EX",
+       "non-exercised": "SED"
+      }
+     },
+     "exclude_samples": {
+      "N2": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N5": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N63": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N65": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N66": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N8": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N1": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N69": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N7": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N4": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N62": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N68": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed"
+     },
+     "matrix_column_pattern": "^([A-Z]\\d+)$",
+     "final": {},
+     "reasoning": "Matrix columns are animal IDs (A76, B9, E42, I50); metadata per tissue was split by a prep script and the ID parsed from title (e.g. 'A76 [heart, ANT1-/-]'). Exact match for ANT1/ND5/ND6/CO1 (48/48). The 12 B6 columns are numbers (25-36 soleus, 37-48 heart) while GEO titles are N1..N69; nothing links them, so the B6 samples are excluded and the numeric columns dropped by matrix_column_pattern. The B6 contrast cannot be run (manual_review: needs the submitter number-to-N-ID map).",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "limma-voom",
+     "final": {
+      "source": "GSE198229_skeletal_muscle_expected_counts_matrix.tsv.gz",
+      "paper_input": "RSEM expected counts (S3.8.1.p1, S3.8.1.p3)"
+     },
+     "reasoning": "File name 'expected_counts', ~94% integer values with fractional remainder, max ~3e6, data_processing: STAR --quantMode TranscriptomeSAM + RSEM. These are RSEM expected counts, the input the paper fed to voom. The sibling fpkm file is not used.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "trt"
+     ],
+     "references": {
+      "trt": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "trt_EX_vs_SED_strain-ANT1",
+      "trt_EX_vs_SED_strain-ND5",
+      "trt_EX_vs_SED_strain-ND6",
+      "trt_EX_vs_SED_strain-CO1"
+     ],
+     "strata": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group within each strain stratum",
+      "design_column": "trt",
+      "control": "SED",
+      "treatment": "EX",
+      "contrasts": [
+       {
+        "name": "trt_EX_vs_SED_strain-ANT1",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-ND5",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-ND6",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-CO1",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "S3.8.1.p3: 'comparing each gene in the exercise-trained vs. the non-exercise-trained group within each strain'. Strain is a stratum: each strain fitted separately as in the paper. Responder/non-responder status (soleus only) splits the exercised arm by outcome; the paper pools both into the exercised group, so it is not a factor. Between-strain comparisons are baseline genotype questions, not the exercise estimand, and are not run.",
+     "candidates": [
+      {
+       "value": "joint model ~ strain*trt on all samples",
+       "reason_rejected": "paper fits within strain; per-strain fit reproduces its variance estimate"
+      },
+      {
+       "value": "responders vs non-responders",
+       "reason_rejected": "outcome-defined split of the exercised arm, not the exercise effect; n=3 vs 3"
+      }
+     ]
+    },
+    "covariance": {
+     "confounding_candidates": [],
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "exercise response",
+        "disposition": "not used: defined only within the exercised arm (aliased with trt), outcome-based"
+       }
+      ]
+     },
+     "reasoning": "Independent mice, one sample per mouse per tissue; no batch or lane recorded. Exercise response is nested in the exercised arm and cannot be a covariate."
+    },
+    "method": {
+     "transform": "round",
+     "final": {
+      "method": "limma-voom (R limma::voom + eBayes, library size = column sums)",
+      "formula": "~ trt",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "limma-voom on RSEM expected counts",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "expected counts rounded to integers before voom (the tool requires integers; the paper passed non-integer expected counts)",
+       "no TMM normalization factors (tool uses column-sum library sizes; paper normalization factors unknown)",
+       "genes with zero counts in all 12 samples dropped by the tool (paper reports 58,581 tested; matrix has 53,656 rows)"
+      ]
+     },
+     "reasoning": "S3.8.1.p3: voom on RSEM expected counts then limma. The repository limma-voom executor runs R limma::voom."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false,
+       "source_locator": "S3.8.1.p3"
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S3.8.1.p3: the gene list for exercised vs non-exercised within each strain (Metascape input) used nominal P < 0.05; no fold-change rule. No other DEG cut-off is stated. BH padj < 0.05 is reported as a labelled audit rule.",
+     "confidence": "medium",
+     "locator": "S3.8.1.p3"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "B6 control (wild-type) exercise contrast not run: B6 matrix columns cannot be mapped to GEO samples",
+       "Paper reports no DEG counts in the main text; supplementary Datasets S1-S11 were not available, so comparison is qualitative only"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Within-strain voom contrasts reproduce the paper route for 4 of 5 strains; the B6 contrast is blocked at alignment."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "B6 control sample IDs",
+     "paper": "6 exercised + 6 non-exercised B6 per tissue",
+     "data": "matrix columns 25-36 / 37-48 have no mapping to GEO N-IDs or exercise status",
+     "disposition": "blocks_contrast"
+    },
+    {
+     "item": "genes tested",
+     "paper": "58,581",
+     "data": "53,656 rows in the deposited matrix",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "ANT1_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ANT1"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ANT1 exercised vs non-exercised, limma-voom (S3.8.1.p3)"
+    },
+    {
+     "name": "ND5_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ND5"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ND5 exercised vs non-exercised, limma-voom (S3.8.1.p3)"
+    },
+    {
+     "name": "ND6_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ND6"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ND6 exercised vs non-exercised, limma-voom (S3.8.1.p3)"
+    },
+    {
+     "name": "CO1_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "CO1"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "CO1 exercised vs non-exercised, limma-voom (S3.8.1.p3)"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "ANT1_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.1.p3); Hallmark only here"
+    },
+    {
+     "execution": "ND5_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.1.p3); Hallmark only here"
+    },
+    {
+     "execution": "ND6_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.1.p3); Hallmark only here"
+    },
+    {
+     "execution": "CO1_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.1.p3); Hallmark only here"
+    }
+   ]
+  },
+  {
+   "case_id": "GSE198229_heart",
+   "accession": "GSE198229",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC9170171.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35482926/prep/GSE198229_heart_metadata.csv",
+    "matrix": "GSE198229/GSE198229_heart_expected_counts_matrix.tsv.gz",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID35482926/prep/split_metadata_by_tissue.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE198229"
+      ],
+      "assay": "bulk poly-A RNA-seq, STAR + RSEM expected counts (mm10, Gencode M17)",
+      "tissue": "heart",
+      "factors": {
+       "strain": [
+        "B6 control",
+        "ND5S204F",
+        "ND6P25L",
+        "CO1V421A",
+        "ANT1-/-"
+       ],
+       "treatment": [
+        "exercised (8 wk treadmill, every 2nd day, 45 min at 50% max)",
+        "non-exercised (handled)"
+       ]
+      },
+      "sample_inclusion": "60 heart samples: per strain 6 non-exercised + 6 exercised (3 responders + 3 non-responders) (S3.8.2.p1)",
+      "primary_estimand": "effect of 8-wk endurance exercise training on gene expression, exercised vs non-exercised within each strain",
+      "planned_contrasts": [
+       "B6 exercised vs non-exercised (S3.8.2.p3)",
+       "ANT1 exercised vs non-exercised (S3.8.2.p3)",
+       "ND5 exercised vs non-exercised (S3.8.2.p3)",
+       "ND6 exercised vs non-exercised (S3.8.2.p3)",
+       "CO1 exercised vs non-exercised (S3.8.2.p3)"
+      ],
+      "repeated_measure_unit": "none: one sample per mouse per tissue; independent mice",
+      "normalization": "voom on RSEM expected counts",
+      "paper_method": "limma-voom, exercised vs non-exercised within each strain",
+      "paper_threshold": {
+       "metric": null,
+       "cutoff": null,
+       "note": "not stated for heart (S3.8.2.p3)"
+      },
+      "paper_results": "Heart (S1.2.5.p2, Fig. 4D): pathways altered in exercised vs rested ANT1 hearts include amino acid metabolism (up), stress response, translation, immune activation, signal transduction. No DEG counts in the main text."
+     },
+     "reasoning": "Methods S3.8.2.p3 describe within-strain exercised vs non-exercised limma-voom on RSEM expected counts; S3.8.2.p1 gives the sample design; DA.p1 deposits GSE198229.",
+     "locator": "S3.8.2.p3"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "DA.p1 and S3.8.2.p7 name GSE198229",
+       "matrix GSE198229_heart_expected_counts_matrix.tsv.gz has 60 columns matching the 60 heart samples (48 by animal ID; 12 B6 columns are numbered)",
+       "strain x treatment counts in GEO (6/6 per strain) match S3.8.1.p1/S3.8.2.p1"
+      ]
+     },
+     "reasoning": "Paper's own deposit; tissue-specific matrix."
+    },
+    "alignment": {
+     "key_column": "animal",
+     "aliases": {
+      "strain": "characteristics_ch1.3.strain",
+      "trt": "characteristics_ch1.0.treatment"
+     },
+     "recode": {
+      "strain": {
+       "ANT1-/-": "ANT1",
+       "ND5S204F": "ND5",
+       "ND6P25L": "ND6",
+       "CO1V421A": "CO1",
+       "B6 control": "B6"
+      },
+      "trt": {
+       "exercised": "EX",
+       "non-exercised": "SED"
+      }
+     },
+     "exclude_samples": {
+      "N2": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N5": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N63": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N65": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N66": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N8": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N1": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N69": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N7": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N4": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N62": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed",
+      "N68": "B6 control: matrix columns for B6 are bare numbers (25-48) and no GEO field maps them to the N-IDs in the sample titles; positional alignment is not allowed"
+     },
+     "matrix_column_pattern": "^([A-Z]\\d+)$",
+     "final": {},
+     "reasoning": "Matrix columns are animal IDs (A76, B9, E42, I50); metadata per tissue was split by a prep script and the ID parsed from title (e.g. 'A76 [heart, ANT1-/-]'). Exact match for ANT1/ND5/ND6/CO1 (48/48). The 12 B6 columns are numbers (25-36 soleus, 37-48 heart) while GEO titles are N1..N69; nothing links them, so the B6 samples are excluded and the numeric columns dropped by matrix_column_pattern. The B6 contrast cannot be run (manual_review: needs the submitter number-to-N-ID map).",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "estimated counts",
+     "recommended_method": "limma-voom",
+     "final": {
+      "source": "GSE198229_heart_expected_counts_matrix.tsv.gz",
+      "paper_input": "RSEM expected counts (S3.8.1.p1, S3.8.1.p3)"
+     },
+     "reasoning": "File name 'expected_counts', ~94% integer values with fractional remainder, max ~3e6, data_processing: STAR --quantMode TranscriptomeSAM + RSEM. These are RSEM expected counts, the input the paper fed to voom. The sibling fpkm file is not used.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "trt"
+     ],
+     "references": {
+      "trt": "SED"
+     },
+     "organism": "Mouse",
+     "planned": [
+      "trt_EX_vs_SED_strain-ANT1",
+      "trt_EX_vs_SED_strain-ND5",
+      "trt_EX_vs_SED_strain-ND6",
+      "trt_EX_vs_SED_strain-CO1"
+     ],
+     "strata": [
+      "strain"
+     ],
+     "final": {
+      "analysis_type": "two-group within each strain stratum",
+      "design_column": "trt",
+      "control": "SED",
+      "treatment": "EX",
+      "contrasts": [
+       {
+        "name": "trt_EX_vs_SED_strain-ANT1",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-ND5",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-ND6",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "trt_EX_vs_SED_strain-CO1",
+        "control": "SED",
+        "treatment": "EX",
+        "role": "primary"
+       }
+      ]
+     },
+     "reasoning": "S3.8.2.p3: 'comparing each gene in the exercise-trained vs. the non-exercise-trained group within each strain'. Strain is a stratum: each strain fitted separately as in the paper. Responder/non-responder status (soleus only) splits the exercised arm by outcome; the paper pools both into the exercised group, so it is not a factor. Between-strain comparisons are baseline genotype questions, not the exercise estimand, and are not run.",
+     "candidates": [
+      {
+       "value": "joint model ~ strain*trt on all samples",
+       "reason_rejected": "paper fits within strain; per-strain fit reproduces its variance estimate"
+      },
+      {
+       "value": "responders vs non-responders",
+       "reason_rejected": "outcome-defined split of the exercised arm, not the exercise effect; n=3 vs 3"
+      }
+     ]
+    },
+    "covariance": {
+     "confounding_candidates": [],
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+       {
+        "name": "exercise response",
+        "disposition": "not used: defined only within the exercised arm (aliased with trt), outcome-based"
+       }
+      ]
+     },
+     "reasoning": "Independent mice, one sample per mouse per tissue; no batch or lane recorded. Exercise response is nested in the exercised arm and cannot be a covariate."
+    },
+    "method": {
+     "transform": "round",
+     "final": {
+      "method": "limma-voom (R limma::voom + eBayes, library size = column sums)",
+      "formula": "~ trt",
+      "rounding_documented": true,
+      "paper_route": {
+       "method": "limma-voom on RSEM expected counts",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "expected counts rounded to integers before voom (the tool requires integers; the paper passed non-integer expected counts)",
+       "no TMM normalization factors (tool uses column-sum library sizes; paper normalization factors unknown)",
+       "genes with zero counts in all 12 samples dropped by the tool (paper reports 58,581 tested; matrix has 53,656 rows)"
+      ]
+     },
+     "reasoning": "S3.8.2.p3: voom on RSEM expected counts then limma. The repository limma-voom executor runs R limma::voom."
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": null,
+      "threshold_source": "workflow_default",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "Heart methods (S3.8.2.p3) state no DEG threshold; the nominal P < 0.05 Metascape rule is described only for skeletal muscle (S3.8.1.p3). It is kept as an audit rule."
+     },
+     "reasoning": "S3.8.2.p3 gives no threshold for heart DE; workflow_default BH padj < 0.05, no effect cutoff.",
+     "confidence": "medium",
+     "locator": "S3.8.2.p3"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "B6 control (wild-type) exercise contrast not run: B6 matrix columns cannot be mapped to GEO samples",
+       "Paper reports no DEG counts in the main text; supplementary Datasets S1-S11 were not available, so comparison is qualitative only"
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {},
+     "reasoning": "Within-strain voom contrasts reproduce the paper route for 4 of 5 strains; the B6 contrast is blocked at alignment."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "B6 control sample IDs",
+     "paper": "6 exercised + 6 non-exercised B6 per tissue",
+     "data": "matrix columns 25-36 / 37-48 have no mapping to GEO N-IDs or exercise status",
+     "disposition": "blocks_contrast"
+    },
+    {
+     "item": "genes tested",
+     "paper": "58,581",
+     "data": "53,656 rows in the deposited matrix",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "ANT1_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ANT1"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ANT1 exercised vs non-exercised, limma-voom (S3.8.2.p3)"
+    },
+    {
+     "name": "ND5_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ND5"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ND5 exercised vs non-exercised, limma-voom (S3.8.2.p3)"
+    },
+    {
+     "name": "ND6_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "ND6"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "ND6 exercised vs non-exercised, limma-voom (S3.8.2.p3)"
+    },
+    {
+     "name": "CO1_EX_vs_SED",
+     "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+     "args": {
+      "design_column": "trt",
+      "control_group": "SED",
+      "treatment_group": "EX"
+     },
+     "subset": {
+      "strain": [
+       "CO1"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "CO1 exercised vs non-exercised, limma-voom (S3.8.2.p3)"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "ANT1_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.2.p3); Hallmark only here"
+    },
+    {
+     "execution": "ND5_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.2.p3); Hallmark only here"
+    },
+    {
+     "execution": "ND6_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.2.p3); Hallmark only here"
+    },
+    {
+     "execution": "CO1_EX_vs_SED",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran GSEA (Hallmark + C2 CP) on each within-strain exercise contrast (S3.8.2.p3); Hallmark only here"
+    }
+   ]
+  }
+ ]
+}

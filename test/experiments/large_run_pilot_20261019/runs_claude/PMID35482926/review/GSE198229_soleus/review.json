@@ -1,0 +1,24 @@
+{"case": "GSE198229_soleus", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. GSE198229 is the paper's own deposit; 8-wk treadmill training vs handled sedentary mice. Exercise factor = characteristics_ch1.0.treatment / trt (24 exercised, 24 non-exercised among 48 mutant-strain soleus samples; the paper's soleus set has 60 incl. 12 B6) (S3.8.1.p1).",
+  "B2": "Exercised vs non-exercised within each strain (B6, ND5, ND6, CO1, ANT1), 6 vs 6 per strain, exercised = 3 responders + 3 non-responders (S3.8.1.p1, p3); also between-strain comparisons in sedentary and in exercised mice.",
+  "B3": "No repeated measure within this series: one soleus per mouse; packet A key links 2/48 only by suffix coincidence across strains. The same animal IDs occur in the heart series, but tissues are analysed separately.",
+  "B4": "Each strain fitted alone: 'comparing each gene in the exercise-trained vs. the non-exercise-trained group within each strain' (S3.8.1.p3).",
+  "B5": "Soleus: voom + limma; Metascape input uses nominal P < 0.05 for exercise-trained vs non-exercise-trained within strain (no fold-change cutoff), adjusted P < 0.05 for baseline mutant vs B6 (S3.8.1.p3). 58,581 genes tested. No DEG counts in main text."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Soleus exercise arm present (EX 24 / SED 24); S3.8.1.p1.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Per-strain 6 vs 6 EX/SED as in S3.8.1.p1; responders and non-responders pooled in EX as in the paper. B6 (12 samples, matrix columns 25-36) excluded with a named reason and recorded as 'blocks_contrast'.", "fix": ""},
+  {"id": "direction", "verdict": "unsure", "severity": "minor", "evidence": "Design is control SED, treatment EX, and stat and log2FC signs are consistent in DEG_results_EX_vs_SED.csv. But the paper says ND5 soleus shows OxPhos induction (S1.2.2.p1); here ND5 is 3147 down / 153 up at P < 0.05 and the mean log2FC of 54 OXPHOS-family genes is about +0.02, with the Hallmark OXPHOS set not significant (NES 1.00, p = 1). This is a qualitative mismatch with the paper, not proof of a sign flip.", "fix": "Optional: state in HANDBACK that the ND5 OxPhos induction was not reproduced; the paper's Fig. S8 gene list could settle it."},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Independent mice, one soleus each; no repeated unit inside the series.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Per-strain ~trt fits as in S3.8.1.p3; joint model rejected with a reason.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "One sex only; no batch or lane field in GEO; recorded with the reason. Strain is a stratum.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "RSEM expected counts correctly typed as estimated counts; rounding, no TMM and the gene-number difference (53,656 vs 58,581) are listed as deviations; filtered sensitivity run added for tied low-count statistics.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Nominal P < 0.05, no fold-change cutoff, transcribed from S3.8.1.p3, with padj < 0.05 as audit (0 DEG). The rule in the paper is attached to the Metascape gene lists, which the record states.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "paper_counts empty; HANDBACK says the comparison is qualitative only and reports the ND5 mismatch honestly.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "B6 stop reason 'no GEO field maps matrix numbers 25-36 to N-IDs' holds for the metadata fields in the packet; the search covered metadata only (no supplementary files or submitter map).", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": [
+  "B6 control contrast not run: ask the submitters for the matrix-column to N-ID map.",
+  "ND5 soleus OxPhos induction (S1.2.2.p1) is not seen in our result; judge from Dataset S1-S11 whether this is a data difference (no TMM, rounding, different gene set) or a sign problem."],
+ "summary": "该案例是GSE198229骨骼肌（比目鱼肌）各突变株内运动组对久坐组的limma-voom比较，阈值使用论文所述的nominal P<0.05，分组、方向设定、模型结构与论文一致，无重复测量问题。B6对照因编号无法对应而被排除，原因已记录。ND5的OxPhos上调未能复现，属于定性差异，已在HANDBACK中如实说明，建议人工对照补充数据集确认。"}

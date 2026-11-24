@@ -1,0 +1,24 @@
+{"case": "GSE198229_heart", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. GSE198229 is the paper's own deposit (DA.p1, S3.8.2.p7); 8-wk treadmill training vs handled sedentary mice. Exercise factor = characteristics_ch1.0.treatment / trt (24 exercised, 24 non-exercised among the 48 mutant-strain heart samples; the paper's heart set has 60 incl. 12 B6).",
+  "B2": "Exercised vs non-exercised within each strain (B6, ND5, ND6, CO1, ANT1), 6 vs 6 per strain (exercised = 3 responders + 3 non-responders) (S3.8.2.p1, p3). Also between-strain baseline and exercised comparisons (S3.8.2.p3).",
+  "B3": "No repeated measure inside this series: one heart per mouse. The same animal ID appears in the soleus series, but tissues are analysed separately; the packet's candidate keys link 0/48 samples within heart. No pairing needed.",
+  "B4": "Each strain fitted alone: 'comparing each gene in the exercised vs. the nonexercised group within each strain' (S3.8.2.p3).",
+  "B5": "Heart: no DEG threshold stated (S3.8.2.p3). Metascape nominal P < 0.05 is given only for skeletal muscle (S3.8.1.p3). 58,581 genes tested. No DEG counts in the main text; Datasets S1-S11 hold them."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Heart exercise arm present (trt EX 24 / SED 24); S3.8.2.p1.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "4 strains x 6 EX + 6 SED = n 6 vs 6 per stratum as in S3.8.2.p1. B6 (12 samples) excluded with a named reason (matrix columns 37-48 are bare numbers, GEO titles N-IDs, no linking field; positional alignment refused) and recorded as discrepancy 'blocks_contrast'. Responders and non-responders are pooled in EX as in the paper.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "control SED, treatment EX for every contrast; DEG stat sign agrees with log2FC; the heart ND5 OXPHOS up (NES +2.91) agrees with the paper's ND5 OxPhos induction (S1.2.2.p1, there for skeletal muscle).", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One heart per mouse; animal IDs unique within heart (packet A, 0 duplicates). Cross-tissue pairing is irrelevant for single-tissue fits.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Per-strain ~trt fits, matching S3.8.2.p3; the joint alternative was rejected with a reason.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "One sex only (suitability), no batch or lane field in GEO; recorded as 'confounding: []' with the reason. Strain is a stratum, not aliased with trt.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "RSEM expected counts (94% integer, max 3e6) correctly typed as estimated counts; rounded, limma-voom with column-sum library sizes; deviations (rounding, no TMM, 53,656 vs 58,581 genes) listed. A low-count filter sensitivity run is added because tied statistics dominate raw-p counts.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states no heart rule; workflow default BH padj < 0.05 applied (0 DEG in all strains), nominal P < 0.05 reported as audit (621/623/2481/1278). Source marked workflow_default, not paper.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "paper_counts is empty and the comparison is stated as qualitative (HANDBACK, caveats); no numeric claim of agreement.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "B6 stop: 'no GEO field maps matrix numbers 37-48 to the N-IDs'. Packet B shows the sample titles N1..N69 and matrix columns are plain numbers, so the claim holds for the fields shown. The check did not test whether the numbers can be tied to N-IDs by name arithmetic or by supplementary files, so it is only as wide as the metadata.", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": [
+  "B6 control contrast (a main paper comparison) is not run: ask the submitters for the matrix-column to N-ID map, or confirm from Dataset S1-S11 that the numeric columns correspond to specific GSMs.",
+  "Open policy question: which heart threshold to report when the paper states none (padj 0 DEG vs nominal P audit counts)."],
+ "summary": "该案例分析的是GSE198229心脏组织中各突变株内运动组对久坐组的limma-voom比较，分组、方向、模型结构均与论文一致，没有重复测量问题。B6对照因矩阵列只有数字编号无法对应GSM而被排除，原因已如实记录；论文未给出心脏的阈值，使用默认padj并附带nominal P审计计数，属于已声明的做法。总体通过，仅留待人工确认B6编号映射。"}

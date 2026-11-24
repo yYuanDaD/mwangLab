@@ -432,3 +432,13 @@ One section per case; newest last.
 ## PMID34880498 / GSE164401_HC_RP_vs_CP (2026-11-24)
 
 - policy: Open policy: plasma-transfer exercise-mediator series counted as exercise study.
+
+## PMID35482926 / GSE198229_heart (2026-11-24)
+
+- policy: B6 control contrast (a main paper comparison) is not run: ask the submitters for the matrix-column to N-ID map, or confirm from Dataset S1-S11 that the numeric columns correspond to specific GSMs.
+- policy: Open policy question: which heart threshold to report when the paper states none (padj 0 DEG vs nominal P audit counts).
+
+## PMID35482926 / GSE198229_soleus (2026-11-24)
+
+- policy: B6 control contrast not run: ask the submitters for the matrix-column to N-ID map.
+- policy: ND5 soleus OxPhos induction (S1.2.2.p1) is not seen in our result; judge from Dataset S1-S11 whether this is a data difference (no TMM, rounding, different gene set) or a sign problem.
