@@ -1,0 +1,91 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID30612451",
+  "request": "Analyze GSE120958 for PMID 30612451 (High-Phosphate Diet Induces Exercise Intolerance and Impairs Fatty Acid Metabolism in Mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE120958",
+      "accession": "GSE120958",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC6411426.paper.md"],
+        "metadata": "GSE120958/GSE120958_metadata.csv",
+        "matrix": "GSE120958/GSE120958_countTable.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE120958"],
+            "assay": "bulk RNA-seq (Illumina HiSeq 2500), mouse gastrocnemius",
+            "primary_estimand": "Effect of 12-week high-phosphate diet (2% Pi, HP) vs normal-phosphate diet (0.6% Pi, NP) on gastrocnemius gene expression (S4.4.p1, FIG5). Exercise is a phenotypic outcome (treadmill capacity, S4.2.p2), not a factor of the RNA-seq design.",
+            "factors": {"diet": ["NP (control)", "HP"]},
+            "sample_inclusion": "n = 3 per diet group, male C57BL/6, 20-24 weeks old (FIG5, S2.2.p1); no exercise state is stated for the sequenced animals; related mitochondria assays are explicitly from non-exercised mice (FIG4 legend)",
+            "planned_contrasts": ["HP vs NP diet (S4.4.p1, FIG5; paper: 'over 5,000' DEGs)"],
+            "repeated_measure_unit": null,
+            "paper_method": "DESeq2 (v1.6.3) ~ diet (FIG5; GEO data_processing)",
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "inclusive": false,
+              "effect_inclusive": true,
+              "source_locator": "FIG5"
+            },
+            "paper_results": "over 5,000 DEGs HP vs NP (S4.4.p1); down: Fabp4, Fabp5, Lipe (Hsl), Fasn, Pparg, Adipoq, Pnpla3; up: Gck, Hk2, Pgk1, Irs2, Ldha, Slc2a4 (Glut4)",
+            "exercise_contrast_in_rnaseq": false
+          },
+          "reasoning": "S2.13.p1 deposits GSE120958 for muscle RNA-seq. S4.4.p1/FIG5 analyze HPD vs normal chow (n=3/group) with DESeq2, 'cutoff values of +/-1.5 fold change and P < 0.05' (raw P stated). Exercise appears only as treadmill phenotyping (S2.7, S4.2) and blood measures; no RNA-seq arm is exercised vs sedentary.",
+          "confidence": "high",
+          "locator": "S4.4.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.13.p1 names GSE120958", "GEO: gastrocnemius, C57BL/6, 12-week diet, 3 NP + 3 HP matches FIG5 n=3/group", "treatment_protocol_ch1 text matches S2.2.p1"]},
+          "reasoning": "Paper names the accession; tissue, strain, diet doses and group sizes agree.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(NP|HP)_\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns NP_1..HP_3 equal metadata title exactly (6/6). grp derived from title; agrees with characteristics diet column.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "GSE120958_countTable.txt.gz is 100% integer, max 1.5e6; data_processing: featureCounts quantification, 'Tab-delimited text files include raw counts and FPKM values'. Paper input to DESeq2 is raw counts, consistent.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "NP"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {
+            "analysis_type": "none",
+            "design_column": "grp",
+            "exercise_contrast_available": false
+          },
+          "candidates": [
+            {"value": "grp_HP_vs_NP as an exercise contrast", "reason_rejected": "This is a dietary phosphate contrast, not exercise; neither arm is exercised or trained and no exercise-state variable exists in GEO or the paper's RNA-seq description. Relabelling diet as 'exercise intolerance' would misstate the estimand."}
+          ],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: GSE120958 contains only normal- vs high-phosphate diet gastrocnemius samples (3 vs 3), all of unstated/non-exercised state. Exercise in the paper is a phenotypic outcome (treadmill capacity), not a factor of the sequenced design, so the data cannot identify an effect of exercise on gene expression.",
+          "reasoning": "Request asks how exercise affects gene expression. S4.4.p1/FIG5: the only RNA-seq comparison is HPD vs normal chow; GEO grouping column is diet only (normal phosphate 3, high phosphate 3); diet time 12 weeks constant. No exercise arm, no pre/post exercise timepoint.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise factor", "paper": "Title/abstract emphasise exercise intolerance; RNA-seq contrast is diet only (S4.4.p1)", "data": "GEO has only diet factor (NP/HP)", "disposition": "blocks_requested_estimand"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
