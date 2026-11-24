@@ -939,3 +939,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID27304508 (GSE75919)
 
 - tools/case_runner.py:54 _EXTENSIONS lacks .xlsx.gz so inspect found no matrix; needed manual prep_counts.py Details: `PMID27304508/HANDBACK.md`.
+
+## PMID27508874 (GSE74570)
+
+- none (raw_tar merge writes merged CSV into the shared data/GSE74570 cache) Details: `PMID27508874/HANDBACK.md`.

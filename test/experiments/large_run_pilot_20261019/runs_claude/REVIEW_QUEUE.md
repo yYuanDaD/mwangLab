@@ -491,3 +491,7 @@ One section per case; newest last.
 ## PMID27304508 / GSE75919 (2026-11-24)
 
 - policy: Policy: whether the analyzable genotype contrast (KO vs fl/fl after exercise, 4 vs 5) should be run as a labelled non-exercise result since the paper's RNA-seq estimand is exactly this contrast; refusal is consistent with the exercise-effect question.
+
+## PMID27508874 / GSE74570 (2026-11-24)
+
+- policy: Policy question (not an error): whether a genotype series whose phenotype is exercise capacity should be offered as a secondary non-exercise analysis (mNKO vs WT, mNTG vs WT).
