@@ -1,0 +1,178 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42545855",
+  "request": "Analyze GSE324210 for PMID 42545855 (Endurance training attenuates acute exercise-induced monocyte transcriptomic responses in adolescents: sex-specific molecular adaptations.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE324210",
+      "accession": "GSE324210",
+      "inputs": {
+        "paper": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID42545855/PMID42545855_abstract.txt",
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID42545855/GSE324210_series_description.txt"
+        ],
+        "metadata": "GSE324210/GSE324210_metadata.csv",
+        "matrix": "GSE324210/GSE324210_MONOCYTE_RNA_SEQ_healthy.xlsx",
+        "raw_tar": false,
+        "prep_scripts": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID42545855/prep/soft_to_metadata.py"
+        ]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE324210"],
+            "assay": "total RNA-seq (stranded mRNA library) of negatively isolated peripheral blood monocytes, Illumina NovaSeq 6000, human",
+            "subjects": "12 males + 9 females, 13-17 y; 20 with 4 blood draws, 1 with 3 (83 samples)",
+            "factors": {"time": "T1 pre-training/pre-acute, T2 pre-training/post-acute, T3 post-training/pre-acute, T4 post-training/post-acute (ordering inferred from GEO overall design; not defined explicitly)", "sex": "female, male (analyzed separately)", "subject": "repeated-measure unit (AC##)"},
+            "primary_estimand": "Within-subject acute exercise response of monocyte gene expression (immediately post vs pre a 10x2-min cycling bout session), per sex, before and after 8-wk endurance training; secondary: training effect on resting expression (post- vs pre-training baseline) per sex.",
+            "planned_contrasts": [
+              "Females acute exercise pre-training, T2 vs T1 (abstract: 5,135 transcripts FDR<0.1; GEO summary: 5,148)",
+              "Males acute exercise pre-training, T2 vs T1 (abstract: 567; GEO summary: 571)",
+              "Females acute exercise post-training, T4 vs T3 (abstract: 94)",
+              "Males acute exercise post-training, T4 vs T3 (abstract: 165)",
+              "Training effect on baseline, T3 vs T1, per sex (GEO summary: none at FDR<0.1)",
+              "Sex x acute-exercise interaction pre-training (GEO summary: 315 sex-specific transcripts) - not reproduced here"
+            ],
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null, "source_locator": "PubMed abstract; GEO Series_summary"},
+            "paper_method": "not stated in the abstract or GEO record (counts from featureCounts; statistical model unknown)",
+            "normalization": "not stated",
+            "inclusion": "all 83 deposited samples"
+          },
+          "reasoning": "No full text available; the study map rests on the PubMed abstract (PMID42545855_abstract.txt) and the GEO series summary/overall design. Both give per-sex acute-exercise counts at FDR<0.1 before and after training; GEO adds no training effect at baseline and 315 sex-specific transcripts. Method, normalization, filtering and covariates are unknown.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO Series_summary / Series_overall_design"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 42545855", "series title matches the paper", "matrix has 83 columns whose names equal the 83 GSM titles (description: 'Column name in raw counts file: <title>')", "21 subjects (9 F, 12 M) as in the abstract"]},
+          "reasoning": "The only supplementary file of GSE324210 is the counts xlsx; GEO links the series to PMID 42545855; sample counts and sex split match the abstract.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"subject": ["title", "^(AC\\d+)_T\\d$"]},
+          "aliases": {"sex": "characteristics_ch1.sex", "time_raw": "characteristics_ch1.time"},
+          "recode": {"time_raw": {"1": "T1", "2": "T2", "3": "T3", "4": "T4"}},
+          "combine": {"time": ["time_raw"]},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal metadata titles (83/83, exact). Subject parsed from the title prefix; time from characteristics 'time' (agrees with the _T# title suffix); sex from characteristics.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE324210_MONOCYTE_RNA_SEQ_healthy.xlsx", "paper_input": "featureCounts raw counts (GEO data_processing)"},
+          "reasoning": "All values integer (integer_fraction 1.0), max 955,444, 60,660 Ensembl gene IDs; GEO data_processing: HiSat2 + featureCounts 'as raw counts'.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "T1"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["sex"],
+          "planned": [
+            "time_T2_vs_T1_sex-female", "time_T2_vs_T1_sex-male",
+            "time_T4_vs_T3_sex-female", "time_T4_vs_T3_sex-male",
+            "time_T3_vs_T1_sex-female", "time_T3_vs_T1_sex-male"
+          ],
+          "covariate_candidates": ["subject"],
+          "final": {
+            "analysis_type": "repeated-measures multi-level time, stratified by sex",
+            "formula": "~ subject + time (fitted separately within each sex)",
+            "contrasts": [
+              {"name": "time_T2_vs_T1_sex-female", "control": "T1", "treatment": "T2", "role": "primary"},
+              {"name": "time_T2_vs_T1_sex-male", "control": "T1", "treatment": "T2", "role": "primary"},
+              {"name": "time_T4_vs_T3_sex-female", "control": "T3", "treatment": "T4", "role": "primary"},
+              {"name": "time_T4_vs_T3_sex-male", "control": "T3", "treatment": "T4", "role": "primary"},
+              {"name": "time_T3_vs_T1_sex-female", "control": "T1", "treatment": "T3", "role": "secondary"},
+              {"name": "time_T3_vs_T1_sex-male", "control": "T1", "treatment": "T3", "role": "secondary"}
+            ]
+          },
+          "reasoning": "The abstract reports acute responses separately for females and males, before and after training, so sex is a stratum and each sex gets one model on all its time points with subject blocking. T1 vs T3 is the GEO-summary training effect at rest. The sex x exercise interaction (315 transcripts) and the training x acute interaction are not run: interaction contrasts are not expressible as pairwise level comparisons in the runner, and the abstract does not give their model. Other pairwise comparisons the suitability report lists (e.g. T4 vs T1) are not paper contrasts.",
+          "confidence": "medium",
+          "candidates": [
+            {"value": "pooled sexes with sex covariate", "reason_rejected": "paper reports each sex separately; subject is nested in sex"},
+            {"value": "unpaired time comparison", "reason_rejected": "same adolescents sampled at every time point; subject must be blocked"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "age", "disposition": "not added: constant within subject, absorbed by subject blocking"}]},
+          "confounding_candidates": ["subject", "characteristics_ch1.age"],
+          "reasoning": "Four draws per adolescent: subject is the blocking unit (fixed effect in DESeq2). No batch or lane information is deposited.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, joint model per sex)",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "unknown", "status": "blocked", "reason": "statistical method not stated in the abstract or GEO record; no full text"},
+            "deviations": ["Method chosen by the workflow (DESeq2 with subject blocking) because the paper's method is unknown; filtering and normalization may differ from the paper's"]
+          },
+          "transform": null,
+          "reasoning": "Integer featureCounts raw counts support DESeq2; subject fixed effect handles pairing.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null}
+          },
+          "reasoning": "Abstract: 'differentially expressed transcripts, false discovery rate (FDR) < 0.1', no fold-change rule. Audit at the workflow default BH 0.05.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Comparison with the paper rests on the PubMed abstract and GEO summary only; no full text.",
+              "Time-point coding 1-4 is inferred as chronological (pre/post acute, pre/post training); GEO does not define it.",
+              "Paper's DE method unknown; DESeq2 with subject blocking used instead.",
+              "Sex x exercise interaction (315 transcripts) not reproduced."
+            ]
+          },
+          "paper_counts": {
+            "joint_female/time_T2_vs_T1_sex-female": 5135,
+            "joint_male/time_T2_vs_T1_sex-male": 567,
+            "joint_female/time_T4_vs_T3_sex-female": 94,
+            "joint_male/time_T4_vs_T3_sex-male": 165,
+            "joint_female/time_T3_vs_T1_sex-female": 0,
+            "joint_male/time_T3_vs_T1_sex-male": 0
+          },
+          "reasoning": "Counts from the abstract (acute) and the GEO summary (training at baseline, 'FDR>0.1' i.e. none). Abstract names no genes.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "pre-training acute DEG counts", "paper": "abstract 5,135 F / 567 M", "data": "GEO summary 5,148 F / 571 M", "disposition": "executable_without_change"},
+        {"item": "DE method", "paper": "not stated in abstract", "data": "raw counts allow DESeq2", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "joint_female",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["time_T2_vs_T1_sex-female", "time_T4_vs_T3_sex-female", "time_T3_vs_T1_sex-female"], "covariates": ["subject"], "alpha": 0.1},
+          "subset": {"sex": ["female"]},
+          "role": "primary",
+          "reasoning": "one DESeq2 model on all female samples, ~ subject + time"
+        },
+        {
+          "name": "joint_male",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["time_T2_vs_T1_sex-male", "time_T4_vs_T3_sex-male", "time_T3_vs_T1_sex-male"], "covariates": ["subject"], "alpha": 0.1},
+          "subset": {"sex": ["male"]},
+          "role": "primary",
+          "reasoning": "one DESeq2 model on all male samples, ~ subject + time"
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint_female/time_T2_vs_T1_sex-female", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "paper reports pathway analyses for the pre-training acute response per sex"},
+        {"execution": "joint_male/time_T2_vs_T1_sex-male", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "paper reports pathway analyses for the pre-training acute response per sex"}
+      ]
+    }
+  ]
+}

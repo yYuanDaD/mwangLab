@@ -1,0 +1,466 @@
+{
+  "case_id": "GSE324210",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "T1": 21,
+          "T2": 21,
+          "T3": 21,
+          "T4": 20
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "subject",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 79,
+        "min_cell_size": 20
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 12,
+      "n_analyzable": 12,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_T2_vs_T1_sex-female",
+        "time_T2_vs_T1_sex-male",
+        "time_T4_vs_T3_sex-female",
+        "time_T4_vs_T3_sex-male",
+        "time_T3_vs_T1_sex-female",
+        "time_T3_vs_T1_sex-male"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 83 samples.",
+      "metadata_sex_column": "characteristics_ch1.sex",
+      "predicted": {
+        "male": 48,
+        "female": 35
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID42545855\\GSE324210\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_T2_vs_T1__sex-female",
+            "time_T3_vs_T1__sex-female",
+            "time_T4_vs_T1__sex-female",
+            "time_T3_vs_T2__sex-female",
+            "time_T4_vs_T2__sex-female",
+            "time_T4_vs_T3__sex-female"
+          ],
+          "male": [
+            "time_T2_vs_T1__sex-male",
+            "time_T3_vs_T1__sex-male",
+            "time_T4_vs_T1__sex-male",
+            "time_T3_vs_T2__sex-male",
+            "time_T4_vs_T2__sex-male",
+            "time_T4_vs_T3__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_T2_vs_T1_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T2",
+      "reference": "T1",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T2"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T1"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T3_vs_T1_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T3",
+      "reference": "T1",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T3"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T1"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T1_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T1",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T4"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T1"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T3_vs_T2_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T3",
+      "reference": "T2",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T3"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T2"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T2_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T2",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T4"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T2"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T3_sex-female",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T3",
+      "within": {
+        "sex": "female"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T4"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "sex": "female",
+            "time": "T3"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T2_vs_T1_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T2",
+      "reference": "T1",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T2"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T1"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T3_vs_T1_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T3",
+      "reference": "T1",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T1"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T1_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T1",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T4"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T1"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T3_vs_T2_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T3",
+      "reference": "T2",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T3"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T2"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T2_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T2",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T4"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T2"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_T4_vs_T3_sex-male",
+      "kind": "simple",
+      "factor": "time",
+      "test": "T4",
+      "reference": "T3",
+      "within": {
+        "sex": "male"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T4"
+          },
+          "n": 12
+        },
+        {
+          "cell": {
+            "sex": "male",
+            "time": "T3"
+          },
+          "n": 12
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

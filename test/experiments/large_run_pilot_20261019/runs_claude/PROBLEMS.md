@@ -1079,3 +1079,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID32409493 (GSE137631)
 
 - alignment needed prep script (key_patterns can't map arm-specific column vocab); no DESeq2 nested-subject interaction executor; pydeseq2 exp overflow warning Details: `PMID32409493/HANDBACK.md`.
+
+## PMID36939205 (GSE209880)
+
+- case_runner.py:871 multi-follow-up paired_change tables collide by contrast name (h3 overwritten); inspect calls versioned Ensembl IDs gene_symbol; loky WinError 6 noise Details: `PMID36939205/HANDBACK.md`.
