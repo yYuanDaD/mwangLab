@@ -1,0 +1,1354 @@
+{
+  "case_id": "GSE120862",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "tr",
+    "time",
+    "leg"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "tr",
+        "time",
+        "leg"
+      ],
+      "levels": {
+        "tr": {
+          "U": 42,
+          "T": 42
+        },
+        "time": {
+          "b": 28,
+          "h1": 28,
+          "h4": 28
+        },
+        "leg": {
+          "NE": 42,
+          "Ex": 42
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "one sample per subject per factor level set: an identifier, not a block"
+        },
+        {
+          "column": "subject",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "instrument_model",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        },
+        {
+          "column": "instrument_model",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(tr) + C(time) + C(leg)",
+        "rank": 5,
+        "full_rank": true,
+        "residual_df": 79,
+        "min_cell_size": 7
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 35,
+      "n_analyzable": 35,
+      "too_small": [],
+      "planned_analyzable": [
+        "leg_Ex_vs_NE_tr-U_time-h1",
+        "leg_Ex_vs_NE_tr-U_time-h4",
+        "leg_Ex_vs_NE_tr-T_time-h1",
+        "leg_Ex_vs_NE_tr-T_time-h4",
+        "tr_T_vs_U_time-b_leg-NE",
+        "tr_T_vs_U_time-b_leg-Ex"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 84 samples.",
+      "metadata_sex_column": "characteristics_ch1.Sex",
+      "predicted": {
+        "male": 84
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\93f7d3bfcc684b7bc42a329faf084a6b31f49523\\GSE120862\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "tr_T_vs_U_time-b_leg-Ex",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "b",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "b",
+            "leg": "Ex",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "b",
+            "leg": "Ex",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_T_vs_U_time-b_leg-NE",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "b",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "b",
+            "leg": "NE",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "b",
+            "leg": "NE",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_T_vs_U_time-h1_leg-Ex",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "h1",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h1",
+            "leg": "Ex",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h1",
+            "leg": "Ex",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_T_vs_U_time-h1_leg-NE",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "h1",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h1",
+            "leg": "NE",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h1",
+            "leg": "NE",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_T_vs_U_time-h4_leg-Ex",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "h4",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h4",
+            "leg": "Ex",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h4",
+            "leg": "Ex",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_T_vs_U_time-h4_leg-NE",
+      "kind": "simple",
+      "factor": "tr",
+      "test": "T",
+      "reference": "U",
+      "within": {
+        "time": "h4",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h4",
+            "leg": "NE",
+            "tr": "T"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h4",
+            "leg": "NE",
+            "tr": "U"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h1_vs_b_tr-T_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h1",
+      "reference": "b",
+      "within": {
+        "tr": "T",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_b_tr-T_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "b",
+      "within": {
+        "tr": "T",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_h1_tr-T_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "h1",
+      "within": {
+        "tr": "T",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "Ex",
+            "time": "h1"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h1_vs_b_tr-T_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h1",
+      "reference": "b",
+      "within": {
+        "tr": "T",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_b_tr-T_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "b",
+      "within": {
+        "tr": "T",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_h1_tr-T_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "h1",
+      "within": {
+        "tr": "T",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "leg": "NE",
+            "time": "h1"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h1_vs_b_tr-U_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h1",
+      "reference": "b",
+      "within": {
+        "tr": "U",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_b_tr-U_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "b",
+      "within": {
+        "tr": "U",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_h1_tr-U_leg-Ex",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "h1",
+      "within": {
+        "tr": "U",
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "Ex",
+            "time": "h1"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h1_vs_b_tr-U_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h1",
+      "reference": "b",
+      "within": {
+        "tr": "U",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_b_tr-U_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "b",
+      "within": {
+        "tr": "U",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_h4_vs_h1_tr-U_leg-NE",
+      "kind": "simple",
+      "factor": "time",
+      "test": "h4",
+      "reference": "h1",
+      "within": {
+        "tr": "U",
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "leg": "NE",
+            "time": "h1"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-T_time-b",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "T",
+        "time": "b"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-T_time-h1",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "T",
+        "time": "h1"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h1",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h1",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-T_time-h4",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "T",
+        "time": "h4"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h4",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h4",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-U_time-b",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "U",
+        "time": "b"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-U_time-h1",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "U",
+        "time": "h1"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h1",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h1",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "leg_Ex_vs_NE_tr-U_time-h4",
+      "kind": "simple",
+      "factor": "leg",
+      "test": "Ex",
+      "reference": "NE",
+      "within": {
+        "tr": "U",
+        "time": "h4"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h4",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h4",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_time_T_h1_vs_U_b_leg-Ex",
+      "kind": "interaction",
+      "factor": "tr:time",
+      "test": "T:h1",
+      "reference": "U:b",
+      "within": {
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "T",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "U",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "T",
+            "time": "b"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "U",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_time_T_h4_vs_U_b_leg-Ex",
+      "kind": "interaction",
+      "factor": "tr:time",
+      "test": "T:h4",
+      "reference": "U:b",
+      "within": {
+        "leg": "Ex"
+      },
+      "cells": [
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "T",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "U",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "T",
+            "time": "b"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "Ex",
+            "tr": "U",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_time_T_h1_vs_U_b_leg-NE",
+      "kind": "interaction",
+      "factor": "tr:time",
+      "test": "T:h1",
+      "reference": "U:b",
+      "within": {
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "T",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "U",
+            "time": "h1"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "T",
+            "time": "b"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "U",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_time_T_h4_vs_U_b_leg-NE",
+      "kind": "interaction",
+      "factor": "tr:time",
+      "test": "T:h4",
+      "reference": "U:b",
+      "within": {
+        "leg": "NE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "T",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "U",
+            "time": "h4"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "T",
+            "time": "b"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "leg": "NE",
+            "tr": "U",
+            "time": "b"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_leg_T_Ex_vs_U_NE_time-b",
+      "kind": "interaction",
+      "factor": "tr:leg",
+      "test": "T:Ex",
+      "reference": "U:NE",
+      "within": {
+        "time": "b"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "b",
+            "tr": "T",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "b",
+            "tr": "U",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "b",
+            "tr": "T",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "b",
+            "tr": "U",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_leg_T_Ex_vs_U_NE_time-h1",
+      "kind": "interaction",
+      "factor": "tr:leg",
+      "test": "T:Ex",
+      "reference": "U:NE",
+      "within": {
+        "time": "h1"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h1",
+            "tr": "T",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h1",
+            "tr": "U",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h1",
+            "tr": "T",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h1",
+            "tr": "U",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "tr_leg_T_Ex_vs_U_NE_time-h4",
+      "kind": "interaction",
+      "factor": "tr:leg",
+      "test": "T:Ex",
+      "reference": "U:NE",
+      "within": {
+        "time": "h4"
+      },
+      "cells": [
+        {
+          "cell": {
+            "time": "h4",
+            "tr": "T",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h4",
+            "tr": "U",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h4",
+            "tr": "T",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "time": "h4",
+            "tr": "U",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_leg_h1_Ex_vs_b_NE_tr-T",
+      "kind": "interaction",
+      "factor": "time:leg",
+      "test": "h1:Ex",
+      "reference": "b:NE",
+      "within": {
+        "tr": "T"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h1",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h1",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_leg_h4_Ex_vs_b_NE_tr-T",
+      "kind": "interaction",
+      "factor": "time:leg",
+      "test": "h4:Ex",
+      "reference": "b:NE",
+      "within": {
+        "tr": "T"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h4",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "h4",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "T",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_leg_h1_Ex_vs_b_NE_tr-U",
+      "kind": "interaction",
+      "factor": "time:leg",
+      "test": "h1:Ex",
+      "reference": "b:NE",
+      "within": {
+        "tr": "U"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h1",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h1",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_leg_h4_Ex_vs_b_NE_tr-U",
+      "kind": "interaction",
+      "factor": "time:leg",
+      "test": "h4:Ex",
+      "reference": "b:NE",
+      "within": {
+        "tr": "U"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h4",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "h4",
+            "leg": "NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tr": "U",
+            "time": "b",
+            "leg": "NE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

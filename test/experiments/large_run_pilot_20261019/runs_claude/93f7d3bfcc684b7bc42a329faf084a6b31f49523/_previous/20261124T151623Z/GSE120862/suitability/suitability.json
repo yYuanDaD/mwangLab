@@ -1,0 +1,394 @@
+{
+  "case_id": "GSE120862",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "UbNE": 7,
+          "Uh1NE": 7,
+          "Uh4NE": 7,
+          "UbEx": 7,
+          "Uh1Ex": 7,
+          "Uh4Ex": 7,
+          "TbNE": 7,
+          "Th1NE": 7,
+          "Th4NE": 7,
+          "TbEx": 7,
+          "Th1Ex": 7,
+          "Th4Ex": 7
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "subject",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "instrument_model",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        },
+        {
+          "column": "instrument_model",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp) + C(subject)",
+        "rank": 18,
+        "full_rank": true,
+        "residual_df": 66,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 11,
+      "n_analyzable": 11,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_TbNE_vs_UbNE"
+      ],
+      "unknown_planned": [
+        "grp_Uh1Ex_vs_Uh1NE",
+        "grp_Uh4Ex_vs_Uh4NE",
+        "grp_Th1Ex_vs_Th1NE",
+        "grp_Th4Ex_vs_Th4NE",
+        "grp_TbEx_vs_UbEx"
+      ]
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 84 samples.",
+      "metadata_sex_column": "characteristics_ch1.Sex",
+      "predicted": {
+        "male": 84
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\93f7d3bfcc684b7bc42a329faf084a6b31f49523\\GSE120862\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_TbEx_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TbEx",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "TbEx"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_TbNE_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "TbNE",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "TbNE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Th1Ex_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Th1Ex",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Th1Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Th1NE_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Th1NE",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Th1NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Th4Ex_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Th4Ex",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Th4Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Th4NE_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Th4NE",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Th4NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_UbEx_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "UbEx",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "UbEx"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Uh1Ex_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Uh1Ex",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Uh1Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Uh1NE_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Uh1NE",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Uh1NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Uh4Ex_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Uh4Ex",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Uh4Ex"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Uh4NE_vs_UbNE",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Uh4NE",
+      "reference": "UbNE",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Uh4NE"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "UbNE"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

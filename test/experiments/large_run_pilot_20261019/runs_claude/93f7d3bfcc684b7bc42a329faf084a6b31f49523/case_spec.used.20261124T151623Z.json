@@ -1,0 +1,366 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/93f7d3bfcc684b7bc42a329faf084a6b31f49523",
+  "request": "Analyze GSE120862 for the paper (Contractile activity-specific transcriptome response to acute endurance exercise and training in human skeletal muscle.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE120862",
+      "accession": "GSE120862",
+      "inputs": {
+        "paper": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/93f7d3bfcc684b7bc42a329faf084a6b31f49523/PMID30779632_abstract.txt",
+          "test/experiments/large_run_pilot_20261019/runs_claude/93f7d3bfcc684b7bc42a329faf084a6b31f49523/GSE120862_series_soft.txt"
+        ],
+        "metadata": "GSE120862/GSE120862_metadata.csv",
+        "matrix": "GSE120862/GSE120862_recount3_est_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/93f7d3bfcc684b7bc42a329faf084a6b31f49523/prep_GSE120862.py"
+        ]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE120862"
+            ],
+            "primary_estimand": "Contractile-activity-specific transcriptome response: exercised (Ex) vs contralateral non-exercised (NE) vastus lateralis at +1 h and +4 h after 60-min one-legged knee extension, within subject, in untrained and (after 2 mo aerobic training) trained state; secondary: training effect on baseline transcriptome (trained vs untrained baseline).",
+            "planned_contrasts": [
+              "Ex vs NE at +1 h, untrained (abstract: 'DEGs between exercised and nonexercised muscle were evaluated at 1 and 4 h'; no count in abstract)",
+              "Ex vs NE at +4 h, untrained (same locator; no count in abstract)",
+              "Ex vs NE at +1 h, trained (GEO summary: 'in both untrained and trained skeletal muscle'; no count)",
+              "Ex vs NE at +4 h, trained (same; no count)",
+              "trained vs untrained at baseline (abstract: 'Transcriptome change at baseline after 2 mo of aerobic training'; no count)"
+            ],
+            "factors": {
+              "training": [
+                "untrained",
+                "trained"
+              ],
+              "time": [
+                "baseline (48 h after exercise / rest)",
+                "+1 h",
+                "+4 h"
+              ],
+              "leg": [
+                "NE",
+                "Ex"
+              ]
+            },
+            "inclusion": "7 untrained males, 84 samples = 7 subjects x 2 training states x 3 times x 2 legs (GEO overall design)",
+            "repeated_measure_unit": "subject (all 12 conditions from each of 7 men)",
+            "normalization": "DESeq normalization of HTSeq counts (GEO data_processing)",
+            "paper_method": "DESeq family (GEO data_processing: HTSeq counts, 'Normalization of read counts provided by DESeq method'); exact DE model, pairing and threshold not stated in abstract",
+            "paper_threshold": {
+              "metric": "unknown",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "not in abstract; full text unavailable"
+            },
+            "paper_results": "Abstract only: contractile-activity-specific responses were increases only (no decreased genes), regulated by CREB/ATF/AP1, MYC/MAX, E2F TFs; training-induced baseline changes (up and down) were more pronounced than acute contractile-specific responses and involved IRF/STAT TFs. GEO summary: contractile-specific responses in trained muscle substantially decreased relative to untrained."
+          },
+          "reasoning": "Full text not available; reconstruction rests on the PubMed abstract (PMID 30779632) and GEO series description only. Factors and sample structure from GEO overall design and sample characteristics.",
+          "confidence": "medium",
+          "locator": "PubMed abstract PMID30779632; GEO GSE120862 Series_summary/overall_design"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GEO series GSE120862 lists PMID 30779632 (Series_pubmed_id) and has the paper's title",
+              "GEO supplementary files (DESeq-normalized counts, FPKM) returned HTTP 403 from GEO FTP and the GEO download endpoint on 2026-11-24; matrix taken instead from recount3 uniform processing of SRA project SRP163524, which GEO links (Series_relation SRA)",
+              "recount3 metadata maps 84 SRR runs one-to-one to the 84 GSM accessions (experiment_attributes 'GEO Accession'); sample titles match GEO titles"
+            ]
+          },
+          "reasoning": "The data are the paper's own 84 libraries, reprocessed by recount3 (STAR/GENCODE v26) rather than the authors' HISAT2/HTSeq pipeline. Recorded as a matrix-source deviation.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {
+            "subject": "characteristics_ch1.individual",
+            "tr": "characteristics_ch1.training status",
+            "time": "characteristics_ch1.time point",
+            "leg": "characteristics_ch1.exercised/non-exercised muscle"
+          },
+          "recode": {
+            "subject": {
+              "1": "S1",
+              "2": "S2",
+              "3": "S3",
+              "4": "S4",
+              "5": "S5",
+              "6": "S6",
+              "7": "S7"
+            },
+            "tr": {
+              "untrained": "U",
+              "trained": "T"
+            },
+            "time": {
+              "baseline": "b",
+              "+1 h after exercise": "h1",
+              "+4 h after exercise": "h4"
+            },
+            "leg": {
+              "non-exercised (NE)": "NE",
+              "exercised (Ex)": "Ex"
+            }
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids (renamed from SRR in prep via recount3 metadata); exact match on metadata index. Factors tr (U/T), time (b/h1/h4), leg (NE/Ex), plus subject."
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "recount3 gene_sums are per-base coverage sums; prep divided by single-end read length (SRA read_info) and rounded, as recount3::compute_read_counts does. Integer fraction 1.0 after rounding. Paper input was HTSeq raw counts (GEO data_processing); the deposited GEO files (DESeq-normalized counts, FPKM) were unreachable.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": [
+            "tr",
+            "time",
+            "leg"
+          ],
+          "references": {
+            "tr": "U",
+            "time": "b",
+            "leg": "NE"
+          },
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [
+            "leg_Ex_vs_NE_tr-U_time-h1",
+            "leg_Ex_vs_NE_tr-U_time-h4",
+            "leg_Ex_vs_NE_tr-T_time-h1",
+            "leg_Ex_vs_NE_tr-T_time-h4",
+            "tr_T_vs_U_time-b_leg-NE",
+            "tr_T_vs_U_time-b_leg-Ex"
+          ],
+          "covariate_candidates": [
+            "subject",
+            "instrument_model"
+          ],
+          "final": {
+            "analysis_type": "factorial repeated measures (training x time x leg, all within subject)",
+            "design_column": "leg",
+            "formula": "~ subject + tr*time*leg (cell means; joint DESeq2)",
+            "contrasts": [
+              {
+                "name": "leg_Ex_vs_NE_tr-U_time-h1",
+                "control": "NE",
+                "treatment": "Ex",
+                "role": "primary"
+              },
+              {
+                "name": "leg_Ex_vs_NE_tr-U_time-h4",
+                "control": "NE",
+                "treatment": "Ex",
+                "role": "primary"
+              },
+              {
+                "name": "leg_Ex_vs_NE_tr-T_time-h1",
+                "control": "NE",
+                "treatment": "Ex",
+                "role": "primary"
+              },
+              {
+                "name": "leg_Ex_vs_NE_tr-T_time-h4",
+                "control": "NE",
+                "treatment": "Ex",
+                "role": "primary"
+              },
+              {
+                "name": "tr_T_vs_U_time-b_leg-NE",
+                "control": "U",
+                "treatment": "T",
+                "role": "secondary"
+              },
+              {
+                "name": "tr_T_vs_U_time-b_leg-Ex",
+                "control": "U",
+                "treatment": "T",
+                "role": "secondary"
+              }
+            ]
+          },
+          "reasoning": "Paper's contractile-specific estimand is Ex vs NE leg at the same time point within subject (abstract). Training effect at baseline is trained vs untrained baseline; the abstract does not say whether legs were pooled, so it is run per leg (NE leg is the cleaner baseline: the Ex leg's baseline biopsy is 48 h after the prior bout). All from one model on 84 samples with subject blocking. Rejected: separate factors with interaction (paper describes cell-wise comparisons); pooling legs at baseline (unknown, would double-count subjects without a leg term).",
+          "candidates": [
+            {
+              "value": "single 12-level cell factor",
+              "reason_rejected": "suitability enumerates only vs-reference pairs for one factor; three factors give the paper's within-cell simple effects"
+            },
+            {
+              "value": "baseline legs pooled",
+              "reason_rejected": "not stated in abstract; per-leg contrasts keep one sample per subject per arm"
+            }
+          ],
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": [
+              {
+                "name": "subject",
+                "disposition": "blocking term (repeated measures, all 12 cells per subject)"
+              },
+              {
+                "name": "instrument_model",
+                "disposition": "not added: nested in subject (S1-S4 HiSeq 2500, S5-S7 NextSeq 500), absorbed by subject block"
+              }
+            ]
+          },
+          "confounding_candidates": [
+            "instrument_model"
+          ],
+          "reasoning": "Every subject contributes every cell, so contrasts are within-subject. Sequencing platform is constant within subject, so the subject term absorbs it and it is balanced across all contrasts.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, joint model)",
+            "formula": "~ subject + tr*time*leg",
+            "rounding_documented": true,
+            "paper_route": {
+              "method": "DESeq (authors' HTSeq counts)",
+              "status": "blocked",
+              "reason": "authors' count matrix unreachable (GEO FTP 403); exact paper model/pairing unknown from abstract"
+            },
+            "deviations": [
+              "matrix from recount3 (STAR, GENCODE v26) estimated counts instead of authors' HISAT2/HTSeq counts",
+              "subject-blocked DESeq2 model; paper's pairing not confirmed from abstract"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Estimated counts rounded in prep (documented) -> DESeq2 with subject blocking, the closest validated route to the authors' DESeq normalisation.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "unknown",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null
+            },
+            "threshold_source": "workflow_default",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.2630344,
+              "inclusive": false
+            },
+            "deviation_note": "Paper threshold not available (abstract only). Applied BH padj<0.05, no fold-change rule. Audit adds |FC|>1.2 (log2 0.2630344) as a labelled comparison rule only."
+          },
+          "reasoning": "No threshold in abstract or GEO description; workflow default.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Comparison with the paper rests on the abstract only; the paper's DEG counts and threshold are unknown.",
+              "Matrix is recount3 reprocessing, not the authors' deposited counts.",
+              "Abstract states contractile-specific responses were increases only; check up/down balance of Ex vs NE tables against that."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "joint/leg_Ex_vs_NE_tr-U_time-h1": [
+              "NR4A3",
+              "PPARGC1A",
+              "ATF3",
+              "MYC"
+            ],
+            "joint/leg_Ex_vs_NE_tr-U_time-h4": [
+              "NR4A3",
+              "PPARGC1A",
+              "ATF3",
+              "MYC"
+            ]
+          },
+          "reasoning": "Genes listed are not named in the abstract; they are canonical CREB/ATF/AP1 / MYC targets used only as a direction sanity check for the abstract's 'CREB/ATF/AP1- and MYC/MAX-related' claim.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "matrix source",
+          "paper": "HISAT2 + HTSeq counts, DESeq normalisation",
+          "data": "recount3 STAR/GENCODE v26 coverage-derived estimated counts (GEO files unreachable)",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "threshold and counts",
+          "paper": "not in abstract",
+          "data": "workflow default padj<0.05",
+          "disposition": "declared_deviation"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": [
+              "leg_Ex_vs_NE_tr-U_time-h1",
+              "leg_Ex_vs_NE_tr-U_time-h4",
+              "leg_Ex_vs_NE_tr-T_time-h1",
+              "leg_Ex_vs_NE_tr-T_time-h4",
+              "tr_T_vs_U_time-b_leg-NE",
+              "tr_T_vs_U_time-b_leg-Ex",
+              "leg_Ex_vs_NE_tr-U_time-b",
+              "leg_Ex_vs_NE_tr-T_time-b",
+              "time_h1_vs_b_tr-U_leg-Ex",
+              "time_h4_vs_b_tr-U_leg-Ex",
+              "time_h1_vs_b_tr-U_leg-NE",
+              "time_h4_vs_b_tr-U_leg-NE",
+              "time_h1_vs_b_tr-T_leg-Ex",
+              "time_h4_vs_b_tr-T_leg-Ex",
+              "time_h1_vs_b_tr-T_leg-NE",
+              "time_h4_vs_b_tr-T_leg-NE"
+            ],
+            "covariates": [
+              "subject"
+            ]
+          },
+          "role": "primary",
+          "reasoning": "One DESeq2 model on all 84 samples (~ subject + tr*time*leg). Planned: 4 Ex-vs-NE + 2 training-baseline. Exploratory: baseline Ex vs NE (leg-difference check) and time-within-leg changes (abstract: post-exercise changes in exercised muscle include circadian effects, which the NE leg also shows)."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "joint/leg_Ex_vs_NE_tr-U_time-h4",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "pathway view of the main contractile-specific response (abstract reports TF/biological-process analysis)"
+        },
+        {
+          "execution": "joint/tr_T_vs_U_time-b_leg-NE",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "abstract: training baseline changes involve different biological processes"
+        }
+      ]
+    }
+  ]
+}

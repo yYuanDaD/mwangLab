@@ -1,0 +1,30 @@
+{
+  "case": "GSE120862",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "Yes. Abstract (PMID 30779632): one-legged knee extension, exercised vs contralateral non-exercised vastus lateralis of 7 men, plus 2 mo aerobic training. All 84 libraries carry the exercise factor (Ex leg at +1 h/+4 h; training status). Only the abstract was available, so Methods locators are missing.",
+    "B2": "Abstract: Ex vs NE leg at 1 h and 4 h after exercise (the 'contractile activity-specific' DEGs), n=7 per group; baseline after 2 mo training vs baseline before (trained vs untrained), n=7. Whether Ex vs NE was also done in the trained state is not stated in the abstract.",
+    "B3": "Yes. Every man gives both legs, 3 time points and 2 training states (12 samples each). Pairing key: characteristics_ch1.individual / title suffix (packet A: 7 subjects x 12; title without leg level pairs all 84 samples).",
+    "B4": "Paper text not available (abstract only); it does not say whether one joint model or pairwise fits were used.",
+    "B5": "Not in the abstract; no DEG rule or counts reported there. Unknown."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Exercise vs contralateral non-exercised leg and training factor present (packet A columns leg, tr); analyzable verdict.", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Ex 42 / NE 42; U 42 / T 42; 7 per subject cell; control is the same-time NE leg of the same subject; no exclusions (84/84 aligned).", "fix": ""},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts Ex (treatment) vs NE (control) and T vs U (control U), as named in design record.", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Formula ~ subject + tr*time*leg; subject as categorical blocking term S1-S7, full rank, residual df 73. The unused_subject_like_column flag refers to the raw column, which was recoded to subject and used.", "fix": ""},
+    {"id": "model_fit", "verdict": "unsure", "severity": "none", "evidence": "Joint 84-sample model; paper silent (abstract only). Open policy question (joint vs pairwise).", "fix": ""},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Instrument nested in subject (S1-S4 HiSeq, S5-S7 NextSeq) and absorbed by subject block; lanes/runs also within subject; recorded in covariance record.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "minor", "evidence": "recount3 coverage-derived counts divided by read length and rounded, DESeq2 on estimated counts; declared deviation from authors' HTSeq counts. Trained +1 h Ex-vs-NE outlier samples (r 0.91-0.96) noted in caveats and not excluded.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule unknown; workflow default padj<0.05 recorded as workflow_default with deviation_note; audit |FC|>1.2 labelled.", "fix": ""},
+    {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No count comparison claimed; HANDBACK states comparison rests on abstract only and flags the direction discrepancy (abstract: increases only).", "fix": ""},
+    {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Joint vs pairwise fit when the paper is silent: obtain the full text Methods to confirm how Ex vs NE was modelled.",
+    "Threshold: paper rule and counts unknown (abstract only); confirm from the full text before any count comparison.",
+    "Trained +1 h Ex vs NE gives 6386 DEGs, likely from outlier samples; decide whether to report a sensitivity run without them."
+  ],
+  "summary": "决策与摘要一致：外显肢体对对侧未运动肢体、同一受试者配对（subject 作为区组项）、方向正确、84 个样本全部对齐且无排除。论文全文不可得，阈值与模型结构无法核对，已如实记录为偏离；基质来自 recount3 估计计数，亦已声明。无阻断或主要问题，总体通过，仅留若干待人工确认事项。"
+}

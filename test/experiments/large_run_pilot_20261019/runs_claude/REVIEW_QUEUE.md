@@ -612,3 +612,9 @@ One section per case; newest last.
 - policy: Joint vs stratum-wise fit is open when the paper is silent; full text would settle it.
 - policy: OH exercise response (paper's stress signature in fast fibers) needs GSE130977 OH PRE; optionally a labelled sensitivity run, with batch caveat.
 - policy: Paper DEG rule and counts need the full text; the run is a declared deviation.
+
+## 93f7d3bfcc684b7bc42a329faf084a6b31f49523 / GSE120862 (2026-11-24)
+
+- policy: Joint vs pairwise fit when the paper is silent: obtain the full text Methods to confirm how Ex vs NE was modelled.
+- policy: Threshold: paper rule and counts unknown (abstract only); confirm from the full text before any count comparison.
+- policy: Trained +1 h Ex vs NE gives 6386 DEGs, likely from outlier samples; decide whether to report a sensitivity run without them.

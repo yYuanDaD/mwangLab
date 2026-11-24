@@ -1047,3 +1047,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38095016 (GSE235781)
 
 - GEO FTP 403 for ~3 min; download_geo_data hides it as GEOparse temp-file error (tools/geo_tools.py:30); pydeseq2 overflow warnings; inspect feature_id_type misleading Details: `PMID38095016/HANDBACK.md`.
+
+## 93f7d3bfcc684b7bc42a329faf084a6b31f49523 (GSE120862)
+
+- GEO FTP 403 (recount3 used; geo_tools.py:42 misleading error); inspect parses SOFT dump as matrix; suitability.py:204 >6 levels vs-ref only, case_runner.py:859 opaque Details: `93f7d3bfcc684b7bc42a329faf084a6b31f49523/HANDBACK.md`.
