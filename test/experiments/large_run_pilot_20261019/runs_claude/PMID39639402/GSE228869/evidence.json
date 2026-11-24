@@ -1,0 +1,337 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID39639402",
+  "subject_id": "GSE228869",
+  "created_at": "2026-11-24T09:55:26",
+  "finished_at": "2026-11-24T09:55:31",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC11622572.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC11622572.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:26",
+      "sha256": null,
+      "attributes": {
+        "sha256": "87fbe8b61b94c45fdab691c292eef098f82d2d9892111b6dbab6e002543b8faa",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE228869_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE228869\\GSE228869_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:26",
+      "sha256": null,
+      "attributes": {
+        "sha256": "23bda3c4a1b710a9cbe8de644655f581f0003f56a8d302826c169e1e4d544690",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE228869_Row_counts_table_faps.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE228869\\GSE228869_Row_counts_table_faps.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:26",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4986e7a5c31c55fd70badf2e9edcad0440957186f8cdb1076a12486c68d2259b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE228869"
+        ],
+        "assay": "bulk RNA-seq (TruSeq stranded mRNA, NextSeq 2000) of in vitro expanded, second-passage FAPs from rat m. soleus",
+        "primary_estimand": "Effect of hindlimb-suspension unloading duration (Contr / HS7 / HS14) on the transcriptome of cultured FAPs (time-course LRT, then degPatterns clustering). This is a disuse/unloading estimand; the study contains no exercise, training or reloading arm.",
+        "factors": {
+          "unloading": [
+            "Contr (0 d)",
+            "HS7",
+            "HS14"
+          ],
+          "adipogenic_differentiation_day (GEO only)": [
+            "d0",
+            "d3"
+          ]
+        },
+        "sample_inclusion": "GEO: 12 libraries = 3 unloading groups x 2 differentiation days x 2 replicates. Paper S2.2.p4: at each time point FAPs from the 8 animals were COMBINED before in vitro expansion, so each group is one pooled isolation; rep1/rep2 are culture replicates of that pool.",
+        "planned_contrasts": [
+          "LRT across Contr/HS7/HS14 (S2.8.p1, S3.6.p1; five clusters of >=30 genes at p.adj<0.01; total DEG count not reported in the text)",
+          "HS7 vs Contr and HS14 vs Contr highlighted for PPAR pathway genes (FIG7), no counts reported"
+        ],
+        "repeated_measure_unit": "none (independent pooled isolations per group)",
+        "paper_method": "DESeq2 LRT (full ~ unloading time vs reduced ~1; whether differentiation day was in the model is not stated), DEGreport degPatterns, clusterProfiler GSEA",
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.01,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.8.p1"
+        },
+        "paper_results": "Cluster 1 cell cycle up in HS7; cluster 2 glycolysis (Eno3, Pfkl, Pgk1, Aldoa, Pkm) increasing; cluster 4 cytokines (Cxcl1, Cxcl3, Cxcl6, Grem2, Wnt5a) up at HS7; cluster 5 PPAR/lipid genes (Pparg, Fabp4, Lpl, Plin1, Acox1, Cpt1c, Rxra, Hmgcs1) down in HS7/HS14"
+      },
+      "reason": "S2.1.p1-p2: rat hindlimb suspension 7 and 14 d vs vivarium control; S2.2.p4: cells from 8 animals combined per time point before expansion; S2.8.p1: DESeq2 LRT, DEGs at p.adj < 0.01; S3.6.p1: five clusters. No exercise intervention anywhere in Methods; exercise appears only as background (S1.p2, S3.2.p1, S4.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:26"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE228869\\GSE228869_Row_counts_table_faps.txt.gz",
+        "owned": true,
+        "checks": [
+          "S2.8.p2 and S11.p1 name GSE228869",
+          "GEO organism Rattus norvegicus, tissue m. soleus, FAPs, Control vs Hindlimb suspension day 0/7/14 matches S2.1/S2.8",
+          "contact Sorokina = first author (S14.p1)"
+        ],
+        "accession": "GSE228869",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE228869\\GSE228869_metadata.csv"
+      },
+      "reason": "The paper deposits exactly this series; the single count table GSE228869_Row_counts_table_faps.txt.gz holds all 12 GEO samples.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:26"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:source_name_ch1",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^(Control|HS7|HS14),",
+              "recode": {
+                "Control": "C",
+                "HS7": "HS7",
+                "HS14": "HS14"
+              }
+            },
+            "diff": {
+              "source": "title",
+              "regex": "day(\\d)",
+              "recode": {
+                "0": "d0",
+                "3": "d3"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\design_metadata.csv",
+          "sha256": "9ab98c055d6c4fb07b5b697ccb421eb6275c1941f9baac8d560b1b50ecaeef3c",
+          "levels": {
+            "grp": {
+              "C": 4,
+              "HS7": 4,
+              "HS14": 4
+            },
+            "diff": {
+              "d0": 6,
+              "d3": 6
+            }
+          }
+        }
+      },
+      "reason": "inspect: source_name_ch1 equals the 12 matrix column names exactly (12/12). grp = unloading group, diff = adipogenic differentiation day, both parsed from title.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:26"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE228869_Row_counts_table_faps.txt.gz",
+        "paper_input": "featureCounts counts into DESeq2 (S2.8.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\aligned_matrix.csv",
+          "sha256": "a93f3a9fb53a2d8be223ab9c3a5d0c4eb9bdfa272f6296833a4b91f3dec04512",
+          "n_features": 32622,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 835198.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer_fraction 1.0, max 835198, Ensembl rat gene IDs; data_processing: STAR + featureCounts v1.6.4 then DESeq2. Consistent with the paper's input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:26"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none (refused)",
+        "design_column": null,
+        "contrasts": [],
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\suitability\\suitability.md",
+          "n_comparisons": 11,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "S2.1.p2 groups are Contr/HS7/HS14 only; GEO treatment column has Control and Hindlimb suspension only. The paper's own framing (S1.p3, S4.p3) is functional unloading. Exercise appears only in cited background. Per the skill, a sample set without an exercise arm is refused at design. The pooling (S2.2.p4) would additionally make any unloading inference pseudoreplicated.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the study manipulates disuse only (hindlimb suspension 7/14 d vs vivarium control); there is no exercise, training or reloading arm, so the requested exercise effect is not identifiable. Independently, each unloading group is a single pooled isolation of 8 animals (S2.2.p4), so rep1/rep2 are culture replicates and the unloading effect is aliased with the isolation/expansion batch (one biological unit per group, n=2 per group x differentiation cell)."
+      },
+      "recorded_at": "2026-11-24T09:55:31"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0663d36c1e43206ac989a0c00ea8694cef9947d19e108ea0de17ac6a97153c0c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f133505f3a0281eade2a14c54aaf2ff1c2a46deb8efd62be365eb4ece7573c68",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a93f3a9fb53a2d8be223ab9c3a5d0c4eb9bdfa272f6296833a4b91f3dec04512",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9ab98c055d6c4fb07b5b697ccb421eb6275c1941f9baac8d560b1b50ecaeef3c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d8300029319ca4a25c7ff8c333625e1d7e9aabb37b717e9e9943af950c30d01a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39639402\\GSE228869\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0c7ac92a419dd34befa114754962b2cdbd80d0edba321e57c24f807d56af9fd5",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

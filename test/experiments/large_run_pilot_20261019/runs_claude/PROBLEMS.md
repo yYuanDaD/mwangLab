@@ -1007,3 +1007,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41194654 (GSE278016)
 
 - none in repo tools; PowerShell blocked setting PYTHONIOENCODING, so commands ran via Bash Details: `PMID41194654/HANDBACK.md`.
+
+## PMID39639402 (GSE228869)
+
+- none blocking; suitability report gives no pooled-over-diff view for grp contrasts; GEO data_processing text garbled (encoding) Details: `PMID39639402/HANDBACK.md`.

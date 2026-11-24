@@ -575,3 +575,8 @@ One section per case; newest last.
 ## PMID37469245 / GSE216408 (2026-11-24)
 
 - policy: Open policy question: whether the genotype contrast under immobilization (an exercise-opposite condition) should ever count as an exercise result. The case follows the current rule by refusing.
+
+## PMID41194654 / GSE278016 (2026-11-24)
+
+- policy: Policy: whether a disuse (immobilization) contrast with no exercise arm counts as an exercise study (open policy question).
+- policy: Whether to accept the +60 sample-number offset as the mouse key without confirmation from the authors.
