@@ -1,0 +1,80 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34427856",
+  "request": "Analyze GSE165110 for PMID 34427856 (Reversal of deficits in aged skeletal muscle during disuse and recovery in response to treatment with a secrotome product derived from partially differentiated human pluripotent stem cells.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE165110",
+      "accession": "GSE165110",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC8602548.paper.md"],
+        "metadata": "GSE165110/GSE165110_metadata.csv",
+        "matrix": "GSE165110/GSE165110_18294R_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE165110"],
+            "assay": "bulk total RNA-seq (Ribo-Zero, NovaSeq 150x150) of C2C12 myotubes only (S2.6.p2); in vivo mouse arms (PBS/STEM x CON/HU/Recovery, S2.1.p1) were analysed by histology, mass and grip strength only, not sequenced",
+            "primary_estimand": "Transcriptional effect of 24 h 4% STEM secretome vs 4% horse serum (control) in differentiated C2C12 myotubes (S2.6.p2, S3.4.p1, Fig. 8B). No exercise or training factor exists anywhere in the study; the in vivo loading manipulation is hindlimb unloading (disuse) and 7-day ambulatory reloading, and those animals were not sequenced.",
+            "factors": {"treatment": ["4% horse serum (control)", "4% STEM"]},
+            "sample_inclusion": "6 replicate wells per arm (12 samples) per GEO; paper S2.6.p1 states 6 replicates per condition",
+            "planned_contrasts": ["STEM vs horse serum in C2C12 myotubes (S3.4.p1, Fig. 8B; DEG count not stated in the text, top-20 up/down table in Fig. 8B)"],
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "inclusive": true, "source_locator": "S2.7.p1"},
+            "paper_method": "DESeq2 1.26.0, 5% FDR (adj. P <= 0.05) (S2.7.p1)",
+            "paper_results": "Named genes regulated by STEM: Igfbp3, Col23a1, Col14a1, Mt2, Mt1, Fmod (S3.4.p1); total DEG count not given in the text"
+          },
+          "reasoning": "The only sequenced experiment (S2.6.p2, GSE165110) is an in vitro secretome-vs-serum treatment of C2C12 myotubes. The in vivo arms (S2.1.p1, S2.3.p1) are disuse (hindlimb unloading) and recovery, not exercise, and have no RNA-seq. Threshold: S2.7.p1 '5% false discovery rate with DESeq2', adj. P <= 0.05, no fold-change cutoff.",
+          "confidence": "high",
+          "locator": "S2.6.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.6.p2 names GSE165110", "GEO contact Micah J Drummond, University of Utah (paper lab, S2.1.p1 Utah IACUC)", "12 samples: 6 x 4% Horse Serum, 6 x 4% STEM, C2C12 myotubes, matching S2.6.p1-p2"]},
+          "reasoning": "Paper cites GSE165110 for the C2C12 RNA-seq; the counts file GSE165110_18294R_counts.txt.gz has 12 columns 18294X1..X12 that match the GEO titles.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^(18294X\\d+) "]},
+          "key_column": "key",
+          "patterns": {"grp": ["characteristics_ch1.2.treatment", "^24 hours of (4% Horse Serum|STEM)$"]},
+          "recode": {"grp": {"4% Horse Serum": "HS", "STEM": "STEM"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns 18294X1..X12 sit at the start of the GEO title; exact match after extracting them. grp derived from the treatment characteristic.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "final": {"source": "GSE165110_18294R_counts.txt.gz (GEO supplementary)", "paper_input": "DESeq2 on gene counts (S2.7.p1)"},
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values are integers (integer fraction 1.0, max 434599, median 0), Ensembl gene IDs; data_processing: STAR 2.7.3a two-pass alignment, reads assigned to annotated genes (featureCounts-style). Consistent with the paper's DESeq2 input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "HS"},
+          "organism": "Mouse",
+          "planned": ["grp_STEM_vs_HS"],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast in the sequenced samples. GSE165110 contains only C2C12 myotubes treated 24 h with 4% STEM secretome vs 4% horse serum (6 vs 6). The paper's in vivo manipulations are hindlimb unloading (disuse) and 7-day ambulatory recovery, not exercise, and those mice were not sequenced. A STEM-vs-serum contrast in cultured cells cannot estimate how exercise affects gene expression.",
+          "candidates": [
+            {"value": "grp_STEM_vs_HS (C2C12, DESeq2)", "reason_rejected": "Valid pharmacological/secretome contrast the paper ran (Fig. 8B), but it is not an exercise estimand; running it would answer a different question than the one requested."},
+            {"value": "Recovery (reloading after HU) vs HU as an exercise-like contrast", "reason_rejected": "Not sequenced (no RNA-seq of mouse soleus in GSE165110 or any other accession in the paper); and reloading/ambulation after disuse is not an exercise intervention."}
+          ],
+          "reasoning": "S2.6.p1-p2 and GEO metadata: the only sequenced factor is culture medium (STEM vs horse serum). S2.1.p1, S2.3.p1: in vivo arms are CON / hindlimb unloading / recovery, measured by histology and grip strength only. No exercise or training arm exists.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "Requested estimand", "paper": "Effect of STEM secretome on aged muscle during disuse/recovery; RNA-seq only for STEM vs horse serum in C2C12 myotubes", "data": "12 C2C12 samples, STEM vs horse serum; no exercise factor", "disposition": "blocks_estimand"},
+        {"item": "Paper extract protocol", "paper": "Qiazol + miRNeasy Mini Kit (S2.6.p2)", "data": "GEO extract_protocol: Trizol", "disposition": "recorded_only"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
