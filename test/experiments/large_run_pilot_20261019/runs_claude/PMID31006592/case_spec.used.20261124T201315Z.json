@@ -1,0 +1,410 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID31006592",
+  "request": "Analyze GSE126962 for PMID 31006592 (Time of Exercise Specifies the Impact on Muscle Metabolic Pathways and Systemic Energy Homeostasis.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE126962",
+      "accession": "GSE126962",
+      "inputs": {
+        "paper": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID31006592/abstract_PMID31006592.txt",
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID31006592/GSE126962_series_description.txt"
+        ],
+        "metadata": "GSE126962/GSE126962_metadata.csv",
+        "matrix": "GSE126962/GSE126962_merged_cpm.csv",
+        "raw_tar": false,
+        "prep_scripts": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID31006592/scripts/prep_GSE126962.py"
+        ]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE126962"
+            ],
+            "assay": "bulk total RNA-seq (Ribo-Zero), mouse gastrocnemius, HiSeq 2500 PE100",
+            "primary_estimand": "Effect of one 1-h treadmill exercise bout versus sham exercise (stationary treadmill) on gastrocnemius gene expression, separately for exercise in the early rest phase (ZT3) and the early active phase (ZT15), at 0, 4, 8, 12, 16 and 20 h after exercise; and whether the exercise effect differs between the two times of day",
+            "factors": {
+              "treatment": [
+                "Sedentary (sham)",
+                "Exercise"
+              ],
+              "phase": [
+                "Rest (exercise at ZT3)",
+                "Active (exercise at ZT15)"
+              ],
+              "hours_post_exercise": [
+                0,
+                4,
+                8,
+                12,
+                16,
+                20
+              ]
+            },
+            "inclusion": "Male C57BL/6J, 10-11 weeks; n=5-6 per phase x treatment x time cell; one mouse per sample (terminal harvest)",
+            "planned_contrasts": [
+              "Exercise vs sedentary within the rest phase at each of 6 post-exercise times (abstract; GEO overall design)",
+              "Exercise vs sedentary within the active phase at each of 6 post-exercise times (abstract; GEO overall design)",
+              "Time-of-day dependence of the exercise response (abstract: 'distinct responses ... in either the early rest phase or the early active phase')"
+            ],
+            "paper_threshold": {
+              "metric": "unknown",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "not available: abstract only"
+            },
+            "paper_method": "edgeR on featureCounts counts after filtering to CPM > 2 in >= 34 samples (GEO data_processing); circadian/oscillation analysis also used (abstract: 'metabolic oscillations'), method not stated in the abstract",
+            "paper_results": "Abstract: glycolytic activation specific to active-phase exercise; HIF1a selectively activated in a time-dependent manner; no DEG counts and no named genes other than HIF1a in the abstract",
+            "full_text_available": false
+          },
+          "reasoning": "No full text available; the study map rests on the PubMed abstract and the GEO series/sample records (overall design, treatment protocol, data_processing). The paper's DE threshold and DEG counts are not in the abstract.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO GSE126962 overall_design; GSM data_processing"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "GSE126962 Series_pubmed_id = 31006592",
+              "140 GSM per-sample CPM files belong to GSE126962 (identical to the members of GSE126962_RAW.tar)",
+              "3 deposited files (GSM3618934/35/36) contain corrupted bytes inside valid gzip; excluded from the merged matrix"
+            ]
+          },
+          "reasoning": "GEO series links PMID 31006592. Matrix merged from the series' own per-sample files by prep_GSE126962.py (GEO FTP returned 403 at first; the files were fetched through the GEO download endpoint and later matched byte-for-byte against GSE126962_RAW.tar).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {
+            "zt": "characteristics_ch1.6.zt"
+          },
+          "patterns": {
+            "trt": [
+              "characteristics_ch1.4.treatment",
+              "^(Exercise|Sedentary)$"
+            ],
+            "phase": [
+              "characteristics_ch1.5.phase",
+              "^(Rest|Active) phase"
+            ]
+          },
+          "recode": {
+            "trt": {
+              "Exercise": "EX",
+              "Sedentary": "SED"
+            },
+            "phase": {
+              "Rest": "REST",
+              "Active": "ACT"
+            },
+            "hpe": {
+              "REST_4": "h0",
+              "REST_8": "h4",
+              "REST_12": "h8",
+              "REST_16": "h12",
+              "REST_20": "h16",
+              "REST_0": "h20",
+              "ACT_16": "h0",
+              "ACT_20": "h4",
+              "ACT_0": "h8",
+              "ACT_4": "h12",
+              "ACT_8": "h16",
+              "ACT_12": "h20"
+            }
+          },
+          "combine": {
+            "hpe": [
+              "phase",
+              "zt"
+            ]
+          },
+          "exclude_samples": {
+            "GSM3618934": "deposited GSM3618934_049.txt.gz is corrupted (non-ASCII bytes inside gene IDs and values; identical in RAW.tar)",
+            "GSM3618935": "deposited GSM3618935_050.txt.gz is corrupted (same)",
+            "GSM3618936": "deposited GSM3618936_051.txt.gz is corrupted (same)"
+          },
+          "reasoning": "Matrix columns are GSM ids (set by the prep script), exact match on the metadata index. hpe = hours after exercise: zt is the clock time at harvest; exercise ended at ZT4 (rest) or ZT16 (active), so harvest ZT minus 4 (rest) or minus 16 (active), mod 24 (GEO treatment protocol: harvest 0-20 h after exercise).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "linear normalized (CPM, pre-filtered)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "GEO data_processing: 'Text file ... with gene counts in units of count per million (CPM)'; filtered to 11461 genes with CPM > 2 in >= 34 samples. Profile: integer fraction 0.0002, non-negative, max 4.5e5. The paper analysed raw counts with edgeR; raw counts were not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "trt",
+            "phase",
+            "hpe"
+          ],
+          "references": {
+            "trt": "SED",
+            "phase": "REST",
+            "hpe": "h0"
+          },
+          "organism": "Mouse",
+          "planned": [
+            "trt_EX_vs_SED_phase-REST_hpe-h0",
+            "trt_EX_vs_SED_phase-REST_hpe-h4",
+            "trt_EX_vs_SED_phase-REST_hpe-h8",
+            "trt_EX_vs_SED_phase-REST_hpe-h12",
+            "trt_EX_vs_SED_phase-REST_hpe-h16",
+            "trt_EX_vs_SED_phase-REST_hpe-h20",
+            "trt_EX_vs_SED_phase-ACT_hpe-h0",
+            "trt_EX_vs_SED_phase-ACT_hpe-h4",
+            "trt_EX_vs_SED_phase-ACT_hpe-h8",
+            "trt_EX_vs_SED_phase-ACT_hpe-h12",
+            "trt_EX_vs_SED_phase-ACT_hpe-h16",
+            "trt_EX_vs_SED_phase-ACT_hpe-h20"
+          ],
+          "final": {
+            "analysis_type": "multi-factor time course (trt x phase x hpe), one cell-means model on all samples",
+            "formula": "~ 0 + C(cell)",
+            "contrasts": [
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h0",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h4",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h8",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h12",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h16",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-REST_hpe-h20",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h0",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h4",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h8",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h12",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h16",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_phase-ACT_hpe-h20",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              }
+            ],
+            "estimand_type": "causal (randomized exercise vs sham)",
+            "design_column": "cell (trt x phase x hpe)",
+            "exploratory": "all other analyzable comparisons from the same model (trt:phase interactions per hpe, phase and time effects)"
+          },
+          "candidates": [
+            {
+              "value": "zt (harvest clock time) as the time factor",
+              "reason_rejected": "Same 24 cells, but trt:phase interactions at equal ZT would compare different times since exercise; hpe gives interpretable time-of-day interactions at equal post-exercise time"
+            },
+            {
+              "value": "pool all time points into EX vs SED per phase",
+              "reason_rejected": "The design is a time course with a sham control at every time point; pooling discards the time structure the paper studies"
+            }
+          ],
+          "reasoning": "Each phase has its own sham group at every harvest time (GEO treatment protocol), so the exercise effect is identified within phase x time. One limma model on all 137 samples shares variance across cells.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": []
+          },
+          "confounding_candidates": [
+            "zt"
+          ],
+          "reasoning": "Every sample is a different mouse (terminal harvest), so there is no repeated-measure unit. No batch or lane information in GEO. zt is a deterministic function of phase x hpe and is part of the cell, not a covariate.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, joint cell-means model) on log2(CPM+1)",
+            "formula": "~ 0 + C(cell)",
+            "paper_route": {
+              "method": "edgeR on featureCounts raw counts",
+              "status": "blocked",
+              "reason": "only CPM values were deposited in GEO; raw counts would require reprocessing SRA SRP186637 (140 PE100 libraries), out of scope"
+            },
+            "deviations": [
+              "limma on log2(CPM+1) instead of edgeR on counts",
+              "3 samples with corrupted deposited files excluded",
+              "gene filter is the authors' (CPM > 2 in >= 34 samples, applied before deposit); no further filtering"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix policy: linear normalized expression -> log2(x+1) then limma. CPM must not be rounded into counts.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "unknown",
+              "cutoff": null,
+              "effect_metric": null,
+              "effect_cutoff": null
+            },
+            "threshold_source": "workflow_default",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "inclusive": false
+            },
+            "deviation_note": "Paper threshold not stated in the abstract (no full text). Workflow default BH padj < 0.05, no fold-change rule; audit adds |log2FC| > log2(1.5) for reference only."
+          },
+          "reasoning": "Abstract only; GEO data_processing names edgeR but no cutoff.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Comparison with the paper rests on the PubMed abstract and GEO records only; no DEG counts are available to compare",
+              "limma on log2(CPM+1) instead of the paper's edgeR on counts",
+              "3 rest-phase h0 samples (EX rep3, SED rep3, EX rep4) excluded for corrupted deposited files; rest h0 has EX n=4, SED n=5",
+              "Not reproduced: the abstract says glycolytic activation is specific to active-phase exercise. Hallmark GLYCOLYSIS is not significant at h0 in either phase (ACT NES 1.22, FDR 0.19; REST NES 1.04, FDR 0.54) and trends down at ACT h4 (NES -1.37, FDR 0.07). HALLMARK_HYPOXIA is up at h0 in BOTH phases (ACT NES 2.42, REST NES 2.28, FDR < 0.001), so the hypoxia-programme response is not phase-specific on this route",
+              "Hif1a mRNA is unchanged at h0 in both phases (padj 0.44 / 0.57); the abstract's HIF1a claim is about protein activation, which RNA-seq cannot test",
+              "No gene passes padj < 0.05 for any trt:phase interaction at matched post-exercise time; the 'time of exercise' difference is in DEG numbers per phase (ACT h0 141 vs REST h0 42), not in a gene-level interaction test",
+              "Exploratory hpe_h4_vs_h0_trt-SED_phase-ACT gives 4459 DEGs versus 3-1555 for other time steps; one sham cell (ACT h0 = ZT16 or ACT h4 = ZT20) may carry a batch effect; not investigated further"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "joint/trt_EX_vs_SED_phase-ACT_hpe-h0": [
+              "ENSMUSG00000021109.13"
+            ],
+            "joint/trt_EX_vs_SED_phase-REST_hpe-h0": [
+              "ENSMUSG00000021109.13"
+            ]
+          },
+          "reasoning": "Paper route blocked (no counts deposited); the analysis keeps the paper's estimand. Hif1a (ENSMUSG00000021109) is the only gene named in the abstract (as HIF1a, a protein-level activation claim).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "input matrix",
+          "paper": "edgeR on read counts (GEO data_processing)",
+          "data": "only CPM deposited",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "sample set",
+          "paper": "140 samples deposited",
+          "data": "3 deposited per-sample files corrupted (GSM3618934-36); 137 usable",
+          "disposition": "declared_deviation"
+        },
+        {
+          "item": "threshold and DEG counts",
+          "paper": "not available (abstract only)",
+          "data": "workflow default used",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {
+            "comparisons": "all",
+            "covariates": []
+          },
+          "role": "primary",
+          "reasoning": "One limma cell-means model on all samples; the 12 planned EX vs SED simple effects are primary, every other analyzable comparison (including trt:phase interactions per hpe, the time-of-day question) is exploratory"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "joint/trt_EX_vs_SED_phase-ACT_hpe-h0",
+          "ora": false,
+          "gsea": true,
+          "ranking_metric": "stat",
+          "reasoning": "abstract: glycolysis/HIF1a (Hallmark GLYCOLYSIS, HYPOXIA) after active-phase exercise"
+        },
+        {
+          "execution": "joint/trt_EX_vs_SED_phase-REST_hpe-h0",
+          "ora": false,
+          "gsea": true,
+          "ranking_metric": "stat",
+          "reasoning": "rest-phase counterpart"
+        },
+        {
+          "execution": "joint/trt_EX_vs_SED_phase-ACT_hpe-h4",
+          "ora": false,
+          "gsea": true,
+          "ranking_metric": "stat",
+          "reasoning": "active phase, 4 h"
+        },
+        {
+          "execution": "joint/trt_EX_vs_SED_phase-REST_hpe-h4",
+          "ora": false,
+          "gsea": true,
+          "ranking_metric": "stat",
+          "reasoning": "rest phase, 4 h"
+        }
+      ]
+    }
+  ]
+}

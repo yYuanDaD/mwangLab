@@ -1,0 +1,21 @@
+{"case": "GSE126962", "reviewer": "case-reviewer, claude-sonnet-5-5",
+ "blind": {
+  "B1": "Yes. Abstract (Sato 2019 Cell Metab): exercise in early rest phase vs early active phase in mice, muscle transcriptomics. GEO metadata characteristics_ch1.4.treatment = Exercise (68) / Sedentary (69), treatment_protocol_ch1: 1 h treadmill at ZT3 or ZT15 vs sham (stationary treadmill). All 137 sequenced gastrocnemius samples are in the exercise design; the Exercise arm carries the factor.",
+  "B2": "Abstract only (no full text). Expected comparisons: exercise vs sham, separately for rest phase (ZT3) and active phase (ZT15), at 0/4/8/12/16/20 h after exercise (24 cells, about 4-6 per cell), plus time-of-day dependence of the response. Group sizes from packet A: EX 68, SED 69; phase REST 68, ACT 69.",
+  "B3": "No repeated measures. Terminal harvest per time point (protocol: mice sacrificed at 0-20 h after exercise), so each sample is a different mouse. The only candidate key (title minus treatment, 66 pairs) is the rep number within a cell, not an animal; the expression check does not support it (r 0.092 vs 0.006, permutation p 0.075, not_supported).",
+  "B4": "The abstract does not say. GEO data_processing names edgeR but no model structure. Paper silent: joint vs pairwise open.",
+  "B5": "Not in the abstract. Threshold and DEG counts unavailable; no verbatim rule can be quoted."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Treatment column Exercise/Sedentary, in vivo exercise bout vs sham (treatment_protocol_ch1); case ran 137 samples.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "trt EX 68 / SED 69 equals metadata; each phase x time cell has its own sham control; hpe recode (harvest ZT minus 4 for rest, minus 16 for active) follows 1 h exercise at ZT3/ZT15 and is consistent. 3 samples (GSM3618934-36) excluded with a named reason (corrupt deposited files); rest h0 EX n=4, SED n=5.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "All 12 primary contrasts control=SED, treatment=EX.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Terminal harvest, one mouse per sample; pairing_key_candidate (title minus treatment) is the replicate index, expression check not_supported (p 0.075). No blocking needed.", "fix": ""},
+  {"id": "model_fit", "verdict": "unsure", "severity": "minor", "evidence": "One cell-means limma model on all 137 samples; paper's structure unknown (abstract only). Open policy question joint vs pairwise.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch/lane/housing info in GEO; sex single (male). Possible batch effect in a sham cell (SED ACT h4 vs h0, 4459 DEGs) is recorded in study caveats.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Matrix is CPM (integer fraction 0.0002), pre-filtered by authors; log2(x+1) then limma, not rounded to counts. Deviation from paper's edgeR on counts declared.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule unavailable; workflow_default padj<0.05 recorded as such, with |log2FC|>log2(1.5) audit only.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No numeric comparison claimed; HANDBACK says counts unavailable. Non-reproduction of glycolysis specificity is stated, not overstated.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; run completed. Exclusion of 3 corrupted samples is a data fact stated with file names.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Joint cell-means fit vs pairwise fits when the paper is silent (open policy question).", "Paper threshold and DEG counts need the full text before any numeric paper comparison."],
+ "summary": "该系列确为运动(1小时跑台)与假运动对照的体内实验,12个主要对比方向(EX vs SED)与分组、hpe换算均正确。每个样本为独立小鼠,无重复测量,配对键候选未获表达支持,无需分块。矩阵为CPM,使用log2(x+1)+limma并声明与论文edgeR的偏离;仅有摘要,阈值与DEG数无法比对,已如实记录。"}

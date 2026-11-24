@@ -686,3 +686,8 @@ One section per case; newest last.
 ## PMID37746697 / GSE240814_male (2026-11-24)
 
 - policy: Policy (open): whether disuse/unloading studies count as exercise-related for the cohort; the case followed the rule that no exercise arm means refuse. Only the abstract was available, so the paper's DEG rule is unconfirmed.
+
+## PMID31006592 / GSE126962 (2026-11-24)
+
+- policy: Joint cell-means fit vs pairwise fits when the paper is silent (open policy question).
+- policy: Paper threshold and DEG counts need the full text before any numeric paper comparison.

@@ -1107,3 +1107,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37746697 (GSE240814)
 
 - inspect alignment_keys reports matrix sample counts (40 female/42 male) higher than the real 39/41 sample columns, apparently counting a non-sample column (cosmetic) Details: `PMID37746697/HANDBACK.md`.
+
+## PMID31006592 (GSE126962)
+
+- GEO FTP 403 (geo_tools.py:30 misleading error); 3 corrupt GEO files excluded; case_runner.py:435 WinError32 half-move; string contrasts split in summary.csv Details: `PMID31006592/HANDBACK.md`.
