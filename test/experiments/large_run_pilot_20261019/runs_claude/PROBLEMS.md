@@ -839,3 +839,23 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35813950 (GSE205907)
 
 - inspect misses 27 Excel date-mangled genes (native.py:284); runner can't count table overlaps (case_runner.py:969); no non-positional animal->GSM key Details: `PMID35813950/HANDBACK.md`.
+
+## PMID35850762 (GSE185530)
+
+- case_runner.py:968 compares total n_deg to the paper's up-only counts; limma_voom.R:12,31 has no TMM and fits two arms only; limma_voom_tools.py:165 prints a fixed summary Details: `PMID35850762/HANDBACK.md`.
+
+## PMID39413782 (GSE239596)
+
+- none blocking; minor: inspect labels the combined ENSMUSG_Symbol feature IDs as "other" type, so enrichment would need them split first Details: `PMID39413782/HANDBACK.md`.
+
+## PMID39732741 (GSE273795)
+
+- none blocking; matrix policy has no type for median-ratio-normalized counts (recorded as estimated counts) Details: `PMID39732741/HANDBACK.md`.
+
+## PMID35689600 (GSE250520)
+
+- rawcounts CSV line 2 has a second header row (EnsembleID/fastq names) kept as data; inspect shows integer_fraction 1.0 but doesn't flag it (only missing_values 6) Details: `PMID35689600/HANDBACK.md`.
+
+## PMID35325353 (GSE195707)
+
+- GBK mojibake in GEO metadata text (geo_tools.py:30,36); inspect does not flag GEO 'raw counts' are E/M estimates; paper_counts cannot hold an approximate count Details: `PMID35325353/HANDBACK.md`.

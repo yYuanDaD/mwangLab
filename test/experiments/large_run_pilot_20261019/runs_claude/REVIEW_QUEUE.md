@@ -392,3 +392,13 @@ One section per case; newest last.
 ## PMID36084645 / GSE205891 (2026-11-24)
 
 - policy: Which fit to treat as primary when the paper is silent on pairing (joint vs pairwise, paired vs unpaired) and counts differ (SC 0 vs 65).
+
+## PMID35813950 / GSE205907 (2026-11-24)
+
+- policy: Open policy: which threshold to report is not in question here (paper rule applied, FDR audit given).
+- policy: E vs M group decoding rests on matrix column letters; no GSM-level confirmation (declared, medium confidence).
+
+## PMID35850762 / GSE185530 (2026-11-24)
+
+- policy: Policy: whether an in-vitro EPS series in C2C12 counts as an exercise study.
+- policy: Policy: joint (Degust-style 36-library) versus two-arm voom as the primary fit when the paper implies one model; the executor cannot express a joint voom.
