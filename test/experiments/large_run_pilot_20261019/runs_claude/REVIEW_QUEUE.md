@@ -691,3 +691,8 @@ One section per case; newest last.
 
 - policy: Joint cell-means fit vs pairwise fits when the paper is silent (open policy question).
 - policy: Paper threshold and DEG counts need the full text before any numeric paper comparison.
+
+## PMID36603044 / GSE221894 (2026-11-24)
+
+- policy: Which threshold to report when the paper states none but its deposited table fits padj<0.05 (35); open policy item.
+- policy: Participant 7 label (7b annotated baseline) is an inference from the title; confirm with the authors if it matters.

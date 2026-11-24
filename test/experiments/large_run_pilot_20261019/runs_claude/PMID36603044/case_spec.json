@@ -1,0 +1,160 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36603044",
+  "request": "Analyze GSE221894 for PMID 36603044 (Two weeks of high-intensity interval training increases skeletal muscle mitochondrial respiration via complex-specific remodeling in sedentary humans.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE221894",
+      "accession": "GSE221894",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID36603044/PMID36603044_abstract.txt"],
+        "metadata": "GSE221894/GSE221894_metadata.csv",
+        "matrix": "GSE221894/GSE221894_salmon_gene_numreads.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID36603044/prep_salmon_to_gene.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE221894"],
+            "source_text": "PubMed abstract only (no full text available) plus GEO series summary/overall design and the authors' deposited DESeq2 table GSE221894_PostLean-PreLean_rawDE-v2.xls.gz",
+            "assay": "bulk RNA-seq, vastus lateralis biopsy, Illumina NextSeq 2000 100bp SE, salmon v1.4.0 (GEO data_processing)",
+            "sample_inclusion": "15 sedentary normal-weight adults started, 14 completed 7 HIIT sessions over 14 days; biopsies before and 48 h after the last session (abstract)",
+            "factors": {"time": ["pre (baseline)", "post (48 h after 2 wk HIIT)"]},
+            "primary_estimand": "within-person change in vastus lateralis gene expression from before to 48 h after 2 weeks (7 sessions) of HIIT",
+            "repeated_measure_unit": "participant (pre and post biopsy from the same person)",
+            "planned_contrasts": ["post-HIIT vs pre-HIIT (abstract: transcripts that increased/decreased with HIIT; GEO deposited table PostLean-PreLean)"],
+            "paper_method": "DESeq2 v1.32.0 on salmon quantifications (GEO data_processing); exact design formula (paired or not) not stated in the abstract",
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "abstract states no DEG threshold"},
+            "paper_results": "abstract: increased transcripts enriched for mitochondrial respiration gene sets (especially complex I); decreased transcripts enriched for DNA and chromatin remodelling pathways; no DEG count given. Deposited authors' table: 35 genes padj<0.05 (19 up, 16 down) among 5944 genes listed (all baseMean>140)."
+          },
+          "reasoning": "No full text; the abstract defines the estimand (pre vs 48 h post 2-wk HIIT in the same people) and the qualitative pathway result. GEO data_processing names salmon v1.4.0 + DESeq2 v1.32.0. The GEO supplementary DE table (Post-Pre) gives the authors' own gene-level result and is used as the count comparison.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO GSE221894 Series_summary/overall_design/data_processing"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 36603044", "series title equals the paper title", "27 GSM quant.sf files in GSE221894_RAW.tar, one per GSM of the series", "matrix built from that tar by prep_salmon_to_gene.py"]},
+          "reasoning": "GSE221894 is linked to PMID 36603044 in GEO and has the paper's title; the matrix is derived only from this series' per-sample salmon files.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"subject": ["title", "^(\\d+)[ab]$"], "time": ["title", "^\\d+([ab])$"]},
+          "recode": {
+            "time": {"a": "pre", "b": "post"},
+            "subject": {"1": "S1", "3": "S3", "4": "S4", "6": "S6", "7": "S7", "8": "S8", "14": "S14", "16": "S16", "19": "S19", "20": "S20", "27": "S27", "28": "S28", "32": "S32", "33": "S33", "34": "S34"}
+          },
+          "aliases": {"sex": "characteristics_ch1.3.Sex", "status": "characteristics_ch1.1.status"},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are GSM ids = metadata index (27/27 exact). Titles follow <participant><a|b>; a = baseline and b = 48 h post for 26/27 samples per the status field. Time is taken from the title: GSM6909087 '7b' is annotated 'baseline' but its title says b; with 7b as post there are exactly 14 post biopsies = the 14 completers in the abstract, and 13 complete pre samples + 1 non-completer. This is treated as a GEO labelling error and fixed (sensitivity run excludes participant 7). Unpaired samples: 27a (likely the non-completer), 4b and 8b (no baseline deposited).",
+          "confidence": "medium",
+          "candidates": [{"value": "time from characteristics status", "reason_rejected": "makes participant 7 have two baselines and only 13 post samples, inconsistent with the title convention and 14 completers"}]
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Salmon v1.4.0 NumReads (estimated counts, 87% integer-valued, max 1.6e6) summed per Ensembl gene (tximport-style, Ensembl 104 tx2gene; ~1.4% reads on transcripts absent from Ens104). The paper used DESeq2 on salmon output, so rounded estimated counts into DESeq2 matches the paper's input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_post_vs_pre"],
+          "covariate_candidates": ["sex"],
+          "final": {
+            "analysis_type": "paired two-group (repeated measures)",
+            "design_column": "time",
+            "control": "pre",
+            "treatment": "post",
+            "contrasts": [{"name": "time_post_vs_pre", "control": "pre", "treatment": "post", "role": "primary"}]
+          },
+          "reasoning": "Abstract: biopsies before and 48 h after HIIT in the same participants; the estimand is the within-person training effect. Single two-level time factor with participant as the blocking unit; samples without a partner do not inform a subject-blocked contrast and are dropped by complete_pairs. Both sexes are present; per-sex paired analyses are added as exploratory.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "sex", "disposition": "absorbed by subject blocking (constant within participant); per-sex exploratory runs instead"}]},
+          "confounding_candidates": ["sex"],
+          "reasoning": "Repeated measures within participant -> subject is a blocking term (~ subject + time). Sex does not vary within a participant so it is aliased with subject and not added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald) ~ subject + time on rounded salmon gene-level estimated counts",
+            "formula": "~ subject + time",
+            "rounding_documented": true,
+            "paper_route": {"method": "DESeq2 v1.32.0 (R)", "status": "reproduced_approximately", "reason": "same model family; abstract does not state whether the authors blocked on participant; pydeseq2 instead of R DESeq2; tximport length offsets not used"},
+            "deviations": ["participant blocking chosen from the study design (paper formula unknown)", "gene summarisation by summed NumReads without tximport average-length offsets", "pydeseq2 instead of R DESeq2"]
+          },
+          "transform": "round",
+          "reasoning": "DESeq2 on rounded estimated counts reproduces the paper's DESeq2-on-salmon route; subject blocking matches the paired design. An unpaired all-sample ~ time model is run as exploratory to compare with the authors' deposited table, which may have been unpaired.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Abstract gives no DEG threshold; BH padj < 0.05 without fold-change cutoff (workflow default). Raw p < 0.05 shown only as a labelled audit count (authors' table: 788 at p<0.05)."
+          },
+          "reasoning": "No threshold in the available text.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": [
+            "Comparison with the paper rests on the PubMed abstract and GEO-deposited files only (no full text).",
+            "Participant 7's post sample (GSM6909087, title 7b) is annotated 'baseline' in GEO; relabelled as post from the title (sensitivity run excludes participant 7).",
+            "Authors' deposited table lists only 5944 genes (baseMean>140); its 35 padj<0.05 genes are the count reference, but its gene filtering and design are unknown.",
+            "Per-sex analyses are exploratory (5 male pairs)."
+          ]},
+          "paper_counts": {"time_post_vs_pre": 35, "unpaired_all_time_post_vs_pre": 35},
+          "paper_genes": {
+            "time_post_vs_pre": ["COQ10A", "CIAO2A", "MDH1", "ZCCHC24", "SH3KBP1", "ALAS1", "USP6", "BCKDK", "TRIM32", "CHCHD3", "GYS1", "MSTN", "PFKFB3"],
+            "unpaired_all_time_post_vs_pre": ["COQ10A", "MDH1", "ALAS1", "MSTN", "PFKFB3"]
+          },
+          "reasoning": "Planned route is DESeq2 like the paper but with declared deviations (blocking chosen by us, gene summarisation). paper_counts are from the authors' GEO-deposited DESeq2 table at padj<0.05 (19 up incl. COQ10A, MDH1, ALAS1, BCKDK, CHCHD3; 16 down incl. MSTN, PFKFB3, USP6), not from the abstract.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "participant 7 post label", "paper": "14 completers with pre and post biopsies", "data": "GSM6909087 titled 7b but status 'baseline'; only 13 samples annotated post", "disposition": "fixed from title; sensitivity without participant 7"},
+        {"item": "unpaired samples", "paper": "14 completers", "data": "27a has no post; 4b and 8b have no baseline", "disposition": "excluded from paired models by complete_pairs; included in exploratory unpaired model"},
+        {"item": "design formula", "paper": "DESeq2 v1.32.0, formula not stated in abstract", "data": "paired structure available", "disposition": "paired ~ subject + time primary; unpaired ~ time exploratory"},
+        {"item": "deposited DE gene set", "paper": "not stated", "data": "authors' table has 5944 genes, baseMean > 140", "disposition": "count comparison noted as approximate"}
+      ],
+      "executions": [
+        {"name": "time_post_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.05},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "role": "primary", "reasoning": "paired DESeq2 on the 12 complete participants (including 7 with 7b as post)"},
+        {"name": "sens_no_subject7_time_post_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.05},
+         "subset": {"subject": ["S1", "S3", "S4", "S6", "S8", "S14", "S16", "S19", "S20", "S27", "S28", "S32", "S33", "S34"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "role": "sensitivity", "reasoning": "drops participant 7 whose post label was corrected"},
+        {"name": "unpaired_all_time_post_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "alpha": 0.05},
+         "role": "exploratory", "reasoning": "all 27 samples, ~ time, as the authors may have fitted; for comparison with the deposited table"},
+        {"name": "female_time_post_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.05},
+         "subset": {"sex": ["Female"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "role": "exploratory", "reasoning": "per-sex split (7 female pairs)"},
+        {"name": "male_time_post_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.05},
+         "subset": {"sex": ["Male"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "role": "exploratory", "reasoning": "per-sex split (5 male pairs)"}
+      ],
+      "enrichment": [
+        {"execution": "time_post_vs_pre", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "abstract reports gene sets up (mitochondrial respiration, complex I) and down (DNA/chromatin remodelling); Hallmark GSEA on the full ranking"},
+        {"execution": "time_post_vs_pre", "ora": true, "gsea": false, "direction": "up", "reasoning": "GO/KEGG of increased transcripts (abstract: mitochondrial respiration)"},
+        {"execution": "time_post_vs_pre", "ora": true, "gsea": false, "direction": "down", "reasoning": "GO/KEGG of decreased transcripts (abstract: DNA and chromatin remodelling)"}
+      ]
+    }
+  ]
+}

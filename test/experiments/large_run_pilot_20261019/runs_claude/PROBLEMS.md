@@ -1111,3 +1111,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID31006592 (GSE126962)
 
 - GEO FTP 403 (geo_tools.py:30 misleading error); 3 corrupt GEO files excluded; case_runner.py:435 WinError32 half-move; string contrasts split in summary.csv Details: `PMID31006592/HANDBACK.md`.
+
+## PMID36603044 (GSE221894)
+
+- GEO 403/geo_tools.py:30 temp error; case_runner.py:54 reads BIFF .xls.gz as TSV, no xlrd; no salmon tx2gene route; sex check false MISMATCH, XIST absent (stats_tools.py:379) Details: `PMID36603044/HANDBACK.md`.

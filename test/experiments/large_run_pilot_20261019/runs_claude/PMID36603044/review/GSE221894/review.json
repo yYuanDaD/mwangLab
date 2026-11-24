@@ -1,0 +1,21 @@
+{"case": "GSE221894", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Abstract: 15 sedentary adults, 7 HIIT sessions over 14 days, vastus lateralis biopsies before and 48 h after; RNA-seq done. All 27 sequenced biopsies carry the exercise factor (pre vs post HIIT); packet A metadata show 'baseline' / '48hr post training' / '7 sessions of HIIT'.",
+  "B2": "Post-HIIT (48 h) vs pre-HIIT in the same participants; 14 completers (abstract). Per-group RNA-seq n is not stated in the abstract; GEO has 27 samples (13 a/14 b by title, 14 baseline/13 post by status field).",
+  "B3": "Yes. Each participant gives pre and post biopsies. The sample title <participant><a|b> encodes the participant (subject key: 12 participants complete in both levels, 0 duplicates per level, 24/27 linked).",
+  "B4": "The abstract does not say how the DE model was fitted (only 'RNA sequencing'); GEO data_processing names DESeq2 but no formula.",
+  "B5": "The abstract states no DEG rule and no DEG count."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run; abstract and metadata show a pre/post HIIT arm in humans.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "minor", "evidence": "time from title a/b; GSM6909087 (7b) annotated baseline in GEO was relabelled post to give 14 post = 14 completers, disclosed in discrepancies, with a sensitivity run excluding participant 7 (104 DEGs vs 174). Reasonable but an inference; unpaired 27a, 4b, 8b named and excluded.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "control=pre, treatment=post; up genes enrich oxidative phosphorylation, consistent with abstract (complex I up).", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "~ subject + time, subject as categorical string (S1...), full rank, 12 complete pairs; packet A key table supports it.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent (B4); both paired primary (174) and unpaired ~ time (62) reported next to the authors' 35.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Sex constant within participant, absorbed by blocking; per-sex exploratory runs; single sequencing flowcell noted (P2).", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "salmon NumReads summed per gene, rounded, into DESeq2; deviations from tximport declared.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states none (B5); workflow default padj<0.05 with threshold_source recorded and raw-p audit count. The flag that padj<0.05 & |lfc|>0.585 gives 33 is not supported as the paper's rule (deposited genes such as COQ10A have lfc 0.52).", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "35 comes from the authors' deposited table (baseMean>140, 5944 genes), not the abstract; caveat stated; unpaired fit recovers 34 of 35 genes.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Which threshold to report when the paper states none but its deposited table fits padj<0.05 (35); open policy item.", "Participant 7 label (7b annotated baseline) is an inference from the title; confirm with the authors if it matters."],
+ "summary": "该系列确为HIIT前后配对设计，按参与者分块的 ~ subject + time 模型合理，方向正确。7b 的标签更正已披露并有敏感性分析。论文摘要未给阈值和DEG数，174 与 35 的差异已如实说明（配对 vs 作者未配对模型），整体通过。"}
