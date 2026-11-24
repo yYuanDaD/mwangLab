@@ -1,0 +1,82 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41225641",
+  "request": "Analyze GSE281210 for PMID 41225641 (Single-cell transcriptome analysis profiles the enlarged subsets of myeloid-biased HSPCs with preleukemic characters in disuse osteoporosis mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE281210",
+      "accession": "GSE281210",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC12607142.paper.md"],
+        "metadata": "GSE281210/GSE281210_metadata.csv",
+        "matrix": "GSE281210/GSE281210_Gene_count_for_all_bone_marrow_cell_samples.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE281210", "GSE281970"],
+            "assay": "GSE281210: bulk RNA-seq of whole bone marrow cells (S2.6.p1, FIG3); GSE281970: scRNA-seq of Lin- c-kit+ HSPCs (S2.8.p1), not analyzed here",
+            "factors": {"condition": ["Con (ground-loaded control)", "OP-HU (28-day hindlimb unloading)"]},
+            "sample_inclusion": "male C57BL/6, 8 weeks old, HU for 28 days (S2.1.p1); bulk RNA-seq 3 replicates per group (FIG3)",
+            "primary_estimand": "Effect of 4-week hindlimb unloading (mechanical unloading / disuse osteoporosis) vs normally loaded control on bone marrow gene expression. No exercise or training arm exists anywhere in the study.",
+            "planned_contrasts": ["OP-HU vs Con, whole bone marrow bulk RNA-seq (S3.3.p1, FIG3; DEG count not reported)"],
+            "repeated_measure_unit": "none (independent mice)",
+            "paper_method": "DESeq2 1.20.0 (S2.6.p1); GO by clusterProfiler",
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "not stated for RNA-seq DEGs (S2.6.p1); S2.9.2.p1 p<0.05 refers to Prism t-tests"},
+            "paper_results": "heatmap of changed genes; GO of downregulated leukocyte-differentiation terms; Pf4 down (p=0.0002, FPKM t-test), Tgfb1 slightly down (FIG3C); Ccl3 down, Ccl5 up (FIG S2B)"
+          },
+          "reasoning": "Paper studies hindlimb unloading (HU) as a disuse-osteoporosis model (ABS.p2, S2.1.p1, S3.1.p1). Bulk RNA-seq (GSE281210, DA.p1) compares OP-HU vs control whole bone marrow, n=3/group (FIG3A). JQ-1 arm (S3.6.p2) is not in the bulk dataset. No exercise, training or reloading intervention is described.",
+          "confidence": "high",
+          "locator": "S2.1.p1; S2.6.p1; FIG3; DA.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE281210 for bulk RNA-seq", "GEO: femur bone marrow cells, Mus musculus, treatment_protocol 'with or without hindlimb unloading for four weeks'", "6 samples = 3 control + 3 OP-HU matches FIG3A", "featureCounts/HISAT2 on NovaSeq 6000 matches S2.6.p1 (Novogene)"]},
+          "reasoning": "Series, tissue, design and sample number all match the paper's bulk RNA-seq.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^BM (?:(con)trol |(OP-HU))(\\d)$"]},
+          "matrix_column_pattern": "^(Con|OP-HU)(\\d)$",
+          "normalize_keys": true,
+          "patterns": {"grp": ["title", "^BM (control|OP-HU) ?\\d$"]},
+          "recode": {"grp": {"control": "Con", "OP-HU": "HU"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Metadata titles 'BM control N' / 'BM OP-HUN' correspond to matrix columns ConN / OP-HUN; keys built as con_N / OP-HU_N on both sides and matched ignoring case. grp = Con / HU.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE281210_Gene_count_for_all_bone_marrow_cell_samples.txt.gz", "paper_input": "DESeq2 on gene counts (S2.6.p1)"},
+          "reasoning": "100% integer values, max 224759; data_processing states featureCounts v1.5.0-p3 read counts; file named Gene_count.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the only comparison in GSE281210 is 4-week hindlimb unloading (disuse) vs normally loaded control. There is no exercise, training or reloading arm, so the requested exercise estimand cannot be identified. Reversing HU vs control would not be an exercise effect (normal cage activity is not an exercise intervention).",
+          "factors": ["grp"],
+          "references": {"grp": "Con"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": "grp", "contrasts": []},
+          "candidates": [
+            {"value": "grp_HU_vs_Con as an exercise proxy", "reason_rejected": "unloading/disuse is not exercise; control is ordinary cage activity, not training; would mislabel the estimand"}
+          ],
+          "reasoning": "S2.1.p1/S3.1.p1: intervention is hindlimb unloading; GEO characteristics treatment='hindlib unloading', treatment_protocol 'with or without hindlimb unloading'. The paper's own contrast (OP-HU vs Con) is analyzable (n=3/group) but answers a disuse question, not the requested exercise question.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "requested estimand", "paper": "hindlimb unloading vs control (disuse osteoporosis)", "data": "Con x3, OP-HU x3; no exercise samples", "disposition": "refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

@@ -535,3 +535,7 @@ One section per case; newest last.
 ## PMID41736525 / GSE310849 (2026-11-24)
 
 - policy: Policy: do disuse/immobilization or TTX-denervation series (inactivity models, no exercise arm) count as exercise studies? Currently refused as 'no exercise arm'; the skill states no rule that contradicts this.
+
+## PMID41225641 / GSE281210 (2026-11-24)
+
+- policy: Policy (not an error): whether a disuse/unloading-vs-control series should count as an exercise-related study (the reverse of exercise) is a person's call; the refusal follows the skill's current rule.

@@ -1,0 +1,88 @@
+{
+ "case": "GSE281210",
+ "reviewer": "Claude Sonnet 5.5 (case-reviewer pass)",
+ "blind": {
+  "B1": "No for an exercise question: S2.1.p1 uses 28-day hindlimb unloading (disuse osteoporosis) vs ground-loaded mice; no exercise, training or reloading arm. Sequenced samples (6 bone-marrow bulk RNA-seq) carry only the unloading factor.",
+  "B2": "OP-HU vs control whole bone marrow, 3 vs 3 (FIG3A legend); JQ-1 arm not in the bulk set.",
+  "B3": "No repeated measures: independent mice, one bone marrow sample each (S2.6.p1, FIG3A). Suffix 1-3 in packet A is only a within-group index.",
+  "B4": "Paper does not say beyond 'differential expression genes were analyzed using DESeq2 R package (1.20.0)' (S2.6.p1); only two groups.",
+  "B5": "No DEG rule or count for bulk RNA-seq given; p<0.05 in S2.9.2.p1 is for Prism t-tests; Fig 3C Pf4 p=0.0002 by unpaired t-test on FPKM."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.1.p1/S3.3.p1: only 28-day hindlimb unloading (disuse) vs ground-loaded control; no exercise/training/reloading arm. GEO treatment 'hindlib unloading' is the mechanical flag's false positive.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Con 3 / HU 3 matches FIG3A (3 replicates per group); no run executed, no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast executed; HU vs Con is disuse, so reversing the sign would not give an exercise effect.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.1.p1 individually housed independent mice; the only candidate key is the within-group suffix 1-3, and pairing_check says not_supported (r diff -0.058, p=0.67); recorded 'none (independent mice)'.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Single two-group comparison; paper silent beyond DESeq2 1.20.0 (S2.6.p1).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "One sex (male), single cohort; nothing aliased with group is evident; no batch field.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Gene_count file, 100% integers, featureCounts v1.5.0-p3 -> raw counts for DESeq2, matching S2.6.p1. (Fig3C uses FPKM from the authors, not the GEO file.)",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper states no DEG rule for bulk RNA-seq (S2.6.p1); p<0.05 in S2.9.2.p1 is for Prism tests. packet B records paper_threshold null.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "HANDBACK reports no DEG count and no paper count (paper reports none); no overclaim.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "'No exercise arm' is a claim of absence but checked against paper methods, GEO treatment field and treatment_protocol; the only treatment is HU. Not a narrow search.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Policy (not an error): whether a disuse/unloading-vs-control series should count as an exercise-related study (the reverse of exercise) is a person's call; the refusal follows the skill's current rule."
+ ],
+ "summary": "该系列只有28天后肢悬吊(废用)与对照,没有运动/训练/复载组,拒绝分析的理由属实,且已对照论文方法与GEO字段核实。分组、基质、阈值与配对记录均与论文一致,无阻断或重要问题。"
+}

@@ -975,3 +975,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41736525 (GSE310344;GSE310849)
 
 - inspect reads Partek chromosome column as entrez IDs (tools/native.py:609); 'level' annotation column counted as sample (tools/native.py:239-242) Details: `PMID41736525/HANDBACK.md`.
+
+## PMID41225641 (GSE281210)
+
+- none blocking; inspect alignment_keys matched only 3/6 (control titles 'BM control N' vs 'ConN'), needed key_patterns+matrix_column_pattern+normalize_keys (tools/case_runner.py:550-585) Details: `PMID41225641/HANDBACK.md`.
+
+## PMID41229364 (GSE285405;GSE302562;GSE160827)
+
+- inspect gives no type or alignment keys for GSE285405's mixed fpkm/read_count/diffexp table (tools/case_runner.py:332); GSE302562 .csv.gz is tab-separated Details: `PMID41229364/HANDBACK.md`.
+
+## PMID40581981 (GSE298607)
+
+- none blocking; GEO contact_address mis-decoded as GBK (UTF-8 "ä" shown as "盲") in inspect output, cosmetic, file:line not found Details: `PMID40581981/HANDBACK.md`.
