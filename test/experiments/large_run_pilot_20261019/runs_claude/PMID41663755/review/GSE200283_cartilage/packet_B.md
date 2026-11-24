@@ -1,0 +1,73 @@
+# Review packet B (the analysis' decisions): GSE200283_cartilage
+
+## Mechanical flags
+
+- **unused_subject_like_column**: {"column": "characteristics_ch1.2.intervention", "n_values": 7, "max_repeat": 2, "named_like_subject": false, "note": "repeated per-sample key not in the model; check whether it is the animal/person"}
+- **unused_subject_like_column**: {"column": "grp_raw", "n_values": 7, "max_repeat": 2, "named_like_subject": false, "note": "repeated per-sample key not in the model; check whether it is the animal/person"}
+- **unused_subject_like_column**: {"column": "grp", "n_values": 7, "max_repeat": 2, "named_like_subject": false, "note": "repeated per-sample key not in the model; check whether it is the animal/person"}
+
+## Stop reasons
+
+- matrix (refused; claim type: exercise_arm): The only deposited matrix is FPKM for 1606 genes that were PRE-SELECTED by fold change MMS D28 vs control (FPKM>1, FC<0.67 or >1.5; S4.8.p2). Any differential test on it is circular (features chosen on the outcome), is not genome-wide (BH/FDR over a selected subset is invalid), and cannot reproduce the paper's PoissonDis DEG call (needs full read counts). FPKM also cannot feed a count model. In addition the design has no exercise arm: it is a disuse model whose only loading-restoration arms (R1/R2) have no paper-reported DEG result. A genome-wide matrix would require re-processing the SRA reads, which is outside this run.
+## Gates
+
+### paper_reconstruction (valid, not_started)
+
+final: {"accessions": ["GSE200283 (bulk RNA-seq)", "GSE200898 (scRNA-seq, not analysed here)"], "primary_estimand": "Effect of loss of mechanical stress (knee immobilization + tail-suspension unloading, MMS) on cartilage gene expression over time (D3/D7/D14/D28 vs control), and its reversal by restored joint motion (R1) or motion + loading (R2). This is a disuse/unloading model, not an exercise intervention; R1/R2 are remobilization/reloading.", "planned_contrasts": ["each MMS time point vs Control (cartilage); R1 and R2 vs Control/MMS — shown only as heatmaps/module patterns (S2.3.p1/S2.4.p1, Figs 2-4); no DEG counts reported", "gene selection: FC MMS D28/control <0.67 or >1.5 with FPKM>1 -> 1606 genes (S4.8.p2)"], "paper_threshold": {"metric": "FDR", "cutoff": 0.001, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": true, "source_locator": "S4.7.p1", "note": "fold change >= 2.0 and FDR <= 0.001 (BGI PoissonDis); inclusive on both cutoffs"}, "paper_method": "BGI PoissonDis on full transcriptome (S4.7.p1); iDEP 0.91 for clustering/PCA on FPKM (S4.8.p1)", "factors": {"intervention": ["Control", "MMS D3", "MMS D7", "MMS D14", "MMS D28", "R1", "R2"]}, "inclusion": "male C57BL/6J; one mouse (both knees pooled) per sample; n=2/group for cartilage (S4.7.p1)", "paper_results": "named genes only (synovium: Spp1, Col1a1, Ibsp, Col1a2, Postn, Mmp13, Mmp9, Il1b, Il11, Ccl2, Osm, Lif, Tgfb1, Tgfb3 up; cartilage: Col2a1, Col11a1, Col11a2, Acan, Prg4, Sox9, Sox5 down); no DEG  ... [8 more characters]
+
+reasoning: S4.7.p1 gives the DEG rule (FC>=2, FDR<=0.001, PoissonDis) but the paper reports no DEG counts; results are heatmaps of modules and named genes (S2.3.p1, S2.4.p1, S2.5.p1). S4.8.p2 states the deposited gene sets were pre-selected by fold change MMS D28/control. The intervention is disuse (S2.1.p1, S4.2.p1), with remobilization R1 and remobilization+reloading R2 (FIG1 c, S2.2.p1).
+
+### ownership (valid, not_started)
+
+final: {"matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\GSE200283_cartilage_renamed.csv", "owned": true, "checks": ["DA.p1 names GSE200283 for bulk RNA-seq", "GEO tissue=cartilage samples match the paper's groups and n=2/group", "matrix has 1606 genes = the paper's FC-selected count in S4.8.p2"], "accession": "GSE200283", "metadata_file": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41663755/prep/GSE200283_metadata_cartilage.csv"}
+
+reasoning: DA.p1 deposits bulk data as GSE200283; matrix row count 1606 equals S4.8.p2.
+
+### alignment (valid, not_started)
+
+final: {"method": "exact:_norm_key", "n_aligned": 14, "n_metadata": 14, "coverage": 1.0, "unmatched_matrix_columns": [], "unmatched_metadata_samples": [], "excluded_samples": {}, "derived_columns": {"source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\GSE200283_cartilage\\aligned\\aligned_metadata.csv", "columns": {"grp_raw": {"alias_of": "characteristics_ch1.2.intervention"}, "grp": {"source": "title", "regex": "^(Control|MMS D\\d+|R1|R2) ", "recode": {"Control": "CON", "MMS D3": "D3", "MMS D7": "D7", "MMS D14": "D14", "MMS D28": "D28", "R1": "R1", "R2": "R2"}}}, "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\GSE200283_cartilage\\aligned\\design_metadata.csv", "sha256": "8abea7e59175b3c73c9bb3a76dcfa45d1faa25392c3a535e4ec67644e03e4d63", "levels": {"grp_raw": {"Control": 2, "MMS D3": 2, "MMS D7": 2, "MMS D14": 2, "MMS D28": 2, "R1": 2, "R2": 2}, "grp": {"CON": 2, "D3": 2, "D7": 2, "D14": 2, "D28": 2, "R1": 2, "R2": 2}}}}
+
+reasoning: Matrix columns (cont_RepN, MMSD3_RepN, ...) correspond to GEO titles ('Control synovium rep1'); prep script only renames 'cont_' to 'Control_' (values untouched), key derived from title group+rep, matched ignoring case/separators. No positional alignment. Metadata restricted to this tissue by prep/split_metadata.py (title keys repeat across tissues).
+
+### matrix (refused, not_started)
+
+final: {"source": "GEO supplementary GSE200283_cartilage.csv.gz", "paper_input": "PoissonDis on full-transcriptome reads (S4.7.p1)", "matrix_type": "FPKM (feature-selected subset)", "recommended_method": "none (refused)", "profile": {"path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\GSE200283_cartilage\\aligned\\aligned_matrix.csv", "sha256": "b1c8b5826c1b83daec0bbadb13c47c59808aa291e144a46bb9a58f059737035c", "n_features": 1606, "n_samples": 14, "annotation_columns_dropped": [], "duplicated_feature_ids": 0, "missing_values": 0, "negative_values": 0, "negative_fraction": 0.0, "min": 0.5, "max": 18513.83, "median": 8.8, "integer_fraction": 0.0103, "candidates": ["linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"]}}
+
+reasoning: Values are non-integer (1% integer), min ~0.5-1.0 (consistent with the FPKM>1 filter), GEO data_processing: 'comma-delimited text files include FPKM values'. Row count equals the FC-selected gene counts in S4.8.p2. Excel-date gene IDs present (e.g. 7-Mar/1-Mar), a further sign of a curated spreadsheet rather than a full matrix.
+
+rejected alternatives: [{"value": "limma on log2(FPKM+1) of the deposited subset", "reason_rejected": "gene set selected on the same MMS-vs-control fold change; circular and non-genome-wide FDR"}, {"value": "R2 or R1 vs MMS as a 'reloading/exercise-like' contrast", "reason_rejected": "same selected-subset problem; paper reports no such DE result; cartilage n=2"}]
+
+
+## Recorded paper-data discrepancies
+
+[]
+
+## HANDBACK.md (start)
+
+# HANDBACK — PMID41663755 / GSE200283
+
+**Status: refused at the `matrix` gate (both tissues).** No differential expression or enrichment was run.
+
+## What ran
+- `python -m tools.case_runner inspect GSE200283` (the series downloaded into `data/GSE200283`): two supplementary matrices, `GSE200283_synovium.csv.gz` (1178 genes × 18) and `GSE200283_cartilage.csv.gz` (1606 genes × 14). Both are non-integer values with a minimum of about 1. GEO `data_processing` says "FPKM values".
+- Prep scripts (they do not change any values):
+  - `prep/rename_control.py` renames the matrix prefix `cont_` to `Control_`.
+  - `prep/split_metadata.py` writes the metadata separately for each tissue.
+- `case_spec.json` has two cases, `GSE200283_synovium` and `GSE200283_cartilage`. For each, the gates `paper_reconstruction`, `ownership`, `alignment` and `matrix` are recorded, and the case stops at `matrix` with `decision_status: refused`.
+- Alignment matched 18/18 synovium samples and 14/14 cartilage samples exactly on a key built from the title (normalized) — not by position. Groups:
+  - synovium: CON, D3, D7, D14, R1, R2, with n=3 each
+  - cartilage: the same groups plus D28, with n=2 each
+- The contract validator checked 8 records and found 0 errors.
+
+## Why refused
+1. **The deposited features were selected on the outcome.** S4.8.p2 says the synovium matrix holds the genes with FPKM>1 and fold change MMS D14/control <0.67 or >1.5, which gives exactly 1,178 genes. The cartilage matrix uses MMS D28/control the same way and gives exactly 1,606 genes. Both row counts match the files.
+   - Any DE test on these subsets is circular.
+   - The BH/FDR correction is applied over a gene set that was itself selected, so it is invalid.
+   - FPKM cannot be used in the count model the paper's PoissonDis test needs.
+   - No genome-wide matrix is deposited. The only way to get one would be to re-process the SRA reads, which this run does not do.
+2. **There is no exercise arm.** This is a disuse model (knee immobilization plus tail-suspension unloading). The closest to "exercise" are the remobilization arm R1 and the remobilization plus reloading arm R2. The paper reports no DE result for R1 or R2, only heatmaps and modules.
+
+## DEG counts vs paper
+- Paper threshold (S4.7.p1): fold change ≥ 2.0 and FDR ≤ 0.001, from the PoissonDis test run by BGI. Inclusive, this is |log2FC| ≥ 1 and FDR ≤ 0.001.
+- **The paper reports no DEG counts.** Its results are module heatmaps and named genes:
+  - Synovium, up:  ... [1047 more characters]

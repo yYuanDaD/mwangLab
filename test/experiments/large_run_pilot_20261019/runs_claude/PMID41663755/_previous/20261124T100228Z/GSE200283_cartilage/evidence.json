@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41663755",
+  "subject_id": "GSE200283_cartilage",
+  "created_at": "2026-11-24T05:02:15",
+  "finished_at": "2026-11-24T05:02:15",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12957370.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC12957370.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "77756abe6580731555b67280dd2aec149035ab8b73a7b1d006879b386e81b960",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE200283_metadata_cartilage.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\GSE200283_metadata_cartilage.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0b6c91e4292cbc2a4bbcdad7674f35ba49264c2fa09ca15f15c42d830d089a1f",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script rename_control.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\rename_control.py",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "151271804ec4e360f3a056a3d25a015a85a0918367aa8969f2ffc05034d9b17f",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "user",
+      "label": "prep script split_metadata.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\split_metadata.py",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "cf1ff14e35df254c2450860bdd30f68b62b5660d350ac0a5661f69d60ddd407e",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0005",
+      "origin": "artifact",
+      "label": "GSE200283_cartilage_renamed.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\GSE200283_cartilage_renamed.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2a95ceba87bef9395e29960cad1e4af958ea92c1922ee4e98ee972c4c65365b3",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE200283 (bulk RNA-seq)",
+          "GSE200898 (scRNA-seq, not analysed here)"
+        ],
+        "primary_estimand": "Effect of loss of mechanical stress (knee immobilization + tail-suspension unloading, MMS) on cartilage gene expression over time (D3/D7/D14/D28 vs control), and its reversal by restored joint motion (R1) or motion + loading (R2). This is a disuse/unloading model, not an exercise intervention; R1/R2 are remobilization/reloading.",
+        "planned_contrasts": [
+          "each MMS time point vs Control (cartilage); R1 and R2 vs Control/MMS — shown only as heatmaps/module patterns (S2.3.p1/S2.4.p1, Figs 2-4); no DEG counts reported",
+          "gene selection: FC MMS D28/control <0.67 or >1.5 with FPKM>1 -> 1606 genes (S4.8.p2)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.001,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": true,
+          "source_locator": "S4.7.p1",
+          "note": "fold change >= 2.0 and FDR <= 0.001 (BGI PoissonDis); inclusive on both cutoffs"
+        },
+        "paper_method": "BGI PoissonDis on full transcriptome (S4.7.p1); iDEP 0.91 for clustering/PCA on FPKM (S4.8.p1)",
+        "factors": {
+          "intervention": [
+            "Control",
+            "MMS D3",
+            "MMS D7",
+            "MMS D14",
+            "MMS D28",
+            "R1",
+            "R2"
+          ]
+        },
+        "inclusion": "male C57BL/6J; one mouse (both knees pooled) per sample; n=2/group for cartilage (S4.7.p1)",
+        "paper_results": "named genes only (synovium: Spp1, Col1a1, Ibsp, Col1a2, Postn, Mmp13, Mmp9, Il1b, Il11, Ccl2, Osm, Lif, Tgfb1, Tgfb3 up; cartilage: Col2a1, Col11a1, Col11a2, Acan, Prg4, Sox9, Sox5 down); no DEG counts"
+      },
+      "reason": "S4.7.p1 gives the DEG rule (FC>=2, FDR<=0.001, PoissonDis) but the paper reports no DEG counts; results are heatmaps of modules and named genes (S2.3.p1, S2.4.p1, S2.5.p1). S4.8.p2 states the deposited gene sets were pre-selected by fold change MMS D28/control. The intervention is disuse (S2.1.p1, S4.2.p1), with remobilization R1 and remobilization+reloading R2 (FIG1 c, S2.2.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:15"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\prep\\GSE200283_cartilage_renamed.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE200283 for bulk RNA-seq",
+          "GEO tissue=cartilage samples match the paper's groups and n=2/group",
+          "matrix has 1606 genes = the paper's FC-selected count in S4.8.p2"
+        ],
+        "accession": "GSE200283",
+        "metadata_file": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID41663755/prep/GSE200283_metadata_cartilage.csv"
+      },
+      "reason": "DA.p1 deposits bulk data as GSE200283; matrix row count 1606 equals S4.8.p2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:15"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\GSE200283_cartilage\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8a1cb1bc83915029b4fe529fb96fbcd72bb241cdde631140e32abd9005ffa804",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41663755\\GSE200283_cartilage\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

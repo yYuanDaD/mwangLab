@@ -519,3 +519,11 @@ One section per case; newest last.
 
 - policy: Whether a hindlimb-unloading (disuse) series counts as an exercise study at all.
 - policy: Joint vs pairwise fit when the paper is silent; counts differ greatly from paper (n=3/group, FPKM instead of counts).
+
+## PMID41663755 / GSE200283_cartilage (2026-11-24)
+
+- policy: Policy: whether R1/R2 reloading-vs-MMS in a disuse model counts as an exercise-like study; deposited matrix is feature-selected so not analyzable either way.
+
+## PMID41663755 / GSE200283_synovium (2026-11-24)
+
+- policy: Policy: whether R1/R2 reloading-vs-MMS in a disuse model counts as an exercise-like study; deposited matrix is feature-selected so not analyzable either way.
