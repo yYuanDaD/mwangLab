@@ -475,3 +475,7 @@ One section per case; newest last.
 ## PMID32483463 / GSE128651 (2026-11-24)
 
 - policy: Raw p<0.01 vs FDR<0.05 ambiguity in paper is open policy; record both when the analysis runs.
+
+## PMID36892893 / GSE213649 (2026-11-24)
+
+- policy: Which of the paper's unreported sample exclusions applies is not stated; the exclusion of the two mislabelled liver samples is an inference that matches the paper's counts.

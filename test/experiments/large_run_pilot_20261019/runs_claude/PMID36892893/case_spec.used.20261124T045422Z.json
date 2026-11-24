@@ -1,0 +1,627 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36892893",
+ "request": "Analyze GSE213649 for PMID 36892893 (Multiomics profiling of the impact of an angiotensin (1-7)-expressing probiotic combined with exercise training in aged male rats.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE213649",
+   "accession": "GSE213649",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC10125028.paper.md"
+    ],
+    "metadata": "GSE213649/GSE213649_metadata.csv",
+    "matrix": "GSE213649/GSE213649_ang1_7_all_tissues_read_counts__1_.csv",
+    "raw_tar": false,
+    "prep_scripts": []
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE213649"
+      ],
+      "primary_estimand": "Per tissue (PFC, hippocampus, colon, liver, TA muscle), expression differences of each of the five other groups vs LPAEx (Ang(1-7) probiotic + exercise) in a 3x2 probiotic x exercise design; the exercise effect the paper interprets is LPAEx vs LPASed (S4.p4), with LPAEx vs LPSed/CONSed as combined-intervention contrasts.",
+      "factors": {
+       "probiotic": [
+        "Control",
+        "LP",
+        "LPA"
+       ],
+       "activity": [
+        "Sed",
+        "Ex"
+       ]
+      },
+      "inclusion": "Aged (24 mo) male F344BN rats, n=4-6/group/tissue (S2.4.3.p1, TAB1); deposited 179 samples: 6/group/tissue except liver LPEx n=5 (LPEx3 liver absent, as in TAB1).",
+      "planned_contrasts": [
+       "LPAEx vs LPASed in each tissue (S2.4.3.2.p1)",
+       "LPAEx vs LPSed in each tissue (S2.4.3.2.p1)",
+       "LPAEx vs CONSed in each tissue (S2.4.3.2.p1)",
+       "LPAEx vs CONEx in each tissue (S2.4.3.2.p1)",
+       "LPAEx vs LPEx in each tissue (S2.4.3.2.p1)"
+      ],
+      "paper_method": "DESeq2 ~group (6-level single factor) per tissue, R 4.1.2 (S2.4.3.2.p1)",
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.1,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "source_locator": "S2.4.3.2.p1"
+      },
+      "paper_results": "PFC: vs LPASed 317 (262/55), vs LPSed 203 (163/40), vs CONSed 170 (140/30), vs LPEx 14, vs CONEx 4 (TAB2). Liver: vs CONEx 258 (252/6), vs LPSed 143, vs LPASed 112 (105/7), vs CONSed 73 (63/10), vs LPEx 19 (TAB3). Muscle vs CONEx 15 (9/6); hippocampus vs CONSed 19 (5/14); other muscle/hippocampus/colon comparisons 2-14 (S3.4.p1)."
+     },
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group, DEGs for all groups compared with LPAEx in each tissue, FDR<0.10 (BH) and |LFC|>1.0. FIG5 volcano/text report 'upregulated' as higher in LPAEx.",
+     "confidence": "high",
+     "locator": "S2.4.3.2.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S5.p1 names GSE213649",
+       "male F344BN rat, five tissues as in S2.3.p1",
+       "animal IDs in titles (CS3, CE5, ..., AE12) match the transcriptomic rows of TAB1",
+       "processing (Trim Galore, STAR, Rnor_5.0) matches S2.4.3.2.p1"
+      ]
+     },
+     "reasoning": "Series, organism, tissues, animal IDs and processing all match the paper.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "title",
+     "patterns": {
+      "tissue": [
+       "title",
+       "^(PFC|Hippo|L|C|M)_?[CPA][SE]\\d+$"
+      ],
+      "grp": [
+       "title",
+       "^(?:PFC_|Hippo|L_|C_|M_)([CPA][SE])\\d+$"
+      ]
+     },
+     "recode": {
+      "tissue": {
+       "PFC": "PFC",
+       "Hippo": "HIP",
+       "L": "LIV",
+       "C": "COL",
+       "M": "MUS"
+      },
+      "grp": {
+       "CS": "CONSed",
+       "CE": "CONEx",
+       "PS": "LPSed",
+       "PE": "LPEx",
+       "AS": "LPASed",
+       "AE": "LPAEx"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal GEO titles (179/179). Title code = tissue prefix + C/P/A (Control/LP/LPA) + S/E (Sed/Ex) + animal number; codes agree with the treatment and activity characteristics.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GEO supplementary read_counts (data_processing: STAR gene counts)",
+      "paper_input": "STAR gene counts into DESeq2"
+     },
+     "reasoning": "100% integers, max 3.25e6, median 1; data_processing: STAR gene counts, file contains read_counts.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "CONSed"
+     },
+     "organism": "Rat",
+     "strata": [
+      "tissue"
+     ],
+     "planned": [
+      "grp_LPAEx_vs_LPASed_tissue-PFC",
+      "grp_LPAEx_vs_LPSed_tissue-PFC",
+      "grp_LPAEx_vs_CONSed_tissue-PFC",
+      "grp_LPAEx_vs_CONEx_tissue-PFC",
+      "grp_LPAEx_vs_LPEx_tissue-PFC",
+      "grp_LPAEx_vs_LPASed_tissue-HIP",
+      "grp_LPAEx_vs_LPSed_tissue-HIP",
+      "grp_LPAEx_vs_CONSed_tissue-HIP",
+      "grp_LPAEx_vs_CONEx_tissue-HIP",
+      "grp_LPAEx_vs_LPEx_tissue-HIP",
+      "grp_LPAEx_vs_LPASed_tissue-LIV",
+      "grp_LPAEx_vs_LPSed_tissue-LIV",
+      "grp_LPAEx_vs_CONSed_tissue-LIV",
+      "grp_LPAEx_vs_CONEx_tissue-LIV",
+      "grp_LPAEx_vs_LPEx_tissue-LIV",
+      "grp_LPAEx_vs_LPASed_tissue-COL",
+      "grp_LPAEx_vs_LPSed_tissue-COL",
+      "grp_LPAEx_vs_CONSed_tissue-COL",
+      "grp_LPAEx_vs_CONEx_tissue-COL",
+      "grp_LPAEx_vs_LPEx_tissue-COL",
+      "grp_LPAEx_vs_LPASed_tissue-MUS",
+      "grp_LPAEx_vs_LPSed_tissue-MUS",
+      "grp_LPAEx_vs_CONSed_tissue-MUS",
+      "grp_LPAEx_vs_CONEx_tissue-MUS",
+      "grp_LPAEx_vs_LPEx_tissue-MUS"
+     ],
+     "covariate_candidates": [],
+     "final": {
+      "analysis_type": "multi-group, one model per tissue",
+      "design_column": "grp",
+      "formula": "~ grp",
+      "contrasts": [
+       {
+        "name": "grp_LPAEx_vs_LPASed_tissue-PFC",
+        "control": "LPASed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPSed_tissue-PFC",
+        "control": "LPSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONSed_tissue-PFC",
+        "control": "CONSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONEx_tissue-PFC",
+        "control": "CONEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPEx_tissue-PFC",
+        "control": "LPEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPASed_tissue-HIP",
+        "control": "LPASed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPSed_tissue-HIP",
+        "control": "LPSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONSed_tissue-HIP",
+        "control": "CONSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONEx_tissue-HIP",
+        "control": "CONEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPEx_tissue-HIP",
+        "control": "LPEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPASed_tissue-LIV",
+        "control": "LPASed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPSed_tissue-LIV",
+        "control": "LPSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONSed_tissue-LIV",
+        "control": "CONSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONEx_tissue-LIV",
+        "control": "CONEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPEx_tissue-LIV",
+        "control": "LPEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPASed_tissue-COL",
+        "control": "LPASed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPSed_tissue-COL",
+        "control": "LPSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONSed_tissue-COL",
+        "control": "CONSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONEx_tissue-COL",
+        "control": "CONEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPEx_tissue-COL",
+        "control": "LPEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPASed_tissue-MUS",
+        "control": "LPASed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPSed_tissue-MUS",
+        "control": "LPSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONSed_tissue-MUS",
+        "control": "CONSed",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_CONEx_tissue-MUS",
+        "control": "CONEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       },
+       {
+        "name": "grp_LPAEx_vs_LPEx_tissue-MUS",
+        "control": "LPEx",
+        "treatment": "LPAEx",
+        "role": "primary"
+       }
+      ]
+     },
+     "candidates": [
+      {
+       "value": "factorial ~probiotic*activity",
+       "reason_rejected": "paper explicitly chose the ~group single factor (S2.4.3.2.p1); exercise main effect not reported"
+      },
+      {
+       "value": "one model across all tissues",
+       "reason_rejected": "paper analyzes each tissue separately"
+      }
+     ],
+     "reasoning": "Paper design ~group per tissue with LPAEx as comparator. Exercise-only simple effects within CON and LP (CONEx vs CONSed, LPEx vs LPSed) are not reported by the paper and run as exploratory from the same fit.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Each tissue is fitted separately with one sample per animal, so no repeated measures within a model. No batch/lane variable recorded; paper adjusts for none.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ grp",
+      "paper_route": {
+       "method": "DESeq2 ~group (R)",
+       "status": "reproduced"
+      },
+      "deviations": [
+       "pydeseq2 rather than R DESeq2; pre-filtering not stated by paper, none applied"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw counts support DESeq2 as the paper used.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.1,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false,
+       "source_locator": "S2.4.3.2.p1"
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.1,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": 1.0,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_cutoff": null
+      }
+     },
+     "reasoning": "S2.4.3.2.p1: FDR<0.10 (BH) and |LFC|>1.0.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Paper reports n=4-6/group; deposited data have 6/group per tissue (liver LPEx 5).",
+       "Only LPAEx vs LPASed isolates exercise among the paper's contrasts; LPAEx vs CONSed/LPSed mixes probiotic and exercise.",
+       "Paper counts for most hippocampus/colon/muscle comparisons are only in supplementary tables (stated as 2-14)."
+      ]
+     },
+     "paper_counts": {
+      "deseq2_PFC/grp_LPAEx_vs_LPASed_tissue-PFC": 317,
+      "deseq2_PFC/grp_LPAEx_vs_LPSed_tissue-PFC": 203,
+      "deseq2_PFC/grp_LPAEx_vs_CONSed_tissue-PFC": 170,
+      "deseq2_PFC/grp_LPAEx_vs_LPEx_tissue-PFC": 14,
+      "deseq2_PFC/grp_LPAEx_vs_CONEx_tissue-PFC": 4,
+      "deseq2_LIV/grp_LPAEx_vs_CONEx_tissue-LIV": 258,
+      "deseq2_LIV/grp_LPAEx_vs_LPSed_tissue-LIV": 143,
+      "deseq2_LIV/grp_LPAEx_vs_LPASed_tissue-LIV": 112,
+      "deseq2_LIV/grp_LPAEx_vs_CONSed_tissue-LIV": 73,
+      "deseq2_LIV/grp_LPAEx_vs_LPEx_tissue-LIV": 19,
+      "deseq2_MUS/grp_LPAEx_vs_CONEx_tissue-MUS": 15,
+      "deseq2_HIP/grp_LPAEx_vs_CONSed_tissue-HIP": 19
+     },
+     "paper_genes": {
+      "deseq2_PFC/grp_LPAEx_vs_LPASed_tissue-PFC": [
+       "Stoml3",
+       "Frmd7",
+       "Pgc",
+       "Pdcd5",
+       "Plat",
+       "ENSRNOG00000050660"
+      ],
+      "deseq2_PFC/grp_LPAEx_vs_CONSed_tissue-PFC": [
+       "Ms4r15",
+       "Frmd7",
+       "Itga10",
+       "Lemd2",
+       "ENSRNOG00000058482"
+      ],
+      "deseq2_PFC/grp_LPAEx_vs_LPSed_tissue-PFC": [
+       "Stoml3",
+       "Rd3",
+       "S100a5",
+       "ENSRNOG00000049394",
+       "Pcsk1n",
+       "Lemd2"
+      ],
+      "deseq2_LIV/grp_LPAEx_vs_LPASed_tissue-LIV": [
+       "ENSRNOG00000037549",
+       "A1bg",
+       "Ank1",
+       "Ube2b",
+       "ENSRNOG00000048864",
+       "Nr1d1"
+      ],
+      "deseq2_LIV/grp_LPAEx_vs_CONSed_tissue-LIV": [
+       "A1bg",
+       "Ank1",
+       "Rrm2",
+       "Ube2b",
+       "ENSRNOG00000048864",
+       "Dbp"
+      ],
+      "deseq2_LIV/grp_LPAEx_vs_LPSed_tissue-LIV": [
+       "A1bg",
+       "ENSRNOG00000009329",
+       "Ank1",
+       "Nr1d1",
+       "Hsd17b2",
+       "Dbp"
+      ],
+      "deseq2_LIV/grp_LPAEx_vs_CONEx_tissue-LIV": [
+       "A2m",
+       "Ank1",
+       "ENSRNOG00000004419",
+       "Zswim8",
+       "Nr1d1"
+      ],
+      "deseq2_MUS/grp_LPAEx_vs_CONEx_tissue-MUS": [
+       "ENSRNOG00000023387",
+       "Cish",
+       "Arrdc2",
+       "ENSRNOG00000019736",
+       "ENSRNOG00000022637"
+      ]
+     },
+     "reasoning": "Paper's contrasts reproduced with its method and threshold.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "liver LPAEx vs LPSed split",
+     "paper": "text 137 up/10 down; TAB3 143 = 137/6",
+     "data": "n/a",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "liver LPAEx vs LPEx count",
+     "paper": "TAB3 19 (11/8); text 22 (11/11)",
+     "data": "n/a",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "group sizes",
+     "paper": "n=4-6 per group (S2.4.3.p1)",
+     "data": "6/group per tissue, liver LPEx 5",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "deseq2_PFC",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "grp_LPAEx_vs_LPASed_tissue-PFC",
+       "grp_LPAEx_vs_LPSed_tissue-PFC",
+       "grp_LPAEx_vs_CONSed_tissue-PFC",
+       "grp_LPAEx_vs_CONEx_tissue-PFC",
+       "grp_LPAEx_vs_LPEx_tissue-PFC",
+       "grp_CONEx_vs_CONSed_tissue-PFC",
+       "grp_LPEx_vs_LPSed_tissue-PFC"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "PFC"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group fitted per tissue, all groups vs LPAEx; PFC samples only. Exercise-only contrasts CONEx vs CONSed and LPEx vs LPSed come from the same fit as exploratory."
+    },
+    {
+     "name": "deseq2_HIP",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "grp_LPAEx_vs_LPASed_tissue-HIP",
+       "grp_LPAEx_vs_LPSed_tissue-HIP",
+       "grp_LPAEx_vs_CONSed_tissue-HIP",
+       "grp_LPAEx_vs_CONEx_tissue-HIP",
+       "grp_LPAEx_vs_LPEx_tissue-HIP",
+       "grp_CONEx_vs_CONSed_tissue-HIP",
+       "grp_LPEx_vs_LPSed_tissue-HIP"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "HIP"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group fitted per tissue, all groups vs LPAEx; HIP samples only. Exercise-only contrasts CONEx vs CONSed and LPEx vs LPSed come from the same fit as exploratory."
+    },
+    {
+     "name": "deseq2_LIV",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "grp_LPAEx_vs_LPASed_tissue-LIV",
+       "grp_LPAEx_vs_LPSed_tissue-LIV",
+       "grp_LPAEx_vs_CONSed_tissue-LIV",
+       "grp_LPAEx_vs_CONEx_tissue-LIV",
+       "grp_LPAEx_vs_LPEx_tissue-LIV",
+       "grp_CONEx_vs_CONSed_tissue-LIV",
+       "grp_LPEx_vs_LPSed_tissue-LIV"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "LIV"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group fitted per tissue, all groups vs LPAEx; LIV samples only. Exercise-only contrasts CONEx vs CONSed and LPEx vs LPSed come from the same fit as exploratory."
+    },
+    {
+     "name": "deseq2_COL",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "grp_LPAEx_vs_LPASed_tissue-COL",
+       "grp_LPAEx_vs_LPSed_tissue-COL",
+       "grp_LPAEx_vs_CONSed_tissue-COL",
+       "grp_LPAEx_vs_CONEx_tissue-COL",
+       "grp_LPAEx_vs_LPEx_tissue-COL",
+       "grp_CONEx_vs_CONSed_tissue-COL",
+       "grp_LPEx_vs_LPSed_tissue-COL"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "COL"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group fitted per tissue, all groups vs LPAEx; COL samples only. Exercise-only contrasts CONEx vs CONSed and LPEx vs LPSed come from the same fit as exploratory."
+    },
+    {
+     "name": "deseq2_MUS",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "args": {
+      "comparisons": [
+       "grp_LPAEx_vs_LPASed_tissue-MUS",
+       "grp_LPAEx_vs_LPSed_tissue-MUS",
+       "grp_LPAEx_vs_CONSed_tissue-MUS",
+       "grp_LPAEx_vs_CONEx_tissue-MUS",
+       "grp_LPAEx_vs_LPEx_tissue-MUS",
+       "grp_CONEx_vs_CONSed_tissue-MUS",
+       "grp_LPEx_vs_LPSed_tissue-MUS"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "MUS"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "S2.4.3.2.p1: DESeq2 ~group fitted per tissue, all groups vs LPAEx; MUS samples only. Exercise-only contrasts CONEx vs CONSed and LPEx vs LPSed come from the same fit as exploratory."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "deseq2_PFC/grp_LPAEx_vs_LPASed_tissue-PFC",
+     "ora": true,
+     "gsea": true,
+     "direction": "up",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports pathways of upregulated DEGs for this exercise comparison (FIG5E); BioPlanet not available, GO/KEGG/Hallmark used"
+    },
+    {
+     "execution": "deseq2_LIV/grp_LPAEx_vs_LPASed_tissue-LIV",
+     "ora": true,
+     "gsea": true,
+     "direction": "up",
+     "ranking_metric": "stat",
+     "reasoning": "paper reports pathways for this liver comparison (FIG6G)"
+    }
+   ]
+  }
+ ]
+}
