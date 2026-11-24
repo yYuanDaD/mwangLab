@@ -1,0 +1,189 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36084645",
+  "request": "Analyze GSE205891 for PMID 36084645 (Worksite-based intensive lifestyle therapy has profound cardiometabolic benefits in people with obesity and type 2 diabetes.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE205891",
+      "accession": "GSE205891",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9728552.paper.md"],
+        "metadata": "GSE205891/GSE205891_metadata.csv",
+        "matrix": "GSE205891/GSE205891_LID_all.gene_moderated_log2cpm.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE205891"],
+            "assay": "bulk total RNA-seq (Illumina NovaSeq 6000), human skeletal muscle and subcutaneous abdominal adipose tissue biopsies (S4.3.4.2.p1, key resources table)",
+            "primary_estimand": "Within-group change in skeletal muscle gene expression after vs before 8 months of intensive lifestyle therapy (ILT: dietary energy restriction plus supervised exercise training 4 x 60 min/week) in people with obesity and T2D; the same within-group change in the standard-care (SC) arm is reported alongside (S2.6.p1, FIG3). Exercise is not separable from energy restriction/weight loss in this design: the estimand is the effect of the combined lifestyle intervention.",
+            "factors": {"arm": ["SC", "ILT"], "time": ["before", "after"], "tissue": ["skeletal muscle", "subcutaneous adipose"]},
+            "repeated_measure_unit": "participant (before and after biopsies from the same person)",
+            "inclusion": "Muscle RNA-seq: SC n=6, ILT n=8 participants (FIG3); adipose: SC n=7, ILT n=10 (FIG4). 9 women + 1 man in ILT, 8 women in SC among completers (S2.1.p1).",
+            "planned_contrasts": [
+              "Muscle ILT after vs before, paired (S2.6.p1, FIG3A; paper: 1,540 DEGs, Table S3)",
+              "Muscle SC after vs before, paired (S2.6.p1, FIG3A; paper: 65 DEGs, Table S2)",
+              "Adipose ILT and SC after vs before: selected-gene results only (S2.7.p1, FIG4; ECM genes SPARC, LOX, LOXL1, TNMD, PDGFA, SEMA3C down after ILT; IL6, TNF, CCL2, CCL5, CD68, CD74 unchanged); no DEG count reported"
+            ],
+            "paper_method": "edgeR (P value and FDR per gene) on gene counts (featureCounts); pairing in the edgeR model not stated (S4.4.p1)",
+            "normalization": "CPM from featureCounts gene counts; deposited file is log-transformed (moderated) CPM (GEO data_processing)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3, "inclusive": false, "source_locator": "S4.4.p1; S2.6.p1"},
+            "paper_results": {"muscle_ILT_DEGs": 1540, "muscle_SC_DEGs": 65, "pathways": "IPA top pathways in ILT muscle: Mitochondrial Dysfunction, Oxidative Phosphorylation, TCA Cycle II, Sirtuin Signaling, NAD Signaling (FIG3B)", "named_up_genes_ILT_muscle": ["NAMPT", "SIRT3", "PPARGC1A", "MT-ND1", "MT-ND5", "SOD2", "COX4I1", "CS", "CYCS", "VEGFA"]}
+          },
+          "reasoning": "S2.6.p1 and FIG3 define the muscle DEG analysis as after-vs-before within each arm with log2|FC|>0.3 and FDR<0.05; S4.4.p1 names edgeR; key resources table names GSE205891 for muscle RNA-seq. S2.7.p1/FIG4 report adipose selected genes only. S1.p3/S4.3.3.p1: ILT = energy restriction + supervised exercise; the transcriptomic effect cannot be attributed to exercise alone.",
+          "confidence": "high",
+          "locator": "S2.6.p1; S4.4.p1; FIG3; FIG4; S4.3.3.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["key resources table lists GSE205891 for skeletal muscle RNA-seq", "GEO growth protocol describes muscle and SAT from people with obesity and T2D before/after SC and ILT", "28 muscle samples = 14 subjects x 2 (SC 6 + ILT 8, matches FIG3); 34 adipose samples = 17 x 2 (SC 7 + ILT 10, matches FIG4)"]},
+          "reasoning": "Accession, tissues, arms, and per-arm subject counts all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "tissue": ["title", "^(Muscle|Fat)_\\d+[AB]$"],
+            "subject": ["title", "^(?:Muscle|Fat)_(\\d+)[AB]$"],
+            "visit": ["title", "^(?:Muscle|Fat)_\\d+([AB])$"]
+          },
+          "aliases": {"time": "characteristics_ch1.0.sample type", "arm": "characteristics_ch1.1.treatment"},
+          "recode": {"time": {"Before": "pre", "After": "post"}, "tissue": {"Muscle": "muscle", "Fat": "fat"}, "visit": {"A": "pre", "B": "post"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns equal metadata title exactly for 62/62 (inspect alignment_keys). Subject = 3-digit participant id in the title; tissue prefix; A/B suffix is cross-checked against the GEO sample type (A=Before, B=After in every row).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "log2 CPM (moderated, prior count; edgeR-style log-CPM)",
+          "recommended_method": "limma",
+          "reasoning": "File name 'gene_moderated_log2cpm'; data_processing: CPM from featureCounts counts, log-transformed. Values are continuous (integer fraction 0), range -6.0 to 18.4; 2^x sums to ~1e6 per column, confirming log2 CPM. Paper input was raw counts (edgeR); raw counts were not deposited and cannot be recovered without library sizes.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["tissue", "arm"],
+          "planned": ["time_post_vs_pre_tissue-muscle_arm-ILT", "time_post_vs_pre_tissue-muscle_arm-SC"],
+          "final": {
+            "analysis_type": "paired two-timepoint within arm and tissue (+ exploratory arm x time change comparison)",
+            "design_column": "time",
+            "control": "pre",
+            "treatment": "post",
+            "contrasts": [
+              {"name": "muscle_ILT_post_vs_pre", "control": "pre", "treatment": "post", "role": "primary", "subset": {"tissue": "muscle", "arm": "ILT"}},
+              {"name": "muscle_SC_post_vs_pre", "control": "pre", "treatment": "post", "role": "secondary", "subset": {"tissue": "muscle", "arm": "SC"}},
+              {"name": "fat_ILT_post_vs_pre", "control": "pre", "treatment": "post", "role": "secondary", "subset": {"tissue": "fat", "arm": "ILT"}},
+              {"name": "fat_SC_post_vs_pre", "control": "pre", "treatment": "post", "role": "secondary", "subset": {"tissue": "fat", "arm": "SC"}},
+              {"name": "muscle_change_ILT_vs_SC", "role": "exploratory", "note": "randomized between-arm difference in paired change; not reported as DEGs by the paper"}
+            ]
+          },
+          "candidates": [
+            {"value": "pooled SC+ILT after vs before", "reason_rejected": "paper analyzes arms separately; pooling mixes intervention and control"},
+            {"value": "ILT vs SC at follow-up only (unpaired)", "reason_rejected": "ignores baseline and pairing; not the paper's estimand"},
+            {"value": "muscle and fat in one model", "reason_rejected": "different tissues; paper analyses them separately; tissue is a stratum"}
+          ],
+          "reasoning": "Paper (S2.6.p1, FIG3A) reports after-vs-before DEGs within each arm in muscle. Tissue and arm are strata; time is the tested factor with subject blocking. The randomized arm x time contrast (ILT change minus SC change) is added as exploratory because it best isolates the lifestyle effect from season/time; the paper uses this ANCOVA-type comparison only for selected genes. Estimand note: ILT combines energy restriction (17% weight loss) with exercise training, so effects are of lifestyle therapy, not exercise alone.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking (paired before/after within participant)"}]},
+          "confounding_candidates": ["subject"],
+          "reasoning": "Before and after biopsies come from the same participant, so participant is a blocking factor (paired design; paper uses paired t-tests for within-group changes, S4.4.p1). No batch or sex column in GEO; sex (1 man in ILT) is constant within subject and absorbed by the subject block.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) with subject blocking, on deposited log2 CPM",
+            "formula": "~ C(subject) + Treatment (Treatment = post vs pre)",
+            "paper_route": {"method": "edgeR on featureCounts gene counts", "status": "blocked", "reason": "raw counts not deposited; only moderated log2 CPM available, and library sizes are not provided to back-calculate counts"},
+            "deviations": [
+              "limma on log2 CPM instead of edgeR on counts",
+              "low-expression filter log2CPM >= 0 (about CPM >= 1) in at least as many samples as the smaller time group of the execution, a standard edgeR/limma step the paper does not describe",
+              "duplicated gene symbols (121 extra rows) collapsed by the executor to the highest-mean row",
+              "pairing by subject explicitly modelled; paper's edgeR pairing unstated"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Matrix and method policy: log-scale CPM goes to limma. Paired design ~ subject + time within each arm/tissue subset.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "paper rule (FDR<0.05 and log2|FC|>0.3) applied unchanged to limma BH-adjusted p and limma log2 fold change"
+          },
+          "reasoning": "S4.4.p1: 'log2 |fold change| > 0.3 and FDR < 0.05'.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Exercise is confounded with dietary energy restriction and ~17% weight loss in ILT; results describe lifestyle therapy, not exercise alone.",
+              "Paper used edgeR on counts; this run uses limma on deposited log2 CPM, so DEG counts are not expected to match exactly.",
+              "Within-arm before/after changes are not randomized comparisons; the arm x time exploratory contrast is the randomized estimand but has low power (6 vs 8 subjects)."
+            ]
+          },
+          "paper_counts": {"muscle_ILT_post_vs_pre": 1540, "muscle_SC_post_vs_pre": 65},
+          "paper_genes": {
+            "muscle_ILT_post_vs_pre": ["NAMPT", "SIRT3", "PPARGC1A", "MT-ND1", "MT-ND5", "SOD2", "COX4I1", "CS", "CYCS", "VEGFA"],
+            "fat_ILT_post_vs_pre": ["SPARC", "LOX", "LOXL1", "TNMD", "PDGFA", "SEMA3C", "IL6", "TNF", "CCL2", "CCL5", "CD68", "CD74"]
+          },
+          "reasoning": "Paper-defined contrasts reproduced on a declared deviation route (limma on log2 CPM).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "input matrix", "paper": "edgeR on featureCounts counts", "data": "only moderated log2 CPM deposited", "disposition": "declared_deviation: limma on log2 CPM"},
+        {"item": "low-expression filtering", "paper": "not described", "data": "34,259 genes incl. many unexpressed", "disposition": "declared_deviation: log2CPM >= 0 in >= n_smaller_group samples per execution"},
+        {"item": "duplicated symbols", "paper": "not described", "data": "121 repeated gene symbols", "disposition": "executable_without_change: executor keeps highest-mean row"}
+      ],
+      "executions": [
+        {"name": "muscle_ILT_post_vs_pre", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject"},
+         "subset": {"tissue": ["muscle"], "arm": ["ILT"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "filter_low_counts": {"min_value": 0, "min_samples": 8},
+         "role": "primary", "reasoning": "paper's primary muscle ILT after-vs-before contrast, paired by participant (8 pairs)"},
+        {"name": "muscle_SC_post_vs_pre", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject"},
+         "subset": {"tissue": ["muscle"], "arm": ["SC"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "filter_low_counts": {"min_value": 0, "min_samples": 6},
+         "role": "secondary", "reasoning": "paper's muscle SC after-vs-before contrast (6 pairs)"},
+        {"name": "fat_ILT_post_vs_pre", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject"},
+         "subset": {"tissue": ["fat"], "arm": ["ILT"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "filter_low_counts": {"min_value": 0, "min_samples": 10},
+         "role": "secondary", "reasoning": "adipose ILT after vs before (10 pairs); paper reports selected genes only"},
+        {"name": "fat_SC_post_vs_pre", "tool": "tools.limma_tools:run_limma_analysis",
+         "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": "subject"},
+         "subset": {"tissue": ["fat"], "arm": ["SC"]},
+         "complete_pairs": {"subject": "subject", "condition": "time", "levels": ["pre", "post"]},
+         "filter_low_counts": {"min_value": 0, "min_samples": 7},
+         "role": "secondary", "reasoning": "adipose SC after vs before (7 pairs)"},
+        {"name": "muscle_change_ILT_vs_SC", "tool": "tools.multigroup_tools:run_multigroup_analysis",
+         "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "time",
+                           "baseline_level": "pre", "followup_levels": ["post"], "group_column": "arm",
+                           "formula": "~ C(arm, Treatment('SC'))",
+                           "contrasts": [{"name": "ILT_vs_SC_change", "coefficients": {"C(arm, Treatment('SC'))[T.ILT]": 1}}]}},
+         "subset": {"tissue": ["muscle"]},
+         "filter_low_counts": {"min_value": 0, "min_samples": 12},
+         "role": "exploratory", "reasoning": "randomized arm x time estimand: per-subject change (post - pre) compared between ILT (8) and SC (6)"}
+      ],
+      "enrichment": [
+        {"execution": "muscle_ILT_post_vs_pre", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat",
+         "reasoning": "paper reports IPA pathways on ILT muscle DEGs (FIG3B); ORA (GO/KEGG) and Hallmark GSEA are a substitute (IPA not available)"}
+      ]
+    }
+  ]
+}

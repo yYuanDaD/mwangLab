@@ -1,0 +1,498 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35813950",
+ "request": "Analyze GSE205907 for PMID 35813950 (Transcriptional Profiling Reveals Brain Region-Specific Gene Networks Regulated in Exercise in a Mouse Model of Parkinson's Disease.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (Claude Code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE205907",
+   "accession": "GSE205907",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261027/papers/PMC9260255.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35813950/prep/GSE205907_sample_sheet.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35813950/prep/GSE205907_fpkm_clean.csv",
+    "raw_tar": false,
+    "prep_scripts": [
+     "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35813950/prep_GSE205907.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE205907"
+      ],
+      "assay": "bulk RNA-seq (Illumina NextSeq 500), mouse brain; 4 regions (cerebellum, cortex, SN, striatum)",
+      "organism": "Mouse (C57BL/6J, female) (S2.1.p1)",
+      "factors": {
+       "group": [
+        "Saline",
+        "MPTP",
+        "MPTP+EX"
+       ],
+       "region": [
+        "cerebellum",
+        "cortex",
+        "SN",
+        "striatum"
+       ]
+      },
+      "sample_inclusion": "n=4 animals per group for RNA-seq; all 4 regions dissected from each animal (S2.5.p1); a separate cohort of 5/group was used for histology only",
+      "primary_estimand": "Effect of 12-week treadmill exercise in MPTP-induced PD mice: MPTP+EX vs MPTP, within each brain region (S3.2.p1, S3.3.p1, FIG3)",
+      "planned_contrasts": [
+       "MPTP+EX vs MPTP per region (exercise effect in PD; S3.2.p1, FIG2B/D)",
+       "MPTP vs Saline per region (PD model effect; S3.2.p1, FIG2A/D)",
+       "Reversal sets in SN and striatum: genes significant in both contrasts with opposite direction (S3.3.p1, FIG3A/D): SN 155 down / 66 up after exercise; striatum 49 down / 185 up"
+      ],
+      "repeated_measure_unit": "animal (4 regions per animal); regions analyzed separately so each animal appears once per fit",
+      "normalization": "Tophat2 + Cufflinks/Cuffquant FPKM, RSEM (S2.7.p1)",
+      "paper_method": "DESeq (v1.14.0), per region; DEG if FPKM > 1 and p < 0.05 (S2.7.p1)",
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "expression_filter": "FPKM > 1",
+       "source_locator": "S2.7.p1; FIG3 legend"
+      },
+      "paper_results": {
+       "SN_reversal_after_exercise": {
+        "down": 155,
+        "up": 66
+       },
+       "striatum_reversal_after_exercise": {
+        "down": 49,
+        "up": 185
+       },
+       "named_genes": {
+        "SN": [
+         "Neurod2",
+         "Rtn4rl2",
+         "Cd5"
+        ],
+        "striatum": [
+         "Bmp5",
+         "Nr4a2",
+         "Ntn5"
+        ]
+       }
+      }
+     },
+     "reasoning": "S2.5.p1 gives n=4 per group for RNA-seq across 4 regions; S2.7.p1 gives the method (DESeq) and DEG rule (FPKM>1, p<0.05, raw p, no fold-change cutoff). S3.2.p1 and FIG2 compare MPTP vs saline and MPTP+EX vs MPTP per region. S3.3.p1/FIG3 report counts only for reversal sets (opposite direction in the two contrasts), not per-contrast DEG totals; per-contrast totals are only in FIG2D Venn diagrams, not in the text.",
+     "locator": "S2.7.p1",
+     "confidence": "high"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S6.p1 names GSE205907",
+       "GEO series: 48 samples = 3 treatments x 4 regions x 4 reps, matching S2.5.p1",
+       "matrix GSE205907_fpkm has 48 columns encoding the same 3 groups x 4 regions x 4 animals",
+       "tissue markers match region labels (Pcp2/Gabra6 cerebellum, Satb2/Neurod6 cortex, Th/Slc6a3 SN, Ppp1r1b/Penk striatum)",
+       "Th/Slc6a3 in SN ~4-7x lower in E and M animals than S animals, consistent with MPTP lesion (S3.5.p1: ~70% TH+ loss)",
+       "Xist expressed and no Y-linked genes in every sample: all female as in S2.1.p1"
+      ]
+     },
+     "reasoning": "Only supplementary file of the series; the paper's data availability statement names GSE205907. Marker genes corroborate region and lesion labels.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": null,
+     "aliases": {},
+     "patterns": {},
+     "recode": {},
+     "exclude_samples": {},
+     "reasoning": "The deposited matrix columns (E26Nigra, M6Stria, S1Cortex, ...) carry animal ID, group and region, while GEO titles carry only '<region>,<treatment>,rep<k>'; no field links animal IDs to rep numbers or GSM IDs except column order, and positional alignment is not allowed. The metadata is therefore a sample sheet derived deterministically from the matrix column names by prep_GSE205907.py (prefix E=MPTP+exercise, M=MPTP, S=Saline; suffix = region), exact-matched on the index. The derived group x region table equals the GEO treatment x tissue table (4 per cell), S=Saline is corroborated by preserved nigral Th/Slc6a3, and E/M are the two MPTP-lesioned groups; E vs M decoding rests on the letters (Exercise, MPTP). GSM IDs are not attached to samples (not needed for the estimand).",
+     "confidence": "medium",
+     "candidates": [
+      {
+       "value": "GEO metadata with key from title",
+       "reason_rejected": "titles hold rep numbers, matrix holds animal IDs; mapping rep k to an animal ID would be positional"
+      }
+     ]
+    },
+    "matrix": {
+     "matrix_type": "FPKM",
+     "recommended_method": "limma",
+     "final": {
+      "source": "GSE205907_fpkm.csv (file name 'fpkm')",
+      "paper_input": "FPKM from Cuffquant/RSEM (S2.7.p1)"
+     },
+     "reasoning": "Values are non-integer (only zeros are integral; 2.4e-6 of non-zero values are integers), column sums 345k-621k (not library sizes, typical of FPKM), the file name says fpkm and the paper says FPKM. GEO data_processing mentions HTSeq counts, but the deposited values are not counts. Linear normalized scale -> log2(x+1) and limma. 27 gene IDs mangled by Excel into dates were dropped (prep script).",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "grp"
+     ],
+     "references": {
+      "grp": "MPTP"
+     },
+     "subject": null,
+     "organism": "Mouse",
+     "strata": [
+      "tissue"
+     ],
+     "planned": [
+      "grp_EX_vs_MPTP_tissue-Cereb",
+      "grp_MPTP_vs_SAL_tissue-Cereb",
+      "grp_EX_vs_MPTP_tissue-Cortex",
+      "grp_MPTP_vs_SAL_tissue-Cortex",
+      "grp_EX_vs_MPTP_tissue-Nigra",
+      "grp_MPTP_vs_SAL_tissue-Nigra",
+      "grp_EX_vs_MPTP_tissue-Stria",
+      "grp_MPTP_vs_SAL_tissue-Stria"
+     ],
+     "covariate_candidates": [],
+     "final": {
+      "analysis_type": "multi-group per stratum",
+      "design_column": "grp",
+      "formula": "~ 0 + grp (within each region)",
+      "contrasts": [
+       {
+        "name": "grp_EX_vs_MPTP_tissue-Cereb",
+        "control": "MPTP",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "grp_EX_vs_MPTP_tissue-Cortex",
+        "control": "MPTP",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "grp_EX_vs_MPTP_tissue-Nigra",
+        "control": "MPTP",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "grp_EX_vs_MPTP_tissue-Stria",
+        "control": "MPTP",
+        "treatment": "EX",
+        "role": "primary"
+       },
+       {
+        "name": "grp_MPTP_vs_SAL_tissue-Cereb",
+        "control": "SAL",
+        "treatment": "MPTP",
+        "role": "secondary"
+       },
+       {
+        "name": "grp_MPTP_vs_SAL_tissue-Cortex",
+        "control": "SAL",
+        "treatment": "MPTP",
+        "role": "secondary"
+       },
+       {
+        "name": "grp_MPTP_vs_SAL_tissue-Nigra",
+        "control": "SAL",
+        "treatment": "MPTP",
+        "role": "secondary"
+       },
+       {
+        "name": "grp_MPTP_vs_SAL_tissue-Stria",
+        "control": "SAL",
+        "treatment": "MPTP",
+        "role": "secondary"
+       },
+       {
+        "name": "grp_EX_vs_SAL_tissue-Cereb",
+        "control": "SAL",
+        "treatment": "EX",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_EX_vs_SAL_tissue-Cortex",
+        "control": "SAL",
+        "treatment": "EX",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_EX_vs_SAL_tissue-Nigra",
+        "control": "SAL",
+        "treatment": "EX",
+        "role": "exploratory"
+       },
+       {
+        "name": "grp_EX_vs_SAL_tissue-Stria",
+        "control": "SAL",
+        "treatment": "EX",
+        "role": "exploratory"
+       }
+      ]
+     },
+     "reasoning": "Three-level group factor (Saline, MPTP, MPTP+EX), analyzed separately in each region as in the paper (S3.2.p1). One limma model per region with planned contrasts, no pooled levels. Exercise estimand = MPTP+EX vs MPTP (the paper has no healthy exercised arm, so this is exercise within PD only). MPTP vs Saline is needed for the paper's reversal sets. EX vs SAL is exploratory. Regions are strata; comparisons never cross them.",
+     "confidence": "high",
+     "candidates": [
+      {
+       "value": "one model over all 48 samples with animal blocking",
+       "reason_rejected": "paper analyzes each region separately; regions differ massively, so a shared variance model would not match the paper's estimand"
+      }
+     ]
+    },
+    "covariance": {
+     "final": {
+      "status": "not_required",
+      "blocking_terms": [],
+      "covariates": []
+     },
+     "confounding_candidates": null,
+     "reasoning": "Within a region each animal contributes one sample, so animals are independent units; no batch, sex (all female) or other covariate is recorded. The 4-regions-per-animal structure is not relevant to per-region fits.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "limma (limma-trend on log2(FPKM+1))",
+      "formula": "~ 0 + grp",
+      "paper_route": {
+       "method": "DESeq (v1.14.0) negative binomial",
+       "status": "blocked",
+       "reason": "only FPKM was deposited; DESeq needs raw counts (GEO data_processing mentions HTSeq counts but they are not deposited)"
+      },
+      "deviations": [
+       "limma on log2(FPKM+1) instead of DESeq on counts",
+       "FPKM>1 filter interpreted as FPKM>=1 in >=4 of the 12 region samples",
+       "27 Excel-mangled gene IDs (Marchf/Septin) dropped"
+      ]
+     },
+     "transform": "log2(x+1)",
+     "reasoning": "Matrix-method policy: linear FPKM -> log2(x+1) -> limma. Paper's DESeq route cannot run on FPKM; declared deviation.",
+     "confidence": "high"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "threshold_source": "paper_on_deviation_route",
+      "applied_threshold": {
+       "metric": "pvalue",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "audit_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "deviation_note": "paper rule (raw p < 0.05, no fold-change cutoff, FPKM > 1 expression filter) applied to limma p-values; BH FDR < 0.05 reported as audit"
+     },
+     "reasoning": "S2.7.p1: 'DEGs which FPKM > 1 and p < 0.05'; FIG3 legend repeats FPKM > 1, P < 0.05. Raw p, no fold-change rule.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "declared_deviation",
+      "caveats": [
+       "Paper reports reversal-set sizes (SN 155 down/66 up, striatum 49 down/185 up after exercise), not per-contrast DEG totals; these are compared from a post-hoc overlap of our MPTP vs SAL and EX vs MPTP tables (reversal_sets.csv), not by the runner.",
+       "Exercise effect is estimated only within MPTP-lesioned mice (no healthy exercise arm).",
+       "n=4 per group; raw p<0.05 without multiplicity control yields many expected false positives (~5% of tested genes).",
+       "Sample-to-GSM mapping not established non-positionally; group labels decoded from matrix column names."
+      ]
+     },
+     "paper_counts": {},
+     "paper_genes": {
+      "limma_Nigra/grp_EX_vs_MPTP_tissue-Nigra": [
+       "Neurod2",
+       "Rtn4rl2",
+       "Cd5"
+      ],
+      "limma_Stria/grp_EX_vs_MPTP_tissue-Stria": [
+       "Bmp5",
+       "Nr4a2",
+       "Ntn5"
+      ]
+     },
+     "reasoning": "Paper's DESeq route blocked (FPKM only); limma deviation runs with the paper threshold."
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "quantification",
+     "paper": "Tophat2 + Cufflinks FPKM / RSEM (S2.7.p1)",
+     "data": "GEO data_processing: hisat2 + HTSeq counts on mm9; deposited file is FPKM",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "DE method",
+     "paper": "DESeq v1.14 (S2.7.p1)",
+     "data": "no counts deposited",
+     "disposition": "declared_deviation"
+    },
+    {
+     "item": "sample IDs",
+     "paper": "n=4 per group",
+     "data": "matrix uses animal IDs (E26-29, M6/16/21/23, S1-4); GEO uses rep1-4; no explicit link",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "reported counts",
+     "paper": "only reversal-set sizes in the text",
+     "data": "per-contrast tables produced",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "limma_Cereb",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "grp_EX_vs_MPTP_tissue-Cereb",
+       "grp_MPTP_vs_SAL_tissue-Cereb",
+       "grp_EX_vs_SAL_tissue-Cereb"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "Cereb"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 4
+     },
+     "role": "primary",
+     "reasoning": "Per-region fit (cerebellum) as in the paper (S2.7.p1, S3.2.p1: DEGs per brain region). One limma model on the 12 cerebellum samples (~0+grp); planned EX vs MPTP (exercise effect in PD model, primary) and MPTP vs SAL (PD model effect, needed for the paper's reversal sets); EX vs SAL is an extra exploratory comparison. FPKM>1 expression filter from S2.7.p1 applied as FPKM>=1 in >=4 of the 12 samples (one group's worth)."
+    },
+    {
+     "name": "limma_Cortex",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "grp_EX_vs_MPTP_tissue-Cortex",
+       "grp_MPTP_vs_SAL_tissue-Cortex",
+       "grp_EX_vs_SAL_tissue-Cortex"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "Cortex"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 4
+     },
+     "role": "primary",
+     "reasoning": "Per-region fit (cortex) as in the paper (S2.7.p1, S3.2.p1: DEGs per brain region). One limma model on the 12 cortex samples (~0+grp); planned EX vs MPTP (exercise effect in PD model, primary) and MPTP vs SAL (PD model effect, needed for the paper's reversal sets); EX vs SAL is an extra exploratory comparison. FPKM>1 expression filter from S2.7.p1 applied as FPKM>=1 in >=4 of the 12 samples (one group's worth)."
+    },
+    {
+     "name": "limma_Nigra",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "grp_EX_vs_MPTP_tissue-Nigra",
+       "grp_MPTP_vs_SAL_tissue-Nigra",
+       "grp_EX_vs_SAL_tissue-Nigra"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "Nigra"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 4
+     },
+     "role": "primary",
+     "reasoning": "Per-region fit (SN) as in the paper (S2.7.p1, S3.2.p1: DEGs per brain region). One limma model on the 12 SN samples (~0+grp); planned EX vs MPTP (exercise effect in PD model, primary) and MPTP vs SAL (PD model effect, needed for the paper's reversal sets); EX vs SAL is an extra exploratory comparison. FPKM>1 expression filter from S2.7.p1 applied as FPKM>=1 in >=4 of the 12 samples (one group's worth)."
+    },
+    {
+     "name": "limma_Stria",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "grp_EX_vs_MPTP_tissue-Stria",
+       "grp_MPTP_vs_SAL_tissue-Stria",
+       "grp_EX_vs_SAL_tissue-Stria"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "Stria"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 4
+     },
+     "role": "primary",
+     "reasoning": "Per-region fit (striatum) as in the paper (S2.7.p1, S3.2.p1: DEGs per brain region). One limma model on the 12 striatum samples (~0+grp); planned EX vs MPTP (exercise effect in PD model, primary) and MPTP vs SAL (PD model effect, needed for the paper's reversal sets); EX vs SAL is an extra exploratory comparison. FPKM>1 expression filter from S2.7.p1 applied as FPKM>=1 in >=4 of the 12 samples (one group's worth)."
+    },
+    {
+     "name": "limma_Stria_noE29",
+     "tool": "tools.joint_contrasts:run_joint_limma",
+     "args": {
+      "comparisons": [
+       "grp_EX_vs_MPTP_tissue-Stria",
+       "grp_MPTP_vs_SAL_tissue-Stria"
+      ],
+      "covariates": []
+     },
+     "subset": {
+      "tissue": [
+       "Stria"
+      ],
+      "animal": [
+       "E26",
+       "E27",
+       "E28",
+       "M16",
+       "M21",
+       "M23",
+       "M6",
+       "S1",
+       "S2",
+       "S3",
+       "S4"
+      ]
+     },
+     "filter_low_counts": {
+      "min_value": 1,
+      "min_samples": 4
+     },
+     "role": "sensitivity",
+     "reasoning": "Sensitivity only: E29Stria is a sample-level outlier (mean log2 correlation with the other striatum samples 0.83 vs 0.97 for every other sample; FPKM column sum 621k vs 345-400k; Xist 12 vs 62-80). The paper gives no exclusion, so the primary striatum fit keeps it; this refit drops it (EX n=3)."
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "limma_Nigra/grp_EX_vs_MPTP_tissue-Nigra",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Paper reports GO/KEGG pathways (DAVID) for exercise-affected genes in SN and striatum (S3.3.p1)."
+    },
+    {
+     "execution": "limma_Stria/grp_EX_vs_MPTP_tissue-Stria",
+     "ora": true,
+     "gsea": true,
+     "direction": "all",
+     "ranking_metric": "stat",
+     "reasoning": "Paper reports GO/KEGG pathways (DAVID) for exercise-affected genes in SN and striatum (S3.3.p1)."
+    }
+   ]
+  }
+ ]
+}

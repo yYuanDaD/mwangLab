@@ -1,0 +1,89 @@
+{
+ "case": "GSE233004",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. Exercise vs sedentary mice, LV bulk RNA-seq; all 12 samples carry the factor (6 EX, 6 SED; S1.7.p1, GEO treatment field).",
+  "B2": "Within each sex, exercised vs sedentary, 3 vs 3 (Fig 6B: males 22 DEGs, females 1 DEG, S2.5.p2). Sex comparisons within Sed (896) and EX (174) are Fig 7, not exercise.",
+  "B3": "None for RNA-seq: one LV per mouse, 3+3 per sex (S1.7.p1). Longitudinal echo/ECG measures are repeated but not sequenced. The 'description' column is a group label, no animal key; packet A lists no candidate keys.",
+  "B4": "Paper does not say whether sexes were fitted jointly or separately (S1.7.p1, S1.8.p3 only say DESeq2 Wald + BH).",
+  "B5": "S1.8.p3: 'Padj cutoff value was <0.05. Log2 fold change cutoff value of 2 was used for top genes and o [0] for volcano and KEGG plots.' Counts (S2.5.p2): males 22, females 1 (Ddx3y); Sed F vs M 896, EX F vs M 174. log2FC defined as Sed minus Exercised (S1.7.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run per B1; exercise arm present (6 EX/6 SED).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Packet B: EX 6/SED 6, 3 per sex per arm, matching S1.7.p1; control is same-sex SED; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Ours EX vs SED, paper Sed minus EX (S1.7.p1); recorded as discrepancy in packet B.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One heart per mouse (S1.7.p1); no pairing key in packet A; 'description' is a group label.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent (B4). Joint 4-group model chosen as primary because it matches the paper's 1/22 counts, separate fits kept as sensitivity (24/0). Both reported. Choice is partly justified by count agreement (open policy question).",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sex crossed 3/3 with treatment; no batch info in GEO or paper; recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer STAR/featureCounts counts, DESeq2 Wald; p-value histogram sane (frac_p_gt_0.9 about 0.19).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.05, no LFC cutoff for volcano counts (S1.8.p3); LFC>2 kept as labelled audit rule.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "F 1 vs 1 (Ddx3y), M 26 vs 22 compared on same contrast and rule; HANDBACK states the difference and the Mtmr14 padj NA.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Joint versus pairwise fit when the paper is silent: joint was selected because it reproduces the paper's counts; open policy question.",
+  "Male count 26 vs paper 22 not exactly reproduced (pydeseq2 vs R DESeq2); noted in the record."
+ ],
+ "summary": "该案例的分组、方向、阈值与论文一致，每个性别各3只运动对3只久坐，使用DESeq2 Wald加BH，padj<0.05。联合模型与分开拟合均已报告，女性1个DEG（Ddx3y）与论文一致，男性26个对论文22个。未发现需要修正的问题。"
+}

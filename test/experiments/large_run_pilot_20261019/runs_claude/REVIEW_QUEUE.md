@@ -383,3 +383,12 @@ One section per case; newest last.
 
 - policy: Joint 3-group limma vs the paper's pairwise fits when the paper is silent on joint modelling: open policy question.
 - policy: Which threshold to report when 900 limma DEGs vs paper 1562 (padj<0.1 gives 1456): open policy question; recorded as declared deviation.
+
+## PMID38686869 / GSE233004 (2026-11-24)
+
+- policy: Joint versus pairwise fit when the paper is silent: joint was selected because it reproduces the paper's counts; open policy question.
+- policy: Male count 26 vs paper 22 not exactly reproduced (pydeseq2 vs R DESeq2); noted in the record.
+
+## PMID36084645 / GSE205891 (2026-11-24)
+
+- policy: Which fit to treat as primary when the paper is silent on pairing (joint vs pairwise, paired vs unpaired) and counts differ (SC 0 vs 65).

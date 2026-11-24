@@ -827,3 +827,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID31589602 (GSE123879)
 
 - native.py:616 misses ISO-date-mangled IDs; inspect profiles headerless DE lists as matrices; SuperSeries inspect gives no SubSeries pointer Details: `PMID31589602/HANDBACK.md`.
+
+## PMID36084645 (GSE205891)
+
+- suitability.py:76-81 type matcher calls log2CPM ('prior count') counts and shows a DESeq2 route; leading zeros dropped from regex subject IDs (003->3) Details: `PMID36084645/HANDBACK.md`.
+
+## PMID38686869 (GSE233004)
+
+- deseq2_tools.py:164/172 n_cpus=8 joblib unpickle fail (transient, rerun ok); summary n_deg shows first table only; ORA 1-gene=failed vs 0-gene=not_run (enrichment_tools.py:250) Details: `PMID38686869/HANDBACK.md`.
+
+## PMID35813950 (GSE205907)
+
+- inspect misses 27 Excel date-mangled genes (native.py:284); runner can't count table overlaps (case_runner.py:969); no non-positional animal->GSM key Details: `PMID35813950/HANDBACK.md`.

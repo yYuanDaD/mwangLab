@@ -1,0 +1,254 @@
+{
+  "case_id": "GSE205891",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "log2 CPM (moderated, prior count; edgeR-style log-CPM)",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "log2 CPM (moderated, prior count; edgeR-style log-CPM)",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "pre": 31,
+          "post": 31
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 18,
+        "full_rank": true,
+        "residual_df": 44,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 4,
+      "n_analyzable": 4,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre_tissue-muscle_arm-ILT",
+        "time_post_vs_pre_tissue-muscle_arm-SC"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 62 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "female": 58,
+        "male": 4
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36084645\\GSE205891\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_post_vs_pre__sex-female"
+          ],
+          "male": []
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_post_vs_pre_tissue-fat_arm-ILT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "tissue": "fat",
+        "arm": "ILT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "fat",
+            "arm": "ILT",
+            "time": "post"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "fat",
+            "arm": "ILT",
+            "time": "pre"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_tissue-fat_arm-SC",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "tissue": "fat",
+        "arm": "SC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "fat",
+            "arm": "SC",
+            "time": "post"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tissue": "fat",
+            "arm": "SC",
+            "time": "pre"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_tissue-muscle_arm-ILT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "tissue": "muscle",
+        "arm": "ILT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "arm": "ILT",
+            "time": "post"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "arm": "ILT",
+            "time": "pre"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_pre_tissue-muscle_arm-SC",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {
+        "tissue": "muscle",
+        "arm": "SC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "arm": "SC",
+            "time": "post"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "arm": "SC",
+            "time": "pre"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

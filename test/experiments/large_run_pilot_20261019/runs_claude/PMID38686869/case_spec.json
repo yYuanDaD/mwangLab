@@ -1,0 +1,344 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38686869",
+  "request": "Analyze GSE233004 for PMID 38686869 (Moderate Endurance Exercise Increases Arrhythmia Susceptibility and Modulates Cardiac Structure and Function in a Sexually Dimorphic Manner.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Code session (claude-opus-5-5)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE233004",
+      "accession": "GSE233004",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC11179941.paper.md"
+        ],
+        "metadata": "GSE233004/GSE233004_metadata.csv",
+        "matrix": "GSE233004/GSE233004_countdata.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE233004"
+            ],
+            "assay": "bulk RNA-seq, mouse left ventricle (S1.7.p1)",
+            "organism": "Mouse (C57BL/6J, ABS.p2)",
+            "factors": {
+              "sex": [
+                "female",
+                "male"
+              ],
+              "treatment": [
+                "sedentary",
+                "exercised (treadmill 6 wk)"
+              ]
+            },
+            "sample_inclusion": "3 sedentary + 3 exercised LV per sex, n=12 (S1.7.p1, FIG6 legend)",
+            "primary_estimand": "Effect of 6-week moderate treadmill endurance exercise on LV gene expression, estimated separately within each sex (exercised vs sedentary)",
+            "planned_contrasts": [
+              "Female EX vs Female Sed (FIG6B/C; S2.5.p2: 1 DEG, Ddx3y up in EX)",
+              "Male EX vs Male Sed (FIG6B/D; S2.5.p2: 22 DEGs)",
+              "Female vs Male within Sed (FIG7; 896 DEGs) and within EX (174 DEGs) -- sex comparisons, not exercise estimands"
+            ],
+            "repeated_measure_unit": "none for RNA-seq (one heart per mouse)",
+            "normalization": "DESeq2 default size factors (S1.8.p3)",
+            "paper_method": "DESeq2 Wald test, BH-adjusted p (S1.8.p3), per-sex exercised vs sedentary comparison",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "source_locator": "S1.8.p3 (Padj < 0.05; log2FC cutoff 0 for volcano/KEGG; 2 only for top-gene plots); FIG6 legend"
+            },
+            "paper_results": {
+              "female_EX_vs_Sed": 1,
+              "male_EX_vs_Sed": 22,
+              "Sed_F_vs_M": 896,
+              "EX_F_vs_M": 174
+            },
+            "paper_direction_convention": "log2FC = Sedentary minus Exercised (S1.7.p1); positive = up in Sed. Our tables use EX vs SED (positive = up in EX)."
+          },
+          "reasoning": "Methods S1.7.p1 and S1.8.p3 define DESeq2 Wald + BH, padj<0.05; the DEG counts quoted in S2.5.p2 come from the volcano plots, whose log2FC cutoff is 0 (S1.8.p3). The exercise question is answered per sex in Figure 6; Figure 7 is sex-difference, not exercise.",
+          "confidence": "high",
+          "locator": "S1.7.p1; S1.8.p3; S2.5.p2; FIG6"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "Data availability S1.p1 names GSE233004",
+              "GEO: Mus musculus heart, bulk tissue, WT, Exercise/Sedentary, treadmill 1 km/h 45 min/day 5 d/wk 6 wk",
+              "12 samples = 3 per sex x treatment, matching S1.7.p1"
+            ]
+          },
+          "reasoning": "Paper S1.p1 cites GSE233004; series design and n match the methods.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {
+            "sex": [
+              "title",
+              "^([FM])(?:EX|SE)\\d+$"
+            ],
+            "trt": [
+              "title",
+              "^[FM](EX|SE)\\d+$"
+            ]
+          },
+          "recode": {
+            "trt": {
+              "EX": "EX",
+              "SE": "SED"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (FEX360...) equal metadata title exactly for 12/12. Sex and treatment are encoded in the title prefix and agree with the 'description' and 'treatment' characteristics.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer, 0..3.1e6, library sizes 22-33M; GEO data_processing: STAR + featureCounts hit counts (gene_id). The paper's input to DESeq2 is the same counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "trt"
+          ],
+          "references": {
+            "trt": "SED"
+          },
+          "strata": [
+            "sex"
+          ],
+          "organism": "Mouse",
+          "planned": [
+            "trt_EX_vs_SED_sex-F",
+            "trt_EX_vs_SED_sex-M"
+          ],
+          "final": {
+            "analysis_type": "one 4-group model (sex x treatment cells), per-sex EX vs SED contrasts",
+            "design_column": "trt",
+            "control": "SED",
+            "treatment": "EX",
+            "contrasts": [
+              {
+                "name": "trt_EX_vs_SED_sex-F",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              },
+              {
+                "name": "trt_EX_vs_SED_sex-M",
+                "control": "SED",
+                "treatment": "EX",
+                "role": "primary"
+              }
+            ],
+            "formula": "~ cell (cell = sex x trt)"
+          },
+          "candidates": [
+            {
+              "value": "separate DESeq2 fits per sex (6 samples each)",
+              "reason_rejected": "gives 24/0 DEGs (F/M) and loses Ddx3y in females, inconsistent with the paper's 1/22; kept as sensitivity"
+            },
+            {
+              "value": "pooled EX vs SED across sexes",
+              "reason_rejected": "paper reports exercise effects per sex (FIG6); pooled additive model kept only as exploratory"
+            },
+            {
+              "value": "Female vs Male within each treatment (FIG7)",
+              "reason_rejected": "sex-difference contrast, not an exercise estimand; outside the request"
+            }
+          ],
+          "reasoning": "Paper FIG6 compares exercised with sedentary mice within each sex (n=3 vs 3), using DESeq2 (S1.7.p1, S1.8.p3). The paper does not say whether each sex was fitted separately; the standard DESeq2 workflow for a 4-group study is one model on all 12 samples (~ group) with per-sex contrasts. A first attempt with separate per-sex fits gave 24 (F) / 0 (M) DEGs against the paper's 1 / 22, while one 4-group model gives 1 / 26 and reproduces Ddx3y as the only female DEG, so the joint 4-group model is taken as the paper's route and the separate fits are kept as sensitivity.",
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [
+              {
+                "name": "sex",
+                "disposition": "part of the 4-level cell factor; contrasts are within sex. Additive ~ sex + trt only in the exploratory pooled model"
+              }
+            ]
+          },
+          "confounding_candidates": [
+            "sex"
+          ],
+          "reasoning": "Independent animals, one LV each; no batch, lane or date recorded in GEO or the paper. Sex is balanced with treatment (3/3 in each sex), so it is not confounded.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald, BH)",
+            "formula": "~ cell (cell = sex x trt; 4 levels), contrasts F/EX vs F/SED and M/EX vs M/SED",
+            "paper_route": {
+              "method": "DESeq2 Wald + BH",
+              "status": "reproduced"
+            },
+            "deviations": [
+              "pydeseq2 rather than R DESeq2; independent filtering/Cook's outlier handling may differ slightly",
+              "paper does not state the fit layout; one 4-group model chosen (matches the paper's counts), separate per-sex fits run as sensitivity"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw featureCounts counts support the paper's DESeq2 route directly.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 2.0,
+              "inclusive": false
+            }
+          },
+          "reasoning": "S1.8.p3: Padj < 0.05, log2FC cutoff 0 for volcano/KEGG (the DEG counts). The |log2FC| > 2 rule applied only to the top-gene panels and is kept as a labelled audit rule.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Paper's log2FC sign is Sed minus EX; ours is EX minus Sed.",
+              "Ddx3y (Y-linked) reported up in exercised females; female samples carry low Ddx3y counts (FEX 14-26 vs FSE 0-5) while Xist is uniformly high in females, so this looks like low-level male-read contamination or cross-mapping, not a sex mislabel."
+            ]
+          },
+          "paper_counts": {
+            "joint4/trt_EX_vs_SED_sex-F": 1,
+            "joint4/trt_EX_vs_SED_sex-M": 22
+          },
+          "paper_genes": {
+            "joint4/trt_EX_vs_SED_sex-F": [
+              "Ddx3y"
+            ],
+            "joint4/trt_EX_vs_SED_sex-M": [
+              "Gpx1",
+              "Mtmr14",
+              "Mrps24",
+              "Klf2",
+              "Fth1"
+            ]
+          },
+          "reasoning": "Counts and named genes from S2.5.p2 and FIG6.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "log2FC direction",
+          "paper": "Sedentary minus Exercised (S1.7.p1)",
+          "data": "our tables report EX vs SED",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "Ddx3y in female samples",
+          "paper": "only DEG in females, up in EX; attributed to probe cross-reactivity (S2.5.p2)",
+          "data": "female Ddx3y counts 14-26 (EX) vs 0-5 (SED); males ~1700-2300; Xist high only in females",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "joint4",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {
+            "comparisons": "planned",
+            "alpha": 0.05
+          },
+          "role": "primary",
+          "reasoning": "Paper route: one DESeq2 model on all 12 samples with the 4-level sex x treatment group; per-sex EX vs SED contrasts (FIG6)."
+        },
+        {
+          "name": "sepfit_trt_EX_vs_SED_sex-F",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "trt",
+            "control_group": "SED",
+            "treatment_group": "EX",
+            "alpha": 0.05
+          },
+          "subset": {
+            "sex": [
+              "F"
+            ]
+          },
+          "role": "sensitivity",
+          "reasoning": "Sensitivity: separate DESeq2 fit on this sex's 6 samples (~ trt); dispersion from 6 samples only."
+        },
+        {
+          "name": "sepfit_trt_EX_vs_SED_sex-M",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "trt",
+            "control_group": "SED",
+            "treatment_group": "EX",
+            "alpha": 0.05
+          },
+          "subset": {
+            "sex": [
+              "M"
+            ]
+          },
+          "role": "sensitivity",
+          "reasoning": "Sensitivity: separate DESeq2 fit on this sex's 6 samples (~ trt); dispersion from 6 samples only."
+        },
+        {
+          "name": "trt_EX_vs_SED_pooled_sexadj",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "trt",
+            "control_group": "SED",
+            "treatment_group": "EX",
+            "covariate_columns": "sex",
+            "alpha": 0.05
+          },
+          "role": "exploratory",
+          "reasoning": "Not in the paper: pooled exercise main effect adjusted for sex (~ sex + trt), all 12 samples"
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "joint4/trt_EX_vs_SED_sex-F",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports KEGG pathways per sex (FIG6E/F)"
+        },
+        {
+          "execution": "joint4/trt_EX_vs_SED_sex-M",
+          "ora": true,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "paper reports KEGG pathways per sex (FIG6E/F); oxidative phosphorylation enriched"
+        }
+      ]
+    }
+  ]
+}

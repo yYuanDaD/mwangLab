@@ -1,0 +1,964 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38686869",
+  "subject_id": "GSE233004",
+  "created_at": "2026-11-17T18:02:37",
+  "finished_at": "2026-11-17T18:06:33",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC11179941.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC11179941.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-17T18:02:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "a0b91906ef614e42292375bca1241e9b49d08d5370eea790c310d4171258c0d5",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE233004_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE233004\\GSE233004_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-17T18:02:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "961d605a0ecd4e72ee5a04f281056aeac4deb10dddf08f6768fa8792f0c989da",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE233004_countdata.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE233004\\GSE233004_countdata.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-17T18:02:37",
+      "sha256": null,
+      "attributes": {
+        "sha256": "c6742be97562c66c8044c5c963c598dd78ea3ea54ab0d4f829bcc712e64742c5",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE233004"
+        ],
+        "assay": "bulk RNA-seq, mouse left ventricle (S1.7.p1)",
+        "organism": "Mouse (C57BL/6J, ABS.p2)",
+        "factors": {
+          "sex": [
+            "female",
+            "male"
+          ],
+          "treatment": [
+            "sedentary",
+            "exercised (treadmill 6 wk)"
+          ]
+        },
+        "sample_inclusion": "3 sedentary + 3 exercised LV per sex, n=12 (S1.7.p1, FIG6 legend)",
+        "primary_estimand": "Effect of 6-week moderate treadmill endurance exercise on LV gene expression, estimated separately within each sex (exercised vs sedentary)",
+        "planned_contrasts": [
+          "Female EX vs Female Sed (FIG6B/C; S2.5.p2: 1 DEG, Ddx3y up in EX)",
+          "Male EX vs Male Sed (FIG6B/D; S2.5.p2: 22 DEGs)",
+          "Female vs Male within Sed (FIG7; 896 DEGs) and within EX (174 DEGs) -- sex comparisons, not exercise estimands"
+        ],
+        "repeated_measure_unit": "none for RNA-seq (one heart per mouse)",
+        "normalization": "DESeq2 default size factors (S1.8.p3)",
+        "paper_method": "DESeq2 Wald test, BH-adjusted p (S1.8.p3), per-sex exercised vs sedentary comparison",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S1.8.p3 (Padj < 0.05; log2FC cutoff 0 for volcano/KEGG; 2 only for top-gene plots); FIG6 legend"
+        },
+        "paper_results": {
+          "female_EX_vs_Sed": 1,
+          "male_EX_vs_Sed": 22,
+          "Sed_F_vs_M": 896,
+          "EX_F_vs_M": 174
+        },
+        "paper_direction_convention": "log2FC = Sedentary minus Exercised (S1.7.p1); positive = up in Sed. Our tables use EX vs SED (positive = up in EX)."
+      },
+      "reason": "Methods S1.7.p1 and S1.8.p3 define DESeq2 Wald + BH, padj<0.05; the DEG counts quoted in S2.5.p2 come from the volcano plots, whose log2FC cutoff is 0 (S1.8.p3). The exercise question is answered per sex in Figure 6; Figure 7 is sex-difference, not exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:37"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE233004\\GSE233004_countdata.csv.gz",
+        "owned": true,
+        "checks": [
+          "Data availability S1.p1 names GSE233004",
+          "GEO: Mus musculus heart, bulk tissue, WT, Exercise/Sedentary, treadmill 1 km/h 45 min/day 5 d/wk 6 wk",
+          "12 samples = 3 per sex x treatment, matching S1.7.p1"
+        ],
+        "accession": "GSE233004",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE233004\\GSE233004_metadata.csv"
+      },
+      "reason": "Paper S1.p1 cites GSE233004; series design and n match the methods.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:37"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "sex": {
+              "source": "title",
+              "regex": "^([FM])(?:EX|SE)\\d+$"
+            },
+            "trt": {
+              "source": "title",
+              "regex": "^[FM](EX|SE)\\d+$",
+              "recode": {
+                "EX": "EX",
+                "SE": "SED"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\design_metadata.csv",
+          "sha256": "8323d421ff57dc6795135ecd4ad514eccb65a4e2e4f9bcccab7a2678b29f030a",
+          "levels": {
+            "sex": {
+              "F": 6,
+              "M": 6
+            },
+            "trt": {
+              "EX": 6,
+              "SED": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (FEX360...) equal metadata title exactly for 12/12. Sex and treatment are encoded in the title prefix and agree with the 'description' and 'treatment' characteristics.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:38"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\aligned_matrix.csv",
+          "sha256": "3ac275ad73d3f7fb3d48185e7e01008d2365cbd662249035ce74b0aa800a6ac1",
+          "n_features": 55401,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3095729.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integer, 0..3.1e6, library sizes 22-33M; GEO data_processing: STAR + featureCounts hit counts (gene_id). The paper's input to DESeq2 is the same counts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:38"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group within each sex stratum",
+        "design_column": "trt",
+        "control": "SED",
+        "treatment": "EX",
+        "contrasts": [
+          {
+            "name": "trt_EX_vs_SED_sex-F",
+            "control": "SED",
+            "treatment": "EX",
+            "role": "primary"
+          },
+          {
+            "name": "trt_EX_vs_SED_sex-M",
+            "control": "SED",
+            "treatment": "EX",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\suitability\\suitability.md",
+          "n_comparisons": 2,
+          "n_analyzable": 2
+        }
+      },
+      "reason": "Paper FIG6 compares exercised with sedentary mice of each sex separately (n=3 vs 3). Separate per-sex fits match 'determined for each group' (S1.7.p1). n=3 per arm meets the minimum.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:47"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "stratified (separate fits per sex); used as an additive covariate only in the exploratory pooled model"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(trt)",
+          "n_samples": 12,
+          "n_columns": 2,
+          "columns": [
+            "Intercept",
+            "trt_SED"
+          ],
+          "rank": 2,
+          "full_rank": true,
+          "residual_df": 10,
+          "levels": {
+            "trt": {
+              "EX": 6,
+              "SED": 6
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "EX"
+              ],
+              "n": 6
+            },
+            {
+              "cell": [
+                "SED"
+              ],
+              "n": 6
+            }
+          ],
+          "min_cell_size": 6,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "sex",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "EX": {
+                "F": 3,
+                "M": 3
+              },
+              "SED": {
+                "F": 3,
+                "M": 3
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Independent animals, one LV each; no batch, lane or date recorded in GEO or the paper. Sex is balanced with treatment (3/3 in each sex), so it is not confounded.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:47"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald, BH)",
+        "formula": "~ trt (within sex)",
+        "paper_route": {
+          "method": "DESeq2 Wald + BH",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 rather than R DESeq2; independent filtering/Cook's outlier handling may differ slightly",
+          "paper does not state whether the per-sex comparisons used separate fits or one model with a 4-level group; separate fits chosen"
+        ]
+      },
+      "reason": "Raw featureCounts counts support the paper's DESeq2 route directly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:47"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 2.0,
+          "inclusive": false
+        }
+      },
+      "reason": "S1.8.p3: Padj < 0.05, log2FC cutoff 0 for volcano/KEGG (the DEG counts). The |log2FC| > 2 rule applied only to the top-gene panels and is kept as a labelled audit rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:02:47"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "trt_EX_vs_SED_sex-F",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 6,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_sex-F\\input\\matrix.csv",
+        "execution_error": "NativeToolError: DESeq2 analysis failed. Error: A task has failed to un-serialize. Please ensure that the arguments of the function are all picklable."
+      },
+      "reason": "FIG6 female exercised vs sedentary, DESeq2 Wald, separate fit",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:03:09"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "trt_EX_vs_SED_sex-M",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 6,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_sex-M\\input\\matrix.csv",
+        "formula": "~ trt",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_sex-M\\DEG_results_EX_vs_SED.csv"
+        ],
+        "counts": {
+          "trt_EX_vs_SED_sex-M": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 29958,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 2",
+              "n_tested": 29958,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "FIG6 male exercised vs sedentary, DESeq2 Wald, separate fit",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:04:17"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint4",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\aligned_matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\joint4\\DEG_results_trt_EX_vs_SED_sex-F.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\joint4\\DEG_results_trt_EX_vs_SED_sex-M.csv"
+        ],
+        "counts": {
+          "joint4/trt_EX_vs_SED_sex-F": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 33215,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 2",
+              "n_tested": 33215,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint4/trt_EX_vs_SED_sex-M": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 4230,
+              "n_significant": 26,
+              "n_up": 14,
+              "n_down": 12,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 2",
+              "n_tested": 4230,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Alternative reading of the paper's DESeq2 setup: one model on all 12 samples with a 4-level sex x treatment group (~ cell), per-sex EX vs SED contrasts extracted from it with pooled dispersion. Separate per-sex fits gave 24 (F) / 0 (M) DEGs vs the paper's 1 / 22.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:04:43"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "trt_EX_vs_SED_pooled_sexadj",
+        "role": "exploratory",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\aligned_matrix.csv",
+        "formula": "~ sex + trt",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_pooled_sexadj\\DEG_results_EX_vs_SED.csv"
+        ],
+        "counts": {
+          "trt_EX_vs_SED_pooled_sexadj": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 33161,
+              "n_significant": 2,
+              "n_up": 2,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 2",
+              "n_tested": 33161,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Not in the paper: pooled exercise main effect adjusted for sex (~ sex + trt), all 12 samples",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:05:11"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_EX_vs_SED_sex-F",
+        "method": "ORA (Enrichr GO + KEGG)",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for trt_EX_vs_SED_sex-F"
+      },
+      "reason": "paper reports KEGG pathways per sex (FIG6E/F)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:05:11"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_EX_vs_SED_sex-F",
+        "method": "GSEA preranked",
+        "gene_sets": "not run",
+        "feature_id_type": "unknown",
+        "reason_not_run": "no completed result for trt_EX_vs_SED_sex-F"
+      },
+      "reason": "paper reports KEGG pathways per sex (FIG6E/F)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:05:11"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_EX_vs_SED_sex-M",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "reason_not_run": "no gene passes the ORA input threshold"
+      },
+      "reason": "paper reports KEGG pathways per sex (FIG6E/F); oxidative phosphorylation enriched",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_run",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:05:12"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_EX_vs_SED_sex-M",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\enrichment_trt_EX_vs_SED_sex-M\\gsea\\DEG_results_EX_vs_SED_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 29159 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 45 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=3.09 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_P53_PATHWAY | NES=2.51 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UV_RESPONSE_UP | NES=2.41 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.36 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=2.25 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.25 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.22 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL2_STAT5_SIGNALING | NES=2.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.11 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_WNT_BETA_CATENIN_SIGNALING | NES=2.11 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 3 DOWN (NES < 0, depleted in treatment): - HALLMARK_PROTEIN_SECRETION | NES=-1.26 | NOM p=8.10e-02 | FDR q=2.18e-01 - HALLMARK_MYOGENESIS | NES=-1.23 | NOM p=5.43e-02 | FDR q=1.42e-01 - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.21 | NOM p=1.07e-01 | FDR q=1.12e-01 Full results saved to: test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\enrichment_trt_EX_vs_SED_sex-M\\gsea\\DEG_results_EX_vs_SED_GSEA_Hallmark.csv"
+      },
+      "reason": "paper reports KEGG pathways per sex (FIG6E/F); oxidative phosphorylation enriched",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:06:33"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Paper's log2FC sign is Sed minus EX; ours is EX minus Sed.",
+          "Ddx3y (Y-linked) reported up in exercised females; female samples carry low Ddx3y counts (FEX 14-26 vs FSE 0-5) while Xist is uniformly high in females, so this looks like low-level male-read contamination or cross-mapping, not a sex mislabel."
+        ],
+        "results": {
+          "trt_EX_vs_SED_sex-M": {
+            "n_deg": 0,
+            "up": 0,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 0
+          },
+          "joint4/trt_EX_vs_SED_sex-F": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 1
+          },
+          "joint4/trt_EX_vs_SED_sex-M": {
+            "n_deg": 26,
+            "up": 14,
+            "down": 12,
+            "rule": "padj < 0.05",
+            "audit_n": 0
+          },
+          "trt_EX_vs_SED_pooled_sexadj": {
+            "n_deg": 2,
+            "up": 2,
+            "down": 0,
+            "rule": "padj < 0.05",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "trt_EX_vs_SED_sex-F": 1,
+          "trt_EX_vs_SED_sex-M": 22
+        },
+        "comparison": {
+          "trt_EX_vs_SED_sex-F": {
+            "ours": null,
+            "paper": 1
+          },
+          "trt_EX_vs_SED_sex-M": {
+            "ours": 0,
+            "paper": 22
+          }
+        },
+        "paper_gene_check": {
+          "trt_EX_vs_SED_sex-M": {
+            "Gpx1": {
+              "baseMean": 1174.7755,
+              "log2FoldChange": 0.3905,
+              "padj": 0.722,
+              "pvalue": 0.000747
+            },
+            "Mtmr14": {
+              "baseMean": 525.9825,
+              "log2FoldChange": 0.4387,
+              "padj": 0.638,
+              "pvalue": 0.000511
+            },
+            "Mrps24": {
+              "baseMean": 1411.0961,
+              "log2FoldChange": 0.534,
+              "padj": 0.392,
+              "pvalue": 0.000223
+            },
+            "Klf2": {
+              "baseMean": 4166.329,
+              "log2FoldChange": 0.7148,
+              "padj": 0.103,
+              "pvalue": 1.03e-05
+            },
+            "Fth1": {
+              "baseMean": 27328.2009,
+              "log2FoldChange": 0.2915,
+              "padj": 1.0,
+              "pvalue": 0.00146
+            }
+          }
+        }
+      },
+      "reason": "Counts and named genes from S2.5.p2 and FIG6.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-17T18:06:33"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "dd727b9ce5ad509bc399cedaef527ff6ea8655fb7059f86e0ebf9918401a7f2d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "646b34db5678b5c7b03be65bccf73246fd9b467ce3d899cc947375fc4c5d7878",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3ac275ad73d3f7fb3d48185e7e01008d2365cbd662249035ce74b0aa800a6ac1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8323d421ff57dc6795135ecd4ad514eccb65a4e2e4f9bcccab7a2678b29f030a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bdef0666375996c7e2e3f328c94495bd928876513870950777c4478147842b7c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a48add7f2e40aca60f911c71cfc86d55f45f81b102a8bf44e1051ac1e0613d1d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_sex-M\\DEG_results_EX_vs_SED.csv",
+      "role": "deg_trt_EX_vs_SED_sex-M",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2f98b8c477b77a037d1860671b7b94ca7d63c3b090a005574b0aacd0bc13c452",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\joint4\\DEG_results_trt_EX_vs_SED_sex-F.csv",
+      "role": "deg_joint4/trt_EX_vs_SED_sex-F",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "103e6fed0fcfa07718028ddd62465fc83ee96c02f67cef26250dad7c111fa29e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\joint4\\DEG_results_trt_EX_vs_SED_sex-M.csv",
+      "role": "deg_joint4/trt_EX_vs_SED_sex-M",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9aa753004c803eaff3eb40e8669c4485b5b28494bb9ac028eb5990db00011806",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\results\\trt_EX_vs_SED_pooled_sexadj\\DEG_results_EX_vs_SED.csv",
+      "role": "deg_trt_EX_vs_SED_pooled_sexadj",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3e5caf3d1790a776d615f0041f687be41a31f50910896d7e3f0de9f31f4b408e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38686869\\GSE233004\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b3bc336c9ea383a267f4732f1cc382e48cb6ce29b619175ea2395149fb65eba8",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
