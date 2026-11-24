@@ -499,3 +499,8 @@ One section per case; newest last.
 ## PMID28066330 / GSE87748 (2026-11-24)
 
 - policy: Open policy: paper-stated vs author-table-inferred threshold; paper count 165 not reproduced by paired fit (418), likely unpaired or different filter.
+
+## PMID29123172 / GSE99963 (2026-11-24)
+
+- policy: DEG counts are well above the paper's (4256 vs 2617, 1487 vs 412) with a declared approximate gene filter; whether to re-run with a stricter filter / robust=FALSE as a sensitivity analysis is an open policy question, not an error.
+- policy: The Ex-HFD Post vs Pre contrast mixes HFD and exercise; the exercise-specific test (interaction) found only 2 genes. The paper's own estimand is the within-group comparison, so the primary is consistent with it.

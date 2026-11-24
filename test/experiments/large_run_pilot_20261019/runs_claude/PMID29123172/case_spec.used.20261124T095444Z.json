@@ -1,0 +1,191 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID29123172",
+  "request": "Analyze GSE99963 for PMID 29123172 (Transcriptomic and epigenetic responses to short-term nutrient-exercise stress in humans.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE99963",
+      "accession": "GSE99963",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC5680174.paper.md"],
+        "metadata": "GSE99963/GSE99963_metadata.csv",
+        "matrix": "GSE99963/GSE99963_GeneCoverage.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE99965 (SuperSeries, S2.5.p1)", "GSE99963 (RNA-seq SubSeries)"],
+            "assay": "total RNA-seq (Ribo-Zero), vastus lateralis biopsies, HiSeq 2500 SE100",
+            "factors": {"group": ["Sed-HFD", "Ex-HFD"], "time": ["Pre", "Post"]},
+            "sample_inclusion": "13 sedentary middle-aged men: Ex-HFD n=7, Sed-HFD n=6 (TAB1); biopsy Pre and Post 9-day HFD (S2.1.p1)",
+            "repeated_measure_unit": "subject (Pre and Post biopsy per subject)",
+            "primary_estimand": "Within-group Post vs Pre change in muscle gene expression in Ex-HFD (HFD + 3 resistance-exercise bouts), compared with the Post vs Pre change in Sed-HFD (HFD alone); exercise effect inferred from the two lists (S3.1.p1-p2)",
+            "planned_contrasts": [
+              "Ex-HFD Post vs Pre, paired by subject (S2.6.p1, S3.1.p1; paper: 2617 DEGs, 1561 up / 1056 down)",
+              "Sed-HFD Post vs Pre, paired by subject (S2.6.p1, S3.1.p1; paper: 412 DEGs, 264 up / 148 down)"
+            ],
+            "normalization": "featureCounts gene coverage; filter rpkm > 0.1 in >= 5 samples (23,373 genes kept) (S2.6.p1, S2.3.p1)",
+            "paper_method": "edgeR glmQLFit/glmQLFTest, y ~ Timepoint + Subject fitted separately in each group (S2.6.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.6.p1"},
+            "paper_results": "Sed-HFD 412 DEGs; Ex-HFD 2617 DEGs; overlap 240 up / 103 down; CHAC1 up in Ex, down in Sed; ANGPTL4 changed only in Ex (Fig5I); Table 2 Sed-only genes SLPI, IRAK2, NUPR1 up, FGF6, MDH1 down"
+          },
+          "reasoning": "S2.1.p1 parallel-group pre/post design; S2.6.p1 gives exact model (edgeR QL, ~Timepoint+Subject per group) and FDR<0.1; S3.1.p1 gives counts. The paper never fits a group x time interaction; the exercise effect is read off the contrast between within-group lists.",
+          "locator": "S2.6.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GSE99963 is a SubSeries of GSE99965 named in S2.5.p1 (metadata series_id GSE99963,GSE99965)", "Homo sapiens muscle, Sed-HFD/Ex-HFD x Pre/Post labels match S2.1.p1", "data_processing: Rsubread + featureCounts + edgeR, matching S2.6.p1"]},
+          "reasoning": "Accession, groups, tissue and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"subject": "characteristics_ch1.0.subject id"},
+          "patterns": {"time": ["title", "^(Pre|Post)_S\\d+$"], "grp": ["characteristics_ch1.1.group", "^(Sedentary|Exercise);"]},
+          "recode": {"grp": {"Sedentary": "Sed", "Exercise": "Ex"}, "ex_post": {"Ex_Post": "1", "Ex_Pre": "0", "Sed_Post": "0", "Sed_Pre": "0"}},
+          "combine": {"ex_post": ["grp", "time"]},
+          "exclude_samples": {
+            "GSM2666603": "Pre_S3: library of 102,811 assigned reads (median ~7.9M; S2.3.p1 reports ~8.5M/sample) - failed library; the paper's Sed-HFD n=6 (TAB1) vs 7 deposited subjects implies one Sed subject was dropped, and S3 is the only failed one",
+            "GSM2666610": "Post_S3: its Pre partner is excluded, so subject S3 contributes nothing to a within-subject Post vs Pre estimate; dropped to match the paper's 13 subjects"
+          },
+          "reasoning": "Matrix columns equal metadata title (28/28). time from title prefix, grp from group characteristic, subject from subject id (each subject has Pre and Post). Subject S3 removed (see exclude_samples).",
+          "confidence": "medium"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "reasoning": "integer_fraction 1.0, max 7.06e6, column sums 3-19M (one 0.1M) consistent with per-gene read counts; file GeneCoverage, data_processing 'gene read coverages were computed with featureCounts'; paper uses edgeR on these counts (S2.6.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp", "time"],
+          "references": {"grp": "Sed", "time": "Pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_Post_vs_Pre_grp-Ex", "time_Post_vs_Pre_grp-Sed"],
+          "strata": ["grp"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "repeated measures, two parallel groups: paired Post vs Pre within each group (paper route) plus exploratory group x time interaction",
+            "formula": "~ subject + time (within each grp)",
+            "contrasts": [
+              {"name": "Ex_Post_vs_Pre", "control": "Pre", "treatment": "Post", "role": "primary"},
+              {"name": "Sed_Post_vs_Pre", "control": "Pre", "treatment": "Post", "role": "secondary"},
+              {"name": "ExVsSed_change_interaction", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "Ex-HFD Post vs Sed-HFD Post (cross-sectional)", "reason_rejected": "ignores baseline and pairing; paper does not do it and S3.1.p1 PCA shows no group separation"}
+          ],
+          "reasoning": "Paper analyses each group's Post vs Pre with subject blocking (S2.6.p1). The Ex-HFD change mixes HFD and exercise; the exercise-specific effect is the difference in change (interaction), which the paper approximates by comparing lists (S3.1.p2). Interaction run as exploratory since the paper did not test it. grp is treated as a stratum for the paper-route paired contrasts.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": []
+          },
+          "confounding_candidates": null,
+          "reasoning": "Pre and Post biopsies from the same man: subject as a fixed blocking effect, as in the paper (y ~ Timepoint + Subject). No batch column in GEO; no other covariates added.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "edgeR QL F-test (R edgeR glmQLFit/glmQLFTest, TMM)",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "edgeR glmQLFit/glmQLFTest ~ Timepoint + Subject per group", "status": "reproduced"},
+            "deviations": [
+              "Low-expression filter: paper keeps genes with rpkm > 0.1 in >= 5 samples; gene lengths are not deposited, so CPM >= 0.15 in >= 5 of the execution's samples is used (gives ~23k genes across all samples, close to the paper's 23,373), applied per group",
+              "Annotation: GEO counts use Ensembl v84 (data_processing) while the paper text says Gencode; used as deposited",
+              "glmQLFit robust=TRUE / estimateDisp robust=TRUE (executor default); paper does not state robust settings",
+              "Exploratory interaction (~ subject + time + ex_post) is not in the paper"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw counts; the paper's own edgeR QL route can be run with tools.r_de_tools (engine edger_ql) with subject as fixed effect.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.6.p1: genes with FDR below 0.1 considered DE; no fold-change rule. Audit at workflow default FDR<0.05.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Subject S3 excluded (failed Pre library) to match the paper's n=13; the paper does not name the excluded subject",
+              "Low-expression filter approximated by CPM because gene lengths are not deposited",
+              "The Ex-HFD Post vs Pre change includes the HFD effect; the exercise-specific effect is only addressed by the exploratory interaction"
+            ]
+          },
+          "paper_counts": {
+            "Ex_Post_vs_Pre/Ex_Post_vs_Pre": 2617,
+            "Sed_Post_vs_Pre/Sed_Post_vs_Pre": 412
+          },
+          "paper_genes": {
+            "Ex_Post_vs_Pre/Ex_Post_vs_Pre": ["ENSG00000167772", "ENSG00000128965"],
+            "Sed_Post_vs_Pre/Sed_Post_vs_Pre": ["ENSG00000124107", "ENSG00000134070", "ENSG00000176046", "ENSG00000111241", "ENSG00000014641", "ENSG00000128965"]
+          },
+          "reasoning": "Ex genes: ANGPTL4 (up, Fig5I/S3.4.p2), CHAC1 (up in Ex, S3.2.p1). Sed genes: Table 2 SLPI/IRAK2/NUPR1 up, FGF6/MDH1 down; CHAC1 down in Sed.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample size", "paper": "13 subjects (Ex 7, Sed 6), TAB1", "data": "14 subjects deposited (7+7); Pre_S3 has 0.1M reads", "disposition": "subject S3 excluded; recorded as assumption"},
+        {"item": "gene filter", "paper": "rpkm > 0.1 in >= 5 samples (23,373 genes)", "data": "no gene lengths deposited", "disposition": "CPM >= 0.15 in >= 5 samples as approximation (declared deviation)"},
+        {"item": "annotation", "paper": "Gencode (S2.6.p1)", "data": "Ensembl v84 per GEO data_processing", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "Ex_Post_vs_Pre",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {"engine": "edger_ql", "design": "~ subject + time", "levels": {"time": ["Pre", "Post"]},
+                   "contrasts": [{"name": "Ex_Post_vs_Pre", "coef": "timePost"}], "label": "Ex_Post_vs_Pre",
+                   "method_label": "edgeR QL (R) ~ subject + time, Ex-HFD only"},
+          "subset": {"grp": ["Ex"]},
+          "filter_low_counts": {"min_cpm": 0.15, "min_samples": 5},
+          "role": "primary",
+          "reasoning": "Paper route S2.6.p1 for HFD + resistance exercise group (7 subjects paired)."
+        },
+        {
+          "name": "Sed_Post_vs_Pre",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {"engine": "edger_ql", "design": "~ subject + time", "levels": {"time": ["Pre", "Post"]},
+                   "contrasts": [{"name": "Sed_Post_vs_Pre", "coef": "timePost"}], "label": "Sed_Post_vs_Pre",
+                   "method_label": "edgeR QL (R) ~ subject + time, Sed-HFD only"},
+          "subset": {"grp": ["Sed"]},
+          "filter_low_counts": {"min_cpm": 0.15, "min_samples": 5},
+          "role": "secondary",
+          "reasoning": "Paper route S2.6.p1 for HFD-alone group (6 subjects paired); reference for the exercise comparison."
+        },
+        {
+          "name": "ExVsSed_change_interaction",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {"engine": "edger_ql", "design": "~ subject + time + ex_post", "levels": {"time": ["Pre", "Post"]},
+                   "numeric": ["ex_post"],
+                   "contrasts": [{"name": "ExVsSed_change_interaction", "coef": "ex_post"}], "label": "interaction",
+                   "method_label": "edgeR QL (R) ~ subject + time + ex_post (group x time interaction)"},
+          "filter_low_counts": {"min_cpm": 0.15, "min_samples": 5},
+          "role": "exploratory",
+          "reasoning": "Exercise-specific effect: (Ex Post-Pre) - (Sed Post-Pre). ex_post = 1 for Ex-HFD Post samples; with subject fixed effects grp main effect is absorbed. Not in the paper."
+        }
+      ],
+      "enrichment": [
+        {"execution": "Ex_Post_vs_Pre/Ex_Post_vs_Pre", "ora": true, "gsea": false, "direction": "up", "reasoning": "S3.1.p2 GO on Ex-HFD up genes"},
+        {"execution": "Ex_Post_vs_Pre/Ex_Post_vs_Pre", "ora": true, "gsea": false, "direction": "down", "reasoning": "S3.1.p2 GO on Ex-HFD down genes (circadian rhythm top)"},
+        {"execution": "Ex_Post_vs_Pre/Ex_Post_vs_Pre", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "Hallmark GSEA as a full-ranking complement"}
+      ]
+    }
+  ]
+}

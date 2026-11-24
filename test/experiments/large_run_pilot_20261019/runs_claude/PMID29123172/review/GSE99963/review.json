@@ -1,0 +1,29 @@
+{
+  "case": "GSE99963",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "Yes. Parallel-group human study: 9-day high-fat diet, sedentary (Sed-HFD) or with 3 bouts of resistance exercise (Ex-HFD), vastus lateralis biopsy Pre and Post (S2.1.p1, FIG1). GEO metadata (characteristics_ch1.1.group, source_name_ch1) carry both arms. Exercise factor = Ex-HFD arm, Post samples (Pre is baseline).",
+  "B2": "Within-group Post vs Pre in each arm: Ex-HFD n=7 subjects (14 libraries) and Sed-HFD n=6 subjects (12 libraries) per TAB1; the paper reports 2617 DEGs for Ex-HFD and 412 for Sed-HFD (S3.1.p1). Exercise effect is read from comparing the two lists (S3.1.p2). GEO deposits 14 subjects (7+7), so one Sed subject is missing from the paper's n.",
+  "B3": "Yes. Every subject has a Pre and a Post biopsy. Unit = subject; field `characteristics_ch1.0.subject id` (also title suffix S1..S14), 14 keys, 28/28 samples linked, no duplicates within a time level (packet A pairing table).",
+  "B4": "Each group fitted separately: 'y~Timepoint + Subject were used for each of the HFD-Ex and HFD-Sed groups' (S2.6.p1), edgeR glmQLFit/glmQLFTest.",
+  "B5": "'Genes with a false discovery rate (FDR) below 0.1 were considered differentially expressed' (S2.6.p1; also S2.7.p1 'FDR of <0.1'). No fold-change cutoff. Counts: Sed-HFD 412 (264 up/148 down); Ex-HFD 2617 (1561 up/1056 down); overlap 240 up/103 down (S3.1.p1-p2)."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "S2.1.p1 / FIG1: Ex-HFD arm exists; metadata group column carries it. Run is correct.", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "minor", "evidence": "Groups follow characteristics_ch1.1.group (Ex 7 subjects, Sed 7 deposited). Subject S3 (Sed; Pre_S3 = 102,811 reads vs ~7.9M median) excluded to match TAB1 Sed n=6; exclusion named with reason and logged as an assumption, the paper does not name the dropped subject (discrepancy table, HANDBACK). Post_S3 also dropped, which is right for a within-subject model.", "fix": "Optional: note that the identity of the dropped Sed subject is inferred, not confirmed by the authors."},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts Post (treatment) vs Pre (control), as the paper reports Pre vs Post with up = higher after the intervention. Named genes agree in sign (CHAC1 up in Ex, down in Sed; IRAK2, NUPR1 up; FGF6 down).", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Design ~ subject + time with subject blocking in each group; subject is a categorical key (S1..S14), not numeric. Matches S2.6.p1 and packet A key (14 keys, 28/28 linked).", "fix": ""},
+    {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Separate per-group fits as in S2.6.p1 (edgeR QL). The pooled interaction model (~ subject + time + ex_post, 26 samples) is labelled exploratory and not in the paper.", "fix": ""},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Groups pair-matched for fat-free mass and strength (S2.1.p1); one sex (men); no batch/lane field in GEO. Nothing aliased with the exercise arm is recorded or visible.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "minor", "evidence": "Integer featureCounts matrix (integer_fraction 1.0), edgeR QL with TMM, p-value histogram not piled at 1 (frac_p_gt_0.9 0.058/0.07). Declared deviations: CPM>=0.15 in >=5 samples instead of RPKM>0.1 (no gene lengths), robust=TRUE, Ensembl v84 vs Gencode. These may contribute to the count inflation below.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied padj < 0.1, no LFC cutoff, exclusive, matching S2.6.p1/S2.7.p1; audit at 0.05. No alternative rule in the packet-B table reproduces 2617/412 (Ex: 3114/2200/1105 at padj<0.05 variants; Sed: 873/620/255), so no silent rule switch.", "fix": ""},
+    {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "Same contrasts compared (Ex Post vs Pre 4256 vs 2617; Sed 1487 vs 412) at the same FDR<0.1 rule, and HANDBACK states the numbers. Counts are 1.6x (Ex) and 3.6x (Sed) the paper's; the ratio Ex/Sed also differs (2.9 vs 6.4). Gene-level logFC for the named genes matches Table 2, so direction/biology reproduce while counts do not.", "fix": "Make sure the HANDBACK states plainly that DEG counts do not reproduce and that the reason is unidentified (filter, robust dispersion, annotation)."},
+    {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; both contrasts ran.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "DEG counts are well above the paper's (4256 vs 2617, 1487 vs 412) with a declared approximate gene filter; whether to re-run with a stricter filter / robust=FALSE as a sensitivity analysis is an open policy question, not an error.",
+    "The Ex-HFD Post vs Pre contrast mixes HFD and exercise; the exercise-specific test (interaction) found only 2 genes. The paper's own estimand is the within-group comparison, so the primary is consistent with it."
+  ],
+  "summary": "分析与论文方法一致：每组单独拟合 ~ subject + time（edgeR QL），按受试者配对，阈值 FDR<0.1 无倍数变化限制，方向为 Post vs Pre。S3 受试者因 Pre 文库失败被排除以对应论文 Sed n=6，已记录为假设。DEG 数量（4256 vs 2617；1487 vs 412）高于论文，原因未明（基因过滤近似等），已如实报告，列为待人工关注项，不构成阻断或重大错误。"
+}
