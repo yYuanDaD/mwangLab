@@ -618,3 +618,8 @@ One section per case; newest last.
 - policy: Joint vs pairwise fit when the paper is silent: obtain the full text Methods to confirm how Ex vs NE was modelled.
 - policy: Threshold: paper rule and counts unknown (abstract only); confirm from the full text before any count comparison.
 - policy: Trained +1 h Ex vs NE gives 6386 DEGs, likely from outlier samples; decide whether to report a sensitivity run without them.
+
+## PMID41247792 / GSE305038 (2026-11-24)
+
+- policy: Download the two edgeRglm xlsx files (or the NCBI counts) into data/GSE305038 and rerun. Check whether the xlsx files hold per-sample counts or only edgeR result tables.
+- policy: The paper's DEG threshold needs the full text.

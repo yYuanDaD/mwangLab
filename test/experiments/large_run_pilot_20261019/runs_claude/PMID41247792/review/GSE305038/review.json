@@ -1,0 +1,21 @@
+{"case": "GSE305038", "reviewer": "case-reviewer, Claude Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. Human skeletal muscle biopsies before and 4 h after 60 min cycling at 65% VO2max, so all post-exercise samples carry the exercise factor (abstract). Trial factor: reduced activity (IN) vs normal activity (A). Packet A shows no exercise words in metadata columns, so the factor sits in sample titles/trial labels, not packet A columns.",
+  "B2": "Abstract only: A post vs pre (793 DEG), IN post vs pre (1,403 DEG), IN vs A at rest (9 DEG), exercise x trial interaction (GSEA). n = 9 subjects (7 M, 2 F); per-group n not given in the abstract.",
+  "B3": "Yes. Crossover design: each subject is biopsied pre and post in both trials, so subject is the repeated unit. Packet A lists no candidate pairing key (none detected); a subject ID must come from sample titles or characteristics.",
+  "B4": "The abstract does not say. It reports an interaction of exercise and trial, which implies a joint model, but this is not stated.",
+  "B5": "The abstract states no DEG rule. Counts only: 9 (rest), 793 (A), 1,403 (IN)."},
+ "checks": [
+  {"id":"run_or_refuse","verdict":"agree","severity":"none","evidence":"Abstract design has an exercise arm; the case treats it as an exercise study and stops only for a missing matrix.","fix":""},
+  {"id":"grouping","verdict":"na","severity":"none","evidence":"No analysis ran. The 28 of 36 biopsies (A-Pre 7, A-Post 7, IN-Pre 6, IN-Post 8) are recorded as a discrepancy, not_evaluated.","fix":""},
+  {"id":"direction","verdict":"na","severity":"none","evidence":"No contrast ran.","fix":""},
+  {"id":"pairing","verdict":"na","severity":"minor","evidence":"The record names subject as the repeated unit (I02-I11), which matches B3. Packet A found no candidate key, so the subject ID is probably in the sample title and was not checked by the key scan. Nothing ran.","fix":"On rerun, block on subject and say where the ID comes from."},
+  {"id":"model_fit","verdict":"na","severity":"none","evidence":"Not run; the paper's model is not in the abstract. Deposited files are named edgeRglm per trial.","fix":""},
+  {"id":"confounding","verdict":"na","severity":"none","evidence":"Not run.","fix":""},
+  {"id":"matrix_method","verdict":"na","severity":"none","evidence":"No matrix obtained. The deposited files are edgeR GLM count tables, which may be results rather than a sample-by-gene matrix; this needs checking after download.","fix":""},
+  {"id":"threshold","verdict":"agree","severity":"none","evidence":"The record says the abstract states no threshold and leaves the cutoff null.","fix":""},
+  {"id":"paper_match","verdict":"agree","severity":"none","evidence":"The HANDBACK table lists the abstract counts 793/1,403/9 as 'not run' and claims no match.","fix":""},
+  {"id":"stop_reason","verdict":"agree","severity":"none","evidence":"Missing-file stop, not a claim that the data lack something. 15 retries and several URL routes all returned 403 while /pub/ returned 200. The stop is labelled manual_review and says how to unblock.","fix":""}],
+ "overall": "pass",
+ "human_items": ["Download the two edgeRglm xlsx files (or the NCBI counts) into data/GSE305038 and rerun. Check whether the xlsx files hold per-sample counts or only edgeR result tables.", "The paper's DEG threshold needs the full text."],
+ "summary": "该案例因GEO的/geo/目录返回403而在ownership处停止,缺失矩阵的说明属实且已尝试多种途径,未运行任何分析。设计(受试者内交叉、前后活检)与摘要一致,把受试者作为重复单位的判断合理。需手动下载矩阵后重跑,并确认xlsx是否含逐样本计数。"}

@@ -1051,3 +1051,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## 93f7d3bfcc684b7bc42a329faf084a6b31f49523 (GSE120862)
 
 - GEO FTP 403 (recount3 used; geo_tools.py:42 misleading error); inspect parses SOFT dump as matrix; suitability.py:204 >6 levels vs-ref only, case_runner.py:859 opaque Details: `93f7d3bfcc684b7bc42a329faf084a6b31f49523/HANDBACK.md`.
+
+## PMID41247792 (GSE305038)
+
+- NCBI /geo/ FTP 403; geo_tools.py:30 GEOparse temp-file Errno2; geo_tools.py:58 no fallback on 403; case_runner.py:529 needs a matrix file to record an ownership stop Details: `PMID41247792/HANDBACK.md`.
+
+## PMID40839394 (GSE277819)
+
+- GEO FTP returns 403 to the default User-Agent (geo_tools.py:30, :105), so files fetched manually; case_runner can't run the suitability per-sex split_plan, needed a prep script Details: `PMID40839394/HANDBACK.md`.
+
+## PMID42545855 (GSE324210)
+
+- geo_tools.py:30 GEOparse temp-file error hidden as "ID incorrect" (:42); geo_tools.py:64 GEO FTP 403s with no retry; metadata rebuilt from SOFT, xlsx fetched by hand Details: `PMID42545855/HANDBACK.md`.

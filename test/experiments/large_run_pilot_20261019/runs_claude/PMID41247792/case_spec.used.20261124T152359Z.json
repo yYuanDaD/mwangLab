@@ -1,0 +1,68 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41247792",
+  "request": "Analyze GSE305038 for PMID 41247792 (A single day of reduced activity alters the next day's transcriptomic and metabolic exercise response.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE305038",
+      "accession": "GSE305038",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID41247792/PMID41247792_abstract.txt"],
+        "metadata": "GSE305038/GSE305038_metadata.csv",
+        "matrix": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41247792/matrix_unavailable.txt",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE305038"],
+            "evidence_basis": "PubMed abstract (efetch PMID 41247792) and GEO series/sample records only; no full text",
+            "assay": "bulk RNA-seq, human skeletal muscle biopsies (NovaSeq X Plus; STAR + RSEM; edgeR v4.0.16 per GEO data_processing)",
+            "subjects": "n = 9 (7 M, 2 F), 24 +/- 1 yr; randomized crossover",
+            "factors": {"trial": ["A (normal activity, ~11,069 steps)", "IN (reduced activity, ~3,581 steps)"], "time": ["Pre-exercise", "4 h post-exercise"]},
+            "repeated_measure_unit": "subject (each subject biopsied pre and post in both trials)",
+            "primary_estimand": "Within-subject effect of 60 min cycling at 65% VO2max on muscle gene expression (4 h post vs pre) in each trial, plus IN vs A at rest and the trial x exercise interaction",
+            "planned_contrasts": [
+              "A: Post vs Pre (abstract: 793 DEGs)",
+              "IN: Post vs Pre (abstract: 1,403 DEGs)",
+              "IN vs A at rest (Pre) (abstract: 9 DEGs)",
+              "trial x exercise interaction (abstract: GSEA only, no DEG count)"
+            ],
+            "paper_method": "edgeR GLM (GEO data_processing: 'Differential expression estimation with edgeR v4.0.16'; supplementary file names 'edgeRglm_Counts_...')",
+            "paper_threshold": {"metric": "not stated in abstract", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "abstract has no DEG threshold; full text not available"},
+            "inclusion": "GEO holds 28 of 36 possible biopsies across 9 subjects (I02-I11, no I08): A-Pre 7, A-Post 7, IN-Pre 6, IN-Post 8"
+          },
+          "reasoning": "Abstract: crossover design, biopsies before and 4 h after exercise in A and IN trials; DEG counts 9 (rest, IN vs A), 793 (A exercise), 1,403 (IN exercise). Threshold and exact model are not in the abstract. GEO data_processing names edgeR.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO GSE305038 Series_summary and Sample_data_processing"
+        },
+        "ownership": {
+          "final": {
+            "owned": false,
+            "checks": {
+              "metadata": "GSE305038_metadata.csv built from the full GEO SOFT text (acc.cgi targ=all); Series_pubmed_id = 41247792; 28 samples, 9 subjects, trial x time labels match the abstract",
+              "matrix": "not obtainable: both deposited supplementary xlsx files (edgeRglm_Counts_*) returned HTTP 403 from ftp.ncbi.nlm.nih.gov/geo/ (whole /geo/ tree blocked; 15-min retry loop failed); no per-sample files exist; NCBI-generated raw counts also 403"
+            }
+          },
+          "decision_status": "manual_review",
+          "stop_reason": "Expression matrix unavailable: GEO FTP (/geo/) returned HTTP 403 for both deposited supplementary files and the NCBI-generated counts; the matrix cannot be identified or checked against the paper's samples. Unblock by downloading GSE305038_20250714_M008795_edgeRglm_Counts_*.xlsx (or GSE305038_raw_counts_GRCh38.p13_NCBI.tsv.gz) into data/GSE305038 and rerunning.",
+          "reasoning": "Metadata belongs to the paper (pubmed id, design). The matrix file needed for every later gate could not be downloaded; the placeholder matrix_unavailable.txt records the attempts. This is a missing-file stop (manual_review), not a scientific refusal: the design (repeated-measures crossover with pre/post in two trials) does support the exercise contrast.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "sample set",
+          "paper": "9 subjects x 2 trials x pre/post = 36 biopsies implied",
+          "data": "28 GEO samples; no A-trial samples for I03; no pre biopsies for I05 (either trial); no A-post for I07; no IN-pre for I09; arms A-Pre 7, A-Post 7, IN-Pre 6, IN-Post 8",
+          "disposition": "not_evaluated (case stopped at ownership)"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

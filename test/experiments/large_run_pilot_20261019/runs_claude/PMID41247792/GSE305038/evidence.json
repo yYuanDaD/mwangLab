@@ -1,0 +1,156 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41247792",
+  "subject_id": "GSE305038",
+  "created_at": "2026-11-24T10:23:59",
+  "finished_at": "2026-11-24T10:23:59",
+  "status": "stopped:ownership",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMID41247792_abstract.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41247792\\PMID41247792_abstract.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:23:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d8957c33fc289160d899f466a048ce82aa8c30b7d4066fa6ecfc3351adf005a0",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE305038_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE305038\\GSE305038_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:23:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "86418a38f73282355ae98cd970feccff02a00b2029bfe5865ba60cb143a8355c",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "matrix_unavailable.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41247792\\matrix_unavailable.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:23:59",
+      "sha256": null,
+      "attributes": {
+        "sha256": "82dd29fd946763ffb1f412725860a0cf24f8fc341736f46eb35e1a628f0176fd",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE305038"
+        ],
+        "evidence_basis": "PubMed abstract (efetch PMID 41247792) and GEO series/sample records only; no full text",
+        "assay": "bulk RNA-seq, human skeletal muscle biopsies (NovaSeq X Plus; STAR + RSEM; edgeR v4.0.16 per GEO data_processing)",
+        "subjects": "n = 9 (7 M, 2 F), 24 +/- 1 yr; randomized crossover",
+        "factors": {
+          "trial": [
+            "A (normal activity, ~11,069 steps)",
+            "IN (reduced activity, ~3,581 steps)"
+          ],
+          "time": [
+            "Pre-exercise",
+            "4 h post-exercise"
+          ]
+        },
+        "repeated_measure_unit": "subject (each subject biopsied pre and post in both trials)",
+        "primary_estimand": "Within-subject effect of 60 min cycling at 65% VO2max on muscle gene expression (4 h post vs pre) in each trial, plus IN vs A at rest and the trial x exercise interaction",
+        "planned_contrasts": [
+          "A: Post vs Pre (abstract: 793 DEGs)",
+          "IN: Post vs Pre (abstract: 1,403 DEGs)",
+          "IN vs A at rest (Pre) (abstract: 9 DEGs)",
+          "trial x exercise interaction (abstract: GSEA only, no DEG count)"
+        ],
+        "paper_method": "edgeR GLM (GEO data_processing: 'Differential expression estimation with edgeR v4.0.16'; supplementary file names 'edgeRglm_Counts_...')",
+        "paper_threshold": {
+          "metric": "not stated in abstract",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "abstract has no DEG threshold; full text not available"
+        },
+        "inclusion": "GEO holds 28 of 36 possible biopsies across 9 subjects (I02-I11, no I08): A-Pre 7, A-Post 7, IN-Pre 6, IN-Post 8"
+      },
+      "reason": "Abstract: crossover design, biopsies before and 4 h after exercise in A and IN trials; DEG counts 9 (rest, IN vs A), 793 (A exercise), 1,403 (IN exercise). Threshold and exact model are not in the abstract. GEO data_processing names edgeR.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:23:59"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41247792\\matrix_unavailable.txt",
+        "owned": false,
+        "checks": {
+          "metadata": "GSE305038_metadata.csv built from the full GEO SOFT text (acc.cgi targ=all); Series_pubmed_id = 41247792; 28 samples, 9 subjects, trial x time labels match the abstract",
+          "matrix": "not obtainable: both deposited supplementary xlsx files (edgeRglm_Counts_*) returned HTTP 403 from ftp.ncbi.nlm.nih.gov/geo/ (whole /geo/ tree blocked; 15-min retry loop failed); no per-sample files exist; NCBI-generated raw counts also 403"
+        },
+        "accession": "GSE305038",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE305038\\GSE305038_metadata.csv"
+      },
+      "reason": "Metadata belongs to the paper (pubmed id, design). The matrix file needed for every later gate could not be downloaded; the placeholder matrix_unavailable.txt records the attempts. This is a missing-file stop (manual_review), not a scientific refusal: the design (repeated-measures crossover with pre/post in two trials) does support the exercise contrast.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "manual_review",
+        "execution_status": "not_started",
+        "stop_reason": "Expression matrix unavailable: GEO FTP (/geo/) returned HTTP 403 for both deposited supplementary files and the NCBI-generated counts; the matrix cannot be identified or checked against the paper's samples. Unblock by downloading GSE305038_20250714_M008795_edgeRglm_Counts_*.xlsx (or GSE305038_raw_counts_GRCh38.p13_NCBI.tsv.gz) into data/GSE305038 and rerunning."
+      },
+      "recorded_at": "2026-11-24T10:23:59"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41247792\\GSE305038\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "706c18452d5b7b8a824fe07c1cb06658e254220139b54dcfa948a89594d36b13",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41247792\\GSE305038\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "3e4f46d834d210bb8459989da5ff06e79daca7969ad9cd8a39335d3e9e23edd8",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
