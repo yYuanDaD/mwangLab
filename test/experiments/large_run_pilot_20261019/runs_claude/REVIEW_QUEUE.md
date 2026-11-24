@@ -656,3 +656,7 @@ One section per case; newest last.
 ## PMID32409493 / GSE137631 (2026-11-24)
 
 - policy: Open policy: joint vs pairwise fit when paper is silent (pairs used here).
+
+## PMID36939205 / GSE209880 (2026-11-24)
+
+- policy: Scope: serum EV and small/circular RNA matrices were not analysed; the abstract's microRNA findings are not covered. A person may want to decide whether they are in scope.

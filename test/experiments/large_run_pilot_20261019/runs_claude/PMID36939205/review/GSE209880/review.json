@@ -1,0 +1,21 @@
+{"case": "GSE209880", "reviewer": "case-reviewer, Claude Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. Human acute exercise study (abstract: single bout, TRAD n=21 vs HITT n=19, biopsies pre/h3/h24). All 120 muscle long-RNA libraries carry the exercise factor (pre = baseline, h3/h24 = post-exercise). Packet A lists 120 samples = 40 subjects x 3 time points. Paper locator: abstract only (no full text).",
+  "B2": "Within each protocol, h3 vs pre and h24 vs pre (TRAD 21 subjects/63 libraries, HITT 19/57); between-protocol comparison at h3 and h24 (abstract); h0 is EV only. Per-group n is 21 (TRAD) and 19 (HITT) per time point.",
+  "B3": "Yes. Each subject gives pre, h3 and h24 biopsies. Packet A pairing keys: subject (PH id from the title) appears once in each time level, 40 keys, 120/120 linked, 0 duplicates. Cohort and sex are constant within subject.",
+  "B4": "The abstract does not say. Not stated whether one joint model or per-protocol fits were used.",
+  "B5": "Abstract: differentially expressed transcripts (|log2FC|>1, FDR <= 0.05) at h3 and h24 within and between protocols; FDR < 0.2 for the SVD latent-variable step. No DEG counts in the abstract."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Abstract: single exercise bout, pre/h3/h24 muscle biopsies; 120 muscle long-RNA libraries analysed.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "TRAD 63 = 21x3, HITT 57 = 19x3, matching abstract n and sex split; pre is the control; no exclusions; 120/120 exact key alignment. Series mixes 4 library types and the muscle long-RNA subset is named.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts h3 vs pre and h24 vs pre (control pre, treatment h3/h24), as in the abstract.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Formula ~ subject + time; subject is a categorical block; design full rank (42 columns, residual df 78). Between-protocol test uses paired change over 40 complete pairs.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent (abstract); one fit per protocol with all three time points is the plain reading of 'within protocols'. Open policy question, no contradiction.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Sex and protocol are constant within subject and absorbed; single NovaSeq 6000 platform; no batch column deposited; suitability sex check passed.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "featureCounts integer counts (integer_fraction 1.0, median 0, max 5.2e7) to DESeq2; low-count filter and the limma log2(CPM+1) between-protocol test are declared deviations/exploratory.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied padj <= 0.05 and |log2FC| > 1 (strict), as in the abstract; audit rule padj < 0.05 is recorded separately.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No paper counts available; HANDBACK states abstract-only basis and makes only the qualitative claim TRAD > HITT, which the counts support (3569/2558 vs 1274/1197).", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal. EV and small/circular RNA streams were left out as scope, recorded as a discrepancy.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Scope: serum EV and small/circular RNA matrices were not analysed; the abstract's microRNA findings are not covered. A person may want to decide whether they are in scope."],
+ "summary": "该案例分析了肌肉长链RNA的120个文库（40名受试者×3个时间点），对每个方案分别用 ~subject+time 的DESeq2，对照为pre，方向与阈值均与摘要一致。未发现阻断性或重要问题。比较仅基于摘要，论文DEG数量未知，已如实说明。"}
