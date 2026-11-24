@@ -1,0 +1,86 @@
+{
+ "case": "GSE161030",
+ "reviewer": "case-reviewer Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. 3 swimming-trained (EHP: 3w swimming + 1w sedentary) and 3 sedentary male C57BL/6 hearts (S2.3.p1).",
+  "B2": "EHP vs sedentary, n=3 vs 3 (S2.3.p1).",
+  "B3": "No repeated measures; one heart per mouse; no pairing key in packet A.",
+  "B4": "Paper does not describe the model; only two groups, so joint vs pairwise is moot.",
+  "B5": "S2.3.p1: '2162 lncRNAs differentially expressed ... (1482 and 680 ... higher and lower in EHP), |log2 [fold change]| >1 (P<0.05'. Raw P, strict >1."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.3.p1: 3 EHP vs 3 sed hearts; swimming arm present",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sed 3 / EHP 3 matches S2.3.p1 and GEO treatment field; no exclusions; control is the sedentary group",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "EHP(treatment) vs Sed(control); paper 1482 up in EHP, ours 1498 up. The possible_reversed_contrast flag is a false positive (word 'sedentary' on control side is correct).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "independent animals; no pairing keys in packet A",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "two groups only, ~grp; paper silent on model, no ambiguity",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "treatment field fully aliased with grp (same factor); single sex, tissue, strain; no batch recorded",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "integer counts, DESeq2 route; p-value histogram sane (frac_p_gt_0.9 0.059, lt_0.05 0.303). Row-sum>=10 filter inferred and recorded.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "paper S2.3.p1: P<0.05 and |log2FC|>1 (raw P, strict); reproduces 2162 from deposited table; GEO's different rule recorded as discrepancy; padj audit reported",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "ours 2163 vs paper 2162 same contrast and rule; up/down 1498/665 vs 1482/680 split differs, attributed to pydeseq2 vs R DESeq2 despite r~1 (not verified, may be shrinkage/independent-filtering differences); HANDBACK states the split difference honestly",
+   "fix": "Optionally word the pydeseq2 explanation as unverified."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "no stop or refusal",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该案例决策与论文一致：EHP 对 Sed（各 n=3），方向正确，阈值按原文 raw P<0.05 且 |log2FC|>1，复现 2163 对 2162。方向标记为误报。仅有一处轻微说明：上/下调拆分差异归因于 pydeseq2 尚未验证。"
+}

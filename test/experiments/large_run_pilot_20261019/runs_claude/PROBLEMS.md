@@ -859,3 +859,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35325353 (GSE195707)
 
 - GBK mojibake in GEO metadata text (geo_tools.py:30,36); inspect does not flag GEO 'raw counts' are E/M estimates; paper_counts cannot hold an approximate count Details: `PMID35325353/HANDBACK.md`.
+
+## PMID33757294 (GSE161030)
+
+- minor: filter_low_counts has no row-sum rule, so a fractional min_mean_count was used (tools/case_runner.py:777) Details: `PMID33757294/HANDBACK.md`.
