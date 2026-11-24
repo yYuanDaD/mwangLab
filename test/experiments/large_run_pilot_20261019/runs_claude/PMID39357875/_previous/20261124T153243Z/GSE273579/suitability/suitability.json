@@ -1,0 +1,171 @@
+{
+  "case_id": "GSE273579",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "ex"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "ex"
+      ],
+      "levels": {
+        "ex": {
+          "NE": 12,
+          "EX": 8
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(ex)",
+        "rank": 2,
+        "full_rank": true,
+        "residual_df": 18,
+        "min_cell_size": 8
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 2,
+      "n_analyzable": 2,
+      "too_small": [],
+      "planned_analyzable": [
+        "ex_EX_vs_NE_tis-NT",
+        "ex_EX_vs_NE_tis-T"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 20 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 20
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39357875\\GSE273579\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "ex_EX_vs_NE_tis-NT",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EX",
+      "reference": "NE",
+      "within": {
+        "tis": "NT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "NT",
+            "ex": "EX"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tis": "NT",
+            "ex": "NE"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_EX_vs_NE_tis-T",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EX",
+      "reference": "NE",
+      "within": {
+        "tis": "T"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tis": "T",
+            "ex": "EX"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "tis": "T",
+            "ex": "NE"
+          },
+          "n": 4
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

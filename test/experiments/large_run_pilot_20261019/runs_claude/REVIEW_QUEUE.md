@@ -647,3 +647,8 @@ One section per case; newest last.
 ## PMID38314723 / GSE269698_young_vehicle (2026-11-24)
 
 - policy: Whether the replicate-number pairing is the true mouse pairing is undocumented; irrelevant to the 0-DEG result.
+
+## PMID39357875 / GSE273579 (2026-11-24)
+
+- policy: Joint model (tissue + exercise) versus per-tissue fits is an open policy question; the paper (abstract only) is silent.
+- policy: Non-tumor liver Hallmark MYC_TARGETS up with exercise contradicts the abstract; recorded as caveat, consider checking against the full text.

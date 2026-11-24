@@ -1071,3 +1071,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39747484 (GSE280845)
 
 - matrix column typo Exe_KO_reap4 not flagged by inspect (fixed in a prep script); paper_gene_check shows Sln p null without giving the Cook's reason Details: `PMID39747484/HANDBACK.md`.
+
+## PMID39357875 (GSE273579)
+
+- GEO metadata CSV text garbled (UTF-8 read as GBK, tools/geo_tools.py); harmless pydeseq2 overflow warning (utils.py:1088) Details: `PMID39357875/HANDBACK.md`.
