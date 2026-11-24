@@ -1,0 +1,248 @@
+{
+  "case_id": "GSE280845",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "ex",
+    "geno"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "ex",
+        "geno"
+      ],
+      "levels": {
+        "ex": {
+          "SED": 6,
+          "EXE": 6
+        },
+        "geno": {
+          "WT": 6,
+          "KO": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [],
+      "design": {
+        "formula_equivalent": "~ C(ex) + C(geno)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "ex_EXE_vs_SED_geno-WT"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID39747484\\GSE280845\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "ex_EXE_vs_SED_geno-KO",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EXE",
+      "reference": "SED",
+      "within": {
+        "geno": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "ex": "EXE"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "ex": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_EXE_vs_SED_geno-WT",
+      "kind": "simple",
+      "factor": "ex",
+      "test": "EXE",
+      "reference": "SED",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "ex": "EXE"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "ex": "SED"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_ex-EXE",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "ex": "EXE"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "EXE",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "EXE",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_ex-SED",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "ex": "SED"
+      },
+      "cells": [
+        {
+          "cell": {
+            "ex": "SED",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "ex_geno_EXE_KO_vs_SED_WT",
+      "kind": "interaction",
+      "factor": "ex:geno",
+      "test": "EXE:KO",
+      "reference": "SED:WT",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "ex": "EXE",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "EXE",
+            "geno": "WT"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "ex": "SED",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

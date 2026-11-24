@@ -1,0 +1,86 @@
+{
+ "case": "GSE280845",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Abstract: acute exercise (90-min running) in muscle; GEO treatment column: Sedentary vs after 90min running, WT and cFeimin MKO, 3 each. All 12 samples carry the factor. Only abstract available.",
+  "B2": "Exercise vs sedentary within WT and within MKO; MKO vs WT after exercise (Sln); n=3 per cell. Paper full text not available, so inferred from abstract and GEO.",
+  "B3": "No repeated measures: one gastrocnemius per mouse. Rep numbers differ between Sed and Exe groups so cannot identify an animal.",
+  "B4": "Paper (abstract) does not say.",
+  "B5": "Abstract does not say; GEO data_processing gives |log2FC| 1 and p<0.05. No counts available."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Abstract: 90-min running vs sedentary; GEO characteristics treatment column. Ran with WT exercise-vs-sed primary.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "6 SED/6 EXE, 6 WT/6 KO, 3 per cell; title-derived columns match characteristics; typo column Exe_KO_reap4 fixed and recorded; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "control SED, treatment EXE; KO vs WT with WT as control; Sln up in KO after exercise matches abstract.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Title rep numbers differ between Sed and Exe (rep1,3,4 vs rep3,4,5); 'key' links are coincidence of labels; pairing_check not_supported (r=-0.023, p=0.64). Independent animals.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Abstract silent; one joint cell-means model on 12 samples; paper used DESeq2 Wald contrasts, consistent. Pairwise fit not reported but design is balanced.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Genotype x exercise fully crossed 3/3/3/3; no batch/lane recorded; male only. Note extract_protocol mentions 18 libraries vs 12 deposited (recorded).",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer StringTie counts, max 838179; DESeq2 matches paper route. Cook's filter gave NaN p for Sln (outlier Exe_KO_rep4) and is disclosed.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "GEO data_processing: |log2FC| +-1 and p<0.05; applied raw p<0.05 with |LFC|>=1 inclusive, padj audit labelled. Inclusivity of the paper's cutoff is an assumption.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper counts unavailable (abstract only); no comparison claimed; HANDBACK states this.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stops or refusals.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "各项关键决策与摘要和GEO信息一致：运动对照组向、2x2设计、联合DESeq2模型、阈值均无问题。无重复测量，配对检验不支持。论文全文缺失，DEG数量未比对，已在HANDBACK中说明。"
+}
