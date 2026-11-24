@@ -963,3 +963,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38714691 (GSE208615)
 
 - none (no Cyber-T executor, so limma ran as a declared deviation) Details: `PMID38714691/HANDBACK.md`.
+
+## PMID41946794 (GSE235042)
+
+- none blocking; inspect gives FPKM an ambiguous type label (integer fraction 0.66 comes from zeros) Details: `PMID41946794/HANDBACK.md`.
+
+## PMID41663755 (GSE200283)
+
+- case_runner.py:577 normalize_keys collision check runs before exclude_samples (needed a metadata split); summary.csv matrix_type empty when a case stops at matrix Details: `PMID41663755/HANDBACK.md`.
+
+## PMID41736525 (GSE310344;GSE310849)
+
+- inspect reads Partek chromosome column as entrez IDs (tools/native.py:609); 'level' annotation column counted as sample (tools/native.py:239-242) Details: `PMID41736525/HANDBACK.md`.

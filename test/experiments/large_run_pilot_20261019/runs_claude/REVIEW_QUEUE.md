@@ -514,3 +514,8 @@ One section per case; newest last.
 
 - policy: Open policy: joint six-group limma vs paper's pairwise Cyber-T fits when the paper states pairwise.
 - policy: 273 vs 21 shared up-regulated genes (14-0-0 and 14-7-2): the paper's 'both' criterion (possibly Cyber-T plus regression, Fig S2) may explain it; not settled from the files.
+
+## PMID41946794 / GSE235042 (2026-11-24)
+
+- policy: Whether a hindlimb-unloading (disuse) series counts as an exercise study at all.
+- policy: Joint vs pairwise fit when the paper is silent; counts differ greatly from paper (n=3/group, FPKM instead of counts).

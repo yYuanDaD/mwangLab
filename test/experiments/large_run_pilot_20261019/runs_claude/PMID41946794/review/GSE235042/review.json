@@ -1,0 +1,89 @@
+{
+ "case": "GSE235042",
+ "reviewer": "case-reviewer, claude-sonnet-5-5",
+ "blind": {
+  "B1": "No exercise arm. The only physical-activity manipulation is 3 weeks of hindlimb unloading (disuse; S2.2, S5), with 4-PBA as a drug arm. Whether HU counts as an exercise-question series is an open policy question; if analyzed, HU vs GC is the inactivity side. All 9 sequenced kidneys (3 GC, 3 HU, 3 HU-t) carry the unloading factor; none carry exercise.",
+  "B2": "HU vs GC, HU-t vs HU, HU-t vs GC (Fig. 4a-c, S3.3.p1); 3 sequenced kidneys per group (S2.4; animal study n=10/group per Fig. 2).",
+  "B3": "None: one kidney per mouse, independent animals. Title suffix (1-3) pairs samples across groups but is only a within-group replicate index.",
+  "B4": "Paper does not say joint vs pairwise; only 'analyzed using DESeq2' (S2.8.p1).",
+  "B5": "S2.8.p1: 'Genes with an adjusted p < 0.05 were assigned as significantly differentially expressed genes' (BH FDR; the 'log2Fold change > 0' clause only splits direction, no magnitude cutoff). Counts S3.3.p1: control vs HU 6628 (4592 up/2036 down); HU-t vs HU 3543 (1096/2447); HU-t vs GC 1114 (890/224); total 11285."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "unsure",
+   "severity": "none",
+   "evidence": "No exercise arm; HU analyzed as inactivity estimand and labelled 'not an exercise effect' in caveats and HANDBACK. Policy question open (disuse series).",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "GC/HU/HUt 3/3/3 matches S2.4; exact alignment 9/9; control for HU is GC, for HUt is HU, as in Fig. 4.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts ordered treatment vs control (HU vs GC, HUt vs HU, HUt vs GC) as Fig. 4 legend; paper text 'control vs HU' ambiguity noted in caveats.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "One kidney per mouse; title suffix is a replicate index, pairing_check not_supported (r diff 0.048, p=0.34).",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on joint vs pairwise; joint limma ~grp recorded. Open policy item.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "All male, single tissue; no batch info in GEO; recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Only FPKM deposited; limma on log2(FPKM+1) with FPKM>=1 in >=3 filter declared as deviation from DESeq2 on counts.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "padj<0.05, no fold-change cutoff, transcribed exactly from S2.8.p1; audit |lfc|>1 labelled audit only. No alternative rule reproduces paper counts (packet B table).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same three contrasts compared; large gaps (1277 vs 6628, 361 vs 3543, 0 vs 1114) stated as not matching, with deviation reasons; ER-stress claim recorded as not reproduced.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Whether a hindlimb-unloading (disuse) series counts as an exercise study at all.",
+  "Joint vs pairwise fit when the paper is silent; counts differ greatly from paper (n=3/group, FPKM instead of counts)."
+ ],
+ "summary": "该系列没有运动组，只有后肢卸载（废用）与4-PBA药物组；分析将其明确标注为“不活动”方向而非运动效应，分组、方向、阈值（padj<0.05，无FC截断）均与论文一致。因只有FPKM，改用limma并声明偏离，DEG数与论文差距大但已如实记录。无阻断或主要问题，仅有待人工决定的政策问题。"
+}
