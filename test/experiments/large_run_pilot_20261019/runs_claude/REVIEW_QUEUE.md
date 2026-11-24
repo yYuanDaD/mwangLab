@@ -442,3 +442,7 @@ One section per case; newest last.
 
 - policy: B6 control contrast not run: ask the submitters for the matrix-column to N-ID map.
 - policy: ND5 soleus OxPhos induction (S1.2.2.p1) is not seen in our result; judge from Dataset S1-S11 whether this is a data difference (no TMM, rounding, different gene set) or a sign problem.
+
+## PMID35316212 / GSE184951 (2026-11-24)
+
+- policy: Open policy question: the stated rule gives 55 and 1471 DEGs against the paper's 19 and 640, while a mean-count>=10 filter (iDEP default) gets close, especially for PRE vs CON (664). Which one to report as the headline is not settled; the case reports the paper's stated rule and keeps the filtered run as a sensitivity analysis.

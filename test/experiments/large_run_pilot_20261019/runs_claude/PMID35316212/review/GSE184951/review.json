@@ -1,0 +1,28 @@
+{
+  "case": "GSE184951",
+  "reviewer": "case-reviewer agent, Claude Sonnet 5.5",
+  "blind": {
+    "B1": "Yes. 12-week cycle ergometry in DM1 patients; DM1-PRE and DM1-POST biopsies (11 each) carry the exercise factor. Healthy CON (n=10) are sedentary, one biopsy, not an exercise arm (S2.8-S2.9, S4.16, Fig 4).",
+    "B2": "DM1-POST vs DM1-PRE (n=11 vs 11, paired; paper 1 down/18 up, S2.9.p1, Fig 4C). DM1-PRE vs CON (n=11 vs 10; paper 205 down/435 up, S2.8.p1, Fig 4B).",
+    "B3": "Yes. Each DM1 patient is biopsied pre and post. Candidate key: subject (Sample_N), which appears once in each treatment level and links 22/32 samples. Control_N are different people.",
+    "B4": "S4.16.p1: DESeq2 'taking into account the group and paired sample study design'. The paper does not say whether one model held all samples or each pair of groups was fitted alone.",
+    "B5": "Fig 4 legend: significant = |log2(FC)| > 1.5 and P < 0.005 (raw P, strict inequalities, no FDR). Counts: PRE vs CON 205 down/435 up; POST vs PRE 1 down/18 up."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Series has a genuine pre/post training arm in DM1 patients; analyzed. PRE vs CON is labelled associational/disease, not exercise.", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp from titles gives CON 10, PRE 11, POST 11, matching paper n=10-11. The missing control for patient 5 is recorded as a discrepancy. Control is PRE for the exercise contrast.", "fix": ""},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "POST vs PRE (control PRE, treatment POST) and PRE vs CON (control CON), as the paper reports them.", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "POST vs PRE fitted as ~ subject + grp on 11 complete pairs; Control_N kept separate from Sample_N; subject is categorical.", "fix": ""},
+    {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent on joint vs pairwise fit; the case fits each contrast on its own subset and states this in method.deviations, with the reason (a joint model with subject cannot estimate CON vs PRE).", "fix": ""},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Extraction batches (P6 pilot, per-group batches, S4.16.p1) may align with group. Recorded as a caveat in covariance and study; no batch column is deposited.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "HTSeq integer counts (integer_fraction 1.0) into DESeq2, the paper's route. The p-value histogram is sane (frac_p_gt_0.9 0.301 and 0.077).", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied rule is raw pvalue < 0.005 and |log2FC| > 1.5, non-inclusive, as in the Fig 4 legend. A padj < 0.05 audit rule is reported alongside.", "fix": ""},
+    {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Same contrasts compared. Ours is 55 vs paper 19 and 1471 vs 640, and the excess is attributed to low-count genes and checked with filtered runs (27 and 664). The filtered runs are labelled sensitivity, and the paper's DEG lists were unavailable.", "fix": ""},
+    {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Open policy question: the stated rule gives 55 and 1471 DEGs against the paper's 19 and 640, while a mean-count>=10 filter (iDEP default) gets close, especially for PRE vs CON (664). Which one to report as the headline is not settled; the case reports the paper's stated rule and keeps the filtered run as a sensitivity analysis."
+  ],
+  "summary": "该案例通过。外源性运动对比为 DM1 患者 POST vs PRE，按患者配对（~ subject + grp），阈值严格按图4图例（原始 P<0.005 且 |log2FC|>1.5）。对照、方向、分批提取混杂与未指定的模型拟合方式均已记录；与论文计数的差异（55 vs 19，1471 vs 640）已用低表达过滤的敏感性分析说明。"
+}

@@ -887,3 +887,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35482926 (GSE198229)
 
 - gseapy prerank NES=±1/NOM p=1 degenerate rows (enrichment_tools.py:423); voom floors counts (limma_voom_tools.py:131); B6 matrix cols unmappable; no TMM in voom Details: `PMID35482926/HANDBACK.md`.
+
+## PMID35316212 (GSE184951)
+
+- case_runner.py:387 inspect skips RAW.tar when rMATS files exist; suitability gives conflicting subject dispositions; sex check gives no split_plan Details: `PMID35316212/HANDBACK.md`.

@@ -1,0 +1,467 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35316212",
+  "request": "Analyze GSE184951 for PMID 35316212 (Aerobic exercise elicits clinical adaptations in myotonic dystrophy type 1 patients independently of pathophysiological changes.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE184951",
+      "accession": "GSE184951",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC9106360.paper.md"
+        ],
+        "metadata": "GSE184951/GSE184951_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE184951"
+            ],
+            "assay": "bulk total RNA-seq (TruSeq Stranded Total RNA), human vastus lateralis biopsies, HISAT2/GRCh37 + HTSeq gene counts",
+            "sample_inclusion": "11 DM1 patients who completed 12 wk cycling (P10, P11 dropped out; S4.1.p1) biopsied pre and post; healthy inactive CON biopsied once at baseline (n = 10 sequenced; Fig 4 legend n = 10-11)",
+            "factors": {
+              "grp": [
+                "CON",
+                "DM1-PRE",
+                "DM1-POST"
+              ]
+            },
+            "primary_estimand": "Within-patient effect of 12 weeks of aerobic cycle training on vastus lateralis gene expression in DM1 patients (DM1-POST vs DM1-PRE, paired by patient) (S2.9.p1, Fig 4C)",
+            "planned_contrasts": [
+              "DM1-POST vs DM1-PRE, paired (S2.9.p1, Fig 4C; paper: 18 up, 1 down)",
+              "DM1-PRE vs CON (S2.8.p1, Fig 4B; paper: 435 up, 205 down) - disease contrast, not an exercise effect"
+            ],
+            "repeated_measure_unit": "patient (pre/post biopsies from the same DM1 patient)",
+            "normalization": "DESeq2 library size normalization (S4.16.p1)",
+            "paper_method": "DESeq2 accounting for group and paired sample design (S4.16.p1)",
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.005,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.5,
+              "inclusive": false,
+              "source_locator": "FIG4 legend"
+            },
+            "paper_results": {
+              "POST_vs_PRE": "18 up, 1 down; ECM remodelling, angiogenesis, inflammation GO terms up",
+              "PRE_vs_CON": "435 up, 205 down; snoRNAs/snRNAs up, splicing/OXPHOS/translation down"
+            }
+          },
+          "reasoning": "S2.9.p1 and Fig 4C define the exercise estimand as DM1-PRE vs DM1-POST with 1 down/18 up genes; S4.16.p1 states DESeq2 with group and paired design; Fig 4 legend gives the significance rule |log2(FC)| > 1.5 and P < 0.005 (a raw P, no FDR stated). S2.8.p1 adds the DM1-PRE vs CON disease contrast. Supplemental Table 3 (DEG lists) is not available here.",
+          "confidence": "high",
+          "locator": "S2.9.p1; S4.16.p1; FIG4"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S4.22.p1 names GSE184951",
+              "GEO series contact Tarnopolsky (senior author), McMaster",
+              "32 GSMs: 10 CON + 11 DM1 pre + 11 DM1 post, matches 11 patients and n=10 CON in Fig 4",
+              "data_processing matches S4.16.p1 (HISAT2 GRCh37, HTSeq, DESeq2)"
+            ]
+          },
+          "reasoning": "Paper data availability (S4.22.p1) names GSE184951; the sample set and processing match the methods. The per-sample HTSeq geneCounts files in GSE184951_RAW.tar are the gene count matrix; the *.SE.MATS.JC.txt.gz files are rMATS splicing outputs, not gene expression.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": [
+              "title",
+              "(Control|pre|post)"
+            ],
+            "subject": [
+              "title",
+              "^(Control|Sample)\\D*(\\d+)"
+            ],
+            "sex": [
+              "title",
+              "^(Control|Sample)\\D*(\\d+)"
+            ]
+          },
+          "recode": {
+            "grp": {
+              "Control": "CON",
+              "pre": "PRE",
+              "post": "POST"
+            },
+            "sex": {
+              "Sample_1": "M",
+              "Sample_12": "M",
+              "Sample_13": "F",
+              "Sample_2": "F",
+              "Sample_3": "M",
+              "Sample_4": "M",
+              "Sample_5": "F",
+              "Sample_6": "F",
+              "Sample_7": "M",
+              "Sample_8": "F",
+              "Sample_9": "F",
+              "Control_1": "M",
+              "Control_12": "M",
+              "Control_13": "F",
+              "Control_2": "F",
+              "Control_3": "M",
+              "Control_4": "M",
+              "Control_6": "F",
+              "Control_7": "M",
+              "Control_8": "F",
+              "Control_9": "F"
+            }
+          },
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Merged tar columns are GSM ids, matching the metadata index exactly. grp from title ('Control matched for sample N' / 'Sample N pre|post treatment'). subject keeps the Control/Sample prefix so that a control matched to patient N is NOT treated as the same person as patient N (they are different individuals, S4.1.p1). sex: metadata has no sex field; each subject is recoded to the sex inferred from Y-gene/XIST expression in the first run's suitability sex check (all high confidence; consistent within every pre/post pair and every control matches its patient's sex)."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {
+            "source": "GSE184951_RAW.tar per-sample *.geneCounts.txt.gz merged",
+            "paper_input": "HTSeq gene read counts into DESeq2 (S4.16.p1)"
+          },
+          "reasoning": "All values integer (fraction 1.0), min 0, max 1.3e7, Ensembl gene IDs; files named geneCounts; data_processing: 'Gene read count abundance determined by HTSeq'. Matches the paper's DESeq2 input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": [
+            "grp"
+          ],
+          "references": {
+            "grp": "PRE"
+          },
+          "subject": "subject",
+          "organism": "Human",
+          "planned": [
+            "grp_POST_vs_PRE",
+            "grp_CON_vs_PRE"
+          ],
+          "covariate_candidates": [
+            "subject"
+          ],
+          "final": {
+            "analysis_type": "paired two-group (primary) + independent two-group (secondary disease contrast)",
+            "design_column": "grp",
+            "contrasts": [
+              {
+                "name": "grp_POST_vs_PRE",
+                "control": "PRE",
+                "treatment": "POST",
+                "role": "primary"
+              },
+              {
+                "name": "grp_PRE_vs_CON",
+                "control": "CON",
+                "treatment": "PRE",
+                "role": "secondary"
+              }
+            ]
+          },
+          "candidates": [
+            {
+              "value": "treatment column (12-weeks of cycle ergometry vs untreated)",
+              "reason_rejected": "pools CON with DM1-PRE in 'untreated', mixing disease with exercise"
+            },
+            {
+              "value": "DM1-POST vs CON as an exercise effect",
+              "reason_rejected": "between-subject, confounded by disease; paper does not test it transcriptomically"
+            }
+          ],
+          "reasoning": "Exercise effect is the within-patient POST vs PRE change (S2.9.p1). DM1-PRE vs CON (S2.8.p1) is a disease association contrast reported in the paper; run as secondary and described as associational, not an exercise effect.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [
+              "subject"
+            ],
+            "covariates": [
+              {
+                "name": "subject",
+                "disposition": "blocking term in the POST vs PRE model (paired design, S4.16.p1); not used in PRE vs CON where each subject has one sample"
+              }
+            ]
+          },
+          "confounding_candidates": [
+            "subject"
+          ],
+          "reasoning": "Pre/post biopsies come from the same 11 patients, so patient is a blocking factor for the exercise contrast. S4.16.p1 notes extraction batches (P6 pilot pair; other PRE, POST and CON samples 'extracted in individual batches'); no batch column is deposited, so this cannot be modelled and is recorded as a caveat. No sex/age in metadata; controls were age- and sex-matched (S4.1.p1).",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ subject + grp (POST vs PRE, DM1 samples only); ~ grp (PRE vs CON)",
+            "paper_route": {
+              "method": "DESeq2 with group and paired design",
+              "status": "reproduced"
+            },
+            "deviations": [
+              "pydeseq2 instead of R DESeq2; each contrast fitted on its own subset (paper did not specify whether one model held all 32 samples)"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw HTSeq counts support DESeq2, the paper's method (S4.16.p1). Pairing via subject term. A single model with subject blocking cannot estimate CON vs PRE (each control is its own subject), so the two contrasts are fitted separately.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.005,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.5,
+              "inclusive": false
+            },
+            "threshold_source": "paper",
+            "applied_threshold": {
+              "metric": "pvalue",
+              "cutoff": 0.005,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 1.5,
+              "inclusive": false
+            },
+            "audit_threshold": {
+              "metric": "padj",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": null,
+              "inclusive": false
+            }
+          },
+          "reasoning": "Fig 4 legend: significant = |log2(FC)| > 1.5 and P < 0.005 (raw P, as written; no FDR). Audit: BH padj < 0.05, no FC cutoff.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "PRE vs CON is associational (disease), not an exercise effect",
+              "Extraction batches (S4.16.p1) may coincide with group (PRE/POST/CON extracted in individual batches); batch not deposited and cannot be adjusted",
+              "Paper threshold uses raw P < 0.005 without multiple-testing correction",
+              "Paper's DEG lists (Supplemental Table 3) unavailable; only counts compared",
+              "Per-sex POST vs PRE runs are exploratory (5 male / 6 female pairs); sex inferred from expression, not deposited"
+            ]
+          },
+          "paper_counts": {
+            "grp_POST_vs_PRE": 19,
+            "grp_PRE_vs_CON": 640
+          },
+          "paper_genes": {
+            "grp_PRE_vs_CON": [
+              "SNORD116-1",
+              "RNU5B-1",
+              "RNU6ATAC",
+              "SNORA38"
+            ]
+          },
+          "reasoning": "Counts from S2.9.p1 (1 down + 18 up) and S2.8.p1 (205 down + 435 up). Named upregulated small RNAs from S2.8.p1."
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "CON n",
+          "paper": "11 controls recruited (S4.1.p1); Fig 4 n = 10-11",
+          "data": "10 CON samples in GEO (no control matched to patient 5)",
+          "disposition": "executable_without_change"
+        },
+        {
+          "item": "extraction batch",
+          "paper": "P6 pilot pair and per-group extraction batches (S4.16.p1)",
+          "data": "no batch annotation",
+          "disposition": "executable_without_change"
+        }
+      ],
+      "executions": [
+        {
+          "name": "grp_POST_vs_PRE",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": [
+              "subject"
+            ],
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "grp",
+            "levels": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "role": "primary",
+          "reasoning": "Paper's paired DESeq2 exercise contrast (S2.9.p1, S4.16.p1)."
+        },
+        {
+          "name": "grp_PRE_vs_CON",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "CON",
+            "treatment_group": "PRE",
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "CON",
+              "PRE"
+            ]
+          },
+          "role": "secondary",
+          "reasoning": "Paper's DM1-PRE vs CON disease contrast (S2.8.p1); associational."
+        },
+        {
+          "name": "grp_POST_vs_PRE_filtered",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": [
+              "subject"
+            ],
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "grp",
+            "levels": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "filter_low_counts": {
+            "min_mean_count": 10
+          },
+          "role": "sensitivity",
+          "reasoning": "Paper states no low-count filter; iDEP (S4.16.p1) filters low-expressed genes by default. Tests whether low-count genes explain our excess DEGs."
+        },
+        {
+          "name": "grp_PRE_vs_CON_filtered",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "CON",
+            "treatment_group": "PRE",
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "CON",
+              "PRE"
+            ]
+          },
+          "filter_low_counts": {
+            "min_mean_count": 10
+          },
+          "role": "sensitivity",
+          "reasoning": "Same low-count sensitivity for the disease contrast."
+        },
+        {
+          "name": "grp_POST_vs_PRE_male",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": [
+              "subject"
+            ],
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "PRE",
+              "POST"
+            ],
+            "sex": [
+              "M"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "grp",
+            "levels": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "role": "exploratory",
+          "reasoning": "Per-sex exploratory (5 male pairs); paper pooled sexes."
+        },
+        {
+          "name": "grp_POST_vs_PRE_female",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {
+            "design_column": "grp",
+            "control_group": "PRE",
+            "treatment_group": "POST",
+            "covariate_columns": [
+              "subject"
+            ],
+            "alpha": 0.05
+          },
+          "subset": {
+            "grp": [
+              "PRE",
+              "POST"
+            ],
+            "sex": [
+              "F"
+            ]
+          },
+          "complete_pairs": {
+            "subject": "subject",
+            "condition": "grp",
+            "levels": [
+              "PRE",
+              "POST"
+            ]
+          },
+          "role": "exploratory",
+          "reasoning": "Per-sex exploratory (6 female pairs); paper pooled sexes."
+        }
+      ],
+      "enrichment": [
+        {
+          "execution": "grp_POST_vs_PRE",
+          "ora": true,
+          "gsea": false,
+          "direction": "up",
+          "reasoning": "Paper reports GO BP terms up with training (Fig 4E)."
+        },
+        {
+          "execution": "grp_POST_vs_PRE",
+          "ora": false,
+          "gsea": true,
+          "direction": "all",
+          "ranking_metric": "stat",
+          "reasoning": "Full-ranking Hallmark GSEA for the exercise contrast."
+        }
+      ]
+    }
+  ]
+}
