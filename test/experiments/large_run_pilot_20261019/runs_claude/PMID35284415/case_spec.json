@@ -1,0 +1,88 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35284415",
+  "request": "Analyze GSE192982 for PMID 35284415 (Engineered Human Meniscus in Modeling Sex Differences of Knee Osteoarthritis in Vitro.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE192982",
+      "accession": "GSE192982",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC8904202.paper.md"],
+        "metadata": "GSE192982/GSE192982_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID35284415/GSE192982_log2TMM_genes_x_samples.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID35284415/prep_transpose.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE192982"],
+            "assay": "bulk RNA-seq (Illumina NextSeq 500, PE 42bp) of tissue-engineered meniscus constructs made from human meniscus fibrochondrocytes (S2.6.p1)",
+            "system": "in vitro: MFCs from 8 non-OA partial-meniscectomy donors (4F/4M) seeded on collagen I scaffolds, 2 wk static preculture, then 3 wk of Static, SMG (rotating-wall bioreactor) or CHP (0.9 MPa, 1 Hz, 1 h/day) (S2.2.p2, S2.3.p1)",
+            "factors": {"mechanical_condition": ["Static", "SMG", "CHP"], "sex": ["F", "M"], "donor": "8 donors, each exposed to all 3 conditions (S3.1.p1)"},
+            "sample_inclusion": "24 libraries = 8 donors x 3 conditions; replicate constructs pooled per donor/condition before sequencing (GEO extract_protocol)",
+            "primary_estimand": "Effect of in vitro mechanical loading (CHP) and unloading (SMG) versus static culture on the transcriptome of engineered meniscus constructs, all donors and within each sex (S1.p6, S3.2.p1, S3.4.p1). No exercise of any organism is studied.",
+            "planned_contrasts": [
+              "CHP vs Static, all donors (S3.2.p1; paper: 236 DEGs)",
+              "SMG vs Static, all donors (S3.2.p1; paper: 388 DEGs)",
+              "CHP vs Static and SMG vs Static within female and within male donors (S3.4.p1, Fig 5A; counts only in figure)"
+            ],
+            "repeated_measure_unit": "donor (random effect within sex; S2.7.p1)",
+            "normalization": "Partek: max-count<50 filter, add 1, TMM, log2 (S2.7.p1)",
+            "paper_method": "Partek Flow ANOVA with sex and treatment, donor as random within sex (S2.7.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S3.2.p1 (FC > 2 and q < 0.05)"},
+            "paper_results": {"CHP_vs_Static": 236, "SMG_vs_Static": 388, "shared": 52}
+          },
+          "reasoning": "The paper (S1.p6, ABS.p1) studies mechanical loading via cyclic hydrostatic pressure and unloading via simulated microgravity applied to cell-seeded scaffolds in a bioreactor, as an in vitro OA/sex-difference model. There is no exercise intervention, no exercising organism, and no training/sedentary arm.",
+          "confidence": "high",
+          "locator": "S1.p6; S2.3.p1; S2.7.p1; S3.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S7.p1 names GSE192982", "24 GEO samples = 8 donors x 3 conditions as in S3.1.p1", "13,361 genes in deposited matrix = 13,361 in S3.1.p1", "Partek/STAR/RefSeq processing in data_processing matches S2.7.p1"]},
+          "reasoning": "Data availability statement S7.p1 names GSE192982; gene count and design match the paper exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"cond": "characteristics_ch1.2.mechanical condition", "sex": "characteristics_ch1.0.Sex"},
+          "patterns": {"donor": ["title", "^ScACS-(\\d)-"]},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix sample names (after transposing the deposited samples-by-genes file) equal GEO titles exactly. Donor number is the first digit group of the title (ScACS-<donor>-<condition>); condition and sex come from GEO characteristics, which agree with the deposited annotation columns.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "log2(TMM-normalized count + 1) from Partek, low-count filtered",
+          "recommended_method": "limma",
+          "reasoning": "Non-integer values, range -4.6..16.6, median 4.2; data_processing and S2.7.p1 state add 1, TMM, log2. Same input as the paper's Partek ANOVA. Not raw counts, so DESeq2/edgeR do not apply.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["cond"],
+          "references": {"cond": "Static"},
+          "subject": "donor",
+          "organism": "Human",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": "cond", "contrasts": []},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the only interventions are in vitro mechanical loading (cyclic hydrostatic pressure in a bioreactor) and unloading (simulated microgravity) of cell-seeded scaffolds versus static culture. No organism exercised, so an exercise effect on gene expression is not identifiable from these data. The data would support CHP/SMG vs Static (donor-blocked limma), but that estimand is bioreactor mechanical stimulation, not exercise.",
+          "candidates": [
+            {"value": "cond CHP vs Static (donor-blocked) as an exercise surrogate", "reason_rejected": "CHP is 0.9 MPa hydrostatic pressure applied 1 h/day to engineered tissue in vitro (S2.3.p1); the paper frames it as mechanical loading for an OA model (S1.p6), not exercise. Labelling it an exercise effect would misstate the estimand."},
+            {"value": "cond SMG vs Static", "reason_rejected": "Mechanical unloading (simulated microgravity), not exercise."},
+            {"value": "sex F vs M", "reason_rejected": "Donor sex, not an exercise factor."}
+          ],
+          "reasoning": "The request is an exercise effect as the paper intends. The paper intends mechanical loading/unloading of engineered meniscus in vitro (ABS.p1, S1.p6, S2.3.p1); none of its factors is exercise. Design is therefore refused; groups would be analyzable (8 donors x 3 conditions, n=8 per arm) if mechanical stimulation itself were requested.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix orientation", "paper": "n/a", "data": "deposited file is samples x genes with 4 annotation columns", "disposition": "executable_without_change (transposed by prep_transpose.py, values unchanged)"},
+        {"item": "estimand vs request", "paper": "in vitro mechanical loading/unloading (CHP, SMG) vs static", "data": "same", "disposition": "blocking: request is an exercise effect; no exercise arm exists"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

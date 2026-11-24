@@ -1,0 +1,206 @@
+{
+  "case_id": "GSE192982",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "cond"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "log2(TMM-normalized count + 1) from Partek, low-count filtered",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "log2(TMM-normalized count + 1) from Partek, low-count filtered",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "cond"
+      ],
+      "levels": {
+        "cond": {
+          "Static": 8,
+          "SMG": 8,
+          "CHP": 8
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "donor"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "donor",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(cond) + C(donor)",
+        "rank": 10,
+        "full_rank": true,
+        "residual_df": 14,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 3,
+      "n_analyzable": 3,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 24 samples.",
+      "metadata_sex_column": "characteristics_ch1.0.Sex",
+      "predicted": {
+        "female": 12,
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35284415\\GSE192982\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "cond_SMG_vs_CHP__sex-female",
+            "cond_CHP_vs_Static__sex-female",
+            "cond_SMG_vs_Static__sex-female"
+          ],
+          "male": [
+            "cond_SMG_vs_CHP__sex-male",
+            "cond_CHP_vs_Static__sex-male",
+            "cond_SMG_vs_Static__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "cond_SMG_vs_CHP",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "SMG",
+      "reference": "CHP",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cond": "SMG"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cond": "CHP"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_CHP_vs_Static",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "CHP",
+      "reference": "Static",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cond": "CHP"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cond": "Static"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "cond_SMG_vs_Static",
+      "kind": "simple",
+      "factor": "cond",
+      "test": "SMG",
+      "reference": "Static",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "cond": "SMG"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "cond": "Static"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

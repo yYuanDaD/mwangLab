@@ -1,0 +1,24 @@
+{"case": "GSE192982", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "The series is an in vitro study: engineered human meniscus constructs (fibrochondrocytes from 8 non-OA donors, 4F/4M) under Static, CHP (cyclic hydrostatic pressure, mechanical loading) or SMG (simulated microgravity, unloading) for 3 weeks (S2.2, S2.3, S3.1.p1). No organism exercises. CHP is a bioreactor loading mimic; whether it counts as an 'exercise mediator' study is an open policy question. No metadata column carries exercise words.",
+  "B2": "CHP vs Static and SMG vs Static, all 8 donors combined (n=8 per arm; 236 and 388 DEGs, 52 shared; S3.2.p1), and the same two contrasts within female (4 donors) and male (4 donors) cohorts (S3.4.p1, Fig 5A; counts only in the figure).",
+  "B3": "Yes. Each of the 8 donors contributes one Static, one CHP and one SMG library (S3.1.p1). Replicate constructs are pooled per donor and condition. Unit = donor (GEO title ScACS-<donor>-<cond>, column donor). Packet A: donor and age each link 24/24 samples once per level; the expression check is supported (same-key r 0.568 vs -0.081, p 0.0005).",
+  "B4": "One joint model on all samples: 'ANOVA for biological sex and treatment. Within each sex, the donors were assigned as a random variable' (S2.7.p1). Per-sex results are reported as separate cohorts.",
+  "B5": "'DEGs were defined as genes with expression fold-change over 2 and q-value less than 0.05' (S3.2.p1): FDR q < 0.05 and FC > 2 (strict, not inclusive). 13,361 genes after the max-count < 50 filter, Add 1 + TMM + log2 (S2.7.p1). Counts: CHP 236, SMG 388, shared 52 (CHP-only 184, SMG-only 336)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "unsure", "severity": "none", "evidence": "No exercise arm in the usual sense: S1.p6, S2.3.p1 describe in vitro CHP/SMG on engineered tissue. The refusal is labelled as in vitro mechanical stimulation, as required. Whether an in vitro loading mimic counts as an exercise study is an open policy question.", "fix": ""},
+  {"id": "grouping", "verdict": "na", "severity": "none", "evidence": "Case refused. For the record, packet B levels (Static 8, SMG 8, CHP 8; 8 donors x 3) match S3.1.p1 and the GEO characteristics; no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast executed.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Repeated measures per donor were found and recorded (donor parsed from title; planned model donor-blocked; repeated_measure_unit = donor). Nothing was run, so nothing was left unpaired.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "Not executed. HANDBACK notes the paper's joint ANOVA with donor random within sex (S2.7.p1).", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "Sex is balanced (12F/12M), donor crossed with condition; no batch alias visible in packet A.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Deposited matrix is log2(TMM+1) from Partek, non-integer, 13,361 genes, matches S2.7.p1; limma recommended, DESeq2/edgeR excluded. Correct.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "HANDBACK transcribes 'fold change > 2 (|log2FC| > 1) and q < 0.05 (S3.2.p1)', same as B5.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK lists the paper counts (236, 388, 52) with the right contrasts and claims no ours-vs-paper comparison.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "The reason 'no exercise arm / no organism exercised' is a design fact established from S1.p6, S2.3.p1 and the metadata (no exercise words), not a missing-data claim. The donor key was found, so the narrow-search failure mode does not apply.", "fix": ""}
+ ],
+ "overall": "human",
+ "human_items": [
+  "Policy: does in vitro cyclic hydrostatic pressure loading (CHP) and simulated microgravity of engineered tissue count as an exercise study (exercise mediator mimic)? If yes, the case is analyzable now: limma on the deposited log2-TMM matrix, cond with Static as reference, donor blocked (dupcor or random), n=8 per arm, rule FC>2 and q<0.05, compare to 236/388 DEGs."
+ ],
+ "summary": "该系列是体外工程化半月板的机械加载(CHP)/卸载(SMG)实验,没有生物体运动臂,拒绝理由属实且已标注为体外设计。基质类型、阈值转录、配对单位(donor)的识别均正确。是否把体外机械加载视为运动研究属于尚未决定的政策问题,交由人工判断。"}

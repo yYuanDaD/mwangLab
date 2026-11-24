@@ -580,3 +580,7 @@ One section per case; newest last.
 
 - policy: Policy: whether a disuse (immobilization) contrast with no exercise arm counts as an exercise study (open policy question).
 - policy: Whether to accept the +60 sample-number offset as the mouse key without confirmation from the authors.
+
+## PMID35284415 / GSE192982 (2026-11-24)
+
+- policy: Policy: does in vitro cyclic hydrostatic pressure loading (CHP) and simulated microgravity of engineered tissue count as an exercise study (exercise mediator mimic)? If yes, the case is analyzable now: limma on the deposited log2-TMM matrix, cond with Static as reference, donor blocked (dupcor or random), n=8 per arm, rule FC>2 and q<0.05, compare to 236/388 DEGs.
