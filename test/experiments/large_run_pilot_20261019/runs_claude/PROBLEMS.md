@@ -1087,3 +1087,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34478753 (GSE179394)
 
 - Windows loky WinError 6 at shutdown (joblib process_executor.py:477); inspect key hint missed 's'/'_R2' suffixes; joint records show formula '~ cell' Details: `PMID34478753/HANDBACK.md`.
+
+## PMID38377006 (GSE254368)
+
+- voom/edgeR executors cannot block on subject (limma_voom_tools.py:60, edger_tools.py:38); runner's paper count includes all biotypes, not just miRNAs; pydeseq2 exp overflow warning Details: `PMID38377006/HANDBACK.md`.

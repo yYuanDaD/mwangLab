@@ -1,0 +1,86 @@
+{
+ "case": "GSE254368",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Abstract METHODS: 10 participants did an acute heavy resistance exercise test (AHRET); plasma EVs pre/post. All 20 libraries carry the factor as pre vs post.",
+  "B2": "One comparison: post- vs pre-AHRET EV miRNAs, 10 participants (5 men, 5 women), 10 pre + 10 post libraries (Abstract METHODS/RESULTS).",
+  "B3": "Yes: each participant sampled pre and post. Key: subject token in sample description (m1..f35); title 'Male N' + sex also pairs every sample once (packet A candidate keys, 10 keys, 20/20 linked, 0 duplicates).",
+  "B4": "Abstract does not say; one two-level comparison, model unstated.",
+  "B5": "Abstract RESULTS: '34 miRNAs were altered by AHRET (P < 0.05)', i.e. raw P < 0.05, no fold-change cutoff, no FDR; 175 canonical pathways at P < 0.01 (IPA)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Exercise arm present (AHRET pre/post); run.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "time pre 10 / post 10 from description suffix, matches metadata time point; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "post vs pre; caveat records that the authors' deposited logFC is pre minus post.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Subject blocking ~ subject + time, 10 complete pairs; matches B3 and GEO 'repeated measures'.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper silent; paired primary plus unpaired voom sensitivity both reported (34 vs 10 DEGs); the unpaired fit overlaps the authors' hits more (9/10), suggesting the authors may not have blocked. Recorded as sensitivity, acceptable.",
+   "fix": "Optionally state in HANDBACK that the authors' fit is probably unpaired."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Sex crossed with time, absorbed by subject; no batch information.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer raw counts, DESeq2 chosen over edgeR/limma, declared as deviation; CPM filter recovered from deposited table (642 features).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "raw P < 0.05, no FC, matches Abstract; FDR audit labelled separately (0 at padj < 0.05).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Count 34 equals the paper's 34 but includes non-miRNA features; miRNA-only is 20 and only 12 overlap the authors' 34. Caveats and HANDBACK state this, so the equality is not claimed as a reproduction.",
+   "fix": "Keep wording that the equal count is coincidental."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stops or refusals; enrichment skipped with a stated reason (IPA miRNA targets not reproducible).",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [],
+ "summary": "该案例应当分析：10名受试者运动前后配对，使用subject区组的DESeq2，阈值为原文的原始P<0.05，方向为post对pre，符合摘要。论文仅有摘要，模型未说明，已同时报告配对与非配对结果；与论文的34个数目相同属巧合，仅12/20个miRNA重叠，已在注意事项中说明。无阻断或重大问题。"
+}

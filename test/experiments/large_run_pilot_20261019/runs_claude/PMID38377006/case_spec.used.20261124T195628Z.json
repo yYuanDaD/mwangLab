@@ -1,0 +1,169 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38377006",
+  "request": "Analyze GSE254368 for PMID 38377006 (Acute Resistance Exercise Modifies Extracellular Vesicle miRNAs Targeting Anabolic Gene Pathways: A Prospective Cohort Study.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE254368",
+      "accession": "GSE254368",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID38377006/abstract_PMID38377006.txt"],
+        "metadata": "GSE254368/GSE254368_metadata.csv",
+        "matrix": "GSE254368/GSE254368_all_miRNA_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_duplicates": "first"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE254368"],
+            "assay": "small RNA-seq (TruSeq Small RNA) of plasma extracellular-vesicle RNA, STAR to miRBase v22 / Ensembl 101",
+            "sample_inclusion": "10 participants (5 men, 5 women), plasma EVs pre and immediately post AHRET; 20 libraries",
+            "factors": {"time": ["pre", "post"], "subject": "10 participants (repeated measures)", "sex": ["male", "female"]},
+            "primary_estimand": "within-subject change in plasma EV small-RNA (miRNA) abundance, post- vs pre-acute heavy resistance exercise test (6x10 back squat at 75% 1RM)",
+            "planned_contrasts": ["time post vs pre (Abstract RESULTS; paper: 34 miRNAs altered, P < 0.05)"],
+            "repeated_measure_unit": "participant",
+            "paper_method": "edgeR workflow (GEO data_processing); deposited DE table has limma topTable columns (logFC, CI.L/R, t, B, adj.P.Val), consistent with edgeR-normalised voom/limma; pairing not stated in abstract",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "Abstract RESULTS: '34 miRNAs were altered by AHRET (P < 0.05)'"},
+            "paper_results": "34 DE miRNAs at P<0.05 -> IPA, 175 canonical pathways (P<0.01); deposited table: 46 features at P.Value<0.05 of 642 tested, 34 of them miRNA biotype, adj.P.Val all >= 0.05"
+          },
+          "reasoning": "Only the PubMed abstract and GEO series description are available (no full text). Abstract METHODS/RESULTS give 10 participants, pre/post AHRET, DE miRNAs at P<0.05 (raw P; no FDR, no fold-change rule). GEO overall_design: 'Repeated measures study, pre- and immediate-post'. GEO data_processing: edgeR workflow.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO Series_summary / overall_design / data_processing"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 38377006", "series title equals paper title", "20 GSMs = 10 participants x pre/post, 5 male + 5 female matches abstract", "matrix column names equal metadata description for all 20 samples"]},
+          "reasoning": "GSE254368 is the paper's own deposit; miRNA count matrix is the input to the deposited DE table (same sample columns).",
+          "confidence": "high",
+          "candidates": [
+            {"value": "GSE254368_all_gene_counts.csv", "reason_rejected": "gene-level counts of all biotypes; paper analyses miRNAs, and the deposited DE table derives from the miRNA count file"},
+            {"value": "GSE254368_all_transcript_counts.csv", "reason_rejected": "transcript level, contains negative values; not the paper's input"},
+            {"value": "GSE254368_all_miRNA_differential_expression.csv", "reason_rejected": "author result table, used only for comparison"}
+          ]
+        },
+        "alignment": {
+          "key_column": "description",
+          "matrix_column_pattern": "^(sample\\..+)$",
+          "patterns": {
+            "subject": ["description", "^sample\\.bn\\d+_([mf]\\d+)_(?:pre|pwo)$"],
+            "time": ["description", "^sample\\.bn\\d+_[mf]\\d+_(pre|pwo)$"]
+          },
+          "aliases": {"sex": "characteristics_ch1.1.Sex"},
+          "recode": {"time": {"pre": "pre", "pwo": "post"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns 'sample.bnNN_<sex><id>_<pre|pwo>' equal metadata 'description' exactly; the pattern drops the numeric annotation column transcript_count. Subject = m1/m12/.../f35 token (each appears once pre, once pwo); time from suffix (pwo = post-workout), consistent with characteristics 'time point'.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values non-negative integers; GEO data_processing: STAR alignment then edgeR workflow and 'raw counts for each sample'. Paper input is raw counts to edgeR. Library sizes vary 0.12M-15.6M (one large library), handled by size-factor normalisation.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "pre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_post_vs_pre"],
+          "covariate_candidates": ["sex"],
+          "final": {
+            "analysis_type": "paired two-group (repeated measures)",
+            "design_column": "time",
+            "control": "pre",
+            "treatment": "post",
+            "contrasts": [{"name": "time_post_vs_pre", "control": "pre", "treatment": "post", "role": "primary"}]
+          },
+          "reasoning": "Abstract: DE miRNAs between pre- and post-AHRET EVs; GEO: repeated measures. Single within-subject contrast post vs pre. Sex is constant within subject and absorbed by subject blocking; per-sex analyses (5 pairs each) are exploratory.",
+          "confidence": "high",
+          "candidates": [{"value": "characteristics_ch1.4.treatment", "reason_rejected": "same split as time point, redundant"}]
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [{"name": "sex", "disposition": "absorbed by subject (between-subject, constant within pair)"}]
+          },
+          "confounding_candidates": ["sex"],
+          "reasoning": "Each participant contributes pre and post; subject is the blocking unit (GEO overall_design: repeated measures). Sex is nested in subject, not added separately.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), ~ subject + time",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "edgeR workflow / limma topTable (likely voom), pairing unknown", "status": "blocked", "reason": "Repository edgeR and limma-voom executors take a single design column (no subject blocking), and the abstract does not state the exact model or low-count filter; the paired model is run with DESeq2 and an unpaired limma-voom run is kept as sensitivity."},
+            "deviations": ["DESeq2 paired model instead of edgeR/limma workflow", "low-count filter approximating edgeR filterByExpr (CPM >= 20, ~10 reads at median library size 0.48M, in >= 10 samples); authors' filter unknown (they tested 642 features)", "all small-RNA biotypes kept in the model as in the deposited table; miRNA-only counts reported separately"]
+          },
+          "reasoning": "Raw counts support DESeq2; paired design needs subject blocking which only the DESeq2 executor offers among count routes.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "Abstract RESULTS: 'P < 0.05' (raw p, no FC). Audit FDR < 0.05 labelled separately.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["Paper comparison rests on the abstract and GEO description only (no full text).", "Paper counts 34 miRNAs; our tables count all small-RNA features passing the filter, miRNA-only count reported in HANDBACK.", "Raw P < 0.05 with no multiple-testing control; the deposited author table has no feature at adj.P < 0.05."]
+          },
+          "paper_counts": {"time_post_vs_pre": 34},
+          "paper_genes": {"time_post_vs_pre": ["MIR23B", "MIR454", "MIR766", "MIR197", "MIR30E", "MIRLET7A2", "MIR210", "MIR378A", "MIR26B", "MIR30D", "MIR22", "MIR98"]},
+          "reasoning": "Named miRNAs are from the deposited author DE table (P.Value < 0.05), not the abstract.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "pairing", "paper": "abstract silent; GEO: repeated measures", "data": "subject derivable for all 10 pairs", "disposition": "executable_without_change"},
+        {"item": "method", "paper": "edgeR workflow (limma-style output)", "data": "raw counts", "disposition": "declared_deviation"},
+        {"item": "feature set", "paper": "34 miRNAs counted; deposited table tested 642 small-RNA features", "data": "7009 small-RNA features before filtering", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "time_post_vs_pre",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": ["subject"], "alpha": 0.05},
+          "filter_low_counts": {"min_cpm": 20, "min_samples": 10},
+          "role": "primary",
+          "reasoning": "Paired post vs pre, subject blocking."
+        },
+        {
+          "name": "time_post_vs_pre_voom_unpaired",
+          "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+          "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post"},
+          "filter_low_counts": {"min_cpm": 20, "min_samples": 10},
+          "role": "sensitivity",
+          "reasoning": "Closest available to the authors' limma-style output; unpaired because the executor has no blocking."
+        },
+        {
+          "name": "time_post_vs_pre_male",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": ["subject"], "alpha": 0.05},
+          "subset": {"sex": ["male"]},
+          "filter_low_counts": {"min_cpm": 20, "min_samples": 5},
+          "role": "exploratory",
+          "reasoning": "Per-sex exploratory (5 pairs); paper pooled sexes."
+        },
+        {
+          "name": "time_post_vs_pre_female",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "time", "control_group": "pre", "treatment_group": "post", "covariate_columns": ["subject"], "alpha": 0.05},
+          "subset": {"sex": ["female"]},
+          "filter_low_counts": {"min_cpm": 20, "min_samples": 5},
+          "role": "exploratory",
+          "reasoning": "Per-sex exploratory (5 pairs); paper pooled sexes."
+        }
+      ],
+      "enrichment": []
+    }
+  ]
+}

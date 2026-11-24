@@ -1,0 +1,141 @@
+{
+  "case_id": "GSE254368",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "pre": 10,
+          "post": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "sex",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject)",
+        "rank": 11,
+        "full_rank": true,
+        "residual_df": 9,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_pre"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "no_markers",
+      "summary": "Sex inference failed: none of the sex-marker genes (Ddx3y, Uty, Eif2s3y, Kdm5d, Rps4y1, Xist) were found in the matrix index. The matrix may use IDs that don't map (check organism='Human') or lack sex chromosomes.",
+      "metadata_sex_column": "characteristics_ch1.1.Sex",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_post_vs_pre__sex-female"
+          ],
+          "male": [
+            "time_post_vs_pre__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_post_vs_pre",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "pre",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "time": "post"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "time": "pre"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

@@ -1,0 +1,1048 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38377006",
+  "subject_id": "GSE254368",
+  "created_at": "2026-11-24T14:58:42",
+  "finished_at": "2026-11-24T14:59:03",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "abstract_PMID38377006.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\abstract_PMID38377006.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T14:58:42",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e40b6ead09dfcb2734ae03652f3ebcb7afea644f4dd727bb108b8261e7aa5c1c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE254368_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE254368\\GSE254368_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T14:58:42",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f4829b0d0e7b40fce141a4e954de9b506ba1a93e6a16223ae141064c332a71ad",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE254368_all_miRNA_counts.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE254368\\GSE254368_all_miRNA_counts.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T14:58:42",
+      "sha256": null,
+      "attributes": {
+        "sha256": "519d11fb988345468b38386d1b2b437d211fa29203c69aafac62069e564439ae",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE254368"
+        ],
+        "assay": "small RNA-seq (TruSeq Small RNA) of plasma extracellular-vesicle RNA, STAR to miRBase v22 / Ensembl 101",
+        "sample_inclusion": "10 participants (5 men, 5 women), plasma EVs pre and immediately post AHRET; 20 libraries",
+        "factors": {
+          "time": [
+            "pre",
+            "post"
+          ],
+          "subject": "10 participants (repeated measures)",
+          "sex": [
+            "male",
+            "female"
+          ]
+        },
+        "primary_estimand": "within-subject change in plasma EV small-RNA (miRNA) abundance, post- vs pre-acute heavy resistance exercise test (6x10 back squat at 75% 1RM)",
+        "planned_contrasts": [
+          "time post vs pre (Abstract RESULTS; paper: 34 miRNAs altered, P < 0.05)"
+        ],
+        "repeated_measure_unit": "participant",
+        "paper_method": "edgeR workflow (GEO data_processing); deposited DE table has limma topTable columns (logFC, CI.L/R, t, B, adj.P.Val), consistent with edgeR-normalised voom/limma; pairing not stated in abstract",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "Abstract RESULTS: '34 miRNAs were altered by AHRET (P < 0.05)'"
+        },
+        "paper_results": "34 DE miRNAs at P<0.05 -> IPA, 175 canonical pathways (P<0.01); deposited table: 46 features at P.Value<0.05 of 642 tested, 34 of them miRNA biotype, adj.P.Val all >= 0.05"
+      },
+      "reason": "Only the PubMed abstract and GEO series description are available (no full text). Abstract METHODS/RESULTS give 10 participants, pre/post AHRET, DE miRNAs at P<0.05 (raw P; no FDR, no fold-change rule). GEO overall_design: 'Repeated measures study, pre- and immediate-post'. GEO data_processing: edgeR workflow.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:42"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE254368\\GSE254368_all_miRNA_counts.csv",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 38377006",
+          "series title equals paper title",
+          "20 GSMs = 10 participants x pre/post, 5 male + 5 female matches abstract",
+          "matrix column names equal metadata description for all 20 samples"
+        ],
+        "accession": "GSE254368",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE254368\\GSE254368_metadata.csv"
+      },
+      "reason": "GSE254368 is the paper's own deposit; miRNA count matrix is the input to the deposited DE table (same sample columns).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:42"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 20,
+        "n_metadata": 20,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "sex": {
+              "alias_of": "characteristics_ch1.1.Sex"
+            },
+            "subject": {
+              "source": "description",
+              "regex": "^sample\\.bn\\d+_([mf]\\d+)_(?:pre|pwo)$"
+            },
+            "time": {
+              "source": "description",
+              "regex": "^sample\\.bn\\d+_[mf]\\d+_(pre|pwo)$",
+              "recode": {
+                "pre": "pre",
+                "pwo": "post"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\design_metadata.csv",
+          "sha256": "5622e795a20a0f2480859bb29036bb77af6217b18f7bac6fa9db535c673cee81",
+          "levels": {
+            "sex": {
+              "male": 10,
+              "female": 10
+            },
+            "subject": {
+              "m1": 2,
+              "m12": 2,
+              "m17": 2,
+              "m33": 2,
+              "m39": 2,
+              "f3": 2,
+              "f2": 2,
+              "f4": 2,
+              "f34": 2,
+              "f35": 2
+            },
+            "time": {
+              "pre": 10,
+              "post": 10
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns 'sample.bnNN_<sex><id>_<pre|pwo>' equal metadata 'description' exactly; the pattern drops the numeric annotation column transcript_count. Subject = m1/m12/.../f35 token (each appears once pre, once pwo); time from suffix (pwo = post-workout), consistent with characteristics 'time point'.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:42"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\aligned_matrix.csv",
+          "sha256": "39cd73e5f539baa06dd74e1012a59ad5576ef6d125c494e92e08829c638410b2",
+          "n_features": 7009,
+          "n_samples": 20,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 2,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 2775696.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values non-negative integers; GEO data_processing: STAR alignment then edgeR workflow and 'raw counts for each sample'. Paper input is raw counts to edgeR. Library sizes vary 0.12M-15.6M (one large library), handled by size-factor normalisation.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:42"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "paired two-group (repeated measures)",
+        "design_column": "time",
+        "control": "pre",
+        "treatment": "post",
+        "contrasts": [
+          {
+            "name": "time_post_vs_pre",
+            "control": "pre",
+            "treatment": "post",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Abstract: DE miRNAs between pre- and post-AHRET EVs; GEO: repeated measures. Single within-subject contrast post vs pre. Sex is constant within subject and absorbed by subject blocking; per-sex analyses (5 pairs each) are exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:48"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "absorbed by subject (between-subject, constant within pair)"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 20,
+          "n_columns": 11,
+          "columns": [
+            "Intercept",
+            "time_pre",
+            "subject_f3",
+            "subject_f34",
+            "subject_f35",
+            "subject_f4",
+            "subject_m1",
+            "subject_m12",
+            "subject_m17",
+            "subject_m33",
+            "subject_m39"
+          ],
+          "rank": 11,
+          "full_rank": true,
+          "residual_df": 9,
+          "levels": {
+            "time": {
+              "pre": 10,
+              "post": 10
+            },
+            "subject": {
+              "m1": 2,
+              "m12": 2,
+              "m17": 2,
+              "m33": 2,
+              "m39": 2,
+              "f3": 2,
+              "f2": 2,
+              "f4": 2,
+              "f34": 2,
+              "f35": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "post",
+                "f2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "f3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "f34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "f35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "f4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "m1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "m12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "m17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "m33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "post",
+                "m39"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "f2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "f3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "f34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "f35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "f4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "m1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "m12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "m17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "m33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "pre",
+                "m39"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "sex",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "post": {
+                "female": 5,
+                "male": 5
+              },
+              "pre": {
+                "female": 5,
+                "male": 5
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Each participant contributes pre and post; subject is the blocking unit (GEO overall_design: repeated measures). Sex is nested in subject, not added separately.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:48"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald), ~ subject + time",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "edgeR workflow / limma topTable (likely voom), pairing unknown",
+          "status": "blocked",
+          "reason": "Repository edgeR and limma-voom executors take a single design column (no subject blocking), and the abstract does not state the exact model or low-count filter; the paired model is run with DESeq2 and an unpaired limma-voom run is kept as sensitivity."
+        },
+        "deviations": [
+          "DESeq2 paired model instead of edgeR/limma workflow",
+          "low-count filter CPM >= 1 in >= 10 samples, recovered from the data: it reproduces exactly the 642 features in the authors' deposited DE table (abstract does not state the filter)",
+          "all small-RNA biotypes kept in the model as in the deposited table; miRNA-only counts reported separately"
+        ]
+      },
+      "reason": "Raw counts support DESeq2; paired design needs subject blocking which only the DESeq2 executor offers among count routes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:48"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "Abstract RESULTS: 'P < 0.05' (raw p, no FC). Audit FDR < 0.05 labelled separately.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:48"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_post_vs_pre",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre\\input\\matrix_filtered.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "time_post_vs_pre": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 642,
+              "n_significant": 34,
+              "n_up": 15,
+              "n_down": 19,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 642,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paired post vs pre, subject blocking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:58"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_limma_voom_analysis",
+        "subset": "time_post_vs_pre_voom_unpaired",
+        "role": "sensitivity",
+        "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_voom_unpaired\\input\\matrix_filtered.csv",
+        "formula": "~ time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_voom_unpaired\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "time_post_vs_pre_voom_unpaired": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 642,
+              "n_significant": 10,
+              "n_up": 3,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 642,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Closest available to the authors' limma-style output; unpaired because the executor has no blocking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:58:58"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_post_vs_pre_male",
+        "role": "exploratory",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_male\\input\\matrix_filtered.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_male\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "time_post_vs_pre_male": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 627,
+              "n_significant": 26,
+              "n_up": 3,
+              "n_down": 23,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 627,
+              "n_significant": 1,
+              "n_up": 0,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Per-sex exploratory (5 pairs); paper pooled sexes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:59:00"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "time_post_vs_pre_female",
+        "role": "exploratory",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_female\\input\\matrix_filtered.csv",
+        "formula": "~ subject + time",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_female\\DEG_results_post_vs_pre.csv"
+        ],
+        "counts": {
+          "time_post_vs_pre_female": {
+            "applied": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 714,
+              "n_significant": 11,
+              "n_up": 5,
+              "n_down": 6,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 714,
+              "n_significant": 0,
+              "n_up": 0,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Per-sex exploratory (5 pairs); paper pooled sexes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:59:01"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Paper comparison rests on the abstract and GEO description only (no full text).",
+          "Paper counts 34 miRNAs; our tables count all small-RNA features passing the filter, miRNA-only count reported in HANDBACK.",
+          "Raw P < 0.05 with no multiple-testing control; the deposited author table has no feature at adj.P < 0.05.",
+          "Sign convention: the deposited author table's logFC equals pre minus post (r = -0.94 with mean(post)-mean(pre) of its own per-sample values), so e.g. MIR23B logFC -0.37 there is an increase after exercise; our post-vs-pre log2FC agrees with the negated author logFC (r = 0.87 over the 642 shared features). Directions quoted from the author table (and possibly in the paper) are inverted relative to post-vs-pre; cannot be checked against the full text.",
+          "Primary result: 34 features at P<0.05 of which 20 are miRNA biotype (paper: 34 miRNAs; author table: 46 features); 12 of our 20 miRNAs are among the authors' 34."
+        ],
+        "results": {
+          "time_post_vs_pre": {
+            "n_deg": 34,
+            "up": 15,
+            "down": 19,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "time_post_vs_pre_voom_unpaired": {
+            "n_deg": 10,
+            "up": 3,
+            "down": 7,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          },
+          "time_post_vs_pre_male": {
+            "n_deg": 26,
+            "up": 3,
+            "down": 23,
+            "rule": "pvalue < 0.05",
+            "audit_n": 1
+          },
+          "time_post_vs_pre_female": {
+            "n_deg": 11,
+            "up": 5,
+            "down": 6,
+            "rule": "pvalue < 0.05",
+            "audit_n": 0
+          }
+        },
+        "paper_counts": {
+          "time_post_vs_pre": 34
+        },
+        "comparison": {
+          "time_post_vs_pre": {
+            "ours": 34,
+            "paper": 34
+          }
+        },
+        "paper_gene_check": {
+          "time_post_vs_pre": {
+            "MIR23B": {
+              "baseMean": 536.4576,
+              "log2FoldChange": 0.2447,
+              "padj": 0.878,
+              "pvalue": 0.0389
+            },
+            "MIR454": {
+              "baseMean": 273.8542,
+              "log2FoldChange": 0.3313,
+              "padj": 0.5,
+              "pvalue": 0.00545
+            },
+            "MIR766": {
+              "baseMean": 75.9209,
+              "log2FoldChange": 0.3183,
+              "padj": 0.771,
+              "pvalue": 0.0287
+            },
+            "MIR197": {
+              "baseMean": 175.873,
+              "log2FoldChange": 0.2323,
+              "padj": 0.998,
+              "pvalue": 0.0839
+            },
+            "MIR30E": {
+              "baseMean": 12910.7558,
+              "log2FoldChange": 0.1729,
+              "padj": 0.998,
+              "pvalue": 0.397
+            },
+            "MIRLET7A2": {
+              "baseMean": 12453.3649,
+              "log2FoldChange": 0.1908,
+              "padj": 0.998,
+              "pvalue": 0.35
+            },
+            "MIR210": {
+              "baseMean": 72.69,
+              "log2FoldChange": -0.3714,
+              "padj": 0.998,
+              "pvalue": 0.115
+            },
+            "MIR378A": {
+              "baseMean": 1.427,
+              "log2FoldChange": -0.602,
+              "padj": 0.998,
+              "pvalue": 0.327
+            },
+            "MIR26B": {
+              "baseMean": 9145.766,
+              "log2FoldChange": 0.0937,
+              "padj": 0.998,
+              "pvalue": 0.349
+            },
+            "MIR30D": {
+              "baseMean": 16503.0774,
+              "log2FoldChange": 0.1473,
+              "padj": 0.998,
+              "pvalue": 0.469
+            },
+            "MIR22": {
+              "baseMean": 90962.1692,
+              "log2FoldChange": 0.021,
+              "padj": 0.998,
+              "pvalue": 0.802
+            },
+            "MIR98": {
+              "baseMean": 1324.3915,
+              "log2FoldChange": 0.2442,
+              "padj": 0.998,
+              "pvalue": 0.324
+            }
+          }
+        }
+      },
+      "reason": "Named miRNAs are from the deposited author DE table (P.Value < 0.05), not the abstract.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:59:03"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ac5a2a598b722d462674d50c6d79fa4606677f538164615858159064d04c4f29",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8fa0c79a10e887c7451f53f02c0e56cf27f57416a9ecf6fdb874e5b25950018e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "39cd73e5f539baa06dd74e1012a59ad5576ef6d125c494e92e08829c638410b2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5622e795a20a0f2480859bb29036bb77af6217b18f7bac6fa9db535c673cee81",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e256fe3cd480410464d784a723f7e518692b781fe18381d953e32d41d13d8e53",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c4c378ad1cdabcbf700221f968077a77c65625be8914458b1f9faf806083363c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre\\DEG_results_post_vs_pre.csv",
+      "role": "deg_time_post_vs_pre",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f50a36ef02dc91e3955b7a19a722b316488baa200abb24dbce31a4721f855f65",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_voom_unpaired\\DEG_results_post_vs_pre.csv",
+      "role": "deg_time_post_vs_pre_voom_unpaired",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "df025c0cea092c46274b142c545daa41c2620834f41a0779d911e80896a883f7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_male\\DEG_results_post_vs_pre.csv",
+      "role": "deg_time_post_vs_pre_male",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "75f6fc4e44eabd53ccbc09ee3c351dcfcbc74a08f584a87d76e3e9f17a38eee5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\results\\time_post_vs_pre_female\\DEG_results_post_vs_pre.csv",
+      "role": "deg_time_post_vs_pre_female",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "80c2242ea8035fe45519fb18b16253932d50065b2c174a3765e3d902e3785a55",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38377006\\GSE254368\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b3b8dcb34dd54946ee172f0b2f0bd334f8ab433817f53490eb9faf439ae6342d",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
