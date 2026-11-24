@@ -664,3 +664,8 @@ One section per case; newest last.
 ## PMID34478753 / GSE179394 (2026-11-24)
 
 - policy: Threshold and joint-vs-pairwise fit unverified: only the abstract was available; compare with the full text if obtained.
+
+## PMID34144055 / GSE168409 (2026-11-24)
+
+- policy: Only the abstract was available; threshold and model fit rest on GEO data_processing text.
+- policy: Rerun needs the count files; confirm subject pairing (tube-number triplets) before blocking on subject.

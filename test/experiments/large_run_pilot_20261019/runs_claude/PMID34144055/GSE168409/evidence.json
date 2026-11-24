@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34144055",
+  "subject_id": "GSE168409",
+  "created_at": "2026-11-24T14:59:54",
+  "finished_at": "2026-11-24T14:59:54",
+  "status": "stopped:ownership",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMID34144055_abstract.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34144055\\PMID34144055_abstract.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T14:59:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "205dc41a7cf8d412293081440ff7e2afafa1e1eb213c20160ebd344de2f00232",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE168409_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE168409\\GSE168409_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T14:59:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "fb434e1649a8faabbfc0b0376a3edefff23e726c91c0e5513305c1d2d6fe88d4",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE168409_matrix_UNAVAILABLE.txt",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34144055\\GSE168409_matrix_UNAVAILABLE.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T14:59:54",
+      "sha256": null,
+      "attributes": {
+        "sha256": "810fa200c76ffecc5c157be8a88cbd50fd555e4954acdb8809d246203eae9c8f",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE168409"
+        ],
+        "assay": "bulk RNA-seq (Illumina, GPL21290) of PBMC total RNA, human",
+        "factors": {
+          "condition": [
+            "Healthy Control",
+            "GWI"
+          ],
+          "time": [
+            "T0 baseline (pre-exercise)",
+            "T1 peak exercise (VO2max)",
+            "T2 recovery (4 h post T1)"
+          ]
+        },
+        "sample_inclusion": "117 GEO samples: GWI T0/T1/T2 = 20/18/20, HC T0/T1/T2 = 19/20/20 (GEO source_name counts)",
+        "repeated_measure_unit": "participant (each subject sampled at T0, T1, T2); GEO gives no explicit subject key",
+        "primary_estimand": "Exercise (stress) response of the PBMC transcriptome over time within GWI patients and within healthy controls (T1 vs T0, T2 vs T0, T2 vs T1), and how the response differs between GWI and controls; plus GWI vs HC at each time point",
+        "planned_contrasts": [
+          "within GWI: T1 vs T0, T2 vs T0 (exercise response; abstract MAIN METHODS; exact contrast list not stated in abstract)",
+          "within HC: T1 vs T0, T2 vs T0",
+          "GWI vs HC at T0, T1, T2 (disease contrast, not an exercise effect)"
+        ],
+        "paper_method": "DESeq2 on HTSeq/STAR raw counts separately for GSNAP, HISAT2 and STAR alignments; DEXSeq for exons (GEO data_processing)",
+        "normalization": "DESeq2 size factors; genes kept if raw count >= 10 in all samples of at least one group (GEO data_processing)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "source_locator": "GEO GSE168409 Sample_data_processing",
+          "note": "multi-aligner consensus: FC>|1.5| & FDR<0.10 in one aligner and FC>|1.4| & FDR<0.15 in the other two, OR FC>|1.5| & FDR<0.10 in two of three aligners (GSNAP, HISAT2, STAR). Only HISAT2 counts are deposited as a matrix, so the consensus rule cannot be reproduced; the single-aligner part (FC 1.5 -> |log2FC| > 0.5849625, FDR < 0.10) is the nearest."
+        },
+        "paper_results": "Abstract only: dysregulated immune and inflammatory pathways in GWI; no DEG counts or gene names in the abstract."
+      },
+      "reason": "No full text available; reconstruction rests on the PubMed abstract (PMID 34144055) and the GEO series description/data_processing. Exercise challenge with blood at baseline, maximal exertion and 4 h recovery in GWI and matched HC; DESeq2 analysis.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T14:59:54"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34144055\\GSE168409_matrix_UNAVAILABLE.txt",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 34144055 and Series_title equals the paper title",
+          "metadata (117 GSM) built from the GEO SOFT text retrieved via acc.cgi",
+          "expression matrix NOT obtainable: GSE168409_HISAT2_forDS.csv.gz, GSE168409_norm_counts_HISAT2.csv.gz and GSE168409_RAW.tar (117 per-sample HTSeq counts) all return HTTP 403 on ftp.ncbi.nlm.nih.gov (HTTPS and FTP) and a reCAPTCHA page on www.ncbi.nlm.nih.gov/geo/download from this machine; no cached copy under data/GSE168409"
+        ],
+        "accession": "GSE168409",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE168409\\GSE168409_metadata.csv"
+      },
+      "reason": "The accession belongs to the paper, but the count files it would be analyzed from are not available in this environment. The design itself supports an exercise contrast (T1/T2 vs T0 within condition, n >= 18 per cell), so this is not a refusal; it is blocked by a missing file. Unblocking fact: download GSE168409_HISAT2_forDS.csv.gz (or the _RAW.tar) into data/GSE168409/ and rerun from the alignment gate. Pairing note for the rerun: subjects are not labelled in GEO; per-sample file names carry consecutive tube numbers (e.g. 2659hG0, 2660hG1, 2661hG2, 2662hH0, 2663hH1, 2664hH2) suggesting GWI/HC triplets, which must be confirmed before using a subject block.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "manual_review",
+        "execution_status": "not_started",
+        "stop_reason": "Expression matrix files for GSE168409 cannot be downloaded (GEO FTP HTTP 403; GEO download page behind reCAPTCHA) and are not cached; no matrix to align or analyze."
+      },
+      "recorded_at": "2026-11-24T14:59:54"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34144055\\GSE168409\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "36624583b74f2c5753625eef9055612fa025eafd33d657d0f37b8b8dc83c50af",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34144055\\GSE168409\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "aba62903c46d2a79f58c1d3cafdcbbf0802406e2d72ad74ea292d9f778c25543",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

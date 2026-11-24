@@ -1091,3 +1091,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38377006 (GSE254368)
 
 - voom/edgeR executors cannot block on subject (limma_voom_tools.py:60, edger_tools.py:38); runner's paper count includes all biotypes, not just miRNAs; pydeseq2 exp overflow warning Details: `PMID38377006/HANDBACK.md`.
+
+## PMID34144055 (GSE168409)
+
+- GEO FTP 403/reCAPTCHA blocks downloads; case_runner.py:529-530 hashes the matrix before gates, so an ownership stop crashes (worked around with a placeholder); geo_tools temp-file error hides the 403 Details: `PMID34144055/HANDBACK.md`.
