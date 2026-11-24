@@ -951,3 +951,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID29123172 (GSE99963)
 
 - edger_tools.py:38 cannot block by subject (used r_de_tools); r_de.R:201-202 hard-codes robust=TRUE; case_runner.py:771-787 has no RPKM filter; filter applies per subset Details: `PMID29123172/HANDBACK.md`.
+
+## PMID33193103 (GSE155230)
+
+- GEO 403 shown as misleading tmp-file error, no retry/fallback (geo_tools.py:30,58); native.py:630 skips no featureCounts '#' line; bare KeyError for non-column confounder (case_runner.py:646) Details: `PMID33193103/HANDBACK.md`.
+
+## PMID41889117 (GSE324693)
+
+- none blocking; inspect gave no alignment_keys for S1.bam vs title "S1 ctrl" (needed key_patterns + matrix_column_pattern) Details: `PMID41889117/HANDBACK.md`.

@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41889117",
+  "subject_id": "GSE324693",
+  "created_at": "2026-11-24T04:59:19",
+  "finished_at": "2026-11-24T04:59:26",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13022470.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC13022470.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T04:59:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "beee2be3acef2172dd416f861eb58f8f367311ad3005450b12cb2cc04cd2bd83",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE324693_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE324693\\GSE324693_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:59:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "03111bc69faaaf9e40ce8b43bf0325f9dcdfce3cc8231e40d03734716b9415b0",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE324693_counts_matrix.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE324693\\GSE324693_counts_matrix.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T04:59:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "23a266ebce4ab723ce0bcf7db6baffef9fe5501a608667d4c05ad45f4e85d18b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE324693"
+        ],
+        "assay": "bulk RNA-seq, subcutaneous white adipose tissue (S2.4.16.p1)",
+        "primary_estimand": "Effect of 60 weeks of 20% EtOH in drinking water vs water (control) on subcutaneous WAT gene expression in aged female C57BL/6 mice (S2.2.p1, S3.4.p3). There is no exercise intervention: the treadmill was used only as a time-to-fatigue performance test (S2.4.2.p1, week 55), given to every mouse in both groups.",
+        "factors": {
+          "treatment": [
+            "Control (water/Vehicle)",
+            "EtOH"
+          ]
+        },
+        "inclusion": "17 female mice (7 control, 10 EtOH); RNA-seq on 6 vs 6 (GEO); paper figure n 5-6 control / 6-9 EtOH (FIG7)",
+        "planned_contrasts": [
+          "EtOH vs Control in WAT (S3.4.p3; paper: 61 DEGs, 47 down / 14 up)"
+        ],
+        "exercise_contrasts": [],
+        "repeated_measure_unit": "none (one WAT sample per mouse at sacrifice)",
+        "paper_method": "Rsubread featureCounts; keep genes mapped in >= 6 samples; DESeq2 v1.44.0 (S2.4.16.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.1,
+          "inclusive": true,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.4.16.p1"
+        },
+        "paper_results": {
+          "EtOH_vs_Control": {
+            "n_deg": 61,
+            "down": 47,
+            "up": 14,
+            "named_genes": [
+              "Cyp2e1"
+            ],
+            "locator": "S3.4.p3"
+          }
+        }
+      },
+      "reason": "S2.2.p1: mice were randomized to 20% EtOH or water. S2.4.2.p1: treadmill endurance was an outcome test, not a training stimulus. S2.4.16.p1: WAT RNA-seq, DESeq2, FDR <= 0.1. S3.4.p3: 61 DEGs (47 down). The paper never compares exercised and non-exercised animals.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:59:19"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE324693\\GSE324693_counts_matrix.csv.gz",
+        "owned": true,
+        "checks": [
+          "S2.4.16.p1 names GSE324693",
+          "GEO tissue = subcutaneous WAT, C57BL/6, Mus musculus, matching the paper",
+          "treatment Vehicle/EtOH, 6/6, matching the paper's two groups",
+          "data_processing: Rsubread + featureCounts raw counts, matching S2.4.16.p1"
+        ],
+        "accession": "GSE324693",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE324693\\GSE324693_metadata.csv"
+      },
+      "reason": "The accession, tissue, strain, groups and processing all match the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:59:19"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:skey",
+        "n_aligned": 12,
+        "n_metadata": 12,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "alias_of": "characteristics_ch1.2.treatment",
+              "recode": {
+                "Vehicle": "CTRL",
+                "EtOH": "ETOH"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\design_metadata.csv",
+          "sha256": "d51ed25e4e42e226fe475ac620ff198b6dc1ff82b421e711d0c8ceb17ead41b4",
+          "levels": {
+            "grp": {
+              "CTRL": 6,
+              "ETOH": 6
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns S1.bam..S12.bam; the GEO titles are 'S1 ctrl'..'S12 EtOH'. The key is the S<n> token, an exact match on a named field, not position.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:59:20"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE324693_counts_matrix.csv.gz",
+        "paper_input": "featureCounts raw counts into DESeq2 (S2.4.16.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\aligned_matrix.csv",
+          "sha256": "8bf2263e87dcdbc3e0dfd654a56428a9b08a6d8c3ee1314289062f6ec97a4b4d",
+          "n_features": 56941,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 5814667.0,
+          "median": 2.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Values are 100% integers, from 0 to 5.8e6; GEO data_processing says 'Raw counts matrix' from Rsubread/featureCounts. This matches the paper's DESeq2 input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:59:20"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "design_column": "grp",
+        "contrasts": [],
+        "exercise_factor_present": false,
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "The only grouping column is treatment (Vehicle 6 / EtOH 6). The task's estimand, an exercise effect, has no arm in the paper or the data.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: GSE324693 holds only Vehicle (water) vs EtOH WAT samples (6/6). Exercise appears in the paper only as a treadmill performance test given to all mice (S2.4.2.p1), so the data cannot identify an exercise effect on gene expression."
+      },
+      "recorded_at": "2026-11-24T04:59:26"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d110b070e4cb676fe636b9a5f0e55192fd543274f1e6643602e8eeb08cf50278",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9870623f66915d1fa883cd282575f72a834e487e1ff72709d3f302f6fab5b418",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8bf2263e87dcdbc3e0dfd654a56428a9b08a6d8c3ee1314289062f6ec97a4b4d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d51ed25e4e42e226fe475ac620ff198b6dc1ff82b421e711d0c8ceb17ead41b4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c1b3ca3607d655a361fda57e286989fbcb087720adf110f0f0ec4714878baec8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41889117\\GSE324693\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "52fee53d4d62e862a4164de384ecb4d5253c1f023c603078d3f054585defbf91",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

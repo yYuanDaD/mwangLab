@@ -1,0 +1,82 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41889117",
+  "request": "Analyze GSE324693 for PMID 41889117 (Systemic Consequences of Chronic Ethanol Intake: From Microbiome Shifts to Metabolic Impairment.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE324693",
+      "accession": "GSE324693",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC13022470.paper.md"],
+        "metadata": "GSE324693/GSE324693_metadata.csv",
+        "matrix": "GSE324693/GSE324693_counts_matrix.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE324693"],
+            "assay": "bulk RNA-seq, subcutaneous white adipose tissue (S2.4.16.p1)",
+            "primary_estimand": "Effect of 60 weeks of 20% EtOH in drinking water vs water (control) on subcutaneous WAT gene expression in aged female C57BL/6 mice (S2.2.p1, S3.4.p3). There is no exercise intervention: the treadmill was used only as a time-to-fatigue performance test (S2.4.2.p1, week 55), given to every mouse in both groups.",
+            "factors": {"treatment": ["Control (water/Vehicle)", "EtOH"]},
+            "inclusion": "17 female mice (7 control, 10 EtOH); RNA-seq on 6 vs 6 (GEO); paper figure n 5-6 control / 6-9 EtOH (FIG7)",
+            "planned_contrasts": ["EtOH vs Control in WAT (S3.4.p3; paper: 61 DEGs, 47 down / 14 up)"],
+            "exercise_contrasts": [],
+            "repeated_measure_unit": "none (one WAT sample per mouse at sacrifice)",
+            "paper_method": "Rsubread featureCounts; keep genes mapped in >= 6 samples; DESeq2 v1.44.0 (S2.4.16.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "inclusive": true, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.4.16.p1"},
+            "paper_results": {"EtOH_vs_Control": {"n_deg": 61, "down": 47, "up": 14, "named_genes": ["Cyp2e1"], "locator": "S3.4.p3"}}
+          },
+          "reasoning": "S2.2.p1: mice were randomized to 20% EtOH or water. S2.4.2.p1: treadmill endurance was an outcome test, not a training stimulus. S2.4.16.p1: WAT RNA-seq, DESeq2, FDR <= 0.1. S3.4.p3: 61 DEGs (47 down). The paper never compares exercised and non-exercised animals.",
+          "confidence": "high",
+          "locator": "S2.4.16.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.4.16.p1 names GSE324693", "GEO tissue = subcutaneous WAT, C57BL/6, Mus musculus, matching the paper", "treatment Vehicle/EtOH, 6/6, matching the paper's two groups", "data_processing: Rsubread + featureCounts raw counts, matching S2.4.16.p1"]},
+          "reasoning": "The accession, tissue, strain, groups and processing all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "skey",
+          "key_patterns": {"skey": ["title", "^(S\\d+) "]},
+          "matrix_column_pattern": "^(S\\d+)\\.bam$",
+          "aliases": {"grp": "characteristics_ch1.2.treatment"},
+          "recode": {"grp": {"Vehicle": "CTRL", "EtOH": "ETOH"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns S1.bam..S12.bam; the GEO titles are 'S1 ctrl'..'S12 EtOH'. The key is the S<n> token, an exact match on a named field, not position.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "final": {"source": "GSE324693_counts_matrix.csv.gz", "paper_input": "featureCounts raw counts into DESeq2 (S2.4.16.p1)"},
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Values are 100% integers, from 0 to 5.8e6; GEO data_processing says 'Raw counts matrix' from Rsubread/featureCounts. This matches the paper's DESeq2 input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CTRL"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": "grp", "contrasts": [], "exercise_factor_present": false},
+          "candidates": [
+            {"value": "grp_ETOH_vs_CTRL as an exercise contrast", "reason_rejected": "EtOH vs water is an alcohol exposure, not exercise; reporting it as an exercise effect would change the estimand"},
+            {"value": "treadmill-tested vs untested animals", "reason_rejected": "every mouse took the same treadmill endurance test (S2.4.2.p1, FIG2 week 55); there is no unexercised comparison group and no exercise column in GEO"}
+          ],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: GSE324693 holds only Vehicle (water) vs EtOH WAT samples (6/6). Exercise appears in the paper only as a treadmill performance test given to all mice (S2.4.2.p1), so the data cannot identify an exercise effect on gene expression.",
+          "reasoning": "The only grouping column is treatment (Vehicle 6 / EtOH 6). The task's estimand, an exercise effect, has no arm in the paper or the data.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample size", "paper": "17 mice (7 control/10 EtOH); FIG7 n 5-6 control / 6-9 EtOH", "data": "12 RNA-seq samples (6/6)", "disposition": "not_relevant_case_refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
