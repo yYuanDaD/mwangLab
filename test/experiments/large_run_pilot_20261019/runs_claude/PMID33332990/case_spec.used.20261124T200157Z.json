@@ -1,0 +1,168 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33332990",
+  "request": "Analyze GSE144109 for PMID 33332990 (Exercise during pregnancy mitigates negative effects of parental obesity on metabolic function in adult mouse offspring.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE144109",
+      "accession": "GSE144109",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID33332990/PMID33332990_abstract.txt"],
+        "metadata": "GSE144109/GSE144109_metadata.csv",
+        "matrix": "GSE144109/GSE144109_reconstructed_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": [
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID33332990/prep_metadata.py",
+          "test/experiments/large_run_pilot_20261019/runs_claude/PMID33332990/prep_counts.py"
+        ]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE144109"],
+            "assay": "bulk RNA-seq (Illumina TruSeq stranded total RNA, HiSeq 2500), quadriceps of adult female offspring",
+            "factors": {"grp": ["NCS (NC-fed parents, sedentary dam)", "MHS (maternal HF, sedentary dam)", "MHE (maternal HF, dam ran voluntarily during gestation)", "PHS (paternal HF, sedentary dam)", "PHE (paternal HF, dam ran during gestation)"]},
+            "inclusion": "15 female offspring, n=3 per group (GEO overall design: '3 samples per groups'); NC-Sed shared control for maternal (Study 1) and paternal (Study 2) lines (GEO treatment protocol)",
+            "primary_estimand": "Effect of maternal voluntary wheel running during gestation on adult female offspring skeletal-muscle transcriptome under parental high-fat diet: MHE vs MHS (maternal HF line) and PHE vs PHS (paternal HF line)",
+            "planned_contrasts": [
+              "grp_MHE_vs_MHS: maternal exercise within maternal-HF line (abstract: 'maternal exercise resulted in a transcriptional profile similar to offspring from NC-fed parents'; paper count not in abstract)",
+              "grp_PHE_vs_PHS: maternal exercise within paternal-HF line (same abstract sentence)",
+              "grp_MHS_vs_NCS and grp_PHS_vs_NCS: parental HF vs NC (abstract: profiles 'enriched in genes regulating inflammation and immune responses')",
+              "grp_MHE_vs_NCS and grp_PHE_vs_NCS: does exercise bring HF offspring back toward NC (abstract: 'similar to NC')"
+            ],
+            "repeated_measure_unit": "none; one muscle per offspring",
+            "paper_method": "DESeq2 v1.11.8 'for maternal and paternal lines separately' (GEO data_processing; full methods not available)",
+            "paper_threshold": {"metric": "not stated in abstract", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "abstract only; no threshold stated"},
+            "paper_results": "Abstract: HF (maternal or paternal) offspring muscle enriched in inflammation/immune genes; maternal exercise gave a profile similar to NC offspring. No DEG counts or named genes in the abstract (Pgc-1a named only for promoter methylation)."
+          },
+          "reasoning": "No full text is available; the study map rests on the PubMed abstract (PMID33332990_abstract.txt) and the GEO series/sample records (summary, overall design, treatment_protocol_ch1, data_processing). The paper's DEG threshold and counts are therefore unknown.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO GSE144109 series summary and sample treatment_protocol/data_processing"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 33332990", "GSE144109 is the RNA-Seq SubSeries of GSE144112; same title as paper topic", "matrix columns equal the 15 GSM titles exactly"]},
+          "reasoning": "GEO record links PMID 33332990; GSE144109_normalized_counts.tsv.gz is the only supplementary matrix and its 15 columns match the sample titles.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"grp": "characteristics_ch1.3.group"},
+          "patterns": {},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "inspect alignment_keys: title matches 15/15 matrix columns exactly. grp is taken from the GEO 'group' characteristic (NCS/MHS/MHE/PHS/PHE), consistent with the diet/treatment/parent columns.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Deposited file is DESeq2-normalized featureCounts counts (data_processing: 'gene coverages in units of normalized read counts'; 61.6% integer). Each column is exactly integer counts / size factor: multiplying by 1/(smallest positive value) gives integers with max deviation 1e-8 on all 50,686 genes x 15 samples (prep_counts.py). This is an exact inversion, not rounding of estimated counts; recovered library sizes 18-27M reads are plausible for 100-bp SE HiSeq. The reconstructed integers equal the featureCounts counts up to one per-sample constant, which DESeq2's size-factor estimation removes. Paper input: DESeq2 on featureCounts counts, so the matrix agrees with the paper.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "linear normalized -> log2(x+1) + limma", "reason_rejected": "the matrix is exactly invertible to counts, so the paper's count route is available"}
+          ]
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "NCS"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_MHE_vs_MHS", "grp_PHE_vs_PHS", "grp_MHS_vs_NCS", "grp_PHS_vs_NCS", "grp_MHE_vs_NCS", "grp_PHE_vs_NCS"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group, fitted per parental line",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_MHE_vs_MHS", "control": "MHS", "treatment": "MHE", "role": "primary"},
+              {"name": "grp_PHE_vs_PHS", "control": "PHS", "treatment": "PHE", "role": "primary"},
+              {"name": "grp_MHS_vs_NCS", "control": "NCS", "treatment": "MHS", "role": "secondary"},
+              {"name": "grp_PHS_vs_NCS", "control": "NCS", "treatment": "PHS", "role": "secondary"},
+              {"name": "grp_MHE_vs_NCS", "control": "NCS", "treatment": "MHE", "role": "secondary"},
+              {"name": "grp_PHE_vs_NCS", "control": "NCS", "treatment": "PHE", "role": "secondary"}
+            ]
+          },
+          "reasoning": "The exercise estimand is maternal running vs sedentary within the same parental-HF exposure: MHE vs MHS and PHE vs PHS (primary). HF vs NC and HF-Ex vs NC test the abstract's 'inflammation' and 'similar to NC' statements (secondary). There is no NC-Ex arm, so the exercise effect under normal chow and an exercise x diet interaction cannot be estimated; the five groups are levels of one factor, not a full factorial. Following GEO data_processing ('DESeq2 ... for maternal and paternal lines separately'), each line is fitted on its own three groups with the shared NCS controls. n=3 per arm.",
+          "confidence": "high",
+          "candidates": [
+            {"value": "diet x treatment factorial", "reason_rejected": "no NC-Ex group; diet and treatment are not crossed"},
+            {"value": "pooled MHE+PHE vs MHS+PHS", "reason_rejected": "pools different parental exposures; the paper analyzes lines separately"},
+            {"value": "one 5-group model on all samples", "reason_rejected": "paper fits lines separately; kept as possible sensitivity only, not run"}
+          ]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Each sample is a different offspring; no batch, litter or lane column is deposited. Litter (dam) is a plausible clustering unit (offspring of the same dam share the gestational exposure) but dam IDs are not in GEO; titles such as F7-2-1/F7-2-4 hint at shared family codes, but the code is undocumented, so it is not used as a blocking term. Recorded as a caveat.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), separate fit per parental line",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 v1.11.8 per line", "status": "reproduced", "reason": "counts reconstructed exactly from the normalized matrix"},
+            "deviations": ["pydeseq2 instead of R DESeq2 v1.11.8", "paper's low-count filtering and LFC shrinkage unknown (abstract only); none applied"]
+          },
+          "transform": null,
+          "reasoning": "Paper used DESeq2 per line (GEO data_processing); counts are available after exact inversion.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Abstract states no DE threshold; workflow default BH padj < 0.05 with no fold-change rule. Raw p < 0.05 is an audit count only."
+          },
+          "reasoning": "No full text; abstract gives no threshold.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Comparison with the paper rests on the PubMed abstract only; paper DEG counts and threshold unknown.",
+              "Counts were reconstructed from DESeq2-normalized values by exact per-sample inversion (prep_counts.py).",
+              "n=3 per group; offspring may share dams (litter not recorded), so tests may be anti-conservative.",
+              "No NC-Ex group: exercise effect is only estimable under parental HF."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Paper's planned route (DESeq2 per line on counts) is reproduced; threshold from workflow default."
+        }
+      },
+      "discrepancies": [
+        {"item": "offspring age", "paper": "abstract: metabolic phenotype at 9 mo", "data": "GEO: euthanized at 10 months", "disposition": "executable_without_change"},
+        {"item": "offspring sex", "paper": "abstract: transcriptomics in female offspring", "data": "GEO does not state sex; checked by X/Y genes in suitability", "disposition": "executable_without_change"},
+        {"item": "matrix", "paper": "DESeq2 on featureCounts counts", "data": "only DESeq2-normalized counts deposited; inverted exactly to integers", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "maternal_line",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_MHE_vs_MHS", "grp_MHS_vs_NCS", "grp_MHE_vs_NCS"], "covariates": []},
+          "subset": {"grp": ["NCS", "MHS", "MHE"]},
+          "role": "primary",
+          "reasoning": "Study 1 (maternal HF line) fitted separately as in GEO data_processing; holds primary MHE vs MHS."
+        },
+        {
+          "name": "paternal_line",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_PHE_vs_PHS", "grp_PHS_vs_NCS", "grp_PHE_vs_NCS"], "covariates": []},
+          "subset": {"grp": ["NCS", "PHS", "PHE"]},
+          "role": "primary",
+          "reasoning": "Study 2 (paternal HF line) fitted separately; holds primary PHE vs PHS."
+        }
+      ],
+      "enrichment": [
+        {"execution": "maternal_line/grp_MHE_vs_MHS", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract reports pathway-level (inflammation/immune) differences"},
+        {"execution": "paternal_line/grp_PHE_vs_PHS", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "as above"},
+        {"execution": "maternal_line/grp_MHS_vs_NCS", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract: HF offspring enriched in inflammation/immune genes"},
+        {"execution": "paternal_line/grp_PHS_vs_NCS", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "as above"}
+      ]
+    }
+  ]
+}

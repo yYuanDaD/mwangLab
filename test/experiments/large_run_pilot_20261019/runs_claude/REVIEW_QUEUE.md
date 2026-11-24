@@ -674,3 +674,7 @@ One section per case; newest last.
 
 - policy: Whether disuse/bed-rest series count as exercise studies (open policy).
 - policy: Paper threshold and DEG counts unknown (abstract only); verify against full text.
+
+## PMID33332990 / GSE144109 (2026-11-24)
+
+- policy: Paper full text not available: DEG threshold, counts and any low-count filter cannot be confirmed.

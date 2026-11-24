@@ -1,0 +1,21 @@
+{"case": "GSE144109", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Abstract: maternal voluntary running during gestation vs sedentary dams, female offspring quadriceps RNA-seq at ~10 mo. The exercise factor is the dam's wheel running, carried by the Ex groups (MHE, PHE: 3 each). No NC-Ex arm. Packet A: treatment Ex 6 / Sed 9, grp NCS/PHE/PHS/MHE/MHS 3 each.",
+  "B2": "Abstract gives no group n. GEO metadata: n=3 per group. Expected main comparisons: MHE vs MHS, PHE vs PHS, and HF-Sed vs NC-Sed (MHS/PHS vs NCS), plus Ex vs NC ('similar to NC'). NCS is the shared control of both lines (treatment_protocol_ch1).",
+  "B3": "No animal sampled twice: one quadriceps per offspring, 15 distinct titles. Packet A pairing keys give no valid animal key (suffix keys link 5/15 or fewer and have duplicates in a level). The F-prefix of the title spans different groups (F1 in NCS and PHE), so it is not a dam ID. Litter clustering is possible but undocumented.",
+  "B4": "Abstract does not say. GEO data_processing: 'DESeq2 ... for maternal and paternal lines separately', i.e. per-line fits, each with the shared NCS controls.",
+  "B5": "Not in the abstract (only the abstract is available); no threshold or DEG counts stated."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Abstract: maternal running during gestation; Ex groups MHE/PHE present in metadata (treatment Ex: 6). In vivo, exercise given to the dam, offspring is the sampled animal; this is stated in caveats/discrepancies.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp levels NCS/MHS/MHE/PHS/PHE n=3 each match GEO characteristics; no exclusions. Exercise arms are compared with their own HF-Sed control (MHE vs MHS, PHE vs PHS), not with NC.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "design contrasts: treatment=MHE/PHE control=MHS/PHS; HF vs NC has treatment=xHS control=NCS.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per offspring; repeated_measure_unit none. Litter/dam clustering undocumented (title codes not decodable) and recorded as a caveat (anti-conservative tests).", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Per-line fits (~cell on 9 samples each) follow the GEO data_processing sentence; the rejected 5-group joint fit is noted as a possible sensitivity only.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch/lane column deposited; liver-transcript contamination in 4 samples (MHS, PHS, NCS) detected and recorded, with the affected Hallmark sets flagged as likely artefact; no NC-Ex arm noted.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Normalized counts inverted exactly to integers (max deviation 1e-8, 50,686 x 15); DESeq2 route matches the paper's.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule unknown (abstract only); workflow default padj<0.05 labelled workflow_default, raw p<0.05 as audit.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK states paper counts are not in the abstract and compares only qualitative pathway claims.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; the case ran to completion.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Paper full text not available: DEG threshold, counts and any low-count filter cannot be confirmed."],
+ "summary": "本案例按GEO说明对母系和父系两条线分别拟合DESeq2，运动组与各自的高脂久坐对照比较，方向、分组和矩阵还原均无问题。同窝（litter）聚类、肝脏转录本污染和缺少NC运动组均已记录。论文阈值和DEG数量因只有摘要而无法核对，其余未发现需要修改之处。"}
