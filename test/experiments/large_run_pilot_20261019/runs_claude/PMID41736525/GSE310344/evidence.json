@@ -1,0 +1,350 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41736525",
+  "subject_id": "GSE310344",
+  "created_at": "2026-11-24T05:02:14",
+  "finished_at": "2026-11-24T05:02:20",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC13104094.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC13104094.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:14",
+      "sha256": null,
+      "attributes": {
+        "sha256": "08ca4eca96d9394f99f5ab4e5b19e7e42923844275e6e1f14dd55964817892a5",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE310344_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE310344\\GSE310344_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:14",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4559ab2ffd0c563eeebe727223a8c00a973ccea9cbcc1ef31a04b9e0d3756a23",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE310344\\GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T05:02:14",
+      "sha256": null,
+      "attributes": {
+        "sha256": "f704c5d03652386d028f96637a9d59d0a349da64a3ed2f3d6f211d6da6fd5ae1",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE310344",
+          "GSE310849"
+        ],
+        "assay": "bulk RNA-seq, human vastus lateralis (young adults, n=9 with RNA-seq per time point)",
+        "factors": {
+          "time": [
+            "Baseline",
+            "Atrophy",
+            "Recovery",
+            "Repeated Atrophy"
+          ],
+          "subject": "participant (repeated measures)"
+        },
+        "primary_estimand": "Effect of 2-wk unilateral knee-brace immobilization (disuse atrophy), ~7 wk return to habitual ambulation (recovery), and 2-wk repeated immobilization on the muscle transcriptome; no exercise intervention is sampled",
+        "planned_contrasts": [
+          "Atrophy vs Baseline (S3.3.p1; 381 DEGs)",
+          "Repeated Atrophy vs Baseline (103 DEGs)",
+          "Repeated Atrophy vs Recovery (82 DEGs)",
+          "Recovery vs Atrophy (536 DEGs)",
+          "Recovery vs Baseline (0 DEGs)"
+        ],
+        "inclusion": "Baseline/Atrophy/Recovery/Repeated Atrophy biopsies, n=9 each (FIG1 legend)",
+        "paper_method": "DESeq2 median-of-ratios within Partek Flow (S2.14.p1); pairing handling not stated",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "inclusive": true,
+          "effect_metric": "fold change",
+          "effect_cutoff": 0.2630344,
+          "effect_inclusive": true,
+          "note": ">=20% FC i.e. |log2FC| >= log2(1.2)",
+          "source_locator": "S2.14.p1"
+        },
+        "exercise_content": "Recovery = participants returned to their normal ambulatory activity (S2.3.p1); they were told to refrain from strenuous exercise 24 h before biopsies; the supervised resistance training was offered only AFTER the study and was not biopsied (S2.3.p1)"
+      },
+      "reason": "S2.3.p1 defines the human design as immobilization -> habitual-activity recovery -> repeated immobilization. S2.14.p1 gives DESeq2 in Partek and the FDR<=5% and >=20% FC rule. S3.3.p1 gives DEG counts. No arm is an exercise bout or training programme.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:14"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE310344\\GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz",
+        "owned": true,
+        "checks": [
+          "Human Skeletal Muscle, Homo sapiens, contact A.P. Sharples (author)",
+          "4 conditions x 9 participants = 36 samples, matching n=9 per timepoint (FIG1)",
+          "data_processing matches S2.14.p1 Partek/STAR hg38 pipeline"
+        ],
+        "accession": "GSE310344",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE310344\\GSE310344_metadata.csv"
+      },
+      "reason": "GEO metadata organism, tissue, design and processing match the human arm of the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:14"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 36,
+        "n_metadata": 36,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [
+          "Start",
+          "Stop",
+          "Length",
+          "level",
+          "GC-AS-10307-BLGCSEQ0278-Control-2",
+          "GC-AS-10307-BLGCSEQ0278-Control-3",
+          "GC-AS-10307-BLGCSEQ0278-Control-1"
+        ],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "alias_of": "characteristics_ch1.2.participant"
+            },
+            "time": {
+              "alias_of": "characteristics_ch1.1.condition/time",
+              "recode": {
+                "Baseline": "BL",
+                "Atrophy": "AT",
+                "Recovery": "REC",
+                "Repeated Atrophy": "RAT"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\design_metadata.csv",
+          "sha256": "97d852420318526b9047e4ef8d03a6993cc1b43a41d906f5fe57bb6e6de8b8a3",
+          "levels": {
+            "subject": {
+              "8": 4,
+              "9": 4,
+              "12": 4,
+              "5": 4,
+              "27": 4,
+              "7": 4,
+              "4": 4,
+              "3": 4,
+              "15": 4
+            },
+            "time": {
+              "BL": 9,
+              "RAT": 9,
+              "AT": 9,
+              "REC": 9
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal the Library name in description (36/36 metadata matched; 4 extra matrix columns have no metadata). Time from condition/time; subject = participant.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:16"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz",
+        "paper_input": "raw counts into DESeq2 (S2.14.p1); only CPM deposited",
+        "matrix_type": "linear_normalized (Partek CPM)",
+        "recommended_method": "limma on log2(CPM+1) (raw counts not deposited)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\aligned_matrix.csv",
+          "sha256": "39c8236d8a1787449213f994e8168bacb516be223cc0cf1dbf56d92a0e452721",
+          "n_features": 28195,
+          "n_samples": 36,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 28170,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0001,
+          "max": 83063.9,
+          "median": 0.777749,
+          "integer_fraction": 0.0001,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "File name says CPM, 1.8% integer values, median ~1; no raw counts deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:02:16"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "design_column": "time",
+        "contrasts": [],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "Request is the exercise effect as the paper intends; the paper has no exercise arm. Refused at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the study manipulates disuse (knee-brace immobilization) and habitual-activity recovery; no sampled arm receives an exercise bout or training (S2.3.p1). The post-study resistance training was not biopsied. Treating recovery (return to normal ambulation) as exercise would change the paper's estimand."
+      },
+      "recorded_at": "2026-11-24T05:02:20"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58c96b23508dd4d609b476766b03909e23cbeffa6f692ae910b1e4c66dd18838",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8f407ccd8c1a56eb310e10c3d1d2b9e3eae24dd7810c6912c0a81108d51963bf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "39c8236d8a1787449213f994e8168bacb516be223cc0cf1dbf56d92a0e452721",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "97d852420318526b9047e4ef8d03a6993cc1b43a41d906f5fe57bb6e6de8b8a3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ab714c47d7240bd18d25ee7ce9429901f7446ad03b31bc2052262d3e7c46cd61",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41736525\\GSE310344\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e9d97604785811f5d48e698606d9279113ad57a7f67ffd1b43a3732e0c1ce069",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -527,3 +527,11 @@ One section per case; newest last.
 ## PMID41663755 / GSE200283_synovium (2026-11-24)
 
 - policy: Policy: whether R1/R2 reloading-vs-MMS in a disuse model counts as an exercise-like study; deposited matrix is feature-selected so not analyzable either way.
+
+## PMID41736525 / GSE310344 (2026-11-24)
+
+- policy: Policy: do disuse/immobilization or TTX-denervation series (inactivity models, no exercise arm) count as exercise studies? Currently refused as 'no exercise arm'; the skill states no rule that contradicts this.
+
+## PMID41736525 / GSE310849 (2026-11-24)
+
+- policy: Policy: do disuse/immobilization or TTX-denervation series (inactivity models, no exercise arm) count as exercise studies? Currently refused as 'no exercise arm'; the skill states no rule that contradicts this.

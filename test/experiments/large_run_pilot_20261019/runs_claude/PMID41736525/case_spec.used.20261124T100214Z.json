@@ -1,0 +1,134 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41736525",
+ "request": "Analyze GSE310344 and GSE310849 for PMID 41736525 (Repeated Disuse Atrophy Imprints a Molecular Memory in Skeletal Muscle: Transcriptional Resilience in Young Adults and Susceptibility in Aged Muscle.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE310344",
+   "accession": "GSE310344",
+   "inputs": {"paper": ["test/experiments/paper_screen_20261028/papers/PMC13104094.paper.md"],
+              "metadata": "GSE310344/GSE310344_metadata.csv",
+              "matrix": "GSE310344/GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz",
+              "raw_tar": false, "prep_scripts": []},
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": ["GSE310344", "GSE310849"],
+      "assay": "bulk RNA-seq, human vastus lateralis (young adults, n=9 with RNA-seq per time point)",
+      "factors": {"time": ["Baseline", "Atrophy", "Recovery", "Repeated Atrophy"], "subject": "participant (repeated measures)"},
+      "primary_estimand": "Effect of 2-wk unilateral knee-brace immobilization (disuse atrophy), ~7 wk return to habitual ambulation (recovery), and 2-wk repeated immobilization on the muscle transcriptome; no exercise intervention is sampled",
+      "planned_contrasts": ["Atrophy vs Baseline (S3.3.p1; 381 DEGs)", "Repeated Atrophy vs Baseline (103 DEGs)", "Repeated Atrophy vs Recovery (82 DEGs)", "Recovery vs Atrophy (536 DEGs)", "Recovery vs Baseline (0 DEGs)"],
+      "inclusion": "Baseline/Atrophy/Recovery/Repeated Atrophy biopsies, n=9 each (FIG1 legend)",
+      "paper_method": "DESeq2 median-of-ratios within Partek Flow (S2.14.p1); pairing handling not stated",
+      "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "inclusive": true, "effect_metric": "fold change", "effect_cutoff": 0.2630344, "effect_inclusive": true, "note": ">=20% FC i.e. |log2FC| >= log2(1.2)", "source_locator": "S2.14.p1"},
+      "exercise_content": "Recovery = participants returned to their normal ambulatory activity (S2.3.p1); they were told to refrain from strenuous exercise 24 h before biopsies; the supervised resistance training was offered only AFTER the study and was not biopsied (S2.3.p1)"
+     },
+     "reasoning": "S2.3.p1 defines the human design as immobilization -> habitual-activity recovery -> repeated immobilization. S2.14.p1 gives DESeq2 in Partek and the FDR<=5% and >=20% FC rule. S3.3.p1 gives DEG counts. No arm is an exercise bout or training programme.",
+     "confidence": "high", "locator": "S2.3.p1; S2.14.p1; S3.3.p1"
+    },
+    "ownership": {
+     "final": {"owned": true, "checks": ["Human Skeletal Muscle, Homo sapiens, contact A.P. Sharples (author)", "4 conditions x 9 participants = 36 samples, matching n=9 per timepoint (FIG1)", "data_processing matches S2.14.p1 Partek/STAR hg38 pipeline"]},
+     "reasoning": "GEO metadata organism, tissue, design and processing match the human arm of the paper.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_patterns": {"key": ["description", "^Library name: (\\S+)$"]},
+     "key_column": "key",
+     "aliases": {"subject": "characteristics_ch1.2.participant", "time": "characteristics_ch1.1.condition/time"},
+     "patterns": {},
+     "recode": {"time": {"Baseline": "BL", "Atrophy": "AT", "Recovery": "REC", "Repeated Atrophy": "RAT"}},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the Library name in description (36/36 metadata matched; 4 extra matrix columns have no metadata). Time from condition/time; subject = participant.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "linear_normalized (Partek CPM)",
+     "recommended_method": "limma on log2(CPM+1) (raw counts not deposited)",
+     "final": {"source": "GSE310344_Partek_GC-AS-10307_Normalization_CPM.txt.gz", "paper_input": "raw counts into DESeq2 (S2.14.p1); only CPM deposited"},
+     "reasoning": "File name says CPM, 1.8% integer values, median ~1; no raw counts deposited.",
+     "confidence": "high"
+    },
+    "design": {
+     "decision_status": "refused",
+     "stop_reason": "No exercise contrast: the study manipulates disuse (knee-brace immobilization) and habitual-activity recovery; no sampled arm receives an exercise bout or training (S2.3.p1). The post-study resistance training was not biopsied. Treating recovery (return to normal ambulation) as exercise would change the paper's estimand.",
+     "final": {"analysis_type": "none", "design_column": "time", "contrasts": []},
+     "factors": ["time"], "references": {"time": "BL"}, "subject": "subject", "organism": "Human", "planned": [],
+     "candidates": [
+      {"value": "time_REC_vs_AT as reloading/exercise", "reason_rejected": "Recovery is return to habitual ambulation, not an exercise intervention; the paper frames it as recovery from disuse (S2.3.p1, S3.3.p1)."},
+      {"value": "time_AT_vs_BL (disuse effect)", "reason_rejected": "Valid disuse estimand but not an exercise effect, which the request asks for."}
+     ],
+     "reasoning": "Request is the exercise effect as the paper intends; the paper has no exercise arm. Refused at design.",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {"item": "matrix input", "paper": "DESeq2 on counts (Partek)", "data": "only Partek CPM deposited", "disposition": "would require a limma deviation; moot because the case is refused at design"}
+   ],
+   "executions": [], "enrichment": []
+  },
+  {
+   "case_id": "GSE310849",
+   "accession": "GSE310849",
+   "inputs": {"paper": ["test/experiments/paper_screen_20261028/papers/PMC13104094.paper.md"],
+              "metadata": "GSE310849/GSE310849_metadata.csv",
+              "matrix": "GSE310849/GSE310849_Partek_GC-AS-10656_Normalization_Normalized_counts.txt.gz",
+              "raw_tar": false, "prep_scripts": []},
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": ["GSE310344", "GSE310849"],
+      "assay": "bulk RNA-seq, aged (23 mo) male F344 rat tibialis anterior",
+      "factors": {"condition": ["contralateral control (right limb, pooled)", "sham", "TTX atrophy", "TTX+Recovery", "Repeated TTX"], "limb": ["Left", "Right"]},
+      "primary_estimand": "Effect of TTX nerve-block disuse atrophy, recovery after TTX exhaustion, and repeated TTX vs pooled contralateral control limb; no exercise intervention",
+      "planned_contrasts": ["Atrophy vs Control (S3.5.p1; 2106 DEGs)", "Recovery vs Control (2008 DEGs)", "Repeated Atrophy vs Control (3937 DEGs)", "Recovery vs Atrophy", "Repeated Atrophy vs Recovery"],
+      "inclusion": "sham excluded; right contralateral limbs pooled as control (S2.14.p1)",
+      "paper_method": "DESeq2 median-of-ratios within Partek Flow (S2.14.p1)",
+      "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "inclusive": true, "effect_metric": "fold change", "effect_cutoff": 0.2630344, "effect_inclusive": true, "note": ">=20% FC", "source_locator": "S2.14.p1"},
+      "exercise_content": "Recovery = cessation of TTX with habitual cage activity; no exercise (S2.9.p1; S3.7.p1 return to habitual activity)"
+     },
+     "reasoning": "S2.8-S2.9 define a TTX disuse model in aged rats; S2.14.p1 defines control pooling and threshold; S3.5.p1 gives counts. No exercise arm.",
+     "confidence": "high", "locator": "S2.8.p1; S2.9.p1; S2.14.p1; S3.5.p1"
+    },
+    "ownership": {
+     "final": {"owned": true, "checks": ["Rattus norvegicus TA muscle from aged rats (extract_protocol)", "12 left/12 right limbs; sham/TTX/RTTX/TTX+Recovery n=3 + 12 CTRL matches S2.8.p1", "Partek/STAR rn7 pipeline matches S2.14.p1"]},
+     "reasoning": "Metadata matches the aged-rat arm of the paper.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_patterns": {"key": ["description", "^Library name: (\\S+)$"]},
+     "key_column": "key",
+     "aliases": {"limb": "characteristics_ch1.1.limb", "grp": "characteristics_ch1.2.condition"},
+     "patterns": {},
+     "recode": {"grp": {"control (CTRL)": "CTRL", "sham": "SHAM", "TTX": "TTX", "Repeated TTX (RTTX)": "RTTX", "TTX+Recovery": "REC"}},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns equal the description Library name (24/24). grp from condition.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "linear_normalized (Partek DESeq2 median-of-ratios normalized counts)",
+     "recommended_method": "limma on log2(x+1) as a declared deviation (raw counts not deposited)",
+     "final": {"source": "GSE310849_Partek_GC-AS-10656_Normalization_Normalized_counts.txt.gz", "paper_input": "raw counts into DESeq2; only normalized counts deposited"},
+     "reasoning": "File name says Normalized_counts; 11% integers; no raw counts deposited.",
+     "confidence": "high"
+    },
+    "design": {
+     "decision_status": "refused",
+     "stop_reason": "No exercise contrast: groups are TTX-induced disuse, recovery after TTX exhaustion (habitual cage activity), repeated TTX, sham and contralateral control limbs (S2.8.p1, S2.9.p1). No exercise intervention exists in the design.",
+     "final": {"analysis_type": "none", "design_column": "grp", "contrasts": []},
+     "factors": ["grp"], "references": {"grp": "CTRL"}, "organism": "Rat", "planned": [],
+     "candidates": [
+      {"value": "grp_REC_vs_TTX as reloading", "reason_rejected": "Recovery is spontaneous return of nerve function with cage activity, not exercise."}
+     ],
+     "reasoning": "No exercise arm; refused at design.",
+     "confidence": "high"
+    }
+   },
+   "discrepancies": [
+    {"item": "matrix input", "paper": "DESeq2 on counts", "data": "only normalized counts deposited", "disposition": "moot because refused at design"}
+   ],
+   "executions": [], "enrichment": []
+  }
+ ]
+}
