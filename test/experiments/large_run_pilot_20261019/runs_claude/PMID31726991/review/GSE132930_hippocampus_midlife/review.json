@@ -1,0 +1,88 @@
+{
+ "case": "GSE132930_hippocampus_midlife",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Voluntary wheel running (12 wk) vs sedentary male C57BL/6J, cortex and hippocampus RNA-seq (S2.1.p1, S5.2.p1). Exercise factor = Run/RunHi/RunLow vs Sed in the activity field.",
+  "B2": "Hippocampus midlife: RunHi (5) vs Sed (12), RunLow (6) vs Sed (12) in GEO; paper reports 271 and 172 DE.",
+  "B3": "One sample per mouse per tissue in each series (title = mouse id + C/H). No repeated measures within a case; cortex and hippocampus of one mouse are separate cases. Packet A lists no candidate key.",
+  "B4": "S5.6.p1: DGE done on hippocampus and cortex separately, comparisons (i) young run vs sed, (ii) midlife low vs sed, (iii) midlife high vs sed per tissue; young and midlife cannot be compared directly. The paper does not say whether the three midlife groups were fitted jointly or as pairs.",
+  "B5": "Methods S5.6.p1: 'Genes were considered DE if the False Discovery Rate was less than 0.05 (FDR < 0.05)'; no fold-change cutoff, strict <. Counts S2.2.p1: cortex young 1252 (742 up/510 down), mid high 214 (70/144), mid low 67 (20/47); hippocampus young 2026 (1498/528), mid high 271 (87/184), mid low 172 (80/92)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Exact title match; RunHi n=5, Sed n=12 vs paper design 12/12 not discussed, but the deposit reproduces counts.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Mechanical flag possible_reversed_contrast is a false positive: design is treatment=RunHi/RunLow, control=Sed.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper says QL F-test (S5.6.p1) and that was run; pairwise subset fits fit the deposited tables listing only two groups; paper is silent on joint vs pairwise. HANDBACK notes the deposited layout suggests exactTest/LRT, not run (no executor).",
+   "fix": "Optional: add an R exactTest/glmLRT sensitivity execution."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "pool unbalanced for RunLow (L001 4/L005 2) vs Sed 6/6; recorded and tested in DESeq2 sensitivity (89/25 DEG).",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR<0.05, no FC, strict (S5.6.p1); audit rule kept separate.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "HANDBACK says the count gap 'comes from the statistical test alone' and that LRT/exactTest explains the near-zero midlife counts (ours 8/3 vs paper 271/172). Not demonstrated: no exactTest/LRT fit was run; midlife p-value Spearman vs deposited tables is only 0.83-0.88 (young 0.99) while log2FC r=0.999, and DESeq2 ~pool+grp changes counts. The seven ECM genes the paper names all go down but none reaches FDR<0.05 (padj 0.29-0.65).",
+   "fix": "Reword HANDBACK and the study record: the gap is unexplained and the test-type difference is a hypothesis. Add an R exactTest (and glmLRT) execution on the same two-group subsets as a labelled sensitivity, or record it as an open discrepancy."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Which test to report when the paper states QL F-test but the deposit looks like exactTest/LRT (open policy question)."
+ ],
+ "summary": "设计与论文一致,方向无误;结果 8/3 vs 论文 271/172。HANDBACK 将差距完全归因于检验类型,缺乏直接证据(midlife p 值秩相关仅 0.83-0.88),建议改写为假设并补 exactTest/LRT 敏感性。"
+}

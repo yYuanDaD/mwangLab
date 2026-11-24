@@ -1,0 +1,945 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID31726991",
+  "subject_id": "GSE132930_hippocampus_young",
+  "created_at": "2026-11-24T09:55:17",
+  "finished_at": "2026-11-24T09:56:52",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC6854620.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC6854620.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "57d0b081fb2c29463e0638a6c6df1b385a80a73e6a4188a949c6609cf9c833b5",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE132930_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE132930\\GSE132930_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "535971971121bc402a4133a820c1b3612b89afd9a5a9ae23b43479c7d956f0d6",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE132930_GeneCount_H_young.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE132930\\GSE132930_GeneCount_H_young.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T09:55:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d275126b400a08770d73fd20cc3206a41a5b896c94c605797a898e716c80f377",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE132930"
+        ],
+        "primary_estimand": "Effect of 12 weeks voluntary wheel running vs age-matched sedentary on brain gene expression, analysed separately per tissue (cortex, hippocampus) and per age cohort (young 1-2 mo start; midlife 12 mo start, runners split into high/low by >10,000 rotations/night)",
+        "planned_contrasts": [
+          "cortex young Run vs Sed (S2.2.p1: 1252 DE; 742 up, 510 down)",
+          "cortex midlife RunHi vs Sed (S2.2.p1: 214; 70 up, 144 down)",
+          "cortex midlife RunLow vs Sed (S2.2.p1: 67; 20 up, 47 down)",
+          "hippocampus young Run vs Sed (S2.2.p1: 2026; 1498 up, 528 down)",
+          "hippocampus midlife RunHi vs Sed (S2.2.p1: 271; 87 up, 184 down)",
+          "hippocampus midlife RunLow vs Sed (S2.2.p1: 172; 80 up, 92 down)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false,
+          "source_locator": "S5.6.p1"
+        },
+        "paper_method": "RSEM counts; edgeR 3.20.9, filter CPM>=1 in >1 sample, TMM, quasi-likelihood F-test, per tissue (S5.6.p1)",
+        "factors": {
+          "activity": [
+            "Sed",
+            "Run (young)",
+            "RunLow",
+            "RunHi (midlife)"
+          ],
+          "tissue": [
+            "Cortex",
+            "Hippocampus"
+          ],
+          "age": [
+            "Young",
+            "Midlife"
+          ]
+        },
+        "inclusion": "male C57BL/6J; young n=5 per activity for RNA-seq (S5.2.p1); midlife n=12 run (6 high, 6 low) + 12 sed (S2.1.p1, S5.2.p1); young and midlife not directly compared (run at separate times, S5.6.p1)",
+        "paper_results": "DEG counts per contrast in S2.2.p1 / Fig 3b,g; named genes S2.3.p1, S2.4.p2"
+      },
+      "reason": "Methods S5.6.p1 define edgeR QL per tissue and three comparisons per tissue; S2.2.p1 gives counts at FDR<0.05 with no fold-change cutoff. Young and midlife were sequenced at separate times and the authors state they cannot be compared directly, so each tissue x age is its own model.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:17"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE132930\\GSE132930_GeneCount_H_young.txt.gz",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE132930",
+          "matrix GSE132930_GeneCount_H_young.txt.gz is deposited in GSE132930 supplementary files; restricted to Young hippocampus samples listed in GEO metadata",
+          "deposited edgeR result tables in the same series reproduce the paper's DEG counts exactly at FDR<0.05 (1252/214/67/2026/271/172), confirming the sample sets"
+        ],
+        "accession": "GSE132930",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE132930\\GSE132930_metadata.csv"
+      },
+      "reason": "Series and matrix belong to the paper; sample titles (mouse id + C/H) map to GSM records.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:17"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 10,
+        "n_metadata": 65,
+        "coverage": 0.1538,
+        "unmatched_matrix_columns": [
+          "17964H",
+          "17966H",
+          "17967H",
+          "17969H",
+          "17970H",
+          "17971H",
+          "17972H",
+          "17973H",
+          "17974H",
+          "17976H",
+          "17977H",
+          "17978H",
+          "17979H",
+          "17980H",
+          "17981H",
+          "17982H",
+          "17985H",
+          "17986H",
+          "17987H",
+          "17989H",
+          "17990H",
+          "17991H",
+          "17992H",
+          "17993H",
+          "17995H",
+          "17996H",
+          "17997H",
+          "17999H",
+          "18000H",
+          "18532H",
+          "18533H",
+          "18534H",
+          "18535H",
+          "18536H",
+          "18602H",
+          "18603H",
+          "18624H",
+          "18625H",
+          "18673H",
+          "18674H",
+          "18675H",
+          "18676H",
+          "18677H",
+          "18678H",
+          "18679H",
+          "18680H"
+        ],
+        "unmatched_metadata_samples": [
+          "GSM3896744",
+          "GSM3896745",
+          "GSM3896746",
+          "GSM3896747",
+          "GSM3896748",
+          "GSM3896749",
+          "GSM3896750",
+          "GSM3896751",
+          "GSM3896752",
+          "GSM3896753",
+          "GSM3896754",
+          "GSM3896755",
+          "GSM3896756",
+          "GSM3896757",
+          "GSM3896758",
+          "GSM3896759",
+          "GSM3896760",
+          "GSM3896761",
+          "GSM3896762",
+          "GSM3896763",
+          "GSM3896764",
+          "GSM3896765",
+          "GSM3896766",
+          "GSM3896767",
+          "GSM3896768",
+          "GSM3896769",
+          "GSM3896770",
+          "GSM3896771",
+          "GSM3896772",
+          "GSM3896773",
+          "GSM3896774",
+          "GSM3896775",
+          "GSM3896776",
+          "GSM3896777",
+          "GSM3896778",
+          "GSM3896779",
+          "GSM3896780",
+          "GSM3896781",
+          "GSM3896782",
+          "GSM3896783",
+          "GSM3896784",
+          "GSM3896785",
+          "GSM3896786",
+          "GSM3896787",
+          "GSM3896788",
+          "GSM3896789",
+          "GSM3896790",
+          "GSM3896791",
+          "GSM3896792",
+          "GSM3896793",
+          "GSM3896794",
+          "GSM3896795",
+          "GSM3896796",
+          "GSM3896797",
+          "GSM3896798"
+        ],
+        "excluded_samples": {
+          "GSM3896805": "18606H excluded: the authors' deposited hippocampus result is named 'wo18606' and its CPM columns omit 18606H; reproduces paper's 2026 DEGs. Paper text does not state the reason."
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "characteristics_ch1.3.activity",
+              "regex": "^(Sed|Run|RunLow|RunHi)$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\design_metadata.csv",
+          "sha256": "63e162dcdb5f80f3f3bb0233f9daf0650c87159701924a28ce0409466156432c",
+          "levels": {
+            "grp": {
+              "Run": 5,
+              "Sed": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns embed the GEO title (mouse id + C/H) followed by GT library id, barcode and lane; matrix_column_pattern extracts the title, exact match on metadata 'title'. grp from the activity characteristic.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:20"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE132930_GeneCount_H_young.txt.gz",
+        "paper_input": "RSEM v1.2.12 gene counts (S5.6.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\aligned_matrix.csv",
+          "sha256": "474802f47a879c91d985732b2bd0a3e2302bac5bc7ce0784ba731d1a24c94042",
+          "n_features": 38924,
+          "n_samples": 9,
+          "annotation_columns_dropped": [
+            "GSM3896805"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 896016.0,
+          "median": 2.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "integer_fraction 1.0, min 0, max ~1.3e6, file named GeneCount; paper quantified with RSEM (S5.6.p1) and analysed them with edgeR, so these are RSEM-derived integer gene counts, the paper's own input.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:20"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group",
+        "design_column": "grp",
+        "control": "Sed",
+        "treatment": "Run",
+        "contrasts": [
+          {
+            "name": "grp_Run_vs_Sed",
+            "control": "Sed",
+            "treatment": "Run",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Young hippocampus: Run vs Sed (S5.6.p1 comparison i).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:22"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 9,
+          "n_columns": 2,
+          "columns": [
+            "Intercept",
+            "grp_Sed"
+          ],
+          "rank": 2,
+          "full_rank": true,
+          "residual_df": 7,
+          "levels": {
+            "grp": {
+              "Run": 5,
+              "Sed": 4
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "Run"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "Sed"
+              ],
+              "n": 4
+            }
+          ],
+          "min_cell_size": 4,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.strain",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.brain region",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.2.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.3.activity",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "Run": {
+                "Run": 5,
+                "Sed": 0
+              },
+              "Sed": {
+                "Run": 0,
+                "Sed": 4
+              }
+            }
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 9,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          }
+        ]
+      },
+      "reason": "Independent animals, one sample per mouse per tissue; paper used ~group only (S5.6.p1). Young libraries spread over 8 lanes; no recorded batch to block on.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:22"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "edgeR (TMM + glmQLFit/glmQLFTest via inmoose)",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "edgeR 3.20.9 QL F-test",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "inmoose edgepy port rather than R edgeR 3.20.9; TMM factors from repository implementation"
+        ]
+      },
+      "reason": "Paper route (S5.6.p1): filter CPM>=1 in >=2 samples of each comparison, TMM, QL F-test, two-group fit per comparison (deposited tables contain only the two compared groups' samples).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:22"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        }
+      },
+      "reason": "S5.6.p1 / S2.2.p1: FDR < 0.05, no fold-change rule. Audit adds |FC|>1.5 for reference only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:55:22"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_edger_analysis",
+        "subset": "H_young_Run_vs_Sed",
+        "role": "primary",
+        "tool": "tools.edger_tools:run_edger_analysis",
+        "n_samples": 9,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\H_young_Run_vs_Sed\\input\\matrix_filtered.csv",
+        "formula": "~ grp",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\H_young_Run_vs_Sed\\DEG_results_Run_vs_Sed.csv"
+        ],
+        "counts": {
+          "H_young_Run_vs_Sed": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 15096,
+              "n_significant": 1950,
+              "n_up": 1396,
+              "n_down": 554,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 15096,
+              "n_significant": 795,
+              "n_up": 774,
+              "n_down": 21,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "paper's edgeR QL two-group comparison",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:56:42"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "H_young_Run_vs_Sed",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\enrichment_H_young_Run_vs_Sed\\ora\\DEG_results_Run_vs_Sed_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\enrichment_H_young_Run_vs_Sed\\ora\\DEG_results_Run_vs_Sed_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\enrichment_H_young_Run_vs_Sed\\ora\\DEG_results_Run_vs_Sed_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\enrichment_H_young_Run_vs_Sed\\ora\\DEG_results_Run_vs_Sed_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 1934 Mouse genes (direction=all, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Cilium Movement (GO:0003341) | padj=4.21e-11 | overlap=29/59 | genes=CLXN;ODAD1;CFAP61;SPAG17;DNAH1;ODAD2;SPEF2;ODAD4;DNAH5;DNAH9;RSPH9;CFAP206;TEKT1 - Axoneme Assembly (GO:0035082) | padj=3.05e-10 | overlap=23/41 | genes=SPAG16;DNAI4;SPAG17;CCDC39;LRGUK;CFAP74;RSPH4A;TTC12;DNAAF3;CFAP91;DNAJB13;FOXJ1 - Extracellular Matrix Organization (GO:0030198) | padj=1.12e-06 | overlap=45/176 | genes=COL17A1;COL18A1;COL15A1;ECM2;NID1;NID2;LOXL1;LOXL2;ADAMTS4;ADAMTS5;MMP24;ADAMTS1 - Cilium Assembly (GO:0060271) | padj=1.60e-06 | overlap=55/243 | genes=SPAG16;SPAG17;LRGUK;IFT172;CDC14B;TEKT1;IQUB;TMEM107;CFAP46;CFAP43;CC2D2A;CEP290 - Extracellular Structure Organization (GO:0043062) | padj=5.84e-05 | overlap=30/109 | genes=COL17A1;COL15A1;ECM2;ADAMTS4;ADAMTS5;MMP24;ADAMTS1;ADAMTSL4;ATP7A;POSTN;MIA;MMP2 - Axonemal Dynein Complex Assembly (GO:0070286) | padj=5.84e-05 | overlap=16/37 | genes=CLXN;ODAD1;DNAI4;CCDC39;DNAH1;DNAI2;TTC12;DNAH2;ODAD2;DNAI3;DNAAF3;ODAD4;DNAH5;Z - External Encapsulating Structure Organization (GO:0045229) | padj=5.84e-05 | overlap=30/110 | genes=COL17A1;COL15A1;ECM2;ADAMTS4;ADAMTS5;MMP24;ADAMTS1;ADAMTSL4;ATP7A;POSTN;MIA;MMP2 - Microtubule Bundle Formation (GO:0001578) | padj=5.84e-05 | overlap=19/51 | genes=SPAG16;LRGUK;CFAP74;RSPH4A;FOXJ1;RSPH9;CFAP206;LRRC43;RSPH1;TPPP3;CAPN6;TTLL3;ST - Plasma Membra..."
+      },
+      "reason": "paper reports KEGG/GO ECM, focal adhesion, angiogenesis enrichment for young runners (S2.3, Fig 3d,e,i,j)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:56:48"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "H_young_Run_vs_Sed",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\enrichment_H_young_Run_vs_Sed\\gsea\\DEG_results_Run_vs_Sed_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 14773 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 25 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=1.90 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=1.86 | NOM p=0.00e+00 | FDR q=4.41e-04 - HALLMARK_BILE_ACID_METABOLISM | NES=1.78 | NOM p=0.00e+00 | FDR q=3.17e-03 - HALLMARK_IL2_STAT5_SIGNALING | NES=1.69 | NOM p=0.00e+00 | FDR q=7.64e-03 - HALLMARK_INFLAMMATORY_RESPONSE | NES=1.65 | NOM p=1.13e-03 | FDR q=1.02e-02 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.65 | NOM p=2.67e-03 | FDR q=9.14e-03 - HALLMARK_APICAL_JUNCTION | NES=1.60 | NOM p=2.24e-03 | FDR q=1.50e-02 - HALLMARK_ADIPOGENESIS | NES=1.58 | NOM p=0.00e+00 | FDR q=1.63e-02 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_MYC_TARGETS_V1 | NES=-2.30 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=-1.87 | NOM p=0.00e+00 | FDR q=4.05e-03 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-1.79 | NOM p=0.00e+00 | FDR q=4.86e-03 - HALLMARK_DNA_REPAIR | NES=-1.78 | NOM p=0.00e+00 | FDR q=4.05e-03 - HALLMARK_PANCREAS_BETA_CELLS | NES=-1.46 | NOM p=3.77e-02 | FDR q=4.08e-02 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=-1.12 | NOM p=2.15e-01 | FDR q=4.65e-01 - HALLMARK_KRAS_SIGNALING_DN | NES=-1.05 | NOM p=3.60e-01 | ..."
+      },
+      "reason": "paper reports KEGG/GO ECM, focal adhesion, angiogenesis enrichment for young runners (S2.3, Fig 3d,e,i,j)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:56:52"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "young and midlife cohorts were sequenced separately; per paper S5.6.p1 they are not compared directly",
+          "midlife high/low split is a post-hoc grouping by running distance (associational within runners)"
+        ],
+        "results": {
+          "H_young_Run_vs_Sed": {
+            "n_deg": 1950,
+            "up": 1396,
+            "down": 554,
+            "rule": "padj < 0.05",
+            "audit_n": 795
+          }
+        },
+        "paper_counts": {
+          "H_young_Run_vs_Sed": 2026
+        },
+        "comparison": {
+          "H_young_Run_vs_Sed": {
+            "ours": 1950,
+            "paper": 2026
+          }
+        },
+        "paper_gene_check": {}
+      },
+      "reason": "Counts from S2.2.p1; genes from S2.3.p1/S2.4.p2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:56:52"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e92243023e67272158cade03773524b5f70a6c091e36dcd8f5b8ebc6a4dd8505",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "14811efdefcaab03651dd78ae7433b99b0bbd26fbbb95dcfd60d559715a00eb6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "474802f47a879c91d985732b2bd0a3e2302bac5bc7ce0784ba731d1a24c94042",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "63e162dcdb5f80f3f3bb0233f9daf0650c87159701924a28ce0409466156432c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "067051bb399acf92978c1dc0c4a6ee72aa21b233c098d706fb3f5eb84f19cdd7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7aba8a0e3997a15708f699d2f874d09223e28fb0cdd3a73854943c5cdff3707f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\results\\H_young_Run_vs_Sed\\DEG_results_Run_vs_Sed.csv",
+      "role": "deg_H_young_Run_vs_Sed",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "2e95a6515adfa89fb7d1cfa44f16a11437a5f9dabaa5a0782f4c3d27a6938ce7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID31726991\\GSE132930_hippocampus_young\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "5b668dd8ffed4c525e2ae196d9b942469fcb4d0e05572833d58b3a15c6746f56",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+ "case": "GSE132930_cortex_midlife",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Voluntary wheel running (12 wk) vs sedentary male C57BL/6J, cortex and hippocampus RNA-seq (S2.1.p1, S5.2.p1). Exercise factor = Run/RunHi/RunLow vs Sed in the activity field.",
+  "B2": "Cortex midlife: RunHi (6) vs Sed (10) and RunLow (6) vs Sed (10) in GEO; paper reports 214 and 67 DE (S2.2.p1). Paper design is 12 running and 12 sedentary (S5.2.p1).",
+  "B3": "One sample per mouse per tissue in each series (title = mouse id + C/H). No repeated measures within a case; cortex and hippocampus of one mouse are separate cases. Packet A lists no candidate key.",
+  "B4": "S5.6.p1: DGE done on hippocampus and cortex separately, comparisons (i) young run vs sed, (ii) midlife low vs sed, (iii) midlife high vs sed per tissue; young and midlife cannot be compared directly. The paper does not say whether the three midlife groups were fitted jointly or as pairs.",
+  "B5": "Methods S5.6.p1: 'Genes were considered DE if the False Discovery Rate was less than 0.05 (FDR < 0.05)'; no fold-change cutoff, strict <. Counts S2.2.p1: cortex young 1252 (742 up/510 down), mid high 214 (70/144), mid low 67 (20/47); hippocampus young 2026 (1498/528), mid high 271 (87/184), mid low 172 (80/92)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Groups from the activity characteristic, titles match matrix columns exactly; Sed n=10 (GEO) vs design n=12 not discussed, though the deposit reproduces the counts.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Mechanical flag possible_reversed_contrast is a false positive: design is treatment=RunHi/RunLow, control=Sed.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Paper says QL F-test (S5.6.p1) and that was run; pairwise subset fits fit the deposited tables listing only two groups; paper is silent on joint vs pairwise. HANDBACK notes the deposited layout suggests exactTest/LRT, not run (no executor).",
+   "fix": "Optional: add an R exactTest/glmLRT sensitivity execution."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "pool (lane L001/L005) unbalanced across groups, recorded as crossed and tested as DESeq2 ~pool+grp sensitivity; paper did not block on lane.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR<0.05, no FC, strict (S5.6.p1); audit rule kept separate.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "disagree",
+   "severity": "major",
+   "evidence": "HANDBACK says the count gap 'comes from the statistical test alone' and that LRT/exactTest explains the near-zero midlife counts (ours 0/0 vs paper 214/67). Not demonstrated: no exactTest/LRT fit was run; midlife p-value Spearman vs deposited tables is only 0.83-0.88 (young 0.99) while log2FC r=0.999, and DESeq2 ~pool+grp changes counts. padj<0.1 gives 879/593, so signal exists but QL is far more conservative than the paper's rule.",
+   "fix": "Reword HANDBACK and the study record: the gap is unexplained and the test-type difference is a hypothesis. Add an R exactTest (and glmLRT) execution on the same two-group subsets as a labelled sensitivity, or record it as an open discrepancy."
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "",
+   "fix": ""
+  }
+ ],
+ "overall": "fix",
+ "human_items": [
+  "Which test to report when the paper states QL F-test but the deposited tables look like exactTest/LRT (open policy question)."
+ ],
+ "summary": "分组、方向、阈值均与论文一致,样本按标题精确对齐。但 ours=0 vs 论文 214/67,HANDBACK 把差距归因于检验类型,这只是未验证的假设;需改写或补做 exactTest/LRT 敏感性分析。"
+}
