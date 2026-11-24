@@ -1,0 +1,155 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36120562",
+  "request": "Analyze GSE208354 for PMID 36120562 (Exercise training ameliorates myocardial phenotypes in heart failure with preserved ejection fraction by changing N6-methyladenosine modification in mice model.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE208354",
+      "accession": "GSE208354",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9478036.paper.md"],
+        "metadata": "GSE208354/GSE208354_metadata.csv",
+        "matrix": "GSE208354/GSE208354_All_comparison_mRNA.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE208354"],
+            "assay": "MeRIP-seq (m6A IP) plus input RNA-seq of mouse heart; the input libraries are the mRNA-expression arm (S2.7.p1, S2.8.p1)",
+            "primary_estimand": "Effect of 8 weeks moderate treadmill exercise on heart mRNA expression in two-hit (HFD + L-NAME) HFpEF mice: HFpEF+EXT vs sedentary HFpEF",
+            "sample_inclusion": "n = 3 male C57BL/6J HFpEF and 3 HFpEF+EXT hearts for RNA-seq (S2.8.p1, S3.4.p1 'n = 3 per group'); IP libraries are the m6A arm, not expression",
+            "factors": {"grp": ["HF (sedentary HFpEF, GEO 'control')", "HFEXT (HFpEF + exercise)"]},
+            "planned_contrasts": ["HFpEF+EXT vs HFpEF (S3.4.p1; paper: 690 DEGs, 267 up, 423 down)"],
+            "repeated_measure_unit": "none; independent animals",
+            "normalization": "featureCounts then DESeq2 (S2.8.p1); FPKM shown in Fig 3A",
+            "paper_method": "DESeq2 on featureCounts counts, two groups (S2.8.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "source_locator": "S3.4.p1 (FC > 2, p < 0.05)"},
+            "paper_results": "690 DEGs (267 up, 423 down) HFpEF+EXT vs HFpEF; Table 3 mRNA log2FC: Casp12 -1.27, Capn2 -0.31, Fas -1.03, Casp7 -0.54, Jun -0.99, Pdia3 -0.50, Tnnt2 +0.73, Mef2a +0.44, Adrb1 +0.53, Agtr1a +0.53"
+          },
+          "reasoning": "Exercise effect within HFpEF mice. The paper's 'control' in GEO is the sedentary HFpEF group (S1.p4 'HFpEF + EXT and control (HFpEF) mice'). The m6A peak / differential methylation results are a different assay and are out of scope for gene expression.",
+          "confidence": "high",
+          "locator": "S3.4.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S5.p1 names GSE208354", "matrix columns HF36/37/43 and HFEXT6/7/14 -input equal GEO titles of the input RNA-seq GSMs", "organism Mus musculus, heart, matches S2.1.p1"]},
+          "reasoning": "Data availability statement names GSE208354; the supplementary All_comparison_mRNA file is the series' own input-library expression table.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(HFEXT|HF)\\d+-"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {
+            "GSM6341819": "m6A IP library (RIP-Seq), not an expression sample",
+            "GSM6341821": "m6A IP library (RIP-Seq), not an expression sample",
+            "GSM6341823": "m6A IP library (RIP-Seq), not an expression sample",
+            "GSM6341825": "m6A IP library (RIP-Seq), not an expression sample",
+            "GSM6341827": "m6A IP library (RIP-Seq), not an expression sample",
+            "GSM6341829": "m6A IP library (RIP-Seq), not an expression sample"
+          },
+          "reasoning": "Exact match of matrix columns to GEO title. Matrix column HF40-input has no GSM in the series (only HF36/37/43 deposited for HFpEF) and the paper states n = 3 per group, so it stays unmatched and is dropped. grp from the title prefix: HF = sedentary HFpEF, HFEXT = HFpEF + exercise.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "final": {"source": "GSE208354_All_comparison_mRNA.csv (supplementary, input libraries)", "paper_input": "featureCounts read counts into DESeq2 (S2.8.p1)"},
+          "reasoning": "Non-integer values (integer fraction 0.60 driven by zeros), small fractional values for low genes, column sums ~0.9-1.3e6 (not exactly 1e6, so FPKM not TPM); paper Fig 3A shows 'FPKM distribution' of these samples (S3.4.p1). Raw counts are not deposited.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "HF"},
+          "organism": "Mouse",
+          "planned": ["grp_HFEXT_vs_HF"],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "HF",
+            "treatment": "HFEXT",
+            "contrasts": [{"name": "grp_HFEXT_vs_HF", "control": "HF", "treatment": "HFEXT", "role": "primary"}]
+          },
+          "candidates": [
+            {"value": "include HF40-input as a 4th HFpEF sample", "reason_rejected": "no GEO sample record and the paper analyses n = 3 per group"},
+            {"value": "IP vs input / methylation contrast", "reason_rejected": "m6A enrichment, not gene expression"}
+          ],
+          "reasoning": "Two-arm design, 3 vs 3 independent mice, all male, one tissue (S2.8.p1, S3.4.p1). Exercise is randomized within HFpEF mice, so the contrast is interventional.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent animals, single sex, no batch or lane recorded in GEO.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (trend, empirical Bayes) on log2(FPKM+1)",
+            "formula": "~ grp",
+            "paper_route": {"method": "DESeq2 on featureCounts counts", "status": "blocked", "reason": "only FPKM deposited; no raw counts in GEO supplementary or as GSM tables"},
+            "deviations": ["limma on log2(FPKM+1) instead of DESeq2 on counts", "genes kept with FPKM >= 1 in at least 3 of the 6 samples (paper states no filter; DESeq2 uses independent filtering)"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix-method policy: log-transformed FPKM goes to limma. A low-expression filter avoids zero-inflated near-constant genes distorting the limma-trend prior.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "deviation_note": "Paper rule (raw p < 0.05, FC > 2) applied to limma results instead of DESeq2; BH FDR < 0.05 reported as audit."
+          },
+          "reasoning": "S3.4.p1 and Fig 3B: fold change > 2 and p < 0.05 (raw p) -> |log2FC| > 1.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "n = 3 per group; raw-p threshold with no multiple-testing correction, as in the paper",
+              "limma on FPKM instead of DESeq2 on counts; counts not directly comparable",
+              "Exercise effect is within HFpEF mice only; no healthy exercise arm sequenced"
+            ]
+          },
+          "paper_counts": {"grp_HFEXT_vs_HF": 690},
+          "paper_genes": {"grp_HFEXT_vs_HF": ["Casp12", "Capn2", "Fas", "Casp7", "Jun", "Pdia3", "Tnnt2", "Mef2a", "Adrb1", "Agtr1a"]},
+          "reasoning": "Paper reports 690 DEGs and Table 3 mRNA log2FC signs for 10 genes (6 down, 4 up).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "HF40-input column", "paper": "n = 3 HFpEF mice sequenced", "data": "matrix has 4 HFpEF input columns; HF40 has no GSM", "disposition": "executable_without_change"},
+        {"item": "matrix type", "paper": "DESeq2 on featureCounts counts", "data": "only FPKM deposited", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "grp_HFEXT_vs_HF",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "HF", "treatment_group": "HFEXT"},
+          "role": "primary",
+          "filter_low_counts": {"min_value": 1, "min_samples": 3},
+          "reasoning": "Two-group limma on log2(FPKM+1), HFpEF+EXT vs HFpEF."
+        },
+        {
+          "name": "grp_HFEXT_vs_HF_nofilter",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "HF", "treatment_group": "HFEXT"},
+          "role": "sensitivity",
+          "reasoning": "Same contrast without the FPKM >= 1 filter, closer to the paper's unfiltered DEG call; tests how much of the count gap comes from the filter."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_HFEXT_vs_HF", "ora": true, "gsea": false, "direction": "up", "reasoning": "paper reports GO/KEGG of up-regulated mRNAs (Fig 3D)"},
+        {"execution": "grp_HFEXT_vs_HF", "ora": true, "gsea": false, "direction": "down", "reasoning": "paper reports GO/KEGG of down-regulated mRNAs (Fig 3E)"},
+        {"execution": "grp_HFEXT_vs_HF", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Hallmark GSEA on full ranking as supporting pathway view"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{"case": "GSE208354", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. HFpEF (HFD + L-NAME) mice with vs without 8 weeks of treadmill running; GEO input RNA-seq libraries (3 HF, 3 HFEXT) carry the exercise factor; the 6 m6A IP libraries are a different assay (S2.1.p1, S2.7.p1, S2.8.p1).",
+  "B2": "HFpEF+EXT vs HFpEF, n = 3 per group, male C57BL/6J, heart (S2.8.p1, S3.4.p1 'n = 3 per group'). No healthy exercise arm.",
+  "B3": "No repeated measures: one heart per mouse, separate animals per group; packet A lists no pairing key.",
+  "B4": "Two-group comparison only, DESeq2 (S2.8.p1 'Differential gene expression analysis was made with the DESeq2 R-package'); joint vs pairwise is moot with two groups.",
+  "B5": "S3.4.p1: '690 mRNAs, including 423 downregulated and 267 upregulated ... (FC > 2, p < 0.05; Figure 3B)'; raw p, fold change > 2 (strict), no FDR."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Exercise arm HFEXT vs sedentary HF in input libraries; IP libraries excluded with reason (alignment gate).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp HF 3 / HFEXT 3 matches paper n=3; HF40-input (no GSM) dropped with stated reason and recorded as discrepancy; control is the paper's sedentary HFpEF.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "HFEXT vs HF, treatment vs control; Table 3 signs of 10 genes match the paper.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "No repeated animals; packet A candidate keys: none.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Single two-group fit ~ grp; covers B4.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Only perfectly collinear columns are the group labels themselves (source_name, condition); one sex, one tissue, no batch recorded.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Matrix is FPKM (fractional, column sums ~1e6, Fig 3A) so limma on log2(FPKM+1) is the policy route; DESeq2 deviation declared; p-value histogram frac_p_gt_0.9 0.071 is healthy.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule raw p<0.05, FC>2 transcribed as pvalue<0.05 and |log2FC|>1, strict; padj audit reported. No alternative rule in packet B reproduces 690 (1538 at p<0.05 alone, 367 at |lfc|>0.585).", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Same contrast (HFpEF+EXT vs HFpEF) compared; 97 vs 690 reported with route difference, no overclaim; gene-level sign concordance reported.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; the 'no raw counts' statement only forces a declared method deviation (counts not in GEO supplementary).", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: which threshold to report when the paper's 690 DEGs fit none of the tested rules; the large gap (97 vs 690) is attributed to FPKM/limma vs DESeq2 counts and the FPKM>=1 filter, not verified."],
+ "summary": "该案例分析了HFpEF运动组与久坐HFpEF组的input RNA-seq(3 vs 3),排除了m6A IP文库,方向、分组、阈值(原始p<0.05且FC>2)均与论文一致。因仅有FPKM,改用limma并已声明偏离,97 vs 690的差异被如实记录,未发现阻断或重大问题。"}

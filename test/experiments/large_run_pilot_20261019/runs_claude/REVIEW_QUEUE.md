@@ -414,3 +414,7 @@ One section per case; newest last.
 ## PMID36611902 / GSE221003_chronic (2026-11-24)
 
 - policy: Open policy question (not an error): whether drug-contrast series from papers with an exercise test outcome should get a labelled sensitivity run; the skill currently says refuse.
+
+## PMID36120562 / GSE208354 (2026-11-24)
+
+- policy: Open policy: which threshold to report when the paper's 690 DEGs fit none of the tested rules; the large gap (97 vs 690) is attributed to FPKM/limma vs DESeq2 counts and the FPKM>=1 filter, not verified.

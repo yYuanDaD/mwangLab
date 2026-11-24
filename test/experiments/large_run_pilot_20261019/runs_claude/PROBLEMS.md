@@ -871,3 +871,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36611902 (GSE221003)
 
 - key_patterns must match all metadata rows across sub-studies (tools/native.py:392); suitability reports sample_size fail (0/0) with no factors Details: `PMID36611902/HANDBACK.md`.
+
+## PMID36120562 (GSE208354)
+
+- minor: GEO metadata text garbled (geo_tools.py, line not found); inspect profiles the methylation BED file as a candidate expression matrix Details: `PMID36120562/HANDBACK.md`.
