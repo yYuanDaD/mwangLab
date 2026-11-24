@@ -450,3 +450,7 @@ One section per case; newest last.
 ## PMID32969079 / GSE146336 (2026-11-24)
 
 - policy: Policy question only: if T3-by-genotype series were ever to count as exercise-adjacent, this case would need reopening. Under the skill's current rules it does not.
+
+## PMID34219410 / GSE159217 (2026-11-24)
+
+- policy: Policy: Older vs Young under matched activity is executable (suitability analyzable) but is an ageing estimand; refusal as an exercise study follows the skill's rule, but a person may want it recorded as non-exercise rather than refused.

@@ -1,0 +1,80 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34219410",
+  "request": "Analyze GSE159217 for PMID 34219410 (Matrisome, innervation and oxidative metabolism affected in older compared with younger males with similar physical activity.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE159217",
+      "accession": "GSE159217",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC8517362.paper.md"],
+        "metadata": "GSE159217/GSE159217_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE159217"],
+            "primary_estimand": "Cross-sectional age effect: older (65-71 y, n=18) vs young (19-27 y, n=20) male vastus lateralis, groups deliberately MATCHED for physical activity (ABS.p2, S1.p3, S2.2.p1). No exercise intervention, no acute bout, no active-vs-sedentary arm.",
+            "planned_contrasts": [
+              "Older vs Young, DESeq2 (S2.5.p2; paper: 4327 DEGs, 3797 coding: 1891 up / 1906 down in older; S3.1.p1) - age contrast, not exercise",
+              "Within-group association of expression with continuous MVPA time, limma-voom (S2.5.p2, S3.4.p4; paper: 662 genes older, 1058 young at unadjusted P<0.05) - the only physical-activity analysis; needs per-subject MVPA"
+            ],
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S2.5.p2"},
+            "paper_method": "DESeq2 ~ age group after removing genes with <10 reads per row; limma-voom (TMM) with MVPA as continuous covariate within each age group",
+            "factors": {"age group": ["Young", "Older"]},
+            "sample_inclusion": "38 males with high-quality RNA; two older subjects excluded before deposition (S2.2.p1)",
+            "repeated_measure_unit": "none (one biopsy per subject)"
+          },
+          "reasoning": "Paper design is an age comparison under matched physical activity (S1.p3, S2.2.p1, S4.p1). Its only physical-activity analysis is a correlation with accelerometry-measured MVPA within each age group (S3.4.p4, FIG5F, Figure S3A) at raw P<0.05.",
+          "confidence": "high",
+          "locator": "S2.5.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.9.p1 names GSE159217", "38 samples = 20 Young + 18 Older matches Table 1", "all male vastus lateralis, BGISEQ-500, STAR+HTSeq matches S2.5.p1"]},
+          "reasoning": "Data availability statement and sample counts match.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "matrix_column_pattern": "^(GSM\\d+)_.*$",
+          "aliases": {"age": "characteristics_ch1.2.age group"},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Merged-tar columns are GSM<id>_<title>_counts; extract GSM id and match metadata index exactly. age alias from 'age group' characteristic.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE159217_RAW.tar per-sample HTSeq count files merged", "paper_input": "HTSeq counts (S2.5.p1)"},
+          "reasoning": "integer_fraction 1.0, max ~2.06M, Ensembl IDs; data_processing: STAR + HTSeq; matches paper input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["age"],
+          "references": {"age": "Young"},
+          "organism": "Human",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": null, "contrasts": []},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast identifiable. The only grouping factor is age (Young/Older), and the paper matched the groups on physical activity (S2.2.p1, S1.p3), so Older vs Young estimates ageing, not exercise. The paper's physical-activity analysis (expression vs continuous MVPA, S3.4.p4) needs per-subject accelerometry MVPA, which GSE159217 metadata does not contain (only title, sex, tissue, age group); it is not in the paper's supplement either. An exercise effect therefore cannot be estimated from the deposited data.",
+          "candidates": [
+            {"value": "age_Older_vs_Young (associational, DESeq2)", "reason_rejected": "Executable, but it is an ageing estimand with activity held equal by design; running it would not answer how exercise affects gene expression."},
+            {"value": "expression ~ MVPA within each age group (limma-voom)", "reason_rejected": "MVPA per subject not deposited in GEO metadata or the paper; covariate unavailable."}
+          ],
+          "reasoning": "Request asks for the exercise effect as the paper intends; the paper intends no exercise contrast and its activity association cannot be reconstructed.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "MVPA covariate", "paper": "per-subject accelerometry MVPA used in limma-voom association (S2.5.p2, S3.4.p4)", "data": "absent from GEO metadata", "disposition": "blocks_estimand"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
