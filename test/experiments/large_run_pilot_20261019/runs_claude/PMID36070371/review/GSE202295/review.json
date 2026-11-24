@@ -1,0 +1,29 @@
+{
+  "case": "GSE202295",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "Yes. Human vastus lateralis biopsies, men with T2D (20) or NGT (17-18), taken at rest, immediately after (post) and 3 h after (recovery) one 30-min cycling bout (S2.2.p1, S4.1.p1-p2). Exercise factor is carried by the post and rec samples vs basal in every participant; GEO metadata (timepoint Basal/Post/Recovery, diagnosis T2D/NGT, 111 samples) carry it.",
+    "B2": "Within each diagnosis group: post vs rest and recovery vs rest (Fig. 2A-B; FIG2 legend n = 17 NGT, n = 20 T2D). Interaction exercise x T2D at recovery used for GSEA only (FIG2F-G). Per-group sample numbers: about 17-18 NGT and 20 T2D participants x 3 time points, minus 2 QC-excluded samples and 1 donor (S4.5.p1).",
+    "B3": "Yes. Every participant gives three biopsies (rest, post, recovery; contralateral leg for recovery). Pairing key = participant ID, available in the sample title (T2D_001 / NGT_003 ...), candidate key 'subject' in packet A links 111/111 samples, no duplicates within a time level. Paper: 'with pairing per individual' (S4.5.p1).",
+    "B4": "The paper says only 'Differential expression analysis was performed with the edgeR package (39), with pairing per individual' (S4.5.p1). It does not say whether one model over the six diagnosis x time groups or separate fits per diagnosis group. The interaction term in Fig. 2F-G suggests a joint model, but this is not stated.",
+    "B5": "'Number of genes regulated by exercise (FDR < 0.01)' (FIG2 legend B); ORA input 'genes that passed the significance threshold FDR < 0.01' (S4.6.p1); no fold-change cutoff. FDR by Benjamini-Hochberg (S4.21.p1). Only reported count in text: 3185 genes unique to T2D at recovery (S2.2.p2); per-contrast totals only in Fig. 2B."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run decision matches B1: in-vivo acute exercise with rest baseline; suitability analyzable (6/6).", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "time levels basal 38 / post 36 / rec 37 from the title, diagnosis from GEO characteristic; control = basal within the same diagnosis stratum, as in FIG2B. Paper's 2 QC-excluded samples and 1 excluded donor not identifiable and recorded as a discrepancy (all 111 used).", "fix": ""},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "All four contrasts are post or rec (treatment) vs basal (control); T2D rec up genes include CXCL12 (+0.42) and inflammation Hallmarks, consistent with S2.4 / S2.2.p2.", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Design ~ subject + time, subject treated as categorical (full rank 40, residual df 71 in the joint check); matches 'pairing per individual' (S4.5.p1). Subjects with 2 of 3 time points contribute through the subject term.", "fix": ""},
+    {"id": "model_fit", "verdict": "agree", "severity": "minor", "evidence": "Paper silent on joint vs per-group fit (B4). Analysis fitted each diagnosis stratum and each time pair alone and declared this as a deviation, together with DESeq2 in place of edgeR (blocked: edgeR executor has no blocking). The T2D-unique count (2349 vs 3185) differs by about 26%; a joint-model fit was not run as a sensitivity.", "fix": "Optional: add a joint paired fit (all six groups, ~ subject + diag:time) as a sensitivity, or an edgeR run with a subject term if the executor supports it."},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Samples from two sites (Stockholm, Umea; S4.1.p1) but site is a subject-level attribute and absorbed by the subject term; no batch column in metadata; all male (sex check passed).", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer counts (max 1.7e7, median 0, data_processing 'raw counts'); DESeq2 appropriate; filter (mean count >= 10) differs from the paper's >= 10*n in one group and is listed as a deviation.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "padj < 0.01, no fold-change cutoff, matches FIG2 legend B and S4.6.p1 (B5); FDR < 0.05 shown only as an audit.", "fix": ""},
+    {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "The only paper count (3185 genes unique to T2D recovery) is compared with the same contrast set at the same rule (ours 2349); handback states the 74% ratio and the missing Fig. 2B numbers. 'The pattern matches the paper' is qualitative and acceptable.", "fix": ""},
+    {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal in this case.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Open policy: joint vs pairwise fit when the paper is silent; the T2D-recovery-unique count is 2349 vs the paper's 3185.",
+    "Paper's own edgeR paired route is blocked by the repository executor; DESeq2 is a declared deviation."
+  ],
+  "summary": "该案例分析了与论文一致的运动前/后/恢复期配对设计，按受试者区组、分诊断分层、阈值为论文的 FDR<0.01 且无倍数变化限制，方向均为运动后对基线。唯一的偏差（DESeq2 代替 edgeR、分层分对拟合、论文排除的样本无法识别）都已如实记录，T2D 恢复期特有基因数 2349 对论文 3185。整体通过，仅有次要建议。"
+}

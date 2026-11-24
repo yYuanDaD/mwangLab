@@ -418,3 +418,8 @@ One section per case; newest last.
 ## PMID36120562 / GSE208354 (2026-11-24)
 
 - policy: Open policy: which threshold to report when the paper's 690 DEGs fit none of the tested rules; the large gap (97 vs 690) is attributed to FPKM/limma vs DESeq2 counts and the FPKM>=1 filter, not verified.
+
+## PMID36070371 / GSE202295 (2026-11-24)
+
+- policy: Open policy: joint vs pairwise fit when the paper is silent; the T2D-recovery-unique count is 2349 vs the paper's 3185.
+- policy: Paper's own edgeR paired route is blocked by the repository executor; DESeq2 is a declared deviation.

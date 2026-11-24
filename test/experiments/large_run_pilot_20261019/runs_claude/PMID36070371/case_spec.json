@@ -1,0 +1,152 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36070371",
+  "request": "Analyze GSE202295 for PMID 36070371 (Distinctive exercise-induced inflammatory response and exerkine induction in skeletal muscle of people with type 2 diabetes.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE202295",
+      "accession": "GSE202295",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9451165.paper.md"],
+        "metadata": "GSE202295/GSE202295_metadata.csv",
+        "matrix": "GSE202295/GSE202295_gene_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_column": "gene_name",
+        "feature_duplicates": "sum"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE202295"],
+            "assay": "total RNA-seq (RiboZero), vastus lateralis, HiSeq 2500; STAR + featureCounts-style gene counts (S4.4.p1, S4.5.p1)",
+            "primary_estimand": "Within-subject effect of one acute 30-min cycling bout (85% HRmax) on skeletal muscle gene expression, immediately post and after 3 h recovery vs rest, separately in men with NGT and men with T2D (S2.2.p1, FIG2)",
+            "factors": {"diagnosis": ["NGT", "T2D"], "time": ["basal (rest)", "post", "recovery (3 h)"]},
+            "repeated_measure_unit": "participant (pairing per individual, S4.5.p1)",
+            "sample_inclusion": "20 T2D + 17 NGT analyzed (FIG2 legend); 2 samples excluded for poor correlation/PCA, 1 donor excluded with only baseline left (S4.5.p1). Identity of excluded samples not stated.",
+            "planned_contrasts": [
+              "NGT post vs basal (FIG2B; FDR<0.01)",
+              "NGT recovery vs basal (FIG2B)",
+              "T2D post vs basal (FIG2B)",
+              "T2D recovery vs basal (FIG2B; 3185 genes unique to this group)",
+              "exercise x T2D interaction at recovery (FIG2F-G, GSEA only)"
+            ],
+            "normalization": "edgeR (TMM implied); filter: >= 10*n counts in at least one of six diagnosis x time groups (S4.5.p1)",
+            "paper_method": "edgeR with pairing per individual (S4.5.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.01, "effect_metric": null, "effect_cutoff": null, "source_locator": "FIG2 legend (B), S4.6.p1"},
+            "paper_results": "Only one DEG number given: 3185 genes unique to T2D recovery in the Venn intersection (S2.2.p2); totals per contrast are in Fig. 2B but not in text. Cytokines CCL2, CXCL2, CXCL12 etc. exercise-responsive (S2.4.p1)."
+          },
+          "reasoning": "Methods S4.5.p1 give the pipeline, edgeR paired by individual; FIG2B gives FDR<0.01 for gene counts; S2.2.p1 gives design (rest, post, 3h recovery biopsies in T2D and NGT).",
+          "confidence": "high",
+          "locator": "S2.2.p1; S4.5.p1; FIG2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S4.4.p1 names GSE202295", "GEO description: T2D or healthy control before and after acute cycling", "111 samples, Male, vastus lateralis, diagnosis T2D/NGT, timepoint Basal/Post/Recovery match the paper design"]},
+          "reasoning": "Paper deposits exactly this accession; metadata matches the study design.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "libkey",
+          "key_patterns": {"libkey": ["title", "\\[(P7401_\\d+)\\]"]},
+          "matrix_column_pattern": "^(P7401_\\d+)Aligned",
+          "patterns": {"subject": ["title", "^((?:T2D|NGT)_\\d+)_"], "time": ["title", "_(basal|post|rec) \\["]},
+          "aliases": {"diag": "characteristics_ch1.0.diagnosis"},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are '<library>Aligned.sortedByCoord.out.bam'; GEO titles carry the library id in brackets ('T2D_001_basal [P7401_101]'). Exact key match after extraction; subject and time from title; diagnosis from characteristics. No samples excluded: GEO already holds 111 samples (paper's QC exclusions are not identified)."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer, max 1.7e7, median 0; data_processing says 'Supplementary files format and content: raw counts' (STAR GRCh38). Paper used these counts in edgeR.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "basal"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["diag"],
+          "planned": ["time_post_vs_basal_diag-NGT", "time_rec_vs_basal_diag-NGT", "time_post_vs_basal_diag-T2D", "time_rec_vs_basal_diag-T2D"],
+          "covariate_candidates": ["subject"],
+          "final": {
+            "analysis_type": "paired repeated measures within diagnosis strata",
+            "design_column": "time",
+            "contrasts": [
+              {"name": "NGT_post_vs_basal", "control": "basal", "treatment": "post", "stratum": {"diag": "NGT"}, "role": "primary"},
+              {"name": "NGT_rec_vs_basal", "control": "basal", "treatment": "rec", "stratum": {"diag": "NGT"}, "role": "primary"},
+              {"name": "T2D_post_vs_basal", "control": "basal", "treatment": "post", "stratum": {"diag": "T2D"}, "role": "primary"},
+              {"name": "T2D_rec_vs_basal", "control": "basal", "treatment": "rec", "stratum": {"diag": "T2D"}, "role": "primary"}
+            ]
+          },
+          "candidates": [
+            {"value": "T2D vs NGT at baseline", "reason_rejected": "disease comparison, not an exercise effect; paper reports no baseline DE focus"},
+            {"value": "pooled diagnosis groups post/rec vs basal", "reason_rejected": "paper analyzes each diagnosis group separately (FIG2B)"},
+            {"value": "exercise x T2D interaction", "reason_rejected": "used by the paper only for GSEA ranking; not a DEG estimand; not run (would need a factorial paired model)"}
+          ],
+          "reasoning": "Paper's Fig. 2B counts exercise-regulated genes per diagnosis group at post and recovery vs rest, paired per individual (S4.5.p1).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking term (paired per individual, S4.5.p1)"}]},
+          "confounding_candidates": ["subject"],
+          "reasoning": "Three biopsies per participant; paper pairs per individual. Age/BMI/HbA1c are subject-level and absorbed by the subject term. No batch column recorded.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald) ~ subject + time, per diagnosis stratum",
+            "formula": "~ subject + time",
+            "paper_route": {"method": "edgeR with pairing per individual (~ subject + time)", "status": "blocked", "reason": "repository edgeR executor (tools/edger_tools.py:38) takes only a single design_column and cannot block on subject"},
+            "deviations": [
+              "DESeq2 paired (subject covariate) instead of edgeR paired",
+              "low-count filter approximated per execution: mean count >= 10 over that execution's samples (paper: >= 10*n counts in at least one of six groups)",
+              "fit per diagnosis stratum, not one model over all six groups",
+              "paper's 2 QC-excluded samples and 1 excluded donor not identifiable; all 111 deposited samples used; subjects with an incomplete triplet contribute through the subject term"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Raw counts support DESeq2 with a subject blocking term; this is the closest available paired count model to edgeR.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper FDR<0.01 (FIG2B) applied on DESeq2 instead of edgeR; FDR<0.05 shown as audit."
+          },
+          "reasoning": "FIG2 legend B: 'Number of genes regulated by exercise (FDR < 0.01)'; S4.6.p1 same threshold for ORA input.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["paper's per-contrast DEG totals are only in Fig. 2B (not in text); the only textual count is 3185 genes unique to T2D recovery (Venn), not a total", "DESeq2 replaces edgeR paired"]},
+          "paper_counts": {},
+          "paper_genes": {"T2D_rec_vs_basal": ["CXCL12", "CXCL2", "CCL2", "IL6", "CX3CL1"], "NGT_rec_vs_basal": ["CXCL2", "CCL2"]},
+          "reasoning": "Compare direction of the exercise-responsive cytokines named in S2.4.p1; the paper states they are induced (up) after exercise, more strongly in T2D."
+        }
+      },
+      "discrepancies": [
+        {"item": "sample count", "paper": "20 T2D + 17 NGT analyzed after excluding 2 samples and 1 donor (S4.5.p1); S4.1.p1 says 18 NGT + 20 T2D recruited", "data": "GEO: 38 subjects (61 T2D samples, 50 NGT), 3 subjects with 2 of 3 time points", "disposition": "executable_with_deviation"},
+        {"item": "DE method", "paper": "edgeR paired per individual", "data": "repository edgeR executor has no blocking", "disposition": "executable_with_deviation"}
+      ],
+      "executions": [
+        {"name": "NGT_post_vs_basal", "tool": "tools.deseq2_tools:run_deseq2_analysis", "subset": {"diag": ["NGT"], "time": ["basal", "post"]}, "filter_low_counts": {"min_mean_count": 10},
+         "args": {"design_column": "time", "control_group": "basal", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.01}, "role": "primary", "reasoning": "FIG2B NGT post"},
+        {"name": "NGT_rec_vs_basal", "tool": "tools.deseq2_tools:run_deseq2_analysis", "subset": {"diag": ["NGT"], "time": ["basal", "rec"]}, "filter_low_counts": {"min_mean_count": 10},
+         "args": {"design_column": "time", "control_group": "basal", "treatment_group": "rec", "covariate_columns": "subject", "alpha": 0.01}, "role": "primary", "reasoning": "FIG2B NGT recovery"},
+        {"name": "T2D_post_vs_basal", "tool": "tools.deseq2_tools:run_deseq2_analysis", "subset": {"diag": ["T2D"], "time": ["basal", "post"]}, "filter_low_counts": {"min_mean_count": 10},
+         "args": {"design_column": "time", "control_group": "basal", "treatment_group": "post", "covariate_columns": "subject", "alpha": 0.01}, "role": "primary", "reasoning": "FIG2B T2D post"},
+        {"name": "T2D_rec_vs_basal", "tool": "tools.deseq2_tools:run_deseq2_analysis", "subset": {"diag": ["T2D"], "time": ["basal", "rec"]}, "filter_low_counts": {"min_mean_count": 10},
+         "args": {"design_column": "time", "control_group": "basal", "treatment_group": "rec", "covariate_columns": "subject", "alpha": 0.01}, "role": "primary", "reasoning": "FIG2B T2D recovery"}
+      ],
+      "enrichment": [
+        {"execution": "T2D_rec_vs_basal", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper's key result: inflammatory GO terms enriched in T2D recovery (FIG2C-E)"},
+        {"execution": "NGT_rec_vs_basal", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "comparison group for FIG2E"}
+      ]
+    }
+  ]
+}

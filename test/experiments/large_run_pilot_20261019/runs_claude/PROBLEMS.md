@@ -875,3 +875,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36120562 (GSE208354)
 
 - minor: GEO metadata text garbled (geo_tools.py, line not found); inspect profiles the methylation BED file as a candidate expression matrix Details: `PMID36120562/HANDBACK.md`.
+
+## PMID36070371 (GSE202295)
+
+- edgeR executor lacks subject blocking (tools/edger_tools.py:38), so paired DESeq2 was used; filter_low_counts can't express paper's per-group 10·n count rule Details: `PMID36070371/HANDBACK.md`.

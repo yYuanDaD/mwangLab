@@ -1,0 +1,279 @@
+{
+  "case_id": "GSE202295",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "basal": 38,
+          "rec": 37,
+          "post": 36
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "subject",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "makes the design rank deficient"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 108,
+        "min_cell_size": 36
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_post_vs_basal_diag-NGT",
+        "time_rec_vs_basal_diag-NGT",
+        "time_post_vs_basal_diag-T2D",
+        "time_rec_vs_basal_diag-T2D"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 111 samples.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "predicted": {
+        "male": 111
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID36070371\\GSE202295\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_post_vs_basal_diag-NGT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "basal",
+      "within": {
+        "diag": "NGT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "post"
+          },
+          "n": 16
+        },
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "basal"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_rec_vs_basal_diag-NGT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "rec",
+      "reference": "basal",
+      "within": {
+        "diag": "NGT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "rec"
+          },
+          "n": 17
+        },
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "basal"
+          },
+          "n": 17
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_rec_vs_post_diag-NGT",
+      "kind": "simple",
+      "factor": "time",
+      "test": "rec",
+      "reference": "post",
+      "within": {
+        "diag": "NGT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "rec"
+          },
+          "n": 17
+        },
+        {
+          "cell": {
+            "diag": "NGT",
+            "time": "post"
+          },
+          "n": 16
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_post_vs_basal_diag-T2D",
+      "kind": "simple",
+      "factor": "time",
+      "test": "post",
+      "reference": "basal",
+      "within": {
+        "diag": "T2D"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "post"
+          },
+          "n": 20
+        },
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "basal"
+          },
+          "n": 21
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_rec_vs_basal_diag-T2D",
+      "kind": "simple",
+      "factor": "time",
+      "test": "rec",
+      "reference": "basal",
+      "within": {
+        "diag": "T2D"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "rec"
+          },
+          "n": 20
+        },
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "basal"
+          },
+          "n": 21
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_rec_vs_post_diag-T2D",
+      "kind": "simple",
+      "factor": "time",
+      "test": "rec",
+      "reference": "post",
+      "within": {
+        "diag": "T2D"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "rec"
+          },
+          "n": 20
+        },
+        {
+          "cell": {
+            "diag": "T2D",
+            "time": "post"
+          },
+          "n": 20
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
