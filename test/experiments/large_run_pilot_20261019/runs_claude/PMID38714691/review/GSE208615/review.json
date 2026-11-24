@@ -1,0 +1,22 @@
+{"case": "GSE208615", "reviewer": "case-reviewer / claude-sonnet-5-5",
+ "blind": {
+  "B1": "Yes. Voluntary wheel-running mice, dorsal hippocampus bulk RNA-seq 1 h after OLM acquisition (S2.2.p1, S4.2.5.p1). Exercise-carrying samples: grp EX14, RE2, EX14D7, EX14D7RE2, EX14D14 (50). Controls: SED (0-0-0, OLM=Yes, n=10); HC (0-0-0, OLM=No, n=10) is a home-cage non-trained group not in the paper's contrasts.",
+  "B2": "Each exercise pattern (14-0-0, 14-7-0, 14-7-2, 14-14-0, 0-0-2) versus sedentary 0-0-0, 1 h after acquisition (S4.2.8.p1, Fig 2C); focus on 14-0-0 and 14-7-2 (S2.2.p1). n=10 per group in GEO (RT-qPCR n differs, Fig 2 legend).",
+  "B3": "No. One dorsal hippocampus sample per mouse, independent groups. Packet A pairing keys link only exercise-parameter+title suffix across OLM (a naming pattern, not an animal ID); no repeated measures stated.",
+  "B4": "Paper fitted each pair of groups alone: 'Comparisons were made across each pair of groups (exercise condition versus sedentary control...)' with Cyber-T (S4.2.8.p1); a linear-regression model was also run (Fig S2).",
+  "B5": "'Genes were first ranked by uncorrected p value, and only genes with both uncorrected p value < 0.05 were used for analysis' (S4.2.8.p1). No fold-change cutoff stated. Counts only graphical (Fig 2C/D); 21 genes shared by up-regulated 14-0-0 and 14-7-2 (S2.2.p1, Table S1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "S2.1, S2.2.p1: exercise arm present; analysed 60 OLM samples", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "6 groups n=10 matching exercise parameters; HC excluded with named reason (no OLM); SED (OLM) is the paper's control for 1 h post-acquisition contrasts", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "All contrasts treatment=exercise pattern vs control=SED. The mechanical flag possible_reversed_contrast on grp_RE2_vs_SED is a false positive: RE2 (0-0-2) is the reactivating exercise arm, SED the control. Acvr1c up in EX14 matches paper.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per mouse (S4.2.5-S4.2.6); no repeated unit", "fix": ""},
+  {"id": "model_fit", "verdict": "unsure", "severity": "minor", "evidence": "Paper: pairwise Cyber-T (S4.2.8.p1); run: one joint limma-trend model on six groups, recorded as declared deviation with paper_route blocked", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Harvest day balanced 5/group/day (crosstab); sensitivity run with cohort gives near-identical counts", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Tuxedo FPKM, 28% integers, non-integer values; limma-trend on log2(FPKM+1) is the policy route; gene filter deviation recorded", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "minor", "evidence": "Raw p<0.05, no FC, strict inequality transcribed from S4.2.8.p1; FDR audit counts reported. Wording 'both uncorrected p value' (possibly Cyber-T and regression) is ambiguous and not noted.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "HANDBACK honestly states per-group counts not comparable and 273 vs paper's 21 shared up genes; the 21-vs-273 gap is not in the recorded discrepancy list", "fix": "Optionally add a discrepancy row for 273 vs 21 shared up-regulated genes."},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; HC exclusion reason is true (OLM=No)", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Open policy: joint six-group limma vs paper's pairwise Cyber-T fits when the paper states pairwise.", "273 vs 21 shared up-regulated genes (14-0-0 and 14-7-2): the paper's 'both' criterion (possibly Cyber-T plus regression, Fig S2) may explain it; not settled from the files."],
+ "summary": "该案例运行决策与论文一致：仅分析OLM训练的60只小鼠，排除未做OLM的HC组并说明原因，各运动组均与SED比较，方向正确（RE2标记为可能反向属误报）。阈值按论文原始p<0.05转录，limma联合模型相对论文的Cyber-T两两比较已作为偏差声明。无阻断或重大问题，仅有联合与两两拟合的开放政策问题和273对21基因交集差异需人工留意。"}

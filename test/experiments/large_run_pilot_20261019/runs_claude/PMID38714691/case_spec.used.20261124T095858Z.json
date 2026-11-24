@@ -1,0 +1,185 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38714691",
+  "request": "Analyze GSE208615 for PMID 38714691 (Specific exercise patterns generate an epigenetic molecular memory window that drives long-term memory formation and identifies ACVR1C as a bidirectional regulator of memory in mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE208615",
+      "accession": "GSE208615",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC11076285.paper.md"],
+        "metadata": "GSE208615/GSE208615_metadata.csv",
+        "matrix": "GSE208615/GSE208615_fpkm.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE208615"],
+            "assay": "bulk RNA-seq (TruSeq, HiSeq, 50 bp SE) of bilateral dorsal hippocampus, 12-week-old male C57BL/6J mice, collected 1 h after a subthreshold 3-min OLM acquisition (S4.2.5.p1, S4.2.6.p1)",
+            "factors": {"exercise pattern (initial-delay-reactivation days)": ["0-0-0 (sedentary)", "14-0-0", "0-0-2", "14-7-0", "14-7-2", "14-14-0"]},
+            "sample_inclusion": "OLM-trained mice of the six exercise patterns (n=10 each in GEO); RIN>9 (S4.2.6.p1). The GEO 'HC' samples (0-0-0, no OLM) are not part of the paper's described RNA-seq contrasts.",
+            "primary_estimand": "Effect of each exercise pattern versus sedentary control on dorsal-hippocampus gene expression during OLM consolidation (1 h post acquisition); focus on 14-0-0 and 14-7-2, the patterns that enable long-term memory (S2.2.p1, S4.2.8.p1)",
+            "planned_contrasts": [
+              "14-0-0 vs 0-0-0 sedentary (S4.2.8.p1, Fig. 2D/F)",
+              "14-7-2 vs 0-0-0 sedentary (S4.2.8.p1, Fig. 2D/H)",
+              "14-7-0 vs 0-0-0 sedentary (S4.2.8.p1, Fig. 2C)",
+              "14-14-0 vs 0-0-0 sedentary (S4.2.8.p1, Fig. 2C)",
+              "0-0-2 vs 0-0-0 sedentary (S4.2.8.p1, Fig. 2C)"
+            ],
+            "repeated_measure_unit": "none (one sample per mouse, independent groups)",
+            "batch": "tissue collected over two separate days with equal n per group (S4.2.5.p1) = GEO 'harvest cohort'",
+            "normalization": "Tuxedo / cuffnorm FPKM (S4.2.8.p1)",
+            "paper_method": "Cyber-T Bayesian-regularized t-test, each exercise group vs sedentary pairwise, on FPKM (S4.2.8.p1); linear regression models as a secondary check (Fig. S2)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false, "source_locator": "S4.2.8.p1"},
+            "paper_results": "Per-group DEG counts are only shown graphically (Fig. 2C/D), not stated in text; intersection of up-regulated genes in 14-0-0 and 14-7-2 = 21 genes incl. Bdnf and Acvr1c (S2.2.p1, Data Table S1); Acvr1c not up in 14-7-0 (S2.2.p1)"
+          },
+          "reasoning": "Methods S4.2.8.p1: FPKM from Tuxedo; Cyber-T per pair of groups (exercise vs sedentary, 1 h after acquisition); 'only genes with uncorrected p value < 0.05 were used'. No fold-change rule stated. Five exercise groups listed in S4.2.8.p1. DA.p1 names GSE208615.",
+          "confidence": "high",
+          "locator": "S4.2.8.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE208615", "metadata: Mus musculus, male, adult, dorsal hippocampus, total RNA, RNA-Seq", "exercise parameters 0-0-0/14-0-0/0-0-2/14-7-0/14-7-2/14-14-0 match the paper's groups", "two harvest cohorts match the two collection days (S4.2.5.p1)"]},
+          "reasoning": "Accession cited in the paper's data availability; sample annotations match the paper's design exactly.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "aliases": {"cohort": "characteristics_ch1.4.harvest cohort"},
+          "patterns": {"grp": ["characteristics_ch1.2.exercise parameters", "^(\\d+-\\d+-\\d+)$"]},
+          "recode": {
+            "grp": {"0-0-0": "SED", "14-0-0": "EX14", "0-0-2": "RE2", "14-7-0": "EX14D7", "14-7-2": "EX14D7RE2", "14-14-0": "EX14D14"},
+            "cohort": {"1": "C1", "2": "C2"}
+          },
+          "exclude_samples": {
+            "GSM6355608": "HC home-cage 0-0-0 without OLM; not in the paper's exercise-vs-sedentary contrasts (S4.2.8.p1)",
+            "GSM6355609": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355610": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355611": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355612": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355613": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355614": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355615": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355616": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts",
+            "GSM6355617": "HC home-cage 0-0-0 without OLM; not in the paper's contrasts"
+          },
+          "reasoning": "Matrix columns equal metadata title (70/70). The sedentary control is 0-0-0 with OLM (sed_*), because every compared group was sampled 1 h after OLM acquisition (S4.2.8.p1). HC (0-0-0, OLM=No) would confound learning with exercise and is excluded.",
+          "candidates": [{"value": "pool HC with sed as 0-0-0 control", "reason_rejected": "HC did not undergo OLM; the paper's contrasts are 1 h post acquisition in all groups"}],
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "reasoning": "File named fpkm; data_processing: 'normalization to FPKM values performed using Tuxedo cuffnorm'; 28% integers (mostly zeros), non-integer values, median 1.46. Paper input is FPKM (S4.2.8.p1). Not counts, so DESeq2/edgeR are not applicable.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SED"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_EX14_vs_SED", "grp_EX14D7RE2_vs_SED", "grp_EX14D7_vs_SED", "grp_EX14D14_vs_SED", "grp_RE2_vs_SED"],
+          "covariate_candidates": ["cohort"],
+          "final": {
+            "analysis_type": "multi-group, one control",
+            "design_column": "grp",
+            "formula": "~ grp",
+            "control": "SED",
+            "contrasts": [
+              {"name": "grp_EX14_vs_SED", "control": "SED", "treatment": "EX14", "role": "primary"},
+              {"name": "grp_EX14D7RE2_vs_SED", "control": "SED", "treatment": "EX14D7RE2", "role": "primary"},
+              {"name": "grp_EX14D7_vs_SED", "control": "SED", "treatment": "EX14D7", "role": "secondary"},
+              {"name": "grp_EX14D14_vs_SED", "control": "SED", "treatment": "EX14D14", "role": "secondary"},
+              {"name": "grp_RE2_vs_SED", "control": "SED", "treatment": "RE2", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Six independent groups (n=10 each) with one sedentary control; the paper compares each exercise pattern to sedentary (S4.2.8.p1). One model with planned contrasts vs SED; levels are not pooled. 14-0-0 and 14-7-2 are primary because they carry the paper's main claim (S2.2.p1).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [{"name": "cohort", "disposition": "sensitivity only: balanced harvest day (5/group/day, S4.2.5.p1); not in the paper's model"}]
+          },
+          "confounding_candidates": ["cohort"],
+          "reasoning": "Independent animals, one sample each. Harvest cohort is perfectly balanced across groups so it is not confounded with exercise; the paper did not adjust for it, so the primary model omits it and a sensitivity run adds it.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend moderated t on log2(FPKM+1), one model ~ grp, contrasts vs SED)",
+            "formula": "~ grp",
+            "paper_route": {"method": "Cyber-T Bayesian-regularized t-test, pairwise", "status": "blocked", "reason": "no Cyber-T executor in the repository; limma's empirical-Bayes moderated t is the validated analogue (both shrink per-gene variance toward a prior)"},
+            "deviations": [
+              "limma moderated t from one six-group model instead of pairwise Cyber-T (pooled residual variance across groups)",
+              "log2(FPKM+1) transform for linear modelling",
+              "genes filtered to FPKM >= 1 in >= 10 samples (smallest group n) to remove unexpressed genes; paper states no filter"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "FPKM is log-scale-compatible after log2(x+1); limma is the policy route for FPKM. Cyber-T itself cannot run here.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper rule (uncorrected p < 0.05, no FC cutoff) applied to limma p-values instead of Cyber-T; BH FDR < 0.05 reported as audit."
+          },
+          "reasoning": "S4.2.8.p1: 'only genes with both uncorrected p value < 0.05 were used for analysis'.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper's per-group DEG counts are only in Fig. 2C/D (not in text), so counts cannot be compared numerically; the comparable statements are the 21-gene 14-0-0 ∩ 14-7-2 up-regulated intersection and Acvr1c/Bdnf up in both.",
+              "Uncorrected p < 0.05 across ~15k genes admits many false positives by design."
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {
+            "limma_joint/grp_EX14_vs_SED": ["Acvr1c", "Bdnf"],
+            "limma_joint/grp_EX14D7RE2_vs_SED": ["Acvr1c", "Bdnf"],
+            "limma_joint/grp_EX14D7_vs_SED": ["Acvr1c"]
+          },
+          "reasoning": "limma route is a declared deviation from Cyber-T; paper's threshold kept. Acvr1c expected up in EX14 and EX14D7RE2, not in EX14D7 (S2.2.p1).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method", "paper": "Cyber-T Bayesian-regularized t, pairwise", "data": "no Cyber-T executor; limma-trend moderated t", "disposition": "declared_deviation"},
+        {"item": "HC samples", "paper": "not described among RNA-seq contrasts", "data": "10 GEO samples 0-0-0 without OLM", "disposition": "excluded"},
+        {"item": "paper DEG counts", "paper": "graphical only (Fig. 2C/D)", "data": "-", "disposition": "not_comparable"}
+      ],
+      "executions": [
+        {
+          "name": "limma_joint",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": []},
+          "filter_low_counts": {"min_value": 1, "min_samples": 10},
+          "role": "primary",
+          "reasoning": "One limma model on the six OLM groups; contrasts of each exercise pattern vs sedentary as in S4.2.8.p1."
+        },
+        {
+          "name": "limma_joint_cohort",
+          "tool": "tools.joint_contrasts:run_joint_limma",
+          "args": {"comparisons": "planned", "covariates": ["cohort"]},
+          "filter_low_counts": {"min_value": 1, "min_samples": 10},
+          "role": "sensitivity",
+          "reasoning": "Same model adjusted for the balanced harvest day (S4.2.5.p1)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "limma_joint/grp_EX14_vs_SED", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "Paper ran GO/KEGG (DAVID) on up-regulated DEGs (S4.2.8.p1, Fig. S5-S6)."},
+        {"execution": "limma_joint/grp_EX14D7RE2_vs_SED", "ora": true, "gsea": true, "direction": "up", "ranking_metric": "stat", "reasoning": "Second memory-enabling pattern (S2.2.p1)."}
+      ]
+    }
+  ]
+}

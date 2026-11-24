@@ -959,3 +959,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41889117 (GSE324693)
 
 - none blocking; inspect gave no alignment_keys for S1.bam vs title "S1 ctrl" (needed key_patterns + matrix_column_pattern) Details: `PMID41889117/HANDBACK.md`.
+
+## PMID38714691 (GSE208615)
+
+- none (no Cyber-T executor, so limma ran as a declared deviation) Details: `PMID38714691/HANDBACK.md`.

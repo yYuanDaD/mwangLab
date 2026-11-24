@@ -509,3 +509,8 @@ One section per case; newest last.
 
 - policy: Lane is completely disjoint between arms in all four training contrasts; the case was kept as primary with a caveat instead of stopped, and the covariance gate says 'not_required'. Decide whether single-run lane aliasing needs a stop or only a label.
 - policy: Paper is silent on joint vs pairwise fits and the applied counts are far below the paper's; decide whether a pairwise sensitivity fit should be added.
+
+## PMID38714691 / GSE208615 (2026-11-24)
+
+- policy: Open policy: joint six-group limma vs paper's pairwise Cyber-T fits when the paper states pairwise.
+- policy: 273 vs 21 shared up-regulated genes (14-0-0 and 14-7-2): the paper's 'both' criterion (possibly Cyber-T plus regression, Fig S2) may explain it; not settled from the files.
