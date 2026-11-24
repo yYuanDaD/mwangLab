@@ -1,0 +1,782 @@
+{
+  "case_id": "GSE242445",
+  "verdict": "partially_analyzable",
+  "failed": [],
+  "warnings": [
+    "sample_size"
+  ],
+  "factors": [
+    "geno",
+    "sex",
+    "diet"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "normalized counts (DESeq2 median-of-ratios)",
+      "route": "limma on log2(x+1); count models are not valid",
+      "required": {
+        "data_type": "normalized counts (DESeq2 median-of-ratios)",
+        "key": "bulk_rnaseq_normalized",
+        "files": [
+          "gene x sample FPKM/RPKM/TPM matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID",
+          "group / condition",
+          "subject ID for repeated samples",
+          "sex"
+        ],
+        "route": "limma on log2(x+1); count models are not valid"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "geno",
+        "sex",
+        "diet"
+      ],
+      "levels": {
+        "geno": {
+          "WT": 12,
+          "KO": 11
+        },
+        "sex": {
+          "M": 12,
+          "F": 11
+        },
+        "diet": {
+          "C": 12,
+          "LC": 11
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(geno) + C(sex) + C(diet)",
+        "rank": 4,
+        "full_rank": true,
+        "residual_df": 19,
+        "min_cell_size": 2
+      }
+    },
+    "sample_size": {
+      "status": "partial",
+      "n_comparisons": 18,
+      "n_analyzable": 12,
+      "too_small": [
+        "geno_KO_vs_WT_sex-F_diet-LC",
+        "sex_F_vs_M_geno-KO_diet-LC",
+        "diet_LC_vs_C_geno-KO_sex-F",
+        "geno_sex_KO_F_vs_WT_M_diet-LC",
+        "geno_diet_KO_LC_vs_WT_C_sex-F",
+        "sex_diet_F_LC_vs_M_C_geno-KO"
+      ],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 23 samples.",
+      "metadata_sex_column": "characteristics_ch1.3.Sex",
+      "predicted": {
+        "female": 11,
+        "male": 11,
+        "unknown": 1
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38661340\\GSE242445\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "geno_KO_vs_WT__sex-female_sex-F_diet-C",
+            "diet_LC_vs_C__sex-female_geno-WT_sex-F"
+          ],
+          "male": [
+            "geno_KO_vs_WT__sex-male_sex-M_diet-C",
+            "geno_KO_vs_WT__sex-male_sex-M_diet-LC",
+            "diet_LC_vs_C__sex-male_geno-KO_sex-M",
+            "diet_LC_vs_C__sex-male_geno-WT_sex-M",
+            "geno_diet_KO_LC_vs_WT_C__sex-male_sex-M"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "geno_KO_vs_WT_sex-F_diet-C",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "sex": "F",
+        "diet": "C"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "diet": "C",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "diet": "C",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_sex-F_diet-LC",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "sex": "F",
+        "diet": "LC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "diet": "LC",
+            "geno": "KO"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "diet": "LC",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "geno_KO_vs_WT_sex-M_diet-C",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "sex": "M",
+        "diet": "C"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "diet": "C",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "diet": "C",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_KO_vs_WT_sex-M_diet-LC",
+      "kind": "simple",
+      "factor": "geno",
+      "test": "KO",
+      "reference": "WT",
+      "within": {
+        "sex": "M",
+        "diet": "LC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "diet": "LC",
+            "geno": "KO"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "diet": "LC",
+            "geno": "WT"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_F_vs_M_geno-KO_diet-C",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "F",
+      "reference": "M",
+      "within": {
+        "geno": "KO",
+        "diet": "C"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "diet": "C",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "diet": "C",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_F_vs_M_geno-KO_diet-LC",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "F",
+      "reference": "M",
+      "within": {
+        "geno": "KO",
+        "diet": "LC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "diet": "LC",
+            "sex": "F"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "diet": "LC",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "sex_F_vs_M_geno-WT_diet-C",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "F",
+      "reference": "M",
+      "within": {
+        "geno": "WT",
+        "diet": "C"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "diet": "C",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "diet": "C",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_F_vs_M_geno-WT_diet-LC",
+      "kind": "simple",
+      "factor": "sex",
+      "test": "F",
+      "reference": "M",
+      "within": {
+        "geno": "WT",
+        "diet": "LC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "diet": "LC",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "diet": "LC",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "diet_LC_vs_C_geno-KO_sex-F",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "LC",
+      "reference": "C",
+      "within": {
+        "geno": "KO",
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "F",
+            "diet": "LC"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "F",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "diet_LC_vs_C_geno-KO_sex-M",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "LC",
+      "reference": "C",
+      "within": {
+        "geno": "KO",
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "M",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "M",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "diet_LC_vs_C_geno-WT_sex-F",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "LC",
+      "reference": "C",
+      "within": {
+        "geno": "WT",
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "F",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "F",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "diet_LC_vs_C_geno-WT_sex-M",
+      "kind": "simple",
+      "factor": "diet",
+      "test": "LC",
+      "reference": "C",
+      "within": {
+        "geno": "WT",
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "M",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "M",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_sex_KO_F_vs_WT_M_diet-C",
+      "kind": "interaction",
+      "factor": "geno:sex",
+      "test": "KO:F",
+      "reference": "WT:M",
+      "within": {
+        "diet": "C"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "C",
+            "geno": "KO",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "diet": "C",
+            "geno": "WT",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "diet": "C",
+            "geno": "KO",
+            "sex": "M"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "diet": "C",
+            "geno": "WT",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "geno_sex_KO_F_vs_WT_M_diet-LC",
+      "kind": "interaction",
+      "factor": "geno:sex",
+      "test": "KO:F",
+      "reference": "WT:M",
+      "within": {
+        "diet": "LC"
+      },
+      "cells": [
+        {
+          "cell": {
+            "diet": "LC",
+            "geno": "KO",
+            "sex": "F"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "diet": "LC",
+            "geno": "WT",
+            "sex": "F"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "diet": "LC",
+            "geno": "KO",
+            "sex": "M"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "diet": "LC",
+            "geno": "WT",
+            "sex": "M"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "geno_diet_KO_LC_vs_WT_C_sex-F",
+      "kind": "interaction",
+      "factor": "geno:diet",
+      "test": "KO:LC",
+      "reference": "WT:C",
+      "within": {
+        "sex": "F"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "F",
+            "geno": "KO",
+            "diet": "LC"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "geno": "WT",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "geno": "KO",
+            "diet": "C"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "F",
+            "geno": "WT",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "geno_diet_KO_LC_vs_WT_C_sex-M",
+      "kind": "interaction",
+      "factor": "geno:diet",
+      "test": "KO:LC",
+      "reference": "WT:C",
+      "within": {
+        "sex": "M"
+      },
+      "cells": [
+        {
+          "cell": {
+            "sex": "M",
+            "geno": "KO",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "geno": "WT",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "geno": "KO",
+            "diet": "C"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "sex": "M",
+            "geno": "WT",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "sex_diet_F_LC_vs_M_C_geno-KO",
+      "kind": "interaction",
+      "factor": "sex:diet",
+      "test": "F:LC",
+      "reference": "M:C",
+      "within": {
+        "geno": "KO"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "F",
+            "diet": "LC"
+          },
+          "n": 2
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "M",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "F",
+            "diet": "C"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "KO",
+            "sex": "M",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": false
+    },
+    {
+      "name": "sex_diet_F_LC_vs_M_C_geno-WT",
+      "kind": "interaction",
+      "factor": "sex:diet",
+      "test": "F:LC",
+      "reference": "M:C",
+      "within": {
+        "geno": "WT"
+      },
+      "cells": [
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "F",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "M",
+            "diet": "LC"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "F",
+            "diet": "C"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "geno": "WT",
+            "sex": "M",
+            "diet": "C"
+          },
+          "n": 3
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

@@ -987,3 +987,19 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID40581981 (GSE298607)
 
 - none blocking; GEO contact_address mis-decoded as GBK (UTF-8 "ä" shown as "盲") in inspect output, cosmetic, file:line not found Details: `PMID40581981/HANDBACK.md`.
+
+## PMID38661340 (GSE242445)
+
+- GEO treatment field constant across C/LC samples; only normalized counts deposited; suitability.md labels matrix FPKM/TPM (cosmetic) Details: `PMID38661340/HANDBACK.md`.
+
+## PMID37469245 (GSE216408)
+
+- suitability.py:332-358 marks constant columns as covariates and fails sample_size when factors are empty; case_runner.py:1115 spec JSON error is a raw traceback, not spec_error Details: `PMID37469245/HANDBACK.md`.
+
+## PMID31726991 (GSE132930)
+
+- edger_tools.py:124-125 offers only QL (deposits used exactTest/glmLRT); lane in matrix names needs a recode workaround; pydeseq2 utils.py:1088 overflow warnings Details: `PMID31726991/HANDBACK.md`.
+
+## PMID37996046 (GSE235942)
+
+- none in the analysis tools; case_runner.py:1115 shows a raw JSONDecodeError traceback for a malformed spec instead of a spec_error Details: `PMID37996046/HANDBACK.md`.

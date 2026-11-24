@@ -555,3 +555,19 @@ One section per case; newest last.
 ## PMID40581981 / GSE298607 (2026-11-24)
 
 - policy: Open policy: whether a disuse (unloading) model should be offered as an inverse-exercise contrast; the case correctly declines under current rules.
+
+## PMID31726991 / GSE132930_cortex_midlife (2026-11-24)
+
+- policy: Which test to report when the paper states QL F-test but the deposited tables look like exactTest/LRT (open policy question).
+
+## PMID31726991 / GSE132930_cortex_young (2026-11-24)
+
+- policy: Which test to report when the paper states QL F-test but the deposit has an LR column (open policy question).
+
+## PMID31726991 / GSE132930_hippocampus_midlife (2026-11-24)
+
+- policy: Which test to report when the paper states QL F-test but the deposit looks like exactTest/LRT (open policy question).
+
+## PMID31726991 / GSE132930_hippocampus_young (2026-11-24)
+
+- policy: Is excluding 18606H (inferred only from the deposit file name) the right primary versus all 10? Paper text is silent.

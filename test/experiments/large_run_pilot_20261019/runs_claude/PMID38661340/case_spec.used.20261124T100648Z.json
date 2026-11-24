@@ -1,0 +1,89 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38661340",
+  "request": "Analyze GSE242445 for PMID 38661340 (Deletion of FNDC5/irisin modifies murine osteocyte function in a sex-specific manner.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE242445",
+      "accession": "GSE242445",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC11045224.paper.md"],
+        "metadata": "GSE242445/GSE242445_metadata.csv",
+        "matrix": "GSE242445/GSE242445_AllnormalizedReadCounts.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE242445"],
+            "assay": "bulk RNA-seq of long-bone osteocyte-enriched fractions, mouse, Illumina NovaSeq 6000 (S4.16.p1, S11.p1)",
+            "factors": {"genotype": ["WT", "FNDC5 global KO"], "sex": ["female", "male"], "diet": ["control (0.6% Ca)", "low-calcium (0.01% Ca) 2 weeks"]},
+            "sample_inclusion": "3 per genotype x sex x diet cell; KO female control sample 23 excluded for Y-chromosome reads / low Xist (S4.15.p1)",
+            "primary_estimand": "Effect of FNDC5/irisin deletion (KO vs WT) and of sex on the osteocyte transcriptome, under control and low-calcium diet. No exercise intervention: exercise appears only as background on irisin as an exercise-induced myokine (ABS.p1, S1.p1, S1.p5).",
+            "planned_contrasts": [
+              "WT F vs WT M (control diet) (S2.x, Supplementary file 3)",
+              "KO F vs WT F and KO M vs WT M (control diet) (Supplementary file 3)",
+              "KO lc vs WT lc within each sex (Supplementary file 4)"
+            ],
+            "exercise_arm": "none",
+            "paper_method": "DESeq2, median-of-ratios normalization, independent filtering (S4.16.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S4.16.p1"}
+          },
+          "reasoning": "The paper's transcriptomic estimands are genotype (FNDC5 KO vs WT), sex and low-calcium diet. Exercise is mentioned only as the stimulus that releases irisin in muscle (ABS.p1, S1.p1); no mouse in the study is exercised or kept sedentary as an experimental arm. Threshold: unadjusted p < 0.01 and |log2FC| > 1 (S4.16.p1).",
+          "locator": "S4.16.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S11.p1 names GSE242445 as the osteocyte transcriptome deposit", "23 samples = 24 sequenced minus excluded sample 23 (S4.15.p1); KO_F_C_23 is absent from the matrix", "series contributor Shimonty / Bonewald Lab matches authors"]},
+          "reasoning": "Paper data-availability statement names GSE242445; sample labels encode genotype/sex/diet exactly as in the paper's design.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "\\[(.+)\\]$"]},
+          "key_column": "key",
+          "patterns": {
+            "geno": ["key", "^(WT|KO)_"],
+            "sex": ["key", "^[A-Z]+_(F|M)_"],
+            "diet": ["key", "^[A-Z]+_[FM]_(C|LC)_"]
+          },
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. WT_F_C_1) sit inside the GEO title in brackets; exact match on that derived key for all 23. Factors parsed from the key. Note: GEO characteristics 'treatment' is constant ('2 weeks of low-calcium-diet') for all samples although titles distinguish control (C) and low-calcium (LC); title is used.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "normalized counts (DESeq2 median-of-ratios)",
+          "recommended_method": "none (no raw integer counts deposited; DESeq2 would need rounding of normalized values)",
+          "final": {"source": "GSE242445_AllnormalizedReadCounts.csv", "paper_input": "raw read counts into DESeq2 (S4.16.p1)"},
+          "reasoning": "File is named AllnormalizedReadCounts; integer fraction 0.20, non-integer values; data_processing says DESeq2 median-of-ratios normalization. It is size-factor-normalized counts, not the raw counts the paper modeled. Recorded for completeness; the case stops at design regardless.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["geno", "sex", "diet"],
+          "references": {"geno": "WT", "sex": "M", "diet": "C"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": null, "contrasts": [], "exercise_factor": null},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the 23 osteocyte samples vary only by genotype (FNDC5 KO vs WT), sex and diet (control vs low-calcium). No sample is exercised, trained or sedentary-as-control (paper S4.15-S4.16, GEO treatment_protocol). The requested exercise estimand cannot be identified; manufacturing it from KO vs WT (irisin as an 'exercise myokine') would change the estimand.",
+          "candidates": [
+            {"value": "geno KO vs WT as an exercise proxy", "reason_rejected": "Irisin deletion is a genetic loss of one myokine, not an exercise intervention; it does not estimate the effect of exercise on gene expression."},
+            {"value": "diet LC vs C", "reason_rejected": "Calcium deficiency, not exercise."}
+          ],
+          "reasoning": "Paper-first: the study map has no exercise factor. Refused at design per the skill's stop rule (sequenced sample set with no exercise arm).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "GEO treatment characteristic", "paper": "control diet and low-calcium diet groups (S2.3.p1)", "data": "characteristics_ch1.5.treatment = '2 weeks of low-calcium-diet' for all 23 samples; titles carry C/LC", "disposition": "executable_without_change"},
+        {"item": "matrix scale", "paper": "raw read counts into DESeq2 (S4.16.p1)", "data": "only DESeq2-normalized counts deposited", "disposition": "recorded; not acted on because the case is refused at design"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
