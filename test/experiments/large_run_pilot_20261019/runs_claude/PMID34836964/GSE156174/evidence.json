@@ -1,0 +1,389 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34836964",
+  "subject_id": "GSE156174",
+  "created_at": "2026-11-24T10:01:04",
+  "finished_at": "2026-11-24T10:01:20",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8626488.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC8626488.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T10:01:04",
+      "sha256": null,
+      "attributes": {
+        "sha256": "452d0db877c28cf20d90052546028d60458d16fd04218112030d00bc00aac0e8",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE156174_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE156174\\GSE156174_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:01:04",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7ddc5247fea631120a2740fee0ed52c6ead4baf869d8607a272c3a1d9436a3a9",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:01:10",
+      "sha256": null,
+      "attributes": {
+        "sha256": "28efd894eebec1fda0b7815377bade549018e5685b843d6776270760c4826eb0",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE156174"
+        ],
+        "assay": "bulk RNA-seq (NextSeq 500, HISAT2/featureCounts mm9), mouse bone-marrow Lin-LEPR+ SSCs (FACS) and immuno-depleted cultured MSCs",
+        "primary_estimand": "Effect of hindlimb unloading (HU, mechanical disuse) vs ambulatory (AMB) controls on SSC and MSC transcriptomes at 8wk and 14wk; plus SSC transcriptome after 8wk HU + 8wk reloading (HUR) vs age-matched AMB",
+        "factors": {
+          "cell_type": [
+            "SSC",
+            "MSC"
+          ],
+          "treatment": [
+            "AMB",
+            "HU",
+            "HUR"
+          ],
+          "duration": [
+            "8wk",
+            "14wk",
+            "8wk+8wk reload"
+          ]
+        },
+        "sample_inclusion": "One pooled RNA library per group: RNA pooled from 3-4 mice per group (S2.4.p1, S4.2.p1, S4.2.p2, S4.7.p1); 10 libraries total, no biological replicates",
+        "planned_contrasts": [
+          "8wk HU vs AMB in SSC (S2.4.p1; paper: 3991 DEGs)",
+          "8wk HU vs AMB in MSC (S2.4.p1; paper: 1504 DEGs)",
+          "14wk HU vs AMB in SSC and MSC (S2.5.p2; counts only in Supplementary Fig. 5d,e, 'fewer than 8wk')",
+          "HUR vs AMB SSC pseudo-time K-means clustering (S2.6.p2-p3; no DEG count)"
+        ],
+        "repeated_measure_unit": "none (pools of different mice per group)",
+        "paper_method": "edgeR exact test with a FIXED dispersion of 0.2 (no replicates to estimate dispersion), TMM calcNormFactors, filter sum of counts > 2, protein-coding transcripts only (S4.8.p1)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S4.9.p1 (general 'p <= 0.05'); DEG rule for RNA-seq not stated in S4.8.p1; Fig. 3c-e highlight Log2FC > 2",
+          "stated_explicitly": false
+        },
+        "paper_results": {
+          "SSC_8wk_HU_vs_AMB": 3991,
+          "MSC_8wk_HU_vs_AMB": 1504
+        }
+      },
+      "reason": "The intervention is hindlimb unloading (disuse, the opposite of mechanical loading/exercise) and reloading recovery; there is no exercise arm. Every group is a single library of RNA pooled from 3-4 mice (S4.7.p1). The paper fitted edgeR exactTest with a dispersion fixed at 0.2 because no replicate exists (S4.8.p1). The DEG threshold for RNA-seq is not stated.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:01:10"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "S8.p1 names GSE156174",
+          "GEO samples = 10 libraries matching S2.4-S2.6 groups (8wk/14wk AMB/HU x SSC/MSC + HUR + recovery AMB SSC)",
+          "data_processing: HISAT2 + featureCounts mm9, raw transcript counts = S4.8.p1"
+        ],
+        "accession": "GSE156174",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE156174\\GSE156174_metadata.csv"
+      },
+      "reason": "Paper's code-availability statement names GSE156174; sample groups and processing match.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:01:10"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 10,
+        "n_metadata": 10,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "cell": {
+              "alias_of": "characteristics_ch1.2.cell type",
+              "recode": {
+                "flow sorted SSCs": "SSC",
+                "depleted MSCs": "MSC"
+              }
+            },
+            "trt": {
+              "alias_of": "characteristics_ch1.3.treatment",
+              "recode": {
+                "AMB": "AMB",
+                "HU": "HU",
+                "HU+recovery": "HUR",
+                "recovery AMB": "AMBR"
+              }
+            },
+            "dur": {
+              "alias_of": "characteristics_ch1.4.duration",
+              "recode": {
+                "8 weeks": "w8",
+                "14 weeks": "w14",
+                "8 weeks + reloaded": "w16",
+                "Reloading control": "w16"
+              }
+            },
+            "grp": {
+              "combine": [
+                "trt",
+                "dur"
+              ],
+              "separator": "_",
+              "of": "recoded values"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\design_metadata.csv",
+          "sha256": "4d1b97d3be3f5e76cf86ab43b5a8ce6160dbd176abe2b79ad371dc3f01ed71cb",
+          "levels": {
+            "cell": {
+              "SSC": 6,
+              "MSC": 4
+            },
+            "trt": {
+              "AMB": 4,
+              "HU": 4,
+              "HUR": 1,
+              "AMBR": 1
+            },
+            "dur": {
+              "w8": 4,
+              "w14": 4,
+              "w16": 2
+            },
+            "grp": {
+              "AMB_w8": 2,
+              "HU_w8": 2,
+              "AMB_w14": 2,
+              "HU_w14": 2,
+              "HUR_w16": 1,
+              "AMBR_w16": 1
+            }
+          }
+        }
+      },
+      "reason": "Tar-merged columns become GSM ids; exact match on metadata index (inspect: 10/10).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:01:11"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\aligned_matrix.csv",
+          "sha256": "28efd894eebec1fda0b7815377bade549018e5685b843d6776270760c4826eb0",
+          "n_features": 95883,
+          "n_samples": 10,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1801473.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Integer fraction 1.0, max 1.8e6; GEO data_processing 'featurecount ... raw transcript counts'; features are Ensembl transcript IDs (ENSMUST), matching the paper's transcript-level edgeR input (S4.8.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:01:12"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "two-group per cell type and duration (as paper)",
+        "design_column": "grp",
+        "contrasts": [
+          {
+            "name": "grp_HU_w8_vs_AMB_w8_cell-SSC",
+            "control": "AMB_w8",
+            "treatment": "HU_w8",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HU_w8_vs_AMB_w8_cell-MSC",
+            "control": "AMB_w8",
+            "treatment": "HU_w8",
+            "role": "primary"
+          }
+        ],
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\suitability\\suitability.md",
+          "n_comparisons": 21,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "S4.7.p1, S2.4.p1 (pooled BM N=3 mice), S4.8.p1 (dispersion 0.2). GEO has exactly one sample per group.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast and no replication: (1) the intervention is hindlimb unloading/disuse and reloading, with no exercise or training arm; (2) every arm (cell type x treatment x duration) is ONE library of RNA pooled from 3-4 mice (S4.7.p1), so each comparison is n=1 vs n=1 with zero residual degrees of freedom. Between-sample variance cannot be estimated; the paper's 3991/1504 DEGs come from an edgeR exact test with an assumed dispersion of 0.2 (S4.8.p1), a fixed assumption rather than inference. No valid DE model exists for these data."
+      },
+      "recorded_at": "2026-11-24T10:01:20"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d97266b1355a2f100d03e45dce35bdc97966eb5cdf7de62433c15c2ee9ba3937",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "c5498d7b71f06eb4a9734a9fb0406bc8d8ef73fdcd0c55cc1b962b39e8a81c10",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "28efd894eebec1fda0b7815377bade549018e5685b843d6776270760c4826eb0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4d1b97d3be3f5e76cf86ab43b5a8ce6160dbd176abe2b79ad371dc3f01ed71cb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "b00f1e975dfe596b0f4720c9d24d1317c025998f2bd5d2bdd7e936278407deb9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34836964\\GSE156174\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "a541019afbcda14fb9022045d96e7bc262e1041c3626af967548de3cea012aac",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
