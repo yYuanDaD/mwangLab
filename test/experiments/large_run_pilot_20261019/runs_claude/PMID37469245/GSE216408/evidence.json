@@ -1,0 +1,313 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37469245",
+  "subject_id": "GSE216408",
+  "created_at": "2026-11-24T05:06:55",
+  "finished_at": "2026-11-24T05:06:58",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10570112.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC10570112.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T05:06:55",
+      "sha256": null,
+      "attributes": {
+        "sha256": "03bcc26869a3f7b693e8e50f093a8dee0b9a5f6b67207c736d4f6c0777fbd55f",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE216408_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE216408\\GSE216408_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:06:55",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2267019dd739e0995bb179dd0e08e4c846f80e42f938354d24fadda0f119fbea",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE216408_exp_all.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE216408\\GSE216408_exp_all.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T05:06:55",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8404b912088ff0282dc6170f3e679ac5cd666e4b1a2da64d7277644d05b84f5c",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE216408"
+        ],
+        "assay": "bulk RNA-seq (BGISEQ-500), gastrocnemius (GAS)",
+        "primary_estimand": "Effect of skeletal-muscle-specific DJ-1 (Park7) knockout (MDKO vs Flox) on GAS gene expression under immobilization (tail suspension / disuse atrophy). Not an exercise effect.",
+        "factors": {
+          "genotype": [
+            "Flox (WT)",
+            "MDKO (KO)"
+          ]
+        },
+        "constant_conditions": "all sequenced animals were immobilized (S2.16.p1, S3.6.p1, FIG5)",
+        "sample_inclusion": "GAS from immobilized MDKO (n=4) and Flox (n=3) mice (FIG5 n=3-4)",
+        "planned_contrasts": [
+          "MDKO vs Flox, both immobilized (S3.6.p1; paper: 1113 DEGs, 763 down / 350 up)"
+        ],
+        "exercise_in_paper": "Treadmill/rotarod/grip/ladder tests are phenotyping endpoints only (S2.11.p1, S3.2.p1); no exercised animals were sequenced.",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "source_locator": "GEO data_processing (DESeq2, adjusted P < 0.05 and |FC| > 1.5); paper text gives no rule"
+        },
+        "paper_method": "DESeq2 (GEO data_processing); RSEM quantification",
+        "paper_results": "1113 DEGs, 763 down-regulated (S3.6.p1, FIG5B)"
+      },
+      "reason": "S2.16.p1: 'GAS tissues from immobilized MDKO mice and Flox mice were extracted for RNA sequencing.' S3.6.p1 reports 1113 DEGs MDKO vs Flox in the immobilization model. Exercise appears only as functional phenotyping (S2.11, S3.2), never as a sequenced condition.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:06:55"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE216408\\GSE216408_exp_all.csv.gz",
+        "owned": true,
+        "checks": [
+          "GEO extract_protocol matches S2.16.p1 (immobilized MPARK7KO and flox GAS)",
+          "7 samples = FIG5 n=3-4",
+          "BGISEQ-500 platform matches paper"
+        ],
+        "accession": "GSE216408",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE216408\\GSE216408_metadata.csv"
+      },
+      "reason": "GEO series text and sample counts match the paper's RNA-seq section.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:06:55"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:_norm_key",
+        "n_aligned": 7,
+        "n_metadata": 7,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "geno": {
+              "source": "characteristics_ch1.1.genotype",
+              "regex": "^(WT|skeletal muscle PARK7KO)$",
+              "recode": {
+                "WT": "WT",
+                "skeletal muscle PARK7KO": "KO"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\design_metadata.csv",
+          "sha256": "d94f71e3dcca796c01b264ca5fbcf3f5b71429ad6d8e03eb0d7589dcf5169353",
+          "levels": {
+            "geno": {
+              "KO": 4,
+              "WT": 3
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns WT-1..3, KO-1..4 correspond to titles 'GAS WT repN' / 'GAS MPARK7KO repN'; key derived from title and matched ignoring '-'/'_'.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:06:55"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "estimated counts (RSEM expected counts)",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\aligned_matrix.csv",
+          "sha256": "c8bb1eec8db6c098481c37ea6d385cb34c1a55c7bfe3540b7cd90e0d03d53245",
+          "n_features": 21487,
+          "n_samples": 7,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 2,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3251545.69,
+          "median": 47.55,
+          "integer_fraction": 0.9241,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "92% integer values, max 3.25e6, median 47.5; GEO data_processing: STAR + RSEM, DESeq2. Consistent with RSEM expected counts. Matches the paper's DESeq2 input. 2 duplicated gene symbols and Excel-mangled IDs (1-Mar etc.) noted; irrelevant because the case stops at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:06:55"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\suitability\\suitability.md",
+          "n_comparisons": 0,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "GEO treatment column is constant ('immobilization-induced muscle atrophy'); the only grouping column is genotype. Immobilization is the opposite of exercise and there is no non-immobilized or exercised arm to contrast. The genotype contrast exists (paper's 1113 DEGs) but is not an exercise estimand; manufacturing one would be invalid.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: all 7 sequenced GAS samples are immobilized (disuse) mice differing only by genotype (MDKO vs Flox). Exercise in this paper is a phenotyping readout, not a sequenced condition, so the requested exercise effect on gene expression is not identifiable from GSE216408."
+      },
+      "recorded_at": "2026-11-24T05:06:58"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9eb62eeb2331e2cdd0b52828e9b5c268ad8702696c892290daa58a0b10813f29",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58f84acfc420eb478308eaeb061e635a5dd3c2005816a615df003d1459c8a14e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c8bb1eec8db6c098481c37ea6d385cb34c1a55c7bfe3540b7cd90e0d03d53245",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d94f71e3dcca796c01b264ca5fbcf3f5b71429ad6d8e03eb0d7589dcf5169353",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e92d25a85de69086ec1413d0e4067fa9afe3faf58aaa4a976b05ee9b775bdda0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37469245\\GSE216408\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "5e74a4ba98a5cfac509cb1bd1c20a7b90a79d1f9717bb5b59a9fd86f80bb2817",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

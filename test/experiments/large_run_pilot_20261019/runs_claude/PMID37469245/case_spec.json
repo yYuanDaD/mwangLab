@@ -1,0 +1,48 @@
+{"run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37469245",
+ "request": "Analyze GSE216408 for PMID 37469245 (Skeletal muscle-specific DJ-1 ablation-induced atrogenes expression and mitochondrial dysfunction contributing to muscular atrophy.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 session", "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [{"case_id": "GSE216408", "accession": "GSE216408",
+  "inputs": {"paper": ["test/experiments/paper_screen_20261028/papers/PMC10570112.paper.md"],
+             "metadata": "GSE216408/GSE216408_metadata.csv",
+             "matrix": "GSE216408/GSE216408_exp_all.csv.gz", "raw_tar": false, "prep_scripts": []},
+  "gates": {
+   "paper_reconstruction": {
+    "final": {"accessions": ["GSE216408"],
+     "assay": "bulk RNA-seq (BGISEQ-500), gastrocnemius (GAS)",
+     "primary_estimand": "Effect of skeletal-muscle-specific DJ-1 (Park7) knockout (MDKO vs Flox) on GAS gene expression under immobilization (tail suspension / disuse atrophy). Not an exercise effect.",
+     "factors": {"genotype": ["Flox (WT)", "MDKO (KO)"]},
+     "constant_conditions": "all sequenced animals were immobilized (S2.16.p1, S3.6.p1, FIG5)",
+     "sample_inclusion": "GAS from immobilized MDKO (n=4) and Flox (n=3) mice (FIG5 n=3-4)",
+     "planned_contrasts": ["MDKO vs Flox, both immobilized (S3.6.p1; paper: 1113 DEGs, 763 down / 350 up)"],
+     "exercise_in_paper": "Treadmill/rotarod/grip/ladder tests are phenotyping endpoints only (S2.11.p1, S3.2.p1); no exercised animals were sequenced.",
+     "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "source_locator": "GEO data_processing (DESeq2, adjusted P < 0.05 and |FC| > 1.5); paper text gives no rule"},
+     "paper_method": "DESeq2 (GEO data_processing); RSEM quantification",
+     "paper_results": "1113 DEGs, 763 down-regulated (S3.6.p1, FIG5B)"},
+    "reasoning": "S2.16.p1: 'GAS tissues from immobilized MDKO mice and Flox mice were extracted for RNA sequencing.' S3.6.p1 reports 1113 DEGs MDKO vs Flox in the immobilization model. Exercise appears only as functional phenotyping (S2.11, S3.2), never as a sequenced condition.",
+    "confidence": "high", "locator": "S2.16.p1; S3.6.p1"},
+   "ownership": {
+    "final": {"owned": true, "checks": ["GEO extract_protocol matches S2.16.p1 (immobilized MPARK7KO and flox GAS)", "7 samples = FIG5 n=3-4", "BGISEQ-500 platform matches paper"]},
+    "reasoning": "GEO series text and sample counts match the paper's RNA-seq section.", "confidence": "high"},
+   "alignment": {
+    "key_column": "key",
+    "key_patterns": {"key": ["title", "^GAS (?:M?PARK7)?(WT|KO) rep([0-9]+)$"]},
+    "normalize_keys": true,
+    "patterns": {"geno": ["characteristics_ch1.1.genotype", "^(WT|skeletal muscle PARK7KO)$"]},
+    "recode": {"geno": {"WT": "WT", "skeletal muscle PARK7KO": "KO"}},
+    "aliases": {}, "exclude_samples": {},
+    "reasoning": "Matrix columns WT-1..3, KO-1..4 correspond to titles 'GAS WT repN' / 'GAS MPARK7KO repN'; key derived from title and matched ignoring '-'/'_'."},
+   "matrix": {
+    "matrix_type": "estimated counts (RSEM expected counts)",
+    "recommended_method": "DESeq2",
+    "reasoning": "92% integer values, max 3.25e6, median 47.5; GEO data_processing: STAR + RSEM, DESeq2. Consistent with RSEM expected counts. Matches the paper's DESeq2 input. 2 duplicated gene symbols and Excel-mangled IDs (1-Mar etc.) noted; irrelevant because the case stops at design.",
+    "confidence": "medium"},
+   "design": {
+    "decision_status": "refused",
+    "stop_reason": "No exercise contrast: all 7 sequenced GAS samples are immobilized (disuse) mice differing only by genotype (MDKO vs Flox). Exercise in this paper is a phenotyping readout, not a sequenced condition, so the requested exercise effect on gene expression is not identifiable from GSE216408.",
+    "reasoning": "GEO treatment column is constant ('immobilization-induced muscle atrophy'); the only grouping column is genotype. Immobilization is the opposite of exercise and there is no non-immobilized or exercised arm to contrast. The genotype contrast exists (paper's 1113 DEGs) but is not an exercise estimand; manufacturing one would be invalid.",
+    "candidates": [{"value": "geno KO vs WT (immobilized)", "reason_rejected": "genotype effect under disuse, not an exercise effect"}],
+    "confidence": "high"}
+  },
+  "discrepancies": [{"item": "requested estimand", "paper": "DJ-1 knockout vs Flox under immobilization", "data": "genotype only; treatment constant (immobilization)", "disposition": "blocks_requested_estimand"}],
+  "executions": [], "enrichment": []}]}

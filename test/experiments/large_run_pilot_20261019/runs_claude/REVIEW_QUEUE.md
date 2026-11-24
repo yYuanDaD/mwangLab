@@ -571,3 +571,7 @@ One section per case; newest last.
 ## PMID31726991 / GSE132930_hippocampus_young (2026-11-24)
 
 - policy: Is excluding 18606H (inferred only from the deposit file name) the right primary versus all 10? Paper text is silent.
+
+## PMID37469245 / GSE216408 (2026-11-24)
+
+- policy: Open policy question: whether the genotype contrast under immobilization (an exercise-opposite condition) should ever count as an exercise result. The case follows the current rule by refusing.

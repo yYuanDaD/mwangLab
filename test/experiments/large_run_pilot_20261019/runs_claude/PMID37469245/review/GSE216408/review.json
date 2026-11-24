@@ -1,0 +1,88 @@
+{
+ "case": "GSE216408",
+ "reviewer": "case reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "No. All 7 sequenced GAS samples are immobilized mice (S2.16.p1, S3.6.p1); exercise is a phenotyping readout (treadmill, rotarod, grip) only. No sequenced sample carries an exercise factor.",
+  "B2": "MDKO vs Flox, both immobilized: KO n=4, WT n=3 (S3.6.p1, FIG5).",
+  "B3": "No repeated measures; one gastrocnemius per mouse. The title suffix repN is a replicate label, and the packet's expression check does not support it as a unit.",
+  "B4": "The paper does not say how the model was fitted; there is one two-group comparison.",
+  "B5": "The article text gives no DEG rule; GEO data_processing says 'DESeq2(1.3.40) with adjust P value < 0.05 and |FC|>1.5'. Reported: 1113 DEGs, 763 down (S3.6.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.16.p1/S3.6.p1: all sequenced GAS from immobilized mice, genotype only; GEO treatment constant. No exercise arm sequenced; refusal correct.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Refused; the 4 KO vs 3 WT split matches the paper (n=3-4, FIG5) and was recorded.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast executed.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Title suffix 'repN' is a replicate label; same-key correlation not supported (p=0.095). The 7 mice are independent animals; no repeated measures.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No fit; paper does not state a model.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast executed.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "RSEM expected counts (92% integer) with DESeq2 is consistent with GEO data_processing.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Transcribed from GEO data_processing: adj P<0.05 and |FC|>1.5 (log2 0.585); the article text states no rule, which the record notes.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "HANDBACK states 1113 DEGs/763 down from S3.6.p1 and claims no our-vs-paper comparison.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "'No exercise arm' is true and was established by checking the treatment column, the paper methods and the sample titles. Minor: the suitability report's 'sample_size' failure (0/0 comparisons) is an artifact of an empty factor list, as HANDBACK already notes.",
+   "fix": "Optionally fix tools/suitability.py so an empty factor list is reported as 'no design' rather than a sample_size failure."
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy question: whether the genotype contrast under immobilization (an exercise-opposite condition) should ever count as an exercise result. The case follows the current rule by refusing."
+ ],
+ "summary": "拒绝分析是正确的:GSE216408 的7个样本全部为制动(immobilization)小鼠,仅基因型不同,没有运动组。配对、阈值和矩阵判断均无问题。唯一的小问题是 suitability 报告在无设计因子时给出了 sample_size 失败的提示,不影响结论。"
+}

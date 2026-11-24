@@ -1003,3 +1003,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37996046 (GSE235942)
 
 - none in the analysis tools; case_runner.py:1115 shows a raw JSONDecodeError traceback for a malformed spec instead of a spec_error Details: `PMID37996046/HANDBACK.md`.
+
+## PMID41194654 (GSE278016)
+
+- none in repo tools; PowerShell blocked setting PYTHONIOENCODING, so commands ran via Bash Details: `PMID41194654/HANDBACK.md`.
