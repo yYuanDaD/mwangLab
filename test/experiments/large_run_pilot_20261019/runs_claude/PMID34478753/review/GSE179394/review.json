@@ -1,0 +1,21 @@
+{"case": "GSE179394", "reviewer": "case-reviewer, Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. Abstract METHODS: Ldlr-/-.Leiden mice on 30 wk HFD, then 20 wk running wheel (exercise), chow switch, or both; liver, WAT, muscle sequenced. Exercise factor = running wheel (GEO runwheel.31-50wk Y: 58 samples). 30-week reference groups are not in GEO (packet A diet columns show only 50-wk animals plus chow reference).",
+  "B2": "Abstract METHODS/RESULTS: each intervention (exercise HFD+rw, diet change, combination) vs untreated HFD control, per organ. Per-group n from GEO treatment_protocol: HFD control 17, exercise 17, diet 18, combination 18 animals; sequenced n=7-11 per group per organ (liver 10-11, eWAT 8-10, muscle 7-10). Counts per group in packet A: HH 28, HHrw 30, HC 27, HCrw 28, CC 25 across 3 organs. Only the abstract was available; no figure legends.",
+  "B3": "Yes: the same mouse gives liver, eWAT and muscle samples (extract_protocol: n per group per organ). Key: characteristics_ch1.4.mousenr (65 keys, 120/138 linked, 0 duplicates within an organ; pairing_check supported, p=0.0005). Only relevant if organs are pooled in one model.",
+  "B4": "The abstract does not say. GEO data_processing names DESeq2 only. Cannot tell joint versus pairwise fits.",
+  "B5": "Not stated in the abstract (full text not available to me); no DEG counts in the abstract."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Abstract METHODS: running wheel arm in vivo; GEO runwheel.31-50wk Y=58. Case run.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Packet B grp levels CC25/HC27/HCrw28/HH28/HHrw30 match the GEO code (donor.allergen.dose). Primary contrast HHrw vs HH uses the HFD control, not chow. 30-wk reference groups not in GEO, recorded as discrepancy. Group-to-protocol n per organ not verifiable beyond the abstract.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts recorded as treatment=HHrw/HCrw/HC, control=HH (or HC for HCrw vs HC); GSEA text labels NES>0 as enriched in treatment.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "mousenr links samples across organs only; each organ fitted separately, so one sample per mouse per fit (0 duplicates per level in packet A). Recorded in covariance reasoning.", "fix": ""},
+  {"id": "model_fit", "verdict": "unsure", "severity": "minor", "evidence": "Paper's fit structure unknown (abstract only). Per-organ joint model on 5 groups was used, recorded as such; pairwise fits not reported.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "eWAT: 8 NovaSeq samples all in HCrw/HHrw (platform crosstab); platform covariate added and a no-platform sensitivity run reported (exercise 4 vs 31 DEGs). Liver all NextSeq, muscle all NovaSeq; group housing noted in growth_protocol.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer fraction 1.0, max 2.4e6, median 0; HTSeq-count raw counts; DESeq2 per GEO data_processing.", "fix": ""},
+  {"id": "threshold", "verdict": "unsure", "severity": "minor", "evidence": "Paper threshold not stated in the abstract; workflow default padj<0.05 with raw p<0.01 audit, deviation recorded.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK states comparison is on the abstract only and no paper numbers were compared; no overclaim.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Threshold and joint-vs-pairwise fit unverified: only the abstract was available; compare with the full text if obtained."],
+ "summary": "本案例设计合理:每个器官单独拟合,以 HFD 对照(HH)为参照比较运动组(HHrw),方向、分组、配对(同一小鼠仅跨器官出现)均无问题。eWAT 的平台混杂已记录并做了敏感性分析。论文阈值与模型结构因仅有摘要无法核对,列为待人工确认项。"}

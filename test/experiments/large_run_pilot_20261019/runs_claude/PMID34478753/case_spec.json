@@ -1,0 +1,162 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34478753",
+  "request": "Analyze GSE179394 for PMID 34478753 (Diet and exercise reduce pre-existing NASH and fibrosis and have additional beneficial effects on the vasculature, adipose tissue and skeletal muscle via organ-crosstalk.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE179394",
+      "accession": "GSE179394",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID34478753/paper_abstract.txt"],
+        "metadata": "GSE179394/GSE179394_metadata.csv",
+        "matrix": "GSE179394/GSE179394_GEO.merged.counts.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE179394"],
+            "assay": "bulk RNA-seq (STAR + HTSeq-count), liver, perigonadal WAT, quadriceps muscle",
+            "primary_estimand": "Effect of 20 weeks of voluntary running-wheel exercise in obese Ldlr-/-.Leiden mice with pre-existing NASH that stay on HFD (HFD+running wheel vs HFD control), per organ (liver, eWAT, muscle)",
+            "factors": {"grp": ["C.C chow reference", "H.H HFD control", "H.Hrw HFD + exercise", "H.C diet change", "H.Crw diet change + exercise"], "tissue": ["liver", "eWAT", "muscle"]},
+            "sample_inclusion": "all 50-week animals in the GEO series; organs analysed separately",
+            "planned_contrasts": [
+              "H.Hrw vs H.H (exercise vs HFD control), per organ (abstract METHODS/RESULTS: treatment groups compared with untreated control group; paper DEG count not available)",
+              "H.Crw vs H.H (combination vs HFD control), per organ (abstract; count not available)",
+              "H.C vs H.H (diet change vs HFD control), per organ (abstract; count not available)"
+            ],
+            "repeated_measure_unit": "mouse (mousenr) appears in several organs, but organs are analysed separately, so each fit has one sample per mouse",
+            "paper_method": "DESeq2 per GEO data_processing ('These counts serve as input for the statistical analysis using DEseq2 package'); exact model and threshold not available (abstract only)",
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "abstract only; full text unavailable"},
+            "paper_results": "Abstract: pathway analysis shows exercise and diet change affect complementary metabolic/lipid-handling pathways and share inflammation pathways; no DEG counts or genes given"
+          },
+          "reasoning": "No full text available. Study map built from the PubMed abstract (METHODS, RESULTS) and the GEO series summary/overall_design/treatment_protocol. Groups: HFD 30 wk then 20 wk of HFD (control), HFD+running wheel (exercise), chow switch (diet), chow+running wheel (combination); chow reference kept on chow 50 wk. GEO donor.allergen.dose codes: C.C, H.H, H.Hrw, H.C, H.Crw (diet 1-30wk . diet 31-50wk, rw = running wheel). The 30-week reference groups in the paper are not in GEO.",
+          "confidence": "medium",
+          "locator": "PubMed abstract METHODS/RESULTS; GEO treatment_protocol_ch1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO series title equals the paper title", "contact A. van den Hoek is the first author", "138 matrix columns = 138 GEO samples after key normalisation"]},
+          "reasoning": "GSE179394 series title and summary are the paper's title and abstract; the merged count file is the series-level supplementary file."
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "^s?(\\d+-\\d+-\\d+R?)$"]},
+          "matrix_column_pattern": "^(\\d+-\\d+-\\d+R?)(?:_R2)?$",
+          "patterns": {},
+          "aliases": {"tissue_raw": "source_name_ch1", "grp_raw": "characteristics_ch1.0.donor.allergen.dose", "platform_raw": "platform_id", "mouse": "characteristics_ch1.4.mousenr"},
+          "combine": {"grp": ["grp_raw"], "tissue": ["tissue_raw"], "platform": ["platform_raw"]},
+          "recode": {
+            "grp": {"C.C": "CC", "H.H": "HH", "H.Hrw": "HHrw", "H.C": "HC", "H.Crw": "HCrw"},
+            "tissue": {"Liver": "liver", "eWAT": "ewat", "muscle": "muscle"},
+            "platform": {"GPL19057": "nextseq", "GPL24247": "novaseq"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are the GEO titles without the leading 's' (liver/most eWAT) and, for 8 NovaSeq eWAT samples, with a '_R2' suffix; the 'R' suffix (e.g. 103566-001-028R) appears in both. Key derived from title by stripping 's'; matrix columns by stripping '_R2'. Exact match on the derived key, no positional alignment."
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE179394_GEO.merged.counts.tsv.gz", "paper_input": "HTSeq-count read counts, 'not normalised per sample', input to DESeq2 (GEO data_processing)"},
+          "reasoning": "integer fraction 1.0, max 2.4e6, median 0; GEO data_processing: STAR + HTSeq-count 0.6.1p1, raw counts for DESeq2."
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "HH"},
+          "organism": "Mouse",
+          "strata": ["tissue"],
+          "subject": null,
+          "covariate_candidates": ["platform"],
+          "planned": [
+            "grp_HHrw_vs_HH_tissue-liver", "grp_HHrw_vs_HH_tissue-ewat", "grp_HHrw_vs_HH_tissue-muscle",
+            "grp_HCrw_vs_HH_tissue-liver", "grp_HCrw_vs_HH_tissue-ewat", "grp_HCrw_vs_HH_tissue-muscle",
+            "grp_HC_vs_HH_tissue-liver", "grp_HC_vs_HH_tissue-ewat", "grp_HC_vs_HH_tissue-muscle"
+          ],
+          "final": {
+            "analysis_type": "multi-group, one model per organ (stratified)",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_HHrw_vs_HH (per tissue)", "control": "HH", "treatment": "HHrw", "role": "primary"},
+              {"name": "grp_HCrw_vs_HH (per tissue)", "control": "HH", "treatment": "HCrw", "role": "secondary"},
+              {"name": "grp_HC_vs_HH (per tissue)", "control": "HH", "treatment": "HC", "role": "secondary"},
+              {"name": "grp_HCrw_vs_HC (per tissue)", "control": "HC", "treatment": "HCrw", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool runwheel Y vs N across diets", "reason_rejected": "mixes diet backgrounds (HFD and chow) and the chow reference; paper compares each intervention to the HFD control"},
+            {"value": "pool all tissues in one model", "reason_rejected": "organs are distinct transcriptomes; the paper analyses each organ separately"},
+            {"value": "CC vs HH", "reason_rejected": "diet-model reference contrast, not an exercise estimand"}
+          ],
+          "reasoning": "Abstract: groups 'treated for 20 weeks with exercise, diet change or the combination' vs 'untreated (control group)'. Exercise effect as the paper intends = HHrw vs HH within each organ; combination vs HH also contains exercise; diet vs HH is kept as a paper contrast for context; HCrw vs HC (exercise on chow background) is exploratory and not stated in the abstract."
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": [],
+            "covariates": [{"name": "platform", "disposition": "included in the eWAT model only (NextSeq vs NovaSeq batch; liver all NextSeq, muscle all NovaSeq)"}]
+          },
+          "confounding_candidates": ["platform"],
+          "reasoning": "eWAT samples were sequenced on two platforms (8 NovaSeq samples, all in HCrw and HHrw, re-sequenced '_R2'); HH, HC, CC eWAT are all NextSeq. Platform is partially confounded with exercise in eWAT, so it is included as a covariate in the eWAT fit (estimable within HCrw and HHrw). Liver and muscle are single-platform. Each mouse contributes one sample per organ, so no subject blocking."
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald), one model per organ",
+            "formula": "~ grp (liver, muscle); ~ platform + grp (eWAT)",
+            "paper_route": {"method": "DESeq2", "status": "available", "reason": "GEO data_processing names DESeq2; exact model unknown (abstract only)"},
+            "deviations": ["platform covariate in eWAT is our decision; paper model unknown"]
+          },
+          "transform": null,
+          "reasoning": "Raw HTSeq counts and GEO data_processing name DESeq2."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Full text unavailable; abstract states no threshold. Workflow default BH padj < 0.05 applied. Audit rule raw p < 0.01 is a labelled comparison only (commonly used by this group's DESeq2 pathway analyses; not verified against this paper)."
+          },
+          "reasoning": "abstract only; no threshold stated"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": [
+              "Comparison with the paper rests on the abstract only; no paper DEG counts or genes available",
+              "eWAT exercise groups partly sequenced on a different platform; platform covariate added",
+              "Paper threshold unknown; workflow default applied"
+            ]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Paper's contrasts (each intervention vs HFD control per organ) with the paper's method (DESeq2); threshold is the workflow default because the abstract states none."
+        }
+      },
+      "discrepancies": [
+        {"item": "30-week reference groups", "paper": "chow and HFD reference groups sacrificed at 30 weeks", "data": "not in GEO (only 50-week animals)", "disposition": "executable_without_change"},
+        {"item": "eWAT sequencing platform", "paper": "not stated in abstract", "data": "8 eWAT exercise-arm samples on NovaSeq (_R2), rest NextSeq", "disposition": "executable_with_covariate"}
+      ],
+      "executions": [
+        {"name": "liver", "tool": "tools.joint_contrasts:run_joint_deseq2", "subset": {"tissue": ["liver"]},
+         "args": {"comparisons": ["grp_HHrw_vs_HH_tissue-liver", "grp_HCrw_vs_HH_tissue-liver", "grp_HC_vs_HH_tissue-liver", "grp_HCrw_vs_HC_tissue-liver"], "covariates": []},
+         "role": "primary", "reasoning": "one DESeq2 model on all liver samples (5 groups)"},
+        {"name": "ewat", "tool": "tools.joint_contrasts:run_joint_deseq2", "subset": {"tissue": ["ewat"]},
+         "args": {"comparisons": ["grp_HHrw_vs_HH_tissue-ewat", "grp_HCrw_vs_HH_tissue-ewat", "grp_HC_vs_HH_tissue-ewat", "grp_HCrw_vs_HC_tissue-ewat"], "covariates": ["platform"]},
+         "role": "primary", "reasoning": "one DESeq2 model on all eWAT samples with platform covariate"},
+        {"name": "muscle", "tool": "tools.joint_contrasts:run_joint_deseq2", "subset": {"tissue": ["muscle"]},
+         "args": {"comparisons": ["grp_HHrw_vs_HH_tissue-muscle", "grp_HCrw_vs_HH_tissue-muscle", "grp_HC_vs_HH_tissue-muscle", "grp_HCrw_vs_HC_tissue-muscle"], "covariates": []},
+         "role": "primary", "reasoning": "one DESeq2 model on all muscle samples (5 groups)"},
+        {"name": "ewat_noplatform", "tool": "tools.joint_contrasts:run_joint_deseq2", "subset": {"tissue": ["ewat"]},
+         "args": {"comparisons": ["grp_HHrw_vs_HH_tissue-ewat", "grp_HCrw_vs_HH_tissue-ewat"], "covariates": []},
+         "role": "sensitivity", "reasoning": "eWAT without platform covariate, to show its influence"}
+      ],
+      "enrichment": [
+        {"execution": "liver/grp_HHrw_vs_HH_tissue-liver", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract reports pathway analysis of exercise effects"},
+        {"execution": "ewat/grp_HHrw_vs_HH_tissue-ewat", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract reports pathway analysis"},
+        {"execution": "muscle/grp_HHrw_vs_HH_tissue-muscle", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract reports pathway analysis"}
+      ]
+    }
+  ]
+}

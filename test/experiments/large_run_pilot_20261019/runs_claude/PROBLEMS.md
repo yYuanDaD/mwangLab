@@ -1083,3 +1083,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36939205 (GSE209880)
 
 - case_runner.py:871 multi-follow-up paired_change tables collide by contrast name (h3 overwritten); inspect calls versioned Ensembl IDs gene_symbol; loky WinError 6 noise Details: `PMID36939205/HANDBACK.md`.
+
+## PMID34478753 (GSE179394)
+
+- Windows loky WinError 6 at shutdown (joblib process_executor.py:477); inspect key hint missed 's'/'_R2' suffixes; joint records show formula '~ cell' Details: `PMID34478753/HANDBACK.md`.

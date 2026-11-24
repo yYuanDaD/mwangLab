@@ -1,0 +1,929 @@
+{
+  "case_id": "GSE179394",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "HHrw": 30,
+          "HH": 28,
+          "HCrw": 28,
+          "HC": 27,
+          "CC": 25
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [
+        "platform"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "characteristics_ch1.0.donor.allergen.dose",
+          "decision": "omit",
+          "reason": "one sample per subject per factor level set: an identifier, not a block"
+        },
+        {
+          "column": "platform",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp) + C(platform)",
+        "rank": 6,
+        "full_rank": true,
+        "residual_df": 132,
+        "min_cell_size": 7
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 30,
+      "n_analyzable": 30,
+      "too_small": [],
+      "planned_analyzable": [
+        "grp_HHrw_vs_HH_tissue-liver",
+        "grp_HHrw_vs_HH_tissue-ewat",
+        "grp_HHrw_vs_HH_tissue-muscle",
+        "grp_HCrw_vs_HH_tissue-liver",
+        "grp_HCrw_vs_HH_tissue-ewat",
+        "grp_HCrw_vs_HH_tissue-muscle",
+        "grp_HC_vs_HH_tissue-liver",
+        "grp_HC_vs_HH_tissue-ewat",
+        "grp_HC_vs_HH_tissue-muscle"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 138 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 138
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34478753\\GSE179394\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_HC_vs_CC_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "CC",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HC"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "CC"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_CC_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HCrw"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "CC"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CC_vs_HH_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CC",
+      "reference": "HH",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "CC"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HH"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_CC_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "CC"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HC_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HCrw"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HC"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HC_vs_HH_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "HH",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HC"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HH"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HC_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HC"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HH_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HCrw"
+          },
+          "n": 8
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HH"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HCrw_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HCrw",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HCrw"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HH_tissue-ewat",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "ewat"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "ewat",
+            "grp": "HH"
+          },
+          "n": 8
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HC_vs_CC_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "CC",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HC"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "CC"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_CC_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "CC"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CC_vs_HH_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CC",
+      "reference": "HH",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "CC"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_CC_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "CC"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HC_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HC"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HC_vs_HH_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "HH",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HC"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HC_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HC"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HH_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HCrw_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HCrw",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HCrw"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HH_tissue-liver",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "liver"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "liver",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HC_vs_CC_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "CC",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HC"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "CC"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_CC_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "CC"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_CC_vs_HH_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CC",
+      "reference": "HH",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "CC"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_CC_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "CC",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "CC"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HC_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HC"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HC_vs_HH_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HC",
+      "reference": "HH",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HC"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HC_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HC",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HC"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HCrw_vs_HH_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HCrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HCrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HCrw_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HCrw",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HCrw"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_HHrw_vs_HH_tissue-muscle",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "HHrw",
+      "reference": "HH",
+      "within": {
+        "tissue": "muscle"
+      },
+      "cells": [
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HHrw"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "tissue": "muscle",
+            "grp": "HH"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

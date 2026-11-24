@@ -660,3 +660,7 @@ One section per case; newest last.
 ## PMID36939205 / GSE209880 (2026-11-24)
 
 - policy: Scope: serum EV and small/circular RNA matrices were not analysed; the abstract's microRNA findings are not covered. A person may want to decide whether they are in scope.
+
+## PMID34478753 / GSE179394 (2026-11-24)
+
+- policy: Threshold and joint-vs-pairwise fit unverified: only the abstract was available; compare with the full text if obtained.
