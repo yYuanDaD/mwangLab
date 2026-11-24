@@ -1095,3 +1095,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34144055 (GSE168409)
 
 - GEO FTP 403/reCAPTCHA blocks downloads; case_runner.py:529-530 hashes the matrix before gates, so an ownership stop crashes (worked around with a placeholder); geo_tools temp-file error hides the 403 Details: `PMID34144055/HANDBACK.md`.
+
+## PMID33332990 (GSE144109)
+
+- geo_tools.py:30 GEOparse temp-file error + ftp.ncbi.nlm.nih.gov 403 (used ftp.ncbi.nih.gov mirror); inspect misses invertible normalized counts; liver contamination in 4 samples Details: `PMID33332990/HANDBACK.md`.
+
+## PMID42113967 (GSE310858)
+
+- geo_tools.py:30 GEOparse temp-file error and :58 ftp.ncbi.nlm.nih.gov 403 (ftp.ncbi.nih.gov works); key_patterns can't reorder column keys (prep script needed) Details: `PMID42113967/HANDBACK.md`.

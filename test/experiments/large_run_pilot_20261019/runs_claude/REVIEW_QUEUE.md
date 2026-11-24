@@ -669,3 +669,8 @@ One section per case; newest last.
 
 - policy: Only the abstract was available; threshold and model fit rest on GEO data_processing text.
 - policy: Rerun needs the count files; confirm subject pairing (tube-number triplets) before blocking on subject.
+
+## PMID42113967 / GSE310858 (2026-11-24)
+
+- policy: Whether disuse/bed-rest series count as exercise studies (open policy).
+- policy: Paper threshold and DEG counts unknown (abstract only); verify against full text.

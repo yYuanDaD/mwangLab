@@ -1,0 +1,141 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID42113967",
+  "request": "Analyze GSE310858 for PMID 42113967 (Different effects of 3-week disuse on phenotype and gene expression in calf and thigh muscles.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE310858",
+      "accession": "GSE310858",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42113967/paper/PMID42113967_abstract.txt",
+                  "test/experiments/large_run_pilot_20261019/runs_claude/PMID42113967/paper/GSE310858_series.txt"],
+        "metadata": "GSE310858/GSE310858_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID42113967/prep/GSE310858_counts_gsm.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID42113967/prep/rename_columns.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE310858"],
+            "assay": "bulk RNA-seq (Illumina), human skeletal muscle; proteomics is in the paper but not in this GEO series",
+            "sample_inclusion": "12 healthy men, biopsies of m. soleus and m. vastus lateralis 14 days before and on day 20 of 21-day -6 degree head-down bed rest (GEO overall design); 48 libraries = 12 subjects x 2 muscles x 2 time points",
+            "factors": {"time": ["before", "after"], "tissue": ["Sol", "Vas"], "subject": "1-12 (repeated-measure unit)"},
+            "primary_estimand": "within-subject change in gene expression after 3-week disuse (bed rest) vs before, separately in calf (soleus) and thigh (vastus lateralis); the paper reports the soleus response is larger. Disuse is the inverse of the exercise/physical-activity axis: the estimand is the effect of removing loading, not of exercise training.",
+            "planned_contrasts": [
+              "Soleus: after vs before bed rest, paired by subject (abstract: transcriptome changes greater in calf; count not stated in abstract)",
+              "Vastus lateralis: after vs before bed rest, paired by subject (abstract; count not stated in abstract)"
+            ],
+            "paper_threshold": {"metric": "not stated in abstract", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "none (abstract only)"},
+            "paper_method": "not stated in abstract; GEO data_processing: HISAT2 alignment to GRCh38, Rsubread exon counts (Ensembl 101)",
+            "paper_results": "abstract: greater transcriptome change in soleus than vastus lateralis; no DEG counts or gene lists in the abstract"
+          },
+          "reasoning": "No full text available; the study map is built from the PubMed abstract (efetch PMID 42113967) and the GEO series summary/overall design. The abstract defines two within-subject disuse responses (calf, thigh) and a between-muscle comparison of their magnitude. No DE method, threshold, or DEG counts are given, so the threshold falls to the workflow default.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO GSE310858 overall design"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 42113967", "series title matches the paper title", "48 GSMs = 12 subjects x 2 muscles x 2 time points, consistent with abstract (12 young males, soleus and vastus lateralis)", "single supplementary matrix GSE310858_Read_counts.txt.gz with 48 sample columns"]},
+          "reasoning": "The series links the PMID directly and its design matches the abstract.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "aliases": {"subject": "characteristics_ch1.2.individual"},
+          "patterns": {"tissue": ["title", "^(Sol|Vas) "], "time": ["title", "^(?:Sol|Vas) (before|after) \\d+$"]},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "The deposited column names (<subject>-<time 0/1>-<s/v>_S<n>.sorted.bam) are not in the metadata; prep/rename_columns.py maps each column by name to the GSM with the same individual, time point (0=before, 1=after) and tissue (s=soleus, v=vastus) and fails on any unmatched or duplicate mapping. Alignment then matches GSM ids exactly on the metadata index. time and tissue come from the title (\"Sol before 1\"); subject from characteristics individual.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE310858_Read_counts.txt.gz", "paper_input": "uniquely aligned read counts per gene (GEO data_processing: Rsubread exon counting)"},
+          "reasoning": "100% integers, zeros to 3.7M, median 0; data_processing states 'uniquely aligned read counts for genes' from Rsubread featureCounts. Raw counts.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "before"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["tissue"],
+          "planned": ["time_after_vs_before_tissue-Sol", "time_after_vs_before_tissue-Vas"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "paired two-time-point, stratified by muscle",
+            "estimand_type": "causal_within_subject_pre_post",
+            "design_column": "time",
+            "control": "before",
+            "treatment": "after",
+            "contrasts": [
+              {"name": "Sol_after_vs_before", "control": "before", "treatment": "after", "stratum": {"tissue": "Sol"}, "role": "primary"},
+              {"name": "Vas_after_vs_before", "control": "before", "treatment": "after", "stratum": {"tissue": "Vas"}, "role": "primary"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool soleus and vastus with tissue as covariate", "reason_rejected": "the paper's estimand is muscle-specific; pooling would assume a common disuse effect"},
+            {"value": "characteristics treatment column", "reason_rejected": "identical to time point (No treatment = before); time is used"},
+            {"value": "time x tissue interaction", "reason_rejected": "the abstract compares the size of the two responses, not a formal interaction test; not run (could be added as exploratory)"}
+          ],
+          "reasoning": "Each subject is biopsied before and after bed rest in both muscles. The two planned contrasts are after vs before within each muscle, blocked by subject. There is no non-bed-rest control group, so the contrast is a pre-post change (time and disuse are not separable). All participants are male (single sex).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "blocking term (repeated measures)"}]},
+          "confounding_candidates": ["characteristics_ch1.3.age", "characteristics_ch1.4.bmi"],
+          "reasoning": "Repeated biopsies per subject: subject enters the model as a blocking factor. Age and BMI are subject-level constants and are absorbed by the subject term; no batch column is recorded.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald)", "formula": "~ subject + time", "paper_route": {"method": "not stated in abstract", "status": "unknown", "reason": "no full text"}, "deviations": []},
+          "transform": null,
+          "reasoning": "Raw counts; a paired design with subject as a blocking factor in DESeq2 is the standard route. The paper's method is unknown (abstract only).",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.3219281, "inclusive": false},
+            "deviation_note": "Abstract gives no threshold; workflow default BH padj < 0.05. Audit rule adds |FC| > 1.25 (log2 0.3219281), a cutoff often used by this group, labelled as audit only."
+          },
+          "reasoning": "No threshold in the abstract.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": [
+            "Comparison with the paper rests on the abstract only; no paper DEG counts are available.",
+            "Estimand is disuse (bed rest), the inverse of the exercise axis, not an exercise intervention.",
+            "Pre-post design without a control group: time-related changes cannot be separated from disuse."
+          ]},
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Paper route is reproduced as far as the abstract defines it; qualitative check: soleus should show more DEGs than vastus lateralis.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix column names", "paper": "n/a", "data": "columns use <subject>-<time>-<tissue>_S<n> names not present in GEO metadata", "disposition": "repaired by prep/rename_columns.py (name-based, one-to-one)"}
+      ],
+      "executions": [
+        {"name": "Sol_after_vs_before", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "before", "treatment_group": "after", "covariate_columns": ["subject"], "alpha": 0.05},
+         "subset": {"tissue": ["Sol"]}, "role": "primary",
+         "reasoning": "soleus disuse response, paired by subject"},
+        {"name": "Vas_after_vs_before", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "time", "control_group": "before", "treatment_group": "after", "covariate_columns": ["subject"], "alpha": 0.05},
+         "subset": {"tissue": ["Vas"]}, "role": "primary",
+         "reasoning": "vastus lateralis disuse response, paired by subject"}
+      ],
+      "enrichment": [
+        {"execution": "Sol_after_vs_before", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "abstract names mitochondrial and translation-regulator changes; GSEA Hallmark on the full ranking"},
+        {"execution": "Vas_after_vs_before", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "same for vastus lateralis"}
+      ]
+    }
+  ]
+}
