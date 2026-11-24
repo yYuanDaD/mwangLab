@@ -1,0 +1,1024 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID33193103",
+  "subject_id": "GSE155230_training",
+  "created_at": "2026-11-24T04:56:03",
+  "finished_at": "2026-11-24T04:57:11",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC7649134.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC7649134.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T04:56:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "baba1fd25ea73861d124eef3e670e527ec77b2e10df03f918199d53a8a0cd786",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE155230_metadata_lane.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\GSE155230_metadata_lane.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:56:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2efbeb7bdc639021614b9678817b3c4fd46cd67780c092b0ec2790ad55a96086",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\prep_counts.py",
+      "locator": null,
+      "captured_at": "2026-11-24T04:56:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ed52accb88f3812a0ad1872ae158bc6ac4c8f2380a3b741b1a59b1ac6f877b4e",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE155230_lrt_hrt_counts_clean.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\GSE155230_lrt_hrt_counts_clean.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:56:03",
+      "sha256": null,
+      "attributes": {
+        "sha256": "56fdbda2c8c032c2ecddaf6c510f613b2aa7d571015276398628cfd6de3f7798",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE155230"
+        ],
+        "assay": "bulk RNA-seq (Illumina HiSeq 2500, 1x50 bp), rat gastrocnemius",
+        "primary_estimand": "Effect of 8-week treadmill endurance training on gastrocnemius gene expression within each selectively bred trainability line (LRTT vs untrained LRT; HRTT vs untrained HRT), plus the paper's Figure 2 line difference in the trained state (HRTT vs LRTT)",
+        "sample_inclusion": "Generation-15 male HRT/LRT rats; n=3 untrained (HRT, LRT) and n=3 trained (HRTT, LRTT) per line, separate animals (S2.1.3.p1). HCR/LCR samples belong to a separate intrinsic-capacity comparison (case GSE155230_capacity).",
+        "factors": {
+          "line": [
+            "LRT (low responder)",
+            "HRT (high responder)"
+          ],
+          "training": [
+            "untrained",
+            "8-wk trained"
+          ]
+        },
+        "planned_contrasts": [
+          "HRTT vs LRTT (S3.2.p1, Fig 2C; paper: 255 DEGs, 68 up in HRTT, 187 down)",
+          "LRTT vs LRT, trained vs untrained low responders (S3.2.p3, Supp Fig 2G; deposited GSE155230_lrtt_lrt_deg: 255 DEGs, 174 up / 81 down)",
+          "HRTT vs HRT, trained vs untrained high responders (S3.2.p3, Supp Fig 2G; deposited GSE155230_hrt_hrtt_deg: 90 DEGs, 62 up / 28 down)",
+          "HRT vs LRT untrained baseline (deposited GSE155230_lrt_hrt_deg: 234 DEGs, 64 up / 170 down; used in Fig 4E pre-training comparison)"
+        ],
+        "repeated_measure_unit": "none: trained and untrained rats are different animals (S2.1.3.p1)",
+        "normalization": "Cufflinks upper-quartile normalization, Cuffdiff -b -u (GEO data_processing; S2.3.1.p1)",
+        "paper_method": "TopHat2 -> Cufflinks/Cuffdiff (S2.3.1.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "fold change",
+          "effect_cutoff": 1.5,
+          "effect_cutoff_log2": 0.5849625,
+          "source_locator": "S3.2.p1; S3.1.p1; S2.5.p1"
+        },
+        "paper_results": {
+          "HRTT_vs_LRTT": 255,
+          "LRTT_vs_LRT": 255,
+          "HRTT_vs_HRT": 90,
+          "HRT_vs_LRT": 234,
+          "unique_low_responder_training_genes": 193
+        }
+      },
+      "reason": "S2.1.3.p1 defines four groups of n=3 male rats (untrained LRT/HRT, trained LRTT/HRTT; separate cohorts, not pre/post on the same animals). S3.2.p3 states the exercise-response analysis compares each trained group to its untrained counterpart; this is the within-line training effect, the estimand closest to 'how exercise affects gene expression'. Fig 2C/S3.2.p1 is the headline HRTT vs LRTT contrast (255 DEGs, FC>1.5, FDR<0.05). Exact paper counts for the training contrasts are not stated in the text, so they are taken from the authors' deposited Cuffdiff lists, all of whose rows pass q<0.05 and |log2FC|>log2(1.5) (HRTT/LRTT list reproduces the text's 255 = 68 up / 187 down exactly).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:03"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\GSE155230_lrt_hrt_counts_clean.csv",
+        "owned": true,
+        "checks": [
+          "S6.p1 names GSE155230 as the dataset generated for this study",
+          "GEO series has the 18 samples (HCR/LCR/HRT/LRT/HRTT/LRTT x3) matching S2.1.1.p1 and S2.1.3.p1",
+          "GSE155230_lrt_hrt_counts.tsv.gz contains exactly the 12 HRT/HRTT/LRT/LRTT libraries (NG-8752 project, GATC)",
+          "deposited Cuffdiff lists reproduce the paper's 255 and 434 DEG counts"
+        ],
+        "accession": "GSE155230",
+        "metadata_file": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33193103/prep/GSE155230_metadata_lane.csv"
+      },
+      "reason": "Data availability statement S6.p1; sample titles and group labels match the paper's design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:03"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 12,
+        "n_metadata": 18,
+        "coverage": 0.6667,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [
+          "GSM4697795",
+          "GSM4697796",
+          "GSM4697797",
+          "GSM4697798",
+          "GSM4697799",
+          "GSM4697800"
+        ],
+        "excluded_samples": {
+          "GSM4697795": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697796": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697797": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697798": "LCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697799": "LCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697800": "LCR sample, not in this matrix; analysed in case GSE155230_capacity"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "^([A-Z]+)_\\d$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\design_metadata.csv",
+          "sha256": "5fc6815b484b74aa4c51ae62e60429a854c5d04e90202117bcbda49c0d1057db",
+          "levels": {
+            "grp": {
+              "HRT": 3,
+              "LRT": 3,
+              "HRTT": 3,
+              "LRTT": 3
+            }
+          }
+        }
+      },
+      "reason": "Prep script renamed BAM-path columns (bam/NG-8752_HRTT_1_lib...bam) to the sample key that GEO stores in `description` (HRTT_1); alignment is an exact match on that column. grp = the line/training code (LRT, LRTT, HRT, HRTT), consistent with characteristics group labels.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:03"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_matrix.csv",
+          "sha256": "6ed1de90508801141954f91ec342be017e488a6ebe71395d20768e7bbc717a6c",
+          "n_features": 32882,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3402977.0,
+          "median": 1.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Integer fraction 1.0, median 1, max 3.4e6; file header is featureCounts v1.6.4 output against Ensembl Rnor_6.0.91 GTF; GEO data_processing: 'Tab delimited text files containing raw counts'. The paper's own input was BAMs into Cuffdiff, which are not deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:03"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group",
+        "design_column": "grp",
+        "estimand_type": "causal for training contrasts (randomly assigned subset trained within line, S2.1.3.p1); associational for line contrasts (selectively bred lines)",
+        "contrasts": [
+          {
+            "name": "grp_LRTT_vs_LRT",
+            "control": "LRT",
+            "treatment": "LRTT",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HRTT_vs_HRT",
+            "control": "HRT",
+            "treatment": "HRTT",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HRTT_vs_LRTT",
+            "control": "LRTT",
+            "treatment": "HRTT",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_HRT_vs_LRT",
+            "control": "LRT",
+            "treatment": "HRT",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\suitability\\suitability.md",
+          "n_comparisons": 7,
+          "n_analyzable": 7
+        }
+      },
+      "reason": "One 4-level grp factor fitted on all 12 samples, with the paper's pairwise contrasts. Training contrasts are the exercise effect; HRTT vs LRTT and HRT vs LRT compare bred lines and are associational.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:08"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [
+          {
+            "name": "lane",
+            "disposition": "not modelled: completely aliased with grp in all four training-case contrasts (HRT L2x3, HRTT L3x3, LRTT L2x3, LRT L3/L1/L1); a sequencing lane inside one GATC run (4266) with libraries prepared in one batch (consecutive lib IDs 99119-99130), not a library-prep batch; its size is checked in the capacity case where it is balanced; recorded as a caveat"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(grp)",
+          "n_samples": 12,
+          "n_columns": 4,
+          "columns": [
+            "Intercept",
+            "grp_HRTT",
+            "grp_LRT",
+            "grp_LRTT"
+          ],
+          "rank": 4,
+          "full_rank": true,
+          "residual_df": 8,
+          "levels": {
+            "grp": {
+              "HRT": 3,
+              "LRT": 3,
+              "HRTT": 3,
+              "LRTT": 3
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "HRT"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "HRTT"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "LRT"
+              ],
+              "n": 3
+            },
+            {
+              "cell": [
+                "LRTT"
+              ],
+              "n": 3
+            }
+          ],
+          "min_cell_size": 3,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "lane",
+            "n_levels": 3,
+            "status": "crossed",
+            "crosstab": {
+              "HRT": {
+                "L1": 0,
+                "L2": 3,
+                "L3": 0
+              },
+              "HRTT": {
+                "L1": 0,
+                "L2": 0,
+                "L3": 3
+              },
+              "LRT": {
+                "L1": 2,
+                "L2": 0,
+                "L3": 1
+              },
+              "LRTT": {
+                "L1": 0,
+                "L2": 3,
+                "L3": 0
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Independent animals, no subject blocking; all male (S2.1.3.p1); no batch, age or sex column. Lane (parsed from FASTQ names by prep_counts.py into the metadata copy) is completely aliased with grp for every contrast. Under a strict reading this would stop the case, but lane here is a flow-cell lane of one sequencing run, not a separate library preparation, and technical lane-to-lane variation for RNA-seq is small; the paper's own Cuffdiff results carry the same aliasing. I keep the case and label every training contrast with the caveat; the exploratory lane_check execution in GSE155230_capacity (lane balanced 2:1 within HCR and LCR) measures the lane effect directly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:08"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald), joint model on all 12 samples",
+        "formula": "~ grp",
+        "paper_route": {
+          "method": "Cufflinks/Cuffdiff (upper-quartile, bias-corrected) on TopHat2 BAMs",
+          "status": "blocked",
+          "reason": "BAM/FASTQ-level transcript quantification is not deposited in GEO; only featureCounts gene counts are available"
+        },
+        "deviations": [
+          "DESeq2 on featureCounts gene counts instead of Cuffdiff on BAMs; GEO data_processing says normalized counts were obtained with featureCounts and DESeq2, so DESeq2 is the authors' own count route"
+        ]
+      },
+      "reason": "Raw counts support DESeq2; Cuffdiff cannot be reproduced from deposited files.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:08"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "Paper rule (FC > 1.5, FDR/q < 0.05) applied to DESeq2 BH-adjusted p instead of Cuffdiff q."
+      },
+      "reason": "S3.2.p1 and S3.1.p1: fold change > 1.5 and FDR (q) < 0.05; log2(1.5) = 0.5849625.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:08"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "training_joint",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_LRTT_vs_LRT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRTT_vs_HRT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRTT_vs_LRTT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRT_vs_LRT.csv"
+        ],
+        "counts": {
+          "training_joint/grp_LRTT_vs_LRT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 17991,
+              "n_significant": 8,
+              "n_up": 4,
+              "n_down": 4,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 17991,
+              "n_significant": 8,
+              "n_up": 4,
+              "n_down": 4,
+              "deg_sanity": "ok"
+            }
+          },
+          "training_joint/grp_HRTT_vs_HRT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 21300,
+              "n_significant": 2,
+              "n_up": 1,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 21300,
+              "n_significant": 3,
+              "n_up": 2,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          },
+          "training_joint/grp_HRTT_vs_LRTT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 13445,
+              "n_significant": 34,
+              "n_up": 18,
+              "n_down": 16,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13445,
+              "n_significant": 35,
+              "n_up": 18,
+              "n_down": 17,
+              "deg_sanity": "ok"
+            }
+          },
+          "training_joint/grp_HRT_vs_LRT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+              "n_tested": 13856,
+              "n_significant": 20,
+              "n_up": 9,
+              "n_down": 11,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 13856,
+              "n_significant": 23,
+              "n_up": 11,
+              "n_down": 12,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One DESeq2 model on all 12 HRT/LRT-line samples; training effect per line plus the paper's line contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:31"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "training_joint/grp_LRTT_vs_LRT",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_LRTT_vs_LRT\\ora\\DEG_results_grp_LRTT_vs_LRT_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_LRTT_vs_LRT\\ora\\DEG_results_grp_LRTT_vs_LRT_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_LRTT_vs_LRT\\ora\\DEG_results_grp_LRTT_vs_LRT_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_LRTT_vs_LRT\\ora\\DEG_results_grp_LRTT_vs_LRT_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 6 Rat genes (direction=all, padj<0.05, |log2FC|>0.5849625). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Induction Of Bacterial Agglutination (GO:0043152) | padj=2.64e-02 | overlap=1/5 | genes=RNASE2 - Regulation Of Cardiac Muscle Cell Membrane Potential (GO:0086036) | padj=2.64e-02 | overlap=1/6 | genes=EHD3 - Golgi To Lysosome Transport (GO:0090160) | padj=2.64e-02 | overlap=1/11 | genes=EHD3 - Negative Regulation Of Epidermal Growth Factor-Activated Receptor Activity (GO:0007175) | padj=2.64e-02 | overlap=1/12 | genes=ZFYVE28 - Early Endosome To Golgi Transport (GO:0034498) | padj=2.64e-02 | overlap=1/12 | genes=EHD3 - Regulation Of Golgi Organization (GO:1903358) | padj=2.64e-02 | overlap=1/16 | genes=EHD3 - Receptor Recycling (GO:0001881) | padj=2.64e-02 | overlap=1/17 | genes=EHD3 - Golgi To Vacuole Transport (GO:0006896) | padj=2.64e-02 | overlap=1/17 | genes=EHD3 - Negative Regulation Of ERBB Signaling Pathway (GO:1901185) | padj=2.64e-02 | overlap=1/18 | genes=ZFYVE28 - Leukotriene Metabolic Process (GO:0006691) | padj=2.64e-02 | overlap=1/20 | genes=CPA1 ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - Ubiquitin-Protein Transferase Activity (GO:0004842) | padj=3.74e-02 | overlap=2/412 | genes=ASB4;TRIM45 - Metallocarboxypeptidase Activity (GO:0004181) | padj=3.74e-02 | overlap=1/29 | genes=CPA1 - Carboxypeptidase Activity (GO:0004180) | padj=3.74e-02 | overlap=1/38 | genes=CPA1 - P..."
+      },
+      "reason": "paper reports GO terms for low-responder training genes (S3.2.p3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:56:33"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "training_joint/grp_LRTT_vs_LRT",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_LRTT_vs_LRT\\gsea\\DEG_results_grp_LRTT_vs_LRT_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 16507 Rat genes ranked by 'stat'. 50 Hallmark sets tested, 17 significant at FDR q < 0.25. Rat genes matched to mouse Hallmark by symbol: 3846/4291 Hallmark genes present in the ranking. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.71 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.19 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=2.07 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=1.79 | NOM p=0.00e+00 | FDR q=4.59e-03 - HALLMARK_MTORC1_SIGNALING | NES=1.78 | NOM p=0.00e+00 | FDR q=4.20e-03 - HALLMARK_FATTY_ACID_METABOLISM | NES=1.78 | NOM p=0.00e+00 | FDR q=3.93e-03 - HALLMARK_ANGIOGENESIS | NES=1.73 | NOM p=3.57e-03 | FDR q=4.44e-03 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=1.69 | NOM p=0.00e+00 | FDR q=5.73e-03 - HALLMARK_MYC_TARGETS_V2 | NES=1.63 | NOM p=8.45e-03 | FDR q=9.63e-03 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_MITOTIC_SPINDLE | NES=-1.57 | NOM p=2.48e-03 | FDR q=6.65e-02 - HALLMARK_MYOGENESIS | NES=-1.32 | NOM p=2.91e-02 | FDR q=3.84e-01 - HALLMARK_HEME_METABOLISM | NES=-1.23 | NOM p=9.11e-02 | FDR q=5.30e-01 - HALLMARK_P53_PATHWAY | NES=-1.23 | NOM p=8.44e-02 | FDR q=4.07e-01 - HALLMARK_TGF_BETA_SIGNALING | NES=-1.19 | NOM p=1.89e-01 | FDR q=4.24e-01 - HALLMARK_G2M_CHECKPOINT | NES=-1.18 | NOM p=9.64e-02 |..."
+      },
+      "reason": "paper reports GO terms for low-responder training genes (S3.2.p3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0007"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:57:08"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "training_joint/grp_HRTT_vs_HRT",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "execution_error": "Only 2 valid genes after filtering / ID conversion. Enrichment requires at least ~5 genes for meaningful results."
+      },
+      "reason": "paper reports GO terms for high-responder training genes (S3.2.p3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "failed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:57:08"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Rat",
+        "subset": "training_joint/grp_HRTT_vs_HRT",
+        "ortholog_mapping": "rat symbols matched to mouse gene sets by identical symbol (tools/enrichment_tools.py); overlap reported by the tool",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\enrichment_training_joint_grp_HRTT_vs_HRT\\gsea\\DEG_results_grp_HRTT_vs_HRT_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 16507 Rat genes ranked by 'stat'. 50 Hallmark sets tested, 20 significant at FDR q < 0.25. Rat genes matched to mouse Hallmark by symbol: 3846/4291 Hallmark genes present in the ranking. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_KRAS_SIGNALING_DN | NES=1.89 | NOM p=0.00e+00 | FDR q=2.26e-03 - HALLMARK_MYOGENESIS | NES=1.84 | NOM p=0.00e+00 | FDR q=1.88e-03 - HALLMARK_TGF_BETA_SIGNALING | NES=1.39 | NOM p=6.55e-02 | FDR q=1.34e-01 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=1.35 | NOM p=5.15e-02 | FDR q=1.42e-01 - HALLMARK_HEDGEHOG_SIGNALING | NES=1.25 | NOM p=1.35e-01 | FDR q=2.85e-01 - HALLMARK_ESTROGEN_RESPONSE_EARLY | NES=1.23 | NOM p=7.10e-02 | FDR q=2.69e-01 - HALLMARK_MITOTIC_SPINDLE | NES=1.20 | NOM p=7.26e-02 | FDR q=2.79e-01 - HALLMARK_P53_PATHWAY | NES=1.19 | NOM p=1.15e-01 | FDR q=2.71e-01 - HALLMARK_WNT_BETA_CATENIN_SIGNALING | NES=1.13 | NOM p=2.61e-01 | FDR q=3.73e-01 - HALLMARK_ANDROGEN_RESPONSE | NES=1.05 | NOM p=3.48e-01 | FDR q=5.65e-01 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.74 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.02 | NOM p=0.00e+00 | FDR q=1.20e-03 - HALLMARK_FATTY_ACID_METABOLISM | NES=-1.98 | NOM p=0.00e+00 | FDR q=8.02e-04 - HALLMARK_E2F_TARGETS | NES=-1.86 | NOM p=0.00e+00 | FDR q=2.11e-03 - HALLMARK_MYC_TARGETS_V1 | NES=-1.81 | NOM p=0.00e+00 | FDR q=3.37e-03 - HALLMARK_PEROXISOME | NES=-1.80 | NOM p=0.00e+00 | FDR q=3.21e-03 - HALL..."
+      },
+      "reason": "paper reports GO terms for high-responder training genes (S3.2.p3)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:57:11"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "Trained vs untrained are different animals (n=3 each); training effect is between-animal.",
+          "Sequencing lane is completely aliased with group in every training contrast (HRT/LRTT lane 2, HRTT lane 3, LRT lanes 1/3) and could not be modelled; see lane_check in GSE155230_capacity for the size of the lane effect.",
+          "Paper counts for the training contrasts come from the authors' deposited Cuffdiff lists, not from the article text.",
+          "Lane check (capacity case, L3 vs L1, ~grp+lane): 36 lane DEGs. Overlap with training-case DEG sets is 0 (LRTT vs LRT), 0 (HRTT vs HRT), 1 (HRTT vs LRTT), 1 (HRT vs LRT), but lane-DEG log2FC correlate with the lane effect at r=0.59/0.41/-0.47/-0.17 in those contrasts, so a lane or processing-order contribution cannot be excluded.",
+          "Paper-named gene directions in HRTT vs LRTT agree with S3.2.p1 (Sln, Adcy1, Kcna10, Lgi3 up; Rcan3, Wnt16, Vat1l, Myh6 down; Per1/Bhlhe40/Dbp higher and Nfil3 lower in LRTT); only Lgi3 passes padj<0.05."
+        ],
+        "results": {
+          "training_joint/grp_LRTT_vs_LRT": {
+            "n_deg": 8,
+            "up": 4,
+            "down": 4,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 8
+          },
+          "training_joint/grp_HRTT_vs_HRT": {
+            "n_deg": 2,
+            "up": 1,
+            "down": 1,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 3
+          },
+          "training_joint/grp_HRTT_vs_LRTT": {
+            "n_deg": 34,
+            "up": 18,
+            "down": 16,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 35
+          },
+          "training_joint/grp_HRT_vs_LRT": {
+            "n_deg": 20,
+            "up": 9,
+            "down": 11,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.584963",
+            "audit_n": 23
+          }
+        },
+        "paper_counts": {
+          "training_joint/grp_LRTT_vs_LRT": 255,
+          "training_joint/grp_HRTT_vs_HRT": 90,
+          "training_joint/grp_HRTT_vs_LRTT": 255,
+          "training_joint/grp_HRT_vs_LRT": 234
+        },
+        "comparison": {
+          "training_joint/grp_LRTT_vs_LRT": {
+            "ours": 8,
+            "paper": 255
+          },
+          "training_joint/grp_HRTT_vs_HRT": {
+            "ours": 2,
+            "paper": 90
+          },
+          "training_joint/grp_HRTT_vs_LRTT": {
+            "ours": 34,
+            "paper": 255
+          },
+          "training_joint/grp_HRT_vs_LRT": {
+            "ours": 20,
+            "paper": 234
+          }
+        },
+        "paper_gene_check": {
+          "training_joint/grp_HRTT_vs_LRTT": {
+            "Sln": {
+              "baseMean": 385.2009,
+              "log2FoldChange": 3.1333,
+              "padj": 0.942,
+              "pvalue": 0.0971
+            },
+            "Adcy1": {
+              "baseMean": 23.7677,
+              "log2FoldChange": 1.9811,
+              "padj": 0.379,
+              "pvalue": 0.00446
+            },
+            "Kcna10": {
+              "baseMean": 66.6936,
+              "log2FoldChange": 3.3597,
+              "padj": 0.0815,
+              "pvalue": 0.000285
+            },
+            "Lgi3": {
+              "baseMean": 144.4982,
+              "log2FoldChange": 3.1818,
+              "padj": 0.0322,
+              "pvalue": 6.71e-05
+            },
+            "Rcan3": {
+              "baseMean": 26.5439,
+              "log2FoldChange": -0.1043,
+              "padj": 0.997,
+              "pvalue": 0.798
+            },
+            "Wnt16": {
+              "baseMean": 74.4383,
+              "log2FoldChange": -2.8534,
+              "padj": 0.997,
+              "pvalue": 0.292
+            },
+            "Vat1l": {
+              "baseMean": 13.7381,
+              "log2FoldChange": -2.7247,
+              "padj": 0.699,
+              "pvalue": 0.0238
+            },
+            "Myh6": {
+              "baseMean": 379.0416,
+              "log2FoldChange": -3.9623,
+              "padj": 0.761,
+              "pvalue": 0.033
+            },
+            "Per1": {
+              "baseMean": 438.6285,
+              "log2FoldChange": -0.8055,
+              "padj": 0.997,
+              "pvalue": 0.196
+            },
+            "Bhlhe40": {
+              "baseMean": 4194.7913,
+              "log2FoldChange": -0.881,
+              "padj": 0.378,
+              "pvalue": 0.00423
+            },
+            "Dbp": {
+              "baseMean": 1825.3688,
+              "log2FoldChange": -1.689,
+              "padj": 0.592,
+              "pvalue": 0.0134
+            },
+            "Nfil3": {
+              "baseMean": 1434.9168,
+              "log2FoldChange": 0.6682,
+              "padj": 0.716,
+              "pvalue": 0.0263
+            },
+            "Vwa7": {
+              "baseMean": 506.0959,
+              "log2FoldChange": -0.5668,
+              "padj": 0.829,
+              "pvalue": 0.0481
+            }
+          },
+          "training_joint/grp_HRTT_vs_HRT": {
+            "Sln": {
+              "baseMean": 385.2009,
+              "log2FoldChange": 4.3654,
+              "padj": 1.0,
+              "pvalue": 0.0209
+            }
+          }
+        }
+      },
+      "reason": "Paper's Cuffdiff route is blocked; DESeq2 runs as a declared deviation with the paper threshold. Gene directions per S3.2.p1: Sln, Adcy1, Kcna10, Lgi3 up in HRTT; Rcan3, Wnt16, Vat1l, Myh6 up in LRTT; Per1/Bhlhe40/Dbp induced and Nfil3 repressed in the low-response signature.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:57:11"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "291cac0639eed86663ed9b2fe7eceecde50e3c85afe40d89ebe28aa27fdc3c8f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "785d4fba9283812c1d7bb0bac0d2f7d44c1a71e050b23300f75c9bd1f5622764",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6ed1de90508801141954f91ec342be017e488a6ebe71395d20768e7bbc717a6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5fc6815b484b74aa4c51ae62e60429a854c5d04e90202117bcbda49c0d1057db",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9dcf39430ea3d326179c635dce0ce5daf5ecb73cb6cfcf5d5036cb9cbdeb109b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6f5678898170e56c98f79298b0b8bc6bf9138444b81b6f4edac236ef76b6bee1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_LRTT_vs_LRT.csv",
+      "role": "deg_training_joint/grp_LRTT_vs_LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3d8dc7db0f8c865a09e2e24c0c7f69ea9cfbedf0092cd62a1da0647dccd4a26a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRTT_vs_HRT.csv",
+      "role": "deg_training_joint/grp_HRTT_vs_HRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fc1362e8e7496bc6c9616ab9d564a0b2902088c98f8b9ac100bae468492273de",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRTT_vs_LRTT.csv",
+      "role": "deg_training_joint/grp_HRTT_vs_LRTT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e2f4fbcdd69845b6e0d60823b326f3af26a874751629a852a9644657509ea8d0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\results\\training_joint\\DEG_results_grp_HRT_vs_LRT.csv",
+      "role": "deg_training_joint/grp_HRT_vs_LRT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a2153a93265dafca3d159da4296a9173335cb90ee036605b401b26b05cb5ba83",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "9ee6b5bf6d0e15c9ffc04cca4a63664cb6ab86e48f759bf82da35177c35f4c01",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

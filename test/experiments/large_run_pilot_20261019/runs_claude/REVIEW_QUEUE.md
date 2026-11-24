@@ -504,3 +504,8 @@ One section per case; newest last.
 
 - policy: DEG counts are well above the paper's (4256 vs 2617, 1487 vs 412) with a declared approximate gene filter; whether to re-run with a stricter filter / robust=FALSE as a sensitivity analysis is an open policy question, not an error.
 - policy: The Ex-HFD Post vs Pre contrast mixes HFD and exercise; the exercise-specific test (interaction) found only 2 genes. The paper's own estimand is the within-group comparison, so the primary is consistent with it.
+
+## PMID33193103 / GSE155230_training (2026-11-24)
+
+- policy: Lane is completely disjoint between arms in all four training contrasts; the case was kept as primary with a caveat instead of stopped, and the covariance gate says 'not_required'. Decide whether single-run lane aliasing needs a stop or only a label.
+- policy: Paper is silent on joint vs pairwise fits and the applied counts are far below the paper's; decide whether a pairwise sensitivity fit should be added.

@@ -1,0 +1,380 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID33193103",
+  "subject_id": "GSE155230_training",
+  "created_at": "2026-11-24T04:52:49",
+  "finished_at": "2026-11-24T04:52:57",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC7649134.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC7649134.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T04:52:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "baba1fd25ea73861d124eef3e670e527ec77b2e10df03f918199d53a8a0cd786",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE155230_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE155230\\GSE155230_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:52:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0a24b74d00c995959af83c3a245d4d54e38d40163ecc3952d499d19bc14a266f",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_counts.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\prep_counts.py",
+      "locator": null,
+      "captured_at": "2026-11-24T04:52:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "695eb5fde0f365b62187d99c3eeba1bca78cf0749a85da205af6ef10affc3850",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE155230_lrt_hrt_counts_clean.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\GSE155230_lrt_hrt_counts_clean.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:52:49",
+      "sha256": null,
+      "attributes": {
+        "sha256": "56fdbda2c8c032c2ecddaf6c510f613b2aa7d571015276398628cfd6de3f7798",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE155230"
+        ],
+        "assay": "bulk RNA-seq (Illumina HiSeq 2500, 1x50 bp), rat gastrocnemius",
+        "primary_estimand": "Effect of 8-week treadmill endurance training on gastrocnemius gene expression within each selectively bred trainability line (LRTT vs untrained LRT; HRTT vs untrained HRT), plus the paper's Figure 2 line difference in the trained state (HRTT vs LRTT)",
+        "sample_inclusion": "Generation-15 male HRT/LRT rats; n=3 untrained (HRT, LRT) and n=3 trained (HRTT, LRTT) per line, separate animals (S2.1.3.p1). HCR/LCR samples belong to a separate intrinsic-capacity comparison (case GSE155230_capacity).",
+        "factors": {
+          "line": [
+            "LRT (low responder)",
+            "HRT (high responder)"
+          ],
+          "training": [
+            "untrained",
+            "8-wk trained"
+          ]
+        },
+        "planned_contrasts": [
+          "HRTT vs LRTT (S3.2.p1, Fig 2C; paper: 255 DEGs, 68 up in HRTT, 187 down)",
+          "LRTT vs LRT, trained vs untrained low responders (S3.2.p3, Supp Fig 2G; deposited GSE155230_lrtt_lrt_deg: 255 DEGs, 174 up / 81 down)",
+          "HRTT vs HRT, trained vs untrained high responders (S3.2.p3, Supp Fig 2G; deposited GSE155230_hrt_hrtt_deg: 90 DEGs, 62 up / 28 down)",
+          "HRT vs LRT untrained baseline (deposited GSE155230_lrt_hrt_deg: 234 DEGs, 64 up / 170 down; used in Fig 4E pre-training comparison)"
+        ],
+        "repeated_measure_unit": "none: trained and untrained rats are different animals (S2.1.3.p1)",
+        "normalization": "Cufflinks upper-quartile normalization, Cuffdiff -b -u (GEO data_processing; S2.3.1.p1)",
+        "paper_method": "TopHat2 -> Cufflinks/Cuffdiff (S2.3.1.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "fold change",
+          "effect_cutoff": 1.5,
+          "effect_cutoff_log2": 0.5849625,
+          "source_locator": "S3.2.p1; S3.1.p1; S2.5.p1"
+        },
+        "paper_results": {
+          "HRTT_vs_LRTT": 255,
+          "LRTT_vs_LRT": 255,
+          "HRTT_vs_HRT": 90,
+          "HRT_vs_LRT": 234,
+          "unique_low_responder_training_genes": 193
+        }
+      },
+      "reason": "S2.1.3.p1 defines four groups of n=3 male rats (untrained LRT/HRT, trained LRTT/HRTT; separate cohorts, not pre/post on the same animals). S3.2.p3 states the exercise-response analysis compares each trained group to its untrained counterpart; this is the within-line training effect, the estimand closest to 'how exercise affects gene expression'. Fig 2C/S3.2.p1 is the headline HRTT vs LRTT contrast (255 DEGs, FC>1.5, FDR<0.05). Exact paper counts for the training contrasts are not stated in the text, so they are taken from the authors' deposited Cuffdiff lists, all of whose rows pass q<0.05 and |log2FC|>log2(1.5) (HRTT/LRTT list reproduces the text's 255 = 68 up / 187 down exactly).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:52:50"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\prep\\GSE155230_lrt_hrt_counts_clean.csv",
+        "owned": true,
+        "checks": [
+          "S6.p1 names GSE155230 as the dataset generated for this study",
+          "GEO series has the 18 samples (HCR/LCR/HRT/LRT/HRTT/LRTT x3) matching S2.1.1.p1 and S2.1.3.p1",
+          "GSE155230_lrt_hrt_counts.tsv.gz contains exactly the 12 HRT/HRTT/LRT/LRTT libraries (NG-8752 project, GATC)",
+          "deposited Cuffdiff lists reproduce the paper's 255 and 434 DEG counts"
+        ],
+        "accession": "GSE155230",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE155230\\GSE155230_metadata.csv"
+      },
+      "reason": "Data availability statement S6.p1; sample titles and group labels match the paper's design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:52:50"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 12,
+        "n_metadata": 18,
+        "coverage": 0.6667,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [
+          "GSM4697795",
+          "GSM4697796",
+          "GSM4697797",
+          "GSM4697798",
+          "GSM4697799",
+          "GSM4697800"
+        ],
+        "excluded_samples": {
+          "GSM4697795": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697796": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697797": "HCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697798": "LCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697799": "LCR sample, not in this matrix; analysed in case GSE155230_capacity",
+          "GSM4697800": "LCR sample, not in this matrix; analysed in case GSE155230_capacity"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "^([A-Z]+)_\\d$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\design_metadata.csv",
+          "sha256": "1d904fe40aeff0f4a44a7773a68b236f5a7bacdbe0630dc623aef901bc6b3ec6",
+          "levels": {
+            "grp": {
+              "HRT": 3,
+              "LRT": 3,
+              "HRTT": 3,
+              "LRTT": 3
+            }
+          }
+        }
+      },
+      "reason": "Prep script renamed BAM-path columns (bam/NG-8752_HRTT_1_lib...bam) to the sample key that GEO stores in `description` (HRTT_1); alignment is an exact match on that column. grp = the line/training code (LRT, LRTT, HRT, HRTT), consistent with characteristics group labels.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:52:50"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_matrix.csv",
+          "sha256": "6ed1de90508801141954f91ec342be017e488a6ebe71395d20768e7bbc717a6c",
+          "n_features": 32882,
+          "n_samples": 12,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 3402977.0,
+          "median": 1.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "Integer fraction 1.0, median 1, max 3.4e6; file header is featureCounts v1.6.4 output against Ensembl Rnor_6.0.91 GTF; GEO data_processing: 'Tab delimited text files containing raw counts'. The paper's own input was BAMs into Cuffdiff, which are not deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:52:50"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "multi-group",
+        "design_column": "grp",
+        "estimand_type": "causal for training contrasts (randomly assigned subset trained within line, S2.1.3.p1); associational for line contrasts (selectively bred lines)",
+        "contrasts": [
+          {
+            "name": "grp_LRTT_vs_LRT",
+            "control": "LRT",
+            "treatment": "LRTT",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HRTT_vs_HRT",
+            "control": "HRT",
+            "treatment": "HRTT",
+            "role": "primary"
+          },
+          {
+            "name": "grp_HRTT_vs_LRTT",
+            "control": "LRTT",
+            "treatment": "HRTT",
+            "role": "secondary"
+          },
+          {
+            "name": "grp_HRT_vs_LRT",
+            "control": "LRT",
+            "treatment": "HRT",
+            "role": "secondary"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\suitability\\suitability.md",
+          "n_comparisons": 7,
+          "n_analyzable": 7
+        }
+      },
+      "reason": "One 4-level grp factor fitted on all 12 samples, with the paper's pairwise contrasts. Training contrasts are the exercise effect; HRTT vs LRTT and HRT vs LRT compare bred lines and are associational.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:52:54"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "291cac0639eed86663ed9b2fe7eceecde50e3c85afe40d89ebe28aa27fdc3c8f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "785d4fba9283812c1d7bb0bac0d2f7d44c1a71e050b23300f75c9bd1f5622764",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6ed1de90508801141954f91ec342be017e488a6ebe71395d20768e7bbc717a6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1d904fe40aeff0f4a44a7773a68b236f5a7bacdbe0630dc623aef901bc6b3ec6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9dcf39430ea3d326179c635dce0ce5daf5ecb73cb6cfcf5d5036cb9cbdeb109b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33193103\\GSE155230_training\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "6f5678898170e56c98f79298b0b8bc6bf9138444b81b6f4edac236ef76b6bee1",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
