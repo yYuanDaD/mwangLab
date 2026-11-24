@@ -119,7 +119,7 @@ def commit(pid, what):
 def do_paper(n, pid, gse):
     prompt = run_py([os.path.join(HERE, "prompt_for.py"), n]).split("\n", 1)[1].strip()
     log(f"start row {n} {pid}")
-    res, sid, mins, toks, err = claude(prompt, "opus")
+    res, sid, mins, toks, err = claude(prompt, "claude-opus-5-5")
     status = field(res, "STATUS") or ("failed" if err else "failed")
     vs = field(res, "VS_PAPER") or res.strip().replace("\n", " ")[:200]
     probs = field(res, "PROBLEMS") or "none"
@@ -132,7 +132,7 @@ def do_paper(n, pid, gse):
         prep = run_py([os.path.join(HERE, "review_paper.py"), "prepare", pid])
         rprompt = "\n".join(l for l in prep.splitlines() if not l.startswith("# ")).strip()
         if "Cases to review" in rprompt:
-            rres, _, rmins, rtoks, _ = claude(rprompt, "sonnet")
+            rres, _, rmins, rtoks, _ = claude(rprompt, "claude-sonnet-5-5")
             with LOCK:
                 rec = run_py([os.path.join(HERE, "review_paper.py"), "record", pid, f"{rmins:.1f}", str(rtoks)])
             review = " ".join(l.strip() for l in rec.splitlines() if ": " in l and "FIX" not in l)[:200]
@@ -142,7 +142,7 @@ def do_paper(n, pid, gse):
                        "not, then update HANDBACK.md:\n\n" + items + "\n\nRun `execute` again if the run changes. "
                        "Same rules as before (no commit/push, no tool code changes). Reply with exactly two lines:\n"
                        "RESOLUTION: applied | rebutted | skipped — <one line>\nVS_PAPER: <updated one line of at most 200 characters>")
-                fres, _, fmins, ftoks, _ = claude(msg, "opus", resume=sid)
+                fres, _, fmins, ftoks, _ = claude(msg, "claude-opus-5-5", resume=sid)
                 resol = field(fres, "RESOLUTION")
                 kind = next((k for k in ("applied", "rebutted", "skipped") if resol.lower().startswith(k)), "skipped")
                 with LOCK:

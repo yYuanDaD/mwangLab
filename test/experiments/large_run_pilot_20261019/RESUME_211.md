@@ -95,3 +95,8 @@ after the full round. The two patches made earlier on 2026-11-17 (rows 112, 114 
 Row 112 stays INVALID after its fix (execution matrix_type text names FPKM); left for the end-of-round summary.
 Quota stop 2026-11-17 ~12:20 local: rows 105-119, 121 recorded (reviews still owed for 119, 121); row 122 then finished and was recorded (review owed); row 120
 was cut off mid-run (resume their subagents with context after the reset, not restart). Next new row: 123.
+
+Round finished 2026-11-24 15:57 local: 211/211 recorded (133 finished, 78 refused; validator 208 VALID, 3 INVALID).
+Rows 157-211 and the 21 abstract-only rows ran through `run_211_driver.py` (one headless session per paper:
+claude-opus-5-5 analysis, claude-sonnet-5-5 review). Tool problems grouped in `runs_claude/PROBLEM_THEMES.md`;
+round summary in the project's Claude Doc "211 篇运动文章分析：整轮汇总". No tool patches until the owner decides.
