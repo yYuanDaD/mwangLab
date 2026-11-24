@@ -1,0 +1,1921 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37486024",
+  "subject_id": "GSE224900",
+  "created_at": "2026-11-24T10:04:51",
+  "finished_at": "2026-11-24T10:10:40",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10652302.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC10652302.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T10:04:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3249670ec88aa51b60581fed6d2e5a99cc283aeb73d3213a6030ff12e4a49630",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE224900_metadata_subject.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_metadata_subject.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:04:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "0b80bab85451b5e955f6f3d319d0548c5b6eedc2748bd42f27cd4a26b1cced4f",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_merge.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\prep_merge.py",
+      "locator": null,
+      "captured_at": "2026-11-24T10:04:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d9d4808499e8c563ee2a136d0d93a1d410c437623b05f60d5bc26cec62efef34",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE224900_merged_counts.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_merged_counts.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T10:04:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "82d62ec34b68a145def6d9fd85a02b122a29e371c157ccb00c2126d72f8b6df9",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE224900"
+        ],
+        "assay": "bulk total RNA-seq (rRNA-depleted), vastus lateralis, older adults (S2.7.p1)",
+        "primary_estimand": "Within-participant change in muscle gene expression with 5 d bed rest (disuse; POST vs PRE) and after 7 d re-ambulation (REC vs PRE), separately in the placebo and metformin arms (S3.4.p1, Fig 5a-d). Physical-activity axis = disuse/reloading, not structured exercise.",
+        "factors": {
+          "time": [
+            "PRE",
+            "POST",
+            "REC"
+          ],
+          "treatment": [
+            "Placebo",
+            "Metformin"
+          ]
+        },
+        "repeated_measure_unit": "participant (biopsies at PRE, DAY1, POST, REC; S2.4.p1)",
+        "inclusion": "fasted biopsies at PRE, POST, REC; N = 9-10/group (Fig 5 legend)",
+        "planned_contrasts": [
+          "Placebo POST vs PRE (S3.4.p1; paper 441 DEGs)",
+          "Metformin POST vs PRE (S3.4.p1; 377)",
+          "Placebo REC vs PRE (S3.4.p1; 3550)",
+          "Metformin REC vs PRE (S3.4.p1; 1386)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.7.p1"
+        },
+        "paper_method": "DESeq2 1.30 via hciR (S2.7.p1); formula not stated",
+        "paper_results": "collagen isoforms highly upregulated in placebo REC (S3.4.p1); CDKN1A, TP53 up in placebo not metformin after bed rest and recovery (S3.5.p1)"
+      },
+      "reason": "S2.7.p1 gives DESeq2 + 5% FDR, no fold-change rule; S3.4.p1 gives the four within-arm DEG counts vs PRE. The paper's activity manipulation is bed-rest disuse followed by re-ambulation; there is no exercise-training arm, so the activity estimand is disuse/reloading within each arm.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:04:51"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_merged_counts.csv.gz",
+        "owned": true,
+        "checks": [
+          "S2.7.p1 and S11.p1 name GSE224900",
+          "GEO contact Drummond lab (senior author)",
+          "timepoint labels PRE/Day1/POST/7d and Placebo/Metformin match the trial design (S2.3.p1)",
+          "10 metformin participants (5F/5M = Table 1) and 9 placebo (paper N=9-10/group)"
+        ],
+        "accession": "GSE224900",
+        "metadata_file": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024/prep/GSE224900_metadata_subject.csv"
+      },
+      "reason": "Both count files (19565R, 20063R sequencing runs) belong to GSE224900 and the paper names it.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:04:51"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "subject_key": "derived in prep_merge.py from consecutive per-participant biopsy blocks; age/sex/treatment constant within each block",
+        "method": "exact:key",
+        "n_aligned": 113,
+        "n_metadata": 113,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM7035214": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035215": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035217": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035220": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035221": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035223": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035226": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035227": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035229": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035232": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035233": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035235": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035238": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035239": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035241": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035244": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035245": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035247": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035250": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035251": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035255": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035256": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035258": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035261": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035262": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035264": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035267": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035268": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035270": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035273": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035274": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035276": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035279": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035280": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035282": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035285": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035286": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035288": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035291": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035292": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035294": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035297": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035298": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035300": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035303": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035304": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035306": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035309": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035310": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035313": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035320": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035323": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035329": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035335": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035337": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035341": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035293": "sex swap: POSTbc labelled F participant 19565_S078 but XIST-absent/chrY-high, while the same participant's PREbc, PREac, Day1, POSTac and 7d biopsies are female",
+          "GSM7035308": "sex swap: PREbc labelled F participant 19565_S096 but male by XIST/chrY, while that block's other 5 biopsies are female",
+          "GSM7035302": "block 19565_S090 inconsistent: PREbc/PREac female but Day1/POSTbc/POSTac/7d male; participant identity of the block cannot be established",
+          "GSM7035305": "block 19565_S090 inconsistent (see 19565X90)",
+          "GSM7035307": "block 19565_S090 inconsistent (see 19565X90)"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "time": {
+              "source": "title",
+              "regex": "^\\S+ (PREbc|PREac|Day1|POSTbc|POSTac|7d)_(?:Con|Met)$",
+              "recode": {
+                "PREbc": "PRE",
+                "POSTbc": "POST",
+                "7d": "REC",
+                "PREac": "PREac",
+                "POSTac": "POSTac",
+                "Day1": "DAY1"
+              }
+            },
+            "trt": {
+              "source": "title",
+              "regex": "_(Con|Met)$",
+              "recode": {
+                "Con": "Pla",
+                "Met": "Met"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\design_metadata.csv",
+          "sha256": "1e86fe077bf2048e87e1fd716fd0149605f9275f9f120e4117df7788b278c871",
+          "levels": {
+            "time": {
+              "REC": 18,
+              "PRE": 17,
+              "POST": 17
+            },
+            "trt": {
+              "Pla": 27,
+              "Met": 25
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (19565X1...) equal the first token of title, written as column `key` by prep_merge.py (two count files merged on identical Ensembl IDs). GEO has no participant ID; prep_merge.py assigns `subject` by sample-number blocks that each start at a PREbc biopsy - every block has one age, one sex and one treatment, giving 9 placebo + 10 metformin participants. Clamp (ac) and Day1 biopsies excluded: the paper's DE uses fasted PRE/POST/REC.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:04:56"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE224900_19565R_counts.txt.gz + GSE224900_20063R_counts.txt.gz merged",
+        "paper_input": "DESeq2 on counts (S2.7.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_matrix.csv",
+          "sha256": "c7b62057f0aa41552273119d995bd16ce279889d209e48e7390862ce6bb1a44e",
+          "n_features": 60664,
+          "n_samples": 52,
+          "annotation_columns_dropped": [
+            "GSM7035214",
+            "GSM7035215",
+            "GSM7035217",
+            "GSM7035220",
+            "GSM7035221",
+            "GSM7035223",
+            "GSM7035226",
+            "GSM7035227",
+            "GSM7035229",
+            "GSM7035232",
+            "GSM7035233",
+            "GSM7035235",
+            "GSM7035238",
+            "GSM7035239",
+            "GSM7035241",
+            "GSM7035244",
+            "GSM7035245",
+            "GSM7035247",
+            "GSM7035250",
+            "GSM7035251",
+            "GSM7035255",
+            "GSM7035256",
+            "GSM7035258",
+            "GSM7035261",
+            "GSM7035262",
+            "GSM7035264",
+            "GSM7035267",
+            "GSM7035268",
+            "GSM7035270",
+            "GSM7035273",
+            "GSM7035274",
+            "GSM7035276",
+            "GSM7035279",
+            "GSM7035280",
+            "GSM7035282",
+            "GSM7035285",
+            "GSM7035286",
+            "GSM7035288",
+            "GSM7035291",
+            "GSM7035292",
+            "GSM7035293",
+            "GSM7035294",
+            "GSM7035297",
+            "GSM7035298",
+            "GSM7035300",
+            "GSM7035302",
+            "GSM7035303",
+            "GSM7035304",
+            "GSM7035305",
+            "GSM7035306",
+            "GSM7035307",
+            "GSM7035308",
+            "GSM7035309",
+            "GSM7035310",
+            "GSM7035313",
+            "GSM7035320",
+            "GSM7035323",
+            "GSM7035329",
+            "GSM7035335",
+            "GSM7035337",
+            "GSM7035341"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 10529500.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integer, median 0, max ~1.2e7; data_processing: STAR two-pass alignment to GRCh38/Ensembl 104 with gene counts; paper used DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:00"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "repeated-measures, within-arm time contrasts",
+        "formula": "~ subject + time (per arm)",
+        "contrasts": [
+          {
+            "name": "time_POST_vs_PRE_trt-Pla",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "primary"
+          },
+          {
+            "name": "time_REC_vs_PRE_trt-Pla",
+            "control": "PRE",
+            "treatment": "REC",
+            "role": "primary"
+          },
+          {
+            "name": "time_POST_vs_PRE_trt-Met",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "secondary"
+          },
+          {
+            "name": "time_REC_vs_PRE_trt-Met",
+            "control": "PRE",
+            "treatment": "REC",
+            "role": "secondary"
+          }
+        ],
+        "estimand_type": "within-subject change; no non-bed-rest control arm",
+        "suitability": {
+          "verdict": "partially_analyzable",
+          "failed": [],
+          "warnings": [
+            "sex"
+          ],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "Placebo arm isolates disuse/re-ambulation (primary); metformin arm reproduces the paper's second set but mixes drug exposure with disuse (secondary). Each arm fitted separately as the paper reports per-arm volcano plots.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:07"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "nested within subject; absorbed by subject block (per-sex fits run as exploratory)"
+          },
+          {
+            "name": "run",
+            "disposition": "sequencing run nested within subject; absorbed by subject block"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 52,
+          "n_columns": 20,
+          "columns": [
+            "Intercept",
+            "time_PRE",
+            "time_REC",
+            "subject_19565_S007",
+            "subject_19565_S013",
+            "subject_19565_S019",
+            "subject_19565_S025",
+            "subject_19565_S031",
+            "subject_19565_S037",
+            "subject_19565_S042",
+            "subject_19565_S048",
+            "subject_19565_S054",
+            "subject_19565_S060",
+            "subject_19565_S066",
+            "subject_19565_S072",
+            "subject_19565_S078",
+            "subject_19565_S084",
+            "subject_19565_S096",
+            "subject_20063_S001",
+            "subject_20063_S007"
+          ],
+          "rank": 20,
+          "full_rank": true,
+          "residual_df": 32,
+          "levels": {
+            "time": {
+              "REC": 18,
+              "PRE": 17,
+              "POST": 17
+            },
+            "subject": {
+              "19565_S001": 3,
+              "19565_S007": 3,
+              "19565_S013": 3,
+              "19565_S019": 3,
+              "19565_S025": 3,
+              "19565_S031": 3,
+              "19565_S037": 3,
+              "19565_S042": 3,
+              "19565_S048": 3,
+              "19565_S054": 3,
+              "19565_S060": 3,
+              "19565_S066": 3,
+              "19565_S072": 3,
+              "19565_S084": 3,
+              "20063_S001": 3,
+              "20063_S007": 3,
+              "19565_S078": 2,
+              "19565_S096": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "POST",
+                "19565_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S007"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S013"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S019"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S025"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S031"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S037"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S042"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S048"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S054"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S060"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S066"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S072"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S084"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "19565_S096"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "20063_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "20063_S007"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S007"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S013"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S019"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S025"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S031"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S037"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S042"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S048"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S054"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S060"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S066"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S072"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S078"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "19565_S084"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "20063_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "20063_S007"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S007"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S013"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S019"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S025"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S031"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S037"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S042"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S048"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S054"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S060"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S066"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S072"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S078"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S084"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "19565_S096"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "20063_S001"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "20063_S007"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "run",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "19565": 15,
+                "20063": 2
+              },
+              "PRE": {
+                "19565": 15,
+                "20063": 2
+              },
+              "REC": {
+                "19565": 16,
+                "20063": 2
+              }
+            }
+          },
+          {
+            "column": "sex",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "F": 9,
+                "M": 8
+              },
+              "PRE": {
+                "F": 9,
+                "M": 8
+              },
+              "REC": {
+                "F": 10,
+                "M": 8
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Repeated biopsies per participant -> subject block. Sex and sequencing run are constant within subject, so the subject term absorbs them.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:07"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "raw counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ subject + time",
+        "paper_route": {
+          "method": "DESeq2 1.30 (hciR)",
+          "status": "reproduced_approximately"
+        },
+        "deviations": [
+          "pydeseq2 instead of R DESeq2 1.30/hciR; hciR default filtering and formula not stated in the paper",
+          "subject derived from sample-number blocks"
+        ]
+      },
+      "reason": "Raw counts support the paper's DESeq2 route; one model per arm with all three timepoints and subject blocking.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:07"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "S2.7.p1: 5% FDR, no fold-change cutoff; Fig 5 legend: adjusted p < 0.05.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:07"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "pla",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 27,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla\\DEG_results_time_REC_vs_PRE_trt-Pla.csv"
+        ],
+        "counts": {
+          "pla/time_POST_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17577,
+              "n_significant": 1872,
+              "n_up": 814,
+              "n_down": 1058,
+              "deg_sanity": "ok"
+            }
+          },
+          "pla/time_REC_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 22464,
+              "n_significant": 5764,
+              "n_up": 3141,
+              "n_down": 2623,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "placebo arm: disuse and re-ambulation vs PRE, ~ subject + time",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:05:46"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "met",
+        "role": "secondary",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 25,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met\\DEG_results_time_REC_vs_PRE_trt-Met.csv"
+        ],
+        "counts": {
+          "met/time_POST_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18024,
+              "n_significant": 276,
+              "n_up": 93,
+              "n_down": 183,
+              "deg_sanity": "ok"
+            }
+          },
+          "met/time_REC_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 17189,
+              "n_significant": 2668,
+              "n_up": 1365,
+              "n_down": 1303,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "metformin arm, same model",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:06:20"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "pla_unpaired",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 27,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_unpaired\\input\\matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_unpaired\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_unpaired\\DEG_results_time_REC_vs_PRE_trt-Pla.csv"
+        ],
+        "counts": {
+          "pla_unpaired/time_POST_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 19206,
+              "n_significant": 371,
+              "n_up": 195,
+              "n_down": 176,
+              "deg_sanity": "ok"
+            }
+          },
+          "pla_unpaired/time_REC_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 21649,
+              "n_significant": 2740,
+              "n_up": 1807,
+              "n_down": 933,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "~ time without subject: tests whether the paper's (unstated) hciR model ignored pairing",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:06:53"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "met_unpaired",
+        "role": "sensitivity",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 25,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_unpaired\\input\\matrix.csv",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_unpaired\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_unpaired\\DEG_results_time_REC_vs_PRE_trt-Met.csv"
+        ],
+        "counts": {
+          "met_unpaired/time_POST_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18023,
+              "n_significant": 158,
+              "n_up": 119,
+              "n_down": 39,
+              "deg_sanity": "ok"
+            }
+          },
+          "met_unpaired/time_REC_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 20529,
+              "n_significant": 602,
+              "n_up": 417,
+              "n_down": 185,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "~ time without subject: tests whether the paper's (unstated) hciR model ignored pairing",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:07:23"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "pla_F",
+        "role": "exploratory",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 15,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_F\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_F\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_F\\DEG_results_time_REC_vs_PRE_trt-Pla.csv"
+        ],
+        "counts": {
+          "pla_F/time_POST_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18287,
+              "n_significant": 1216,
+              "n_up": 418,
+              "n_down": 798,
+              "deg_sanity": "ok"
+            }
+          },
+          "pla_F/time_REC_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18287,
+              "n_significant": 1152,
+              "n_up": 601,
+              "n_down": 551,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "per-sex exploratory fit (Pla, sex F); paper pooled sexes",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:07:52"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "pla_M",
+        "role": "exploratory",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_M\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_M\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_M\\DEG_results_time_REC_vs_PRE_trt-Pla.csv"
+        ],
+        "counts": {
+          "pla_M/time_POST_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 16395,
+              "n_significant": 51,
+              "n_up": 22,
+              "n_down": 29,
+              "deg_sanity": "ok"
+            }
+          },
+          "pla_M/time_REC_vs_PRE_trt-Pla": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 19300,
+              "n_significant": 3465,
+              "n_up": 2036,
+              "n_down": 1429,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "per-sex exploratory fit (Pla, sex M); paper pooled sexes",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:08:19"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "met_F",
+        "role": "exploratory",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 13,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_F\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_F\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_F\\DEG_results_time_REC_vs_PRE_trt-Met.csv"
+        ],
+        "counts": {
+          "met_F/time_POST_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 40947,
+              "n_significant": 1,
+              "n_up": 1,
+              "n_down": 0,
+              "deg_sanity": "ok"
+            }
+          },
+          "met_F/time_REC_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 40947,
+              "n_significant": 3,
+              "n_up": 2,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "per-sex exploratory fit (Met, sex F); paper pooled sexes",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:08:50"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "met_M",
+        "role": "exploratory",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 12,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_M\\input\\matrix.csv",
+        "formula": "~ subject + cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_M\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_M\\DEG_results_time_REC_vs_PRE_trt-Met.csv"
+        ],
+        "counts": {
+          "met_M/time_POST_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14644,
+              "n_significant": 440,
+              "n_up": 114,
+              "n_down": 326,
+              "deg_sanity": "ok"
+            }
+          },
+          "met_M/time_REC_vs_PRE_trt-Met": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 18383,
+              "n_significant": 3306,
+              "n_up": 1794,
+              "n_down": 1512,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "per-sex exploratory fit (Met, sex M); paper pooled sexes",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:09:16"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "pla/time_REC_vs_PRE_trt-Pla",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\enrichment_pla_time_REC_vs_PRE_trt-Pla\\gsea\\DEG_results_time_REC_vs_PRE_trt-Pla_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 32131 Human genes ranked by 'stat'. 50 Hallmark sets tested, 44 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.74 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.21 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.16 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.02 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.02 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANGIOGENESIS | NES=2.02 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.19 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.36 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.16 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.09 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=-1.75 | NOM p=0.00e+00 | FDR q=1.15e-03 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.64 | NOM p=0.00e+00 | FDR q=2.78e-03 - HALLMARK_PEROXISOME | NES=-1.46 | NOM p=8.38e-03 | FDR q=1.28e-02 - H..."
+      },
+      "reason": "paper ran fgsea (KEGG/Reactome) on recovery; Hallmark GSEA as a check of collagen/TGF-beta direction",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:10:28"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "met/time_REC_vs_PRE_trt-Met",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\enrichment_met_time_REC_vs_PRE_trt-Met\\gsea\\DEG_results_time_REC_vs_PRE_trt-Met_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 32817 Human genes ranked by 'stat'. 50 Hallmark sets tested, 43 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.75 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.39 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.36 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.34 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.30 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.29 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.15 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANGIOGENESIS | NES=2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.49 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.08 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.06 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=-1.60 | NOM p=2.38e-03 | FDR q=5.05e-03 - HALLMARK_PROTEIN_SECRETION | NES=-1.60 | NOM p=5.32e-03 | FDR q=4.21e-03 - HALLMARK_PEROXISOME | NES=-1.52 | NOM p=2.58e-03 | FDR q=8.96e-03 - HALL..."
+      },
+      "reason": "same for metformin arm",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0010"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:10:40"
+    },
+    {
+      "decision_id": "DEC-0019",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Activity axis is bed-rest disuse and re-ambulation, not exercise training.",
+          "No time-matched non-bed-rest control: time contrasts include any time/season effect; metformin-arm contrasts also include drug exposure (POST) or withdrawal (REC).",
+          "Participant IDs were derived from sample-number blocks, not given in GEO.",
+          "Expression-inferred sex contradicts GEO labels in 7 metformin-arm biopsies: 5 biopsies excluded, one block relabelled F; the metformin arm therefore differs from the paper's sample set (paper presumably used the labels as deposited)."
+        ],
+        "results": {
+          "pla/time_POST_vs_PRE_trt-Pla": {
+            "n_deg": 1872,
+            "up": 814,
+            "down": 1058,
+            "rule": "padj < 0.05"
+          },
+          "pla/time_REC_vs_PRE_trt-Pla": {
+            "n_deg": 5764,
+            "up": 3141,
+            "down": 2623,
+            "rule": "padj < 0.05"
+          },
+          "met/time_POST_vs_PRE_trt-Met": {
+            "n_deg": 276,
+            "up": 93,
+            "down": 183,
+            "rule": "padj < 0.05"
+          },
+          "met/time_REC_vs_PRE_trt-Met": {
+            "n_deg": 2668,
+            "up": 1365,
+            "down": 1303,
+            "rule": "padj < 0.05"
+          },
+          "pla_unpaired/time_POST_vs_PRE_trt-Pla": {
+            "n_deg": 371,
+            "up": 195,
+            "down": 176,
+            "rule": "padj < 0.05"
+          },
+          "pla_unpaired/time_REC_vs_PRE_trt-Pla": {
+            "n_deg": 2740,
+            "up": 1807,
+            "down": 933,
+            "rule": "padj < 0.05"
+          },
+          "met_unpaired/time_POST_vs_PRE_trt-Met": {
+            "n_deg": 158,
+            "up": 119,
+            "down": 39,
+            "rule": "padj < 0.05"
+          },
+          "met_unpaired/time_REC_vs_PRE_trt-Met": {
+            "n_deg": 602,
+            "up": 417,
+            "down": 185,
+            "rule": "padj < 0.05"
+          },
+          "pla_F/time_POST_vs_PRE_trt-Pla": {
+            "n_deg": 1216,
+            "up": 418,
+            "down": 798,
+            "rule": "padj < 0.05"
+          },
+          "pla_F/time_REC_vs_PRE_trt-Pla": {
+            "n_deg": 1152,
+            "up": 601,
+            "down": 551,
+            "rule": "padj < 0.05"
+          },
+          "pla_M/time_POST_vs_PRE_trt-Pla": {
+            "n_deg": 51,
+            "up": 22,
+            "down": 29,
+            "rule": "padj < 0.05"
+          },
+          "pla_M/time_REC_vs_PRE_trt-Pla": {
+            "n_deg": 3465,
+            "up": 2036,
+            "down": 1429,
+            "rule": "padj < 0.05"
+          },
+          "met_F/time_POST_vs_PRE_trt-Met": {
+            "n_deg": 1,
+            "up": 1,
+            "down": 0,
+            "rule": "padj < 0.05"
+          },
+          "met_F/time_REC_vs_PRE_trt-Met": {
+            "n_deg": 3,
+            "up": 2,
+            "down": 1,
+            "rule": "padj < 0.05"
+          },
+          "met_M/time_POST_vs_PRE_trt-Met": {
+            "n_deg": 440,
+            "up": 114,
+            "down": 326,
+            "rule": "padj < 0.05"
+          },
+          "met_M/time_REC_vs_PRE_trt-Met": {
+            "n_deg": 3306,
+            "up": 1794,
+            "down": 1512,
+            "rule": "padj < 0.05"
+          }
+        },
+        "paper_counts": {
+          "pla/time_POST_vs_PRE_trt-Pla": 441,
+          "pla/time_REC_vs_PRE_trt-Pla": 3550,
+          "met/time_POST_vs_PRE_trt-Met": 377,
+          "met/time_REC_vs_PRE_trt-Met": 1386
+        },
+        "comparison": {
+          "pla/time_POST_vs_PRE_trt-Pla": {
+            "ours": 1872,
+            "paper": 441
+          },
+          "pla/time_REC_vs_PRE_trt-Pla": {
+            "ours": 5764,
+            "paper": 3550
+          },
+          "met/time_POST_vs_PRE_trt-Met": {
+            "ours": 276,
+            "paper": 377
+          },
+          "met/time_REC_vs_PRE_trt-Met": {
+            "ours": 2668,
+            "paper": 1386
+          }
+        },
+        "paper_gene_check": {
+          "pla/time_REC_vs_PRE_trt-Pla": {
+            "COL1A1": {
+              "baseMean": 14091.6774,
+              "log2FoldChange": 5.5199,
+              "padj": 6.49e-16,
+              "pvalue": 1.44e-19
+            },
+            "COL3A1": {
+              "baseMean": 15128.7725,
+              "log2FoldChange": 4.1367,
+              "padj": 3.25e-13,
+              "pvalue": 1.16e-16
+            },
+            "COL1A2": {
+              "baseMean": 8641.243,
+              "log2FoldChange": 3.349,
+              "padj": 4.06e-11,
+              "pvalue": 3.26e-14
+            },
+            "CDKN1A": {
+              "baseMean": 282.5536,
+              "log2FoldChange": 2.1888,
+              "padj": 0.00184,
+              "pvalue": 0.000157
+            },
+            "TP53": {
+              "baseMean": 136.2119,
+              "log2FoldChange": 0.8057,
+              "padj": 0.0021,
+              "pvalue": 0.000189
+            }
+          },
+          "pla/time_POST_vs_PRE_trt-Pla": {
+            "CDKN1A": {
+              "baseMean": 282.5536,
+              "log2FoldChange": 2.8631,
+              "padj": 0.000112,
+              "pvalue": 7.59e-07
+            },
+            "TP53": {
+              "baseMean": 136.2119,
+              "log2FoldChange": 0.9309,
+              "padj": 0.000985,
+              "pvalue": 1.62e-05
+            }
+          }
+        }
+      },
+      "reason": "All four contrasts follow the paper's DESeq2 + FDR 5% route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:10:40"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58a345c3da484e4f801e3fbfb1e640c6ab17d4abb4a42e87e420f377bb6dacca",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "137604b6aac716a630c7359ee0329930bebad4e571ac28d9efef4d55835e40cd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c7b62057f0aa41552273119d995bd16ce279889d209e48e7390862ce6bb1a44e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "1e86fe077bf2048e87e1fd716fd0149605f9275f9f120e4117df7788b278c871",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ca1fdccbd2324f84aa316ffdb1e15c2f860257b51e75caf2bd622431f887845b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "eb584d7d90c7751e38bc3ea68b4a81f3fe44d54483639ccbbdcf6857b8b1dd84",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla/time_POST_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fee6d68f228f89877c52640889614e3c1b5b03927379b974237109fc72c88ae1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla\\DEG_results_time_REC_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla/time_REC_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "868198b728f9de3c2b3398bb180d13735649fee658547c475946f90e2e186c06",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+      "role": "deg_met/time_POST_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d852bd943eed6afdb821712ed4c0129de01ef4d29660891d12470d8d5f648366",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met\\DEG_results_time_REC_vs_PRE_trt-Met.csv",
+      "role": "deg_met/time_REC_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ff43ae924aadb94bb5ef2495faf67556786c8ace9a25b52ade17ed6d4ba544b0",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_unpaired\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_unpaired/time_POST_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0b47c514d5743d082c2efa2d77b4a2ff41717371ec8d20657687793bad3ba7ed",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_unpaired\\DEG_results_time_REC_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_unpaired/time_REC_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "946b5de4e60b3d3a970af4513e5645ac3c2dc73ac49e479edc610c96892945b1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_unpaired\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+      "role": "deg_met_unpaired/time_POST_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7a045ed1620f177b74e263bea42909920b56d7284205c472b7ed028f2daefca2",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_unpaired\\DEG_results_time_REC_vs_PRE_trt-Met.csv",
+      "role": "deg_met_unpaired/time_REC_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "043d54001546fe50018f5b2cacbf37fe39215e41beade603861380c3e37ecde6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_F\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_F/time_POST_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "09dfe8fa2257f36b362bbf5d5cb727a599e1510c7e598d84dad7bdab82785730",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_F\\DEG_results_time_REC_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_F/time_REC_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4d1973dcbe28dcdf8a96815d2360d50c79cba449bbe7492ac7ea5fbc18348d9a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_M\\DEG_results_time_POST_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_M/time_POST_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "bf212ade4f365ba3e9c5695547d0b327be06f79e6caf782615fd0bd151881a72",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\pla_M\\DEG_results_time_REC_vs_PRE_trt-Pla.csv",
+      "role": "deg_pla_M/time_REC_vs_PRE_trt-Pla",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "992621806b7eb164770522b836d7b1ca9516d644e03444dea22f2352426b67b3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0019",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_F\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+      "role": "deg_met_F/time_POST_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "9c913f92aeb9a7b15d36f93b13ba2c438e136f79aefd958b44afd2a08b44ca72",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0020",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_F\\DEG_results_time_REC_vs_PRE_trt-Met.csv",
+      "role": "deg_met_F/time_REC_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "15afe96da632d8e47703fc13427f86d1e01843b782e9538fe3476a11c12c48bd",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0021",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_M\\DEG_results_time_POST_vs_PRE_trt-Met.csv",
+      "role": "deg_met_M/time_POST_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0f92f3364291ca91e0f08a52852ebfc147d93caa7063927e20cfef77c0ef1ae6",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0022",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\results\\met_M\\DEG_results_time_REC_vs_PRE_trt-Met.csv",
+      "role": "deg_met_M/time_REC_vs_PRE_trt-Met",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fd0c0881c25dceb4ef5a6df400d106ce28cb36e36dfdc22b85d276bce3aaa343",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0023",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "16c3368ce535bab73645d2a0dc564ded0cea8073b53c66f88de37ed583c6df0b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

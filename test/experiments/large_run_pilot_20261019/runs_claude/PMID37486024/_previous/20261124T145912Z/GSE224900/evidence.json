@@ -1,0 +1,437 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37486024",
+  "subject_id": "GSE224900",
+  "created_at": "2026-11-24T09:57:19",
+  "finished_at": "2026-11-24T09:57:34",
+  "status": "decided_not_executed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10652302.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC10652302.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3249670ec88aa51b60581fed6d2e5a99cc283aeb73d3213a6030ff12e4a49630",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE224900_metadata_subject.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_metadata_subject.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "634fc8000bd31ca08ab32e0252a745a6949ff6b2dc43243901e47c1a9973660c",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "user",
+      "label": "prep script prep_merge.py",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\prep_merge.py",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3cbf3bb3febe5e1c8921243d0d4cd44d5165e0b70f9b917e6658dab4e01315f1",
+        "kind": "user"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE224900_merged_counts.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_merged_counts.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "079eb6900be6c6b8db03136e885a20dad1dbfc52e081160935a9091bc279cc94",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE224900"
+        ],
+        "assay": "bulk total RNA-seq (rRNA-depleted), vastus lateralis, older adults (S2.7.p1)",
+        "primary_estimand": "Within-participant change in muscle gene expression with 5 d bed rest (disuse; POST vs PRE) and after 7 d re-ambulation (REC vs PRE), separately in the placebo and metformin arms (S3.4.p1, Fig 5a-d). Physical-activity axis = disuse/reloading, not structured exercise.",
+        "factors": {
+          "time": [
+            "PRE",
+            "POST",
+            "REC"
+          ],
+          "treatment": [
+            "Placebo",
+            "Metformin"
+          ]
+        },
+        "repeated_measure_unit": "participant (biopsies at PRE, DAY1, POST, REC; S2.4.p1)",
+        "inclusion": "fasted biopsies at PRE, POST, REC; N = 9-10/group (Fig 5 legend)",
+        "planned_contrasts": [
+          "Placebo POST vs PRE (S3.4.p1; paper 441 DEGs)",
+          "Metformin POST vs PRE (S3.4.p1; 377)",
+          "Placebo REC vs PRE (S3.4.p1; 3550)",
+          "Metformin REC vs PRE (S3.4.p1; 1386)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.7.p1"
+        },
+        "paper_method": "DESeq2 1.30 via hciR (S2.7.p1); formula not stated",
+        "paper_results": "collagen isoforms highly upregulated in placebo REC (S3.4.p1); CDKN1A, TP53 up in placebo not metformin after bed rest and recovery (S3.5.p1)"
+      },
+      "reason": "S2.7.p1 gives DESeq2 + 5% FDR, no fold-change rule; S3.4.p1 gives the four within-arm DEG counts vs PRE. The paper's activity manipulation is bed-rest disuse followed by re-ambulation; there is no exercise-training arm, so the activity estimand is disuse/reloading within each arm.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:19"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\prep\\GSE224900_merged_counts.csv.gz",
+        "owned": true,
+        "checks": [
+          "S2.7.p1 and S11.p1 name GSE224900",
+          "GEO contact Drummond lab (senior author)",
+          "timepoint labels PRE/Day1/POST/7d and Placebo/Metformin match the trial design (S2.3.p1)",
+          "10 metformin participants (5F/5M = Table 1) and 9 placebo (paper N=9-10/group)"
+        ],
+        "accession": "GSE224900",
+        "metadata_file": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024/prep/GSE224900_metadata_subject.csv"
+      },
+      "reason": "Both count files (19565R, 20063R sequencing runs) belong to GSE224900 and the paper names it.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0004",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:19"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "subject_key": "derived in prep_merge.py from consecutive per-participant biopsy blocks; age/sex/treatment constant within each block",
+        "method": "exact:key",
+        "n_aligned": 113,
+        "n_metadata": 113,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {
+          "GSM7035214": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035215": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035217": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035220": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035221": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035223": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035226": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035227": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035229": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035232": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035233": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035235": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035238": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035239": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035241": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035244": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035245": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035247": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035250": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035251": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035255": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035256": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035258": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035261": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035262": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035264": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035267": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035268": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035270": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035273": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035274": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035276": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035279": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035280": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035282": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035285": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035286": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035288": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035291": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035292": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035294": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035297": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035298": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035300": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035303": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035304": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035306": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035309": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035310": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035313": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035320": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035323": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035329": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035335": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+          "GSM7035337": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+          "GSM7035341": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)"
+        },
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_metadata_kept.csv",
+          "columns": {
+            "time": {
+              "source": "title",
+              "regex": "^\\S+ (PREbc|PREac|Day1|POSTbc|POSTac|7d)_(?:Con|Met)$",
+              "recode": {
+                "PREbc": "PRE",
+                "POSTbc": "POST",
+                "7d": "REC",
+                "PREac": "PREac",
+                "POSTac": "POSTac",
+                "Day1": "DAY1"
+              }
+            },
+            "trt": {
+              "source": "title",
+              "regex": "_(Con|Met)$",
+              "recode": {
+                "Con": "Pla",
+                "Met": "Met"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\design_metadata.csv",
+          "sha256": "a8e5fee20a6be48ffeac9249ff5efdb3ed5d2189fa9c05c4a99b1f651798a7d4",
+          "levels": {
+            "time": {
+              "PRE": 19,
+              "POST": 19,
+              "REC": 19
+            },
+            "trt": {
+              "Met": 30,
+              "Pla": 27
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (19565X1...) equal the first token of title, written as column `key` by prep_merge.py (two count files merged on identical Ensembl IDs). GEO has no participant ID; prep_merge.py assigns `subject` by sample-number blocks that each start at a PREbc biopsy - every block has one age, one sex and one treatment, giving 9 placebo + 10 metformin participants. Clamp (ac) and Day1 biopsies excluded: the paper's DE uses fasted PRE/POST/REC.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:23"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE224900_19565R_counts.txt.gz + GSE224900_20063R_counts.txt.gz merged",
+        "paper_input": "DESeq2 on counts (S2.7.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_matrix.csv",
+          "sha256": "c7b62057f0aa41552273119d995bd16ce279889d209e48e7390862ce6bb1a44e",
+          "n_features": 60664,
+          "n_samples": 57,
+          "annotation_columns_dropped": [
+            "GSM7035214",
+            "GSM7035215",
+            "GSM7035217",
+            "GSM7035220",
+            "GSM7035221",
+            "GSM7035223",
+            "GSM7035226",
+            "GSM7035227",
+            "GSM7035229",
+            "GSM7035232",
+            "GSM7035233",
+            "GSM7035235",
+            "GSM7035238",
+            "GSM7035239",
+            "GSM7035241",
+            "GSM7035244",
+            "GSM7035245",
+            "GSM7035247",
+            "GSM7035250",
+            "GSM7035251",
+            "GSM7035255",
+            "GSM7035256",
+            "GSM7035258",
+            "GSM7035261",
+            "GSM7035262",
+            "GSM7035264",
+            "GSM7035267",
+            "GSM7035268",
+            "GSM7035270",
+            "GSM7035273",
+            "GSM7035274",
+            "GSM7035276",
+            "GSM7035279",
+            "GSM7035280",
+            "GSM7035282",
+            "GSM7035285",
+            "GSM7035286",
+            "GSM7035288",
+            "GSM7035291",
+            "GSM7035292",
+            "GSM7035294",
+            "GSM7035297",
+            "GSM7035298",
+            "GSM7035300",
+            "GSM7035303",
+            "GSM7035304",
+            "GSM7035306",
+            "GSM7035309",
+            "GSM7035310",
+            "GSM7035313",
+            "GSM7035320",
+            "GSM7035323",
+            "GSM7035329",
+            "GSM7035335",
+            "GSM7035337",
+            "GSM7035341"
+          ],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 10529500.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All values integer, median 0, max ~1.2e7; data_processing: STAR two-pass alignment to GRCh38/Ensembl 104 with gene counts; paper used DESeq2.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:27"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "58a345c3da484e4f801e3fbfb1e640c6ab17d4abb4a42e87e420f377bb6dacca",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d8db98792d584b43cc6688b9c24b2b7e2dd23872fda522fbcbea9d2036b32db8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c7b62057f0aa41552273119d995bd16ce279889d209e48e7390862ce6bb1a44e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a8e5fee20a6be48ffeac9249ff5efdb3ed5d2189fa9c05c4a99b1f651798a7d4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ca1fdccbd2324f84aa316ffdb1e15c2f860257b51e75caf2bd622431f887845b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "d8f15692b799691494799f9c4dbb7048b937fe02a37e28991b7202fb949a0f79",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

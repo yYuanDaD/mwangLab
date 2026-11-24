@@ -1,0 +1,310 @@
+{
+  "case_id": "GSE224900",
+  "verdict": "not_analyzable",
+  "failed": [
+    "covariance"
+  ],
+  "warnings": [
+    "sex"
+  ],
+  "factors": [
+    "time"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "time"
+      ],
+      "levels": {
+        "time": {
+          "PRE": 19,
+          "POST": 19,
+          "REC": 19
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "fail",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [
+        "characteristics_ch1.4.Sex",
+        "run"
+      ],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "characteristics_ch1.4.Sex",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        },
+        {
+          "column": "run",
+          "decision": "candidate_covariate",
+          "reason": "crossed with the design factors; include if the paper did or PCA shows it"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(time) + C(subject) + C(characteristics_ch1.4.Sex) + C(run)",
+        "rank": 21,
+        "full_rank": false,
+        "residual_df": 36,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 6,
+      "n_analyzable": 6,
+      "too_small": [],
+      "planned_analyzable": [
+        "time_POST_vs_PRE_trt-Pla",
+        "time_REC_vs_PRE_trt-Pla",
+        "time_POST_vs_PRE_trt-Met",
+        "time_REC_vs_PRE_trt-Met"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "mismatch",
+      "summary": "Sex inference completed on 57 samples.",
+      "metadata_sex_column": "characteristics_ch1.4.Sex",
+      "predicted": {
+        "female": 29,
+        "male": 28
+      },
+      "mismatched": [
+        "GSM7035293",
+        "GSM7035296",
+        "GSM7035299",
+        "GSM7035301",
+        "GSM7035305",
+        "GSM7035307",
+        "GSM7035308"
+      ],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37486024\\GSE224900\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "time_POST_vs_PRE__sex-female",
+            "time_REC_vs_POST__sex-female",
+            "time_REC_vs_PRE__sex-female"
+          ],
+          "male": [
+            "time_POST_vs_PRE__sex-male",
+            "time_REC_vs_POST__sex-male",
+            "time_REC_vs_PRE__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "time_POST_vs_PRE_trt-Met",
+      "kind": "simple",
+      "factor": "time",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {
+        "trt": "Met"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "POST"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "PRE"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_REC_vs_POST_trt-Met",
+      "kind": "simple",
+      "factor": "time",
+      "test": "REC",
+      "reference": "POST",
+      "within": {
+        "trt": "Met"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "REC"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "POST"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_REC_vs_PRE_trt-Met",
+      "kind": "simple",
+      "factor": "time",
+      "test": "REC",
+      "reference": "PRE",
+      "within": {
+        "trt": "Met"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "REC"
+          },
+          "n": 10
+        },
+        {
+          "cell": {
+            "trt": "Met",
+            "time": "PRE"
+          },
+          "n": 10
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_POST_vs_PRE_trt-Pla",
+      "kind": "simple",
+      "factor": "time",
+      "test": "POST",
+      "reference": "PRE",
+      "within": {
+        "trt": "Pla"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "POST"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "PRE"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_REC_vs_POST_trt-Pla",
+      "kind": "simple",
+      "factor": "time",
+      "test": "REC",
+      "reference": "POST",
+      "within": {
+        "trt": "Pla"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "REC"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "POST"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "time_REC_vs_PRE_trt-Pla",
+      "kind": "simple",
+      "factor": "time",
+      "test": "REC",
+      "reference": "PRE",
+      "within": {
+        "trt": "Pla"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "REC"
+          },
+          "n": 9
+        },
+        {
+          "cell": {
+            "trt": "Pla",
+            "time": "PRE"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

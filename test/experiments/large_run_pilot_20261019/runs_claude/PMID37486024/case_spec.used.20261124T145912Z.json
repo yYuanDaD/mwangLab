@@ -1,0 +1,518 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024",
+ "request": "Analyze GSE224900 for PMID 37486024 (Disuse-induced muscle fibrosis, cellular senescence, and senescence-associated secretory phenotype in older adults are alleviated during re-ambulation with metformin pre-treatment.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE224900",
+   "accession": "GSE224900",
+   "inputs": {
+    "paper": [
+     "test/experiments/paper_screen_20261028/papers/PMC10652302.paper.md"
+    ],
+    "metadata": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024/prep/GSE224900_metadata_subject.csv",
+    "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024/prep/GSE224900_merged_counts.csv.gz",
+    "raw_tar": false,
+    "prep_scripts": [
+     "test/experiments/large_run_pilot_20261019/runs_claude/PMID37486024/prep/prep_merge.py"
+    ]
+   },
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": [
+       "GSE224900"
+      ],
+      "assay": "bulk total RNA-seq (rRNA-depleted), vastus lateralis, older adults (S2.7.p1)",
+      "primary_estimand": "Within-participant change in muscle gene expression with 5 d bed rest (disuse; POST vs PRE) and after 7 d re-ambulation (REC vs PRE), separately in the placebo and metformin arms (S3.4.p1, Fig 5a-d). Physical-activity axis = disuse/reloading, not structured exercise.",
+      "factors": {
+       "time": [
+        "PRE",
+        "POST",
+        "REC"
+       ],
+       "treatment": [
+        "Placebo",
+        "Metformin"
+       ]
+      },
+      "repeated_measure_unit": "participant (biopsies at PRE, DAY1, POST, REC; S2.4.p1)",
+      "inclusion": "fasted biopsies at PRE, POST, REC; N = 9-10/group (Fig 5 legend)",
+      "planned_contrasts": [
+       "Placebo POST vs PRE (S3.4.p1; paper 441 DEGs)",
+       "Metformin POST vs PRE (S3.4.p1; 377)",
+       "Placebo REC vs PRE (S3.4.p1; 3550)",
+       "Metformin REC vs PRE (S3.4.p1; 1386)"
+      ],
+      "paper_threshold": {
+       "metric": "FDR",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "source_locator": "S2.7.p1"
+      },
+      "paper_method": "DESeq2 1.30 via hciR (S2.7.p1); formula not stated",
+      "paper_results": "collagen isoforms highly upregulated in placebo REC (S3.4.p1); CDKN1A, TP53 up in placebo not metformin after bed rest and recovery (S3.5.p1)"
+     },
+     "reasoning": "S2.7.p1 gives DESeq2 + 5% FDR, no fold-change rule; S3.4.p1 gives the four within-arm DEG counts vs PRE. The paper's activity manipulation is bed-rest disuse followed by re-ambulation; there is no exercise-training arm, so the activity estimand is disuse/reloading within each arm.",
+     "confidence": "high",
+     "locator": "S2.7.p1"
+    },
+    "ownership": {
+     "final": {
+      "owned": true,
+      "checks": [
+       "S2.7.p1 and S11.p1 name GSE224900",
+       "GEO contact Drummond lab (senior author)",
+       "timepoint labels PRE/Day1/POST/7d and Placebo/Metformin match the trial design (S2.3.p1)",
+       "10 metformin participants (5F/5M = Table 1) and 9 placebo (paper N=9-10/group)"
+      ]
+     },
+     "reasoning": "Both count files (19565R, 20063R sequencing runs) belong to GSE224900 and the paper names it.",
+     "confidence": "high"
+    },
+    "alignment": {
+     "key_column": "key",
+     "patterns": {
+      "time": [
+       "title",
+       "^\\S+ (PREbc|PREac|Day1|POSTbc|POSTac|7d)_(?:Con|Met)$"
+      ],
+      "trt": [
+       "title",
+       "_(Con|Met)$"
+      ]
+     },
+     "recode": {
+      "time": {
+       "PREbc": "PRE",
+       "POSTbc": "POST",
+       "7d": "REC",
+       "PREac": "PREac",
+       "POSTac": "POSTac",
+       "Day1": "DAY1"
+      },
+      "trt": {
+       "Con": "Pla",
+       "Met": "Met"
+      }
+     },
+     "aliases": {},
+     "exclude_samples": {
+      "GSM7035214": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035215": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035217": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035220": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035221": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035223": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035226": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035227": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035229": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035232": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035233": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035235": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035238": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035239": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035241": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035244": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035245": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035247": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035250": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035251": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035255": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035256": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035258": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035261": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035262": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035264": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035267": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035268": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035270": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035273": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035274": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035276": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035279": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035280": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035282": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035285": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035286": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035288": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035291": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035292": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035294": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035297": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035298": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035300": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035303": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035304": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035306": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035309": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035310": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035313": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035320": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035323": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035329": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035335": "PREac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035337": "Day1: after 2-wk drug run-in, before bed rest; not part of the paper's PRE/POST/REC DE contrasts (S3.4.p1)",
+      "GSM7035341": "POSTac: post hyperinsulinemic-euglycemic clamp biopsy; paper's RNA-seq DE uses fasted PRE/POST/REC biopsies (S2.4.p1, S3.4.p1)",
+      "GSM7035293": "sex swap: POSTbc labelled F participant 19565_S078 but XIST-absent/chrY-high, while the same participant's PREbc, PREac, Day1, POSTac and 7d biopsies are female",
+      "GSM7035308": "sex swap: PREbc labelled F participant 19565_S096 but male by XIST/chrY, while that block's other 5 biopsies are female",
+      "GSM7035302": "block 19565_S090 inconsistent: PREbc/PREac female but Day1/POSTbc/POSTac/7d male; participant identity of the block cannot be established",
+      "GSM7035305": "block 19565_S090 inconsistent (see 19565X90)",
+      "GSM7035307": "block 19565_S090 inconsistent (see 19565X90)"
+     },
+     "final": {
+      "subject_key": "derived in prep_merge.py from consecutive per-participant biopsy blocks; age/sex/treatment constant within each block"
+     },
+     "reasoning": "Matrix columns (19565X1...) equal the first token of title, written as column `key` by prep_merge.py (two count files merged on identical Ensembl IDs). GEO has no participant ID; prep_merge.py assigns `subject` by sample-number blocks that each start at a PREbc biopsy - every block has one age, one sex and one treatment, giving 9 placebo + 10 metformin participants. Clamp (ac) and Day1 biopsies excluded: the paper's DE uses fasted PRE/POST/REC.",
+     "confidence": "medium"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {
+      "source": "GSE224900_19565R_counts.txt.gz + GSE224900_20063R_counts.txt.gz merged",
+      "paper_input": "DESeq2 on counts (S2.7.p1)"
+     },
+     "reasoning": "All values integer, median 0, max ~1.2e7; data_processing: STAR two-pass alignment to GRCh38/Ensembl 104 with gene counts; paper used DESeq2.",
+     "confidence": "high"
+    },
+    "design": {
+     "factors": [
+      "time"
+     ],
+     "references": {
+      "time": "PRE"
+     },
+     "subject": "subject",
+     "organism": "Human",
+     "strata": [
+      "trt"
+     ],
+     "planned": [
+      "time_POST_vs_PRE_trt-Pla",
+      "time_REC_vs_PRE_trt-Pla",
+      "time_POST_vs_PRE_trt-Met",
+      "time_REC_vs_PRE_trt-Met"
+     ],
+     "covariate_candidates": [],
+     "final": {
+      "analysis_type": "repeated-measures, within-arm time contrasts",
+      "formula": "~ subject + time (per arm)",
+      "contrasts": [
+       {
+        "name": "time_POST_vs_PRE_trt-Pla",
+        "control": "PRE",
+        "treatment": "POST",
+        "role": "primary"
+       },
+       {
+        "name": "time_REC_vs_PRE_trt-Pla",
+        "control": "PRE",
+        "treatment": "REC",
+        "role": "primary"
+       },
+       {
+        "name": "time_POST_vs_PRE_trt-Met",
+        "control": "PRE",
+        "treatment": "POST",
+        "role": "secondary"
+       },
+       {
+        "name": "time_REC_vs_PRE_trt-Met",
+        "control": "PRE",
+        "treatment": "REC",
+        "role": "secondary"
+       }
+      ],
+      "estimand_type": "within-subject change; no non-bed-rest control arm"
+     },
+     "candidates": [
+      {
+       "value": "treatment x time interaction",
+       "reason_rejected": "the paper's reported DEG counts are within-arm vs PRE; interaction is the drug question, not the activity estimand"
+      },
+      {
+       "value": "include DAY1",
+       "reason_rejected": "DAY1 reflects 2-wk drug run-in, not disuse; paper's RNA-seq DE uses PRE/POST/REC (S3.4.p1)"
+      }
+     ],
+     "reasoning": "Placebo arm isolates disuse/re-ambulation (primary); metformin arm reproduces the paper's second set but mixes drug exposure with disuse (secondary). Each arm fitted separately as the paper reports per-arm volcano plots.",
+     "confidence": "high"
+    },
+    "covariance": {
+     "final": {
+      "status": "required",
+      "blocking_terms": [
+       "subject"
+      ],
+      "covariates": [
+       {
+        "name": "sex",
+        "disposition": "nested within subject; absorbed by subject block (per-sex fits run as exploratory)"
+       },
+       {
+        "name": "run",
+        "disposition": "sequencing run nested within subject; absorbed by subject block"
+       }
+      ]
+     },
+     "confounding_candidates": [
+      "run",
+      "sex"
+     ],
+     "reasoning": "Repeated biopsies per participant -> subject block. Sex and sequencing run are constant within subject, so the subject term absorbs them.",
+     "confidence": "high"
+    },
+    "method": {
+     "final": {
+      "method": "DESeq2 (pydeseq2 Wald)",
+      "formula": "~ subject + time",
+      "paper_route": {
+       "method": "DESeq2 1.30 (hciR)",
+       "status": "reproduced_approximately"
+      },
+      "deviations": [
+       "pydeseq2 instead of R DESeq2 1.30/hciR; hciR default filtering and formula not stated in the paper",
+       "subject derived from sample-number blocks"
+      ]
+     },
+     "transform": null,
+     "reasoning": "Raw counts support the paper's DESeq2 route; one model per arm with all three timepoints and subject blocking.",
+     "confidence": "medium"
+    },
+    "threshold": {
+     "final": {
+      "paper_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      },
+      "threshold_source": "paper",
+      "applied_threshold": {
+       "metric": "padj",
+       "cutoff": 0.05,
+       "effect_metric": "log2FoldChange",
+       "effect_cutoff": null,
+       "inclusive": false
+      }
+     },
+     "reasoning": "S2.7.p1: 5% FDR, no fold-change cutoff; Fig 5 legend: adjusted p < 0.05.",
+     "confidence": "high"
+    },
+    "study": {
+     "final": {
+      "route": "paper_aligned",
+      "caveats": [
+       "Activity axis is bed-rest disuse and re-ambulation, not exercise training.",
+       "No time-matched non-bed-rest control: time contrasts include any time/season effect; metformin-arm contrasts also include drug exposure (POST) or withdrawal (REC).",
+       "Participant IDs were derived from sample-number blocks, not given in GEO.",
+       "Expression-inferred sex contradicts GEO labels in 7 metformin-arm biopsies: 5 biopsies excluded, one block relabelled F; the metformin arm therefore differs from the paper's sample set (paper presumably used the labels as deposited)."
+      ]
+     },
+     "paper_counts": {
+      "pla/time_POST_vs_PRE_trt-Pla": 441,
+      "pla/time_REC_vs_PRE_trt-Pla": 3550,
+      "met/time_POST_vs_PRE_trt-Met": 377,
+      "met/time_REC_vs_PRE_trt-Met": 1386
+     },
+     "paper_genes": {
+      "pla/time_REC_vs_PRE_trt-Pla": [
+       "COL1A1",
+       "COL3A1",
+       "COL1A2",
+       "CDKN1A",
+       "TP53"
+      ],
+      "pla/time_POST_vs_PRE_trt-Pla": [
+       "CDKN1A",
+       "TP53"
+      ]
+     },
+     "reasoning": "All four contrasts follow the paper's DESeq2 + FDR 5% route.",
+     "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {
+     "item": "participant ID",
+     "paper": "paired design, 9-10/group",
+     "data": "GEO lacks participant IDs; derived from biopsy blocks (age/sex constant)",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "placebo n",
+     "paper": "Table 1: 10 placebo (6F/4M)",
+     "data": "9 placebo participants sequenced (5F/4M); Fig 5 N = 9-10/group",
+     "disposition": "executable_without_change"
+    },
+    {
+     "item": "sample sex labels (metformin arm)",
+     "paper": "metformin 5F/5M (Table 1)",
+     "data": "XIST/chrY: 19565_S084 block entirely female though GEO says M (label corrected, block kept); single swapped biopsies 19565X81 and 19565X96 excluded; block 19565_S090 switches sex between PREac and Day1, all its PRE/POST/REC biopsies excluded. Metformin arm analysed with 9 participants (PRE 8, POST 8, REC 9).",
+     "disposition": "executable_with_exclusions"
+    },
+    {
+     "item": "two sequencing runs",
+     "paper": "not mentioned",
+     "data": "19565R (17 participants) and 20063R (2 placebo participants)",
+     "disposition": "executable_without_change"
+    }
+   ],
+   "executions": [
+    {
+     "name": "pla",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Pla"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Pla",
+       "time_REC_vs_PRE_trt-Pla"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "primary",
+     "reasoning": "placebo arm: disuse and re-ambulation vs PRE, ~ subject + time"
+    },
+    {
+     "name": "met",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Met"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Met",
+       "time_REC_vs_PRE_trt-Met"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "secondary",
+     "reasoning": "metformin arm, same model"
+    },
+    {
+     "name": "pla_F",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Pla"
+      ],
+      "sex": [
+       "F"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Pla",
+       "time_REC_vs_PRE_trt-Pla"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "exploratory",
+     "reasoning": "per-sex exploratory fit (Pla, sex F); paper pooled sexes"
+    },
+    {
+     "name": "pla_M",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Pla"
+      ],
+      "sex": [
+       "M"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Pla",
+       "time_REC_vs_PRE_trt-Pla"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "exploratory",
+     "reasoning": "per-sex exploratory fit (Pla, sex M); paper pooled sexes"
+    },
+    {
+     "name": "met_F",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Met"
+      ],
+      "sex": [
+       "F"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Met",
+       "time_REC_vs_PRE_trt-Met"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "exploratory",
+     "reasoning": "per-sex exploratory fit (Met, sex F); paper pooled sexes"
+    },
+    {
+     "name": "met_M",
+     "tool": "tools.joint_contrasts:run_joint_deseq2",
+     "subset": {
+      "trt": [
+       "Met"
+      ],
+      "sex": [
+       "M"
+      ]
+     },
+     "args": {
+      "comparisons": [
+       "time_POST_vs_PRE_trt-Met",
+       "time_REC_vs_PRE_trt-Met"
+      ],
+      "covariates": [
+       "subject"
+      ]
+     },
+     "role": "exploratory",
+     "reasoning": "per-sex exploratory fit (Met, sex M); paper pooled sexes"
+    }
+   ],
+   "enrichment": [
+    {
+     "execution": "pla/time_REC_vs_PRE_trt-Pla",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "paper ran fgsea (KEGG/Reactome) on recovery; Hallmark GSEA as a check of collagen/TGF-beta direction"
+    },
+    {
+     "execution": "met/time_REC_vs_PRE_trt-Met",
+     "ora": false,
+     "gsea": true,
+     "ranking_metric": "stat",
+     "reasoning": "same for metformin arm"
+    }
+   ]
+  }
+ ]
+}

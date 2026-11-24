@@ -1039,3 +1039,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID41956699 (GSE315845)
 
 - GEO FTP /geo/ blocked (403/550); case_runner.py:529-530 needs a matrix before ownership gate (placeholder used); inspect hides 403 behind GEOparse temp error Details: `PMID41956699/HANDBACK.md`.
+
+## PMID37486024 (GSE224900)
+
+- sex check can't use corrected column (stats_tools.py:257); subject key from sample blocks needs prep script; nested covariates give unexplained not_analyzable Details: `PMID37486024/HANDBACK.md`.

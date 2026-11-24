@@ -601,3 +601,8 @@ One section per case; newest last.
 ## 8d368462bbdbebbcf6223c8ad5899f11ea581ce7 / GSE71972 (2026-11-24)
 
 - policy: Count matrix must be placed in data/GSE71972 (GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx) from a network that can reach GEO, then rerun; use subject key = drug + subject id.
+
+## PMID37486024 / GSE224900 (2026-11-24)
+
+- policy: Open policy: whether a bed-rest disuse/re-ambulation series counts as a physical-activity (exercise) study.
+- policy: Open policy: which threshold to report when paper REC counts fit padj<0.05 & |log2FC|>0.585 rather than the stated rule.
