@@ -584,3 +584,7 @@ One section per case; newest last.
 ## PMID35284415 / GSE192982 (2026-11-24)
 
 - policy: Policy: does in vitro cyclic hydrostatic pressure loading (CHP) and simulated microgravity of engineered tissue count as an exercise study (exercise mediator mimic)? If yes, the case is analyzable now: limma on the deposited log2-TMM matrix, cond with Static as reference, donor blocked (dupcor or random), n=8 per arm, rule FC>2 and q<0.05, compare to 236/388 DEGs.
+
+## PMID34203013 / GSE141827 (2026-11-24)
+
+- policy: Policy: whether reloading/recovery after unloading counts as an exercise-like contrast is open; the case followed the stricter reading (no exercise arm), which is consistent with the skill's rules.

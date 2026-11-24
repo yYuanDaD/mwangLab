@@ -1,0 +1,104 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34203013",
+  "request": "Analyze GSE141827 for PMID 34203013 (Genome-Wide Atlas of Promoter Expression Reveals Contribution of Transcribed Regulatory Elements to Genetic Control of Disuse-Mediated Atrophy of Skeletal Muscle.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE141827",
+      "accession": "GSE141827",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC8235325.paper.md"],
+        "metadata": "GSE141827/GSE141827_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID34203013/prep/GSE141827_peak_raw_counts.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID34203013/prep/prep_osc.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE141827"],
+            "assay": "nAnT-iCAGE (CAGE-seq), rat soleus and EDL (S2.6.p1)",
+            "primary_estimand": "Effect of hindlimb unloading (disuse; 1, 3, 7 days) and subsequent reloading/recovery (free cage activity 1, 3, 7 days after 7-day unloading) versus active cage controls on TSS-peak / gene expression, separately in soleus and EDL (S2.2.p1, S2.7.8.p1)",
+            "factors": {"protocol": ["control", "D1", "D3", "D7", "R1", "R3", "R7"], "tissue": ["soleus", "EDL"]},
+            "sample_inclusion": "21 Wistar rats, 3 per group, both muscles per rat (S2.1.p1, S2.2.p1)",
+            "planned_contrasts": [
+              "each phase (D1, D3, D7, R1, R3, R7) vs control, per muscle (S2.7.8.p1, FIG3; counts only in Figure 3A / ST4, not in text)",
+              "time-course comparisons between consecutive phases (S3.3.p1, ST4C,D)"
+            ],
+            "repeated_measure_unit": "rat (soleus and EDL from the same animal); muscles analysed separately",
+            "paper_method": "DESeq2 on CAGE TSS peaks, peak-level; gene DE if any peak in gene is DE (S2.7.8.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.25, "source_locator": "S2.7.8.p1"},
+            "paper_results": "DEG counts per phase only in Figure 3A (not stated numerically in text); R1 soleus has the most DEGs (S3.3.p2)",
+            "exercise_arm": "none: no exercise training or acute exercise bout; 'recovery' is release from tail suspension into normal cage activity (S2.2.p1)"
+          },
+          "reasoning": "S2.2.p1 defines the U-experiment: tail-suspension unloading followed by reloading in the home cage, compared with active controls. S2.7.8.p1 gives DESeq2 on peaks with padj < 0.05 and |LFC| > 1.25. The intervention is disuse (and recovery from disuse), not exercise.",
+          "locator": "S2.2.p1; S2.7.8.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S11.p1 names GSE141827", "metadata: 42 GSMs, rat soleus/EDL, 7 protocol levels x 3 rats x 2 muscles = paper design", "Level2 OSC table holds 42 raw.* columns whose sample labels equal metadata titles"]},
+          "reasoning": "Data availability statement S11.p1 links GSE141827; sample count and design match S2.2.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "matrix_column_pattern": "^raw\\.Lane\\d+\\.(.+)\\.[ACGT]{3}$",
+          "aliases": {"tissue": "characteristics_ch1.0.tissue", "protocol": "characteristics_ch1.1.protocol"},
+          "recode": {
+            "tissue": {"soleus muscle": "Sol", "EDL muscle": "EDL"},
+            "protocol": {
+              "control": "CTRL",
+              "unloading 24 hours": "D1",
+              "unloading 3 days": "D3",
+              "unloading 7 days": "D7",
+              "unloading 7 days; recovery 24 hours": "R1",
+              "unloading 7 days; recovery 3 days": "R3",
+              "unloading 7 days; recovery 7 days": "R7"
+            }
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns raw.LaneN.<title>.<barcode> carry the GEO title (e.g. U24_Sol); the pattern strips lane and barcode and aligns exactly on title. Normalized (norm.*) columns were dropped by the prep script.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE141827_Level2_table.osc.txt.gz, raw.* columns (CAGE tag counts per DPI TSS peak; '##' OSC header lines stripped by prep_osc.py)", "paper_input": "CTSS peak counts into DESeq2 (S2.7.p1, S2.7.8.p1)"},
+          "reasoning": "raw.* columns are integer CAGE tag counts per TSS peak (values like 63.0, 155.0); the file also has norm.* (TPM-like) columns, excluded. Features are peaks (L2__chr_strand_pos) without gene annotation, not genes. Matches the paper's peak-level DESeq2 input.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["protocol"],
+          "references": {"protocol": "CTRL"},
+          "organism": "Rat",
+          "strata": ["tissue"],
+          "planned": [],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the study is hindlimb unloading (disuse) and reloading into normal cage activity versus active cage controls (S2.2.p1). No group performs exercise training or an exercise bout, so the requested estimand (effect of exercise on gene expression) is not identifiable. Reloading R1/R3/R7 vs D7 would be recovery from disuse, not exercise, and was not run as a substitute.",
+          "final": {
+            "analysis_type": "none",
+            "design_column": "protocol",
+            "contrasts": []
+          },
+          "candidates": [
+            {"value": "protocol R1/R3/R7 vs CTRL (paper's recovery phases)", "reason_rejected": "recovery from 7-day unloading versus active controls; estimand is residual disuse/reloading effect, not exercise"},
+            {"value": "protocol R1 vs D7 (reloading vs unloaded)", "reason_rejected": "return to normal ambulation after disuse; not an exercise intervention and not a paper-planned phase-vs-control comparison"},
+            {"value": "protocol D1/D3/D7 vs CTRL", "reason_rejected": "disuse (inactivity) effect; opposite of exercise and not the requested estimand"}
+          ],
+          "reasoning": "Paper-first: the paper's estimand is disuse-induced atrophy and recovery (title, S1.p2, S2.2.p1). The design is analyzable for that estimand (3 rats per phase per muscle) but contains no exercise arm, so the request's exercise estimand cannot be identified. Refused at design.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "requested estimand",
+          "paper": "disuse (hindlimb unloading) and recovery versus active control",
+          "data": "same: 7 protocol levels (control, unloading 1/3/7 d, recovery 1/3/7 d) x soleus/EDL, no exercise group",
+          "disposition": "blocks_estimand"
+        }
+      ]
+    }
+  ]
+}

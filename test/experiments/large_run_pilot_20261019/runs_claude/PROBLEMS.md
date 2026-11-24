@@ -1023,3 +1023,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35284415 (GSE192982)
 
 - inspect doesn't flag a transposed (samples x genes) matrix, so a prep script was needed; data_processing text shows mojibake ("鈮" for "≤") Details: `PMID35284415/HANDBACK.md`.
+
+## PMID34203013 (GSE141827)
+
+- inspect misread .osc table: '##' header lines listed as features, raw.*/norm.* columns mixed, start.0base/pos taken as samples (tools/native.py:239), no alignment_keys Details: `PMID34203013/HANDBACK.md`.

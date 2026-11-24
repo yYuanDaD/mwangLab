@@ -1,0 +1,22 @@
+{"case": "GSE141827", "reviewer": "case-reviewer (claude-sonnet-5-5)",
+ "blind": {
+  "B1": "No. The study is tail-suspension hindlimb unloading (D1/D3/D7) and reloading (R1/R3/R7, release into normal cage activity) versus active controls, in soleus and EDL (S2.2.p1). No sample carries an exercise training or exercise bout factor; reloading is recovery from disuse.",
+  "B2": "Each phase (D1, D3, D7, R1, R3, R7) vs control (DESeq2 phase-control), plus consecutive time-course comparisons (S3.3.p1), separately per muscle; 3 rats per group (S2.2.p1), i.e. 3 samples per group per muscle (6 per protocol level in GEO with both muscles).",
+  "B3": "Yes: each rat contributes both soleus and EDL (21 rats x 2 muscles). Key = GEO title without the tissue suffix (U1_EDL/U1_Sol), 21 keys, each once per tissue, 42/42 linked. Muscles are analysed separately in the paper, so blocking is not needed within a per-muscle model.",
+  "B4": "Paper does not state a joint model; S2.7.8.p1 describes DESeq2 LFC between control and case samples, i.e. pairwise case vs control, per muscle.",
+  "B5": "S2.7.8.p1: DESeq2, Benjamini-Hochberg-adjusted p ('Bonferroni-Hochberg'), cutoffs |LFC| > 1.25 and Padj < 0.05; gene DE if at least one peak is DE. Fig 2 uses FDR 5e-4. Counts only in Figure 3A / ST4, not in the text."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "S2.2.p1: unloading/reloading vs active control; no exercise arm; metadata protocol values carry only unloading/recovery. Exercise-word flag fires only on 'recovery'/'unloading' style values, not exercise.", "fix": ""},
+  {"id": "grouping", "verdict": "na", "severity": "none", "evidence": "No contrast fitted. Packet levels (6 per protocol, 3 rats x 2 muscles) match S2.2.p1 n=3 per group per muscle.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast fitted.", "fix": ""},
+  {"id": "pairing", "verdict": "na", "severity": "none", "evidence": "Not run. Recorded unit (rat, soleus/EDL from the same animal) matches the title-minus-tissue key (21 keys, expression check supported r diff 0.209, p 0.0005); muscles are analysed separately per paper.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "No model fitted; paper implies pairwise phase-vs-control per muscle.", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "Not assessed; sex unknown (no markers), animals singly housed in both arms per S2.2.p1.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "raw.* integer CAGE tag counts per TSS peak (integer_fraction 1.0, 9971 x 42), norm.* dropped; DESeq2 matches S2.7.8.p1.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "paper_threshold FDR 0.05, |LFC| 1.25 transcribed as in S2.7.8.p1.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK claims no DEG counts; says paper gives them only in Fig 3A/ST4. No overclaim.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise arm' is established from S2.2.p1 and the full protocol list (7 levels: control, D1/3/7, R1/3/7); wide enough. Alternatives R vs CTRL, R1 vs D7, D vs CTRL considered.", "fix": ""}
+ ],
+ "overall": "pass",
+ "human_items": ["Policy: whether reloading/recovery after unloading counts as an exercise-like contrast is open; the case followed the stricter reading (no exercise arm), which is consistent with the skill's rules."],
+ "summary": "该系列为大鼠尾悬吊失用及复载实验,没有运动组,在 design 阶段拒绝运行是正确的,停止理由有 S2.2.p1 和完整分组列表支持。矩阵(原始 CAGE 计数)、阈值(padj<0.05, |LFC|>1.25)和配对键(同一大鼠的比目鱼肌与趾长伸肌)的记录均与论文一致,未发现需要修改之处。"}
