@@ -1,0 +1,283 @@
+{
+  "case_id": "GSE235942",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "treatment",
+    "age"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "raw counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "raw counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "treatment",
+        "age"
+      ],
+      "levels": {
+        "treatment": {
+          "CTRL": 22,
+          "HLU": 8
+        },
+        "age": {
+          "m22": 16,
+          "m6": 14
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(treatment) + C(age)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 27,
+        "min_cell_size": 3
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 30 samples.",
+      "metadata_sex_column": "characteristics_ch1.1.gender",
+      "predicted": {
+        "male": 23,
+        "unknown": 7
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37996046\\GSE235942\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [
+            "age_m22_vs_m6__sex-female_treatment-CTRL"
+          ],
+          "male": [
+            "treatment_HLU_vs_CTRL__sex-male_age-m22",
+            "treatment_HLU_vs_CTRL__sex-male_age-m6",
+            "age_m22_vs_m6__sex-male_treatment-CTRL",
+            "age_m22_vs_m6__sex-male_treatment-HLU",
+            "treatment_age_HLU_m22_vs_CTRL_m6__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "treatment_HLU_vs_CTRL_age-m22",
+      "kind": "simple",
+      "factor": "treatment",
+      "test": "HLU",
+      "reference": "CTRL",
+      "within": {
+        "age": "m22"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "m22",
+            "treatment": "HLU"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "age": "m22",
+            "treatment": "CTRL"
+          },
+          "n": 13
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "treatment_HLU_vs_CTRL_age-m6",
+      "kind": "simple",
+      "factor": "treatment",
+      "test": "HLU",
+      "reference": "CTRL",
+      "within": {
+        "age": "m6"
+      },
+      "cells": [
+        {
+          "cell": {
+            "age": "m6",
+            "treatment": "HLU"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "age": "m6",
+            "treatment": "CTRL"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "age_m22_vs_m6_treatment-CTRL",
+      "kind": "simple",
+      "factor": "age",
+      "test": "m22",
+      "reference": "m6",
+      "within": {
+        "treatment": "CTRL"
+      },
+      "cells": [
+        {
+          "cell": {
+            "treatment": "CTRL",
+            "age": "m22"
+          },
+          "n": 13
+        },
+        {
+          "cell": {
+            "treatment": "CTRL",
+            "age": "m6"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "age_m22_vs_m6_treatment-HLU",
+      "kind": "simple",
+      "factor": "age",
+      "test": "m22",
+      "reference": "m6",
+      "within": {
+        "treatment": "HLU"
+      },
+      "cells": [
+        {
+          "cell": {
+            "treatment": "HLU",
+            "age": "m22"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "treatment": "HLU",
+            "age": "m6"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "treatment_age_HLU_m22_vs_CTRL_m6",
+      "kind": "interaction",
+      "factor": "treatment:age",
+      "test": "HLU:m22",
+      "reference": "CTRL:m6",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "treatment": "HLU",
+            "age": "m22"
+          },
+          "n": 3
+        },
+        {
+          "cell": {
+            "treatment": "CTRL",
+            "age": "m22"
+          },
+          "n": 13
+        },
+        {
+          "cell": {
+            "treatment": "HLU",
+            "age": "m6"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "treatment": "CTRL",
+            "age": "m6"
+          },
+          "n": 9
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

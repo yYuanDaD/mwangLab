@@ -1,0 +1,78 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID37996046",
+  "request": "Analyze GSE235942 for PMID 37996046 (A comparison of bone microarchitectural and transcriptomic changes in murine long bones in response to hindlimb unloading and aging.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE235942",
+      "accession": "GSE235942",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC11651238.paper.md"],
+        "metadata": "GSE235942/GSE235942_metadata.csv",
+        "matrix": "GSE235942/GSE235942_raw_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE235942"],
+            "assay": "bulk RNA-seq, marrow-flushed tibia (S2.4.p1)",
+            "factors": {"treatment": ["control", "HLU (hindlimb unloading, 3 weeks)"], "age": ["6 month", "22 month"], "sex": "paper analyses males; GEO also holds female controls"},
+            "primary_estimand": "Effect of disuse (hindlimb unloading) and of aging on tibial gene expression; no exercise intervention (ABS.p2, S2.1.p1)",
+            "planned_contrasts": ["6mo HLU vs 6mo control (Fig 5C/H)", "22mo control vs 6mo control (Fig 5E/I)", "4mo HLU vs control (Fig 5A/G; from a prior study, not in this series)"],
+            "paper_method": "BioJupies kallisto counts, logCPM, limma (S2.4.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "logFC", "effect_cutoff": 1.5, "source_locator": "S3.3.p2", "note": "'logFC > |1.5| and p-value < 0.05' (raw p, no FDR)"},
+            "paper_results": "No DEG counts stated in text; volcano plots only (Fig 5G-I). Exercise is mentioned only as a general countermeasure (S1.p1, S4.p8)."
+          },
+          "reasoning": "Paper compares hindlimb unloading (disuse) with aging in male C57BL/6J mice (ABS.p2, S2.1.p1). DE: limma on kallisto counts, threshold raw p<0.05 & logFC>|1.5| (S3.3.p2). No exercise, training or loading arm anywhere in methods or Table 1; 'exercise' appears only in Introduction/Discussion as background (S1.p1, S4.p8).",
+          "confidence": "high",
+          "locator": "S2.1.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.6.p1 names GSE235942", "GEO tissue marrow-flushed tibia, BioJupies processing, C57BL/6 ages 6/22 months match S2.1.p1/S2.4.p1"]},
+          "reasoning": "Data availability statement S2.6.p1 deposits RNA-seq under GSE235942; metadata matches the paper's tissue, ages and HLU treatment.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "aliases": {"treatment": "characteristics_ch1.4.treatment", "sex": "characteristics_ch1.1.gender"},
+          "patterns": {"age": ["characteristics_ch1.2.age", "^([0-9]+)-month"]},
+          "recode": {"age": {"6": "m6", "22": "m22"}, "treatment": {"control": "CTRL", "HLU": "HLU"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (A1, AM1, YM3, ...) equal the metadata 'description' field for all 30 samples (inspect alignment_keys). Derived formula-safe columns treatment, age, sex.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE235942_raw_counts.txt.gz", "paper_input": "kallisto gene counts via BioJupies (S2.4.p1)"},
+          "reasoning": "All values integer (integer_fraction 1.0), median 11, max 2.6e6; data_processing: 'raw counts per Sample' from BioJupies. kallisto estimated counts rounded by BioJupies; type not in doubt for the gate since the case stops at design.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["treatment", "age"],
+          "references": {"treatment": "CTRL", "age": "m6"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": null, "contrasts": [], "exercise_arm": "absent"},
+          "candidates": [
+            {"value": "treatment HLU vs CTRL (6mo males)", "reason_rejected": "Hindlimb unloading is disuse, the opposite of exercise; it does not identify an exercise effect"},
+            {"value": "age m22 vs m6", "reason_rejected": "Aging contrast, not exercise"}
+          ],
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the series contains only control and hindlimb-unloaded (disuse) mice at 6 and 22 months (paper S2.1.p1, GEO treatment column control/HLU). Neither disuse nor aging can stand in for an exercise effect, so the requested estimand is not identifiable.",
+          "reasoning": "The requested estimand (effect of exercise) has no arm in this study. Running HLU vs control and relabelling it as exercise would invert the biology; the paper itself frames exercise only as background (S1.p1, S4.p8).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample set", "paper": "male mice analysed; 4mo HLU group from a prior study", "data": "GEO also holds 7 female 22mo/6mo controls and 3 male 22mo HLU samples not described in the paper; no 4mo samples", "disposition": "not_executed_case_refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
