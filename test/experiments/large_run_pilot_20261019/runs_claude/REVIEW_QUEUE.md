@@ -551,3 +551,7 @@ One section per case; newest last.
 ## PMID41229364 / GSE302562 (2026-11-24)
 
 - policy: Whether knockout-only series count as exercise studies (open policy).
+
+## PMID40581981 / GSE298607 (2026-11-24)
+
+- policy: Open policy: whether a disuse (unloading) model should be offered as an inverse-exercise contrast; the case correctly declines under current rules.
