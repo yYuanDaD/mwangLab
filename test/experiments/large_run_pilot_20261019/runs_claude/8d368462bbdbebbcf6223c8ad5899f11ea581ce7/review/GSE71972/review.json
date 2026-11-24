@@ -1,0 +1,88 @@
+{
+ "case": "GSE71972",
+ "reviewer": "Claude Sonnet 5.5 (case reviewer)",
+ "blind": {
+  "B1": "Yes. Human vastus lateralis biopsies after a bout of exercise, with H1/H2 blockade vs control (abstract, PMID 27061420). Exercise factor: post-exercise vs pre biopsies in all subjects; paper full text not available, only abstract.",
+  "B2": "Abstract: exercise vs baseline (>3000 protein-coding DEGs); control vs blockade post-exercise (795 DEGs). Group sizes not in abstract; GEO design suggests 8+8 subjects.",
+  "B3": "Likely yes: same subject sampled at several time points (pre/post), so the subject is the unit. Packet A lists no candidate key (no matrix/metadata fields flagged).",
+  "B4": "The abstract does not say.",
+  "B5": "Not in the abstract. Reported counts: >3000 protein-coding genes responding to exercise; 795 genes different between control and blockade."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Abstract (PMID 27061420): human vastus lateralis, exercise vs pre; design supports exercise contrasts. Decision is a stop for missing matrix, not a refusal.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No model fitted; recorded design 16 subjects x 3 times (8 CON, 8 HIST) matches abstract-level design.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast fitted; planned contrasts are post vs pre (exercise vs baseline).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Recorded repeated-measure unit = subject (3 biopsies); discrepancy note says key must be drug+subject id because ids 4,5 occur in both arms. Matches my blind B3.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Paper abstract silent; nothing fitted.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Drug is between-subject; no batch information assessed; nothing fitted.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No matrix obtained.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Abstract gives no rule; record states 'not stated in abstract', not invented.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No ours-vs-paper numbers claimed; abstract counts (>3000, 795) listed as unreproduced, with note about 2018 updated analysis.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "Claim is 'matrix unavailable' (HTTP 403 on all GEO paths, sandbox on/off, EBI and ENA checked). Search was wide; holds. Minor: execute crashed before recording gates, so stop was recorded via record_stop.py.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Count matrix must be placed in data/GSE71972 (GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx) from a network that can reach GEO, then rerun; use subject key = drug + subject id."
+ ],
+ "summary": "本案例因GEO文件服务器返回403而在ownership门停止,属于缺文件而非科学性拒绝,停止理由成立且检查范围足够广。设计(16名受试者×3个时间点,受试者为重复测量单位,键为药物+受试者ID)与摘要一致,未捏造阈值或DEG数。总体通过,需在可访问GEO的环境补齐矩阵后重跑。"
+}

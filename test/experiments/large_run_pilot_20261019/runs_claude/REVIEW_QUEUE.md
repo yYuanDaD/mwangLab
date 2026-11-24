@@ -597,3 +597,7 @@ One section per case; newest last.
 ## PMID41956699 / GSE315845 (2026-11-24)
 
 - policy: Count file GSE315845_RAW.tar must be supplied manually; then rerun SUSLE vs SUS and SUS vs SED. Threshold and fit structure unknown (abstract only).
+
+## 8d368462bbdbebbcf6223c8ad5899f11ea581ce7 / GSE71972 (2026-11-24)
+
+- policy: Count matrix must be placed in data/GSE71972 (GSE71972_Protein_Coding_Full_Counts_Updated_20160830.xlsx) from a network that can reach GEO, then rerun; use subject key = drug + subject id.

@@ -1,0 +1,12 @@
+2026-11-24 download attempts for GSE71972 (all from this machine, sandbox on and off):
+- tools.case_runner inspect -> download_geo_data: GEOparse temp-file error after FTP fetch failed; download_supplementary_files: HTTP 403
+- https://ftp.ncbi.nlm.nih.gov/geo/series/GSE71nnn/GSE71972/ and /suppl/ : HTTP 403 (Apache "Access forbidden"), also with sandbox disabled
+- https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE71972&format=file&file=<each of 5 suppl files>: redirect to ftp.ncbi.nlm.nih.gov -> 403
+- sample-level GSM1848779_CON_13_immediate_star.counts.txt.gz: redirect -> 403
+- NCBI-generated counts (type=rnaseq_counts, GSE71972_raw_counts_GRCh38.p13_NCBI.tsv.gz): redirect -> 403
+- ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE71nnn/GSE71972/ : "Server denied you to change to the given directory"
+- https://ftp.ncbi.nlm.nih.gov/geo/ (root) : 403 -> the whole GEO file host is blocked from this network, not this series
+- EBI BioStudies E-GEOD-71972: not present (404 / empty)
+- ENA PRJNA292608: FASTQ only (~3 GB per sample x 48); no STAR/HTSeq available to realign -> not a substitute
+Succeeded: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE71972&targ=all&form=text&view=full (family SOFT, no count tables: Sample_data_row_count = 0)
+ -> data/GSE71972/_soft/GSE71972_family.soft ; metadata built from it with GEOparse -> data/GSE71972/GSE71972_metadata.csv
