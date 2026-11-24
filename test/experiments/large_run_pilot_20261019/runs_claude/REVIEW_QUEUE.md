@@ -423,3 +423,12 @@ One section per case; newest last.
 
 - policy: Open policy: joint vs pairwise fit when the paper is silent; the T2D-recovery-unique count is 2349 vs the paper's 3185.
 - policy: Paper's own edgeR paired route is blocked by the repository executor; DESeq2 is a declared deviation.
+
+## PMID34880498 / GSE164401_HC_LPS (2026-11-24)
+
+- policy: Open policy: plasma-transfer exercise-mediator series counted as exercise study.
+- policy: Open policy: joint vs pairwise fit when paper is silent; padj<0.05 gives only 3 DEGs for LPS+RP vs LPS+CP versus 1395 at raw P.
+
+## PMID34880498 / GSE164401_HC_RP_vs_CP (2026-11-24)
+
+- policy: Open policy: plasma-transfer exercise-mediator series counted as exercise study.

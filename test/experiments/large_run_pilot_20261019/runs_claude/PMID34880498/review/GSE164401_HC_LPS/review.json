@@ -1,0 +1,89 @@
+{
+ "case": "GSE164401_HC_LPS",
+ "reviewer": "case-reviewer (claude-sonnet-5-5)",
+ "blind": {
+  "B1": "Yes, as an exercise-mediator (runner plasma RP vs control plasma CP, in vivo plasma transfer into non-running recipients; recipients do not exercise). Series GSE164401 hippocampus LPS experiment: 31 samples, SAL+SAL, LPS+SAL, LPS+CP, LPS+RP; RP is the exercise-conditioned factor (S2.p1, S6.3.p1, Fig.2a).",
+  "B2": "LPS vs control (SAL+SAL n=8 vs LPS+SAL n=8; 4,936 DEGs) and RP vs CP under LPS (LPS+CP n=7 vs LPS+RP n=8), Fig.2b legend (S2.p1).",
+  "B3": "Paper treats each sample as one mouse (n=8/group). Titles carry an L index (4 per group) and _1/_2 suffix (2 per L), i.e. 4 L x 2 = 8; L is nested in group, so it could be a cage (mice housed in pairs, S6.2.p1) or a technical grouping; the paper does not say. No documented repeated measure.",
+  "B4": "Paper does not state joint vs pairwise fits; S6.9.p1 only says 'DESeq2 ... using built-in algorithms'. Fig.2b legend lists four groups together; a joint 4-level fit is plausible but unstated.",
+  "B5": "'Wald test, P < 0.05' (Fig.2b legend), raw P, no fold-change cutoff. LPS effect: 4,936 DEGs (S2.p1). RP vs CP under LPS count not given in text (Supplementary Table 4)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Runs as plasma-transfer exercise-mediator; analysis labels caveat that recipients did not exercise and LPS vs SAL is only the reference contrast.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Groups 8/8/7/8 match Fig.2b legend (n=8,8,7,8); GEO treatment column (all 'RP') rejected in favour of title; CP is the correct LPS-matched control; no exclusions.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "LPSRP vs LPSCP (ctrl CP) and LPSSAL vs SALSAL (ctrl SALSAL); treatment-over-control ordering.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "L1-L16 nested in group (L3,7,11,15=LPS+CP etc.); paper n=8 mice/group matches 4 L x 2, so _1/_2 are counted as separate mice; analysis tested expression neighbours and treated as independent. If L is a cage of two mice, cluster effect is ignored, but paper does the same.",
+   "fix": "Optional sensitivity: cluster-robust or L-aware check, labelled assumption; not required."
+  },
+  {
+   "id": "model_fit",
+   "verdict": "unsure",
+   "severity": "minor",
+   "evidence": "Paper does not state joint vs pairwise fits; S6.9.p1 only says 'DESeq2 ... using built-in algorithms'. Analysis used one joint ~grp model on all 31 samples (one dispersion fit) and recorded this as a deviation/assumption.",
+   "fix": "Optionally report pairwise fits for LPSRP vs LPSCP as sensitivity."
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No batch/sex/housing column in GEO; L nesting recorded by hand; all male, same tissue.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer STAR GeneCounts, integer_fraction 1.0, pydeseq2 Wald; 27 Excel-mangled gene rows dropped and recorded; p-value fractions plausible (frac_p_gt_0.9 0.097).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Applied raw P<0.05 as in Fig.2b legend, no FC cutoff; padj<0.05 reported as audit (3 DEG for RP vs CP, 2940 for LPS).",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "LPS vs SAL 4,709 vs paper 4,936 (same rule, same contrast); RP vs CP paper count absent and stated as such.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: plasma-transfer exercise-mediator series counted as exercise study.",
+  "Open policy: joint vs pairwise fit when paper is silent; padj<0.05 gives only 3 DEGs for LPS+RP vs LPS+CP versus 1395 at raw P."
+ ],
+ "summary": "决定与论文一致：分组(8/8/7/8)、方向、阈值(Wald原始P<0.05)和原始计数矩阵均正确，LPS对照4709对4936基本吻合。L编号嵌套于组内，可能是笼，但论文同样按独立小鼠处理，仅列为次要提示。总体通过，开放的策略问题交人工。"
+}

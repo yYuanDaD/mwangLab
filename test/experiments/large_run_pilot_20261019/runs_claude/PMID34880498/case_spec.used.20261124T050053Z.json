@@ -1,0 +1,244 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34880498",
+  "request": "Analyze GSE164401 for PMID 34880498 (Exercise plasma boosts memory and dampens brain inflammation via clusterin.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE164401_HC_RP_vs_CP",
+      "accession": "GSE164401",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9721468.paper.md"],
+        "metadata": "GSE164401/GSE164401_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID34880498/prepped/GSE164401_HC_RNAseq_RP_vs_CP_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID34880498/prep_drop_excel_dates.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE164401"],
+            "assay": "bulk RNA-seq of whole hippocampus (SMART-seq v4 + Nextera XT, NovaSeq; STAR GeneCounts) (S6.9.p1)",
+            "primary_estimand": "Effect of runner plasma (RP; pooled plasma from male C57BL/6 mice with 28 d voluntary wheel running) versus control plasma (CP; sedentary standard-cage donors) infused retro-orbitally every 3 d for 28 d into young non-running recipients, on the recipient hippocampal transcriptome (S1.p3, S6.3.p1, Fig. 1a,h)",
+            "factors": {"grp": ["CP", "RP"]},
+            "inclusion": "n = 8 recipient mice per group (FIG12 Fig. 1h legend); male donors and sex/age matched recipients",
+            "planned_contrasts": [
+              "RP vs CP, hippocampus, no LPS (S1.p3, Fig. 1h; paper: 1,952 DEGs, 61% down / 39% up)",
+              "LPS+RP vs LPS+CP, hippocampus (S2.p1, Fig. 2b; separate experiment, case GSE164401_HC_LPS)"
+            ],
+            "repeated_measure_unit": "none; one hippocampus per recipient mouse",
+            "paper_method": "DESeq2 v1.32 default (built-in) Wald test, ~ treatment (S6.9.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "FIG12 (Fig. 1h legend: 'Wald tests; P < 0.05')"},
+            "paper_results": {"RP_vs_CP_DEGs": 1952, "down_fraction": 0.61, "up_fraction": 0.39, "named_down": ["Tns4", "Igsf5", "Ehf"], "named_up": ["Foxo6", "Fam19a2"], "unchanged": ["Clu (S4.p2)"]}
+          },
+          "reasoning": "S1.p3 and Fig. 1h define the exercise-plasma estimand on hippocampus with DESeq2 Wald P<0.05 (raw P, no FC rule; n=8/group). The design is a plasma-transfer experiment: recipients did not exercise, so the estimand is the effect of exercise-conditioned plasma, which is the paper's intended exercise comparison. S6.10.p1's padj<0.1 rule applies to the cortex clusterin experiment, not to this one.",
+          "confidence": "high",
+          "locator": "S1.p3; S6.9.p1; FIG12"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE164401 for the bulk RNA-seq", "GSE164401_HC_RNAseq_RP_vs_CP.csv columns CP1-8/RP1-8 match GEO titles HC_CP1-8/HC_RP1-8 (Whole HC, treatment CP/RP)", "16 samples = paper's n=8 per group"]},
+          "reasoning": "Series supplementary file deposited by the authors; columns map one-to-one onto the 16 hippocampal CP/RP GSMs.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^HC_((?:CP|RP)\\d+)$"]},
+          "key_column": "key",
+          "patterns": {"grp": ["title", "^HC_(CP|RP)\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix column CP1 equals the GEO title HC_CP1 without the HC_ prefix (inspect alignment_keys); group from title, consistent with characteristics treatment CP/RP for these 16 GSMs. Other GSMs (BEC scRNA, cortex, LPS experiment) are not in this matrix.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "All values integer (integer_fraction 1.0), library sums 2.2-37.9 M; data_processing for the 47 HC samples: STAR GeneCounts; paper S6.9.p1 runs DESeq2 on these counts. 27 Excel-mangled date IDs (Mar/Sep genes) dropped by prep script because the original symbols collide (e.g. March1/Marc1).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CP"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_RP_vs_CP"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "CP",
+            "treatment": "RP",
+            "estimand_type": "causal (randomized plasma infusion)",
+            "contrasts": [{"name": "grp_RP_vs_CP", "control": "CP", "treatment": "RP", "role": "primary"}]
+          },
+          "reasoning": "Two independent recipient groups, n=8 each (Fig. 1h). Reference CP (control plasma).",
+          "candidates": [{"value": "characteristics_ch1.1.treatment as group column", "reason_rejected": "mislabels all 31 LPS-experiment samples as RP; title is the reliable label"}],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent recipient mice, one sample each; no batch, sex or litter recorded in GEO; paper model has treatment only.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald)", "formula": "~ grp", "paper_route": {"method": "DESeq2 v1.32 Wald ~ treatment", "status": "reproduced"}, "deviations": ["pydeseq2 instead of R DESeq2", "27 Excel-mangled gene rows removed"]},
+          "transform": null,
+          "reasoning": "Paper's DESeq2 default Wald on raw counts (S6.9.p1). No independent pre-filter stated, so none applied.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null}
+          },
+          "reasoning": "Fig. 1h legend (FIG12): 'Wald tests; P < 0.05' with 1,952 DEGs; raw P kept as stated. BH padj<0.05 reported separately as audit.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["Recipients did not exercise: the estimand is the effect of runner plasma, not of running itself.", "Paper's DEG rule is raw P<0.05 without multiple-testing correction; the audit padj count is the stricter figure."]},
+          "paper_counts": {"grp_RP_vs_CP": 1952},
+          "paper_genes": {"grp_RP_vs_CP": ["Tns4", "Igsf5", "Ehf", "Foxo6", "Fam19a2", "Clu"]},
+          "reasoning": "Direct reproduction of Fig. 1h.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "GEO treatment annotation", "paper": "LPS experiment has SAL+SAL, LPS+SAL, LPS+CP, LPS+RP groups", "data": "characteristics_ch1.1.treatment = RP for all 31 LPS-experiment hippocampus GSMs", "disposition": "executable_without_change"},
+        {"item": "Excel-mangled gene IDs", "paper": "n/a", "data": "27 rows named 2019-03-xx / 2019-09-xx (March/Sept genes) with 2 duplicated IDs", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_RP_vs_CP",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "grp", "control_group": "CP", "treatment_group": "RP", "alpha": 0.05},
+          "role": "primary",
+          "reasoning": "Paper's two-group DESeq2 Wald (S6.9.p1, Fig. 1h)."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_RP_vs_CP", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports downregulated acute inflammatory response (S1.p3); GSEA on the full Wald ranking tests the inflammation direction. ORA skipped: paper's ORA used the top 250 DEGs, not the threshold list."}
+      ]
+    },
+    {
+      "case_id": "GSE164401_HC_LPS",
+      "accession": "GSE164401",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9721468.paper.md"],
+        "metadata": "GSE164401/GSE164401_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID34880498/prepped/GSE164401_HC_RNAseq_LPS_SAL_RP_CP_clean.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID34880498/prep_drop_excel_dates.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE164401"],
+            "assay": "bulk RNA-seq of whole hippocampus (S6.9.p1)",
+            "primary_estimand": "Effect of runner plasma versus control plasma on the hippocampal transcriptome of LPS-inoculated mice (LPS+RP vs LPS+CP), read against the LPS effect (LPS+SAL vs SAL+SAL) (S2.p1, Fig. 2a,b)",
+            "factors": {"grp": ["SALSAL", "LPSSAL", "LPSCP", "LPSRP"]},
+            "inclusion": "SAL+SAL n=8, LPS+SAL n=8, LPS+CP n=7, LPS+RP n=8 (FIG13 Fig. 2b legend)",
+            "planned_contrasts": [
+              "LPS+RP vs LPS+CP (S2.p1, Fig. 2b; count not stated in text, Supplementary Table 4)",
+              "LPS+SAL vs SAL+SAL (S2.p1; paper: 4,936 DEGs; LPS effect, non-exercise reference for the reversal)"
+            ],
+            "repeated_measure_unit": "none",
+            "paper_method": "DESeq2 Wald (S6.9.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "FIG13 (Fig. 2b legend: 'Wald test, P < 0.05')"},
+            "paper_results": {"LPS_DEGs": 4936, "reversal_correlation_r": -0.78, "RP_reduced_genes_qPCR": ["Myd88", "Tlr1", "Tlr2", "Irak3", "Irf9", "Ifngr1", "Stat1", "Stat3", "Gfap"]}
+          },
+          "reasoning": "S2.p1 / Fig. 2: RP reverses LPS-induced hippocampal genes (r=-0.78); DESeq2 Wald P<0.05.",
+          "confidence": "high",
+          "locator": "S2.p1; FIG13"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE164401", "31 columns equal GEO titles of GSM5625049-79 exactly", "group sizes 8/8/7/8 match Fig. 2b legend"]},
+          "reasoning": "Author-deposited series file; exact title match for all 31 columns.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(SAL_SAL|LPS_SAL|LPS_CP|LPS_RP)_L\\d+_\\d$"]},
+          "recode": {"grp": {"SAL_SAL": "SALSAL", "LPS_SAL": "LPSSAL", "LPS_CP": "LPSCP", "LPS_RP": "LPSRP"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Exact match of matrix columns to GEO title. Group from title prefix; GEO treatment field is wrong (all 'RP') and is not used. _1/_2 suffix columns are not technical replicates (log-CPM Spearman: a column's nearest neighbour is usually another L index), consistent with the paper counting them as separate mice.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "Integer counts (integer_fraction 1.0), library sums 5.5-50.9 M, STAR GeneCounts (data_processing), DESeq2 in paper. Same 27 Excel-mangled rows dropped.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "LPSCP"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_LPSRP_vs_LPSCP", "grp_LPSSAL_vs_SALSAL"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "multi-group, planned contrasts from one model",
+            "formula": "~ grp",
+            "estimand_type": "causal (randomized plasma infusion under LPS)",
+            "contrasts": [
+              {"name": "grp_LPSRP_vs_LPSCP", "control": "LPSCP", "treatment": "LPSRP", "role": "secondary"},
+              {"name": "grp_LPSSAL_vs_SALSAL", "control": "SALSAL", "treatment": "LPSSAL", "role": "secondary"}
+            ]
+          },
+          "reasoning": "Four-arm one-way design; the exercise-plasma contrast is LPS+RP vs LPS+CP (CP is the paper's plasma control). LPS vs saline is the paper's reference contrast for the reversal analysis, not an exercise effect. Fitted from one model on all 31 samples.",
+          "candidates": [{"value": "LPS+RP vs LPS+SAL", "reason_rejected": "paper's exercise comparison uses CP as control (Fig. 2b)"}],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": ["L index in titles"],
+          "reasoning": "The L index (L1-L16) in titles is nested within group (each L belongs to one arm), so it cannot be adjusted for as a fixed effect without absorbing the treatment; the paper does not model it. Independent mice treated as units.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald, joint model)", "formula": "~ grp", "paper_route": {"method": "DESeq2 Wald", "status": "reproduced"}, "deviations": ["pydeseq2; one dispersion fit across all four arms (paper likely did the same with a 4-level factor; not stated)", "27 Excel-mangled gene rows removed"]},
+          "transform": null,
+          "reasoning": "Raw counts, paper DESeq2 Wald.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null}
+          },
+          "reasoning": "Fig. 2b legend: Wald test, P < 0.05.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["LPS+SAL vs SAL+SAL is the LPS effect, reported only as the paper's reference for reversal, not as an exercise effect.", "Paper does not state the LPS+RP vs LPS+CP DEG count in the text."]},
+          "paper_counts": {"joint/grp_LPSSAL_vs_SALSAL": 4936},
+          "paper_genes": {"joint/grp_LPSRP_vs_LPSCP": ["Myd88", "Tlr1", "Tlr2", "Irak3", "Irf9", "Ifngr1", "Stat1", "Stat3", "Gfap"]},
+          "reasoning": "Reproduction of Fig. 2b contrasts.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "GEO treatment annotation", "paper": "four arms SAL+SAL / LPS+SAL / LPS+CP / LPS+RP", "data": "characteristics treatment = RP for all 31 samples; titles carry the true arm", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_LPSRP_vs_LPSCP", "grp_LPSSAL_vs_SALSAL"], "covariates": []},
+          "role": "secondary",
+          "reasoning": "Both planned contrasts from one DESeq2 model on all four arms."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_LPSRP_vs_LPSCP", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper: RP reduces cytokine/innate immune pathways under LPS (S2.p1)."}
+      ]
+    }
+  ]
+}
