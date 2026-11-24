@@ -907,3 +907,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID38151020 (GSE198922)
 
 - no duplicateCorrelation/voom-quality-weights executor; run_joint_limma fits numeric-looking subject IDs as continuous (tools/joint_contrasts.py:166); nested subject rank-deficient in pooled model Details: `PMID38151020/HANDBACK.md`.
+
+## PMID32930093 (GSE156667)
+
+- GEO SOFT/FTP fetch fails in inspect (geo_tools.py:30, FTP 403); runner needs matrix file even when stopping at gate 1 (case_runner.py:529, native.py:1049) Details: `PMID32930093/HANDBACK.md`.
+
+## PMID33311503 (GSE153350)
+
+- NCBI ftp gave 403 so no matrix; GEOparse error misleading (geo_tools.py:30); case_runner needs a matrix even to refuse at the paper gate (case_runner.py:178,529) Details: `PMID33311503/HANDBACK.md`.
