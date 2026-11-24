@@ -1,0 +1,88 @@
+{
+ "case": "GSE75919",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "No exercise-vs-rest question can be answered: all 9 sequenced gastrocnemius samples are post-exercise (GEO source_name 'after exercise'; S2.5.p1 'transcriptomic analysis in muscles of control and Gprc6a_Mck-/- mice after exercise'; S4.3.p1). Exercise factor is constant. Only a genotype contrast exists.",
+  "B2": "Gprc6a_Mck-/- vs Gprc6a fl/fl (control), both after a 40 min treadmill run (S4.1.p1, S4.3.p1); packet A gives 4 vs 5 samples. Paper states no n for RNA-seq in main text.",
+  "B3": "No repeated measures: one gastrocnemius per mouse, 9 distinct mice; packet A lists no pairing keys.",
+  "B4": "Paper does not say (RNA-seq methods are in the supplement, not available).",
+  "B5": "No DEG rule or DEG count in main text (S4.5.p1 gives only t-test P<=0.05 for non-omics data); only Il6 ~80% decreased and Il6ra modestly decreased (S2.5.p2)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Refusal for exercise question matches B1: exercise constant across all 9 samples (S2.5.p1; source_name_ch1). Flag refusal_vs_exercise_words is explained: the exercise words are constant, so no exercise arm exists.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "WT 5 / KO 4 matches geno levels in packet A; no exclusions; typos in GEO titles handled via description alignment 9/9.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast run.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No repeated-measures unit; 9 independent mice.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No model fitted; paper silent.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No fit; suitability reports one sex only, no batch info.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer HTSeq counts (integer_fraction 1.0) -> DESeq2 would fit; not used.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper states no omics threshold (S4.3.p1 defers to supplement); recorded as not stated.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No ours-vs-paper comparison claimed; HANDBACK reports only Il6/Il6ra as named in S2.5.p2.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "'No sedentary arm' is true and established from the full metadata (only one source_name level, no other columns) plus S2.5.p1. Genotype-within-exercise contrast was available and rated analyzable but declined on scope.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Policy: whether the analyzable genotype contrast (KO vs fl/fl after exercise, 4 vs 5) should be run as a labelled non-exercise result since the paper's RNA-seq estimand is exactly this contrast; refusal is consistent with the exercise-effect question."
+ ],
+ "summary": "该系列9只小鼠全部在运动后取样,没有安静对照组,因此无法估计运动效应,拒绝分析的理由属实。论文的RNA-seq本身就是运动后的基因型比较(KO 4 vs fl/fl 5),未给出阈值或DEG数。审查通过;仅留一个策略问题供人决定是否作为非运动结果另行运行。"
+}

@@ -487,3 +487,7 @@ One section per case; newest last.
 ## PMID33042761 / GSE140633 (2026-11-24)
 
 - policy: Policy question (open): whether the genotype contrast MI4KO vs flox should be run as a labelled non-exercise result.
+
+## PMID27304508 / GSE75919 (2026-11-24)
+
+- policy: Policy: whether the analyzable genotype contrast (KO vs fl/fl after exercise, 4 vs 5) should be run as a labelled non-exercise result since the paper's RNA-seq estimand is exactly this contrast; refusal is consistent with the exercise-effect question.

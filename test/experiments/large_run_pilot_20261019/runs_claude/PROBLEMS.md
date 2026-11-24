@@ -935,3 +935,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID33042761 (GSE136623;GSE140633)
 
 - geo_tools.py:30 GEOparse temp-file ENOENT plus HTTP 403 on supplements under default TEMP (fixed by scratch TMP); inspect gave no alignment_keys for GSE140633 Details: `PMID33042761/HANDBACK.md`.
+
+## PMID27304508 (GSE75919)
+
+- tools/case_runner.py:54 _EXTENSIONS lacks .xlsx.gz so inspect found no matrix; needed manual prep_counts.py Details: `PMID27304508/HANDBACK.md`.
