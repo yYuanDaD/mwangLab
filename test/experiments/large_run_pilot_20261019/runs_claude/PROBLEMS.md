@@ -1015,3 +1015,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36071599 (GSE211204)
 
 - validator wants rounding_documented for voom on estimated counts (native.py:1127); r_de.R voom lacks quantile normalization (r_de.R:192); R warning text lost in report Details: `PMID36071599/HANDBACK.md`.
+
+## PMID34836964 (GSE156174)
+
+- none in repo tools; minor: execute output levels.grp pools across strata (AMB_w8=2 = 1 SSC + 1 MSC), so n per arm looks larger Details: `PMID34836964/HANDBACK.md`.
+
+## PMID35284415 (GSE192982)
+
+- inspect doesn't flag a transposed (samples x genes) matrix, so a prep script was needed; data_processing text shows mojibake ("鈮" for "≤") Details: `PMID35284415/HANDBACK.md`.

@@ -1,0 +1,138 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41194654",
+  "request": "Analyze GSE278016 for PMID 41194654 (Anabolic Effects of Salbutamol Are Lost Upon Immobilization.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE278016",
+      "accession": "GSE278016",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC12589897.paper.md"],
+        "metadata": "GSE278016/GSE278016_metadata.csv",
+        "matrix": "GSE278016/GSE278016_merged.counts.geo1.tsv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE278016"],
+            "assay": "bulk RNA-seq, mouse quadriceps (S2.11.p1)",
+            "primary_estimand": "Physical-activity (muscle contraction) contrast as the paper defines it: effect of 2-week unilateral hindlimb immobilization (disuse) on quadriceps transcriptome, immobilized right leg vs contralateral non-immobilized left leg of untreated caloric-restricted mice (S3.6.p1, FIG6A). Secondary: salbutamol effect in mobile vs immobilized legs (S3.6.p1-p2), and caloric restriction vs healthy reference (S3.6.p1). No exercise arm exists; disuse (removal of contraction) is the activity manipulation.",
+            "factors": {"diet": ["H (ad libitum healthy reference)", "CR (60% food)"], "immobilization": ["non-immobilized left leg", "immobilized right leg"], "compound": ["PBS vehicle", "salbutamol 1 mg/kg/d"]},
+            "groups": "5 groups x n=15: H.0.0.R, CR.0.0.L, CR.I.0.R, CR.0.S.L, CR.I.S.R (S2.7.p1, FIG7)",
+            "repeated_measure_unit": "mouse: CR mice contribute both legs (left non-immob, right immob) (S2.7.p1)",
+            "sample_inclusion": "all 75 quadriceps samples (FIG7: n=15 per group)",
+            "planned_contrasts": [
+              "CR+Immob untreated vs CR untreated non-immob (immobilization effect; paper 2241 genes, S3.6.p1)",
+              "CR untreated non-immob vs Healthy (caloric restriction; paper 6513 genes, S3.6.p1)",
+              "CR+Salbutamol non-immob vs CR untreated non-immob (salbutamol in mobile leg; paper 2904 genes, S3.6.p2)",
+              "CR+Immob+Salbutamol vs CR+Immob untreated (salbutamol in immobilized leg; paper count not stated directly; 281 overlap with IM genes, 518 overlap with 2904)"
+            ],
+            "paper_threshold": {"metric": "not stated for genes", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.11.p1 (DESeq2; pathways p < 0.01 only); S2.13.p1 general p < 0.05 for non-omics stats"},
+            "paper_method": "HTSeq-count -> DESeq2; GSEA on Reactome (pathway p < 0.01)",
+            "normalization": "DESeq2 size factors",
+            "paper_results": "IM 2241 DEGs; CR 6513; salbutamol non-immob 2904; 518 of those still significant in immobilized leg; muscle contraction pathway up by salbutamol in mobile leg only; Rac1 down in immobilized vs non-immobilized (log2FC -0.26)"
+          },
+          "reasoning": "Paper is a salbutamol x immobilization study; transcriptomics in S2.11.p1/S3.6. The only physical-activity contrast is immobilization (disuse) vs contralateral mobile leg, which the paper frames as removing muscle contraction (S4.p1). The paper never states the gene-level significance rule.",
+          "confidence": "medium",
+          "locator": "S2.11.p1; S3.6.p1; S3.6.p2; S2.7.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE278016", "GEO: mouse quadriceps, C57BL/6J, TNO contact, STAR+HTSeq-count vM19 matches S2.11.p1", "75 samples = 5 groups x 15 matches FIG7"]},
+          "reasoning": "Data availability statement names GSE278016; processing and design match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "patterns": {},
+          "recode": {"grp": {"H.0.0.R": "H", "CR.0.0.L": "CR", "CR.I.0.R": "CRI", "CR.0.S.L": "CRS", "CR.I.S.R": "CRIS"}},
+          "aliases": {"grp": "characteristics_ch1.2.treatment"},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (105707-001-NNN) equal metadata 'description' exactly for 75/75. grp derived from the treatment code (diet.immob.compound.leg).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE278016_merged.counts.geo1.tsv.gz", "paper_input": "HTSeq-count read counts into DESeq2 (S2.11.p1)"},
+          "reasoning": "100% integers, max 2.76M; data_processing: HTSeq-count reads per gene, not normalised, input for DESeq2.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "CR"},
+          "organism": "Mouse",
+          "planned": ["grp_CRI_vs_CR", "grp_CR_vs_H", "grp_CRS_vs_CR", "grp_CRIS_vs_CRI"],
+          "final": {
+            "analysis_type": "multi-group, one DESeq2 model on 5 groups with planned pairwise contrasts",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_CRI_vs_CR", "control": "CR", "treatment": "CRI", "role": "primary"},
+              {"name": "grp_CR_vs_H", "control": "H", "treatment": "CR", "role": "secondary"},
+              {"name": "grp_CRS_vs_CR", "control": "CR", "treatment": "CRS", "role": "secondary"},
+              {"name": "grp_CRIS_vs_CRI", "control": "CRI", "treatment": "CRIS", "role": "secondary"}
+            ]
+          },
+          "candidates": [
+            {"value": "characteristics_ch1.4.treatm.immob pooled (I vs 0 across all groups)", "reason_rejected": "pools salbutamol and healthy groups; paper's IM contrast is within untreated CR mice"},
+            {"value": "2x2 factorial immob x compound with interaction", "reason_rejected": "paper reports simple-effect contrasts (FIG6A/C/D), not an interaction test; simple effects from the 5-group model reproduce them"}
+          ],
+          "reasoning": "Paper contrasts are simple effects between the 5 groups (FIG6). One model fitted on all samples; reference CR (untreated non-immobilized). Immobilization (CRI vs CR) is the primary activity contrast.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "leg side (treatm.leg)", "disposition": "aliased with immobilization by design (immobilized leg is always right); not a separate covariate"}, {"name": "mouse (pairing of left/right legs)", "disposition": "blocking would be appropriate but no mouse key is recorded in GEO; legs analyzed as independent samples (conservative for within-mouse contrasts)"}]},
+          "confounding_candidates": ["characteristics_ch1.6.treatm.leg"],
+          "reasoning": "CR mice contributed both legs (S2.7.p1), so CRI vs CR and CRIS vs CRS are within-mouse. Sample numbers differ per leg (016-030 vs 076-090) and no mouse ID exists in metadata, so the pairing cannot be recovered without guessing by position, which is forbidden. Ignoring a positive within-mouse correlation inflates the variance of the difference (conservative), so the unpaired test remains valid. Leg side is the experimental contralateral-control design, not a nuisance variable.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {"method": "DESeq2 (pydeseq2 Wald), one model ~ grp", "formula": "~ grp", "paper_route": {"method": "DESeq2", "status": "reproduced"}, "deviations": ["pydeseq2 instead of R DESeq2", "no mouse blocking (key not deposited); paper's own blocking unknown"]},
+          "transform": null,
+          "reasoning": "Raw HTSeq counts; paper used DESeq2 (S2.11.p1).",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "not stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper never states the gene-level rule; applied BH padj < 0.05 (workflow default). Raw p < 0.05 recorded only as an audit comparison because S2.13.p1 uses p < 0.05 for other outcomes."
+          },
+          "reasoning": "S2.11.p1 states only the pathway rule (p < 0.01); no gene threshold anywhere.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["No exercise arm: the activity contrast is disuse (immobilization) vs mobile contralateral leg under caloric restriction; interpret as removal of muscle contraction, the inverse of loading.", "Within-mouse pairing not modelled (no mouse key deposited).", "Paper's gene-level threshold unstated; counts compared under workflow default.", "Immobilized leg is always the right leg; side is aliased with immobilization."]},
+          "paper_counts": {"joint/grp_CRI_vs_CR": 2241, "joint/grp_CR_vs_H": 6513, "joint/grp_CRS_vs_CR": 2904},
+          "paper_genes": {"joint/grp_CRI_vs_CR": ["Rac1"], "joint/grp_CRS_vs_CR": ["Prkaca", "Ryr1", "Fbxo32", "Ttn", "Des"], "joint/grp_CRIS_vs_CRI": ["Prkaca", "Fbxo32"]},
+          "reasoning": "Counts from S3.6.p1-p2; Rac1 from S4.p3 (down in immobilized); Prkaca/Ryr1 up and Fbxo32 down by salbutamol in mobile leg only (S3.6.p5, S4.p2, S4.p4).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "pairing", "paper": "both legs of each CR mouse sequenced (S2.7.p1)", "data": "no mouse identifier; left/right sample numbers in disjoint ranges", "disposition": "executable_without_change"},
+        {"item": "gene threshold", "paper": "not stated", "data": "n/a", "disposition": "executable_without_change"},
+        {"item": "pathway database", "paper": "GSEA Reactome, p < 0.01", "data": "workflow GSEA uses MSigDB Hallmark", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "joint",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": ["grp_CRI_vs_CR", "grp_CR_vs_H", "grp_CRS_vs_CR", "grp_CRIS_vs_CRI"]},
+          "role": "primary",
+          "reasoning": "One DESeq2 model on all 75 samples; the paper's four simple-effect contrasts. grp_CRI_vs_CR is the primary activity (disuse) contrast."
+        }
+      ],
+      "enrichment": [
+        {"execution": "joint/grp_CRI_vs_CR", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports pathways regulated by immobilization (FIG6B); GSEA on full ranking (Hallmark, not Reactome)."},
+        {"execution": "joint/grp_CRS_vs_CR", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper's muscle-contraction pathway result for salbutamol in the mobile leg (FIG6E)."},
+        {"execution": "joint/grp_CRIS_vs_CRI", "ora": false, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Same pathway comparison in the immobilized leg (FIG6E striped bars)."}
+      ]
+    }
+  ]
+}
