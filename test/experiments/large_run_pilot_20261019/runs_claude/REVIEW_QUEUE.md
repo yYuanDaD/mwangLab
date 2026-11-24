@@ -696,3 +696,7 @@ One section per case; newest last.
 
 - policy: Which threshold to report when the paper states none but its deposited table fits padj<0.05 (35); open policy item.
 - policy: Participant 7 label (7b annotated baseline) is an inference from the title; confirm with the authors if it matters.
+
+## PMID31433691 / GSE122628 (2026-11-24)
+
+- policy: Paper threshold and DEG counts unverified: only the abstract was available; check against the full text if obtainable.

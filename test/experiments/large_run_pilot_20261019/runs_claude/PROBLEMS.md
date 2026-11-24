@@ -1115,3 +1115,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36603044 (GSE221894)
 
 - GEO 403/geo_tools.py:30 temp error; case_runner.py:54 reads BIFF .xls.gz as TSV, no xlrd; no salmon tx2gene route; sex check false MISMATCH, XIST absent (stats_tools.py:379) Details: `PMID36603044/HANDBACK.md`.
+
+## PMID31433691 (GSE122628)
+
+- GEO download failed (geo_tools.py:30 temp-dir error; ftp.ncbi.nlm.nih.gov 403, used ftp.ncbi.nih.gov); edger_tools.py:105-124 has no low-count filter (about 18 min); edgeR needs integers Details: `PMID31433691/HANDBACK.md`.

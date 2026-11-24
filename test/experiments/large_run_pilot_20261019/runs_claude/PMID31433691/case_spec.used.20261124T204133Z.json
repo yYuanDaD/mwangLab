@@ -1,0 +1,126 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID31433691",
+  "request": "Analyze GSE122628 for PMID 31433691 (The impact of skeletal muscle contraction on CD146(+)Lin(-) pericytes.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE122628",
+      "accession": "GSE122628",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID31433691/abstract_PMID31433691.txt"],
+        "metadata": "GSE122628/GSE122628_metadata.csv",
+        "matrix": "GSE122628/GSE122628_Boppart_GeneCounts_GEO.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_column": "external_gene_name",
+        "feature_duplicates": "sum"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE122628"],
+            "assay": "bulk RNA-seq (SMARTer Stranded Total RNA-seq Pico v2, HiSeq 4000 SE101) of FACS-sorted CD146+CD45-CD31- pericytes from gastrocnemius-soleus",
+            "sample_inclusion": "6 male C57BL/6J WT mice, 14 wk; 3 e-stim, 3 sham (GEO overall_design)",
+            "factors": {"treatment": ["sham (U)", "acute e-stim (S)"]},
+            "primary_estimand": "Effect of a single 10-min bout of electrically stimulated (eccentric) muscle contraction vs sham on the transcriptome of CD146+Lin- pericytes, 3 h post-contraction",
+            "planned_contrasts": ["e-stim vs sham, CD146+Lin- pericytes, 3 h (abstract; GEO overall_design); paper DEG count not available from abstract"],
+            "repeated_measure_unit": "none (one sample per mouse, independent groups)",
+            "normalization": "Salmon -> tximport lengthScaledTPM gene counts (GEO data_processing)",
+            "paper_method": "edgeR quasi-likelihood (GEO data_processing: counts analyzed directly using the edgeR-quasi method)",
+            "paper_threshold": {"metric": "FDR", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "not stated in abstract or GEO; full text unavailable"},
+            "paper_results": "Abstract: upregulation of genes related to immunomodulation and extracellular matrix remodeling in CD146+Lin- pericytes after contraction; no counts or gene names given"
+          },
+          "reasoning": "Only the PubMed abstract (PMID 31433691) and the GEO series/sample records are available; no full text. The abstract states RNA-seq of CD146+Lin- pericytes 3 h after a single e-stim session vs sham; GEO overall_design confirms n=3/group male mice, and data_processing names the edgeR-quasi method. No threshold or DEG count is recoverable.",
+          "confidence": "medium",
+          "locator": "abstract; GEO GSE122628 overall_design, data_processing"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 31433691", "6 GSMs (GSM3476630-35) match 6 matrix columns S1-S3, U1-U3", "cell type CD146+CD45-CD31- pericytes matches abstract"]},
+          "reasoning": "Series links PMID 31433691; supplementary gene-count file belongs to this series and its columns map one-to-one to the series samples."
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "\\[(\\w+)\\]$"]},
+          "key_column": "key",
+          "patterns": {"grp": ["source_name_ch1", "\\((S|U)\\)$"]},
+          "recode": {"grp": {"S": "STIM", "U": "SHAM"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns S1..U3 are the bracketed codes in GEO titles (Stim 1 [S1]); group from source_name_ch1 (S)/(U), consistent with treatment Exercised/Not Exercised."
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "edgeR",
+          "reasoning": "Only 25% of values are integers, max 1.9e6, median 8.7; GEO data_processing: Salmon quasi-mapping + tximport lengthScaledTPM summed to gene level -> estimated (length-scaled) counts on the count scale, not TPM. Paper input is the same file, analyzed with edgeR-quasi.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "SHAM"},
+          "organism": "Mouse",
+          "planned": ["grp_STIM_vs_SHAM"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "SHAM",
+            "treatment": "STIM",
+            "contrasts": [{"name": "grp_STIM_vs_SHAM", "control": "SHAM", "treatment": "STIM", "role": "primary"}]
+          },
+          "reasoning": "Single factor, two independent arms (3 vs 3); e-stim induced contraction is the paper's exercise model. Treatment column (Exercised/Not Exercised) is identical to source_name grouping.",
+          "candidates": [{"value": "characteristics_ch1.4.treatment", "reason_rejected": "identical partition to source_name_ch1; used one column"}]
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice, all male, same age/strain, one sequencing lane (L002 for all in description); no batch or pairing recorded."
+        },
+        "method": {
+          "transform": "round",
+          "final": {
+            "method": "edgeR (quasi-likelihood F-test, TMM) on rounded tximport lengthScaledTPM counts",
+            "formula": "~ grp",
+            "rounding_documented": true,
+            "paper_route": {"method": "edgeR-quasi on non-integer lengthScaledTPM counts", "status": "approximated", "reason": "repository edgeR executor (inmoose) enforces integer input; counts are rounded to nearest integer, which edgeR in R would accept unrounded; effect is negligible except for very low counts"},
+            "deviations": ["counts rounded to integers before edgeR", "paper's low-expression filter unknown (abstract only); executor defaults used"]
+          },
+          "reasoning": "Reproduce the paper's stated edgeR-quasi route. Rounding of tximport lengthScaledTPM counts is the standard documented recipe for count-based tools on tximport output."
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": null, "effect_metric": null, "effect_cutoff": null},
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Paper threshold not recoverable from the abstract; workflow default BH-FDR < 0.05, no fold-change cutoff. Raw p < 0.05 recorded as an audit count only."
+          },
+          "reasoning": "No full text; abstract and GEO give no cutoff."
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": ["Comparison with the paper rests on the abstract only (no DEG count or gene list available)", "n=3 per group", "counts rounded for the integer-only edgeR executor", "threshold is the workflow default, not the paper's", "Immunomodulation direction agrees with the abstract (GSEA Hallmark inflammatory response, IL6-JAK-STAT3, TNFa-NFkB, allograft rejection positive; S100a8/S100a9, Il1rn, Cxcl3, Ptx3 up), but Hallmark EPITHELIAL_MESENCHYMAL_TRANSITION (ECM-rich set, NES -2.18) and ANGIOGENESIS (NES -2.15) are NEGATIVELY enriched, which does not support the abstract's ECM-remodelling up-regulation at the Hallmark level; the paper's specific ECM genes are unknown (abstract only)"]
+          },
+          "paper_counts": {},
+          "paper_genes": {},
+          "reasoning": "Paper's stated method on the paper's deposited input; the abstract reports only a direction (up-regulation of immunomodulatory and ECM-remodelling genes)."
+        }
+      },
+      "discrepancies": [
+        {"item": "edgeR input", "paper": "non-integer lengthScaledTPM counts into edgeR-quasi", "data": "executor requires integers", "disposition": "executable_with_declared_change"}
+      ],
+      "executions": [
+        {"name": "grp_STIM_vs_SHAM", "tool": "tools.edger_tools:run_edger_analysis",
+         "args": {"design_column": "grp", "control_group": "SHAM", "treatment_group": "STIM"},
+         "role": "primary", "reasoning": "paper's edgeR-quasi two-group test"},
+        {"name": "grp_STIM_vs_SHAM_deseq2", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "SHAM", "treatment_group": "STIM", "alpha": 0.05},
+         "role": "sensitivity", "reasoning": "second NB method on the same rounded counts to gauge method sensitivity at n=3"}
+      ],
+      "enrichment": [
+        {"execution": "grp_STIM_vs_SHAM", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "abstract reports immunomodulation and ECM remodelling gene programs"}
+      ]
+    }
+  ]
+}

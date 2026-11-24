@@ -1,0 +1,21 @@
+{"case": "GSE122628", "reviewer": "case-reviewer, Claude Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. Abstract: mice got bilateral e-stim (single session of eccentric/concentric contraction) or sham; RNA-seq of CD146+Lin- pericytes 3 h after contraction. In packet A the 3 'Stim' (S1-S3, grp STIM, treatment Exercised) samples carry the exercise factor; 3 'Unstim' (U1-U3) are sham. Only the abstract is available, no Methods.",
+  "B2": "e-stim vs sham, CD146+Lin- pericytes, 3 h post, 3 vs 3 male mice (GEO treatment_protocol, n=3/group). Abstract gives no other RNA-seq comparison.",
+  "B3": "No repeated measures: 6 samples, one per mouse, one cell type, one time point. No pairing key in packet A links any samples (0/6). Abstract mentions bilateral e-stim but each GSM is a sorted pericyte pool per animal.",
+  "B4": "Abstract does not say. GEO data_processing says gene counts were analyzed with the edgeR-quasi method; two groups only, so joint vs pairwise is moot.",
+  "B5": "Abstract gives no DEG rule or counts (only 'upregulation of genes related to immunomodulation and ECM remodeling'). Not stated in the available text."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Series has an in vivo e-stim arm vs sham (abstract; packet A treatment Exercised/Not Exercised); analyzed.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp STIM 3 / SHAM 3 from source_name_ch1 (S)/(U), identical to treatment column and to sample descriptions; alignment coverage 6/6, no exclusions; control = sham.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrast grp_STIM_vs_SHAM, control SHAM, treatment STIM; GSEA 'enriched in treatment' reads as STIM.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per mouse, no repeated unit; repeated_measure_unit 'none'; no candidate keys link samples.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Single two-group model ~ grp; GEO says edgeR-quasi. DESeq2 run as sensitivity.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "All male, same age/strain, same lane L002; no batch/housing column varies with group.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "minor", "evidence": "25% integer values, tximport lengthScaledTPM estimated counts; rounded and run through edgeR QL with TMM, declared as approximated. No low-expression filter was applied (edgeR tested 48759 genes vs DESeq2 20359), which dilutes BH power; the paper's filter is unknown.", "fix": "Optional: add a filterByExpr-style filter as a sensitivity run."},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule not recoverable (abstract only); workflow default padj<0.05 and raw p audit recorded as default, not as the paper's (threshold_source workflow_default, deviation_note).", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "No paper counts available; paper_counts empty; HANDBACK states the comparison rests on the abstract and only compares direction. ECM caveat is stated honestly.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Paper threshold and DEG counts unverified: only the abstract was available; check against the full text if obtainable."],
+ "summary": "该系列为体内电刺激与假刺激各3只雄性小鼠的独立样本，分组、方向、模型和矩阵处理均与摘要及GEO记录一致，无重复测量或混杂。论文阈值和DEG数无法从摘要获得，已如实记为默认阈值并仅比较方向。仅有未做低表达过滤这一轻微问题。"}
