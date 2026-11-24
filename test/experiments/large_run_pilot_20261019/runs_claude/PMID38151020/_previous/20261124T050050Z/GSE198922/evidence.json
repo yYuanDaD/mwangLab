@@ -1,0 +1,2597 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38151020",
+  "subject_id": "GSE198922",
+  "created_at": "2026-11-23T23:55:08",
+  "finished_at": "2026-11-24T00:00:23",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC10829726.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC10829726.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-23T23:55:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "3445e0c1e05fc6bd6bad915647b278c7cdf95df550d865eaa7d814c87781a753",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE198922_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE198922\\GSE198922_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-23T23:55:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d1ba7f6854b402b319efd96b3a55b2f77ce8ce3f509744b1d5df054aa2d4144b",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE198922_processed.data.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE198922\\GSE198922_processed.data.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-23T23:55:08",
+      "sha256": null,
+      "attributes": {
+        "sha256": "97ecfafc199dc2d8a822c98ffc02bd5079f4b9fa0bd5732d6eb984b8674138ab",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE198922"
+        ],
+        "assay": "bulk RNA-seq (TruSeq stranded total RNA, NextSeq500), leg subcutaneous adipose tissue",
+        "primary_estimand": "Within-subject change in adipose-tissue gene expression after one acute 30-min cycling bout (85% HRmax), at 0 min post-exercise (POST) and 3 h recovery (REC) versus pre-exercise basal (PRE), separately in NGT (n=20) and T2D (n=28) participants",
+        "factors": {
+          "diagnosis": [
+            "NGT",
+            "T2D"
+          ],
+          "time": [
+            "PRE",
+            "POST",
+            "REC"
+          ],
+          "sex": [
+            "M",
+            "F"
+          ]
+        },
+        "sample_inclusion": "20 NGT (11M/9F) + 28 T2D (16M/12F) participants, three biopsies each (S2.1.p1, TAB1)",
+        "repeated_measure_unit": "participant (three biopsies per person)",
+        "planned_contrasts": [
+          "NGT POST vs PRE (S2.1.p1; paper: 712 DEGs)",
+          "T2D POST vs PRE (S2.1.p1; paper: 893 DEGs)",
+          "NGT REC vs PRE (S2.1.p1; count not stated exactly; T2D REC has 3228 genes not shared with NGT REC, implying 1088 shared)",
+          "T2D REC vs PRE (S2.1.p1; paper: 4316 DEGs)",
+          "T2D vs NGT at PRE (S2.1.p1; 589 DEGs; basal disease comparison, not an exercise contrast)"
+        ],
+        "paper_method": "edgeR filterByExpr (min.count 15, design ~0+group+sex); limma with quality weights (voomWithQualityWeights implied) on ~0 + group + sex, duplicateCorrelation blocking on participant (S4.4.2.p1)",
+        "paper_normalization": "CPM (GEO supplementary is CPM)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "source_locator": "S4.4.2.p1"
+        },
+        "paper_results": "OSM among most induced post-exercise in both groups; CYR61(CCN1), CXCL2, HBEGF, IL6, COX2(PTGS2) highly induced post; SFRP4 and MXRA5 up at REC in T2D; PPARG down at REC in T2D only; LEP/ADIPOQ/RARRES2 decreased at REC"
+      },
+      "reason": "S4.4.2.p1 gives filter, model (~0 + group + sex, quality weights, duplicateCorrelation on participant) and threshold (FDR 0.05, 'fold change cut-off of 0.1'); S2.1.p1 gives the per-group counts. 'Fold change cut-off of 0.1' is read as |logFC| > 0.1 on the limma log2 scale (a linear fold change of 0.1 is meaningless as a symmetric cutoff).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:08"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE198922\\GSE198922_processed.data.csv.gz",
+        "owned": true,
+        "checks": [
+          "TAB2 key resources and S4.4.2.p1 name GSE198922",
+          "GEO contact Lundell (L.S.L. did bioinformatics, S5.1.p1), Karolinska",
+          "48 participants (20 NGT/28 T2D) and sexes match the paper",
+          "adipose tissue biopsies PRE/POST/REC"
+        ],
+        "accession": "GSE198922",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE198922\\GSE198922_metadata.csv"
+      },
+      "reason": "Paper names GSE198922 as its deposited RNA-seq; sample composition matches S2.1.p1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:08"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 143,
+        "n_metadata": 144,
+        "coverage": 0.9931,
+        "unmatched_matrix_columns": [
+          "entrez"
+        ],
+        "unmatched_metadata_samples": [
+          "GSM5960610"
+        ],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "pid": {
+              "alias_of": "characteristics_ch1.2.participant id"
+            },
+            "dx": {
+              "alias_of": "characteristics_ch1.3.diagnosis"
+            },
+            "sex": {
+              "alias_of": "characteristics_ch1.0.Sex"
+            },
+            "time": {
+              "source": "title",
+              "regex": "^\\d+_(PRE|POST|REC)$"
+            },
+            "subject": {
+              "combine": [
+                "dx",
+                "pid"
+              ],
+              "separator": "_",
+              "of": "recoded values"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\design_metadata.csv",
+          "sha256": "c3903fca1ab66df8ff7b707e942287ecbfa6f3bd11a305933f6c99ff766e6f6c",
+          "levels": {
+            "pid": {
+              "11": 3,
+              "12": 3,
+              "15": 3,
+              "16": 3,
+              "17": 3,
+              "18": 3,
+              "19": 3,
+              "2": 3,
+              "20": 3,
+              "21": 3,
+              "22": 3,
+              "23": 3,
+              "26": 3,
+              "27": 3,
+              "3": 3,
+              "30": 3,
+              "31": 3,
+              "32": 3,
+              "33": 3,
+              "34": 3,
+              "35": 3,
+              "37": 3,
+              "38": 3,
+              "4": 3,
+              "42": 3,
+              "44": 3,
+              "46": 3,
+              "49": 3,
+              "50": 3,
+              "53": 3,
+              "56": 3,
+              "57": 3,
+              "58": 3,
+              "59": 3,
+              "6": 3,
+              "60": 3,
+              "62": 3,
+              "63": 3,
+              "64": 3,
+              "65": 3,
+              "66": 3,
+              "67": 3,
+              "68": 3,
+              "7": 3,
+              "71": 3,
+              "75": 3,
+              "9": 3,
+              "1": 2
+            },
+            "dx": {
+              "T2D": 83,
+              "NGT": 60
+            },
+            "sex": {
+              "M": 80,
+              "F": 63
+            },
+            "time": {
+              "PRE": 48,
+              "REC": 48,
+              "POST": 47
+            },
+            "subject": {
+              "T2D_11": 3,
+              "T2D_12": 3,
+              "NGT_15": 3,
+              "NGT_16": 3,
+              "T2D_17": 3,
+              "NGT_18": 3,
+              "T2D_19": 3,
+              "T2D_2": 3,
+              "NGT_20": 3,
+              "NGT_21": 3,
+              "NGT_22": 3,
+              "NGT_23": 3,
+              "T2D_26": 3,
+              "NGT_27": 3,
+              "NGT_3": 3,
+              "T2D_30": 3,
+              "T2D_31": 3,
+              "NGT_32": 3,
+              "NGT_33": 3,
+              "T2D_34": 3,
+              "T2D_35": 3,
+              "T2D_37": 3,
+              "T2D_38": 3,
+              "T2D_4": 3,
+              "NGT_42": 3,
+              "T2D_44": 3,
+              "T2D_46": 3,
+              "NGT_49": 3,
+              "NGT_50": 3,
+              "T2D_53": 3,
+              "T2D_56": 3,
+              "NGT_57": 3,
+              "T2D_58": 3,
+              "NGT_59": 3,
+              "T2D_6": 3,
+              "NGT_60": 3,
+              "NGT_62": 3,
+              "T2D_63": 3,
+              "T2D_64": 3,
+              "T2D_65": 3,
+              "NGT_66": 3,
+              "T2D_67": 3,
+              "T2D_68": 3,
+              "T2D_7": 3,
+              "T2D_71": 3,
+              "NGT_75": 3,
+              "T2D_9": 3,
+              "T2D_1": 2
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (e.g. 11_POST) equal GEO title for 143/144 samples; 1_POST has metadata but no matrix column (missing from the deposited matrix). Time comes from the title suffix, which matches characteristics exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:17"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GEO data_processing: 'processed.data.csv contains cpm'; values non-integer, column sums ~0.7-7e6",
+        "paper_input": "raw featureCounts counts into limma with quality weights (voom)",
+        "matrix_type": "CPM (linear normalized counts)",
+        "recommended_method": "limma on log2(CPM+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\aligned_matrix.csv",
+          "sha256": "dafaa373e302a2bff1586701350185793f1b97bbbceb26ff58c1461cb2689c54",
+          "n_features": 23937,
+          "n_samples": 143,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 4078790.10234494,
+          "median": 5.14511512018902,
+          "integer_fraction": 0.0303,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "data_processing explicitly states CPM; 97% non-integer values; no raw counts deposited (supplementary_file NONE besides processed CPM). Raw counts cannot be recovered without library sizes, so voom cannot run as in the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:21"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "repeated-measures time course within diagnosis strata",
+        "formula": "~ 0 + time + subject (per diagnosis stratum)",
+        "contrasts": [
+          {
+            "name": "time_POST_vs_PRE_dx-NGT",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "primary"
+          },
+          {
+            "name": "time_REC_vs_PRE_dx-NGT",
+            "control": "PRE",
+            "treatment": "REC",
+            "role": "primary"
+          },
+          {
+            "name": "time_POST_vs_PRE_dx-T2D",
+            "control": "PRE",
+            "treatment": "POST",
+            "role": "primary"
+          },
+          {
+            "name": "time_REC_vs_PRE_dx-T2D",
+            "control": "PRE",
+            "treatment": "REC",
+            "role": "primary"
+          }
+        ],
+        "estimand_type": "causal within-subject (pre/post, no non-exercise control arm)",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\suitability\\suitability.md",
+          "n_comparisons": 6,
+          "n_analyzable": 6
+        }
+      },
+      "reason": "S2.1.p1/FIG1B: exercise contrasts are POST vs PRE and REC vs PRE within NGT and within T2D. Repeated biopsies per participant require the participant as blocking unit. Diagnosis is a stratum so time contrasts never cross groups.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:32"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "required",
+        "blocking_terms": [
+          "subject"
+        ],
+        "covariates": [
+          {
+            "name": "sex",
+            "disposition": "nested: constant within subject, absorbed by the subject fixed effect"
+          },
+          {
+            "name": "dx",
+            "disposition": "excluded: used as stratum"
+          }
+        ],
+        "design_check": {
+          "formula_equivalent": "~ C(time) + C(subject)",
+          "n_samples": 143,
+          "n_columns": 50,
+          "columns": [
+            "Intercept",
+            "time_PRE",
+            "time_REC",
+            "subject_NGT_16",
+            "subject_NGT_18",
+            "subject_NGT_20",
+            "subject_NGT_21",
+            "subject_NGT_22",
+            "subject_NGT_23",
+            "subject_NGT_27",
+            "subject_NGT_3",
+            "subject_NGT_32",
+            "subject_NGT_33",
+            "subject_NGT_42",
+            "subject_NGT_49",
+            "subject_NGT_50",
+            "subject_NGT_57",
+            "subject_NGT_59",
+            "subject_NGT_60",
+            "subject_NGT_62",
+            "subject_NGT_66",
+            "subject_NGT_75",
+            "subject_T2D_1",
+            "subject_T2D_11",
+            "subject_T2D_12",
+            "subject_T2D_17",
+            "subject_T2D_19",
+            "subject_T2D_2",
+            "subject_T2D_26",
+            "subject_T2D_30",
+            "subject_T2D_31",
+            "subject_T2D_34",
+            "subject_T2D_35",
+            "subject_T2D_37",
+            "subject_T2D_38",
+            "subject_T2D_4",
+            "subject_T2D_44",
+            "subject_T2D_46",
+            "subject_T2D_53",
+            "subject_T2D_56",
+            "subject_T2D_58",
+            "subject_T2D_6",
+            "subject_T2D_63",
+            "subject_T2D_64",
+            "subject_T2D_65",
+            "subject_T2D_67",
+            "subject_T2D_68",
+            "subject_T2D_7",
+            "subject_T2D_71",
+            "subject_T2D_9"
+          ],
+          "rank": 50,
+          "full_rank": true,
+          "residual_df": 93,
+          "levels": {
+            "time": {
+              "PRE": 48,
+              "REC": 48,
+              "POST": 47
+            },
+            "subject": {
+              "T2D_11": 3,
+              "T2D_12": 3,
+              "NGT_15": 3,
+              "NGT_16": 3,
+              "T2D_17": 3,
+              "NGT_18": 3,
+              "T2D_19": 3,
+              "T2D_2": 3,
+              "NGT_20": 3,
+              "NGT_21": 3,
+              "NGT_22": 3,
+              "NGT_23": 3,
+              "T2D_26": 3,
+              "NGT_27": 3,
+              "NGT_3": 3,
+              "T2D_30": 3,
+              "T2D_31": 3,
+              "NGT_32": 3,
+              "NGT_33": 3,
+              "T2D_34": 3,
+              "T2D_35": 3,
+              "T2D_37": 3,
+              "T2D_38": 3,
+              "T2D_4": 3,
+              "NGT_42": 3,
+              "T2D_44": 3,
+              "T2D_46": 3,
+              "NGT_49": 3,
+              "NGT_50": 3,
+              "T2D_53": 3,
+              "T2D_56": 3,
+              "NGT_57": 3,
+              "T2D_58": 3,
+              "NGT_59": 3,
+              "T2D_6": 3,
+              "NGT_60": 3,
+              "NGT_62": 3,
+              "T2D_63": 3,
+              "T2D_64": 3,
+              "T2D_65": 3,
+              "NGT_66": 3,
+              "T2D_67": 3,
+              "T2D_68": 3,
+              "T2D_7": 3,
+              "T2D_71": 3,
+              "NGT_75": 3,
+              "T2D_9": 3,
+              "T2D_1": 2
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "POST",
+                "NGT_15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_59"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_60"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_62"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_66"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "NGT_75"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_31"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_63"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_64"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_65"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_67"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_68"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_71"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "POST",
+                "T2D_9"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_59"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_60"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_62"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_66"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "NGT_75"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_31"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_63"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_64"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_65"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_67"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_68"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_71"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "PRE",
+                "T2D_9"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_15"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_16"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_18"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_20"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_21"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_22"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_23"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_27"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_3"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_32"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_33"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_42"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_49"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_50"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_57"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_59"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_60"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_62"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_66"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "NGT_75"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_1"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_11"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_12"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_17"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_19"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_2"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_26"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_30"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_31"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_34"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_35"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_37"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_38"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_4"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_44"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_46"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_53"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_56"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_58"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_6"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_63"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_64"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_65"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_67"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_68"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_7"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_71"
+              ],
+              "n": 1
+            },
+            {
+              "cell": [
+                "REC",
+                "T2D_9"
+              ],
+              "n": 1
+            }
+          ],
+          "min_cell_size": 1,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "sex",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "F": 21,
+                "M": 26
+              },
+              "PRE": {
+                "F": 21,
+                "M": 27
+              },
+              "REC": {
+                "F": 21,
+                "M": 27
+              }
+            }
+          },
+          {
+            "column": "subject",
+            "n_levels": 48,
+            "status": "crossed",
+            "crosstab": {
+              "POST": {
+                "NGT_15": 1,
+                "NGT_16": 1,
+                "NGT_18": 1,
+                "NGT_20": 1,
+                "NGT_21": 1,
+                "NGT_22": 1,
+                "NGT_23": 1,
+                "NGT_27": 1,
+                "NGT_3": 1,
+                "NGT_32": 1,
+                "NGT_33": 1,
+                "NGT_42": 1,
+                "NGT_49": 1,
+                "NGT_50": 1,
+                "NGT_57": 1,
+                "NGT_59": 1,
+                "NGT_60": 1,
+                "NGT_62": 1,
+                "NGT_66": 1,
+                "NGT_75": 1,
+                "T2D_1": 0,
+                "T2D_11": 1,
+                "T2D_12": 1,
+                "T2D_17": 1,
+                "T2D_19": 1,
+                "T2D_2": 1,
+                "T2D_26": 1,
+                "T2D_30": 1,
+                "T2D_31": 1,
+                "T2D_34": 1,
+                "T2D_35": 1,
+                "T2D_37": 1,
+                "T2D_38": 1,
+                "T2D_4": 1,
+                "T2D_44": 1,
+                "T2D_46": 1,
+                "T2D_53": 1,
+                "T2D_56": 1,
+                "T2D_58": 1,
+                "T2D_6": 1,
+                "T2D_63": 1,
+                "T2D_64": 1,
+                "T2D_65": 1,
+                "T2D_67": 1,
+                "T2D_68": 1,
+                "T2D_7": 1,
+                "T2D_71": 1,
+                "T2D_9": 1
+              },
+              "PRE": {
+                "NGT_15": 1,
+                "NGT_16": 1,
+                "NGT_18": 1,
+                "NGT_20": 1,
+                "NGT_21": 1,
+                "NGT_22": 1,
+                "NGT_23": 1,
+                "NGT_27": 1,
+                "NGT_3": 1,
+                "NGT_32": 1,
+                "NGT_33": 1,
+                "NGT_42": 1,
+                "NGT_49": 1,
+                "NGT_50": 1,
+                "NGT_57": 1,
+                "NGT_59": 1,
+                "NGT_60": 1,
+                "NGT_62": 1,
+                "NGT_66": 1,
+                "NGT_75": 1,
+                "T2D_1": 1,
+                "T2D_11": 1,
+                "T2D_12": 1,
+                "T2D_17": 1,
+                "T2D_19": 1,
+                "T2D_2": 1,
+                "T2D_26": 1,
+                "T2D_30": 1,
+                "T2D_31": 1,
+                "T2D_34": 1,
+                "T2D_35": 1,
+                "T2D_37": 1,
+                "T2D_38": 1,
+                "T2D_4": 1,
+                "T2D_44": 1,
+                "T2D_46": 1,
+                "T2D_53": 1,
+                "T2D_56": 1,
+                "T2D_58": 1,
+                "T2D_6": 1,
+                "T2D_63": 1,
+                "T2D_64": 1,
+                "T2D_65": 1,
+                "T2D_67": 1,
+                "T2D_68": 1,
+                "T2D_7": 1,
+                "T2D_71": 1,
+                "T2D_9": 1
+              },
+              "REC": {
+                "NGT_15": 1,
+                "NGT_16": 1,
+                "NGT_18": 1,
+                "NGT_20": 1,
+                "NGT_21": 1,
+                "NGT_22": 1,
+                "NGT_23": 1,
+                "NGT_27": 1,
+                "NGT_3": 1,
+                "NGT_32": 1,
+                "NGT_33": 1,
+                "NGT_42": 1,
+                "NGT_49": 1,
+                "NGT_50": 1,
+                "NGT_57": 1,
+                "NGT_59": 1,
+                "NGT_60": 1,
+                "NGT_62": 1,
+                "NGT_66": 1,
+                "NGT_75": 1,
+                "T2D_1": 1,
+                "T2D_11": 1,
+                "T2D_12": 1,
+                "T2D_17": 1,
+                "T2D_19": 1,
+                "T2D_2": 1,
+                "T2D_26": 1,
+                "T2D_30": 1,
+                "T2D_31": 1,
+                "T2D_34": 1,
+                "T2D_35": 1,
+                "T2D_37": 1,
+                "T2D_38": 1,
+                "T2D_4": 1,
+                "T2D_44": 1,
+                "T2D_46": 1,
+                "T2D_53": 1,
+                "T2D_56": 1,
+                "T2D_58": 1,
+                "T2D_6": 1,
+                "T2D_63": 1,
+                "T2D_64": 1,
+                "T2D_65": 1,
+                "T2D_67": 1,
+                "T2D_68": 1,
+                "T2D_7": 1,
+                "T2D_71": 1,
+                "T2D_9": 1
+              }
+            }
+          }
+        ]
+      },
+      "reason": "Paper blocks participants with duplicateCorrelation and adjusts sex (S4.4.2.p1). Here subject is a fixed effect within each stratum; sex is subject-level so it is absorbed. Within-subject time contrasts are identified.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:32"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "CPM (linear normalized counts)",
+        "method": "limma (moderated t, eBayes) on log2(CPM+1), subject fixed effect",
+        "formula": "~ 0 + C(time) + C(subject)",
+        "paper_route": {
+          "method": "limma-voom with quality weights, ~0 + group + sex, duplicateCorrelation(participant)",
+          "status": "blocked",
+          "reason": "only CPM deposited (no raw counts / library sizes for voom); executor has no duplicateCorrelation or array quality weights"
+        },
+        "deviations": [
+          "log2(CPM+1) limma instead of voomWithQualityWeights on counts",
+          "subject fixed effect instead of duplicateCorrelation random block",
+          "separate fit per diagnosis stratum instead of one pooled model (residual variance not shared across groups)",
+          "no additional filterByExpr: deposited CPM matrix is used as filtered by the authors"
+        ],
+        "transform": "log2(x+1)"
+      },
+      "reason": "Matrix-method policy: linear normalized values go to limma after log2. Subject fixed effects give the same within-subject estimand as duplicateCorrelation blocking for time contrasts.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:40"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "threshold_source": "paper_on_deviation_route",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null
+        },
+        "deviation_note": "'fold change cut-off of 0.1' interpreted as |log2FC| > 0.1; audit rule drops the FC cutoff"
+      },
+      "reason": "S4.4.2.p1: FDR 0.05 and fold change cut-off 0.1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:55:40"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "limma_NGT",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 60,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_NGT\\input\\matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell) + C(cov0)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_NGT\\DEG_results_time_POST_vs_PRE_dx-NGT.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_NGT\\DEG_results_time_REC_vs_PRE_dx-NGT.csv"
+        ],
+        "counts": {
+          "limma_NGT/time_POST_vs_PRE_dx-NGT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+              "n_tested": 23937,
+              "n_significant": 965,
+              "n_up": 597,
+              "n_down": 368,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23937,
+              "n_significant": 965,
+              "n_up": 597,
+              "n_down": 368,
+              "deg_sanity": "ok"
+            }
+          },
+          "limma_NGT/time_REC_vs_PRE_dx-NGT": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+              "n_tested": 23937,
+              "n_significant": 4920,
+              "n_up": 2229,
+              "n_down": 2691,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23937,
+              "n_significant": 4921,
+              "n_up": 2229,
+              "n_down": 2692,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "NGT time course, subject fixed effect",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:57:13"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_limma",
+        "subset": "limma_T2D",
+        "role": "primary",
+        "tool": "tools.joint_contrasts:run_joint_limma",
+        "n_samples": 83,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_T2D\\input\\matrix.csv",
+        "transform": "log2(x+1)",
+        "formula": "~ 0 + C(cell) + C(cov0)",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_T2D\\DEG_results_time_POST_vs_PRE_dx-T2D.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_T2D\\DEG_results_time_REC_vs_PRE_dx-T2D.csv"
+        ],
+        "counts": {
+          "limma_T2D/time_POST_vs_PRE_dx-T2D": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+              "n_tested": 23937,
+              "n_significant": 1573,
+              "n_up": 1123,
+              "n_down": 450,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23937,
+              "n_significant": 1575,
+              "n_up": 1124,
+              "n_down": 451,
+              "deg_sanity": "ok"
+            }
+          },
+          "limma_T2D/time_REC_vs_PRE_dx-T2D": {
+            "applied": {
+              "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+              "n_tested": 23937,
+              "n_significant": 8755,
+              "n_up": 5066,
+              "n_down": 3689,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "padj < 0.05",
+              "n_tested": 23937,
+              "n_significant": 8800,
+              "n_up": 5078,
+              "n_down": 3722,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "T2D time course, subject fixed effect",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:58:30"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_NGT/time_POST_vs_PRE_dx-NGT",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\ora\\DEG_results_time_POST_vs_PRE_dx-NGT_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\ora\\DEG_results_time_POST_vs_PRE_dx-NGT_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\ora\\DEG_results_time_POST_vs_PRE_dx-NGT_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\ora\\DEG_results_time_POST_vs_PRE_dx-NGT_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 780 Human genes (direction=all, padj<0.05, |log2FC|>0.1). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Positive Regulation Of miRNA Metabolic Process (GO:2000630) | padj=4.01e-03 | overlap=11/49 | genes=IL10;FOSL1;EGR1;JUN;MYC;SRF;ZC3H12A;FOS;GATA3;KLF4;RELA - Response To Tumor Necrosis Factor (GO:0034612) | padj=4.01e-03 | overlap=16/108 | genes=CCL14;CXCL8;GATA3;SELE;YBX3;CX3CL1;RELA;NFKBIA;ZFP36;CASP3;ZC3H12A;CCL4;CCL3;CCL - Positive Regulation Of miRNA Transcription (GO:1902895) | padj=4.01e-03 | overlap=10/43 | genes=IL10;FOSL1;EGR1;JUN;SRF;MYC;GATA3;FOS;KLF4;RELA - Integrated Stress Response Signaling (GO:0140467) | padj=5.61e-03 | overlap=8/29 | genes=FOSL1;JUN;CEBPD;DDIT3;NFE2L3;FOS;JUNB;NFE2L2 - Response To Lipopolysaccharide (GO:0032496) | padj=5.61e-03 | overlap=19/159 | genes=IL10;XBP1;CXCL8;SERPINE1;TNFAIP3;BCL10;CXCL3;SELE;CXCL2;RELA;ZFP36;IL6;IL1B;NOCT - Regulation Of miRNA Transcription (GO:1902893) | padj=5.61e-03 | overlap=11/59 | genes=IL10;FOSL1;EGR1;DDX5;JUN;MYC;SRF;FOS;GATA3;KLF4;RELA - Cellular Response To Chemokine (GO:1990869) | padj=5.61e-03 | overlap=11/59 | genes=CCL14;CXCL8;DUSP1;ZC3H12A;CCL4;CCL3;CCL2;CXCL3;CXCL2;SH2B3;CX3CL1 - Cellular Response To Lipopolysaccharide (GO:0071222) | padj=8.60e-03 | overlap=16/124 | genes=IL10;XBP1;CXCL8;SERPINE1;TNFAIP3;BCL10;CXCL3;CXCL2;RELA;ZFP36;IL6;IL1B;ZC3H12A;P - Cellular Response To Molecule Of Bacterial Origin (GO:0071219) | padj=1.46e-02 | ove..."
+      },
+      "reason": "paper reports GO MF enrichment of exercise DEGs (S2.1.p2)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:58:36"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_NGT/time_POST_vs_PRE_dx-NGT",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\gsea\\DEG_results_time_POST_vs_PRE_dx-NGT_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 20531 Human genes ranked by 'stat'. 50 Hallmark sets tested, 35 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=3.74 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.97 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UV_RESPONSE_UP | NES=2.87 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.84 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HYPOXIA | NES=2.72 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_P53_PATHWAY | NES=2.67 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=2.57 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.46 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.40 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TGF_BETA_SIGNALING | NES=2.38 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 3 DOWN (NES < 0, depleted in treatment): - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=-1.02 | NOM p=3.86e-01 | FDR q=1.00e+00 - HALLMARK_SPERMATOGENESIS | NES=-1.00 | NOM p=4.55e-01 | FDR q=6.76e-01 - HALLMARK_BILE_ACID_METABOLISM | NES=-0.80 | NOM p=9.10e-01 | FDR q=9.04e-01 Full results saved to: test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_POST_vs_PRE_dx-NGT\\gsea\\DEG_results_time_POST_vs_PRE_dx-NGT_GSEA_Hallmark.csv"
+      },
+      "reason": "paper reports GO MF enrichment of exercise DEGs (S2.1.p2)",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0008"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:59:17"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_T2D/time_POST_vs_PRE_dx-T2D",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\ora\\DEG_results_time_POST_vs_PRE_dx-T2D_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\ora\\DEG_results_time_POST_vs_PRE_dx-T2D_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\ora\\DEG_results_time_POST_vs_PRE_dx-T2D_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\ora\\DEG_results_time_POST_vs_PRE_dx-T2D_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 1293 Human genes (direction=all, padj<0.05, |log2FC|>0.1). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Negative Regulation Of Transcription By RNA Polymerase II (GO:0000122) | padj=5.04e-03 | overlap=83/763 | genes=ZNF451;ZNF891;UBE2D3;ZBTB21;FHL2;HNRNPU;PRDM1;ING1;ETS2;IRF2BPL;TRO;ZFP36;SOX18; - Response To Tumor Necrosis Factor (GO:0034612) | padj=5.04e-03 | overlap=21/108 | genes=CCL14;CXCL8;CHUK;GCH1;DHX9;SELE;TANK;CX3CL1;RELA;NFKBIA;ZFP36;CCL8;CASP3;HYAL2;Z - Positive Regulation Of Apoptotic Process (GO:0043065) | padj=5.04e-03 | overlap=38/270 | genes=BTG1;DDX3X;DIABLO;DCUN1D3;BCL10;HSPD1;BCLAF1;CASP3;ZC3H12A;CCL3;CTLA4;PMAIP1;ZNF - Regulation Of RNA Splicing (GO:0043484) | padj=5.04e-03 | overlap=20/102 | genes=TAF10;TAF9;HNRNPLL;TAF5L;JMJD6;CLK1;HNRNPL;RPS26;HNRNPH1;HNRNPF;TRA2B;SRSF3;ZNF3 - Regulation Of mRNA Splicing, Via Spliceosome (GO:0048024) | padj=5.04e-03 | overlap=19/94 | genes=DDX5;RBM8A;WTAP;HNRNPU;JMJD6;HNRNPL;RBMXL1;NOVA1;TRA2B;TRA2A;SRSF3;RBM7;NSRP1;RB - Cellular Response To Lipopolysaccharide (GO:0071222) | padj=7.32e-03 | overlap=22/124 | genes=IL10;CD274;XBP1;CXCL8;SERPINE1;CTR9;TNFAIP3;BCL10;CXCL3;CXCL2;RELA;ZFP36;IL6;SEL - Response To Unfolded Protein (GO:0006986) | padj=7.32e-03 | overlap=12/44 | genes=DNAJA1;DNAJB1;HSPA8;HSP90AA1;HSPH1;DNAJB4;DDIT3;HSPE1;TOR1B;HERPUD1;HSPD1;HSPA1A - Cellular Response To Molecule Of Bacterial Origin (GO:0071219) | padj=7.40e-03 | overlap=21/117 | gene..."
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0010"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:59:21"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_T2D/time_POST_vs_PRE_dx-T2D",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\gsea\\DEG_results_time_POST_vs_PRE_dx-T2D_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 20531 Human genes ranked by 'stat'. 50 Hallmark sets tested, 38 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=3.24 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.63 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.43 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HYPOXIA | NES=2.42 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_P53_PATHWAY | NES=2.41 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MTORC1_SIGNALING | NES=2.38 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UNFOLDED_PROTEIN_RESPONSE | NES=2.37 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UV_RESPONSE_UP | NES=2.33 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=2.31 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TGF_BETA_SIGNALING | NES=2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 0 DOWN (NES < 0, depleted in treatment): Full results saved to: test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_POST_vs_PRE_dx-T2D\\gsea\\DEG_results_time_POST_vs_PRE_dx-T2D_GSEA_Hallmark.csv"
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0010"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:59:26"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_NGT/time_REC_vs_PRE_dx-NGT",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_REC_vs_PRE_dx-NGT\\ora\\DEG_results_time_REC_vs_PRE_dx-NGT_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_REC_vs_PRE_dx-NGT\\ora\\DEG_results_time_REC_vs_PRE_dx-NGT_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_REC_vs_PRE_dx-NGT\\ora\\DEG_results_time_REC_vs_PRE_dx-NGT_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_REC_vs_PRE_dx-NGT\\ora\\DEG_results_time_REC_vs_PRE_dx-NGT_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 4627 Human genes (direction=all, padj<0.05, |log2FC|>0.1). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Positive Regulation Of Apoptotic Process (GO:0043065) | padj=1.01e-03 | overlap=99/270 | genes=MTCH2;CLU;PYCARD;LGALS2;LGALS1;RASSF2;FAM162A;CYP1B1;PHLDA1;PHLDA3;UNC13B;BNIP3L - Regulation Of ERK1 And ERK2 Cascade (GO:0070372) | padj=1.01e-03 | overlap=91/244 | genes=APP;PHB1;ARHGAP8;APIP;PTPN22;TREM2;ARRB2;HMGB1;FGF1;FGF2;PYCARD;DUSP10;GPER1;FFA - Regulation Of Interleukin-6 Production (GO:0032675) | padj=1.30e-03 | overlap=50/114 | genes=APP;CD84;PTPN22;TREM2;HMGB1;PYCARD;C1QTNF3;SIRPA;LGALS9;IL10;SYK;F2R;CYBA;TIRAP; - Positive Regulation Of Programmed Cell Death (GO:0043068) | padj=2.46e-03 | overlap=89/245 | genes=TOP2A;ITGB1;MTCH2;CSRNP3;HMGB1;CLU;ING4;PYCARD;LGALS2;LGALS1;RASSF2;CASP8;ADAMTS - Regulation Of Small GTPase Mediated Signal Transduction (GO:0051056) | padj=2.67e-03 | overlap=50/118 | genes=ARHGAP11A;ARHGAP9;ARHGAP11B;ARHGAP8;DOCK8;RASGRF2;ITSN1;ARHGAP1;ARHGAP5;FOXM1;AR - Negative Regulation Of Mitotic Metaphase/Anaphase Transition (GO:0045841) | padj=2.67e-03 | overlap=18/28 | genes=IK;ZWILCH;PLK1;BUB1B;KLHL22;TTK;HASPIN;NDC80;ZWINT;CDC20;CENPF;NUF2;KNTC1;FBXO5; - Positive Regulation Of Cytokine Production (GO:0001819) | padj=2.67e-03 | overlap=109/320 | genes=CD86;APP;PHB1;TRAF3IP3;CD80;SERPINE1;PYCARD;CYP1B1;LGALS9;GBP5;SLC11A1;SERPINF2; - Mitotic Spindle Assembly Checkpoint Signaling (GO:000..."
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:59:41"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_NGT/time_REC_vs_PRE_dx-NGT",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_NGT_time_REC_vs_PRE_dx-NGT\\gsea\\DEG_results_time_REC_vs_PRE_dx-NGT_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 20531 Human genes ranked by 'stat'. 50 Hallmark sets tested, 44 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_G2M_CHECKPOINT | NES=2.54 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.50 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_E2F_TARGETS | NES=2.44 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.42 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.41 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.28 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.24 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.02 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MITOTIC_SPINDLE | NES=1.95 | NOM p=0.00e+00 | FDR q=1.39e-04 - HALLMARK_COAGULATION | NES=1.93 | NOM p=0.00e+00 | FDR q=1.25e-04 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_ADIPOGENESIS | NES=-3.13 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.71 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.59 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.06 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.96 | NOM p=0.00e+00 | FDR q=1.73e-04 - HALLMARK_PEROXISOME | NES=-1.94 | NOM p=0.00e+00 | FDR q=1.44e-04 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-1.93 | NOM p=0.00e+00 | FDR q=1.23e-04 - HALL..."
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:59:47"
+    },
+    {
+      "decision_id": "DEC-0017",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_T2D/time_REC_vs_PRE_dx-T2D",
+        "feature_id_type": "ensembl_gene",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.1,
+          "inclusive": false
+        },
+        "direction": "all",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_REC_vs_PRE_dx-T2D\\ora\\DEG_results_time_REC_vs_PRE_dx-T2D_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_REC_vs_PRE_dx-T2D\\ora\\DEG_results_time_REC_vs_PRE_dx-T2D_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_REC_vs_PRE_dx-T2D\\ora\\DEG_results_time_REC_vs_PRE_dx-T2D_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_REC_vs_PRE_dx-T2D\\ora\\DEG_results_time_REC_vs_PRE_dx-T2D_KEGG_2021_Human.csv"
+        ],
+        "summary": "Enrichment analysis complete for 7972 Human genes (direction=all, padj<0.05, |log2FC|>0.1). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Receptor-Mediated Endocytosis (GO:0006898) | padj=5.81e-03 | overlap=75/122 | genes=ITGB1;LMBR1L;ITGAM;TFRC;CLTC;ITGB2;STAB2;CLTA;LDLRAD3;AP2A1;ARRB2;CLEC9A;STON2;V - Phagocytosis (GO:0006909) | padj=1.58e-02 | overlap=46/69 | genes=ITGB1;SRPX;ITGAM;LRP1;ITGB2;PLD4;TREM2;HMGB1;AIF1;CORO1A;TM9SF4;P2RY6;SH3BP1;ADO - Positive Regulation Of Cell Motility (GO:2000147) | padj=5.55e-02 | overlap=117/221 | genes=SEMA5A;SEMA5B;RIPOR1;FAM107A;CIB1;FGF1;MYLK;CXCL16;PLAU;AKT2;CPNE3;EPHB2;ACVR1;S - Positive Regulation Of Protein Localization (GO:1903829) | padj=5.55e-02 | overlap=52/85 | genes=HSP90AB1;TFRC;CEP120;TESK1;TREM2;BICD1;TNF;PPP3CB;NUP62;SESN2;TRAPPC12;CEP250;CD - Regulation Of Cell Cycle Process (GO:0010564) | padj=5.55e-02 | overlap=74/130 | genes=AHCTF1;SMARCB1;CETN2;KIF11;MKI67;ZFYVE26;BCL7A;MYC;CHEK1;BCL7B;KIF13A;CEP250;RCC - Positive Regulation Of Cell Migration (GO:0030335) | padj=5.55e-02 | overlap=140/272 | genes=SEMA5A;SEMA5B;RIPOR1;FAM107A;CIB1;FGF1;MYLK;CXCL16;SRGAP2C;ZNF609;CAPN7;PLAU;AKT - Regulation Of Intracellular Signal Transduction (GO:1902531) | padj=5.57e-02 | overlap=151/297 | genes=RPL5;TRIO;TP53RK;ZFAND6;ITSN1;FAM13A;WWC2;SLA;GBA1;FGF1;TNF;ARHGAP35;PREX2;PYCAR - Endocytosis (GO:0006897) | padj=6.78e-02 | overlap=101/189 | genes=APP;ZFYVE9;INPPL1;LDLRAD3;CXCL16;DPYSL2;ADORA1;AP1S1;RALBP1;SLC..."
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0011"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:00:16"
+    },
+    {
+      "decision_id": "DEC-0018",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Human",
+        "subset": "limma_T2D/time_REC_vs_PRE_dx-T2D",
+        "feature_id_type": "ensembl_gene",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\enrichment_limma_T2D_time_REC_vs_PRE_dx-T2D\\gsea\\DEG_results_time_REC_vs_PRE_dx-T2D_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 20531 Human genes ranked by 'stat'. 50 Hallmark sets tested, 36 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_E2F_TARGETS | NES=2.57 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.53 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_G2M_CHECKPOINT | NES=2.53 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.51 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_GAMMA_RESPONSE | NES=2.36 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.31 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INTERFERON_ALPHA_RESPONSE | NES=2.28 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.05 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=1.98 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MITOTIC_SPINDLE | NES=1.95 | NOM p=0.00e+00 | FDR q=7.40e-05 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_ADIPOGENESIS | NES=-3.25 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-2.83 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.57 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.98 | NOM p=0.00e+00 | FDR q=1.28e-03 - HALLMARK_CHOLESTEROL_HOMEOSTASIS | NES=-1.86 | NOM p=0.00e+00 | FDR q=1.70e-03 - HALLMARK_HEME_METABOLISM | NES=-1.81 | NOM p=0.00e+00 | FDR q=2.55e-03 - HALLMARK_PEROXISOME | NES=-1.68 | NOM p=3.24e-03 | FDR q=..."
+      },
+      "reason": "as above",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0011"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:00:23"
+    },
+    {
+      "decision_id": "DEC-0019",
+      "step": "study",
+      "selected": {
+        "route": "declared_deviation",
+        "caveats": [
+          "paper's voom/quality-weights/duplicateCorrelation route not reproducible from deposited CPM",
+          "NGT REC vs PRE paper count not stated exactly",
+          "1_POST missing from deposited matrix (paper's T2D/NGT n may differ by one sample)"
+        ],
+        "results": {
+          "limma_NGT/time_POST_vs_PRE_dx-NGT": {
+            "n_deg": 965,
+            "up": 597,
+            "down": 368,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+            "audit_n": 965
+          },
+          "limma_NGT/time_REC_vs_PRE_dx-NGT": {
+            "n_deg": 4920,
+            "up": 2229,
+            "down": 2691,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+            "audit_n": 4921
+          },
+          "limma_T2D/time_POST_vs_PRE_dx-T2D": {
+            "n_deg": 1573,
+            "up": 1123,
+            "down": 450,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+            "audit_n": 1575
+          },
+          "limma_T2D/time_REC_vs_PRE_dx-T2D": {
+            "n_deg": 8755,
+            "up": 5066,
+            "down": 3689,
+            "rule": "padj < 0.05 and |log2FoldChange| > 0.1",
+            "audit_n": 8800
+          }
+        },
+        "paper_counts": {
+          "limma_NGT/time_POST_vs_PRE_dx-NGT": 712,
+          "limma_T2D/time_POST_vs_PRE_dx-T2D": 893,
+          "limma_T2D/time_REC_vs_PRE_dx-T2D": 4316
+        },
+        "comparison": {
+          "limma_NGT/time_POST_vs_PRE_dx-NGT": {
+            "ours": 965,
+            "paper": 712
+          },
+          "limma_T2D/time_POST_vs_PRE_dx-T2D": {
+            "ours": 1573,
+            "paper": 893
+          },
+          "limma_T2D/time_REC_vs_PRE_dx-T2D": {
+            "ours": 8755,
+            "paper": 4316
+          }
+        },
+        "paper_gene_check": {
+          "limma_NGT/time_POST_vs_PRE_dx-NGT": {
+            "ENSG00000099985": {
+              "AveExpr": 0.8443,
+              "log2FoldChange": 1.441,
+              "padj": 9.94e-07,
+              "pvalue": 3.24e-09
+            },
+            "ENSG00000136244": {
+              "AveExpr": 1.24,
+              "log2FoldChange": 2.1461,
+              "padj": 1.39e-09,
+              "pvalue": 1.57e-12
+            },
+            "ENSG00000081041": {
+              "AveExpr": 2.2808,
+              "log2FoldChange": 2.2984,
+              "padj": 1.86e-09,
+              "pvalue": 2.25e-12
+            },
+            "ENSG00000142871": {
+              "AveExpr": 5.256,
+              "log2FoldChange": 3.1752,
+              "padj": 1.01e-12,
+              "pvalue": 2.11e-16
+            },
+            "ENSG00000113070": {
+              "AveExpr": 3.1131,
+              "log2FoldChange": 1.7957,
+              "padj": 2.33e-12,
+              "pvalue": 6.81e-16
+            },
+            "ENSG00000073756": {
+              "AveExpr": 2.4922,
+              "log2FoldChange": 2.481,
+              "padj": 2.88e-10,
+              "pvalue": 2.53e-13
+            },
+            "ENSG00000130513": {
+              "AveExpr": 1.1383,
+              "log2FoldChange": 0.4187,
+              "padj": 0.253,
+              "pvalue": 0.0298
+            }
+          },
+          "limma_T2D/time_POST_vs_PRE_dx-T2D": {
+            "ENSG00000099985": {
+              "AveExpr": 0.9941,
+              "log2FoldChange": 1.7274,
+              "padj": 3.29e-12,
+              "pvalue": 7e-15
+            },
+            "ENSG00000136244": {
+              "AveExpr": 1.4873,
+              "log2FoldChange": 2.2422,
+              "padj": 4.2e-12,
+              "pvalue": 9.12e-15
+            },
+            "ENSG00000081041": {
+              "AveExpr": 2.3581,
+              "log2FoldChange": 2.5744,
+              "padj": 9.05e-24,
+              "pvalue": 5.73e-28
+            },
+            "ENSG00000142871": {
+              "AveExpr": 5.5742,
+              "log2FoldChange": 3.3965,
+              "padj": 7.64e-21,
+              "pvalue": 2.55e-24
+            },
+            "ENSG00000113070": {
+              "AveExpr": 3.2626,
+              "log2FoldChange": 1.9851,
+              "padj": 2.09e-12,
+              "pvalue": 4.2e-15
+            },
+            "ENSG00000073756": {
+              "AveExpr": 2.4817,
+              "log2FoldChange": 2.5015,
+              "padj": 6.45e-14,
+              "pvalue": 9.43e-17
+            }
+          },
+          "limma_T2D/time_REC_vs_PRE_dx-T2D": {
+            "ENSG00000106483": {
+              "AveExpr": 6.1196,
+              "log2FoldChange": 2.0442,
+              "padj": 1.31e-08,
+              "pvalue": 9.98e-11
+            },
+            "ENSG00000101825": {
+              "AveExpr": 6.3464,
+              "log2FoldChange": 1.8222,
+              "padj": 1.15e-07,
+              "pvalue": 1.63e-09
+            },
+            "ENSG00000132170": {
+              "AveExpr": 6.9909,
+              "log2FoldChange": -0.7193,
+              "padj": 3.06e-05,
+              "pvalue": 2.1e-06
+            },
+            "ENSG00000081041": {
+              "AveExpr": 2.3581,
+              "log2FoldChange": 0.634,
+              "padj": 4.71e-05,
+              "pvalue": 3.62e-06
+            },
+            "ENSG00000174697": {
+              "AveExpr": 8.8396,
+              "log2FoldChange": -1.3751,
+              "padj": 8.93e-05,
+              "pvalue": 7.95e-06
+            },
+            "ENSG00000181092": {
+              "AveExpr": 9.2079,
+              "log2FoldChange": -0.9438,
+              "padj": 0.000129,
+              "pvalue": 1.26e-05
+            },
+            "ENSG00000106538": {
+              "AveExpr": 6.3505,
+              "log2FoldChange": -0.9417,
+              "padj": 8.52e-06,
+              "pvalue": 4.09e-07
+            }
+          },
+          "limma_NGT/time_REC_vs_PRE_dx-NGT": {
+            "ENSG00000174697": {
+              "AveExpr": 9.2832,
+              "log2FoldChange": -1.1712,
+              "padj": 0.00374,
+              "pvalue": 0.000253
+            },
+            "ENSG00000181092": {
+              "AveExpr": 9.8764,
+              "log2FoldChange": -0.6699,
+              "padj": 0.00504,
+              "pvalue": 0.00039
+            },
+            "ENSG00000106538": {
+              "AveExpr": 7.0038,
+              "log2FoldChange": -0.8778,
+              "padj": 0.000255,
+              "pvalue": 2.41e-06
+            },
+            "ENSG00000099985": {
+              "AveExpr": 0.8443,
+              "log2FoldChange": 0.0847,
+              "padj": 0.804,
+              "pvalue": 0.663
+            }
+          }
+        }
+      },
+      "reason": "Gene IDs: OSM, IL6, CXCL2, CCN1(CYR61), HBEGF, PTGS2(COX2), GDF15 expected up POST; SFRP4, MXRA5 up REC T2D; PPARG down REC T2D; LEP, ADIPOQ, RARRES2 down REC; OSM back to baseline at REC (S2.2, S2.3.p2, FIG3-4).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:00:23"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "13a18bc3199a84afbb5c1ef135448bc5a1997ebf61503f060318d30c82a3046a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "fc2f3c37cfe03916750a1c0c0dd96ad132f3868115c0ff155c0772521d468a9d",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "dafaa373e302a2bff1586701350185793f1b97bbbceb26ff58c1461cb2689c54",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c3903fca1ab66df8ff7b707e942287ecbfa6f3bd11a305933f6c99ff766e6f6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "62015ee63391ae67b86fbca1702b8a22ab0d6436af3e6ec5d5006ac629cfa0b7",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "54b87232afed66e7d1c19ff3358e2fe0b48ab60392ccda86b94d91b8d62aa4ec",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\transformed\\log2_matrix.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "d9a21932877d5b5128ff05726d9dc861db99a46ca2f63837e8b88cab0f38d47b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_NGT\\DEG_results_time_POST_vs_PRE_dx-NGT.csv",
+      "role": "deg_limma_NGT/time_POST_vs_PRE_dx-NGT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "39e8bc7dcc54c94793b2149aa7c32c1c0a756566ce3e95eda2c9a64ad8987868",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_NGT\\DEG_results_time_REC_vs_PRE_dx-NGT.csv",
+      "role": "deg_limma_NGT/time_REC_vs_PRE_dx-NGT",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "71546f31b0236b0613191772920e1cb291b1124003a2d0ba7ba9ffc8120229ee",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_T2D\\DEG_results_time_POST_vs_PRE_dx-T2D.csv",
+      "role": "deg_limma_T2D/time_POST_vs_PRE_dx-T2D",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a56dd010a065dbb08c539e88b4709c97d7f605583ad5c6ac34e040d2660ff8ed",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\results\\limma_T2D\\DEG_results_time_REC_vs_PRE_dx-T2D.csv",
+      "role": "deg_limma_T2D/time_REC_vs_PRE_dx-T2D",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "53d9cf3099048877b03a3a76cca49a5e04958ab5fe99ee1804217dfa3bff0f73",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38151020\\GSE198922\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b8696d05dc6ce9dc55c7178591c9303f4511cc8a26520e037dec02531a555b52",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

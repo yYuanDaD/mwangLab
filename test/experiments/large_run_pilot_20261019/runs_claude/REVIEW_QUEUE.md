@@ -454,3 +454,7 @@ One section per case; newest last.
 ## PMID34219410 / GSE159217 (2026-11-24)
 
 - policy: Policy: Older vs Young under matched activity is executable (suitability analyzable) but is an ageing estimand; refusal as an exercise study follows the skill's rule, but a person may want it recorded as non-exercise rather than refused.
+
+## PMID38151020 / GSE198922 (2026-11-24)
+
+- policy: Open policy: counts are 1.35-2x the paper's under the stated rule; whether to also report a pooled-model sensitivity fit.

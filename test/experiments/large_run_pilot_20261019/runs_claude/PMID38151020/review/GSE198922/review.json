@@ -1,0 +1,21 @@
+{"case": "GSE198922", "reviewer": "case-review pass, Claude Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. Acute 30-min cycling bout (85% HRmax) in 20 NGT + 28 T2D; leg subcutaneous adipose biopsies PRE (basal), POST (0 min), REC (3 h) (S4.3.1.p1, S2.1.p1). All 143 samples are exercise-time-course samples; PRE is the within-person control. No non-exercise control arm.",
+  "B2": "Per diagnosis: POST vs PRE and REC vs PRE, NGT (n=20 per time) and T2D (n=28 per time); paper counts NGT POST 712, T2D POST 893, T2D REC 4316 (S2.1.p1); basal T2D vs NGT 589. GEO metadata: PRE 48, POST 47, REC 48; NGT 60, T2D 83 samples.",
+  "B3": "Yes: three biopsies per participant. Key: characteristics_ch1.2.participant id (= pid; = title prefix), 48 keys, links 143/143, no duplicates in a level.",
+  "B4": "One joint model: '~0 + group + sex, quality weights and duplicate correlation blocking for participants' (S4.4.2.p1); not pairwise per stratum.",
+  "B5": "S4.4.2.p1: 'an FDR cut-off of 0.05 and a fold change cut-off of 0.1' (filterByExpr min count 15). Counts: S2.1.p1 (712 NGT POST, 893 T2D POST, 4,316 T2D REC, 3,228 T2D-distinct, 589 basal)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Analyzed; exercise PRE/POST/REC present (S4.3.1.p1).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "dx strata NGT 20 / T2D 28 participants; missing 1_POST named (GEO has no matrix column; POST n=47); sex-count inconsistencies in paper recorded.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts POST vs PRE and REC vs PRE with PRE as control; named genes (OSM, IL6, CXCL2) up POST as in paper.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "~0+time+subject (dx_pid string, full rank, residual df 93) blocks participant within each stratum; pid treated as category.", "fix": ""},
+  {"id": "model_fit", "verdict": "unsure", "severity": "minor", "evidence": "Paper fits one pooled model with duplicateCorrelation + quality weights + sex; run fits each diagnosis stratum separately with subject fixed effects. Declared as deviation; ours are 1.35-2x paper counts (e.g. T2D REC 8755 vs 4316). No pooled-model sensitivity fit.", "fix": "Optional: add a pooled (both strata, time:dx cell + subject) fit as sensitivity if the executor allows, and report whether counts move toward the paper."},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Sex constant within subject, absorbed by subject effect; no batch field in metadata; per-sex fits exploratory.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "data_processing states CPM; 97% non-integer; limma on log2(CPM+1) is the policy route; p-value histogram sane (frac_p_gt_0.9 0.04-0.08, no pile near 1). Voom route recorded as blocked.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "FDR<0.05 and |log2FC|>0.1 transcribed from S4.4.2.p1 with interpretation of 'fold change 0.1' recorded; no alternative rule in packet B table brings counts to the paper's (all larger).", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "minor", "evidence": "Same contrasts compared at same rule, HANDBACK states 1.35-2x excess. NGT REC 'implied >=1088' is an inference from 4316-3228 (distinct vs NGT), labelled as implied, not a stated count.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop; T2D vs NGT at PRE not run because it is a disease contrast, which is true.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: counts are 1.35-2x the paper's under the stated rule; whether to also report a pooled-model sensitivity fit."],
+ "summary": "该案例设计正确：按诊断分层、以 PRE 为对照、对 POST 和 REC 分别比较，并用参与者固定效应处理每人三次活检。矩阵为 CPM，走 limma(log2CPM+1) 路线，偏离论文 voom/duplicateCorrelation 的情况已如实记录。阈值转录正确；DEG 数量比论文多 1.35–2 倍已在 HANDBACK 中说明，无阻塞或主要问题。"}

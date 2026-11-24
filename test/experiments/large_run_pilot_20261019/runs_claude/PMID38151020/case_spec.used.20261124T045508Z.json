@@ -1,0 +1,155 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID38151020",
+  "request": "Analyze GSE198922 for PMID 38151020 (Exercise-induced crosstalk between immune cells and adipocytes in humans: Role of oncostatin-M.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-opus-5-5)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE198922",
+      "accession": "GSE198922",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC10829726.paper.md"],
+        "metadata": "GSE198922/GSE198922_metadata.csv",
+        "matrix": "GSE198922/GSE198922_processed.data.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE198922"],
+            "assay": "bulk RNA-seq (TruSeq stranded total RNA, NextSeq500), leg subcutaneous adipose tissue",
+            "primary_estimand": "Within-subject change in adipose-tissue gene expression after one acute 30-min cycling bout (85% HRmax), at 0 min post-exercise (POST) and 3 h recovery (REC) versus pre-exercise basal (PRE), separately in NGT (n=20) and T2D (n=28) participants",
+            "factors": {"diagnosis": ["NGT", "T2D"], "time": ["PRE", "POST", "REC"], "sex": ["M", "F"]},
+            "sample_inclusion": "20 NGT (11M/9F) + 28 T2D (16M/12F) participants, three biopsies each (S2.1.p1, TAB1)",
+            "repeated_measure_unit": "participant (three biopsies per person)",
+            "planned_contrasts": [
+              "NGT POST vs PRE (S2.1.p1; paper: 712 DEGs)",
+              "T2D POST vs PRE (S2.1.p1; paper: 893 DEGs)",
+              "NGT REC vs PRE (S2.1.p1; count not stated exactly; T2D REC has 3228 genes not shared with NGT REC, implying 1088 shared)",
+              "T2D REC vs PRE (S2.1.p1; paper: 4316 DEGs)",
+              "T2D vs NGT at PRE (S2.1.p1; 589 DEGs; basal disease comparison, not an exercise contrast)"
+            ],
+            "paper_method": "edgeR filterByExpr (min.count 15, design ~0+group+sex); limma with quality weights (voomWithQualityWeights implied) on ~0 + group + sex, duplicateCorrelation blocking on participant (S4.4.2.p1)",
+            "paper_normalization": "CPM (GEO supplementary is CPM)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.1, "source_locator": "S4.4.2.p1"},
+            "paper_results": "OSM among most induced post-exercise in both groups; CYR61(CCN1), CXCL2, HBEGF, IL6, COX2(PTGS2) highly induced post; SFRP4 and MXRA5 up at REC in T2D; PPARG down at REC in T2D only; LEP/ADIPOQ/RARRES2 decreased at REC"
+          },
+          "reasoning": "S4.4.2.p1 gives filter, model (~0 + group + sex, quality weights, duplicateCorrelation on participant) and threshold (FDR 0.05, 'fold change cut-off of 0.1'); S2.1.p1 gives the per-group counts. 'Fold change cut-off of 0.1' is read as |logFC| > 0.1 on the limma log2 scale (a linear fold change of 0.1 is meaningless as a symmetric cutoff).",
+          "confidence": "medium",
+          "locator": "S4.4.2.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["TAB2 key resources and S4.4.2.p1 name GSE198922", "GEO contact Lundell (L.S.L. did bioinformatics, S5.1.p1), Karolinska", "48 participants (20 NGT/28 T2D) and sexes match the paper", "adipose tissue biopsies PRE/POST/REC"]},
+          "reasoning": "Paper names GSE198922 as its deposited RNA-seq; sample composition matches S2.1.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"time": ["title", "^\\d+_(PRE|POST|REC)$"]},
+          "aliases": {"pid": "characteristics_ch1.2.participant id", "dx": "characteristics_ch1.3.diagnosis", "sex": "characteristics_ch1.0.Sex"},
+          "combine": {"subject": ["dx", "pid"]},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (e.g. 11_POST) equal GEO title for 143/144 samples; 1_POST has metadata but no matrix column (missing from the deposited matrix). Time comes from the title suffix, which matches characteristics exercise.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "CPM (linear normalized counts)",
+          "recommended_method": "limma on log2(CPM+1)",
+          "final": {"source": "GEO data_processing: 'processed.data.csv contains cpm'; values non-integer, column sums ~0.7-7e6", "paper_input": "raw featureCounts counts into limma with quality weights (voom)"},
+          "reasoning": "data_processing explicitly states CPM; 97% non-integer values; no raw counts deposited (supplementary_file NONE besides processed CPM). Raw counts cannot be recovered without library sizes, so voom cannot run as in the paper.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "PRE"},
+          "subject": "subject",
+          "organism": "Human",
+          "strata": ["dx"],
+          "planned": ["time_POST_vs_PRE_dx-NGT", "time_REC_vs_PRE_dx-NGT", "time_POST_vs_PRE_dx-T2D", "time_REC_vs_PRE_dx-T2D"],
+          "final": {
+            "analysis_type": "repeated-measures time course within diagnosis strata",
+            "formula": "~ 0 + time + subject (per diagnosis stratum)",
+            "contrasts": [
+              {"name": "time_POST_vs_PRE_dx-NGT", "control": "PRE", "treatment": "POST", "role": "primary"},
+              {"name": "time_REC_vs_PRE_dx-NGT", "control": "PRE", "treatment": "REC", "role": "primary"},
+              {"name": "time_POST_vs_PRE_dx-T2D", "control": "PRE", "treatment": "POST", "role": "primary"},
+              {"name": "time_REC_vs_PRE_dx-T2D", "control": "PRE", "treatment": "REC", "role": "primary"}
+            ],
+            "estimand_type": "causal within-subject (pre/post, no non-exercise control arm)"
+          },
+          "candidates": [
+            {"value": "T2D vs NGT at PRE (589 DEGs in paper)", "reason_rejected": "basal disease comparison, not an exercise effect; outside this request"},
+            {"value": "pool NGT and T2D", "reason_rejected": "paper reports exercise responses per diagnosis group"}
+          ],
+          "reasoning": "S2.1.p1/FIG1B: exercise contrasts are POST vs PRE and REC vs PRE within NGT and within T2D. Repeated biopsies per participant require the participant as blocking unit. Diagnosis is a stratum so time contrasts never cross groups.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "required",
+            "blocking_terms": ["subject"],
+            "covariates": [{"name": "sex", "disposition": "nested: constant within subject, absorbed by the subject fixed effect"}, {"name": "dx", "disposition": "excluded: used as stratum"}]
+          },
+          "confounding_candidates": ["sex", "subject"],
+          "reasoning": "Paper blocks participants with duplicateCorrelation and adjusts sex (S4.4.2.p1). Here subject is a fixed effect within each stratum; sex is subject-level so it is absorbed. Within-subject time contrasts are identified.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (moderated t, eBayes) on log2(CPM+1), subject fixed effect",
+            "formula": "~ 0 + C(time) + C(subject)",
+            "paper_route": {"method": "limma-voom with quality weights, ~0 + group + sex, duplicateCorrelation(participant)", "status": "blocked", "reason": "only CPM deposited (no raw counts / library sizes for voom); executor has no duplicateCorrelation or array quality weights"},
+            "deviations": ["log2(CPM+1) limma instead of voomWithQualityWeights on counts", "subject fixed effect instead of duplicateCorrelation random block", "separate fit per diagnosis stratum instead of one pooled model (residual variance not shared across groups)", "no additional filterByExpr: deposited CPM matrix is used as filtered by the authors"]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "Matrix-method policy: linear normalized values go to limma after log2. Subject fixed effects give the same within-subject estimand as duplicateCorrelation blocking for time contrasts.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.1, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.1, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "'fold change cut-off of 0.1' interpreted as |log2FC| > 0.1; audit rule drops the FC cutoff"
+          },
+          "reasoning": "S4.4.2.p1: FDR 0.05 and fold change cut-off 0.1.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": ["paper's voom/quality-weights/duplicateCorrelation route not reproducible from deposited CPM", "NGT REC vs PRE paper count not stated exactly", "1_POST missing from deposited matrix (paper's T2D/NGT n may differ by one sample)"]
+          },
+          "paper_counts": {"limma_NGT/time_POST_vs_PRE_dx-NGT": 712, "limma_T2D/time_POST_vs_PRE_dx-T2D": 893, "limma_T2D/time_REC_vs_PRE_dx-T2D": 4316},
+          "paper_genes": {
+            "limma_NGT/time_POST_vs_PRE_dx-NGT": ["ENSG00000099985", "ENSG00000136244", "ENSG00000081041", "ENSG00000142871", "ENSG00000113070", "ENSG00000073756", "ENSG00000130513"],
+            "limma_T2D/time_POST_vs_PRE_dx-T2D": ["ENSG00000099985", "ENSG00000136244", "ENSG00000081041", "ENSG00000142871", "ENSG00000113070", "ENSG00000073756"],
+            "limma_T2D/time_REC_vs_PRE_dx-T2D": ["ENSG00000106483", "ENSG00000101825", "ENSG00000132170", "ENSG00000081041", "ENSG00000174697", "ENSG00000181092", "ENSG00000106538"],
+            "limma_NGT/time_REC_vs_PRE_dx-NGT": ["ENSG00000174697", "ENSG00000181092", "ENSG00000106538", "ENSG00000099985"]
+          },
+          "reasoning": "Gene IDs: OSM, IL6, CXCL2, CCN1(CYR61), HBEGF, PTGS2(COX2), GDF15 expected up POST; SFRP4, MXRA5 up REC T2D; PPARG down REC T2D; LEP, ADIPOQ, RARRES2 down REC; OSM back to baseline at REC (S2.2, S2.3.p2, FIG3-4).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "matrix", "paper": "raw counts into voom with quality weights", "data": "CPM only", "disposition": "requires_explicit_deviation"},
+        {"item": "blocking", "paper": "duplicateCorrelation on participant with sex covariate in one pooled model", "data": "executor offers subject fixed effects only", "disposition": "requires_explicit_deviation"},
+        {"item": "samples", "paper": "48 participants x 3 biopsies", "data": "143 matrix columns; 1_POST absent", "disposition": "executable_without_change"},
+        {"item": "sex counts", "paper": "S4.3.1.p1 says 18 men/9 women T2D; S2.1.p1 says 16 men/12 women; TAB1 says 18 men/12 women", "data": "T2D 16 M / 12 F", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {"name": "limma_NGT", "tool": "tools.joint_contrasts:run_joint_limma", "args": {"comparisons": ["time_POST_vs_PRE_dx-NGT", "time_REC_vs_PRE_dx-NGT"], "covariates": ["subject"]}, "subset": {"dx": ["NGT"]}, "role": "primary", "reasoning": "NGT time course, subject fixed effect"},
+        {"name": "limma_T2D", "tool": "tools.joint_contrasts:run_joint_limma", "args": {"comparisons": ["time_POST_vs_PRE_dx-T2D", "time_REC_vs_PRE_dx-T2D"], "covariates": ["subject"]}, "subset": {"dx": ["T2D"]}, "role": "primary", "reasoning": "T2D time course, subject fixed effect"}
+      ],
+      "enrichment": [
+        {"execution": "limma_NGT/time_POST_vs_PRE_dx-NGT", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "paper reports GO MF enrichment of exercise DEGs (S2.1.p2)"},
+        {"execution": "limma_T2D/time_POST_vs_PRE_dx-T2D", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "as above"},
+        {"execution": "limma_NGT/time_REC_vs_PRE_dx-NGT", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "as above"},
+        {"execution": "limma_T2D/time_REC_vs_PRE_dx-T2D", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "as above"}
+      ]
+    }
+  ]
+}

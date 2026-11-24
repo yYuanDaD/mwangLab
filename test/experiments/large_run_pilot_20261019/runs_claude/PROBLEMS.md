@@ -899,3 +899,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34219410 (GSE159217)
 
 - inspect shows merged-tar columns as GSM_title_counts but runner renames them to GSM ids (case_runner.py:715), so a matrix_column_pattern matched 0 columns (case_runner.py:561) Details: `PMID34219410/HANDBACK.md`.
+
+## PMID34417591 (GSE174210;GSE174211;GSE179078)
+
+- suitability.py:201-203 inverts non-reference pairwise direction (KO_Sed_vs_KO_Run); pydeseq2 overflow warnings + loky WinError 6 at shutdown Details: `PMID34417591/HANDBACK.md`.
+
+## PMID38151020 (GSE198922)
+
+- no duplicateCorrelation/voom-quality-weights executor; run_joint_limma fits numeric-looking subject IDs as continuous (tools/joint_contrasts.py:166); nested subject rank-deficient in pooled model Details: `PMID38151020/HANDBACK.md`.
