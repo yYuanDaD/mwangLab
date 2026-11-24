@@ -1011,3 +1011,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39639402 (GSE228869)
 
 - none blocking; suitability report gives no pooled-over-diff view for grp contrasts; GEO data_processing text garbled (encoding) Details: `PMID39639402/HANDBACK.md`.
+
+## PMID36071599 (GSE211204)
+
+- validator wants rounding_documented for voom on estimated counts (native.py:1127); r_de.R voom lacks quantile normalization (r_de.R:192); R warning text lost in report Details: `PMID36071599/HANDBACK.md`.

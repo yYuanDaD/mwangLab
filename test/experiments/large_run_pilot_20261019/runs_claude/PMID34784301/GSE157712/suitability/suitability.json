@@ -1,0 +1,201 @@
+{
+  "case_id": "GSE157712",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "grp"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "grp"
+      ],
+      "levels": {
+        "grp": {
+          "Control": 7,
+          "CKD": 7,
+          "Dialysis": 4
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "omit",
+          "reason": "one sample per subject per factor level set: an identifier, not a block"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(grp)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 15,
+        "min_cell_size": 4
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 3,
+      "n_analyzable": 3,
+      "too_small": [],
+      "planned_analyzable": [],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 18 samples.",
+      "metadata_sex_column": "characteristics_ch1.2.Sex",
+      "predicted": {
+        "male": 14,
+        "female": 4
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "female",
+        "male"
+      ],
+      "split_plan": {
+        "split": true,
+        "sexes": [
+          "female",
+          "male"
+        ],
+        "n_unknown": 0,
+        "analyzable_per_sex": {
+          "female": [],
+          "male": [
+            "grp_CKD_vs_Control__sex-male",
+            "grp_Dialysis_vs_CKD__sex-male",
+            "grp_Dialysis_vs_Control__sex-male"
+          ]
+        },
+        "note": "the pooled analysis follows the paper; per-sex analyses are added as exploratory when the paper pooled"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "grp_CKD_vs_Control",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "CKD",
+      "reference": "Control",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "CKD"
+          },
+          "n": 7
+        },
+        {
+          "cell": {
+            "grp": "Control"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Dialysis_vs_CKD",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Dialysis",
+      "reference": "CKD",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Dialysis"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "grp": "CKD"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "grp_Dialysis_vs_Control",
+      "kind": "simple",
+      "factor": "grp",
+      "test": "Dialysis",
+      "reference": "Control",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "grp": "Dialysis"
+          },
+          "n": 4
+        },
+        {
+          "cell": {
+            "grp": "Control"
+          },
+          "n": 7
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

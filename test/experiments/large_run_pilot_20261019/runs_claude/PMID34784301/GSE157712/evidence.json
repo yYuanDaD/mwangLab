@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID34784301",
+  "subject_id": "GSE157712",
+  "created_at": "2026-11-24T09:57:40",
+  "finished_at": "2026-11-24T09:57:46",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC8783691.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC8783691.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "2129d78569e3757e1f48a53d789591833868545203d71deff76bc9c396c279e6",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE157712_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE157712\\GSE157712_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "4ee48517215fb24db8991594e5ee2baba6cad6184eb29d9199d3bde45fe99e9d",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE157712_Muscle_CKD_raw_counts.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE157712\\GSE157712_Muscle_CKD_raw_counts.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T09:57:40",
+      "sha256": null,
+      "attributes": {
+        "sha256": "6da1d88c95adf4be189b5a47120f12a38dd00649e0348d43ecc8bd6c9a579a3b",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE157712"
+        ],
+        "assay": "bulk RNA-seq, human vastus lateralis biopsies (S4.6.1.p1)",
+        "primary_estimand": "Difference in muscle gene expression between non-dialysis CKD patients and healthy age-matched controls (disease state, associational); secondary: CKD pre- vs post-dialysis initiation. No exercise intervention or exercise arm exists; both groups were 'highly sedentary' (S2.1.p1).",
+        "factors": {
+          "group": [
+            "Control",
+            "CKD",
+            "Dialysis"
+          ]
+        },
+        "sample_inclusion": "7 CKD, 7 control (S2.5.p1); 4 dialysis samples, 3 paired with prior CKD biopsy, 1 unpaired (S2.6.p3)",
+        "repeated_measure_unit": "patient (sample ID used as blocking variable for paired CKD/dialysis, S4.6.2.p2)",
+        "planned_contrasts": [
+          "CKD vs Control (S2.5.p1; paper: 967 DEGs, 464 up / 503 down, q < 0.05)",
+          "Dialysis vs CKD pre-dialysis (S2.6.p3; paper: 0 DEGs, q < 0.05)"
+        ],
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S4.6.2.p2"
+        },
+        "paper_method": "edgeR TMM + limma-voom, CPM > 0.5 in >= 7 samples, patient as blocking variable, eBayes, BH q < 0.05 (S4.6.2.p2)",
+        "exercise_content": "Exercise mentioned only as background (S2.3.p1, S3.p8 citing other studies); physical function tests (strength, endurance) are outcomes, not interventions."
+      },
+      "reason": "Methods S4.6.2.p2 lists exactly two DE contrasts: CKD vs healthy controls and CKD pre- vs post-dialysis. Neither is an exercise contrast. The paper studies kidney disease and dialysis effects on muscle.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:40"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE157712\\GSE157712_Muscle_CKD_raw_counts.txt.gz",
+        "owned": true,
+        "checks": "S4.6.1.p1 names GSE157712; GEO samples are vastus lateralis Control 7 / CKD 7 / Dialysis 4, matching S2.5.p1 and S2.6.p3 (3 dialysis subjects 10,14,15 also have CKD samples; subject 13 unpaired).",
+        "accession": "GSE157712",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE157712\\GSE157712_metadata.csv"
+      },
+      "reason": "Accession cited in the paper's data availability; group sizes match exactly.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:40"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 18,
+        "n_metadata": 18,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "subject": {
+              "alias_of": "characteristics_ch1.0.subject id"
+            },
+            "grp": {
+              "source": "title",
+              "regex": "^(Control|CKD|Dialysis)_"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\design_metadata.csv",
+          "sha256": "39e662bc313686af2455c60007e0a3e44f879c3cd4d25d24caa0d04fe030c6d9",
+          "levels": {
+            "subject": {
+              "10": 2,
+              "14": 2,
+              "15": 2,
+              "1": 1,
+              "2": 1,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "11": 1,
+              "12": 1,
+              "13": 1
+            },
+            "grp": {
+              "Control": 7,
+              "CKD": 7,
+              "Dialysis": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (C1, S15, ...) appear in brackets in the GEO title; inspect matched 18/18. Group taken from title prefix (equals characteristics group).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:41"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GEO data_processing: STAR + RSEM v1.3.0, 'raw counts (generated using RSEM)'",
+        "paper_input": "raw counts, TMM + voom (S4.6.2.p2)",
+        "matrix_type": "estimated counts",
+        "recommended_method": "limma-voom",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\aligned_matrix.csv",
+          "sha256": "0f14cb4217acfdcdc101127b5c76d24daebda49ade02601bbac6defe085bd4bb",
+          "n_features": 58870,
+          "n_samples": 18,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1401943.0,
+          "median": 0.0,
+          "integer_fraction": 0.9324,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Integer fraction 0.93 with non-integer values; data_processing states RSEM expected counts. Count-scale, consistent with the paper's voom route.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T09:57:41"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "exercise_contrast": null,
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\suitability\\suitability.md",
+          "n_comparisons": 3,
+          "n_analyzable": 3
+        }
+      },
+      "reason": "Request asks how exercise affects gene expression as the paper intends; the paper has no exercise comparison, so the case is refused at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the only factor is disease state (Control / CKD / Dialysis). The paper's planned contrasts are CKD vs Control and Dialysis vs CKD (S4.6.2.p2); no sample received an exercise intervention and both groups were sedentary (S2.1.p1). An exercise estimand cannot be identified from these data."
+      },
+      "recorded_at": "2026-11-24T09:57:46"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "96ac4c84a1a69b3f39968b81c12b8dabc26fe04c3ca840e2a6a8cab9b3731a78",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "0f14cb4217acfdcdc101127b5c76d24daebda49ade02601bbac6defe085bd4bb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "39e662bc313686af2455c60007e0a3e44f879c3cd4d25d24caa0d04fe030c6d9",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4d889474477ba3ca5a340dbc670341367e91cd6fde213e94d461cf576f214855",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID34784301\\GSE157712\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "7a53992d4005194f09eb7472a9401577d9e52cf5c47079581eebb3cba805daf1",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
