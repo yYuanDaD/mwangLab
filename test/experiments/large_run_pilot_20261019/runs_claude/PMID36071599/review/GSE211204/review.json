@@ -1,0 +1,20 @@
+{"case":"GSE211204","reviewer":"case-reviewer (Claude Sonnet 5.5)",
+"blind":{
+"B1":"Yes, with caveat. Vastus lateralis biopsies at LS0, LS10 (10-d ULLS unloading) and AR21 (21-d resistance-exercise active recovery) (S2.2.p1, S2.4). The exercise factor is carried by the AR samples (9); the exercise contrast is AR21 vs LS10. No non-exercising recovery arm.",
+"B2":"LS0 vs LS10, LS10 vs AR21, LS0 vs AR21 (S3.3.p1, Fig 4B-D). 12 recruited, 1 dropout, 2 declined AR21 biopsy, so 11 BL / 11 ULLS / 9 AR (31 samples, consistent with GEO).",
+"B3":"Yes: every participant is biopsied up to 3 times. Key = characteristics_ch1.1.subject (11 keys, links 31/31, no duplicates within a level).",
+"B4":"One joint limma-voom fit adjusted for subject ID: 'case vs. control differentially expressed genes adjusted for subject ID (paired analysis)' (S2.7.3.p1). Pairwise contrasts are read off that fit; the paper is not explicit about a joint fit across all time points.",
+"B5":"'differentially regulated at q < 0.05 (70 genes at q < 0.01)' (S3.3.p1), FDR q, no fold-change cutoff. Counts within 290 NMJ genes only: LS0 vs LS10 95 (70); LS10 vs AR21 114 (81); LS0 vs AR21 24 (7)."},
+"checks":[
+{"id":"run_or_refuse","verdict":"agree","severity":"none","evidence":"AR arm is resistance exercise (S2.4); packet B runs AR vs ULLS as the primary exercise contrast.","fix":""},
+{"id":"grouping","verdict":"agree","severity":"none","evidence":"BL 11 / ULLS 11 / AR 9 matches S3.p1 dropouts; no exclusions; exact key alignment 31/31.","fix":""},
+{"id":"direction","verdict":"agree","severity":"none","evidence":"Contrasts coded control->treatment: BL->ULLS, ULLS->AR (primary), BL->AR. COLQ/CHRNA1/CHRND signs match S3.3 / Fig 5 expectations.","fix":""},
+{"id":"pairing","verdict":"agree","severity":"none","evidence":"~ subject + time with subject as categorical blocking term; full rank, residual df 18; matches S2.7.3.p1.","fix":""},
+{"id":"model_fit","verdict":"agree","severity":"none","evidence":"Single joint fit, three contrasts, consistent with paper's subject-adjusted limma-voom.","fix":""},
+{"id":"confounding","verdict":"agree","severity":"none","evidence":"AR vs ULLS confounds training with natural reloading; recorded as caveat. Single sequencing pool, males only, no batch term needed.","fix":""},
+{"id":"matrix_method","verdict":"agree","severity":"none","evidence":"RSEM expected counts, unrounded into voom; TMM vs quantile normalization recorded as declared deviation.","fix":""},
+{"id":"threshold","verdict":"agree","severity":"none","evidence":"padj<0.05 no FC cutoff, q<0.01 audit; matches S3.3.p1.","fix":""},
+{"id":"paper_match","verdict":"agree","severity":"minor","evidence":"Counts compared per contrast but gene universe differs (290 NMJ genes vs transcriptome-wide); HANDBACK says so. study.json paper_counts is empty {} although HANDBACK tabulates them.","fix":"Optionally fill paper_counts with 95/114/24 (70/81/7) in the study record."},
+{"id":"stop_reason","verdict":"na","severity":"none","evidence":"No stop or refusal.","fix":""}],
+"overall":"pass","human_items":[],
+"summary":"该案例运行决策与论文一致:以受试者为区块的 limma-voom 联合模型,AR vs ULLS 为运动对比,方向、样本数(11/11/9)、阈值(q<0.05)均正确。TMM 替代 quantile 归一化与基因范围差异(290 NMJ 基因)已作为偏差声明。仅有一处次要问题:study 记录中 paper_counts 为空。"}

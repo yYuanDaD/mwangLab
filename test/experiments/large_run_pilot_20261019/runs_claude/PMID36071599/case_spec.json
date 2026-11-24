@@ -1,0 +1,161 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36071599",
+  "request": "Analyze GSE211204 for PMID 36071599 (Effects of short-term unloading and active recovery on human motor unit properties, neuromuscular junction transmission and transcriptomic profile.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE211204",
+      "accession": "GSE211204",
+      "inputs": {
+        "paper": ["E:/agent/mwangLab_pdf/test/experiments/paper_screen_20261028/papers/PMC9828768.paper.md"],
+        "metadata": "GSE211204/GSE211204_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID36071599/prep/GSE211204_RSEM_counts_symbol.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID36071599/prep_feature_ids.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE211204"],
+            "primary_estimand": "Within-subject change in vastus lateralis gene expression across three time points in young healthy men: LS0 (baseline) -> LS10 (10 d unilateral lower-limb suspension, unloading) -> AR21 (21 d resistance-exercise active recovery). The exercise effect is AR21 vs LS10 (21 d of resistance training after unloading); LS10 vs LS0 is the unloading (inactivity) effect; AR21 vs LS0 tests return to baseline.",
+            "planned_contrasts": [
+              "LS10 vs LS0 (S3.3.p1, Fig 4B; paper: 95 of 290 NMJ genes at q<0.05)",
+              "AR21 vs LS10 (S3.3.p1, Fig 4C; paper: 114 of 290 NMJ genes at q<0.05) - exercise contrast",
+              "AR21 vs LS0 (S3.3.p1, Fig 4D; paper: 24 of 290 NMJ genes at q<0.05)"
+            ],
+            "factors": {"time": ["LS0 (baseline)", "LS10 (ULLS)", "AR21 (AR)"]},
+            "repeated_measure_unit": "participant (paired analysis adjusted for subject ID, S2.7.3.p1)",
+            "inclusion": "12 recruited; 1 dropped after baseline, 2 declined the AR21 biopsy (S3.p1) -> GEO has 11 subjects, 31 samples (11 baseline, 11 ULLS, 9 AR)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.3.p1"},
+            "paper_method": "RSEM counts -> edgeR filterByExpr (20,555 genes) -> voom with quantile normalization -> limma eBayes, adjusted for subject ID (paired) (S2.7.3.p1); DEG counts and volcanoes reported only for a pre-selected set of 290 NMJ genes (12 MSigDB v7.4 pathways, Data S1) and 33 ion-channel genes (S2.9.p1)",
+            "paper_results": "NMJ genes q<0.05: LS10 vs LS0 95, AR21 vs LS10 114, AR21 vs LS0 24; leading-edge: COLQ down at LS10 / up at AR21; CHRNA1, CHRND up at LS10 / down at AR21 (S3.3.p2, Fig 5)"
+          },
+          "reasoning": "Methods S2.3-S2.4 (ULLS, then 21-d resistance-exercise AR: leg press + leg extension 3x10 at 70% 1RM, 3x/week), S2.7.3.p1 (RNA-seq pipeline, limma-voom paired by subject), S2.9.p1 (DE reported within 290 NMJ + 33 ion-channel gene sets), S3.3.p1 (counts per pairwise contrast, q<0.05). DA.p1 names GSE211204.",
+          "locator": "S2.7.3.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 cites GSE211204", "GEO: vastus lateralis, Homo sapiens, 31 samples; 11 subjects x baseline/ULLS/AR matches S3.p1 drop-outs (9 AR biopsies)", "data_processing matches S2.7.3.p1 (Cutadapt, STAR 2.7.0f, RSEM 1.3.0, GENCODE v21)"]},
+          "reasoning": "Accession, tissue, time points, sample count and processing chain all match the paper.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "\\[(S\\d+)\\]$"]},
+          "key_column": "key",
+          "aliases": {"subject": "characteristics_ch1.1.subject", "time_raw": "characteristics_ch1.2.treatment"},
+          "recode": {"time_raw": {"baseline": "BL", "ULLS": "ULLS", "AR": "AR"}},
+          "combine": {"time": ["time_raw"]},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns S1..S31 appear in brackets in the GEO title ('Subj_1 baseline [S1]'); exact match on that extracted key. subject and treatment come from the characteristics fields; treatment recoded to BL/ULLS/AR.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "limma-voom",
+          "reasoning": "GEO data_processing: 'RSEM raw counts'; 87.5% integer values with fractional entries (RSEM expected counts), max 3.9e7, no negatives. Matches the paper's input (RSEM counts into edgeR/voom). Feature IDs 'ENSG|SYMBOL' re-keyed to symbols by prep_feature_ids.py (values unchanged).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["time"],
+          "references": {"time": "BL"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["time_ULLS_vs_BL", "time_AR_vs_ULLS", "time_AR_vs_BL"],
+          "final": {
+            "analysis_type": "repeated-measures three-level time course",
+            "formula": "~ subject + time",
+            "contrasts": [
+              {"name": "time_ULLS_vs_BL", "control": "BL", "treatment": "ULLS", "role": "secondary"},
+              {"name": "time_AR_vs_ULLS", "control": "ULLS", "treatment": "AR", "role": "primary"},
+              {"name": "time_AR_vs_BL", "control": "BL", "treatment": "AR", "role": "secondary"}
+            ],
+            "estimand_type": "within-subject change"
+          },
+          "candidates": [
+            {"value": "pool ULLS and AR vs baseline", "reason_rejected": "paper compares the three time points pairwise; pooling mixes unloading and exercise"},
+            {"value": "unpaired comparison", "reason_rejected": "paper's analysis is paired on subject ID (S2.7.3.p1)"}
+          ],
+          "reasoning": "One model with time (3 levels) and subject, the three pairwise contrasts the paper reports (Fig 4B-D). Exercise effect = AR vs ULLS. There is no non-exercising recovery arm, so AR vs ULLS cannot separate resistance training from spontaneous reloading after the suspension; recorded as a caveat.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "fixed-effect blocking term (paired analysis, S2.7.3.p1)"}]},
+          "confounding_candidates": null,
+          "reasoning": "Repeated biopsies from the same 11 men; paper adjusts for subject ID. Subjects 4 and 5 lack AR and contribute only to BL/ULLS within-subject estimates. All samples are from one sequencing pool (2 lanes, GEO description), so no batch term.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma-voom (R limma/edgeR via tools.r_de_tools, engine voom)",
+            "formula": "~ subject + time",
+            "rounding_documented": true,
+            "rounding_note": "No rounding: voom/edgeR take the fractional RSEM expected counts as-is (tools/r_de_tools.py:48,100 rounds only for deseq2/deseq1), as the paper did.",
+            "paper_route": {"method": "edgeR filterByExpr + voom(normalize.method='quantile') + limma eBayes ~ subject + time", "status": "partially_reproduced", "reason": "executor's voom path applies calcNormFactors (TMM) and does not expose voom's quantile normalization"},
+            "deviations": ["TMM normalization instead of voom quantile normalization (executor limitation, tools/r_de.R:192,214)", "DE reported transcriptome-wide; the paper reports counts only inside its 290-gene NMJ set (gene list in Data S1, not available here)"]
+          },
+          "transform": null,
+          "reasoning": "Paper's own route is limma-voom on RSEM counts with filterByExpr and subject adjustment; the R voom executor reproduces it except for the normalization step.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "deviation_note": "Paper q<0.05 (also reports q<0.01, used here as the audit rule). Paper's q is reported within 290 NMJ genes; ours is BH over all filterByExpr-retained genes."
+          },
+          "reasoning": "S3.3.p1: 'differentially regulated at q < 0.05 (70 genes at q < 0.01)'; no fold-change cutoff.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper DEG counts (95/114/24) are within a 290-gene NMJ set whose list is not available; our transcriptome-wide counts are not directly comparable.",
+              "AR vs ULLS confounds resistance training with natural reloading/recovery after suspension (no non-exercise recovery control).",
+              "TMM instead of voom quantile normalization."
+            ]
+          },
+          "paper_genes": {
+            "voom_paired/time_ULLS_vs_BL": ["COLQ", "CHRNA1", "CHRND", "GDNF", "NTF4"],
+            "voom_paired/time_AR_vs_ULLS": ["COLQ", "CHRNA1", "CHRND"],
+            "voom_paired/time_AR_vs_BL": ["COLQ", "CHRNA1", "CHRND"]
+          },
+          "reasoning": "Expected directions (S3.3.p2/Fig 5): COLQ down at LS10, up at AR21; CHRNA1/CHRND up at LS10, down at AR21.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "gene universe of reported DEG counts", "paper": "290 NMJ genes (Data S1)", "data": "full RSEM matrix, 58,381 genes; NMJ list not deposited", "disposition": "declared_deviation"},
+        {"item": "normalization", "paper": "voom quantile normalization", "data": "executor offers TMM only", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "voom_paired",
+          "tool": "tools.r_de_tools:run_r_de",
+          "args": {
+            "engine": "voom",
+            "design": "~ subject + time",
+            "levels": {"time": ["BL", "ULLS", "AR"]},
+            "filter_by_expr": true,
+            "contrasts": [
+              {"name": "time_ULLS_vs_BL", "coef": "timeULLS"},
+              {"name": "time_AR_vs_ULLS", "expr": "timeAR - timeULLS"},
+              {"name": "time_AR_vs_BL", "coef": "timeAR"}
+            ],
+            "label": "voom_paired",
+            "method_label": "limma-voom (R), TMM, filterByExpr, ~ subject + time"
+          },
+          "role": "primary",
+          "reasoning": "Paper's paired limma-voom: one model over all 31 samples, three pairwise time contrasts; AR vs ULLS is the exercise contrast."
+        }
+      ],
+      "enrichment": [
+        {"execution": "voom_paired/time_AR_vs_ULLS", "ora": false, "gsea": true, "ranking_metric": "stat", "direction": "all", "reasoning": "Paper ran GSEA (custom NMJ sets, not reproducible); Hallmark GSEA on the exercise contrast as exploratory pathway context."}
+      ]
+    }
+  ]
+}
