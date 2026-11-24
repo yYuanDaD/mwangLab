@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID32483463",
+  "subject_id": "GSE128651",
+  "created_at": "2026-11-24T04:48:15",
+  "finished_at": "2026-11-24T04:48:15",
+  "status": "stopped:ownership",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC7255041.paper.md",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261027\\papers\\PMC7255041.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T04:48:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "455d480b859055286c319a07aa6e6d54249dc350e924c1c13722bd14d60d9067",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "PMC7255041.paper.json",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\paper_screen_20261027\\papers\\PMC7255041.paper.json",
+      "locator": null,
+      "captured_at": "2026-11-24T04:48:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "26fb1c874c2e426f479f07ffe9b097222981d3be36bc6f09b8f74d5e161da1d2",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GEO series record (acc.cgi text)",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32483463\\evidence_geo\\GSE128651_series.soft.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T04:48:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "315039e3e35d19066308859059ce2d3130f9b97d5452249d58c86b3d9ab69a88",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "metadata",
+      "label": "GEO sample records (acc.cgi text)",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32483463\\evidence_geo\\GSE128651_samples.soft.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T04:48:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1c7292c408ee1fce1f3a76e78edc0b434e6f67b2975377df82114dff8e00c2c3",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0005",
+      "origin": "user",
+      "label": "download attempts log",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32483463\\evidence_geo\\download_attempts.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T04:48:15",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ba62207c6816070a342535a18ab16cdc83e00996ac101f5c5b40ffbe01b9bfcf",
+        "kind": "user"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE128651"
+        ],
+        "assay": "bulk RNA-seq (QIAseq FX Single Cell RNA Library Kit, ~800 FACS-sorted SCs/sample), Illumina HiSeq 2000 (S4.p10)",
+        "sample_inclusion": "FACS-sorted Lin- CD34+ a7-integrin+ muscle satellite cells, n=4 mice per arm (FIG3 legend B)",
+        "factors": {
+          "grp": [
+            "Con (sedentary/untrained)",
+            "Exe (4-week treadmill training)"
+          ]
+        },
+        "primary_estimand": "effect of 4-week treadmill training on the SC transcriptome: Exe vs Con (S2.3.p1, FIG3)",
+        "planned_contrasts": [
+          "grp_Exe_vs_Con (S2.3.p1; paper: 573 up + 1,326 down = 1,899 DEGs, >2-fold, p<0.01)"
+        ],
+        "repeated_measure_unit": null,
+        "paper_method": "bowtie -> HTSeq counts -> DESeq2; Cufflinks FPKM for display (S4.p10)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.01,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 1.0,
+          "inclusive": false,
+          "source_locator": "S2.3.p1; FIG3 legend B"
+        },
+        "paper_threshold_alternative": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_cutoff": null,
+          "source_locator": "S4.p10"
+        },
+        "paper_results": {
+          "up": 573,
+          "down": 1326,
+          "total": 1899,
+          "named_genes": {
+            "down": [
+              "Igfbp4",
+              "Igfbp5",
+              "Igfbp6"
+            ],
+            "up": [
+              "Igfbp7"
+            ]
+          },
+          "gsea": "up: ECM receptor interaction, cardiac muscle contraction, S phase; down: OXPHOS, ATP synthesis, PI3K-Akt, mTOR, TCA cycle (FIG3 C-K)"
+        }
+      },
+      "reason": "Paper names GSE128651 (S4.p22) as the SC RNA-seq of control vs exercise mice (S2.3.p1, FIG3A). Two arms, 4 mice each; GEO record confirms Con1-4 / Exe1-4. The DEG rule that yields the reported 573/1,326 is 'over 2-fold change, p<0.01' (S2.3.p1, FIG3B); methods state FDR<0.05 (S4.p10). Whether 'p' is raw or adjusted is not stated; taken as raw p as written.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002",
+        "SRC-0003"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:48:15"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "owned": null,
+        "accession": "GSE128651",
+        "expected_matrix_file": "GSE128651_gene_fpkm.txt.gz (GEO Series_supplementary_file; RPKM/FPKM per data_processing)",
+        "matrix_file": null,
+        "metadata_file": "evidence_geo/GSE128651_samples.soft.txt",
+        "checks": {
+          "pubmed_id_on_series": "32483463 (matches)",
+          "samples": "8 GSM (GSM3681653-60): Con1-4 untrained, Exe1-4 trained",
+          "matrix_retrieved": false,
+          "download_status": "HTTP 403 Forbidden from ftp.ncbi.nlm.nih.gov (https and GEOparse), FTP 550; geo/download redirects to the same FTP host"
+        }
+      },
+      "reason": "GEO series GSE128651 carries PubMed 32483463 and 8 samples matching the paper's n=4 vs n=4 design, so the series belongs to the paper. But the only expression file (GSE128651_gene_fpkm.txt.gz) could not be retrieved: every ftp.ncbi.nlm.nih.gov request from this host returns 403 (also for unrelated series), and the metadata SOFT download via GEOparse fails the same way. Without the matrix, ownership of the file (its columns vs the 8 GSMs) and every later gate cannot be checked. A specific fact unblocks it: the deposited FPKM file. Note for resumption: the deposit is FPKM only, so the paper's DESeq2-on-counts route is blocked; the expected route is log2(FPKM+1) + limma (declared deviation) or SRA SRP189039 re-quantification.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0005",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "manual_review",
+        "execution_status": "not_started",
+        "stop_reason": "matrix file GSE128651_gene_fpkm.txt.gz unavailable: NCBI GEO FTP returns HTTP 403 from this host; rerun when the file is placed in data/GSE128651/"
+      },
+      "recorded_at": "2026-11-24T04:48:15"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32483463\\GSE128651\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ff2e50557c2bccf9140bd6405e40facf7749ce2225bf00fab554ce74b3f37158",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32483463\\GSE128651\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "ce7723f1d9b23b53944817fe767635856d0830cb46a815590c1c64ba22da8a5f",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

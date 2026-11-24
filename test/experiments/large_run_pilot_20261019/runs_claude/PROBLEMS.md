@@ -919,3 +919,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID32483463 (GSE128651)
 
 - NCBI GEO FTP 403 from host (geo_tools download); GEOparse reports Errno2 tmp not 403; case_runner.py:529-530 needs matrix file to record ownership stop Details: `PMID32483463/HANDBACK.md`.
+
+## PMID36892893 (GSE213649)
+
+- case_runner.py:588 exclude_samples silently ignores non-GSM keys; Ensembl-only gene check returns null for symbols; PFC ORA CSV holds Enrichr HTML, no KEGG; no tissue-identity QC Details: `PMID36892893/HANDBACK.md`.

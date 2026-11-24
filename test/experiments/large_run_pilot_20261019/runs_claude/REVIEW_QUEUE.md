@@ -471,3 +471,7 @@ One section per case; newest last.
 ## PMID34417591 / GSE179078 (2026-11-24)
 
 - policy: Open policy question: this is a genotype-only series (F5KO vs WT) that the paper itself uses for its DG bulk comparison. Refused for the exercise question; a person may decide whether a knockout of the exercise-hormone gene should be run as a labelled non-exercise case.
+
+## PMID32483463 / GSE128651 (2026-11-24)
+
+- policy: Raw p<0.01 vs FDR<0.05 ambiguity in paper is open policy; record both when the analysis runs.
