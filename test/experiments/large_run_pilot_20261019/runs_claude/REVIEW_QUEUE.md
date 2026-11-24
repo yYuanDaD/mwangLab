@@ -678,3 +678,11 @@ One section per case; newest last.
 ## PMID33332990 / GSE144109 (2026-11-24)
 
 - policy: Paper full text not available: DEG threshold, counts and any low-count filter cannot be confirmed.
+
+## PMID37746697 / GSE240814_female (2026-11-24)
+
+- policy: Policy (open): whether disuse/unloading studies count as exercise-related for the cohort; the case followed the rule that no exercise arm means refuse. Only the abstract was available, so the paper's DEG rule is unconfirmed.
+
+## PMID37746697 / GSE240814_male (2026-11-24)
+
+- policy: Policy (open): whether disuse/unloading studies count as exercise-related for the cohort; the case followed the rule that no exercise arm means refuse. Only the abstract was available, so the paper's DEG rule is unconfirmed.

@@ -1,0 +1,393 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID37746697",
+  "subject_id": "GSE240814_male",
+  "created_at": "2026-11-24T15:11:19",
+  "finished_at": "2026-11-24T15:11:24",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMID37746697_abstract.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\PMID37746697_abstract.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T15:11:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "77d72cc342d01df7d65c0ad43b88895707eadc78e8dac96fd1bf26f4206d54de",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE240814_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE240814\\GSE240814_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T15:11:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "dbd1fe3d9d856b14a477f58be60b78664f424b8cb9a70da5e97c59d9b972fe4b",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE240814_HU_male_total.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE240814\\GSE240814_HU_male_total.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T15:11:19",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ab1114c80e6da6a8b1180645fb3fe22e21f970193691a664fbb202f0152ea51a",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE240814"
+        ],
+        "primary_estimand": "Effect of hindlimb unloading (disuse) duration (24, 48, 72, 168 h vs 0 h control) on gastrocnemius transcriptome, analysed separately in male and female C57BL/6J mice. No exercise or training arm.",
+        "planned_contrasts": [
+          "Male HU 24h/48h/72h/168h vs 0h control (abstract; GEO supplementary DE files per sex and time)"
+        ],
+        "factors": {
+          "time_HU": [
+            "0h",
+            "24h",
+            "48h",
+            "72h",
+            "168h"
+          ],
+          "sex": [
+            "Male",
+            "Female"
+          ]
+        },
+        "inclusion": "n=8/group per abstract; GEO has 7 male / 8 female controls and 7-9 per HU group",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "abstract has no threshold; inferred from GEO supplementary DE_*vs0.csv files (all FDR step-up < 0.05, no FC cutoff)"
+        },
+        "paper_method": "Partek Flow: STAR mm10, filter genes max count <= 50, median-ratio normalization, DESeq2 (GEO data_processing)",
+        "paper_results": {
+          "male_DEGs": {
+            "24vs0": 3888,
+            "48vs0": 4133,
+            "72vs0": 1611,
+            "168vs0": 3053
+          },
+          "female_DEGs": {
+            "24vs0": 3173,
+            "48vs0": 4907,
+            "72vs0": 3647,
+            "168vs0": 1633
+          },
+          "source": "GEO supplementary Total_Up_and_Down_DE_*.csv"
+        }
+      },
+      "reason": "Only the PubMed abstract and the GEO series description are available (no full text). Both describe hindlimb unloading (HU), a disuse/unloading model of muscle atrophy, compared against 0 h ambulatory controls in each sex. No exercise, training, or loading intervention is described.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T15:11:20"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE240814\\GSE240814_HU_male_total.csv",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 37746697",
+          "Series title equals paper title",
+          "metadata description 'HU male_total.xlsx' names this matrix"
+        ],
+        "accession": "GSE240814",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE240814\\GSE240814_metadata.csv"
+      },
+      "reason": "GSE240814 is the paper's own deposit; the per-sex matrix is listed in each sample's description field.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T15:11:20"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:title",
+        "n_aligned": 41,
+        "n_metadata": 80,
+        "coverage": 0.5125,
+        "unmatched_matrix_columns": [
+          "Start",
+          "Stop",
+          "Length",
+          "gene_version"
+        ],
+        "unmatched_metadata_samples": [
+          "GSM7709837",
+          "GSM7709838",
+          "GSM7709839",
+          "GSM7709840",
+          "GSM7709841",
+          "GSM7709842",
+          "GSM7709843",
+          "GSM7709844",
+          "GSM7709845",
+          "GSM7709846",
+          "GSM7709847",
+          "GSM7709848",
+          "GSM7709849",
+          "GSM7709850",
+          "GSM7709851",
+          "GSM7709852",
+          "GSM7709853",
+          "GSM7709854",
+          "GSM7709855",
+          "GSM7709856",
+          "GSM7709857",
+          "GSM7709858",
+          "GSM7709859",
+          "GSM7709860",
+          "GSM7709861",
+          "GSM7709862",
+          "GSM7709863",
+          "GSM7709864",
+          "GSM7709865",
+          "GSM7709866",
+          "GSM7709867",
+          "GSM7709868",
+          "GSM7709869",
+          "GSM7709870",
+          "GSM7709871",
+          "GSM7709872",
+          "GSM7709873",
+          "GSM7709874",
+          "GSM7709875"
+        ],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "trt": {
+              "alias_of": "characteristics_ch1.2.treatment"
+            },
+            "sex": {
+              "alias_of": "characteristics_ch1.3.Sex"
+            },
+            "time": {
+              "source": "characteristics_ch1.4.time point",
+              "regex": "^(\\d+)h$",
+              "recode": {
+                "0": "h0",
+                "24": "h24",
+                "48": "h48",
+                "72": "h72",
+                "168": "h168"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\design_metadata.csv",
+          "sha256": "af3128f0b0cba399a2310c09f41ba713f4c4fa40dd7fb4207f709b477533ab28",
+          "levels": {
+            "trt": {
+              "Hindlimb Unloading": 34,
+              "Control": 7
+            },
+            "sex": {
+              "Male": 41
+            },
+            "time": {
+              "h48": 9,
+              "h72": 9,
+              "h24": 8,
+              "h168": 8,
+              "h0": 7
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns equal metadata 'title' exactly (inspect alignment_keys). Short formula-safe columns trt/sex/time derived for the record.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T15:11:20"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "DESeq2 median-ratio normalized counts (linear, non-integer)",
+        "recommended_method": "limma on log2(x+1) (raw counts not deposited)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\aligned_matrix.csv",
+          "sha256": "c4660021b5ad18a91aa17ffa2e81bf9d049d6ed98f070e5f27c26ff82bf5f0a4",
+          "n_features": 12853,
+          "n_samples": 41,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 12831,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 2919490.0,
+          "median": 500.191,
+          "integer_fraction": 0.0088,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Integer fraction ~0.03; GEO data_processing: 'filtered counts were median ratio normalized and tested ... using DESeq2' (Partek Flow). Values are normalized counts, not raw counts. Not needed further because the case stops at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T15:11:20"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\suitability\\suitability.md",
+          "n_comparisons": 10,
+          "n_analyzable": 10
+        }
+      },
+      "reason": "Treatment column has only 'Control' and 'Hindlimb Unloading'; time 0h=controls. Any contrast available here (HU vs control) estimates disuse, not exercise; relabelling it as exercise would misstate the estimand.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the study compares hindlimb unloading (disuse) durations with 0 h ambulatory controls. Unloading is the opposite of an exercise/loading stimulus, and no exercise or training group exists in the paper or in GEO (treatment levels: Control, Hindlimb Unloading). The requested estimand (effect of exercise on gene expression) cannot be identified from these data."
+      },
+      "recorded_at": "2026-11-24T15:11:24"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b92b269d62e9bd1c30c6fe9f1232e4d9fd010ba0a6a42ad0ce4083fb9bbabc91",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "8a78e07d500175c5a239d1b554bf602133b27a470684f200e0969162a100244b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "c4660021b5ad18a91aa17ffa2e81bf9d049d6ed98f070e5f27c26ff82bf5f0a4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "af3128f0b0cba399a2310c09f41ba713f4c4fa40dd7fb4207f709b477533ab28",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4a826f2108b9ab48af1a247592862f5faaf75fb42c0118b3dd123784542cb2cb",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID37746697\\GSE240814_male\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "e9123aedb11529417de7762171021dc8a20ba6c5e48a474bcbf15a6a4adec225",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

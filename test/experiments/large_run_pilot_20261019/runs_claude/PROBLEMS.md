@@ -1103,3 +1103,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42113967 (GSE310858)
 
 - geo_tools.py:30 GEOparse temp-file error and :58 ftp.ncbi.nlm.nih.gov 403 (ftp.ncbi.nih.gov works); key_patterns can't reorder column keys (prep script needed) Details: `PMID42113967/HANDBACK.md`.
+
+## PMID37746697 (GSE240814)
+
+- inspect alignment_keys reports matrix sample counts (40 female/42 male) higher than the real 39/41 sample columns, apparently counting a non-sample column (cosmetic) Details: `PMID37746697/HANDBACK.md`.
