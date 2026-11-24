@@ -1043,3 +1043,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID37486024 (GSE224900)
 
 - sex check can't use corrected column (stats_tools.py:257); subject key from sample blocks needs prep script; nested covariates give unexplained not_analyzable Details: `PMID37486024/HANDBACK.md`.
+
+## PMID38095016 (GSE235781)
+
+- GEO FTP 403 for ~3 min; download_geo_data hides it as GEOparse temp-file error (tools/geo_tools.py:30); pydeseq2 overflow warnings; inspect feature_id_type misleading Details: `PMID38095016/HANDBACK.md`.

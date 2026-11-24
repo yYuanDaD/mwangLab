@@ -606,3 +606,9 @@ One section per case; newest last.
 
 - policy: Open policy: whether a bed-rest disuse/re-ambulation series counts as a physical-activity (exercise) study.
 - policy: Open policy: which threshold to report when paper REC counts fit padj<0.05 & |log2FC|>0.585 rather than the stated rule.
+
+## PMID38095016 / GSE235781 (2026-11-24)
+
+- policy: Joint vs stratum-wise fit is open when the paper is silent; full text would settle it.
+- policy: OH exercise response (paper's stress signature in fast fibers) needs GSE130977 OH PRE; optionally a labelled sensitivity run, with batch caveat.
+- policy: Paper DEG rule and counts need the full text; the run is a declared deviation.

@@ -1,0 +1,30 @@
+{
+  "case": "GSE235781",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "Yes. Abstract: LLE/OH/YE men, vastus lateralis biopsies pre and 4 h after 3x10 knee extensions at 70% 1-RM. Exercise factor = time.point (PRE vs POST); the training-state/age groups are a cohort factor, not the acute exercise. Series metadata: 81 samples, fiber FAST/SLOW x group LLE/YE/OH x PRE/POST (OH has POST only: 18 samples).",
+    "B2": "Abstract only: POST vs PRE exercise response in fast fibers and in slow fibers, separately per cohort (LLE n=8, OH n=9, YE n=8). Fast responded more than slow; slow responded only in LLE. Per-comparison sample numbers are not in the abstract; metadata allow 8 pairs per fiber x cohort (YE SLOW PRE short by one).",
+    "B3": "Yes. Each man gives PRE and POST and both fiber types. characteristics_ch1.4.subject.id restarts at 1 in every cohort, so the unit is group+subject id (title/description key; no duplicates within a level, 80/81 linked). Numeric IDs must be categories.",
+    "B4": "Abstract does not say. Per-fiber, per-cohort comparisons suggest stratum-wise fits, but this is not stated (abstract only).",
+    "B5": "Abstract states only 'P < 0.05'; no FDR/fold-change rule or DEG counts are reported in the abstract."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Abstract: pre/4 h post resistance exercise; metadata title field carries PRE/POST. Series run for exercise question.", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Four strata (FAST/SLOW x LLE/YE) with PRE and POST, n=8 pairs, SLOW YE 7 pairs (YE_5 SLOW PRE absent in metadata, named). OH has no PRE in this series (metadata: all OH are POST), so OH contrasts reported not estimable; exclusion reason stated.", "fix": ""},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "design: control PRE, treatment POST for all contrasts; outputs DEG_results_POST_vs_PRE.", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "formula ~ subj + time with subj = <grp>_<id> as categorical (design_check full rank, 26 columns); the cohort-restarting id was correctly prefixed with group.", "fix": ""},
+    {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper (abstract) silent; strata fitted separately, joint alternative recorded as rejected (changes estimand). Open policy question only.", "fix": ""},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch/lane info; all male; sex check no_markers (human gene IDs) but one sex only. OH PRE processed in a different series, so merging was rejected to avoid batch confound.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "featureCounts -M --fraction, integer_fraction 0.875, rounded and run with DESeq2; deviation recorded.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Abstract gives no rule; padj<0.05 recorded as workflow_default with raw P<0.05 audit counts; not claimed as paper rule.", "fix": ""},
+    {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK states comparison is qualitative against the abstract only; no paper counts claimed.", "fix": ""},
+    {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "OH contrasts not run because the series has no OH PRE samples (verified: all 18 OH samples are POST in metadata); stated source of PRE (GSE130977) cannot be checked from the files here.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Joint vs stratum-wise fit is open when the paper is silent; full text would settle it.",
+    "OH exercise response (paper's stress signature in fast fibers) needs GSE130977 OH PRE; optionally a labelled sensitivity run, with batch caveat.",
+    "Paper DEG rule and counts need the full text; the run is a declared deviation."
+  ],
+  "summary": "本案例判定通过：运动因素（PRE 与 POST 4 小时）、配对单位（组别加受试者编号）、方向（POST 对 PRE）和模型（~subj + time，按纤维类型与队列分层）均与摘要相符。OH 组在本系列中无 PRE 样本，因此未做对比并已如实记录。论文的方法、阈值和 DEG 数量需全文才能核对，已作为人工事项列出。"
+}
