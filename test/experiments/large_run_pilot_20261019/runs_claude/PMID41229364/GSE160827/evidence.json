@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41229364",
+  "subject_id": "GSE160827",
+  "created_at": "2026-11-24T05:04:17",
+  "finished_at": "2026-11-24T05:04:33",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12612635.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC12612635.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7d1a97864dc558d5a0ae87f5d778d7b7038c2bf73187f4954829c9ac16cbe3dc",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE160827_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE160827\\GSE160827_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:17",
+      "sha256": null,
+      "attributes": {
+        "sha256": "422a7e2ff6c178e54e059139bd2e919b8f190618080457b93348ebb16ff2b35f",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "merged_from_tar_gsm.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\input\\merged_from_tar_gsm.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:31",
+      "sha256": null,
+      "attributes": {
+        "sha256": "48b61132f520dfe60900a3975686c2bc5288811b05ab6eaa67265958ef5b1708",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE285405",
+          "GSE302562",
+          "GSE160827"
+        ],
+        "assay": "single EDL fibre RNA-seq (Illumina HiSeq 4000), male FVB/N mice, 2-3 months; reanalysed from an earlier study",
+        "factors": {
+          "genotype": [
+            "WT",
+            "C2KO"
+          ]
+        },
+        "sample_inclusion": "n = 10 fibres per group (S3.5.p1)",
+        "primary_estimand": "Effect of Mybpc2 knockout on single EDL fibre gene expression in young male mice",
+        "planned_contrasts": [
+          "C2-/- vs WT single EDL fibres (S3.5.p1; paper: 956 DEGs, 621 up / 335 down)"
+        ],
+        "exercise_component": "none (S2.5.p1, S3.5.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "source_locator": "S2.11.p1"
+        },
+        "paper_method": "featureCounts -> edgeR TMM -> limma/voom (S2.11.p1)",
+        "paper_results": {
+          "n_deg": 956,
+          "up": 621,
+          "down": 335,
+          "genes": [
+            "Actc1",
+            "Phlda3",
+            "Atp13a2",
+            "Apcdd1"
+          ]
+        }
+      },
+      "reason": "S3.5.p1 reanalyses GSE160827 (single EDL fibres) for KO vs WT. Genotype only.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:31"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\input\\merged_from_tar_gsm.csv",
+        "owned": true,
+        "checks": [
+          "S3.5.p1 and S10.p1 name GSE160827",
+          "metadata: EDL single fibres, FVB/N, WT (27) vs C2KO (20); same lab"
+        ],
+        "accession": "GSE160827",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE160827\\GSE160827_metadata.csv"
+      },
+      "reason": "Accession, tissue and genotypes match; sample count differs from the paper (27/20 deposited vs n=10/10 analysed) and the paper does not say which 20 fibres it used.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:31"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:metadata_index",
+        "n_aligned": 47,
+        "n_metadata": 47,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "characteristics_ch1.1.genotype/variation",
+              "regex": "^(WT|C2KO)$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\design_metadata.csv",
+          "sha256": "fead85bb3ddde0586bf05199acd1c85db286795a432912de1b13d4be5d054421",
+          "levels": {
+            "grp": {
+              "WT": 27,
+              "C2KO": 20
+            }
+          }
+        }
+      },
+      "reason": "Tar-merged columns become GSM ids, exact match on the metadata index (47/47).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:31"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE160827_RAW.tar per-sample featureCounts .count files merged",
+        "paper_input": "featureCounts raw counts (S2.11.p1)",
+        "matrix_type": "raw counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\aligned_matrix.csv",
+          "sha256": "48b61132f520dfe60900a3975686c2bc5288811b05ab6eaa67265958ef5b1708",
+          "n_features": 24421,
+          "n_samples": 47,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1269842.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "100% integer, 0 to 1.27e6; data_processing: featureCounts, 'Supplementary_files_format_and_content: Read counts'.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:32"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "exercise_factor": null,
+        "available_factor": "genotype WT vs C2KO only",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "Grouping columns are genotype only; S2.5.p1 describes fibre isolation from untreated mice.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: single EDL fibres from sedentary WT and C2KO mice; only genotype varies. The exercise estimand is not identifiable. (Fibres would also need the donor mouse as blocking unit, 3 WT and 2 KO mice per extract_protocol.)"
+      },
+      "recorded_at": "2026-11-24T05:04:33"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "b9be27f03fff7a6788f6c6dd914d8161ab9761c9754699707ed5a30ae94e0ac8",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "801937dbd28b530adf2ea619749a40cbaf55297c9e6e703c386ac70fd9f40b13",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "48b61132f520dfe60900a3975686c2bc5288811b05ab6eaa67265958ef5b1708",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fead85bb3ddde0586bf05199acd1c85db286795a432912de1b13d4be5d054421",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "5aae6917fba1ab0d9e48eece24a0a6230ad34c7d059037073a118789ecb9d1c4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE160827\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "eb46b26965487727b4a61e97240340951f8035662bd31f9c6955fd8d86c9685d",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

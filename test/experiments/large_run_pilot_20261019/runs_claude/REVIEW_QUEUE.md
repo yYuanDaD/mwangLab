@@ -539,3 +539,15 @@ One section per case; newest last.
 ## PMID41225641 / GSE281210 (2026-11-24)
 
 - policy: Policy (not an error): whether a disuse/unloading-vs-control series should count as an exercise-related study (the reverse of exercise) is a person's call; the refusal follows the skill's current rule.
+
+## PMID41229364 / GSE160827 (2026-11-24)
+
+- policy: Whether knockout-only series with no exercise arm should be refused or run as a labelled non-exercise control (open policy).
+
+## PMID41229364 / GSE285405 (2026-11-24)
+
+- policy: Whether knockout-only series count as exercise studies (open policy).
+
+## PMID41229364 / GSE302562 (2026-11-24)
+
+- policy: Whether knockout-only series count as exercise studies (open policy).

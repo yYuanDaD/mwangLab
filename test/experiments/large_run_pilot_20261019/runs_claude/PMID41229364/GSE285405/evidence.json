@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41229364",
+  "subject_id": "GSE285405",
+  "created_at": "2026-11-24T05:04:13",
+  "finished_at": "2026-11-24T05:04:17",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC12612635.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261028\\papers\\PMC12612635.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:13",
+      "sha256": null,
+      "attributes": {
+        "sha256": "7d1a97864dc558d5a0ae87f5d778d7b7038c2bf73187f4954829c9ac16cbe3dc",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE285405_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE285405\\GSE285405_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:13",
+      "sha256": null,
+      "attributes": {
+        "sha256": "566dec825cd260a6b80a14ffe14da931fe147484dc66207df47f7e557cc91ddf",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE285405_core_table_gene_C2KO_Aging.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE285405\\GSE285405_core_table_gene_C2KO_Aging.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T05:04:13",
+      "sha256": null,
+      "attributes": {
+        "sha256": "9aeb1b0f70ede7311c7d6e7864abb509269164f3124c10aeb12eb47936d24c3e",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE285405",
+          "GSE302562",
+          "GSE160827"
+        ],
+        "assay": "bulk RNA-seq (BGISEQ), TA muscle, male FVB/N mice, 21-22 months",
+        "factors": {
+          "genotype": [
+            "WT",
+            "C2-/- (Mybpc2 KO)"
+          ]
+        },
+        "sample_inclusion": "aged male WT vs C2-/- TA muscle, n = 4 per group (FIG8)",
+        "primary_estimand": "Effect of Mybpc2 (fMyBP-C) knockout on TA muscle gene expression in aged (21-22 mo) male mice; genotype, not exercise",
+        "planned_contrasts": [
+          "C2-/-Old vs WT-Old (S3.7.p1, FIG8; paper: 310 DEGs, 226 up / 84 down)"
+        ],
+        "exercise_component": "none: no training, running, or acute exercise arm in any RNA-seq dataset (S2.11.p1). The only contraction intervention in the paper (ECC injury, S2.3.p1) was analysed by Western blot/ELISA in C57BL/6 mice, not sequenced.",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "source_locator": "S2.11.p1"
+        },
+        "paper_method": "featureCounts -> edgeR TMM -> limma/voom (S2.11.p1)",
+        "paper_results": {
+          "n_deg": 310,
+          "up": 226,
+          "down": 84,
+          "genes": [
+            "Actc1",
+            "Myh13",
+            "Fam174b",
+            "Apold1"
+          ]
+        }
+      },
+      "reason": "S2.11.p1 defines the RNA-seq as genotype comparisons (WT vs C2-/-) at young and old ages; S3.7.p1/FIG8 reports the aged TA comparison on GSE285405. Threshold S2.11.p1: |fold| > 1.5x and adjusted p < 0.05 (FIG8 legend says 'log-transformed fold change cut off of 0.5', which is consistent with log2(1.5)=0.585 rounded). No exercise factor exists.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:13"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE285405\\GSE285405_core_table_gene_C2KO_Aging.txt.gz",
+        "owned": true,
+        "checks": [
+          "S3.7.p1 and S10.p1 name GSE285405",
+          "metadata: male TA muscle, 22 months, FVBN WT vs C2-/-, n=4/4, matches FIG8"
+        ],
+        "accession": "GSE285405",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE285405\\GSE285405_metadata.csv"
+      },
+      "reason": "Accession, tissue, age, sex, genotype and n match the paper's aged dataset.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:13"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 8,
+        "n_metadata": 8,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "description",
+              "regex": "^Library name: (WT|KO)\\d$"
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\design_metadata.csv",
+          "sha256": "7d3f21baffbf5dffc21042add8ff347d5cbf3a526781ad3fdf0ff630e98df96e",
+          "levels": {
+            "grp": {
+              "WT": 4,
+              "KO": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns read_count_WT1..KO4 hold the library names given in metadata description ('Library name: WT1'); exact match on the derived key. grp = genotype (WT/KO).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:14"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "source": "GSE285405_core_table_gene_C2KO_Aging.txt.gz read_count_* columns (BGI core table; also holds fpkm/tpm and BGI DESeq2 diffexp columns)",
+        "paper_input": "featureCounts raw counts (S2.11.p1)",
+        "matrix_type": "estimated counts",
+        "recommended_method": "DESeq2 (rounded) or limma-voom",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\aligned_matrix.csv",
+          "sha256": "6f2f5c98fa9beb5fadc1cb4e319975b6871588911aec41a97ffd03c1e3c99763",
+          "n_features": 16687,
+          "n_samples": 8,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 8,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1894356.0,
+          "median": 152.0,
+          "integer_fraction": 0.9402,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "read_count columns are 94% integer with fractional values (e.g. 1544165.29), i.e. estimated counts; GEO data_processing says Bowtie2 + DESeq2, the paper says featureCounts + limma/voom. Type is not decisive for the stop because the case stops at design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T05:04:14"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "exercise_factor": null,
+        "available_factor": "genotype WT vs C2-/- only",
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "S2.11.p1 and FIG8: genotype-only design; metadata grouping column is characteristics genotype only, age/sex/tissue constant. Running a KO vs WT model would not answer the exercise question, so no contrast is manufactured.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: all 8 samples are sedentary aged male mice differing only by Mybpc2 genotype (WT vs C2-/-). The request's estimand (effect of exercise on gene expression) is not identifiable; the paper's own contrast is a knockout effect, not exercise."
+      },
+      "recorded_at": "2026-11-24T05:04:17"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "757be602fb68e2b7b460e503fc21651a7604b8d1db32369cf5c13f2de6ede936",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "72dc581f1669f6cab37f7b4be351a1292b356edd30d3622fe3d3b1d3fbd2b3ea",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6f2f5c98fa9beb5fadc1cb4e319975b6871588911aec41a97ffd03c1e3c99763",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "7d3f21baffbf5dffc21042add8ff347d5cbf3a526781ad3fdf0ff630e98df96e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "82d08d5aaf22b108b61d2f9d99befedb5139a25ae6f0aa5743afadddeb94ab9f",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41229364\\GSE285405\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "35c37e4945b5a2eb41d2857c83bce708b78e3c458672fe5ffffbb8f85d2b7b7d",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID41229364",
+  "request": "Analyze GSE285405, GSE302562 and GSE160827 for PMID 41229364 (Fast Myosin Binding Protein-C Is a Vital Regulator in Young and Aged Fast Skeletal Muscle Homeostasis.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-opus-5-5)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE285405",
+      "accession": "GSE285405",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC12612635.paper.md"],
+        "metadata": "GSE285405/GSE285405_metadata.csv",
+        "matrix": "GSE285405/GSE285405_core_table_gene_C2KO_Aging.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE285405", "GSE302562", "GSE160827"],
+            "assay": "bulk RNA-seq (BGISEQ), TA muscle, male FVB/N mice, 21-22 months",
+            "factors": {"genotype": ["WT", "C2-/- (Mybpc2 KO)"]},
+            "sample_inclusion": "aged male WT vs C2-/- TA muscle, n = 4 per group (FIG8)",
+            "primary_estimand": "Effect of Mybpc2 (fMyBP-C) knockout on TA muscle gene expression in aged (21-22 mo) male mice; genotype, not exercise",
+            "planned_contrasts": ["C2-/-Old vs WT-Old (S3.7.p1, FIG8; paper: 310 DEGs, 226 up / 84 down)"],
+            "exercise_component": "none: no training, running, or acute exercise arm in any RNA-seq dataset (S2.11.p1). The only contraction intervention in the paper (ECC injury, S2.3.p1) was analysed by Western blot/ELISA in C57BL/6 mice, not sequenced.",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "source_locator": "S2.11.p1"},
+            "paper_method": "featureCounts -> edgeR TMM -> limma/voom (S2.11.p1)",
+            "paper_results": {"n_deg": 310, "up": 226, "down": 84, "genes": ["Actc1", "Myh13", "Fam174b", "Apold1"]}
+          },
+          "reasoning": "S2.11.p1 defines the RNA-seq as genotype comparisons (WT vs C2-/-) at young and old ages; S3.7.p1/FIG8 reports the aged TA comparison on GSE285405. Threshold S2.11.p1: |fold| > 1.5x and adjusted p < 0.05 (FIG8 legend says 'log-transformed fold change cut off of 0.5', which is consistent with log2(1.5)=0.585 rounded). No exercise factor exists.",
+          "locator": "S2.11.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S3.7.p1 and S10.p1 name GSE285405", "metadata: male TA muscle, 22 months, FVBN WT vs C2-/-, n=4/4, matches FIG8"]},
+          "reasoning": "Accession, tissue, age, sex, genotype and n match the paper's aged dataset.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^Library name: ((?:WT|KO)\\d)$"]},
+          "matrix_column_pattern": "^read_count_((?:WT|KO)\\d)$",
+          "patterns": {"grp": ["description", "^Library name: (WT|KO)\\d$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns read_count_WT1..KO4 hold the library names given in metadata description ('Library name: WT1'); exact match on the derived key. grp = genotype (WT/KO).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2 (rounded) or limma-voom",
+          "final": {"source": "GSE285405_core_table_gene_C2KO_Aging.txt.gz read_count_* columns (BGI core table; also holds fpkm/tpm and BGI DESeq2 diffexp columns)", "paper_input": "featureCounts raw counts (S2.11.p1)"},
+          "reasoning": "read_count columns are 94% integer with fractional values (e.g. 1544165.29), i.e. estimated counts; GEO data_processing says Bowtie2 + DESeq2, the paper says featureCounts + limma/voom. Type is not decisive for the stop because the case stops at design.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor": null, "available_factor": "genotype WT vs C2-/- only"},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: all 8 samples are sedentary aged male mice differing only by Mybpc2 genotype (WT vs C2-/-). The request's estimand (effect of exercise on gene expression) is not identifiable; the paper's own contrast is a knockout effect, not exercise.",
+          "reasoning": "S2.11.p1 and FIG8: genotype-only design; metadata grouping column is characteristics genotype only, age/sex/tissue constant. Running a KO vs WT model would not answer the exercise question, so no contrast is manufactured.",
+          "candidates": [{"value": "grp_KO_vs_WT (genotype)", "reason_rejected": "knockout effect, not an exercise effect"}],
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "DE method", "paper": "edgeR TMM + limma/voom (S2.11.p1)", "data": "GEO data_processing: Bowtie2 + DESeq2; table carries BGI DESeq2 columns", "disposition": "recorded_not_needed_case_refused"},
+        {"item": "growth protocol age", "paper": "21-22 months (FIG8)", "data": "growth_protocol says 'grown upto 2 months' while age field says 22 Months", "disposition": "recorded_not_needed_case_refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE302562",
+      "accession": "GSE302562",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC12612635.paper.md"],
+        "metadata": "GSE302562/GSE302562_metadata.csv",
+        "matrix": "GSE302562/GSE302562_log2_TMM.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE285405", "GSE302562", "GSE160827"],
+            "assay": "bulk RNA-seq (BGISEQ), TA muscle, male FVB/N mice, 5-6 months",
+            "factors": {"genotype": ["WT", "C2-/-"]},
+            "sample_inclusion": "young male WT vs C2-/- TA muscle (S3.7.p1); n not stated in text",
+            "primary_estimand": "Effect of Mybpc2 knockout on TA gene expression in young (5-6 mo) male mice; used to find DEGs shared with the aged comparison",
+            "planned_contrasts": ["C2-/-Young vs WT-Young TA (S3.7.p1; paper reports only the overlap with aged: 45 up / 14 down shared, Figure S8C)"],
+            "exercise_component": "none (S2.11.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "source_locator": "S2.11.p1"},
+            "paper_method": "featureCounts -> edgeR TMM -> limma/voom (S2.11.p1)",
+            "paper_results": {"n_deg": null, "shared_with_aged": {"up": 45, "down": 14}}
+          },
+          "reasoning": "S3.7.p1 introduces GSE302562 as young TA RNA-seq compared against the aged KO DEGs. Genotype only; no exercise.",
+          "locator": "S3.7.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S3.7.p1 and S10.p1 name GSE302562", "metadata: male TA muscle, 5-6 months, FVBN WT (4) vs C2-/- (3)"]},
+          "reasoning": "Accession, tissue, age and genotypes match S3.7.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["description", "^Library name: ((?:WT|KO)\\d)$"]},
+          "matrix_column_pattern": "^(?:C2)?((?:WT|KO)\\d)_\\w+$",
+          "patterns": {"grp": ["description", "^Library name: (WT|KO)\\d$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns WT1_6603 / C2KO1_2880 reduce to WT1 / KO1, matching metadata 'Library name: WT1/KO1' exactly.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "log2 TMM-normalized expression (log2 CPM)",
+          "recommended_method": "limma",
+          "final": {"source": "GSE302562_log2_TMM.csv.gz (GSE302562_DEG.csv.gz is the authors' limma result table, not a matrix)", "paper_input": "featureCounts counts, TMM, limma/voom (S2.11.p1)"},
+          "reasoning": "Non-integer values -4.9 to 15.9, file name log2_TMM, data_processing describes featureCounts + TMM normalization.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor": null, "available_factor": "genotype WT vs C2-/- only"},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: 7 sedentary young male mice differing only by Mybpc2 genotype. The exercise estimand is not identifiable.",
+          "reasoning": "Only grouping column is genotype; age, sex, tissue constant; S2.11.p1 describes no exercise.",
+          "candidates": [{"value": "grp_KO_vs_WT (genotype)", "reason_rejected": "knockout effect, not an exercise effect"}],
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [],
+      "executions": [],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE160827",
+      "accession": "GSE160827",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261028/papers/PMC12612635.paper.md"],
+        "metadata": "GSE160827/GSE160827_metadata.csv",
+        "raw_tar": true,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE285405", "GSE302562", "GSE160827"],
+            "assay": "single EDL fibre RNA-seq (Illumina HiSeq 4000), male FVB/N mice, 2-3 months; reanalysed from an earlier study",
+            "factors": {"genotype": ["WT", "C2KO"]},
+            "sample_inclusion": "n = 10 fibres per group (S3.5.p1)",
+            "primary_estimand": "Effect of Mybpc2 knockout on single EDL fibre gene expression in young male mice",
+            "planned_contrasts": ["C2-/- vs WT single EDL fibres (S3.5.p1; paper: 956 DEGs, 621 up / 335 down)"],
+            "exercise_component": "none (S2.5.p1, S3.5.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "source_locator": "S2.11.p1"},
+            "paper_method": "featureCounts -> edgeR TMM -> limma/voom (S2.11.p1)",
+            "paper_results": {"n_deg": 956, "up": 621, "down": 335, "genes": ["Actc1", "Phlda3", "Atp13a2", "Apcdd1"]}
+          },
+          "reasoning": "S3.5.p1 reanalyses GSE160827 (single EDL fibres) for KO vs WT. Genotype only.",
+          "locator": "S3.5.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S3.5.p1 and S10.p1 name GSE160827", "metadata: EDL single fibres, FVB/N, WT (27) vs C2KO (20); same lab"]},
+          "reasoning": "Accession, tissue and genotypes match; sample count differs from the paper (27/20 deposited vs n=10/10 analysed) and the paper does not say which 20 fibres it used.",
+          "confidence": "medium"
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {"grp": ["characteristics_ch1.1.genotype/variation", "^(WT|C2KO)$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Tar-merged columns become GSM ids, exact match on the metadata index (47/47).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE160827_RAW.tar per-sample featureCounts .count files merged", "paper_input": "featureCounts raw counts (S2.11.p1)"},
+          "reasoning": "100% integer, 0 to 1.27e6; data_processing: featureCounts, 'Supplementary_files_format_and_content: Read counts'.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "WT"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor": null, "available_factor": "genotype WT vs C2KO only"},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: single EDL fibres from sedentary WT and C2KO mice; only genotype varies. The exercise estimand is not identifiable. (Fibres would also need the donor mouse as blocking unit, 3 WT and 2 KO mice per extract_protocol.)",
+          "reasoning": "Grouping columns are genotype only; S2.5.p1 describes fibre isolation from untreated mice.",
+          "candidates": [{"value": "grp_C2KO_vs_WT (genotype)", "reason_rejected": "knockout effect, not an exercise effect"}],
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample count", "paper": "n = 10 fibres per group (S3.5.p1)", "data": "27 WT and 20 C2KO fibres deposited; selection of the 20 not stated", "disposition": "recorded_not_needed_case_refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+ "case": "GSE160827",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "No. All three series compare Mybpc2 KO (C2-/-) with WT mice; no training/running/acute-exercise arm was sequenced (S2.11.p1, S3.5.p1, S3.7.p1). ECC injury (S2.3) was only analysed by WB/ELISA. No sample carries an exercise factor.",
+  "B2": "C2-/- vs WT single EDL fibres, young male; paper says n=10 per group (S3.5.p1), GEO has 27 WT / 20 KO fibres from 3 WT and 2 KO mice (extract_protocol).",
+  "B3": "Yes: several fibres per mouse (3 WT, 2 KO mice). No animal-ID field in metadata; candidate-key table is empty. Title suffixes (s2445-x, s740-x) hint at donor mice for KO only.",
+  "B4": "Paper does not say (only limma/voom, S2.11.p1).",
+  "B5": "S2.11.p1: 'genes surpassing the defined moderate threshold criteria (|fold| > 1.5x and (adjusted) p < 0.05) were designated as differentially expressed'; limma/voom after edgeR TMM. FIG8 legend (per packet B) says log fold-change cutoff 0.5. Reports 956 DEGs (621 up/335 down) (S3.5.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Refusal matches B1: genotype-only series, no exercise arm (S2.11.p1, S3.5.p1). The mechanical 'exercise words' flag is a false positive: the matched strings are run/lane/index labels in `description`, not exercise terms.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Not run. Stop-reason note that fibres need the donor mouse as block is right (3 WT/2 KO mice); no animal key exists in metadata. Would matter only for a KO-vs-WT run.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Case refused at design gate before any model; nothing to check beyond the stop reason.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "'Sedentary' is an inference: the paper does not state activity status of these mice. The claim 'no exercise arm' rests on metadata columns, the paper text and the paper's other methods; search is wide enough.",
+   "fix": "Optionally reword 'sedentary' to 'untreated'."
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Whether knockout-only series with no exercise arm should be refused or run as a labelled non-exercise control (open policy)."
+ ],
+ "summary": "拒绝合理:该系列只有 Mybpc2 敲除与野生型的比较,没有运动组。机械标记的 'exercise words' 是 run/lane 编号造成的误报。未运行任何模型,因此分组、方向、阈值等不适用。"
+}
