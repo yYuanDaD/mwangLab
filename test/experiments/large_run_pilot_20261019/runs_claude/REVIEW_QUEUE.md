@@ -406,3 +406,11 @@ One section per case; newest last.
 ## PMID35291563 / GSE149405 (2026-11-24)
 
 - policy: Which threshold to report when no rule fits the paper's 1344 (open policy); here the stated rule was applied and the mismatch recorded.
+
+## PMID36611902 / GSE221003_acute (2026-11-24)
+
+- policy: Open policy question (not an error): whether a drug-contrast dataset from a paper with an exercise test outcome should ever be run as a sensitivity analysis; skill rule says no exercise arm means refuse.
+
+## PMID36611902 / GSE221003_chronic (2026-11-24)
+
+- policy: Open policy question (not an error): whether drug-contrast series from papers with an exercise test outcome should get a labelled sensitivity run; the skill currently says refuse.

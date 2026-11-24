@@ -1,0 +1,22 @@
+{"case": "GSE221003_acute", "reviewer": "case-reviewer, claude-sonnet-5-5",
+ "blind": {
+  "B1": "No. The series (GSE221003) is a doxorubicin cardiotoxicity / NMN study; no sequenced group is exercised or trained. Exercise appears only as a treadmill exhaustion and rotarod TEST on chronic cohort-2 and cohort-3 (S2.5.p1, S2.6.p1, S3.7.p1), a phenotype outcome. Acute RNA-seq is on cohort-1 hearts (S2.2.p2). No sequenced sample carries an exercise factor.",
+  "B2": "Acute, D5 hearts: Doxo vs Ctrl and Doxo-NMN vs Doxo (S3.3.p1). Cohort-1 RNA-seq on 13-14 hearts per group (S2.2.p2); GEO has 14 Vehicle / 13 Doxo / 13 Doxo-NMN.",
+  "B3": "No repeated measures: one heart per mouse, one tissue, one time point. The 'suffix of title' key in packet A is only the replicate index rep1..repN, and the expression check says not_supported (p=0.32). No animal ID is documented or needed.",
+  "B4": "S2.9.p1: edgeR, TMM, estimateDisp, negative-binomial GLM, QL F-test; the paper speaks of 'pairwise comparison' (S3.3.p1) but does not say whether it was a joint or separate fit.",
+  "B5": "S3.3.p1: 'Pairwise comparison between Doxo vs. Ctrl mice and Doxo-NMN vs. Doxo mice identified 3874 and 2207 differentially expressed genes (adjusted p-value < 0.05 and FC cutoff of 1.5), respectively.' Inclusive or strict is not stated."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "No exercise arm among sequenced hearts (S2.2.p2, S2.2.p4; metadata treatment = Vehicle/Doxo/Doxo-NMN; packet A finds no exercise words in any column). Refusal is correct.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "Aligned levels 14/13/13 match the paper's 13-14 per group; no exclusions. Not exercised as no contrast was run.", "fix": ""},
+  {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast run.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One heart per mouse. The title-suffix candidate is a replicate index; pairing_check not_supported (r diff 0.03, p=0.32). repeated_measure_unit = none is right.", "fix": ""},
+  {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "No fit run; the paper is silent on joint versus pairwise.", "fix": ""},
+  {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "No contrast run. Acute and chronic cohorts were sequenced at different providers (S2.9.p1) but are separate matrices here.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer fraction 1.0, featureCounts, so raw counts; recommended edgeR matches S2.9.p1.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "FDR 0.05 and FC 1.5 (log2 0.585) transcribed correctly from S3.3.p1.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "HANDBACK lists the paper counts (3874 / 2207) only as reference and claims no comparison.", "fix": ""},
+  {"id": "stop_reason", "verdict": "agree", "severity": "minor", "evidence": "'No exercise arm' is true and was checked against the paper and metadata, not only a narrow key. The suitability fail 'sample_size 0/0 comparisons' is a mechanical artefact of having no contrast, not a true sample-size problem; groups have >=13 each.", "fix": "Optional: state in the record that the sample_size fail is a consequence of the refusal, not a finding."}
+ ],
+ "overall": "pass",
+ "human_items": ["Open policy question (not an error): whether a drug-contrast dataset from a paper with an exercise test outcome should ever be run as a sensitivity analysis; skill rule says no exercise arm means refuse."],
+ "summary": "该系列(GSE221003 急性组)是阿霉素心脏毒性与 NMN 研究,测序的心脏样本只有 Ctrl/Doxo/Doxo-NMN,没有运动干预;跑步机只是未测序队列的表型检测,拒绝分析的理由成立。其余检查项(分组、阈值、矩阵类型、无重复测量)与论文一致,仅有一个次要的措辞问题(sample_size 失败只是拒绝的机械后果)。"}

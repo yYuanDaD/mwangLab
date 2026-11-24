@@ -867,3 +867,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35291563 (GSE149405)
 
 - minor only: inspect output shows GBK mojibake in extract_protocol_ch1 ("渭g" for µg), file:line not found; nothing blocking Details: `PMID35291563/HANDBACK.md`.
+
+## PMID36611902 (GSE221003)
+
+- key_patterns must match all metadata rows across sub-studies (tools/native.py:392); suitability reports sample_size fail (0/0) with no factors Details: `PMID36611902/HANDBACK.md`.

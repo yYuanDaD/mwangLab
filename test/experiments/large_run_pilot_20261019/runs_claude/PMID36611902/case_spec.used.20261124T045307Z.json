@@ -1,0 +1,246 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID36611902",
+  "request": "Analyze GSE221003 for PMID 36611902 (Nicotinamide Mononucleotide Administration Prevents Doxorubicin-Induced Cardiotoxicity and Loss in Physical Activity in Mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE221003_acute",
+      "accession": "GSE221003",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC9818647.paper.md"
+        ],
+        "metadata": "GSE221003/GSE221003_metadata.csv",
+        "matrix": "GSE221003/GSE221003_Acute_Doxo_Heart.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE221003"
+            ],
+            "assay": "bulk RNA-seq (poly(A), NovaSeq 6000, STAR + featureCounts) of mouse heart",
+            "primary_estimand": "Effect of doxorubicin vs vehicle, and of NMN on top of doxorubicin, on heart gene expression (acute regimen, D5). No exercise intervention: the only exercise-related measure is a treadmill exhaustion TEST (S2.5.p1, S3.7.p1) used as a phenotypic outcome in chronic cohort-2; RNA-seq hearts come from acute cohort-1 and chronic cohort-3 (S2.2.p2, S2.2.p4).",
+            "sample_inclusion": "Acute: 13-14 hearts per group of cohort-1 (S2.2.p2)",
+            "factors": {
+              "treatment": [
+                "Ctrl (vehicle)",
+                "Doxo",
+                "Doxo-NMN"
+              ]
+            },
+            "planned_contrasts": [
+              "Acute Doxo vs Ctrl (S3.3.p1; paper: 3874 DEGs)",
+              "Acute Doxo-NMN vs Doxo (S3.3.p1; paper: 2207 DEGs)"
+            ],
+            "repeated_measure_unit": "none (one heart per mouse)",
+            "paper_method": "edgeR 3.32.1, TMM, estimateDisp, glmQLFit + QL F-test (S2.9.p1)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": "log2FoldChange",
+              "effect_cutoff": 0.5849625,
+              "source_locator": "S3.3.p1"
+            },
+            "exercise_arm": "none"
+          },
+          "reasoning": "S2.2.p1-p4 and S2.9.p1 define the RNA-seq design: heart tissue from Ctrl, Doxo, Doxo-NMN mice in an acute (cohort-1) and a chronic (cohort-3) study. Exercise appears only as a treadmill exhaustion test outcome (S2.5.p1, S3.7.p1) on chronic cohort-2, which has no RNA-seq. No group trains or exercises as an intervention. Acute threshold: adjusted p < 0.05 and FC 1.5 (S3.3.p1).",
+          "confidence": "high",
+          "locator": "S2.2.p2"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S11.p1 names GSE221003",
+              "GEO titles: acute study mouse heart control/doxo/doxo+NMN; 14/13/13 samples match 13-14 per group (S2.2.p2)",
+              "data_processing: STAR + featureCounts count table Acute_Doxo_Heart.csv"
+            ]
+          },
+          "reasoning": "Data availability S11.p1 cites GSE221003; acute matrix holds 40 heart samples matching acute cohort-1 RNA-seq.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {
+            "key": [
+              "description",
+              ",(?:Heart_)?(.+?)$"
+            ]
+          },
+          "matrix_column_pattern": "^X(\\d+)_counts$",
+          "patterns": {},
+          "recode": {},
+          "aliases": {
+            "grp": "characteristics_ch1.2.treatment"
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns X<n>_counts carry the heart number that the GEO description stores as ',Heart_<n>'; exact match on that number. Chronic-study GSMs are absent from this matrix and stay unmatched. Key = text after the last comma in description, with an acute 'Heart_' prefix stripped (acute -> heart number, chronic -> CTRL-17-Heart style); one regex covers all 57 GSMs."
+        },
+        "matrix": {
+          "final": {
+            "matrix_type": "raw counts",
+            "source": "GSE221003_Acute_Doxo_Heart.csv.gz",
+            "paper_input": "featureCounts count table (S2.9.p1)"
+          },
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "reasoning": "integer_fraction 1.0, max 4.2e6; GEO data_processing: featureCounts count table; paper used edgeR on counts (S2.9.p1).",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the sequenced hearts are Ctrl (vehicle), Doxo and Doxo-NMN only (S2.2.p2, S3.3.p1). Exercise appears only as a treadmill exhaustion test outcome in a non-sequenced chronic cohort (S2.5.p1, S3.7.p1). An exercise effect on gene expression is not identifiable from these data.",
+          "final": {
+            "analysis_type": "none",
+            "exercise_arm": "absent"
+          },
+          "candidates": [
+            {
+              "value": "grp Doxo vs Vehicle",
+              "reason_rejected": "drug-toxicity contrast, not exercise"
+            },
+            {
+              "value": "grp Doxo-NMN vs Doxo",
+              "reason_rejected": "NMN supplementation contrast, not exercise"
+            }
+          ],
+          "reasoning": "The request asks for an exercise effect. No sample group differs by exercise or training; treatment levels are Vehicle/Doxo/Doxo-NMN only. Running a drug contrast would not answer the question.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "exercise",
+          "paper": "treadmill exhaustion test as a functional outcome in chronic cohort-2 (S2.5.p1)",
+          "data": "no exercise factor in GEO; RNA-seq from acute cohort-1 and chronic cohort-3",
+          "disposition": "blocks_estimand"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    },
+    {
+      "case_id": "GSE221003_chronic",
+      "accession": "GSE221003",
+      "inputs": {
+        "paper": [
+          "test/experiments/paper_screen_20261027/papers/PMC9818647.paper.md"
+        ],
+        "metadata": "GSE221003/GSE221003_metadata.csv",
+        "matrix": "GSE221003/GSE221003_Chronic_Doxo_Heart.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": [
+              "GSE221003"
+            ],
+            "assay": "bulk RNA-seq of mouse heart, chronic regimen (day 60)",
+            "primary_estimand": "Effect of chronic doxorubicin vs PBS, and of oral NMN on top of doxorubicin, on heart gene expression. No exercise intervention (treadmill only a test on cohort-2, S2.5.p1; RNA-seq on cohort-3, S2.2.p4).",
+            "sample_inclusion": "5-6 hearts per group of cohort-3 (S2.2.p4)",
+            "factors": {
+              "treatment": [
+                "Ctrl (PBS)",
+                "Doxo",
+                "Doxo-NMN"
+              ]
+            },
+            "planned_contrasts": [
+              "Chronic Doxo vs Ctrl (S3.6.p1; paper: 9 DEGs)",
+              "Chronic Doxo-NMN vs Doxo (S3.6.p1; paper: 0 DEGs)"
+            ],
+            "repeated_measure_unit": "none",
+            "paper_method": "edgeR TMM + QL F-test (S2.9.p1)",
+            "paper_threshold": {
+              "metric": "FDR",
+              "cutoff": 0.05,
+              "effect_metric": null,
+              "effect_cutoff": null,
+              "source_locator": "S3.6.p1"
+            },
+            "exercise_arm": "none"
+          },
+          "reasoning": "S2.2.p3-p4, S3.6.p1: chronic Ctrl/Doxo/Doxo-NMN hearts, n=5-6. Exercise capacity was measured (S3.7.p1) on a different cohort and is not a sample factor.",
+          "confidence": "high",
+          "locator": "S2.2.p4"
+        },
+        "ownership": {
+          "final": {
+            "owned": true,
+            "checks": [
+              "S11.p1 names GSE221003",
+              "17 chronic heart samples (5/6/6) match 5-6 per group of cohort-3 (S2.2.p4)"
+            ]
+          },
+          "reasoning": "Chronic matrix matches the GEO chronic-study GSMs.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {
+            "key": [
+              "description",
+              ",(?:Heart_)?(.+?)$"
+            ]
+          },
+          "normalize_keys": true,
+          "patterns": {},
+          "recode": {},
+          "aliases": {
+            "grp": "characteristics_ch1.2.treatment"
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns such as CTRL.17.Heart equal the GEO description suffix CTRL-17-Heart up to separators; normalize_keys matches ignoring -/. Key = text after the last comma in description, with an acute 'Heart_' prefix stripped (acute -> heart number, chronic -> CTRL-17-Heart style); one regex covers all 57 GSMs."
+        },
+        "matrix": {
+          "final": {
+            "matrix_type": "raw counts",
+            "source": "GSE221003_Chronic_Doxo_Heart.csv.gz",
+            "paper_input": "featureCounts count table (S2.9.p1)"
+          },
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "reasoning": "integer_fraction 1.0; featureCounts per GEO data_processing.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: chronic hearts are Ctrl/Doxo/Doxo-NMN only (S2.2.p4); exercise was a treadmill test outcome on non-sequenced cohort-2 (S2.5.p1).",
+          "final": {
+            "analysis_type": "none",
+            "exercise_arm": "absent"
+          },
+          "candidates": [
+            {
+              "value": "grp Doxo vs Vehicle",
+              "reason_rejected": "drug contrast, not exercise"
+            },
+            {
+              "value": "grp Doxo-NMN vs Doxo",
+              "reason_rejected": "NMN contrast, not exercise"
+            }
+          ],
+          "reasoning": "No exercise factor among the sequenced samples.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {
+          "item": "exercise",
+          "paper": "treadmill test outcome on cohort-2 only (S2.5.p1)",
+          "data": "no exercise factor",
+          "disposition": "blocks_estimand"
+        }
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
