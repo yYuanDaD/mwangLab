@@ -402,3 +402,7 @@ One section per case; newest last.
 
 - policy: Policy: whether an in-vitro EPS series in C2C12 counts as an exercise study.
 - policy: Policy: joint (Degust-style 36-library) versus two-arm voom as the primary fit when the paper implies one model; the executor cannot express a joint voom.
+
+## PMID35291563 / GSE149405 (2026-11-24)
+
+- policy: Which threshold to report when no rule fits the paper's 1344 (open policy); here the stated rule was applied and the mismatch recorded.

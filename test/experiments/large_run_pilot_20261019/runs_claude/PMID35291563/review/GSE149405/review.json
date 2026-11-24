@@ -1,0 +1,21 @@
+{"case": "GSE149405", "reviewer": "case-reviewer, Claude Sonnet 5.5",
+ "blind": {
+  "B1": "Yes. In vivo swimming training in CT-26 tumor-bearing male BALB/c mice (S2.4.p1, S2.5.p1); the 6 swimming tumors (GSM4499035-40) carry the exercise factor, 6 control tumors are the control. Tumor tissue, not muscle, so the question is exercise effect on tumor.",
+  "B2": "Swimming vs control tumors, n = 6 per group sequenced out of 10 per group in the tumor study (S2.4.p1, S2.6.p1); 715 up / 629 down DETs (S3.2.p1, Fig 2).",
+  "B3": "No repeated measures: one tumor per mouse, tumors from independent mice; bracketed numbers in titles are unique per sample. Packet A lists no pairing key.",
+  "B4": "Single two-group comparison; no joint model needed. Paper says only 'limma package (cut-off > 2; P < 0.05)' (S2.6.p1).",
+  "B5": "'Differential expression analyses were performed using the limma package (cut-off > 2; P < 0.05)' (S2.6.p1); Fig 2 legend 'Cut-off >2, P < 0.05'. Raw P, no FDR stated; fold-change > 2 presumed (ambiguous: FC vs log2FC). Reported 715 up + 629 down = 1344 transcripts (S3.2.p1)."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Two-arm in vivo swimming design with 6+6 samples (S2.6.p1); suitability analyzable.", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp control 6 / swimming 6 matches S2.6.p1; titles agree with characteristics group; no exclusions.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "contrast grp_swimming_vs_control, control=control, treatment=swimming; matches S3.2.p1 'swimming compared with control'.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One tumor per independent mouse; packet A has no candidate key; repeated_measure_unit none.", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Single two-group fit ~ grp, rank 2, residual df 10.", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "Only complete_confounding column is the group alias itself; all other columns constant; all male, one tissue, one platform.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "StringTie gene-level FPKM (24% integer, median 0.37) correctly routed to limma-trend on log2(FPKM+1), not count methods; p-value histogram frac_p_gt_0.9 0.092, frac_p_lt_0.05 0.056 shows near-null signal, not a method artefact. Gene vs transcript level is a recorded deviation.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper rule transcribed as raw P < 0.05 and |log2FC| > 1 with interpretation stated; packet B table shows no alternative rule reaches 1344 (p<0.05 alone 714, FC>1.5 86, FC>2 20), and the FC-vs-log2FC ambiguity is noted in rejected alternatives; FDR audit reported separately.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "Same contrast; ours 20 vs paper 1344 is explicitly flagged as not comparable (gene vs transcript); HANDBACK reports the failure to replicate Vegfa/Stat3 and hypoxia direction without overclaiming.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; case completed.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Which threshold to report when no rule fits the paper's 1344 (open policy); here the stated rule was applied and the mismatch recorded."],
+ "summary": "该案例为单一两组设计(游泳 vs 对照,每组6只独立小鼠,每只一个肿瘤),分组、方向、模型、矩阵方法(FPKM→limma-trend)与阈值转录均与论文一致。基因水平与转录本水平的差异已如实记录,HANDBACK 没有夸大结果。未发现需要修改的项目。"}

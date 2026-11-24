@@ -1,0 +1,152 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35291563",
+  "request": "Analyze GSE149405 for PMID 35291563 (Swimming attenuates tumor growth in CT-26 tumor-bearing mice and suppresses angiogenesis by mediating the HIF-1a/VEGFA pathway.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE149405",
+      "accession": "GSE149405",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC8886589.paper.md"],
+        "metadata": "GSE149405/GSE149405_metadata.csv",
+        "matrix": "GSE149405/GSE149405_merged_from_tar.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE149405"],
+            "assay": "bulk RNA-seq (rRNA-depleted, NovaSeq 6000) of subcutaneous CT-26 tumor tissue",
+            "sample_inclusion": "6 tumors per group randomly selected from 10 control and 10 swimming male BALB/c mice (S2.6.p1, S2.4.p1)",
+            "factors": {"group": ["control", "swimming"]},
+            "primary_estimand": "Effect of 3 weeks of swimming (twice daily, 6 d/week, up to 30 min) on tumor-tissue gene expression in CT-26 tumor-bearing mice, swimming vs control (S2.5.p1, S3.2.p1)",
+            "planned_contrasts": ["swimming vs control (S3.2.p1; paper: 715 up / 629 down transcripts = 1344 DETs)"],
+            "repeated_measure_unit": "none; one tumor per independent mouse",
+            "normalization": "StringTie FPKM (S2.6.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "source_locator": "S2.6.p1; FIG2"},
+            "paper_method": "limma on StringTie transcript-level expression (S2.6.p1); KEGG ORA on DETs (S3.3.p1)",
+            "paper_results": "715 up / 629 down transcripts; Vegfa mRNA down; Stat3, Pdgfa, Pld2, Pik3r2 decreased; Hif1a and Kdr (VEGFR2) mRNA unchanged (S3.2.p1, S3.4.p1, S4.p4)"
+          },
+          "reasoning": "Single two-arm exercise design. S2.6.p1 states limma with 'cut-off > 2; P < 0.05'; read as fold change > 2 (|log2FC| > 1) and raw P < 0.05 — no FDR is mentioned, and Table 1 lists raw P values only. Results are reported as transcripts (ENSMUST IDs in Table 1).",
+          "confidence": "medium",
+          "locator": "S2.6.p1",
+          "candidates": [{"value": "cut-off > 2 meaning |log2FC| > 2", "reason_rejected": "'cut-off' with value 2 conventionally refers to fold change; Table 1 top hits have |logFC| 5-9 so either reading is consistent there, FC>2 is the standard reading"}]
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S2.6.p1 and S2.9.p1 name GSE149405", "GEO contact institute (Fujian Univ. TCM) and author Jun Peng (S6.p1) match", "12 samples = 6 control + 6 swimming as in S2.6.p1", "tumor tissue, CT-26 cells, Mus musculus"]},
+          "reasoning": "Paper cites GSE149405 explicitly; sample counts and tissue match.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": null,
+          "matrix_column_pattern": "^(GSM\\d+)_\\d+$",
+          "aliases": {"grp": "characteristics_ch1.1.group"},
+          "patterns": {},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Merged tar columns are GSM<id>_<tumor id>; regex extracts the GSM id, which equals the metadata index (12/12 per inspect). Group taken from characteristics 'group' (control/swimming), consistent with titles control1-6 / swimming1-6.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "FPKM",
+          "recommended_method": "limma",
+          "reasoning": "Per-sample files hold one decimal column; only 24% integer values, max 7145, median 0.37; data_processing: 'Supplementary files ... include FPKM values for each Sample' (StringTie). Gene-level (ENSMUSG) whereas the paper analyzed transcripts (ENSMUST). Paper input was StringTie expression, analyzed by limma.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "control"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["grp_swimming_vs_control"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "two-group",
+            "design_column": "grp",
+            "control": "control",
+            "treatment": "swimming",
+            "contrasts": [{"name": "grp_swimming_vs_control", "control": "control", "treatment": "swimming", "role": "primary"}]
+          },
+          "reasoning": "Randomized two-arm intervention (S2.4.p1); swimming vs control is the paper's contrast (S3.2.p1). Causal estimand. All male (S2.3.p1).",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "Independent mice, one tumor each; no batch, lane or pairing recorded in GEO or the paper.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "limma (limma-trend on log2(FPKM+1))",
+            "formula": "~ grp",
+            "paper_route": {"method": "limma on StringTie transcript-level expression", "status": "blocked", "reason": "Only gene-level FPKM is deposited; transcript-level quantification is not available, so the paper's per-transcript DET table cannot be reproduced."},
+            "deviations": [
+              "gene-level instead of transcript-level features",
+              "log2(FPKM+1) transform and expression filter (FPKM >= 1 in >= 6 samples) chosen here; paper does not state its transform or filtering"
+            ]
+          },
+          "transform": "log2(x+1)",
+          "reasoning": "FPKM is linear-normalized, not counts, so DESeq2/edgeR do not apply; limma on log2(FPKM+1) matches the paper's limma route on the available gene-level matrix.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper_on_deviation_route",
+            "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+            "deviation_note": "Paper rule applied to gene-level features; paper counts are transcripts, so counts are not directly comparable."
+          },
+          "reasoning": "S2.6.p1 / FIG2: 'cut-off > 2, P < 0.05' -> FC > 2 and raw P < 0.05. Audit: BH FDR < 0.05, no FC rule.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {
+            "route": "declared_deviation",
+            "caveats": [
+              "Paper DETs are transcripts (ENSMUST); our features are genes (ENSMUSG); counts are not directly comparable.",
+              "Paper threshold uses raw P with no multiple-testing correction; audit FDR count reported separately.",
+              "Paper text says reads mapped to hg38 while GEO says GRCm38.92; the matrix uses mouse Ensembl IDs, so hg38 is treated as a typo.",
+              "Direction contradiction: paper reports Vegfa mRNA significantly down with swimming; here Vegfa log2FC -0.09, P = 0.56 (not changed). Stat3, Pdgfa, Pld2, Pik3r2 (paper: decreased) are unchanged or slightly up (all P > 0.05).",
+              "Direction contradiction: paper argues swimming reduces tumor hypoxia; Hallmark HYPOXIA GSEA is positively enriched in swimming (NES +1.72, FDR 0.006). Hallmark ANGIOGENESIS is not enriched (FDR 1.0).",
+              "Gene-level signal is near null: 714/12737 genes at raw P < 0.05 vs ~637 expected by chance; 0 genes at FDR < 0.05. The paper's 1344 transcript DETs under raw P < 0.05 with FC > 2 likely include many low-expression isoform-level chance hits."
+            ]
+          },
+          "paper_counts": {"grp_swimming_vs_control": 1344},
+          "paper_genes": {"grp_swimming_vs_control": ["Vegfa", "Stat3", "Pdgfa", "Pld2", "Pik3r2", "Hif1a", "Kdr", "Nupr1", "Fgfr1", "Clta"]},
+          "reasoning": "Paper reports 715 up + 629 down = 1344 transcripts; named genes: Vegfa, Stat3, Pdgfa, Pld2, Pik3r2 down; Hif1a, Kdr unchanged; Table 1 examples Nupr1 (down), Fgfr1, Clta (up).",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "feature level", "paper": "transcript-level DETs (ENSMUST, S3.2.p1, Table 1)", "data": "gene-level FPKM (ENSMUSG)", "disposition": "declared_deviation"},
+        {"item": "reference genome", "paper": "hg38 (S2.6.p1)", "data": "GRCm38.92 per GEO data_processing; mouse Ensembl IDs", "disposition": "executable_without_change"},
+        {"item": "group size", "paper": "10 per group in the tumor study, 6 per group sequenced (S2.6.p1)", "data": "6 + 6 samples", "disposition": "executable_without_change"}
+      ],
+      "executions": [
+        {
+          "name": "grp_swimming_vs_control",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "control", "treatment_group": "swimming"},
+          "filter_low_counts": {"min_value": 1, "min_samples": 6},
+          "role": "primary",
+          "reasoning": "Paper's limma two-group contrast on gene-level log2(FPKM+1), filtered to expressed genes."
+        },
+        {
+          "name": "grp_swimming_vs_control_nofilter",
+          "tool": "tools.limma_tools:run_limma_analysis",
+          "args": {"design_column": "grp", "control_group": "control", "treatment_group": "swimming"},
+          "role": "sensitivity",
+          "reasoning": "Same model without the expression filter, since the paper states none."
+        }
+      ],
+      "enrichment": [
+        {"execution": "grp_swimming_vs_control", "ora": true, "gsea": true, "direction": "all", "ranking_metric": "stat", "reasoning": "Paper reports KEGG pathways (angiogenesis, hypoxia, VEGF) from DETs (S3.3.p1)."}
+      ]
+    }
+  ]
+}

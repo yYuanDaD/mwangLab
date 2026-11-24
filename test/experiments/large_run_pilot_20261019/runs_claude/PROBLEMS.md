@@ -863,3 +863,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID33757294 (GSE161030)
 
 - minor: filter_low_counts has no row-sum rule, so a fractional min_mean_count was used (tools/case_runner.py:777) Details: `PMID33757294/HANDBACK.md`.
+
+## PMID35291563 (GSE149405)
+
+- minor only: inspect output shows GBK mojibake in extract_protocol_ch1 ("渭g" for µg), file:line not found; nothing blocking Details: `PMID35291563/HANDBACK.md`.
