@@ -1075,3 +1075,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID39357875 (GSE273579)
 
 - GEO metadata CSV text garbled (UTF-8 read as GBK, tools/geo_tools.py); harmless pydeseq2 overflow warning (utils.py:1088) Details: `PMID39357875/HANDBACK.md`.
+
+## PMID32409493 (GSE137631)
+
+- alignment needed prep script (key_patterns can't map arm-specific column vocab); no DESeq2 nested-subject interaction executor; pydeseq2 exp overflow warning Details: `PMID32409493/HANDBACK.md`.

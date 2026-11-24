@@ -1,0 +1,21 @@
+{"case": "GSE137631", "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. RCT in women after RYGB: RYGB+exercise training (ET) vs RYGB alone (abstract; GEO overall design). Exercise factor is carried by the 12 RYGB+ET samples (6 women x PRE/POST9); 12 RYGB-alone samples are the randomized control; 6 lean controls baseline only (GEO overall design). Within-arm POST vs PRE mixes surgery, weight loss and training.",
+  "B2": "Abstract gives no explicit DE contrasts. Likely RYGB+ET POST9 vs PRE and RYGB POST9 vs PRE, 6 women each (12 samples per arm); exercise-specific = difference in change between arms; lean (n=6) as reference. 3-month biopsies are not in GEO.",
+  "B3": "Yes. Each woman biopsied PRE and POST9. Packet A key `subject` (arm+num from title) links 24/30 samples, no duplicates within a level; lean women single-sampled.",
+  "B4": "Paper text unavailable (abstract only); it does not say joint or pairwise. GEO data_processing names DESeq2 V1.18.1 and JMP ANOVA only.",
+  "B5": "Not stated in abstract or GEO; no DEG counts reported in the available text."},
+ "checks": [
+  {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Run; exercise arm present (RYGB+ET, abstract/GEO design). Within-arm contrast labelled as surgery+training, not exercise alone (design.estimand_note).", "fix": ""},
+  {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp levels 6/6/6/6/6 match GEO design; 30/30 aligned exactly; no exclusions. Randomized control for exercise is RYGB alone, used in the difference-in-change contrast.", "fix": ""},
+  {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "ETpost vs ETpre, RYpost vs RYpre, LEAN as reference for lean comparisons; DEG file names match treatment_vs_control.", "fix": ""},
+  {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "~ subject + grp for within-arm pairs (6 complete pairs each); limma paired_change for interaction. Subject is categorical (arm_num string).", "fix": ""},
+  {"id": "model_fit", "verdict": "agree", "severity": "none", "evidence": "Paper silent; pairs fitted on their own subsets, interaction by paired-change. Declared as deviation (limma on log2CPM vs DESeq2).", "fix": ""},
+  {"id": "confounding", "verdict": "agree", "severity": "minor", "evidence": "Possible per-arm processing batch ('WD.' prefix on lean and RYGB+ET columns) recorded as caveat for lean comparisons; constant within subject so paired contrasts protected.", "fix": ""},
+  {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "integer_fraction 1.0, max 690916, raw QuantSeq counts; DESeq2-normalized file rejected.", "fix": ""},
+  {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Paper states none; padj<0.05 workflow default recorded as threshold_source workflow_default and in discrepancies.", "fix": ""},
+  {"id": "paper_match", "verdict": "agree", "severity": "none", "evidence": "paper_counts empty; HANDBACK says comparison rests on abstract only and claims only direction agreement for collagen I/FST, plus null interaction.", "fix": ""},
+  {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal; all planned contrasts executed.", "fix": ""}],
+ "overall": "pass",
+ "human_items": ["Open policy: joint vs pairwise fit when paper is silent (pairs used here)."],
+ "summary": "该案例分析合理：运动臂（RYGB+ET）存在，分组、n=6 及配对（subject 区组）均与 GEO 设计一致，方向正确，原始计数使用 DESeq2。论文仅有摘要、无阈值与 DEG 数，已如实记录为 workflow_default 并声明偏差。批次（WD. 前缀）风险已记录，未发现阻断或重大问题。"}

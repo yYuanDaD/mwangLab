@@ -1,0 +1,162 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID32409493",
+  "request": "Analyze GSE137631 for PMID 32409493 (Exercise-Induced Increases in Insulin Sensitivity After Bariatric Surgery Are Mediated By Muscle Extracellular Matrix Remodeling.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE137631",
+      "accession": "GSE137631",
+      "inputs": {
+        "paper": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID32409493/paper_abstract_and_geo.md"],
+        "metadata": "GSE137631/GSE137631_metadata.csv",
+        "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID32409493/GSE137631_raw_counts_gsm.csv",
+        "raw_tar": false,
+        "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID32409493/prep_rename_columns.py"]
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE137631"],
+            "assay": "Lexogen QuantSeq 3' mRNA-seq, vastus lateralis, women",
+            "primary_estimand": "Change in skeletal-muscle gene expression from pre-surgery to 9 months after RYGB in women randomized to RYGB + combined aerobic/resistance exercise training (RYGB+ET), compared with RYGB alone (standard of care); lean women as a baseline reference",
+            "factors": {"arm": ["RYGB", "RYGB+ET", "lean"], "time": ["PRE", "POST9 (9 months)"]},
+            "sample_inclusion": "GEO: 6 RYGB (pre/post9), 6 RYGB+ET (pre/post9), 6 lean controls (baseline only); 3-month biopsies mentioned in abstract are not in GEO",
+            "repeated_measure_unit": "patient (pre and post9 biopsies from the same woman)",
+            "planned_contrasts": [
+              "RYGB+ET POST9 vs PRE, paired (abstract: 'candidates modulated by exercise training'; GEO summary: transcriptome changes explaining RYGB+ET improvement; DEG count not in abstract)",
+              "RYGB POST9 vs PRE, paired (surgery alone)",
+              "exercise-specific: change in RYGB+ET minus change in RYGB (randomized comparison; not stated as a DE contrast in the abstract)",
+              "POST9 groups vs lean controls (GEO summary: 'restored to a lean phenotype')"
+            ],
+            "paper_threshold": {"metric": "not_stated", "cutoff": null, "effect_metric": null, "effect_cutoff": null, "source_locator": "abstract does not give a DEG threshold; full text unavailable"},
+            "paper_method": "DESeq2 V1.18.1 (GEO data_processing); JMP Genomics ANOVA also listed",
+            "paper_results": "Abstract names TGF-beta1/SMAD2/3 pathway and follistatin (FST) as exercise-modulated candidates; ECM remodeling (collagen I) reduced more with RYGB+ET. No DEG counts in abstract."
+          },
+          "reasoning": "Full text unavailable; reconstruction rests on the PubMed abstract (PMID 32409493) and GEO GSE137631 summary/overall design/data_processing. DESeq2 is named in data_processing.",
+          "confidence": "medium",
+          "locator": "PubMed abstract; GEO Series_overall_design; data_processing"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO series contact (Dantas WS, Pennington) = first author", "GEO overall design matches abstract (RYGB vs RYGB+ET randomized, women, pre and 9-month muscle biopsies)", "30 matrix columns map one-to-one by name to the 30 GSM titles"]},
+          "reasoning": "GSE137631 is the paper's RNA-seq deposit; raw_counts file used (DESeq2_normalized_counts rejected as normalized input).",
+          "candidates": [{"value": "GSE137631_DESeq2_normalized_counts.txt.gz", "reason_rejected": "DESeq2 size-factor-normalized, non-integer; has 33 columns incl. extra annotation; raw counts available"}]
+        },
+        "alignment": {
+          "key_column": null,
+          "patterns": {
+            "grp": ["characteristics_ch1.0.group", "^(.*)$"],
+            "arm": ["characteristics_ch1.0.group", "^(lean control|RYGB \\+ exercise training|RYGB)"],
+            "tm": ["characteristics_ch1.0.group", "(PRE|POST|control)"],
+            "num": ["title", "_(\\d+)"]
+          },
+          "recode": {
+            "grp": {"lean control": "LEAN", "RYGB + exercise training PRE SURGERY": "ETpre", "RYGB + exercise training POST SURGERY": "ETpost", "RYGB PRE SURGERY": "RYpre", "RYGB POST SURGERY": "RYpost"},
+            "arm": {"lean control": "LEAN", "RYGB + exercise training": "RYGBET", "RYGB": "RYGB"},
+            "tm": {"PRE": "pre", "POST": "post", "control": "none"}
+          },
+          "combine": {"subject": ["arm", "num"]},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns were renamed to GSM ids by prep_rename_columns.py using an explicit name rule (RYGB.k.PRE -> 'RYGB_k PRE', WD.RYGB.ET.k.T -> 'RYGB + exercise training_k T', WD.lean.control.k -> 'lean control_k'); exact index match. Subject = arm + patient number; ages agree within each PRE/POST9 pair, supporting the pairing.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE137631_raw_counts.txt.gz (Lexogen QuantSeq pipeline read count tables)", "paper_input": "DESeq2 on read counts (data_processing)"},
+          "reasoning": "integer_fraction 1.0, max 690916, file named raw_counts, data_processing: Lexogen QuantSeq pipeline read count tables then DESeq2.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "ETpre"},
+          "subject": "subject",
+          "organism": "Human",
+          "planned": ["grp_ETpost_vs_ETpre", "grp_RYpost_vs_RYpre"],
+          "covariate_candidates": [],
+          "final": {
+            "analysis_type": "paired within-arm pre/post plus between-arm change comparison",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "ET_post9_vs_pre", "control": "ETpre", "treatment": "ETpost", "role": "primary"},
+              {"name": "RYGB_post9_vs_pre", "control": "RYpre", "treatment": "RYpost", "role": "secondary"},
+              {"name": "exercise_x_time_change", "control": "RYGB change", "treatment": "RYGBET change", "role": "secondary"},
+              {"name": "ETpost_vs_LEAN", "control": "LEAN", "treatment": "ETpost", "role": "exploratory"},
+              {"name": "RYpost_vs_LEAN", "control": "LEAN", "treatment": "RYpost", "role": "exploratory"}
+            ],
+            "estimand_note": "Within-arm pre/post is a surgery(+training) effect over 9 months, not an exercise effect alone; the randomized exercise effect is the difference in change between arms. Lean comparisons are associational."
+          },
+          "reasoning": "GEO overall design: randomized RYGB vs RYGB+ET, biopsies PRE and 9 months; lean controls baseline only. Paper used DESeq2 (within-group comparisons implied by abstract 'candidates modulated by exercise training'). The interaction (difference in change) is the only contrast isolating exercise; included as secondary. 3-month timepoint absent from GEO.",
+          "candidates": [{"value": "pooling RYGB and RYGB+ET post vs pre", "reason_rejected": "would mix the arms and lose the exercise contrast"}],
+          "confidence": "medium"
+        },
+        "covariance": {
+          "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "age", "disposition": "not added: constant within subject, absorbed by subject blocking in paired contrasts"}, {"name": "bmi", "disposition": "not added: outcome of surgery, post-treatment variable"}]},
+          "confounding_candidates": ["characteristics_ch1.2.age"],
+          "reasoning": "Same patient biopsied PRE and POST9 -> subject blocking. Matrix column prefix 'WD.' appears on lean and RYGB+ET columns but not on RYGB columns, which may indicate a separate processing batch per arm; any such batch is constant within subject, so within-arm paired contrasts and the difference-in-change are protected from additive batch, but lean-vs-POST comparisons crossing arms are not.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald) paired ~ subject + grp for within-arm contrasts; limma paired_change on log2(CPM+1) for difference-in-change",
+            "formula": "~ subject + grp",
+            "paper_route": {"method": "DESeq2", "status": "reproduced", "reason": "raw counts deposited; paper's exact DESeq2 design not stated in abstract (pairing assumed)"},
+            "deviations": ["difference-in-change uses limma paired_change on log2(CPM+1) (no DESeq2 interaction executor with nested subject); declared deviation", "lean comparisons use unpaired DESeq2 ~ grp"]
+          },
+          "transform": null,
+          "reasoning": "Raw counts support DESeq2 as named in GEO data_processing.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": null,
+            "threshold_source": "workflow_default",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "deviation_note": "Abstract states no DEG threshold and the full text is unavailable; workflow default BH padj < 0.05, no fold-change cutoff."
+          },
+          "reasoning": "No threshold in abstract or GEO.",
+          "confidence": "medium"
+        },
+        "study": {
+          "final": {"route": "paper_aligned", "caveats": ["Comparison with the paper rests on the abstract only (no full text); abstract gives no DEG counts.", "Within-arm POST9 vs PRE confounds exercise with surgery and weight loss; exercise-specific effect = difference in change (limma, declared deviation).", "3-month biopsies are not in GEO.", "Possible per-arm processing batch ('WD.' column prefix) affects lean comparisons."]},
+          "paper_counts": {},
+          "paper_genes": {"ET_post9_vs_pre": ["FST", "TGFB1", "SMAD2", "SMAD3", "COL1A1", "COL1A2"], "exercise_x_time/RYGBET_vs_RYGB": ["FST", "TGFB1", "SMAD2", "SMAD3", "COL1A1", "COL1A2"]},
+          "reasoning": "Abstract names FST and the TGF-beta1/SMAD2/3 pathway as exercise-modulated, and collagen I as reduced more with RYGB+ET.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "timepoints", "paper": "biopsies at baseline, 3 and 9 months", "data": "GEO has PRE and POST9 only", "disposition": "executable_without_change"},
+        {"item": "DEG threshold", "paper": "not stated in abstract", "data": "n/a", "disposition": "workflow_default"}
+      ],
+      "executions": [
+        {"name": "ET_post9_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "ETpre", "treatment_group": "ETpost", "covariate_columns": "subject", "alpha": 0.05},
+         "subset": {"grp": ["ETpre", "ETpost"]}, "role": "primary",
+         "reasoning": "paired DESeq2 in RYGB+ET arm, 6 complete pairs"},
+        {"name": "RYGB_post9_vs_pre", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "RYpre", "treatment_group": "RYpost", "covariate_columns": "subject", "alpha": 0.05},
+         "subset": {"grp": ["RYpre", "RYpost"]}, "role": "secondary",
+         "reasoning": "paired DESeq2 in RYGB-alone arm"},
+        {"name": "exercise_x_time", "tool": "tools.multigroup_tools:run_multigroup_analysis",
+         "args": {"plan": {"analysis_type": "paired_change", "subject_column": "subject", "time_column": "tm", "baseline_level": "pre", "followup_levels": ["post"], "group_column": "arm", "formula": "~ C(arm)", "contrasts": [{"name": "RYGBET_vs_RYGB", "coefficients": {"C(arm)[T.RYGBET]": 1}}]}},
+         "subset": {"arm": ["RYGB", "RYGBET"]}, "transform": "log2(CPM+1)", "filter_low_counts": {"min_cpm": 1, "min_samples": 6}, "role": "secondary",
+         "reasoning": "randomized exercise effect: (POST9-PRE in RYGB+ET) minus (POST9-PRE in RYGB)"},
+        {"name": "ETpost_vs_LEAN", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "LEAN", "treatment_group": "ETpost", "alpha": 0.05},
+         "subset": {"grp": ["LEAN", "ETpost"]}, "role": "exploratory",
+         "reasoning": "GEO summary: restoration toward lean phenotype; associational"},
+        {"name": "RYpost_vs_LEAN", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+         "args": {"design_column": "grp", "control_group": "LEAN", "treatment_group": "RYpost", "alpha": 0.05},
+         "subset": {"grp": ["LEAN", "RYpost"]}, "role": "exploratory",
+         "reasoning": "surgery-alone vs lean; associational"}
+      ],
+      "enrichment": [
+        {"execution": "ET_post9_vs_pre", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "paper reports pathway identification (TGF-beta/SMAD, ECM)"},
+        {"execution": "exercise_x_time/RYGBET_vs_RYGB", "ora": false, "gsea": true, "ranking_metric": "stat", "reasoning": "exercise-specific pathway changes"}
+      ]
+    }
+  ]
+}

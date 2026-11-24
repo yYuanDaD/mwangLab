@@ -652,3 +652,7 @@ One section per case; newest last.
 
 - policy: Joint model (tissue + exercise) versus per-tissue fits is an open policy question; the paper (abstract only) is silent.
 - policy: Non-tumor liver Hallmark MYC_TARGETS up with exercise contradicts the abstract; recorded as caveat, consider checking against the full text.
+
+## PMID32409493 / GSE137631 (2026-11-24)
+
+- policy: Open policy: joint vs pairwise fit when paper is silent (pairs used here).
