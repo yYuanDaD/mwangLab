@@ -495,3 +495,7 @@ One section per case; newest last.
 ## PMID27508874 / GSE74570 (2026-11-24)
 
 - policy: Policy question (not an error): whether a genotype series whose phenotype is exercise capacity should be offered as a secondary non-exercise analysis (mNKO vs WT, mNTG vs WT).
+
+## PMID28066330 / GSE87748 (2026-11-24)
+
+- policy: Open policy: paper-stated vs author-table-inferred threshold; paper count 165 not reproduced by paired fit (418), likely unpaired or different filter.

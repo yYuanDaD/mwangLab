@@ -1,0 +1,122 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID28066330",
+ "request": "Analyze GSE87748 for PMID 28066330 (Muscle Contraction Induces Acute Hydroxymethylation of the Exercise-Responsive Gene Nr4a3.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [{
+  "case_id": "GSE87748",
+  "accession": "GSE87748",
+  "inputs": {
+   "paper": ["test/experiments/paper_screen_20261027/papers/PMC5179501.paper.md"],
+   "metadata": "GSE87748/GSE87748_metadata.csv",
+   "matrix": "E:/agent/mwangLab_pdf/test/experiments/large_run_pilot_20261019/runs_claude/PMID28066330/prep/GSE87748_counts_paper_universe.csv",
+   "raw_tar": false,
+   "prep_scripts": ["test/experiments/large_run_pilot_20261019/runs_claude/PMID28066330/prep/restrict_to_paper_universe.py"]
+  },
+  "gates": {
+   "paper_reconstruction": {
+    "final": {
+     "accessions": ["GSE87748 (RNA-seq SubSeries of SuperSeries GSE87749, S5.p1)"],
+     "assay": "total RNA-seq (Ribo-Zero), human vastus lateralis, HiSeq 2500 SR100",
+     "primary_estimand": "within-subject change in skeletal-muscle gene expression 4 h after one 15-min bout of cycling at 80% VO2max vs resting basal biopsy, in 10 sedentary young men",
+     "inclusion": "10 male volunteers, biopsies at rest (basal) and 4 h post-exercise (S2.1.p1); all 20 samples deposited",
+     "factors": {"time": ["Basal (pre)", "240 min (post)"], "subject": "10 individuals, each sampled twice"},
+     "repeated_measure_unit": "subject (paired before/after biopsies)",
+     "planned_contrasts": ["post-exercise (240 min) vs basal (S3.1.p1; paper: 165 DEGs, 72 up / 93 down, of 6,242 genes tested)"],
+     "normalization": "featureCounts gene coverage; filter > 2.5 RPKM in >= 5 samples (S2.3.p1)",
+     "paper_method": "edgeR glmQLFit/glmQLFTest (S2.3.p1; GEO data_processing edgeR v3.12.1); paired vs unpaired design not stated",
+     "paper_threshold": {"metric": "FDR", "cutoff": 0.1, "effect_metric": null, "effect_cutoff": null, "source_locator": "S3.1.p1 + deposited GSE87748_RNAseq_stats.txt.gz (inferred)"},
+     "paper_results": "165 DEGs (72 up, 93 down); NR4A3 top up (FC 26, FDR 2.51e-5); Table 1 top-10 up genes"
+    },
+    "reasoning": "S2.1.p1 defines the paired pre/4h-post biopsy design; S2.3.p1 the edgeR QL method and RPKM filter; S3.1.p1 the 165-DEG result. The paper never states the DEG cutoff. The authors' deposited result table (6,242 genes) gives exactly 165 genes at FDR < 0.1 (72 up / 93 down, identical to S3.1.p1) and 141 at FDR < 0.05; Table 1 also lists METTL7B with FDR 0.080. So the paper's rule is FDR < 0.1 with no fold-change cutoff (inferred, not stated).",
+    "confidence": "medium",
+    "locator": "S2.3.p1"
+   },
+   "ownership": {
+    "final": {"owned": true, "checks": ["S5.p1 names GSE87749 (SuperSeries); GEO series_id lists GSE87748,GSE87749", "20 samples = 10 subjects x {Basal, 240 min}, matches S2.1.p1", "stats file has 6,242 genes = '6,242 genes detected' (S3.1.p1)", "data_processing matches S2.3.p1 (tophat2/featureCounts/edgeR QL)"]},
+    "reasoning": "The paper cites the SuperSeries GSE87749; GSE87748 is its RNA-seq SubSeries with the human biopsies. Sample count, tested-gene count and processing all match the paper.",
+    "confidence": "high"
+   },
+   "alignment": {
+    "key_column": "title",
+    "patterns": {"subject": ["title", "^(\\d+)_1_(?:Basal|240)$"], "time": ["title", "^\\d+_1_(Basal|240)$"]},
+    "recode": {"subject": {"4": "S04", "5": "S05", "7": "S07", "8": "S08", "9": "S09", "11": "S11", "13": "S13", "14": "S14", "15": "S15", "16": "S16"},
+               "time": {"Basal": "Pre", "240": "Post"}},
+    "aliases": {},
+    "exclude_samples": {},
+    "reasoning": "Matrix columns equal metadata title exactly (20/20). Subject and time parsed from the title; they agree with characteristics individual/time. Subject recoded to strings so R treats it as a factor.",
+    "confidence": "high"
+   },
+   "matrix": {
+    "matrix_type": "raw counts",
+    "recommended_method": "edgeR",
+    "final": {"source": "GSE87748_RNAseq_Readcoverage_v3.txt.gz restricted to the authors' 6,242 tested genes", "paper_input": "featureCounts gene coverage (S2.3.p1)"},
+    "reasoning": "All values integer (0 to 5.7e6), file named Readcoverage, data_processing says featureCounts gene coverages: raw read counts, the input edgeR expects. The gene set is restricted to the authors' tested genes because the RPKM filter needs exon lengths that are not deposited (prep script).",
+    "confidence": "high"
+   },
+   "design": {
+    "factors": ["time"],
+    "references": {"time": "Pre"},
+    "subject": "subject",
+    "organism": "Human",
+    "planned": ["time_Post_vs_Pre"],
+    "covariate_candidates": [],
+    "final": {"analysis_type": "paired two-group", "design_column": "time", "control": "Pre", "treatment": "Post",
+              "contrasts": [{"name": "time_Post_vs_Pre", "control": "Pre", "treatment": "Post", "role": "primary"}]},
+    "reasoning": "One exercise bout, two time points per subject (S2.1.p1). The estimand is the within-subject change Post vs Pre; subject is the repeated-measure unit. GEO treatment exercise/control is the same split as time, so it is not a separate factor.",
+    "candidates": [{"value": "characteristics_ch1.1.treatment exercise vs control", "reason_rejected": "identical split to time; time is used"}],
+    "confidence": "high"
+   },
+   "covariance": {
+    "final": {"status": "required", "blocking_terms": ["subject"], "covariates": [{"name": "subject", "disposition": "fixed blocking effect (~ subject + time)"}]},
+    "confounding_candidates": ["subject"],
+    "reasoning": "Each subject contributes both arms, so subject is blocked as a fixed effect (standard edgeR paired design). The paper does not say whether it paired; an unpaired ~ time fit runs as sensitivity.",
+    "confidence": "medium"
+   },
+   "method": {
+    "final": {"method": "edgeR QL F-test (R edgeR, TMM)", "formula": "~ subject + time",
+              "paper_route": {"method": "edgeR glmQLFit/glmQLFTest after > 2.5 RPKM in >= 5 samples", "status": "partially_reproduced", "reason": "RPKM filter replaced by the authors' deposited tested-gene list (no exon lengths deposited); pairing not stated in paper, paired design chosen"},
+              "deviations": ["gene universe = authors' 6,242 tested genes instead of recomputed RPKM filter", "edgeR 4.x (R 4.6) instead of 3.12.1", "pairing by subject assumed (not stated)"]},
+    "transform": null,
+    "reasoning": "Raw counts support the paper's edgeR QL route; run it in R edgeR (tools.r_de_tools engine edger_ql, TMM) to match the paper's software. DESeq2 paired and edgeR unpaired are sensitivity runs.",
+    "confidence": "high"
+   },
+   "threshold": {
+    "final": {"paper_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+              "threshold_source": "paper",
+              "applied_threshold": {"metric": "padj", "cutoff": 0.1, "effect_metric": "log2FoldChange", "effect_cutoff": null},
+              "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+              "deviation_note": "FDR < 0.1 inferred from the deposited author table (exactly 165 = 72 up/93 down); paper text does not state the cutoff. FDR < 0.05 kept as audit rule."},
+    "reasoning": "See paper_reconstruction: the deposited table reproduces S3.1.p1 exactly at FDR < 0.1, not 0.05.",
+    "confidence": "medium"
+   },
+   "study": {
+    "final": {"route": "declared_deviation", "caveats": ["threshold FDR < 0.1 is inferred from the authors' deposited table, not stated in text", "pairing of the original edgeR model is not stated", "gene universe taken from the authors' tested-gene list"]},
+    "paper_counts": {"edgeR_paired/time_Post_vs_Pre": 165},
+    "paper_genes": {"edgeR_paired/time_Post_vs_Pre": ["NR4A3", "PRKAG2", "RTN4RL1", "WNT9A", "CHST15", "FCN3", "FKBP5", "KCNQ4", "PMP22", "METTL7B"]},
+    "reasoning": "Paper's method and contrast reproduced with declared deviations in filter, software version and assumed pairing.",
+    "confidence": "medium"
+   }
+  },
+  "discrepancies": [
+   {"item": "accession", "paper": "GSE87749 (SuperSeries)", "data": "GSE87748 RNA-seq SubSeries", "disposition": "executable_without_change"},
+   {"item": "low-expression filter", "paper": "> 2.5 RPKM in >= 5 samples", "data": "no exon lengths deposited; authors' 6,242-gene tested list deposited", "disposition": "declared_deviation"},
+   {"item": "DEG threshold", "paper": "not stated; 165 DEGs", "data": "authors' table gives 165 at FDR < 0.1", "disposition": "declared_deviation"}
+  ],
+  "executions": [
+   {"name": "edgeR_paired", "tool": "tools.r_de_tools:run_r_de",
+    "args": {"engine": "edger_ql", "design": "~ subject + time", "levels": {"time": ["Pre", "Post"]},
+             "contrasts": [{"name": "time_Post_vs_Pre", "coef": "timePost"}], "label": "edgeR_paired"},
+    "role": "primary", "reasoning": "paper's edgeR QL, paired by subject"},
+   {"name": "edgeR_unpaired", "tool": "tools.r_de_tools:run_r_de",
+    "args": {"engine": "edger_ql", "design": "~ time", "levels": {"time": ["Pre", "Post"]},
+             "contrasts": [{"name": "time_Post_vs_Pre", "coef": "timePost"}], "label": "edgeR_unpaired"},
+    "role": "sensitivity", "reasoning": "the paper does not state pairing; tests which model the authors used"},
+   {"name": "DESeq2_paired", "tool": "tools.deseq2_tools:run_deseq2_analysis",
+    "args": {"design_column": "time", "control_group": "Pre", "treatment_group": "Post", "covariate_columns": "subject", "alpha": 0.1},
+    "role": "sensitivity", "reasoning": "method robustness"}
+  ],
+  "enrichment": []
+ }]
+}

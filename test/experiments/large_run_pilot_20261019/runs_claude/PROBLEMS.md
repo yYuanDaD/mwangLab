@@ -943,3 +943,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID27508874 (GSE74570)
 
 - none (raw_tar merge writes merged CSV into the shared data/GSE74570 cache) Details: `PMID27508874/HANDBACK.md`.
+
+## PMID28066330 (GSE87748)
+
+- case_runner.py:483 gene lookup uses current MyGene symbols, so renamed METTL7B (now TMT1B) shows null; RPKM filter not recomputable (no exon lengths) Details: `PMID28066330/HANDBACK.md`.
+
+## PMID29123172 (GSE99963)
+
+- edger_tools.py:38 cannot block by subject (used r_de_tools); r_de.R:201-202 hard-codes robust=TRUE; case_runner.py:771-787 has no RPKM filter; filter applies per subset Details: `PMID29123172/HANDBACK.md`.

@@ -1,0 +1,88 @@
+{
+ "case": "GSE87748",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Human acute-exercise arm: 10 sedentary men, vastus lateralis biopsy at rest and 4 h after a 15-min 80% VO2max bout (S2.1.p1). All 20 sequenced samples carry the exercise factor (Pre/Post). The C2C12 EPS work is qPCR/bisulfite, not in this series.",
+  "B2": "Post-exercise (4 h) vs basal, 10 vs 10 samples (S3.1.p1, S2.1.p1).",
+  "B3": "Yes: each of 10 men sampled twice. Candidate key: characteristics_ch1.3.individual / subject (title prefix), once per level, links 20/20.",
+  "B4": "Paper says only 'tested for differential expression with edgeR using glmQLFit/glmQLFTest' (S2.3.p1); one joint model on all samples is implied, pairing not stated.",
+  "B5": "Genes with >2.5 RPKM in >=5 samples tested (S2.3.p1); no explicit DEG cutoff stated. Reports 165 DEGs of 6,242 genes, 72 up / 93 down (S3.1.p1); NR4A3 FDR 2.51e-5; Table 1 includes METTL7B FDR 0.0801, implying FDR<0.1."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run; matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Post 10 / Pre 10, all 20 samples, no exclusions; matches S2.1.p1 and metadata.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Post vs Pre (treatment=Post), exercise vs basal; NR4A3 log2FC +5.0.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Blocked on subject (~ subject + time), subject recoded as string factor; full rank, residual df 9. Unpaired fit run as sensitivity.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent on pairing; paired primary plus edgeR unpaired and DESeq2 paired both reported (418/257/559 vs paper 165). Declared.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single sex (male), single batch; subject fully crossed with time. None.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer featureCounts counts, edgeR QL with TMM, restricted to authors' 6,242 tested genes; deviation declared.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FDR<0.1 inferred from authors' deposited table (exactly 165, 72/93); stated as inferred in deviation_note and discrepancies. The flagged padj<0.05&|lfc|>0.585 match (164) applies to our table and is coincidental; author-table evidence is stronger.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Same contrast; 418 vs 165 reported honestly with caveats; no overclaim (overlap 162/165, logFC r 0.992).",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No stops or refusals.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: paper-stated vs author-table-inferred threshold; paper count 165 not reproduced by paired fit (418), likely unpaired or different filter."
+ ],
+ "summary": "该案例的设计、配对（按受试者区组）、方向和阈值（FDR<0.1，来自作者沉积表推断）均与论文一致，偏差已如实记录。主分析得到418个DEG，高于论文165个，原因已在配对、基因集和软件版本偏差中说明，并给出非配对和DESeq2敏感性分析。无阻断或重要问题。"
+}
