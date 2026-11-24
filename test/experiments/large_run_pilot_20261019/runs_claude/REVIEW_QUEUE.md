@@ -593,3 +593,7 @@ One section per case; newest last.
 
 - policy: Open policy: whether a hind-limb unloading/reloading series counts as an exercise-related study; it was run with a disuse/reloading label and caveat.
 - policy: About half of all genes are DE under the paper's raw-p rule and ~46% under FDR; person may want to check the Partek estimated-count matrix behaviour.
+
+## PMID41956699 / GSE315845 (2026-11-24)
+
+- policy: Count file GSE315845_RAW.tar must be supplied manually; then rerun SUSLE vs SUS and SUS vs SED. Threshold and fit structure unknown (abstract only).

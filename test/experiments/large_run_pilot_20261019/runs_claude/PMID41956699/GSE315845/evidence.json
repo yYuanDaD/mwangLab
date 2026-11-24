@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID41956699",
+  "subject_id": "GSE315845",
+  "created_at": "2026-11-24T10:09:52",
+  "finished_at": "2026-11-24T10:09:52",
+  "status": "stopped:ownership",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "abstract_PMID41956699.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41956699\\abstract_PMID41956699.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:09:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "1ce335130d92e289a63669138efb8ccc9e8ea8a9793da059033c675bc64ff5f5",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE315845_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE315845\\GSE315845_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:09:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "e1ea1176384278883c5ca72930abc5f19bfd4791712ac8e6818e3c2cc6aac369",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "MISSING_MATRIX_GSE315845.txt",
+      "uri": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41956699\\MISSING_MATRIX_GSE315845.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:09:52",
+      "sha256": null,
+      "attributes": {
+        "sha256": "343ebccf1e6d9a6550de8e68fc40553b05cdfe5f4cb1c491cff56972e362adcf",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE315845"
+        ],
+        "assay": "bulk RNA-seq, mouse ventral hippocampus (Illumina NovaSeq 6000, 101 bp PE; STAR GRCm39 + salmon; TMM+CPM via conorm per GEO data_processing)",
+        "sample_inclusion": "male C57BL/6J mice; GEO lists 9 samples: SED (non-stressed sedentary, n=3), SUS (chronic-restraint-stress susceptible, sedentary, n=3), SUS+LE (stress-susceptible + low-intensity treadmill exercise below VT, n=3); single batch",
+        "factors": {
+          "grp": [
+            "SED",
+            "SUS",
+            "SUSLE"
+          ]
+        },
+        "primary_estimand": "Effect of low-intensity treadmill exercise on the ventral-hippocampal transcriptome of stress-susceptible mice (SUS+LE vs SUS); secondary: stress-susceptibility effect (SUS vs SED)",
+        "planned_contrasts": [
+          "SUSLE vs SUS (abstract: 'transcriptomic profiling of vHPC showed this adaptive state was associated with coordinated modulation of primary cilium-associated gene networks'; DEG count not stated in abstract)",
+          "SUS vs SED (stress effect; implied by GEO overall design, count not stated)"
+        ],
+        "repeated_measure_unit": "none (independent animals)",
+        "paper_method": "not stated in the abstract or GEO record",
+        "paper_threshold": {
+          "metric": "unknown",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "not available: abstract only"
+        },
+        "paper_results": "abstract names no DEG counts or genes; reports reduced IL-1a (Il1a) and fractalkine (Cx3cl1) expression after low-intensity exercise (measurement assay unspecified)"
+      },
+      "reason": "No full text available; the study map rests on the PubMed abstract (PMID 41956699) and the GEO series record (Series_overall_design: 'RNA-seq profiling of sedentary controls (SED), stress-susceptible animals (SUS), and stress-susceptible animals subjected to low-intensity exercise (SUS+LE)'). The exercise estimand is SUS+LE vs SUS: both arms share the stress-susceptible phenotype and differ only in exercise.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:09:52"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41956699\\MISSING_MATRIX_GSE315845.txt",
+        "owned": true,
+        "checks": {
+          "series_pubmed_id": "GEO Series_pubmed_id = 41956699 (matches)",
+          "title": "GEO series title matches the paper title",
+          "samples": "9 GSM records GSM9438437-GSM9438445 (SED1-3, SUSLE1-3, SUSSED1-3)",
+          "matrix_files": "only per-sample GSM*_<lib>.txt.gz inside GSE315845_RAW.tar; NOT retrievable on this machine"
+        },
+        "accession": "GSE315845",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE315845\\GSE315845_metadata.csv"
+      },
+      "reason": "The series belongs to the paper (Series_pubmed_id 41956699, matching title, design matches the abstract). The only expression data are per-sample supplementary files (GSE315845_RAW.tar / GSM*_SED1.txt.gz etc., 'Read count values for each sample'). Every https/http/ftp request to ftp.ncbi.nlm.nih.gov/geo/ from this machine returned 403 / 550 (also for an unrelated control series GSE266241), and the www.ncbi.nlm.nih.gov/geo/download endpoint redirects to the same blocked FTP path. GEOparse's SOFT download also failed, so the metadata CSV was built by parsing the GEO acc.cgi full SOFT text with GEOparse. No matrix is available, so alignment, matrix typing and design cannot be checked against data. The Zenodo record cited by the series (10.5281/zenodo.19596784) holds only a supplemental .docx, not a count matrix.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "manual_review",
+        "execution_status": "not_started",
+        "stop_reason": "missing file: the per-sample count files (GSE315845_RAW.tar) could not be downloaded (GEO FTP returns HTTP 403 / FTP 550 from this host). Place GSE315845_RAW.tar in data/GSE315845/ and rerun; the planned exercise contrast SUSLE vs SUS (n=3 vs 3) is otherwise identifiable from metadata."
+      },
+      "recorded_at": "2026-11-24T10:09:52"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41956699\\GSE315845\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "66630954a4901ccbebc8857626c14def5156ea9dae352802771120ea5d053194",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID41956699\\GSE315845\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "624d475db50dd2aef6513a1edabba443b888c4f7388f7cc3e5893ce54f43088f",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

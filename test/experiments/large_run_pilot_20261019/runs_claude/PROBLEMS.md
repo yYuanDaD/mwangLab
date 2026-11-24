@@ -1031,3 +1031,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID29562317 (GSE102284)
 
 - filter_low_counts can't use deposited RPKM columns while Reads are analyzed (RPKM>1 rule approximated by CPM>=1); deg_sanity flags 52% significant (checked, groups tight) Details: `PMID29562317/HANDBACK.md`.
+
+## 8d368462bbdbebbcf6223c8ad5899f11ea581ce7 (GSE71972)
+
+- GEO FTP host returns HTTP 403 for all files; case_runner.py:529-530 crashes on a missing matrix before recording gates; geo_tools.py:30 hides the 403 behind a temp-file error Details: `8d368462bbdbebbcf6223c8ad5899f11ea581ce7/HANDBACK.md`.
+
+## PMID41956699 (GSE315845)
+
+- GEO FTP /geo/ blocked (403/550); case_runner.py:529-530 needs a matrix before ownership gate (placeholder used); inspect hides 403 behind GEOparse temp error Details: `PMID41956699/HANDBACK.md`.
