@@ -1,0 +1,88 @@
+{
+ "case": "GSE277819",
+ "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+ "blind": {
+  "B1": "Yes. Resistance-training study in older adults (abstract): 27 participants, one leg 1 set, contralateral leg 4 sets, 10 wk; biopsies pre and post. All 81 samples (27 baseline, 27 1set, 27 4set per packet A condition column) carry the exercise factor.",
+  "B2": "Abstract: comparisons by responder group (low/medium/high) for 1-set and 4-set vs pre, and 4 vs 1 set. Responder group sizes are not in the abstract; packet A has no responder field. Pooled n = 27 per condition.",
+  "B3": "Yes. Each participant has 3 biopsies (baseline, 1-set leg, 4-set leg). Key: 'participant id' / pid, 27 keys each appearing once per condition level, linking 81/81 samples.",
+  "B4": "Abstract does not say. A joint model with participant blocking is the natural fit.",
+  "B5": "Not in the abstract (only GO and PLIER pathway results); no DEG counts reported. Full text needed."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Run; exercise arms in condition field (1set/4set vs Baseline), abstract confirms RT design.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "cond BL/S1/S4 = 27/27/27 from the condition field, not the A/BD/BE prefix (BD/BE are randomized legs); no exclusions. Control for S1/S4 is the participant's own baseline. Responder stratification not reconstructable (no GEO field), recorded as a declared deviation.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts ordered treatment vs control: S1 vs BL, S4 vs BL, S4 vs S1 (control S1).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Formula ~ subject + cond with subject='P_<pid>' as a string category; full rank, residual df 52; matches candidate key (27 keys, once per level).",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper silent in abstract; joint model on all 81 samples is the defensible default. Per-sex fits are labelled exploratory.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Leg side randomized to volume; sex inferred from X/Y and fitted per subject (within-subject so aliased only through subject). No batch field. Recorded.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integers 100%, STAR+featureCounts raw counts; DESeq2 Wald. n_tested varies (3201-42884) across contrasts, consistent with DESeq2 independent filtering when few genes are rejected; deg_sanity ok.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper rule not stated in abstract; padj<0.05 without FC cutoff recorded as workflow_default and a declared deviation.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "paper_counts empty, no counts compared. HANDBACK explicitly says comparison rests on the abstract; FZD1 mRNA check is flagged as only indicative.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal in this case.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Full text not available: paper DE method, DEG threshold and responder group assignments (low/medium/high) remain unchecked; if the authors' responder labels can be obtained, rerun per responder group."
+ ],
+ "summary": "本案例通过审查：81个样本为27名受试者各3次活检（基线、1组腿、4组腿），模型以受试者为区组（~ subject + cond），分组、方向、配对均与摘要和GEO元数据一致。论文阈值、DEG数量和响应者分组在摘要中缺失，已作为声明偏离记录，未做过度的论文对比声明。"
+}

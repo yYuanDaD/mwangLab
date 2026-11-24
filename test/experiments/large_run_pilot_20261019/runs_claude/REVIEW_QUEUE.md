@@ -623,3 +623,7 @@ One section per case; newest last.
 
 - policy: Download the two edgeRglm xlsx files (or the NCBI counts) into data/GSE305038 and rerun. Check whether the xlsx files hold per-sample counts or only edgeR result tables.
 - policy: The paper's DEG threshold needs the full text.
+
+## PMID40839394 / GSE277819 (2026-11-24)
+
+- policy: Full text not available: paper DE method, DEG threshold and responder group assignments (low/medium/high) remain unchecked; if the authors' responder labels can be obtained, rerun per responder group.
