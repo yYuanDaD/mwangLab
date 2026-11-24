@@ -1,0 +1,80 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35689600",
+  "request": "Analyze GSE250520 for PMID 35689600 (Human cardiac organoids to model COVID-19 cytokine storm induced cardiac injuries.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE250520",
+      "accession": "GSE250520",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9350263.paper.md"],
+        "metadata": "GSE250520/GSE250520_metadata.csv",
+        "matrix": "GSE250520/GSE250520_il1b_rawcounts_041621.csv",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE250520"],
+            "assay": "bulk RNA-seq of human cardiac organoids (hPSC-CM/hcFB/HUVEC/hADSC), n=3 vehicle vs n=3 IL-1beta, day 4 of treatment",
+            "primary_estimand": "Transcriptomic effect of 4-day IL-1beta stimulation vs vehicle in human cardiac organoids (COVID-19 cytokine-storm model). No exercise estimand: the only 'simulated exercise' is a functional norepinephrine stress test (beating rate/FAC, S2.6.p2, FIG7d-g) that has no transcriptome.",
+            "planned_contrasts": ["IL-1beta vs control hCOs (S2.1.p2, FIG2d volcano; paper DEG count not stated)"],
+            "exercise_contrast_in_paper": "none for RNA-seq; NE 'stress test to simulate physiological exercise' is beating-rate only (S2.6.p2)",
+            "factors": {"treatment": ["vehicle", "IL-1beta"]},
+            "sample_inclusion": "3 vs 3 organoid pools (FIG3b n=3)",
+            "repeated_measure_unit": "none; single hiPSC-CM donor line",
+            "paper_threshold": {"metric": null, "cutoff": null, "effect_metric": null, "effect_cutoff": null, "stated": false, "source_locator": "S5.p2 (only generic p<0.05 t-test rule for non-omics assays); FIG2d gives no DEG rule"},
+            "paper_method": "not stated for RNA-seq; Median-of-Ratios normalization (FIG3c) suggests DESeq2",
+            "paper_results": "IL1R1 up in IL-1beta hCOs (S2.1.p2); ADRB2 up, ADRB1 unchanged (S2.6.p2)"
+          },
+          "reasoning": "Abstract ABS.p1 mentions 'simulated exercise conditions'; the only such experiment is the NE stress test in S2.6.p2/FIG7, a functional readout. RNA-seq (S2.1.p2) compares IL-1beta vs vehicle only. Methods S5 give no RNA-seq pipeline or DEG threshold.",
+          "confidence": "high",
+          "locator": "ABS.p1; S2.1.p2; S2.6.p2; S5.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO contact Dimitrios Arhontoulis, Mei lab, MUSC = first/senior authors (S6.p1)", "cardiac organoids, IL1B 4 days = paper's regimen (S5.p1)", "3 Vehicle + 3 IL1b samples = paper n=3 (FIG3b)", "DA.p1 promised GEO deposit; GSE250520 public Dec 2023"]},
+          "reasoning": "Series metadata and files match the paper's authors, model, treatment and sample count.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^cardiac organoids, (.+)$"]},
+          "key_column": "key",
+          "aliases": {"trt": "characteristics_ch1.3.treatment"},
+          "recode": {"trt": {"control": "VEH", "IL-1 cytokine": "IL1B"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns Vehicle.1..IL1bOrgs.3 sit inside the GEO title after 'cardiac organoids, '; exact match on the derived key. Treatment column recoded to formula-safe trt.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "DESeq2",
+          "final": {"source": "GSE250520_il1b_rawcounts_041621.csv", "paper_input": "not stated; FIG3c uses median-of-ratios values, consistent with DESeq2 on counts"},
+          "reasoning": "integer_fraction 1.0, max 831330; data_processing: STAR + htseq-count. The other file is DESeq2 median-of-ratios normalized (non-integer).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["trt"],
+          "references": {"trt": "VEH"},
+          "organism": "Human",
+          "planned": [],
+          "final": {"analysis_type": "none", "design_column": null, "contrasts": [], "exercise_factor_present": false},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: GSE250520 contains only vehicle vs IL-1beta cardiac organoids (no exercise, training, or NE/stress-test arm). The paper's 'simulated exercise' (NE stress test, S2.6.p2) is a functional beating-rate assay without RNA-seq, so the requested exercise estimand cannot be identified from these data. IL-1beta vs vehicle is not an exercise comparison and was not run as a substitute.",
+          "candidates": [
+            {"value": "trt IL1B vs VEH", "reason_rejected": "cytokine-storm treatment, not exercise; answering it would substitute a different estimand"}
+          ],
+          "reasoning": "Only grouping column is treatment (control 3, IL-1 cytokine 3); all other fields constant. No time, NE, or exercise factor exists in metadata or matrix columns.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise", "paper": "abstract mentions reversibility 'at baseline and simulated exercise conditions' (ABS.p1); NE stress test D4/D14 (S2.6.p2)", "data": "GEO series has only D4 vehicle vs IL-1beta RNA-seq; no NE or D14 samples", "disposition": "blocks_estimand"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
