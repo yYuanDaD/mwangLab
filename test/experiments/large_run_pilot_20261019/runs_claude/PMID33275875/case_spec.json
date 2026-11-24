@@ -1,0 +1,82 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33275875",
+  "request": "Analyze GSE123961 for PMID 33275875 (ROS Dynamics Delineate Functional States of Hippocampal Neural Stem Cells and Link to Their Activity-Dependent Exit from Quiescence.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-code session)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE123961",
+      "accession": "GSE123961",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7875116.paper.md"],
+        "metadata": "GSE123961/GSE123961_metadata.csv",
+        "matrix": "GSE123961/GSE123961_SVZ_processed_counts.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE124095 (SuperSeries)", "GSE123961 (DG vs SVZ SubSeries)"],
+            "assay": "bulk RNA-seq (SMARTer) of FACS-sorted Nes-GFP+ precursor cells",
+            "experiments_sequenced": [
+              "Experiment 1: Nes-GFP+ cells from DG vs SVZ of the same standard-housed animals (S2.2.p1, S4.4.10.1.p1) -> GSE123961",
+              "Experiment 2: DG Nes-GFP+ cells sorted by ROS class (hi/mid/loROS) from standard-housed animals (S2.3.p1, S4.4.10.1.p1) -> other SubSeries"
+            ],
+            "primary_estimand": "For GSE123961: region-specific transcription (DG vs SVZ) in Nes-GFP+ precursors of standard-housed mice. No exercise estimand is sequenced; running-wheel effects (S2.1, S2.6) are measured only by BrdU/IdU counts, flow-cytometric ROS and western blot.",
+            "planned_contrasts": ["DG vs SVZ 'enriched'/'signature' transcripts (S4.4.11.p1; Table S1) - not an exercise contrast"],
+            "factors": {"tissue": ["DG", "SVZ"]},
+            "housing": "all sequenced animals standard housed (S2.2.p1, S4.4.10.1.p1; GEO growth_protocol 'Standard housing')",
+            "sample_exclusion": "one low-depth sample per experiment removed (S4.4.11.p1)",
+            "paper_method": "edgeR CPM filter (>=1 CPM in 75% of one group) then limma lmFit/topTags (S4.4.11.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.4.11.p1"},
+            "paper_results": "Table S1 (DG/SVZ enriched transcripts); count not stated in text"
+          },
+          "reasoning": "The paper's two RNA-seq experiments both use standard-housed mice (S4.4.10.1.p1: 'standard housed animals' in both). Exercise (running wheel 1-5 nights) appears only in histology/flow/western experiments (S2.1.p1-p2, S2.6.p1, S4.4.16.p1). GSE123961 is the DG vs SVZ subseries.",
+          "confidence": "high",
+          "locator": "S4.4.10.1.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 33275875", "SubSeries of GSE124095 named in S4.2.3.p1", "9 samples DG/SVZ Nes-GFP+ matches experiment 1"]},
+          "reasoning": "GEO series record links PMID 33275875 and is a SubSeries of GSE124095 cited in the paper's data availability (S4.2.3.p1).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^(L\\d+):"]},
+          "key_column": "key",
+          "patterns": {"tissue": ["title", "^L\\d+: (DG|SVZ)_STD_POS\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns L#### are the prefix of the GEO title ('L4799: SVZ_STD_POS1'); tissue derived from title. All titles carry STD (standard housing)."
+        },
+        "matrix": {
+          "matrix_type": "log2 CPM (edgeR cpm, low-expression filtered), normalized expression",
+          "recommended_method": "limma",
+          "reasoning": "Non-integer values from -5.1 to 14.1 with median 4.3; GEO data_processing: 'Counts per million (cpm) calculated using EdgeR and low-expressed genes discarded'; supplementary format 'normalised expression'. Consistent with log2 CPM.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["tissue"],
+          "references": {"tissue": "SVZ"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor_present": false},
+          "candidates": [
+            {"value": "tissue DG vs SVZ", "reason_rejected": "Region comparison in standard-housed mice; not an exercise contrast. Running it would manufacture an exercise estimand the data cannot identify."}
+          ],
+          "decision_status": "refused",
+          "stop_reason": "No exercise arm: all 9 samples are standard-housed (title *_STD_*, growth_protocol 'Standard housing'; paper S4.4.10.1.p1). The only factor is tissue (DG 5 / SVZ 4). The paper's exercise effects are measured by cell counts, flow cytometry and westerns, not RNA-seq.",
+          "reasoning": "The requested estimand (effect of exercise on gene expression) is not identifiable from GSE123961.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "exercise in sequencing", "paper": "running-wheel paradigms (S2.1, S2.6) assessed by BrdU/IdU, DHE flow cytometry, western blot", "data": "GSE123961 samples all standard housed, DG vs SVZ only", "disposition": "blocks_estimand"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}
