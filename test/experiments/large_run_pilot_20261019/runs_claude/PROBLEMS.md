@@ -915,3 +915,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID33311503 (GSE153350)
 
 - NCBI ftp gave 403 so no matrix; GEOparse error misleading (geo_tools.py:30); case_runner needs a matrix even to refuse at the paper gate (case_runner.py:178,529) Details: `PMID33311503/HANDBACK.md`.
+
+## PMID32483463 (GSE128651)
+
+- NCBI GEO FTP 403 from host (geo_tools download); GEOparse reports Errno2 tmp not 403; case_runner.py:529-530 needs matrix file to record ownership stop Details: `PMID32483463/HANDBACK.md`.
