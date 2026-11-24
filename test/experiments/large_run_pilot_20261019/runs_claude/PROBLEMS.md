@@ -1027,3 +1027,7 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID34203013 (GSE141827)
 
 - inspect misread .osc table: '##' header lines listed as features, raw.*/norm.* columns mixed, start.0base/pos taken as samples (tools/native.py:239), no alignment_keys Details: `PMID34203013/HANDBACK.md`.
+
+## PMID29562317 (GSE102284)
+
+- filter_low_counts can't use deposited RPKM columns while Reads are analyzed (RPKM>1 rule approximated by CPM>=1); deg_sanity flags 52% significant (checked, groups tight) Details: `PMID29562317/HANDBACK.md`.

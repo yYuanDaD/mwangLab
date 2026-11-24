@@ -588,3 +588,8 @@ One section per case; newest last.
 ## PMID34203013 / GSE141827 (2026-11-24)
 
 - policy: Policy: whether reloading/recovery after unloading counts as an exercise-like contrast is open; the case followed the stricter reading (no exercise arm), which is consistent with the skill's rules.
+
+## PMID29562317 / GSE102284 (2026-11-24)
+
+- policy: Open policy: whether a hind-limb unloading/reloading series counts as an exercise-related study; it was run with a disuse/reloading label and caveat.
+- policy: About half of all genes are DE under the paper's raw-p rule and ~46% under FDR; person may want to check the Partek estimated-count matrix behaviour.
