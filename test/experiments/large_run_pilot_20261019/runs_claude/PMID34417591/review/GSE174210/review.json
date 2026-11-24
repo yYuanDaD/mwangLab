@@ -1,0 +1,28 @@
+{
+  "case": "GSE174210",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "No exercise arm: APP/PS1 male mice, hippocampus, tail-vein AAV8-GFP vs AAV8-irisin-FLAG (S2.6.p2, S2.7.p1, S4.20.p1, FIG17c-d); no running/sedentary words in the metadata. Irisin is the exercise hormone, so this is an exercise-mimetic (hormone overexpression) design, not exercise. All 10 sequenced samples carry the irisin factor; none carries exercise.",
+    "B2": "Irisin (n=5) vs GFP (n=5) in APP/PS1 hippocampus; analysed only by GSEA (FIG17c) and glia-gene overrepresentation (FIG17d); the paper gives no DEG count for this dataset (FIG17 legend GFP n=5, irisin n=5).",
+    "B3": "No repeated measures: one hippocampus sample per mouse, 10 distinct mice (GFP-3106... vs Irisin-3111...). The only candidate keys are the title suffix (mouse 1..5), which numbers different animals in each arm, not shared animals. Irisin and GFP are between-animal groups.",
+    "B4": "Paper does not say how the model was fitted (S4.21.p1 only says DESeq2 for normalization and DEG; details in the supplement). Two groups, so joint and pairwise are the same fit.",
+    "B5": "No DEG rule is given for this dataset. S4.29.p1 gives only the general p < 0.05; S4.22.p1 gives BH-corrected p < 0.05 for enrichment. No DEG count is reported."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Metadata have no exercise words; S2.6.p2 / FIG17: AAV8-irisin vs AAV8-GFP only. The refusal is stated as 'irisin overexpression is a mimetic, not exercise', so the design is labelled as such.", "fix": ""},
+    {"id": "grouping", "verdict": "na", "severity": "none", "evidence": "Design was refused; trt levels GFP 5 / Irisin 5 match FIG17 n, no exclusions.", "fix": ""},
+    {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast executed (control GFP, treatment Irisin recorded correctly).", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "Candidate key 'title without treatment level' only numbers mice 1-5 per arm; descriptions GFP-3106... vs Irisin-3111... are different animals; pairing_check same_key_mean_r -0.003, p 0.44, not_supported.", "fix": ""},
+    {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "No fit; two groups only.", "fix": ""},
+    {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "No analysis run; single sex, no batch fields.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Matrix is DESeq2-normalized (28% integers, max 610487.7), with Excel-mangled gene IDs and 2 duplicated IDs; correctly classified as non-count and not fed to DESeq2.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "S4.29.p1 general p<0.05, no DEG rule for this dataset; recorded as such in paper_reconstruction.", "fix": ""},
+    {"id": "paper_match", "verdict": "na", "severity": "none", "evidence": "No result produced and the paper reports no DEG count here; HANDBACK makes no numeric claim for this case.", "fix": ""},
+    {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise contrast' is true by the data (no exercise words in any column, one factor GFP/Irisin). The claim is not 'data lack X by a narrow search'. Normalized-only matrix is a second true reason.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Open policy question: whether an exercise-hormone (irisin) overexpression series counts as an exercise study. Refused here with the reason stated; a person may want it run as an exercise-mimetic case, but the deposited matrix is DESeq2-normalized (non-integer), so limma/voom on it would need a stated route."
+  ],
+  "summary": "该系列没有运动组（APP/PS1 小鼠，AAV8-irisin 对 AAV8-GFP），拒绝分析的理由属实且已注明是运动模拟物而非运动。矩阵为 DESeq2 标准化后的非整数值，识别正确；各样本为不同小鼠，无重复测量。是否把 irisin 过表达算作运动研究属于尚未定论的政策问题，列入 human_items。"
+}

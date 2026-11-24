@@ -1,0 +1,171 @@
+{
+ "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID34417591",
+ "request": "Analyze GSE174210, GSE174211 and GSE179078 for PMID 34417591 (Exercise hormone irisin is a critical regulator of cognitive function.): how exercise affects gene expression as the paper intends.",
+ "decision_maker": "Claude Opus 5.5 (claude-code session)",
+ "platform": "claude-code",
+ "data_root": "E:/agent/mwangLab_pdf/data",
+ "cases": [
+  {
+   "case_id": "GSE174211",
+   "accession": "GSE174211",
+   "inputs": {"paper": ["test/experiments/paper_screen_20261027/papers/PMC10317538.paper.md"],
+              "metadata": "GSE174211/GSE174211_metadata.csv",
+              "matrix": "GSE174211/GSE174211_cw2002-WT_Sed_Run_SedSTAR_normalized_Gene_Counts.csv.gz",
+              "raw_tar": false, "prep_scripts": []},
+   "gates": {
+    "paper_reconstruction": {
+     "final": {
+      "accessions": ["GSE174211"],
+      "assay": "FACS-sorted GFP+ newborn-neuron nuclei from hippocampus (RV-SYN-GTRgp), SmartSeq v4 RNA-seq (S2.5.p1, S4.19.p1)",
+      "factors": {"genotype": ["WT", "F5KO"], "exercise": ["Sed", "Run (voluntary wheel)"]},
+      "sample_inclusion": "WT-sed n=4, WT-run n=4, F5KO-run n=4, F5KO-sed n=5; 6-week-old males (FIG15, S4.1.p2)",
+      "primary_estimand": "Paper's DE estimand in this dataset is F5KO vs WT newborn neurons (459 DEGs) regardless of exercise intervention; the paper states the study was underpowered to detect an exercise effect and reports no exercise DEG count (S2.5.p2). The requested exercise estimand (Run vs Sed) is therefore exploratory.",
+      "planned_contrasts": ["F5KO vs WT, pooled over exercise (S2.5.p2, FIG15c; paper: 459 DEGs)", "Run vs Sed: not reported by paper (S2.5.p2: underpowered)"],
+      "paper_method": "DESeq2 v1.10.1 on gene-level counts (S4.21.p1); GSEA (S4.22.p1)",
+      "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.5, "source_locator": "S2.5.p2"},
+      "repeated_measure_unit": "none; one sample per mouse"
+     },
+     "reasoning": "S2.5.p2: 459 genes DE between F5KO and WT newborn neurons (log2FC > |1.5|, p-value < 0.05); exercise effect not detected/reported. FIG15 gives group n. S4.27.p1 maps GSE174211 to the super-series.",
+     "confidence": "high", "locator": "S2.5.p2"
+    },
+    "ownership": {"final": {"owned": true, "checks": ["S4.27.p1 lists GSE174211 under GSE174212", "GEO contact C. Wrann (senior author)", "17 samples with WT/KO x Sed/Run = FIG15 n 4/4/4/5", "tissue/protocol: GFP+ sorted nuclei from hippocampus"]},
+                  "reasoning": "Accession named in data availability; group sizes and protocol match FIG15.", "confidence": "high"},
+    "alignment": {
+     "key_column": "description",
+     "aliases": {"geno": "characteristics_ch1.1.genotype", "ex": "characteristics_ch1.3.running or sedentary"},
+     "recode": {"geno": {"Wild-type": "WT", "Knock-out": "KO"},
+                "ex": {"Sedentary group": "Sed", "Voluntery free wheel running group": "Run"}},
+     "combine": {"grp": ["geno", "ex"]},
+     "exclude_samples": {},
+     "reasoning": "Matrix columns (s3079...) equal metadata description exactly (17/17). geno/ex from GEO characteristics; grp = geno_ex for the 4-cell model.",
+     "confidence": "high"
+    },
+    "matrix": {
+     "matrix_type": "raw counts",
+     "recommended_method": "DESeq2",
+     "final": {"source": "GSE174211_cw2002-...STAR_normalized_Gene_Counts.csv.gz", "paper_input": "gene-level counts into DESeq2 (S4.21.p1)"},
+     "reasoning": "All values integer; column sums vary 1.08M-8.52M (not library-size normalized); data_processing says 'Gene counts were quantified using STAR'; the FPKM (cufflinks) line refers to a separate output; 'normalized' in the filename is VIPER boilerplate (the sister DG file GSE179078 has the same processing text and is named STAR_Gene_Counts). Treated as raw STAR counts.",
+     "confidence": "medium",
+     "candidates": [{"value": "normalized counts", "reason_rejected": "library sizes differ ~8-fold; normalized counts would have near-equal column sums"}]
+    },
+    "design": {
+     "factors": ["grp"],
+     "references": {"grp": "WT_Sed"},
+     "organism": "Mouse",
+     "planned": ["grp_WT_Run_vs_WT_Sed"],
+     "final": {
+      "analysis_type": "multi-group",
+      "design_column": "grp",
+      "contrasts": [
+       {"name": "grp_WT_Run_vs_WT_Sed", "control": "WT_Sed", "treatment": "WT_Run", "role": "primary"},
+       {"name": "grp_KO_Run_vs_KO_Sed", "control": "KO_Sed", "treatment": "KO_Run", "role": "exploratory"},
+       {"name": "ex_Run_vs_Sed_adj_geno", "control": "Sed", "treatment": "Run", "role": "exploratory"},
+       {"name": "geno_KO_vs_WT", "control": "WT", "treatment": "KO", "role": "secondary"}
+      ]
+     },
+     "reasoning": "2x2 genotype x exercise. The exercise effect in intact (WT) animals is the cleanest exercise estimand; KO Run vs Sed and the genotype-adjusted exercise main effect are exploratory. The paper's own contrast (KO vs WT pooled) is reproduced as secondary for comparison with the 459 DEGs. n=4-5 per cell.",
+     "confidence": "medium",
+     "candidates": [{"value": "pooled Run vs Sed ignoring genotype", "reason_rejected": "genotype has a large effect (S2.5.p2); ignoring it inflates residual variance"}]
+    },
+    "covariance": {
+     "final": {"status": "not_required", "blocking_terms": [], "covariates": [{"name": "geno", "disposition": "model term in the exercise main-effect fit (design factor, not a nuisance covariate)"}]},
+     "confounding_candidates": null,
+     "reasoning": "Independent mice, one sample each; no batch or sort date recorded in GEO. Genotype is a crossed design factor.",
+     "confidence": "medium"
+    },
+    "method": {
+     "final": {"method": "DESeq2 (pydeseq2 Wald)", "formula": "~ grp (joint); ~ geno + ex; ~ geno",
+               "paper_route": {"method": "DESeq2 v1.10.1", "status": "reproduced_approximately", "reason": "pydeseq2 instead of R DESeq2 1.10.1; paper's exact gene filtering is in a supplement not available here"},
+               "deviations": ["pydeseq2 implementation", "exercise contrasts not run by paper (exploratory)"]},
+     "transform": null,
+     "reasoning": "Raw counts -> DESeq2, matching S4.21.p1.", "confidence": "high"
+    },
+    "threshold": {
+     "final": {"paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.5, "inclusive": false},
+               "threshold_source": "paper",
+               "applied_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 1.5, "inclusive": false},
+               "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null}},
+     "reasoning": "S2.5.p2: log2FC > |1.5|, p-value < 0.05 (raw p, as stated). Audit: BH padj < 0.05.", "confidence": "high"
+    },
+    "study": {
+     "final": {"route": "exploratory", "caveats": ["Paper reports no exercise DEG set for newborn neurons and states the nuclear RNA-seq was underpowered for an exercise effect (S2.5.p2); exercise contrasts are exploratory.", "Paper threshold uses raw p < 0.05; counts under it are not FDR-controlled."]},
+     "paper_counts": {"geno_KO_vs_WT": 459},
+     "paper_genes": {"geno_KO_vs_WT": ["FNDC5"]},
+     "reasoning": "Only the genotype contrast has a paper count; Fndc5 should drop in KO.", "confidence": "medium"
+    }
+   },
+   "discrepancies": [
+    {"item": "matrix file name says 'normalized'", "paper": "DESeq2 on gene-level counts", "data": "integer STAR counts with unequal library sizes", "disposition": "executable_without_change"},
+    {"item": "exercise estimand", "paper": "no exercise DEG analysis reported (underpowered)", "data": "4 Run vs 4 Sed in WT, 4 vs 5 in KO", "disposition": "executable_as_exploratory"}
+   ],
+   "executions": [
+    {"name": "joint", "tool": "tools.joint_contrasts:run_joint_deseq2", "args": {"comparisons": "all"}, "role": "primary",
+     "reasoning": "One ~grp model on all 17 samples; WT_Run vs WT_Sed is the requested exercise estimand; other cell contrasts exploratory."},
+    {"name": "ex_Run_vs_Sed_adj_geno", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "ex", "control_group": "Sed", "treatment_group": "Run", "covariate_columns": ["geno"], "alpha": 0.05}, "role": "exploratory",
+     "reasoning": "Exercise main effect across genotypes, ~ geno + ex."},
+    {"name": "geno_KO_vs_WT", "tool": "tools.deseq2_tools:run_deseq2_analysis", "args": {"design_column": "geno", "control_group": "WT", "treatment_group": "KO", "alpha": 0.05}, "role": "secondary",
+     "reasoning": "Paper's F5KO vs WT pooled comparison (S2.5.p2) for count comparison."}
+   ],
+   "enrichment": []
+  },
+  {
+   "case_id": "GSE174210",
+   "accession": "GSE174210",
+   "inputs": {"paper": ["test/experiments/paper_screen_20261027/papers/PMC10317538.paper.md"],
+              "metadata": "GSE174210/GSE174210_metadata.csv",
+              "matrix": "GSE174210/GSE174210_cw2036-APP_PS1NormalisedCounts_DESeq2.txt.gz", "raw_tar": false, "prep_scripts": []},
+   "gates": {
+    "paper_reconstruction": {
+     "final": {"accessions": ["GSE174210"],
+               "primary_estimand": "Hippocampus of APP/PS1 mice: AAV8-irisin-FLAG vs AAV8-GFP (tail vein) (S2.7.p1, S4.20.p1, FIG17c-d); no exercise arm",
+               "planned_contrasts": ["Irisin vs GFP (GSEA and glia-gene ORA only; no DEG count reported)"],
+               "paper_method": "DESeq2 (S4.21.p1), GSEA (FIG17c)",
+               "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S4.29.p1 (general p<0.05; no DEG rule given for this dataset)"}},
+     "reasoning": "S4.20.p1 / FIG17: n=5 GFP vs 5 irisin. Intervention is hepatic irisin overexpression, not exercise.", "confidence": "high", "locator": "S4.20.p1"},
+    "ownership": {"final": {"owned": true, "checks": ["S4.27.p1 lists GSE174210", "10 samples GFP 5 / Irisin 5 = FIG17 n", "APP/PS1 hippocampus"]}, "reasoning": "matches", "confidence": "high"},
+    "alignment": {"key_column": "description", "aliases": {"trt": "characteristics_ch1.1.treatment"},
+                  "recode": {"trt": {"tail vein injected AAV8-GFP": "GFP", "tail vein injected AAV8-Irisin-FLAG": "Irisin"}},
+                  "exclude_samples": {}, "reasoning": "Matrix columns equal description (10/10).", "confidence": "high"},
+    "matrix": {"matrix_type": "DESeq2-normalized counts (non-integer, linear scale)", "recommended_method": "none for exercise question",
+               "final": {"source": "GSE174210_cw2036-APP_PS1NormalisedCounts_DESeq2.txt.gz", "paper_input": "DESeq2 on raw counts; only normalized counts deposited"},
+               "reasoning": "File name and 28% integer fraction: DESeq2 size-factor-normalized counts; also Excel-mangled gene IDs (1-Mar, ...).", "confidence": "high"},
+    "design": {"factors": ["trt"], "references": {"trt": "GFP"}, "organism": "Mouse", "planned": [],
+               "final": {"analysis_type": "none", "design_column": "trt", "control": "GFP", "treatment": "Irisin"},
+               "decision_status": "refused",
+               "stop_reason": "No exercise contrast: all mice are sedentary APP/PS1 receiving AAV8-irisin or AAV8-GFP. Irisin overexpression is a mimetic, not exercise; analysing it as an exercise effect would change the estimand.",
+               "reasoning": "S4.20.p1, FIG17. The request is the exercise effect.", "confidence": "high"}
+   },
+   "discrepancies": [], "executions": [], "enrichment": []
+  },
+  {
+   "case_id": "GSE179078",
+   "accession": "GSE179078",
+   "inputs": {"paper": ["test/experiments/paper_screen_20261027/papers/PMC10317538.paper.md"],
+              "metadata": "GSE179078/GSE179078_metadata.csv",
+              "matrix": "GSE179078/GSE179078_cw2001-WT_F5KO_DG_STAR_Gene_Counts.csv.gz", "raw_tar": false, "prep_scripts": []},
+   "gates": {
+    "paper_reconstruction": {
+     "final": {"accessions": ["GSE179078"],
+               "primary_estimand": "Microdissected dentate gyrus F5KO vs WT, n=5 each (S2.5.p2, FIG4c); no exercise arm",
+               "planned_contrasts": ["F5KO vs WT (paper: 2 genes + Fndc5)"],
+               "paper_method": "DESeq2 (FIG4c)",
+               "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5, "source_locator": "S2.5.p2"}},
+     "reasoning": "S2.5.p2: only two genes plus Fndc5 DE (log2FC > |0.5|, p<0.05).", "confidence": "high", "locator": "S2.5.p2"},
+    "ownership": {"final": {"owned": true, "checks": ["S4.27.p1 lists GSE179078", "WT 5 / KO 5 = FIG4c n", "dentate gyrus"]}, "reasoning": "matches", "confidence": "high"},
+    "alignment": {"key_patterns": {"key": ["description", "^\\d+_([A-Z]+\\d+)_"]}, "key_column": "key",
+                  "aliases": {"geno": "characteristics_ch1.1.genotype/variation"},
+                  "recode": {"geno": {"Wild-type": "WT", "Global Fndc5 Knock out": "KO"}},
+                  "exclude_samples": {}, "reasoning": "description 20190116_WT1_CW6530_S1 contains matrix column WT1.", "confidence": "high"},
+    "matrix": {"matrix_type": "raw counts", "recommended_method": "DESeq2",
+               "final": {"source": "GSE179078_cw2001-WT_F5KO_DG_STAR_Gene_Counts.csv.gz", "paper_input": "DESeq2 counts"},
+               "reasoning": "integers, unequal library sizes (26-44M), STAR gene counts.", "confidence": "high"},
+    "design": {"factors": ["geno"], "references": {"geno": "WT"}, "organism": "Mouse", "planned": [],
+               "final": {"analysis_type": "none", "design_column": "geno", "control": "WT", "treatment": "KO"},
+               "decision_status": "refused",
+               "stop_reason": "No exercise contrast: all samples are sedentary WT or F5KO dentate gyrus; genotype (loss of the exercise-induced hormone) is not an exercise intervention.",
+               "reasoning": "S2.5.p2, FIG4c. The request is the exercise effect.", "confidence": "high"}
+   },
+   "discrepancies": [], "executions": [], "enrichment": []
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+{
+  "case": "GSE174211",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "Yes, it has an exercise arm: GFP+ newborn-neuron nuclei from hippocampus, WT and F5KO mice, sedentary vs voluntary wheel running (S2.5.p1, S4.6.p1, Fig. 5 legend). All 17 sequenced samples carry genotype and exercise factors; the paper says the exercise effect was not detected, 'underpowered' (S2.5.p2).",
+    "B2": "Paper's main comparison: F5KO vs WT, 459 DEGs (S2.5.p2, Fig. 5c). Groups WT-sed 4, WT-run 4, F5KO-run 4, F5KO-sed 5 (Fig. 5 legend). No exercise DEG comparison is reported.",
+    "B3": "No repeated measures: one nuclei sample per mouse, 17 mice (descriptions s3035...s3386 all distinct). Genotype and running are between-animal factors. The metadata candidate key (exercise + title suffix) only numbers mice within each group and is not an animal.",
+    "B4": "Paper says only 'DESeq2 ... was used for normalization and to determine differentially expressed genes' (S4.21.p1); no statement of joint 4-group or pairwise fit, and the supplement is not available. Fig. 5b clusters all four groups together.",
+    "B5": "'A total of 459 genes were differentially expressed between F5KO and WT newborn neurons (log_2FC > |1.5|, p-value < 0.05)' (S2.5.p2): raw p < 0.05, effect cutoff 1.5 written as '> |1.5|' (strict). Count 459 for F5KO vs WT; no exercise count."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "Series has a running vs sedentary factor (title / characteristics_ch1.3), run as 'exploratory' because the paper reports no exercise DEG set (S2.5.p2).", "fix": ""},
+    {"id": "grouping", "verdict": "agree", "severity": "none", "evidence": "grp levels KO_Run 4, KO_Sed 5, WT_Run 4, WT_Sed 4 = Fig. 5 legend; no exclusions; primary exercise contrast is WT_Run vs WT_Sed, the within-genotype control (not a cross-cell control). Cross-cell contrasts are labelled as extra.", "fix": ""},
+    {"id": "direction", "verdict": "agree", "severity": "none", "evidence": "Contrasts recorded as treatment Run vs control Sed, KO vs WT; spec names grp_WT_Run_vs_WT_Sed, grp_KO_Run_vs_KO_Sed, geno_KO_vs_WT, ex_Run_vs_Sed_adj_geno.", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "One sample per mouse (17 distinct descriptions); packet key 'ex + suffix of title' links only 16/17 and only numbers mice within group; pairing_check r difference 0.021, p 0.07, not_supported.", "fix": ""},
+    {"id": "model_fit", "verdict": "unsure", "severity": "minor", "evidence": "Paper is silent (S4.21.p1). Analysis used joint ~grp (4 cells) for the cell contrasts, ~geno+ex for the exercise main effect and ~geno for the paper's pooled contrast; both joint and pooled fits are reported. Whether the paper fitted pairs or one model is open policy.", "fix": ""},
+    {"id": "confounding", "verdict": "agree", "severity": "none", "evidence": "No batch, sort date or housing field in GEO; all males, running and sedentary mice both individually housed (S4.6.p1). Recorded as no confounder available. Caveat on Fndc5 counts higher in KO is stated in the study record.", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "File name says 'normalized' but integer_fraction 1.0 and column sums 1.08M-8.52M; treated as raw STAR counts with the reason and the rejected alternative recorded. DESeq2 on counts matches S4.21.p1.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Applied: pvalue < 0.05 and |log2FC| > 1.5, strict, as S2.5.p2; audit padj<0.05 also reported. No alternative rule in the packet table gives 459 (784 paper rule, 1241 for p<0.05 & |lfc|>1), so no silent substitution.", "fix": ""},
+    {"id": "paper_match", "verdict": "unsure", "severity": "minor", "evidence": "Pooled KO vs WT gives 784 under the paper rule vs paper 459, a 1.7-fold gap; the HANDBACK table shows both numbers but the recorded paper-data discrepancies list does not include this count gap. Exercise contrasts are not compared to the paper (none reported), which is correct.", "fix": "Add a discrepancy entry: geno_KO_vs_WT 784 vs paper 459 under the same stated rule (likely different gene filter or DESeq2 version, S4.21.p1 vs pydeseq2), disposition 'count differs, not reconciled'."},
+    {"id": "stop_reason", "verdict": "na", "severity": "none", "evidence": "No stop or refusal in this case.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Open policy question: joint ~grp versus pairwise fits when the paper is silent (S4.21.p1). Both a joint model and a pooled ~geno model are reported here, so nothing is hidden, but the primary choice is unsettled.",
+    "FNDC5 counts are slightly higher in KO (log2FC +0.36); the study record notes it but genotype labels were not re-verified from data. A person may want to confirm the KO allele design (partial exon deletion with intronic nuclear reads)."
+  ],
+  "summary": "该系列有跑步与久坐因素，运行为探索性路线是合适的，因为论文称运动效应检验功效不足、未报告运动 DEG。分组 4/4/4/5 与论文一致，主对比是 WT 内 Run 对 Sed，符号方向正确，阈值逐字采用（原始 p<0.05 且 |log2FC|>1.5）。唯一的小问题是合并 KO 对 WT 得到 784 个 DEG，而论文为 459，这个差异应补记为 discrepancy。"
+}

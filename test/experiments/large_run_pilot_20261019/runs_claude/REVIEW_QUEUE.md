@@ -458,3 +458,16 @@ One section per case; newest last.
 ## PMID38151020 / GSE198922 (2026-11-24)
 
 - policy: Open policy: counts are 1.35-2x the paper's under the stated rule; whether to also report a pooled-model sensitivity fit.
+
+## PMID34417591 / GSE174210 (2026-11-24)
+
+- policy: Open policy question: whether an exercise-hormone (irisin) overexpression series counts as an exercise study. Refused here with the reason stated; a person may want it run as an exercise-mimetic case, but the deposited matrix is DESeq2-normalized (non-integer), so limma/voom on it would need a stated route.
+
+## PMID34417591 / GSE174211 (2026-11-24)
+
+- policy: Open policy question: joint ~grp versus pairwise fits when the paper is silent (S4.21.p1). Both a joint model and a pooled ~geno model are reported here, so nothing is hidden, but the primary choice is unsettled.
+- policy: FNDC5 counts are slightly higher in KO (log2FC +0.36); the study record notes it but genotype labels were not re-verified from data. A person may want to confirm the KO allele design (partial exon deletion with intronic nuclear reads).
+
+## PMID34417591 / GSE179078 (2026-11-24)
+
+- policy: Open policy question: this is a genotype-only series (F5KO vs WT) that the paper itself uses for its DG bulk comparison. Refused for the exercise question; a person may decide whether a knockout of the exercise-hormone gene should be run as a labelled non-exercise case.

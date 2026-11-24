@@ -1,0 +1,28 @@
+{
+  "case": "GSE179078",
+  "reviewer": "case-reviewer (Claude Sonnet 5.5)",
+  "blind": {
+    "B1": "No exercise arm: microdissected dentate gyrus of WT vs global Fndc5 knockout (F5KO) mice, 5 each (S2.5.p2, S4.20.p1, Extended Data Fig. 4c legend n=5 per group). No exercise words in the metadata. The comparison is genotype only; the knocked-out gene encodes the exercise hormone irisin precursor.",
+    "B2": "F5KO (n=5) vs WT (n=5), bulk DG RNA-seq, DESeq2 (Extended Data Fig. 4c).",
+    "B3": "No repeated measures: one DG sample per mouse, WT1-5 and KO1-5 are different animals, and genotype is between-animal, so a shared animal across genotypes is impossible. The 'suffix of title' key only numbers mice within each genotype.",
+    "B4": "Paper does not say how the model was fitted beyond 'DESeq2' (S4.21.p1, ED Fig. 4c legend). Two groups, so joint and pairwise coincide.",
+    "B5": "'only two genes, in addition to Fndc5, were differentially expressed between WT and F5KO (log_2FC > |0.5|, p-value < 0.05)' (S2.5.p2). Raw p, effect cutoff 0.5 written as '> |0.5|' (strict). Count: 2 genes plus Fndc5."
+  },
+  "checks": [
+    {"id": "run_or_refuse", "verdict": "agree", "severity": "none", "evidence": "No running/sedentary factor in any metadata column; S2.5.p2 / ED Fig. 4c: genotype only. Genotype loss of an exercise hormone is not an exercise intervention.", "fix": ""},
+    {"id": "grouping", "verdict": "na", "severity": "none", "evidence": "Refused at design; WT 5 / KO 5 matches ED Fig. 4c n, no exclusions.", "fix": ""},
+    {"id": "direction", "verdict": "na", "severity": "none", "evidence": "No contrast executed (control WT, treatment KO recorded).", "fix": ""},
+    {"id": "pairing", "verdict": "agree", "severity": "none", "evidence": "WT and KO are different animals (genotype is between-animal), so 'suffix of title' (1-5 within each genotype) cannot be a shared animal. pairing_check r 0.234, p 0.029 but status not_supported and the key is not biologically possible; library-prep order (S1, S3, ... interleaved) explains any residual similarity.", "fix": ""},
+    {"id": "model_fit", "verdict": "na", "severity": "none", "evidence": "No fit; two groups only.", "fix": ""},
+    {"id": "confounding", "verdict": "na", "severity": "none", "evidence": "No analysis run; single sex, one prep date in descriptions (20190116).", "fix": ""},
+    {"id": "matrix_method", "verdict": "agree", "severity": "none", "evidence": "Integer STAR gene counts, library sizes 26-44M, 24982 genes; classification as raw counts is correct.", "fix": ""},
+    {"id": "threshold", "verdict": "agree", "severity": "none", "evidence": "Recorded as pvalue 0.05, effect log2FoldChange 0.5 from S2.5.p2; matches the verbatim rule. Not applied because no run.", "fix": ""},
+    {"id": "paper_match", "verdict": "na", "severity": "none", "evidence": "No result produced; HANDBACK makes no numeric claim for this case.", "fix": ""},
+    {"id": "stop_reason", "verdict": "agree", "severity": "none", "evidence": "'No exercise arm' is true across all columns and the file list; the design is genotype only.", "fix": ""}
+  ],
+  "overall": "pass",
+  "human_items": [
+    "Open policy question: this is a genotype-only series (F5KO vs WT) that the paper itself uses for its DG bulk comparison. Refused for the exercise question; a person may decide whether a knockout of the exercise-hormone gene should be run as a labelled non-exercise case."
+  ],
+  "summary": "该系列是 WT 对 Fndc5 敲除的齿状回，各 5 只，没有运动因素，拒绝分析的理由属实。基因型是动物间因素，所谓配对键只是各组内编号，不构成重复测量。论文的阈值（原始 p<0.05，|log2FC|>0.5）已准确记录；矩阵为整数计数，识别正确。"
+}
