@@ -1063,3 +1063,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID42545855 (GSE324210)
 
 - geo_tools.py:30 GEOparse temp-file error hidden as "ID incorrect" (:42); geo_tools.py:64 GEO FTP 403s with no retry; metadata rebuilt from SOFT, xlsx fetched by hand Details: `PMID42545855/HANDBACK.md`.
+
+## PMID38314723 (GSE248869;GSE269698)
+
+- limma_tools.py:26,115 covariate_columns list->AttributeError; case_runner needs paper inputs as files; refusal forced at alignment (unmappable labels) before design Details: `PMID38314723/HANDBACK.md`.
+
+## PMID39747484 (GSE280845)
+
+- matrix column typo Exe_KO_reap4 not flagged by inspect (fixed in a prep script); paper_gene_check shows Sln p null without giving the Cook's reason Details: `PMID39747484/HANDBACK.md`.

@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID38314723",
+  "subject_id": "GSE248869",
+  "created_at": "2026-11-24T10:28:35",
+  "finished_at": "2026-11-24T10:28:35",
+  "status": "stopped:alignment",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMID38314723_abstract.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38314723\\paper\\PMID38314723_abstract.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:28:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "fb280f469ef81fea3cf84225630393778b198c6177914f3f4935c67686385156",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "paper",
+      "label": "GSE248869_series_description.txt",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38314723\\paper\\GSE248869_series_description.txt",
+      "locator": null,
+      "captured_at": "2026-11-24T10:28:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "6856fd1640cf5ae6edc015a21c5cd22b0ba069e133a41cf42cf1f708d962bcda",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "metadata",
+      "label": "GSE248869_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE248869\\GSE248869_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:28:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "ded5c494b5f6ea16847b5dd9bb1706fa97b5d526cc9343dfb6cfa6f94f512e8c",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0004",
+      "origin": "artifact",
+      "label": "GSE248869_rlog_GFPvsArrdc2.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE248869\\GSE248869_rlog_GFPvsArrdc2.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T10:28:35",
+      "sha256": null,
+      "attributes": {
+        "sha256": "b664d2c179ac0db0a8f794cdbfb50b7d0e2e0f9f17105f3f67e3427424e4d1f8",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE248869",
+          "GSE269698"
+        ],
+        "assay": "bulk RNA-seq (Illumina NovaSeq 6000), STAR + DESeq2 per GEO data_processing",
+        "primary_estimand": "For this series: effect of adenoviral Arrdc2 overexpression vs GFP-only control on the C2C12 myotube transcriptome 48 h post-transfection (cell culture, no exercise).",
+        "planned_contrasts": [
+          "Arrdc2 vs GFP in C2C12 myotubes (abstract: transcriptome shifted toward atrophy; no DEG count given in abstract)"
+        ],
+        "sample_inclusion": "5 GFP + 5 Arrdc2 C2C12 wells (GEO)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": null,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "not stated in abstract; GEO data_processing says DESeq2 default with BH FDR"
+        },
+        "paper_method": "DESeq2 1.30.1 default (GEO data_processing)"
+      },
+      "reason": "Abstract only (no full text available). The abstract says RNA sequencing was performed on the C2C12 overexpression samples; in vivo mechanical-load results (unloading, reloading, high-force contractions) are reported for Arrdc2/Arrdc3 mRNA. GSE248869 overall_design: Arrdc2+GFP vs GFP-only adenovirus in C2C12 myotubes.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:28:35"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE248869\\GSE248869_rlog_GFPvsArrdc2.csv",
+        "owned": true,
+        "checks": [
+          "GEO Series_pubmed_id = 38314723",
+          "10 samples, C2C12, GFP vs Arrdc2 transfection, matching the abstract's RNA-seq experiment"
+        ],
+        "accession": "GSE248869",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE248869\\GSE248869_metadata.csv"
+      },
+      "reason": "GEO series cites PMID 38314723 and the design matches the abstract's cell-culture RNA-seq.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T10:28:35"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {},
+      "reason": "No metadata field equals the matrix column names (inspect alignment_keys empty); the numbers in matrix labels (3-7, 6,7,9,10,11) differ from the title numbers (1-5). Group membership is unambiguous from the label prefix, but sample identity is not. Since the series has no exercise arm, no fact would unblock the requested exercise estimand.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0004",
+        "SRC-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast exists in this series (Arrdc2 vs GFP adenoviral overexpression in C2C12 myotubes, cell culture). In addition, the matrix column labels (GFP3-GFP7, Arrdc2-6/7/9/10/11) cannot be mapped by name to the GSM titles (GFP control 1-5, Arrdc2 treatment 1-5); only a positional mapping would work, which is not allowed. The case is refused for the exercise request at the first gate it cannot pass; the design gate would refuse it regardless."
+      },
+      "recorded_at": "2026-11-24T10:28:35"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38314723\\GSE248869\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "37d2d39c37ac8f57dd4fdf90be96e75d7476602ca4f4ba704426f16bb5b2783e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38314723\\GSE248869\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "83b9c1818ba420f8692a7628797426a384f5d82914b132105ccb36ee5fbc4aef",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

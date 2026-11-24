@@ -627,3 +627,23 @@ One section per case; newest last.
 ## PMID40839394 / GSE277819 (2026-11-24)
 
 - policy: Full text not available: paper DE method, DEG threshold and responder group assignments (low/medium/high) remain unchecked; if the authors' responder labels can be obtained, rerun per responder group.
+
+## PMID42545855 / GSE324210 (2026-11-24)
+
+- policy: Open policy: joint (~ subject + time per sex) vs pairwise paired fits when the paper is silent; the male counts disagree strongly with the paper under the joint fit.
+- policy: Open policy: the male pre-training count (571 at raw p<0.01, equal to the GEO summary) suggests the authors' stated FDR may not be what produced their number; which rule to report is a person's decision.
+- policy: Sex x acute-exercise interaction (315 transcripts) and training x acute interaction were not run (runner limitation).
+
+## PMID38314723 / GSE248869 (2026-11-24)
+
+- policy: Whether in-vitro overexpression series count as exercise studies is the open policy question; here no exercise mediator is involved, so refusal stands.
+
+## PMID38314723 / GSE269698_aged_vehicle (2026-11-24)
+
+- pairing (unsure, major): Pairing inferred from replicate number; GEO overall_design says aged vehicle n=4 mice but 6 pairs deposited; residual correlation of OVNk-OVSk -0.49..0.26 shows no support. Paired primary gives 1 DEG, unpaired sensitivity 104 DEG (95 up/9 down).
+- policy: Is aged OVNk/OVSk really one mouse? GEO says n=4 mice for 6 deposited pairs; the data show no within-pair correlation. Primary (paired) 1 DEG vs unpaired 104 DEG cannot be settled from the files.
+- policy: Open policy item: a paired model on an unsupported key may be less valid than an unpaired one; decide which to report as primary.
+
+## PMID38314723 / GSE269698_young_vehicle (2026-11-24)
+
+- policy: Whether the replicate-number pairing is the true mouse pairing is undocumented; irrelevant to the 0-DEG result.

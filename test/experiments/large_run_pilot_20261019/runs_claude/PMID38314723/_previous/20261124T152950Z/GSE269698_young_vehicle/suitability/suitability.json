@@ -1,0 +1,146 @@
+{
+  "case_id": "GSE269698_young_vehicle",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "stim"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "rlog (DESeq2 regularized log2 counts)",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "rlog (DESeq2 regularized log2 counts)",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "stim"
+      ],
+      "levels": {
+        "stim": {
+          "N": 6,
+          "S": 6
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "required",
+      "blocking_terms": [
+        "subject"
+      ],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [
+        {
+          "column": "subject",
+          "decision": "block",
+          "reason": "same subject sampled at several levels: repeated measures"
+        },
+        {
+          "column": "data_processing",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_selection",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_source",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        },
+        {
+          "column": "library_strategy",
+          "decision": "omit",
+          "reason": "constant: carries no batch information"
+        }
+      ],
+      "design": {
+        "formula_equivalent": "~ C(stim) + C(subject)",
+        "rank": 7,
+        "full_rank": true,
+        "residual_df": 5,
+        "min_cell_size": 1
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 1,
+      "n_analyzable": 1,
+      "too_small": [],
+      "planned_analyzable": [
+        "stim_S_vs_N"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 12 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 12
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID38314723\\GSE269698_young_vehicle\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "stim_S_vs_N",
+      "kind": "simple",
+      "factor": "stim",
+      "test": "S",
+      "reference": "N",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "stim": "S"
+          },
+          "n": 6
+        },
+        {
+          "cell": {
+            "stim": "N"
+          },
+          "n": 6
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}
