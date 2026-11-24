@@ -1,0 +1,79 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID32969079",
+  "request": "Analyze GSE146336 for PMID 32969079 (Thyroid hormone receptor alpha in skeletal muscle is essential for T3-mediated increase in energy expenditure.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE146336",
+      "accession": "GSE146336",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7702122.paper.md"],
+        "metadata": "GSE146336/GSE146336_metadata.csv",
+        "matrix": "GSE146336/GSE146336_counts.csv.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE146336"],
+            "assay": "bulk polyA RNA-seq, soleus muscle, male mice (S2.5.p1, S3.3.p1)",
+            "factors": {"genotype": ["WT", "TRa1 HSACre (L400R dominant-negative, 'TRa1 KO' in GEO)"], "treatment": ["vehicle", "T3 100 nmol/kg s.c. daily, 7 days"]},
+            "sample_inclusion": "WT and TRa-HSACre SOL, vehicle n=5-6/4-6, T3 n=5-6/7 (FIG3); GEO has 22 samples (11 WT/11 KO; 9 vehicle/13 T3)",
+            "primary_estimand": "Effect of muscle TRa1 loss-of-function (genotype) on the soleus transcriptome under vehicle, and the T3 response by genotype (S3.3.p1). No exercise factor in the RNA-seq.",
+            "planned_contrasts": [
+              "KO vs WT, vehicle (S3.3.p1/FIG3A; paper: 788 DEGs)",
+              "WT-T3 vs KO-T3 (FIG3B/C; GO enrichment, no DEG count)"
+            ],
+            "exercise_component": "Treadmill exhaustion and 6-week voluntary wheel running were phenotyping endpoints only (S2.4, S3.1.p1, FIG1E/F); no exercised samples were sequenced.",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": null, "effect_cutoff": null, "source_locator": "S2.11.p1 (FDR-adjusted P; cutoff assumed 0.05 from P < .05 significance rule)"},
+            "paper_method": "edgeR QL, ~0 + group (group = genotype x treatment), contrasts per edgeR manual (S2.6.p1)",
+            "paper_results": {"KO_vs_WT_vehicle": 788}
+          },
+          "reasoning": "S2.5/S2.6 describe RNA-seq of SOL from WT and TRa-HSACre mice treated with T3 or vehicle; S3.3.p1 reports 788 DEGs KO vs WT. Exercise appears only in S2.4/S3.1 as phenotyping (treadmill capacity, wheel running) of separate cohorts; none of those mice were sequenced.",
+          "locator": "S2.6.p1; S3.3.p1; S2.4",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE146336", "GEO tissue Soleus muscle, male, genotype WT/TRa1 KO, treatment T3/vehicle matches S3.3.p1", "data_processing STAR/featureCounts/edgeR matches S2.6.p1"]},
+          "reasoning": "Data availability statement DA.p1 cites GSE146336; metadata factors match the paper's RNA-seq design.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_patterns": {"key": ["title", "^(\\S+?):"]},
+          "key_column": "key",
+          "aliases": {},
+          "patterns": {},
+          "recode": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (033_1 ...) are the prefix of the GEO title ('033_1: Sample 1'); inspect matched 22/22.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "edgeR",
+          "reasoning": "All-integer values up to 4.6e6, featureCounts per data_processing and S2.6.p1; paper input is raw counts to edgeR.",
+          "confidence": "high"
+        },
+        "design": {
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: the sequenced samples differ only by genotype (WT vs muscle TRa1 loss-of-function) and treatment (T3 vs vehicle). Exercise (treadmill, wheel running) was a phenotyping readout in unsequenced cohorts (S2.4, S3.1.p1). An exercise effect on gene expression cannot be identified from GSE146336.",
+          "final": {"analysis_type": "none", "exercise_contrast_available": false},
+          "candidates": [
+            {"value": "characteristics_ch1.3.treatment T3 vs vehicle", "reason_rejected": "Pharmacological T3 treatment, not exercise."},
+            {"value": "characteristics_ch1.0.genotype TRa1 KO vs WT", "reason_rejected": "Genotype contrast, not exercise."}
+          ],
+          "reasoning": "The request is for an exercise effect; GEO grouping columns are only genotype and treatment (T3/vehicle). Running a T3 or genotype contrast would answer a different question than the one asked.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample counts", "paper": "FIG3: vehicle WT/KO n=5-6/4-6, T3 n=5-6/7", "data": "22 samples: 11 WT/11 KO, 9 vehicle/13 T3", "disposition": "not_evaluated_case_refused"}
+      ],
+      "executions": [],
+      "enrichment": []
+    }
+  ]
+}

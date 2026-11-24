@@ -891,3 +891,11 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID35316212 (GSE184951)
 
 - case_runner.py:387 inspect skips RAW.tar when rMATS files exist; suitability gives conflicting subject dispositions; sex check gives no split_plan Details: `PMID35316212/HANDBACK.md`.
+
+## PMID32969079 (GSE146336)
+
+- suitability check still runs when design is refused and reports a misleading "sample_size" failure (GSE146336/suitability/suitability.md) Details: `PMID32969079/HANDBACK.md`.
+
+## PMID34219410 (GSE159217)
+
+- inspect shows merged-tar columns as GSM_title_counts but runner renames them to GSM ids (case_runner.py:715), so a matrix_column_pattern matched 0 columns (case_runner.py:561) Details: `PMID34219410/HANDBACK.md`.

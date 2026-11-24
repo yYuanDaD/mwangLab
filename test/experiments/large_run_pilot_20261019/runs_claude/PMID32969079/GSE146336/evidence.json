@@ -1,0 +1,311 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID32969079",
+  "subject_id": "GSE146336",
+  "created_at": "2026-11-24T00:11:51",
+  "finished_at": "2026-11-24T00:12:07",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC7702122.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC7702122.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T00:11:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "d3dae7eac83e57cade95a73bfde1bedff6c734e998ca95aa4793fab92a7e883c",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE146336_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE146336\\GSE146336_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T00:11:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "34ae1a0cce129c318dca650226087cd15051a191f808c5d6939033c5d3727d35",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE146336_counts.csv.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE146336\\GSE146336_counts.csv.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T00:11:51",
+      "sha256": null,
+      "attributes": {
+        "sha256": "607c8614d2bd9e61a0b537adacde63ceb8bb11c764f17407ba194a872fb6af3e",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE146336"
+        ],
+        "assay": "bulk polyA RNA-seq, soleus muscle, male mice (S2.5.p1, S3.3.p1)",
+        "factors": {
+          "genotype": [
+            "WT",
+            "TRa1 HSACre (L400R dominant-negative, 'TRa1 KO' in GEO)"
+          ],
+          "treatment": [
+            "vehicle",
+            "T3 100 nmol/kg s.c. daily, 7 days"
+          ]
+        },
+        "sample_inclusion": "WT and TRa-HSACre SOL, vehicle n=5-6/4-6, T3 n=5-6/7 (FIG3); GEO has 22 samples (11 WT/11 KO; 9 vehicle/13 T3)",
+        "primary_estimand": "Effect of muscle TRa1 loss-of-function (genotype) on the soleus transcriptome under vehicle, and the T3 response by genotype (S3.3.p1). No exercise factor in the RNA-seq.",
+        "planned_contrasts": [
+          "KO vs WT, vehicle (S3.3.p1/FIG3A; paper: 788 DEGs)",
+          "WT-T3 vs KO-T3 (FIG3B/C; GO enrichment, no DEG count)"
+        ],
+        "exercise_component": "Treadmill exhaustion and 6-week voluntary wheel running were phenotyping endpoints only (S2.4, S3.1.p1, FIG1E/F); no exercised samples were sequenced.",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": null,
+          "effect_cutoff": null,
+          "source_locator": "S2.11.p1 (FDR-adjusted P; cutoff assumed 0.05 from P < .05 significance rule)"
+        },
+        "paper_method": "edgeR QL, ~0 + group (group = genotype x treatment), contrasts per edgeR manual (S2.6.p1)",
+        "paper_results": {
+          "KO_vs_WT_vehicle": 788
+        }
+      },
+      "reason": "S2.5/S2.6 describe RNA-seq of SOL from WT and TRa-HSACre mice treated with T3 or vehicle; S3.3.p1 reports 788 DEGs KO vs WT. Exercise appears only in S2.4/S3.1 as phenotyping (treadmill capacity, wheel running) of separate cohorts; none of those mice were sequenced.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:11:51"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE146336\\GSE146336_counts.csv.gz",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE146336",
+          "GEO tissue Soleus muscle, male, genotype WT/TRa1 KO, treatment T3/vehicle matches S3.3.p1",
+          "data_processing STAR/featureCounts/edgeR matches S2.6.p1"
+        ],
+        "accession": "GSE146336",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE146336\\GSE146336_metadata.csv"
+      },
+      "reason": "Data availability statement DA.p1 cites GSE146336; metadata factors match the paper's RNA-seq design.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:11:51"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 22,
+        "n_metadata": 22,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [
+          "start",
+          "end",
+          "length"
+        ],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\aligned_metadata.csv",
+          "columns": {},
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\design_metadata.csv",
+          "sha256": "a572200a89f1965c7a33f5ce17ea7470e12c255e08a4a15a0f35596ce0adb397",
+          "levels": {}
+        }
+      },
+      "reason": "Matrix columns (033_1 ...) are the prefix of the GEO title ('033_1: Sample 1'); inspect matched 22/22.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:11:53"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "raw counts",
+        "recommended_method": "edgeR",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\aligned_matrix.csv",
+          "sha256": "e39d70c250fb6c327a3e3c30d54a51bb8659fe25bb4fd8d473d91107c044ede4",
+          "n_features": 55487,
+          "n_samples": 22,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 4575446.0,
+          "median": 0.0,
+          "integer_fraction": 1.0,
+          "candidates": [
+            "raw_counts (confirm against provenance: normalized integers and rounded estimated counts look the same)"
+          ]
+        }
+      },
+      "reason": "All-integer values up to 4.6e6, featureCounts per data_processing and S2.6.p1; paper input is raw counts to edgeR.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T00:11:54"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "exercise_contrast_available": false,
+        "suitability": {
+          "verdict": "not_analyzable",
+          "failed": [
+            "sample_size"
+          ],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\suitability\\suitability.md",
+          "n_comparisons": 0,
+          "n_analyzable": 0
+        }
+      },
+      "reason": "The request is for an exercise effect; GEO grouping columns are only genotype and treatment (T3/vehicle). Running a T3 or genotype contrast would answer a different question than the one asked.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: the sequenced samples differ only by genotype (WT vs muscle TRa1 loss-of-function) and treatment (T3 vs vehicle). Exercise (treadmill, wheel running) was a phenotyping readout in unsequenced cohorts (S2.4, S3.1.p1). An exercise effect on gene expression cannot be identified from GSE146336."
+      },
+      "recorded_at": "2026-11-24T00:12:07"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "f71273d1b92f7554225b060f015db666a91ca3559ec120dca8e9de12621e9f42",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "dff07bcea29f024bd99770d8f54ac44f98b296817c29a92324993400a0f23afc",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e39d70c250fb6c327a3e3c30d54a51bb8659fe25bb4fd8d473d91107c044ede4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "a572200a89f1965c7a33f5ce17ea7470e12c255e08a4a15a0f35596ce0adb397",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "ae0e94ab7cd95578560e04e30de607ed0f6ed7b11287a3fc5dc1885e20a28e8e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID32969079\\GSE146336\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "34d4a643cec792c4ef6bc5b19db67feeb7fd81741a5d08c131e3507dca3430ae",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}
