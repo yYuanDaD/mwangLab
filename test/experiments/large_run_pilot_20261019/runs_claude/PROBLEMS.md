@@ -923,3 +923,15 @@ One section per paper, after the 2-paper pilot (whose problems are in ../REPORT.
 ## PMID36892893 (GSE213649)
 
 - case_runner.py:588 exclude_samples silently ignores non-GSM keys; Ensembl-only gene check returns null for symbols; PFC ORA CSV holds Enrichr HTML, no KEGG; no tissue-identity QC Details: `PMID36892893/HANDBACK.md`.
+
+## PMID33275875 (GSE123961)
+
+- geo_tools.py:30 GEOparse temp-file error on Windows; geo_tools.py:58/105 urllib supplementary download HTTP 403 (curl works); fetched files manually Details: `PMID33275875/HANDBACK.md`.
+
+## PMID31393098 (GSE129612)
+
+- inspect counts AltAnalyze stat columns (avg/fold/p) as samples (n_samples 15 vs 6 real) and gives no type candidate for log-TPM Details: `PMID31393098/HANDBACK.md`.
+
+## PMID33042761 (GSE136623;GSE140633)
+
+- geo_tools.py:30 GEOparse temp-file ENOENT plus HTTP 403 on supplements under default TEMP (fixed by scratch TMP); inspect gave no alignment_keys for GSE140633 Details: `PMID33042761/HANDBACK.md`.
