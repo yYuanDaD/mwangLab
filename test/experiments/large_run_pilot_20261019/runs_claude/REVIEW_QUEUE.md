@@ -479,3 +479,11 @@ One section per case; newest last.
 ## PMID36892893 / GSE213649 (2026-11-24)
 
 - policy: Which of the paper's unreported sample exclusions applies is not stated; the exclusion of the two mislabelled liver samples is an inference that matches the paper's counts.
+
+## PMID33042761 / GSE136623 (2026-11-24)
+
+- policy: Policy question (open): whether a genotype contrast on an exercise-capacity gene (MI4OE vs MI4KO) should be run as a labelled non-exercise result. Currently refused; consistent with the skill rule.
+
+## PMID33042761 / GSE140633 (2026-11-24)
+
+- policy: Policy question (open): whether the genotype contrast MI4KO vs flox should be run as a labelled non-exercise result.

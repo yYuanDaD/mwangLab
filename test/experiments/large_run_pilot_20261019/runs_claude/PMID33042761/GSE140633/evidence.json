@@ -1,0 +1,323 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID33042761",
+  "subject_id": "GSE140633",
+  "created_at": "2026-11-24T04:51:10",
+  "finished_at": "2026-11-24T04:51:11",
+  "status": "stopped:design",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC7539189.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC7539189.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-24T04:51:10",
+      "sha256": null,
+      "attributes": {
+        "sha256": "62bbe7eff2c30257c64fe245f6d4c05699c0a82da4a140bd854be46b5652aeff",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE140633_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE140633\\GSE140633_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-24T04:51:10",
+      "sha256": null,
+      "attributes": {
+        "sha256": "5bc3a3091c549f27e83e79fb2bf377e85db20a90adb7587aa584e045a78554b0",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "GSE140633_KOvsWT_all_gene_for_GOE.txt.gz",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE140633\\GSE140633_KOvsWT_all_gene_for_GOE.txt.gz",
+      "locator": null,
+      "captured_at": "2026-11-24T04:51:10",
+      "sha256": null,
+      "attributes": {
+        "sha256": "8cee0775f3a8e757b11c9f68e3496582e6c81f19de5ac0c37af84ef221f69b13",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE136623",
+          "GSE140633"
+        ],
+        "assay": "bulk RNA-seq (Kapa stranded mRNA, HiSeq3000 SE50; Bowtie2 + RSEM; TMM; edgeR) (S4.17.p1)",
+        "sample_inclusion": "SOL muscle, 4 MI4KO + 4 flox mice (S4.17.p1); GEO: titles Flox1224/1281/1282/1285 and IRF4 MKO1221/1223/1283/1284, male, soleus",
+        "factors": {
+          "genotype": [
+            "flox",
+            "MI4KO"
+          ]
+        },
+        "exercise_factor": "none: genotype-only RNA-seq; exercise effects in the paper come from qPCR/western (S2.1.p1, S2.5.p2).",
+        "primary_estimand": "Genotype effect in SOL muscle: MI4KO vs flox (normalized to flox) (S2.5.p1). Not an exercise effect.",
+        "planned_contrasts": [
+          "MI4KO vs flox in SOL (S2.5.p1; paper: 447 DEGs)"
+        ],
+        "repeated_measure_unit": "none (independent mice)",
+        "paper_method": "edgeR on RSEM expected counts with TMM normalization (S4.17.p1)",
+        "paper_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": 0.5849625,
+          "inclusive": false,
+          "effect_inclusive": true,
+          "source_locator": "S2.5.p1; S4.17.p1 (|FC| >= 1.5 and p < 0.05)"
+        },
+        "paper_results": {
+          "MI4KO_vs_flox_SOL": 447,
+          "named_genes": [
+            "Ppp1r3c"
+          ]
+        }
+      },
+      "reason": "Same paper map as GSE136623; this series is the SOL MI4KO vs flox assay. No exercise arm was sequenced.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:51:11"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "E:\\agent\\mwangLab_pdf\\data\\GSE140633\\GSE140633_KOvsWT_all_gene_for_GOE.txt.gz",
+        "owned": true,
+        "checks": [
+          "paper S4.20.p1 names GSE140633",
+          "8 samples match S4.17.p1 (4 SOL MI4KO + 4 SOL flox)",
+          "source_name = Skeletal muscle (Soleus)",
+          "contributors Kong/Liu = paper authors",
+          "deposited KOvsWT table reproduces the paper's 447 genes at |FC|>=1.5, p<0.05"
+        ],
+        "accession": "GSE140633",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE140633\\GSE140633_metadata.csv"
+      },
+      "reason": "Sample count, tissue and genotypes match the paper's SOL assay; the deposited DE table yields exactly 447 genes under the paper's rule.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:51:11"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:key",
+        "n_aligned": 8,
+        "n_metadata": 8,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "grp": {
+              "source": "title",
+              "regex": "^(Flox|IRF4 MKO)\\d+$",
+              "recode": {
+                "Flox": "flox",
+                "IRF4 MKO": "MKO"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\design_metadata.csv",
+          "sha256": "8237029ac9baac5d1cf127270a60943a32c68610d5c972336dbf468c75c0c860",
+          "levels": {
+            "grp": {
+              "flox": 4,
+              "MKO": 4
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns are Kong-<mouse id>; metadata titles end in the same mouse id (Flox1224 ... IRF4 MKO1284). Key derived from the trailing digits of title; annotation columns (NAME, Foldchange, PValue, FDR) dropped by the column pattern. Mouse 1283 appears here (MKO1283) and in GSE136623 (MKO1283, GAS) - plausibly the same animal, different muscle.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:51:11"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "TMM-normalized expression (linear, non-integer)",
+        "recommended_method": "limma on log2(x+1)",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\aligned_matrix.csv",
+          "sha256": "6d5d7c7ce301296d223de768a9bc080862c404a766656c86163df8ce53b34968",
+          "n_features": 24054,
+          "n_samples": 8,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 2,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 66560.67505,
+          "median": 0.84043399,
+          "integer_fraction": 0.3527,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "Only deposited matrix is a DE table whose sample columns are decimal normalized expression values (34% integer, mostly zeros; e.g. 0.0751, 1.4223), not counts; 2 duplicated gene IDs and Excel-date gene names (9-Mar, 6-Sep). data_processing: RSEM + TMM. The paper's edgeR route on counts cannot be reproduced from this file; no raw counts are deposited.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-24T04:51:11"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "none",
+        "exercise_factor_present": false,
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\suitability\\suitability.md",
+          "n_comparisons": 1,
+          "n_analyzable": 1
+        }
+      },
+      "reason": "The only group factor is genotype (in the title). No exercise/training/time factor exists.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "refused",
+        "execution_status": "not_started",
+        "stop_reason": "No exercise contrast: all 8 samples are SOL muscle differing only by IRF4 genotype (flox vs MI4KO); no sequenced animal was exercised (S2.5.p1, S4.17.p1, GEO characteristics). The requested exercise estimand is not identifiable. The genotype contrast is a different estimand and is not run here."
+      },
+      "recorded_at": "2026-11-24T04:51:11"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "dd87995e523f63b84c5171cc8ba41f6e9843ce0f9b6242b3c990717ced6203b4",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "3cc2148ee4727af5f83c776c3acf46c9a44545267c5bc25d86bdbaa3f6f1f883",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "6d5d7c7ce301296d223de768a9bc080862c404a766656c86163df8ce53b34968",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8237029ac9baac5d1cf127270a60943a32c68610d5c972336dbf468c75c0c860",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "fb14512fb38d3f8954787fc852e350267b24f98a236143f9fbb01c78570c9f6c",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID33042761\\GSE140633\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "0c86250c58174b6d7369f2797166ba733d26bdd8717747682eee4a823c47292b",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

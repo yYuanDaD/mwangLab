@@ -1,0 +1,149 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID33042761",
+  "request": "Analyze GSE136623 and GSE140633 for PMID 33042761 (IRF4 in Skeletal Muscle Regulates Exercise Capacity via PTG/Glycogen Pathway.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE136623",
+      "accession": "GSE136623",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7539189.paper.md"],
+        "metadata": "GSE136623/GSE136623_metadata.csv",
+        "matrix": "GSE136623/GSE136623_rsem_count.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE136623", "GSE140633"],
+            "assay": "bulk RNA-seq (Kapa stranded mRNA, HiSeq3000 SE50; Bowtie2 + RSEM; TMM; edgeR) (S4.17.p1)",
+            "sample_inclusion": "GAS muscle, 3 MI4KO + 3 MI4OE mice (S4.17.p1); GEO: 3 'IRF4 knock out' + 3 'IRF4 overexpression', male, gastrocnemius",
+            "factors": {"genotype": ["MI4KO", "MI4OE"]},
+            "exercise_factor": "none: the RNA-seq compares genotypes only; no exercised vs sedentary animals were sequenced. Exercise effects in the paper (Irf4 up after training/acute bout, Fig 1a,b; PTG down after acute exercise, Fig S5f,g) are qPCR/western only (S2.1.p1, S2.5.p2).",
+            "primary_estimand": "Genotype effect in GAS muscle: MI4OE vs MI4KO (results normalized to MI4KO) (S2.5.p1). Not an exercise effect.",
+            "planned_contrasts": ["MI4OE vs MI4KO in GAS (S2.5.p1; paper: 872 DEGs, 312 up / 560 down)"],
+            "repeated_measure_unit": "none (independent mice)",
+            "paper_method": "edgeR on RSEM expected counts with TMM normalization (S4.17.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true, "source_locator": "S2.5.p1; S4.17.p1 (|FC| >= 1.5 and p < 0.05)"},
+            "paper_results": {"MI4OE_vs_MI4KO_GAS": 872, "up": 312, "down": 560, "named_genes": ["Ppp1r3c"]}
+          },
+          "reasoning": "S2.5.p1 and S4.17.p1 describe two RNA-seq assays: SOL MI4KO vs flox (GSE140633) and GAS MI4OE vs MI4KO (GSE136623). Data availability S4.20.p1 names both. Neither assay includes an exercise arm; exercise biology in the paper is measured by qPCR/western/physiology, not by RNA-seq.",
+          "confidence": "high",
+          "locator": "S2.5.p1; S4.17.p1; S4.20.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["GEO Series_pubmed_id = 33042761", "paper S4.20.p1 names GSE136623", "6 samples match S4.17.p1 (3 GAS MI4KO + 3 GAS MI4OE)", "source_name = Skeletal muscle (Gastrocnemius)", "contributors Kong/Liu = paper authors"]},
+          "reasoning": "GEO series links PMID 33042761; sample count, tissue and genotypes match the paper's GAS assay.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "title",
+          "patterns": {"grp": ["title", "^(MKO|MOE)\\d+$"]},
+          "recode": {},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "rsem_count columns equal metadata title exactly (inspect: title 6/6). grp from the title prefix MKO/MOE, consistent with characteristics genotype (IRF4 knock out / IRF4 overexpression).",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts (RSEM expected counts)",
+          "recommended_method": "edgeR",
+          "reasoning": "File named rsem_count; 84% integer values with fractional values (RSEM expected counts), library sizes 19-29 M; data_processing: Bowtie2 + RSEM v1.2.15, TMM. Matches the paper's input (S4.17.p1). Would be rounded for a count model.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "MKO"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor_present": false},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: all 6 samples are sedentary GAS muscle differing only by IRF4 genotype (MI4KO vs MI4OE); no metadata column or paper statement places any sequenced animal in an exercise condition (S2.5.p1, S4.17.p1, GEO characteristics). The requested estimand (exercise effect on gene expression) is not identifiable from these data. The genotype contrast MI4OE vs MI4KO is a different estimand and is not run here.",
+          "candidates": [
+            {"value": "grp MOE vs MKO (genotype)", "reason_rejected": "Genotype effect, not an exercise effect; manufacturing it as the exercise answer would misstate the estimand."}
+          ],
+          "reasoning": "The request asks how exercise affects gene expression. The only grouping column is genotype (IRF4 knock out / IRF4 overexpression). No exercise, training, running or time-after-exercise factor exists.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "diet", "paper": "MI4KO/MI4OE phenotyping described on chow diet (S2.2.p2, S2.4.p1); RNA-seq diet not stated", "data": "GEO characteristics food = High fat diet", "disposition": "recorded; moot because the case is refused"},
+        {"item": "series description", "paper": "exercise capacity via PTG/glycogen", "data": "GEO series title is about BCAAs and glycogen; GEO summary claims MI4KO decreased body weight, unlike the paper's normal body weight", "disposition": "recorded; moot because the case is refused"}
+      ]
+    },
+    {
+      "case_id": "GSE140633",
+      "accession": "GSE140633",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC7539189.paper.md"],
+        "metadata": "GSE140633/GSE140633_metadata.csv",
+        "matrix": "GSE140633/GSE140633_KOvsWT_all_gene_for_GOE.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_duplicates": "first"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE136623", "GSE140633"],
+            "assay": "bulk RNA-seq (Kapa stranded mRNA, HiSeq3000 SE50; Bowtie2 + RSEM; TMM; edgeR) (S4.17.p1)",
+            "sample_inclusion": "SOL muscle, 4 MI4KO + 4 flox mice (S4.17.p1); GEO: titles Flox1224/1281/1282/1285 and IRF4 MKO1221/1223/1283/1284, male, soleus",
+            "factors": {"genotype": ["flox", "MI4KO"]},
+            "exercise_factor": "none: genotype-only RNA-seq; exercise effects in the paper come from qPCR/western (S2.1.p1, S2.5.p2).",
+            "primary_estimand": "Genotype effect in SOL muscle: MI4KO vs flox (normalized to flox) (S2.5.p1). Not an exercise effect.",
+            "planned_contrasts": ["MI4KO vs flox in SOL (S2.5.p1; paper: 447 DEGs)"],
+            "repeated_measure_unit": "none (independent mice)",
+            "paper_method": "edgeR on RSEM expected counts with TMM normalization (S4.17.p1)",
+            "paper_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": 0.5849625, "inclusive": false, "effect_inclusive": true, "source_locator": "S2.5.p1; S4.17.p1 (|FC| >= 1.5 and p < 0.05)"},
+            "paper_results": {"MI4KO_vs_flox_SOL": 447, "named_genes": ["Ppp1r3c"]}
+          },
+          "reasoning": "Same paper map as GSE136623; this series is the SOL MI4KO vs flox assay. No exercise arm was sequenced.",
+          "confidence": "high",
+          "locator": "S2.5.p1; S4.17.p1; S4.20.p1"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["paper S4.20.p1 names GSE140633", "8 samples match S4.17.p1 (4 SOL MI4KO + 4 SOL flox)", "source_name = Skeletal muscle (Soleus)", "contributors Kong/Liu = paper authors", "deposited KOvsWT table reproduces the paper's 447 genes at |FC|>=1.5, p<0.05"]},
+          "reasoning": "Sample count, tissue and genotypes match the paper's SOL assay; the deposited DE table yields exactly 447 genes under the paper's rule.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "key",
+          "key_patterns": {"key": ["title", "(\\d+)$"]},
+          "matrix_column_pattern": "^Kong-(\\d+)$",
+          "patterns": {"grp": ["title", "^(Flox|IRF4 MKO)\\d+$"]},
+          "recode": {"grp": {"Flox": "flox", "IRF4 MKO": "MKO"}},
+          "aliases": {},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns are Kong-<mouse id>; metadata titles end in the same mouse id (Flox1224 ... IRF4 MKO1284). Key derived from the trailing digits of title; annotation columns (NAME, Foldchange, PValue, FDR) dropped by the column pattern. Mouse 1283 appears here (MKO1283) and in GSE136623 (MKO1283, GAS) - plausibly the same animal, different muscle.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "TMM-normalized expression (linear, non-integer)",
+          "recommended_method": "limma on log2(x+1)",
+          "reasoning": "Only deposited matrix is a DE table whose sample columns are decimal normalized expression values (34% integer, mostly zeros; e.g. 0.0751, 1.4223), not counts; 2 duplicated gene IDs and Excel-date gene names (9-Mar, 6-Sep). data_processing: RSEM + TMM. The paper's edgeR route on counts cannot be reproduced from this file; no raw counts are deposited.",
+          "confidence": "medium"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "flox"},
+          "organism": "Mouse",
+          "planned": [],
+          "final": {"analysis_type": "none", "exercise_factor_present": false},
+          "decision_status": "refused",
+          "stop_reason": "No exercise contrast: all 8 samples are SOL muscle differing only by IRF4 genotype (flox vs MI4KO); no sequenced animal was exercised (S2.5.p1, S4.17.p1, GEO characteristics). The requested exercise estimand is not identifiable. The genotype contrast is a different estimand and is not run here.",
+          "candidates": [
+            {"value": "grp MKO vs flox (genotype)", "reason_rejected": "Genotype effect, not an exercise effect."}
+          ],
+          "reasoning": "The only group factor is genotype (in the title). No exercise/training/time factor exists.",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "diet", "paper": "phenotyping on chow diet (S2.2.p2); RNA-seq diet not stated", "data": "GEO characteristics food = High fat diet", "disposition": "recorded; moot because the case is refused"}
+      ]
+    }
+  ]
+}
