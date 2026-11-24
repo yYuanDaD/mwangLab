@@ -1,0 +1,168 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35325353",
+  "request": "Analyze GSE195707 for PMID 35325353 (Senolytic treatment rescues blunted muscle hypertrophy in old mice.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 session (claude-code)",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE195707",
+      "accession": "GSE195707",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9616988.paper.md"],
+        "metadata": "GSE195707/GSE195707_metadata.csv",
+        "matrix": "GSE195707/GSE195707_count_matrix.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": [],
+        "feature_column": "gene_name",
+        "feature_duplicates": "sum"
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE195707"],
+            "assay": "bulk RNA-seq, plantaris muscle, old (23-24 mo) male C57BL/6J mice (S2.8.p1, S2.2.p1)",
+            "primary_estimand": "Effect of senolytic D+Q (vs vehicle) on the plantaris transcriptome of old mice after 14 days of synergist-ablation mechanical overload (MOV, the paper's resistance-exercise model) (S2.8.p1, S3.5.p1)",
+            "factors": {"treatment": ["Vehicle", "Senolytic (D+Q)"], "surgery": ["Sham", "14d MOV"]},
+            "sample_inclusion": "Paper RNA-seq: vehicle- and D+Q-treated old mice, 14 d MOV, n=5/group (S2.8.p1; FIG6 N=5/group). GEO also deposits sham-operated vehicle and D+Q mice (n=5 each), not analysed by RNA-seq in the paper.",
+            "planned_contrasts": ["D+Q vs vehicle at 14 d MOV (S3.5.p1; paper: ~2,000 DEGs, Fig. 6a)"],
+            "repeated_measure_unit": "none; one plantaris per mouse, independent animals",
+            "normalization": "Partek E/M gene counts, minimum expression cutoff of 10 counts (S2.8.p1)",
+            "paper_method": "DESeq2 (Partek Flow v10) two-group, FDR < 0.05 (S2.8.p1)",
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "source_locator": "S2.8.p1"},
+            "paper_results": "~2,000 DEGs D+Q vs vehicle; down: Ddit4, Cryab, TCA/ETC genes; up: Igf1, Fmod, Dcn, Mmp14, Adamts1, Plau, 7 ADAMTS members (S3.5.p1)"
+          },
+          "reasoning": "S2.8.p1 defines the RNA-seq: plantaris from vehicle and D+Q old mice 14 d after MOV, n=5/group, Partek E/M counts, filter 10 counts, DESeq2 FDR<0.05. S3.5.p1 reports ~2000 DEGs. The exercise stimulus (MOV) is common to both arms in the paper's contrast; the paper's estimand is how senolytic treatment modifies the exercise-induced transcriptome, not MOV vs sham. MOV vs sham contrasts are identifiable from the deposited sham samples and are run as exploratory.",
+          "locator": "S2.8.p1",
+          "confidence": "high"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["DA.p1 names GSE195707", "GEO: Mus musculus plantaris, age 2 years, treatment Senolytic/Vehicle, surgery Overload/Sham, protocol text matches S2.4.p1/S2.3.p1", "20 samples = 4 groups x 5; paper's 10 MOV samples are a subset"]},
+          "reasoning": "Data-availability statement DA.p1 names GSE195707; GEO treatment protocol (D+Q 5/50 mg/kg on days 7 and 10 of 14-day MOV) and data_processing (Partek Flow, STAR 2.7.8a, Partek E/M, GRCm39, release 103) match S2.4.p1 and S2.8.p1.",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "aliases": {"trt": "characteristics_ch1.1.treatment", "surg": "characteristics_ch1.2.surgery"},
+          "patterns": {},
+          "combine": {},
+          "recode": {"trt": {"Senolytic": "DQ", "Vehicle": "Veh"}, "surg": {"Overload": "MOV", "Sham": "Sham"}},
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (OS14d5, OVS4, OV14D5 ...) equal metadata 'description' exactly for 20/20 (inspect alignment_keys). Codes are consistent with titles (OS14d=old senolytic 14d overload, OSS=old senolytic sham, OV14D=old vehicle 14d overload, OVS=old vehicle sham). Factors from the GEO characteristics columns.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "estimated counts",
+          "recommended_method": "DESeq2",
+          "reasoning": "GEO says 'raw counts' but 30% of values are non-integer (e.g. 3735.96, 729.999), consistent with Partek E/M expectation-maximization estimated counts (data_processing). Library sizes 17.9-26.2 M, median 50: count scale, not FPKM/TPM. Paper input to DESeq2 is the same Partek E/M counts (S2.8.p1). Round to integers for DESeq2. 20 gene symbols repeat (distinct Ensembl genes sharing a symbol); summed per symbol.",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["trt", "surg"],
+          "references": {"trt": "Veh", "surg": "Sham"},
+          "subject": null,
+          "organism": "Mouse",
+          "planned": ["trt_DQ_vs_Veh_surg-MOV"],
+          "covariate_candidates": [],
+          "strata": [],
+          "final": {
+            "analysis_type": "factorial (2x2); paper contrast is the simple effect of treatment within MOV",
+            "design_column": "trt",
+            "control": "Veh",
+            "treatment": "DQ",
+            "contrasts": [
+              {"name": "trt_DQ_vs_Veh_surg-MOV", "control": "Veh", "treatment": "DQ", "role": "primary"},
+              {"name": "surg_MOV_vs_Sham_trt-Veh", "control": "Sham", "treatment": "MOV", "role": "exploratory"},
+              {"name": "surg_MOV_vs_Sham_trt-DQ", "control": "Sham", "treatment": "MOV", "role": "exploratory"},
+              {"name": "trt_DQ_vs_Veh_surg-Sham", "control": "Veh", "treatment": "DQ", "role": "exploratory"},
+              {"name": "trt_surg_DQ_MOV_vs_Veh_Sham", "control": "Veh:Sham", "treatment": "DQ:MOV", "role": "exploratory"}
+            ]
+          },
+          "reasoning": "Paper's planned contrast is D+Q vs vehicle within 14 d MOV (S2.8.p1, S3.5.p1). The deposited 2x2 (treatment x surgery, n=5/cell) also identifies the exercise-model effect MOV vs sham within vehicle and within D+Q, and the treatment x surgery interaction (does D+Q change the MOV response); these are exploratory, fitted in one cell-means DESeq2 model on all 20 samples. Old male mice only, so no sex stratification.",
+          "candidates": [{"value": "pooled MOV vs sham across treatments", "reason_rejected": "pooling treatment levels hides the treatment factor; simple effects within each treatment plus interaction used instead"}],
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {"status": "not_required", "blocking_terms": [], "covariates": []},
+          "confounding_candidates": null,
+          "reasoning": "One plantaris per independent mouse; no batch, lane or pairing recorded in GEO and none stated in the paper.",
+          "confidence": "high"
+        },
+        "method": {
+          "final": {
+            "method": "DESeq2 (pydeseq2 Wald)",
+            "formula": "~ trt (MOV subset); exploratory joint model ~ cell (2x2 cell means)",
+            "paper_route": {"method": "DESeq2 (Partek Flow) two-group on MOV samples, FDR<0.05", "status": "reproduced"},
+            "deviations": ["pydeseq2 instead of Partek Flow DESeq2 v3.5", "Partek 'minimum expression cutoff of 10 counts' interpreted as mean raw count >= 10 across the analysed samples (exact Partek rule not stated); sensitivity with count >= 10 in at least one sample", "E/M estimated counts rounded to integers"],
+            "rounding_documented": true
+          },
+          "transform": "round",
+          "reasoning": "Paper used DESeq2 on Partek E/M counts (S2.8.p1); the deposited matrix is those counts, so the paper method is reproducible after rounding.",
+          "confidence": "medium"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false},
+            "audit_threshold": {"metric": "pvalue", "cutoff": 0.05, "effect_metric": "log2FoldChange", "effect_cutoff": null, "inclusive": false}
+          },
+          "reasoning": "S2.8.p1: DESeq2 (FDR<0.05); no fold-change cutoff stated. Audit rule raw p<0.05 (labelled, not the paper rule) is recorded only to test whether the paper's ~2,000 DEG figure could correspond to an unadjusted cutoff (Fig. 6 legend marks *p < 0.05).",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {
+            "route": "paper_aligned",
+            "caveats": ["Paper's RNA-seq estimand is D+Q vs vehicle under MOV (senolytic modification of the exercise-model response), not exercise vs sham; MOV vs sham and interaction are exploratory, not reported by the paper.", "Partek low-count filter rule ambiguous; count comparison depends on it.", "Synergist ablation is a model of resistance-exercise overload, not voluntary exercise."]
+          },
+          "paper_counts": {"trt_DQ_vs_Veh_MOV": 2000},
+          "paper_genes": {"trt_DQ_vs_Veh_MOV": ["Ddit4", "Cryab", "Igf1", "Fmod", "Dcn", "Mmp14", "Adamts1", "Plau"]},
+          "reasoning": "Paper reports approximately 2,000 DEGs (S3.5.p1); named genes from S3.5.p1/FIG6 (Ddit4, Cryab down; others up).",
+          "confidence": "high"
+        }
+      },
+      "discrepancies": [
+        {"item": "sample set", "paper": "RNA-seq on 10 MOV samples (vehicle, D+Q)", "data": "GEO has 20 samples incl. 10 sham", "disposition": "executable_without_change"},
+        {"item": "matrix type", "paper": "Partek E/M gene counts", "data": "GEO labels 'raw counts' but values are non-integer estimated counts", "disposition": "executable_without_change"},
+        {"item": "low-expression filter", "paper": "minimum expression cutoff of 10 counts (rule unspecified)", "data": "interpreted as mean count >= 10; sensitivity count>=10 in >=1 sample", "disposition": "declared_deviation"}
+      ],
+      "executions": [
+        {
+          "name": "trt_DQ_vs_Veh_MOV",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "trt", "control_group": "Veh", "treatment_group": "DQ", "alpha": 0.05},
+          "subset": {"surg": ["MOV"]},
+          "filter_low_counts": {"min_mean_count": 10},
+          "role": "primary",
+          "reasoning": "Paper's two-group DESeq2 on the 10 MOV samples (S2.8.p1), with the 10-count filter read as mean count >= 10.",
+          "confidence": "medium"
+        },
+        {
+          "name": "trt_DQ_vs_Veh_MOV_filter_any10",
+          "tool": "tools.deseq2_tools:run_deseq2_analysis",
+          "args": {"design_column": "trt", "control_group": "Veh", "treatment_group": "DQ", "alpha": 0.05},
+          "subset": {"surg": ["MOV"]},
+          "filter_low_counts": {"min_count": 10, "min_samples": 1},
+          "role": "sensitivity",
+          "reasoning": "Alternative reading of Partek's 10-count cutoff (max count >= 10).",
+          "confidence": "medium"
+        },
+        {
+          "name": "joint2x2",
+          "tool": "tools.joint_contrasts:run_joint_deseq2",
+          "args": {"comparisons": "all", "covariates": []},
+          "filter_low_counts": {"min_mean_count": 10},
+          "role": "exploratory",
+          "reasoning": "One cell-means DESeq2 model on all 20 samples: exercise-model effect (MOV vs sham) within vehicle and within D+Q, D+Q vs vehicle within sham and MOV, and the treatment x surgery interaction. Not reported by the paper.",
+          "confidence": "high"
+        }
+      ],
+      "enrichment": [
+        {"execution": "trt_DQ_vs_Veh_MOV", "ora": true, "gsea": false, "direction": "up", "reasoning": "Paper ran ORA (ConsensusPathDB) on FDR<0.05 up genes (S2.8.p1, S3.5.p1)."},
+        {"execution": "trt_DQ_vs_Veh_MOV", "ora": true, "gsea": false, "direction": "down", "reasoning": "Paper ORA on down genes (TCA/ETC expected)."},
+        {"execution": "trt_DQ_vs_Veh_MOV", "ora": false, "gsea": true, "direction": "all", "reasoning": "Hallmark GSEA on full ranking as a direction check."},
+        {"execution": "joint2x2/surg_MOV_vs_Sham_trt-Veh", "ora": false, "gsea": true, "direction": "all", "reasoning": "Exploratory exercise-model (MOV vs sham, vehicle) pathway direction."}
+      ]
+    }
+  ]
+}

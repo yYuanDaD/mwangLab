@@ -1,0 +1,248 @@
+{
+  "case_id": "GSE195707",
+  "verdict": "analyzable",
+  "failed": [],
+  "warnings": [],
+  "factors": [
+    "trt",
+    "surg"
+  ],
+  "checks": {
+    "data_type": {
+      "status": "pass",
+      "matrix_type": "estimated counts",
+      "route": "DESeq2 / edgeR / limma-voom",
+      "required": {
+        "data_type": "estimated counts",
+        "key": "bulk_rnaseq_counts",
+        "files": [
+          "gene x sample raw (or estimated) count matrix",
+          "sample metadata table"
+        ],
+        "fields": [
+          "sample ID matching the matrix columns",
+          "group / condition per sample",
+          "subject or animal ID when samples are repeated",
+          "sex (for the sex check)",
+          "batch, lane or sequencing run when the paper used it"
+        ],
+        "route": "DESeq2 / edgeR / limma-voom"
+      }
+    },
+    "grouping": {
+      "status": "pass",
+      "factors": [
+        "trt",
+        "surg"
+      ],
+      "levels": {
+        "trt": {
+          "DQ": 10,
+          "Veh": 10
+        },
+        "surg": {
+          "MOV": 10,
+          "Sham": 10
+        }
+      },
+      "problems": []
+    },
+    "covariance": {
+      "status": "pass",
+      "covariance_status": "not_required",
+      "blocking_terms": [],
+      "covariates": [],
+      "stopping_columns": [],
+      "check_columns": [],
+      "between_subject_factors": [],
+      "decisions": [],
+      "design": {
+        "formula_equivalent": "~ C(trt) + C(surg)",
+        "rank": 3,
+        "full_rank": true,
+        "residual_df": 17,
+        "min_cell_size": 5
+      }
+    },
+    "sample_size": {
+      "status": "pass",
+      "n_comparisons": 5,
+      "n_analyzable": 5,
+      "too_small": [],
+      "planned_analyzable": [
+        "trt_DQ_vs_Veh_surg-MOV"
+      ],
+      "unknown_planned": []
+    },
+    "sex": {
+      "status": "pass",
+      "summary": "Sex inference completed on 20 samples.",
+      "metadata_sex_column": "",
+      "predicted": {
+        "male": 20
+      },
+      "mismatched": [],
+      "uncertain": [],
+      "table": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\suitability\\aligned_matrix_sex_check.tsv",
+      "sexes": [
+        "male"
+      ],
+      "split_plan": {
+        "split": false,
+        "sexes": [
+          "male"
+        ],
+        "reason": "one sex only"
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "name": "trt_DQ_vs_Veh_surg-MOV",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "DQ",
+      "reference": "Veh",
+      "within": {
+        "surg": "MOV"
+      },
+      "cells": [
+        {
+          "cell": {
+            "surg": "MOV",
+            "trt": "DQ"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "surg": "MOV",
+            "trt": "Veh"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_DQ_vs_Veh_surg-Sham",
+      "kind": "simple",
+      "factor": "trt",
+      "test": "DQ",
+      "reference": "Veh",
+      "within": {
+        "surg": "Sham"
+      },
+      "cells": [
+        {
+          "cell": {
+            "surg": "Sham",
+            "trt": "DQ"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "surg": "Sham",
+            "trt": "Veh"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "surg_MOV_vs_Sham_trt-DQ",
+      "kind": "simple",
+      "factor": "surg",
+      "test": "MOV",
+      "reference": "Sham",
+      "within": {
+        "trt": "DQ"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "DQ",
+            "surg": "MOV"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "DQ",
+            "surg": "Sham"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "surg_MOV_vs_Sham_trt-Veh",
+      "kind": "simple",
+      "factor": "surg",
+      "test": "MOV",
+      "reference": "Sham",
+      "within": {
+        "trt": "Veh"
+      },
+      "cells": [
+        {
+          "cell": {
+            "trt": "Veh",
+            "surg": "MOV"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "Veh",
+            "surg": "Sham"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    },
+    {
+      "name": "trt_surg_DQ_MOV_vs_Veh_Sham",
+      "kind": "interaction",
+      "factor": "trt:surg",
+      "test": "DQ:MOV",
+      "reference": "Veh:Sham",
+      "within": {},
+      "cells": [
+        {
+          "cell": {
+            "trt": "DQ",
+            "surg": "MOV"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "Veh",
+            "surg": "MOV"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "DQ",
+            "surg": "Sham"
+          },
+          "n": 5
+        },
+        {
+          "cell": {
+            "trt": "Veh",
+            "surg": "Sham"
+          },
+          "n": 5
+        }
+      ],
+      "analyzable": true
+    }
+  ]
+}

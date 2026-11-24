@@ -1,0 +1,1367 @@
+{
+  "schema_version": "1.0",
+  "run_id": "PMID35325353",
+  "subject_id": "GSE195707",
+  "created_at": "2026-11-23T23:46:34",
+  "finished_at": "2026-11-23T23:47:41",
+  "status": "completed",
+  "error": null,
+  "sources": [
+    {
+      "source_id": "SRC-0001",
+      "origin": "paper",
+      "label": "PMC9616988.paper.md",
+      "uri": "test\\experiments\\paper_screen_20261027\\papers\\PMC9616988.paper.md",
+      "locator": null,
+      "captured_at": "2026-11-23T23:46:34",
+      "sha256": null,
+      "attributes": {
+        "sha256": "bf0b789305afd2d4b759841d6579f80823049eb3b26ea06d53496617aee814f8",
+        "kind": "paper"
+      }
+    },
+    {
+      "source_id": "SRC-0002",
+      "origin": "metadata",
+      "label": "GSE195707_metadata.csv",
+      "uri": "E:\\agent\\mwangLab_pdf\\data\\GSE195707\\GSE195707_metadata.csv",
+      "locator": null,
+      "captured_at": "2026-11-23T23:46:34",
+      "sha256": null,
+      "attributes": {
+        "sha256": "75589e8def65a5430e62b651db047c528575473026e12842cd09d9e34860c965",
+        "kind": "metadata"
+      }
+    },
+    {
+      "source_id": "SRC-0003",
+      "origin": "artifact",
+      "label": "matrix_feature_ids.csv",
+      "uri": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\input\\matrix_feature_ids.csv",
+      "locator": null,
+      "captured_at": "2026-11-23T23:46:34",
+      "sha256": null,
+      "attributes": {
+        "sha256": "bb6be7c04eca55461e5528eb659fa5753c648a2b9d81555e21e0fc936830b25d",
+        "kind": "matrix"
+      }
+    }
+  ],
+  "claims": [],
+  "decisions": [
+    {
+      "decision_id": "DEC-0001",
+      "step": "paper_reconstruction",
+      "selected": {
+        "accessions": [
+          "GSE195707"
+        ],
+        "assay": "bulk RNA-seq, plantaris muscle, old (23-24 mo) male C57BL/6J mice (S2.8.p1, S2.2.p1)",
+        "primary_estimand": "Effect of senolytic D+Q (vs vehicle) on the plantaris transcriptome of old mice after 14 days of synergist-ablation mechanical overload (MOV, the paper's resistance-exercise model) (S2.8.p1, S3.5.p1)",
+        "factors": {
+          "treatment": [
+            "Vehicle",
+            "Senolytic (D+Q)"
+          ],
+          "surgery": [
+            "Sham",
+            "14d MOV"
+          ]
+        },
+        "sample_inclusion": "Paper RNA-seq: vehicle- and D+Q-treated old mice, 14 d MOV, n=5/group (S2.8.p1; FIG6 N=5/group). GEO also deposits sham-operated vehicle and D+Q mice (n=5 each), not analysed by RNA-seq in the paper.",
+        "planned_contrasts": [
+          "D+Q vs vehicle at 14 d MOV (S3.5.p1; paper: ~2,000 DEGs, Fig. 6a)"
+        ],
+        "repeated_measure_unit": "none; one plantaris per mouse, independent animals",
+        "normalization": "Partek E/M gene counts, minimum expression cutoff of 10 counts (S2.8.p1)",
+        "paper_method": "DESeq2 (Partek Flow v10) two-group, FDR < 0.05 (S2.8.p1)",
+        "paper_threshold": {
+          "metric": "FDR",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "source_locator": "S2.8.p1"
+        },
+        "paper_results": "~2,000 DEGs D+Q vs vehicle; down: Ddit4, Cryab, TCA/ETC genes; up: Igf1, Fmod, Dcn, Mmp14, Adamts1, Plau, 7 ADAMTS members (S3.5.p1)"
+      },
+      "reason": "S2.8.p1 defines the RNA-seq: plantaris from vehicle and D+Q old mice 14 d after MOV, n=5/group, Partek E/M counts, filter 10 counts, DESeq2 FDR<0.05. S3.5.p1 reports ~2000 DEGs. The exercise stimulus (MOV) is common to both arms in the paper's contrast; the paper's estimand is how senolytic treatment modifies the exercise-induced transcriptome, not MOV vs sham. MOV vs sham contrasts are identifiable from the deposited sham samples and are run as exploratory.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:34"
+    },
+    {
+      "decision_id": "DEC-0002",
+      "step": "ownership",
+      "selected": {
+        "matrix_file": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\input\\matrix_feature_ids.csv",
+        "owned": true,
+        "checks": [
+          "DA.p1 names GSE195707",
+          "GEO: Mus musculus plantaris, age 2 years, treatment Senolytic/Vehicle, surgery Overload/Sham, protocol text matches S2.4.p1/S2.3.p1",
+          "20 samples = 4 groups x 5; paper's 10 MOV samples are a subset"
+        ],
+        "accession": "GSE195707",
+        "metadata_file": "E:\\agent\\mwangLab_pdf\\data\\GSE195707\\GSE195707_metadata.csv"
+      },
+      "reason": "Data-availability statement DA.p1 names GSE195707; GEO treatment protocol (D+Q 5/50 mg/kg on days 7 and 10 of 14-day MOV) and data_processing (Partek Flow, STAR 2.7.8a, Partek E/M, GRCm39, release 103) match S2.4.p1 and S2.8.p1.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0002",
+        "SRC-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:34"
+    },
+    {
+      "decision_id": "DEC-0003",
+      "step": "alignment",
+      "selected": {
+        "method": "exact:description",
+        "n_aligned": 20,
+        "n_metadata": 20,
+        "coverage": 1.0,
+        "unmatched_matrix_columns": [],
+        "unmatched_metadata_samples": [],
+        "excluded_samples": {},
+        "derived_columns": {
+          "source": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\aligned_metadata.csv",
+          "columns": {
+            "trt": {
+              "alias_of": "characteristics_ch1.1.treatment",
+              "recode": {
+                "Senolytic": "DQ",
+                "Vehicle": "Veh"
+              }
+            },
+            "surg": {
+              "alias_of": "characteristics_ch1.2.surgery",
+              "recode": {
+                "Overload": "MOV",
+                "Sham": "Sham"
+              }
+            }
+          },
+          "output": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\design_metadata.csv",
+          "sha256": "82767f942920920615ebb3fed0eaa03b51a36c2a75d685314d716f427aec13b3",
+          "levels": {
+            "trt": {
+              "DQ": 10,
+              "Veh": 10
+            },
+            "surg": {
+              "MOV": 10,
+              "Sham": 10
+            }
+          }
+        }
+      },
+      "reason": "Matrix columns (OS14d5, OVS4, OV14D5 ...) equal metadata 'description' exactly for 20/20 (inspect alignment_keys). Codes are consistent with titles (OS14d=old senolytic 14d overload, OSS=old senolytic sham, OV14D=old vehicle 14d overload, OVS=old vehicle sham). Factors from the GEO characteristics columns.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0003",
+        "SRC-0002",
+        "ART-0003",
+        "ART-0004",
+        "ART-0005"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:35"
+    },
+    {
+      "decision_id": "DEC-0004",
+      "step": "matrix",
+      "selected": {
+        "matrix_type": "estimated counts",
+        "recommended_method": "DESeq2",
+        "profile": {
+          "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\aligned_matrix.csv",
+          "sha256": "342d6105c4b925fc1df80ef933caac2b1ba05dfc286b509f0fe137a5e7edac2b",
+          "n_features": 22640,
+          "n_samples": 20,
+          "annotation_columns_dropped": [],
+          "duplicated_feature_ids": 0,
+          "missing_values": 0,
+          "negative_values": 0,
+          "negative_fraction": 0.0,
+          "min": 0.0,
+          "max": 1440000.0,
+          "median": 50.0,
+          "integer_fraction": 0.7124,
+          "candidates": [
+            "linear_normalized (FPKM/TPM/RPKM/intensity) or estimated_counts"
+          ]
+        }
+      },
+      "reason": "GEO says 'raw counts' but 30% of values are non-integer (e.g. 3735.96, 729.999), consistent with Partek E/M expectation-maximization estimated counts (data_processing). Library sizes 17.9-26.2 M, median 50: count scale, not FPKM/TPM. Paper input to DESeq2 is the same Partek E/M counts (S2.8.p1). Round to integers for DESeq2. 20 gene symbols repeat (distinct Ensembl genes sharing a symbol); summed per symbol.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:35"
+    },
+    {
+      "decision_id": "DEC-0005",
+      "step": "design",
+      "selected": {
+        "analysis_type": "factorial (2x2); paper contrast is the simple effect of treatment within MOV",
+        "design_column": "trt",
+        "control": "Veh",
+        "treatment": "DQ",
+        "contrasts": [
+          {
+            "name": "trt_DQ_vs_Veh_surg-MOV",
+            "control": "Veh",
+            "treatment": "DQ",
+            "role": "primary"
+          },
+          {
+            "name": "surg_MOV_vs_Sham_trt-Veh",
+            "control": "Sham",
+            "treatment": "MOV",
+            "role": "exploratory"
+          },
+          {
+            "name": "surg_MOV_vs_Sham_trt-DQ",
+            "control": "Sham",
+            "treatment": "MOV",
+            "role": "exploratory"
+          },
+          {
+            "name": "trt_DQ_vs_Veh_surg-Sham",
+            "control": "Veh",
+            "treatment": "DQ",
+            "role": "exploratory"
+          },
+          {
+            "name": "trt_surg_DQ_MOV_vs_Veh_Sham",
+            "control": "Veh:Sham",
+            "treatment": "DQ:MOV",
+            "role": "exploratory"
+          }
+        ],
+        "suitability": {
+          "verdict": "analyzable",
+          "failed": [],
+          "warnings": [],
+          "report": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\suitability\\suitability.md",
+          "n_comparisons": 5,
+          "n_analyzable": 5
+        }
+      },
+      "reason": "Paper's planned contrast is D+Q vs vehicle within 14 d MOV (S2.8.p1, S3.5.p1). The deposited 2x2 (treatment x surgery, n=5/cell) also identifies the exercise-model effect MOV vs sham within vehicle and within D+Q, and the treatment x surgery interaction (does D+Q change the MOV response); these are exploratory, fitted in one cell-means DESeq2 model on all 20 samples. Old male mice only, so no sex stratification.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0004",
+        "ART-0006"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:40"
+    },
+    {
+      "decision_id": "DEC-0006",
+      "step": "covariance",
+      "selected": {
+        "status": "not_required",
+        "blocking_terms": [],
+        "covariates": [],
+        "design_check": {
+          "formula_equivalent": "~ C(trt) + C(surg)",
+          "n_samples": 20,
+          "n_columns": 3,
+          "columns": [
+            "Intercept",
+            "trt_Veh",
+            "surg_Sham"
+          ],
+          "rank": 3,
+          "full_rank": true,
+          "residual_df": 17,
+          "levels": {
+            "trt": {
+              "DQ": 10,
+              "Veh": 10
+            },
+            "surg": {
+              "MOV": 10,
+              "Sham": 10
+            }
+          },
+          "cells": [
+            {
+              "cell": [
+                "DQ",
+                "MOV"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "DQ",
+                "Sham"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "Veh",
+                "MOV"
+              ],
+              "n": 5
+            },
+            {
+              "cell": [
+                "Veh",
+                "Sham"
+              ],
+              "n": 5
+            }
+          ],
+          "min_cell_size": 5,
+          "missing_values": {}
+        },
+        "confounding": [
+          {
+            "column": "title",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "geo_accession",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "status",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "submission_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "last_update_date",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "type",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "channel_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "source_name_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "organism_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "taxid_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.0.tissue",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "characteristics_ch1.1.treatment",
+            "n_levels": 2,
+            "status": "complete_confounding",
+            "crosstab": {
+              "DQ": {
+                "Senolytic": 10,
+                "Vehicle": 0
+              },
+              "Veh": {
+                "Senolytic": 0,
+                "Vehicle": 10
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.2.surgery",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "DQ": {
+                "Overload": 5,
+                "Sham": 5
+              },
+              "Veh": {
+                "Overload": 5,
+                "Sham": 5
+              }
+            }
+          },
+          {
+            "column": "characteristics_ch1.3.age",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "treatment_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "growth_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "molecule_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "extract_protocol_ch1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "description",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "data_processing",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "platform_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_name",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_email",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_phone",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_institute",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_address",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_city",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_state",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_zip/postal_code",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "contact_country",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "instrument_model",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_selection",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_source",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "library_strategy",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "relation",
+            "n_levels": 20,
+            "status": "sample_identifier"
+          },
+          {
+            "column": "supplementary_file_1",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "series_id",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "data_row_count",
+            "n_levels": 1,
+            "status": "constant"
+          },
+          {
+            "column": "surg",
+            "n_levels": 2,
+            "status": "crossed",
+            "crosstab": {
+              "DQ": {
+                "MOV": 5,
+                "Sham": 5
+              },
+              "Veh": {
+                "MOV": 5,
+                "Sham": 5
+              }
+            }
+          }
+        ]
+      },
+      "reason": "One plantaris per independent mouse; no batch, lane or pairing recorded in GEO and none stated in the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0004",
+        "SRC-0002",
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:41"
+    },
+    {
+      "decision_id": "DEC-0007",
+      "step": "method",
+      "selected": {
+        "matrix_type": "estimated counts",
+        "method": "DESeq2 (pydeseq2 Wald)",
+        "formula": "~ trt (MOV subset); exploratory joint model ~ cell (2x2 cell means)",
+        "paper_route": {
+          "method": "DESeq2 (Partek Flow) two-group on MOV samples, FDR<0.05",
+          "status": "reproduced"
+        },
+        "deviations": [
+          "pydeseq2 instead of Partek Flow DESeq2 v3.5",
+          "Partek 'minimum expression cutoff of 10 counts' interpreted as mean raw count >= 10 across the analysed samples (exact Partek rule not stated); sensitivity with count >= 10 in at least one sample",
+          "E/M estimated counts rounded to integers"
+        ],
+        "rounding_documented": true,
+        "transform": "round"
+      },
+      "reason": "Paper used DESeq2 on Partek E/M counts (S2.8.p1); the deposited matrix is those counts, so the paper method is reproducible after rounding.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "SRC-0001"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:41"
+    },
+    {
+      "decision_id": "DEC-0008",
+      "step": "threshold",
+      "selected": {
+        "paper_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "threshold_source": "paper",
+        "applied_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "audit_threshold": {
+          "metric": "pvalue",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        }
+      },
+      "reason": "S2.8.p1: DESeq2 (FDR<0.05); no fold-change cutoff stated. Audit rule raw p<0.05 (labelled, not the paper rule) is recorded only to test whether the paper's ~2,000 DEG figure could correspond to an unadjusted cutoff (Fig. 6 legend marks *p < 0.05).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "not_started",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:46:41"
+    },
+    {
+      "decision_id": "DEC-0009",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "trt_DQ_vs_Veh_MOV",
+        "role": "primary",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV\\input\\rounded_counts.csv",
+        "transform": "round",
+        "formula": "~ trt",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV\\DEG_results_DQ_vs_Veh.csv"
+        ],
+        "counts": {
+          "trt_DQ_vs_Veh_MOV": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 15151,
+              "n_significant": 13,
+              "n_up": 6,
+              "n_down": 7,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 15151,
+              "n_significant": 1499,
+              "n_up": 677,
+              "n_down": 822,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Paper's two-group DESeq2 on the 10 MOV samples (S2.8.p1), with the 10-count filter read as mean count >= 10.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:04"
+    },
+    {
+      "decision_id": "DEC-0010",
+      "step": "execution",
+      "selected": {
+        "method": "run_deseq2_analysis",
+        "subset": "trt_DQ_vs_Veh_MOV_filter_any10",
+        "role": "sensitivity",
+        "tool": "tools.deseq2_tools:run_deseq2_analysis",
+        "n_samples": 10,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV_filter_any10\\input\\rounded_counts.csv",
+        "transform": "round",
+        "formula": "~ trt",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV_filter_any10\\DEG_results_DQ_vs_Veh.csv"
+        ],
+        "counts": {
+          "trt_DQ_vs_Veh_MOV_filter_any10": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 16394,
+              "n_significant": 12,
+              "n_up": 6,
+              "n_down": 6,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 17399,
+              "n_significant": 1604,
+              "n_up": 720,
+              "n_down": 884,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "Alternative reading of Partek's 10-count cutoff (max count >= 10).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.6,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:17"
+    },
+    {
+      "decision_id": "DEC-0011",
+      "step": "execution",
+      "selected": {
+        "method": "run_joint_deseq2",
+        "subset": "joint2x2",
+        "role": "exploratory",
+        "tool": "tools.joint_contrasts:run_joint_deseq2",
+        "n_samples": 20,
+        "matrix": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\input\\rounded_counts.csv",
+        "transform": "round",
+        "formula": "~ cell",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_DQ_vs_Veh_surg-MOV.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_DQ_vs_Veh_surg-Sham.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_surg_MOV_vs_Sham_trt-DQ.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_surg_MOV_vs_Sham_trt-Veh.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_surg_DQ_MOV_vs_Veh_Sham.csv"
+        ],
+        "counts": {
+          "joint2x2/trt_DQ_vs_Veh_surg-MOV": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 5582,
+              "n_significant": 14,
+              "n_up": 10,
+              "n_down": 4,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 14704,
+              "n_significant": 1631,
+              "n_up": 849,
+              "n_down": 782,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint2x2/trt_DQ_vs_Veh_surg-Sham": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 12423,
+              "n_significant": 95,
+              "n_up": 74,
+              "n_down": 21,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 14704,
+              "n_significant": 1435,
+              "n_up": 888,
+              "n_down": 547,
+              "deg_sanity": "ok"
+            }
+          },
+          "joint2x2/surg_MOV_vs_Sham_trt-DQ": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14704,
+              "n_significant": 9664,
+              "n_up": 5034,
+              "n_down": 4630,
+              "deg_sanity": "implausible_sig_fraction=66%(9664/14704)"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 14704,
+              "n_significant": 10015,
+              "n_up": 5194,
+              "n_down": 4821,
+              "deg_sanity": "implausible_sig_fraction=68%(10015/14704)"
+            }
+          },
+          "joint2x2/surg_MOV_vs_Sham_trt-Veh": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14704,
+              "n_significant": 9482,
+              "n_up": 4971,
+              "n_down": 4511,
+              "deg_sanity": "implausible_sig_fraction=64%(9482/14704)"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 14704,
+              "n_significant": 9886,
+              "n_up": 5158,
+              "n_down": 4728,
+              "deg_sanity": "implausible_sig_fraction=67%(9886/14704)"
+            }
+          },
+          "joint2x2/trt_surg_DQ_MOV_vs_Veh_Sham": {
+            "applied": {
+              "rule": "padj < 0.05",
+              "n_tested": 14704,
+              "n_significant": 2,
+              "n_up": 1,
+              "n_down": 1,
+              "deg_sanity": "ok"
+            },
+            "audit": {
+              "rule": "pvalue < 0.05",
+              "n_tested": 14704,
+              "n_significant": 882,
+              "n_up": 440,
+              "n_down": 442,
+              "deg_sanity": "ok"
+            }
+          }
+        }
+      },
+      "reason": "One cell-means DESeq2 model on all 20 samples: exercise-model effect (MOV vs sham) within vehicle and within D+Q, D+Q vs vehicle within sham and MOV, and the treatment x surgery interaction. Not reported by the paper.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0003",
+        "ART-0004"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:30"
+    },
+    {
+      "decision_id": "DEC-0012",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_DQ_vs_Veh_MOV",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "up",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_up\\DEG_results_DQ_vs_Veh_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_up\\DEG_results_DQ_vs_Veh_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_up\\DEG_results_DQ_vs_Veh_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_up\\DEG_results_DQ_vs_Veh_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 6 Mouse genes (direction=up, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Extracellular Matrix Organization (GO:0030198) | padj=3.75e-02 | overlap=2/176 | genes=CTSK;COL11A1 - Actin Filament Reorganization (GO:0090527) | padj=3.75e-02 | overlap=1/6 | genes=CASS4 - Detection Of Mechanical Stimulus Involved In Sensory Perception Of Sound (GO:0050910) | padj=3.75e-02 | overlap=1/8 | genes=COL11A1 - Thyroid Hormone Generation (GO:0006590) | padj=3.75e-02 | overlap=1/10 | genes=CTSK - Detection Of Mechanical Stimulus Involved In Sensory Perception (GO:0050974) | padj=4.16e-02 | overlap=1/14 | genes=COL11A1 - Positive Regulation Of Peptidase Activity (GO:0010952) | padj=4.16e-02 | overlap=1/25 | genes=CTSK - Regulation Of Peptidase Activity (GO:0052547) | padj=4.16e-02 | overlap=1/27 | genes=CTSK - Endodermal Cell Differentiation (GO:0035987) | padj=4.16e-02 | overlap=1/31 | genes=COL11A1 - Positive Regulation Of Substrate Adhesion-Dependent Cell Spreading (GO:1900026) | padj=4.16e-02 | overlap=1/35 | genes=CASS4 - Mitochondrion Disassembly (GO:0061726) | padj=4.16e-02 | overlap=1/37 | genes=CTSK ### GO_Molecular_Function_2023 — top 9 terms (sorted by adjusted p): - Cysteine-Type Endopeptidase Activator Activity Involved In Apoptotic Process (GO:0008656) | padj=2.96e-02 | overlap=1/20 | genes=CTSK - Peptidase Activator Activity Involved In Apoptotic Process (GO:0016505) | padj=2.96e-02 | overla..."
+      },
+      "reason": "Paper ran ORA (ConsensusPathDB) on FDR<0.05 up genes (S2.8.p1, S3.5.p1).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:32"
+    },
+    {
+      "decision_id": "DEC-0013",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_DQ_vs_Veh_MOV",
+        "feature_id_type": "gene_symbol",
+        "method": "ORA (Enrichr GO BP/MF/CC + KEGG)",
+        "gene_sets": "Enrichr GO_Biological_Process_2023, GO_Molecular_Function_2023, GO_Cellular_Component_2023, KEGG",
+        "input_threshold": {
+          "metric": "padj",
+          "cutoff": 0.05,
+          "effect_metric": "log2FoldChange",
+          "effect_cutoff": null,
+          "inclusive": false
+        },
+        "direction": "down",
+        "input_threshold_source": "applied",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_down\\DEG_results_DQ_vs_Veh_GO_Biological_Process_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_down\\DEG_results_DQ_vs_Veh_GO_Cellular_Component_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_down\\DEG_results_DQ_vs_Veh_GO_Molecular_Function_2023.csv",
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\ora_down\\DEG_results_DQ_vs_Veh_KEGG_2019_Mouse.csv"
+        ],
+        "summary": "Enrichment analysis complete for 7 Mouse genes (direction=down, padj<0.05, |log2FC|>0.0). ### GO_Biological_Process_2023 — top 10 terms (sorted by adjusted p): - Negative Regulation Of Hematopoietic Progenitor Cell Differentiation (GO:1901533) | padj=4.37e-02 | overlap=1/6 | genes=TCF15 - Negative Regulation Of Mitochondrial Fusion (GO:0010637) | padj=4.37e-02 | overlap=1/7 | genes=TFRC - Transferrin Transport (GO:0033572) | padj=4.37e-02 | overlap=1/9 | genes=TFRC - Regulation Of Mitochondrial Fusion (GO:0010635) | padj=4.37e-02 | overlap=1/11 | genes=TFRC - Negative Regulation Of Stem Cell Differentiation (GO:2000737) | padj=4.37e-02 | overlap=1/12 | genes=TCF15 - Regulation Of Hematopoietic Stem Cell Differentiation (GO:1902036) | padj=4.37e-02 | overlap=1/12 | genes=TCF15 - Regulation Of Isotype Switching (GO:0045191) | padj=4.37e-02 | overlap=1/15 | genes=TFRC - Positive Regulation Of Immunoglobulin Mediated Immune Response (GO:0002891) | padj=4.37e-02 | overlap=1/15 | genes=TFRC - Positive Regulation Of Isotype Switching (GO:0045830) | padj=4.37e-02 | overlap=1/15 | genes=TFRC - Positive Regulation Of Stem Cell Differentiation (GO:2000738) | padj=4.45e-02 | overlap=1/17 | genes=TCF15 ### GO_Molecular_Function_2023 — top 10 terms (sorted by adjusted p): - E-box Binding (GO:0070888) | padj=1.35e-01 | overlap=1/51 | genes=TCF15 - Double-Stranded RNA Binding (GO:0003725) | padj=1.35e-01 | overlap=1/65 | genes=TFRC - Kinase Activity (GO:0016301) | padj=1.46e-01 | overlap=..."
+      },
+      "reason": "Paper ORA on down genes (TCA/ETC expected).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:33"
+    },
+    {
+      "decision_id": "DEC-0014",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "trt_DQ_vs_Veh_MOV",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_trt_DQ_vs_Veh_MOV\\gsea\\DEG_results_DQ_vs_Veh_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 15155 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 40 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=2.98 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.61 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_UV_RESPONSE_DN | NES=2.14 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_TGF_BETA_SIGNALING | NES=2.10 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.06 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=2.05 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANGIOGENESIS | NES=1.93 | NOM p=0.00e+00 | FDR q=5.25e-04 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=1.85 | NOM p=0.00e+00 | FDR q=9.18e-04 - HALLMARK_COMPLEMENT | NES=1.84 | NOM p=0.00e+00 | FDR q=1.36e-03 - HALLMARK_TNFA_SIGNALING_VIA_NFKB | NES=1.79 | NOM p=0.00e+00 | FDR q=2.82e-03 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.49 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V1 | NES=-2.69 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYC_TARGETS_V2 | NES=-2.32 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.23 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.12 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_MYOGENESIS | NES=-1.75 | NOM p=0.00e+00 | FDR q=3.02e-03 - HALLMARK_E2F_TARGETS | NES=-1.75 | NOM p=0.00e+00 | FDR q=2.59e-03 - HALLMARK_DNA_REPAIR | ..."
+      },
+      "reason": "Hallmark GSEA on full ranking as a direction check.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0009"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:37"
+    },
+    {
+      "decision_id": "DEC-0015",
+      "step": "enrichment",
+      "selected": {
+        "organism": "Mouse",
+        "subset": "joint2x2/surg_MOV_vs_Sham_trt-Veh",
+        "feature_id_type": "gene_symbol",
+        "method": "GSEA preranked (gseapy prerank)",
+        "gene_sets": "MSigDB Hallmark",
+        "ranking_metric": "stat",
+        "outputs": [
+          "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\enrichment_joint2x2_surg_MOV_vs_Sham_trt-Veh\\gsea\\DEG_results_surg_MOV_vs_Sham_trt-Veh_GSEA_Hallmark.csv"
+        ],
+        "summary": "GSEA complete on 14704 Mouse genes ranked by 'stat'. 50 Hallmark sets tested, 43 significant at FDR q < 0.25. ### Top 10 UP (NES > 0, enriched in treatment): - HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION | NES=3.28 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COAGULATION | NES=2.61 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APICAL_JUNCTION | NES=2.55 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ALLOGRAFT_REJECTION | NES=2.26 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ANGIOGENESIS | NES=2.22 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_KRAS_SIGNALING_UP | NES=2.21 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_INFLAMMATORY_RESPONSE | NES=2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_IL6_JAK_STAT3_SIGNALING | NES=2.20 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_COMPLEMENT | NES=2.11 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_APOPTOSIS | NES=2.08 | NOM p=0.00e+00 | FDR q=0.00e+00 ### Top 10 DOWN (NES < 0, depleted in treatment): - HALLMARK_OXIDATIVE_PHOSPHORYLATION | NES=-3.26 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_FATTY_ACID_METABOLISM | NES=-2.39 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_ADIPOGENESIS | NES=-2.28 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_BILE_ACID_METABOLISM | NES=-1.96 | NOM p=0.00e+00 | FDR q=0.00e+00 - HALLMARK_HEME_METABOLISM | NES=-1.61 | NOM p=0.00e+00 | FDR q=7.42e-03 - HALLMARK_SPERMATOGENESIS | NES=-1.59 | NOM p=6.80e-03 | FDR q=7.98e-03 - HALLMARK_PEROXISOME | NES=-1.51 | NOM p=7.14e-03 | FDR q=1.27e-02 - HALLMARK_MYC_TARGETS_V1..."
+      },
+      "reason": "Exploratory exercise-model (MOV vs sham, vehicle) pathway direction.",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "ART-0016"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:41"
+    },
+    {
+      "decision_id": "DEC-0016",
+      "step": "study",
+      "selected": {
+        "route": "paper_aligned",
+        "caveats": [
+          "Paper's RNA-seq estimand is D+Q vs vehicle under MOV (senolytic modification of the exercise-model response), not exercise vs sham; MOV vs sham and interaction are exploratory, not reported by the paper.",
+          "Partek low-count filter rule ambiguous; count comparison depends on it.",
+          "Synergist ablation is a model of resistance-exercise overload, not voluntary exercise."
+        ],
+        "results": {
+          "trt_DQ_vs_Veh_MOV": {
+            "n_deg": 13,
+            "up": 6,
+            "down": 7,
+            "rule": "padj < 0.05",
+            "audit_n": 1499
+          },
+          "trt_DQ_vs_Veh_MOV_filter_any10": {
+            "n_deg": 12,
+            "up": 6,
+            "down": 6,
+            "rule": "padj < 0.05",
+            "audit_n": 1604
+          },
+          "joint2x2/trt_DQ_vs_Veh_surg-MOV": {
+            "n_deg": 14,
+            "up": 10,
+            "down": 4,
+            "rule": "padj < 0.05",
+            "audit_n": 1631
+          },
+          "joint2x2/trt_DQ_vs_Veh_surg-Sham": {
+            "n_deg": 95,
+            "up": 74,
+            "down": 21,
+            "rule": "padj < 0.05",
+            "audit_n": 1435
+          },
+          "joint2x2/surg_MOV_vs_Sham_trt-DQ": {
+            "n_deg": 9664,
+            "up": 5034,
+            "down": 4630,
+            "rule": "padj < 0.05",
+            "audit_n": 10015
+          },
+          "joint2x2/surg_MOV_vs_Sham_trt-Veh": {
+            "n_deg": 9482,
+            "up": 4971,
+            "down": 4511,
+            "rule": "padj < 0.05",
+            "audit_n": 9886
+          },
+          "joint2x2/trt_surg_DQ_MOV_vs_Veh_Sham": {
+            "n_deg": 2,
+            "up": 1,
+            "down": 1,
+            "rule": "padj < 0.05",
+            "audit_n": 882
+          }
+        },
+        "paper_counts": {
+          "trt_DQ_vs_Veh_MOV": 2000
+        },
+        "comparison": {
+          "trt_DQ_vs_Veh_MOV": {
+            "ours": 13,
+            "paper": 2000
+          }
+        },
+        "paper_gene_check": {
+          "trt_DQ_vs_Veh_MOV": {
+            "Ddit4": {
+              "baseMean": 277.9453,
+              "log2FoldChange": -0.4458,
+              "padj": 0.259,
+              "pvalue": 0.00342
+            },
+            "Cryab": {
+              "baseMean": 20818.5272,
+              "log2FoldChange": -1.0377,
+              "padj": 0.317,
+              "pvalue": 0.00686
+            },
+            "Igf1": {
+              "baseMean": 2349.9113,
+              "log2FoldChange": 0.4148,
+              "padj": 0.351,
+              "pvalue": 0.0127
+            },
+            "Fmod": {
+              "baseMean": 3042.8706,
+              "log2FoldChange": 0.4302,
+              "padj": 0.027,
+              "pvalue": 1.61e-05
+            },
+            "Dcn": {
+              "baseMean": 12522.9915,
+              "log2FoldChange": 0.4137,
+              "padj": 0.301,
+              "pvalue": 0.00585
+            },
+            "Mmp14": {
+              "baseMean": 3528.8122,
+              "log2FoldChange": 0.3992,
+              "padj": 0.358,
+              "pvalue": 0.0145
+            },
+            "Adamts1": {
+              "baseMean": 1143.5925,
+              "log2FoldChange": 0.4262,
+              "padj": 0.494,
+              "pvalue": 0.0458
+            },
+            "Plau": {
+              "baseMean": 699.2762,
+              "log2FoldChange": 0.3599,
+              "padj": 0.531,
+              "pvalue": 0.0591
+            }
+          }
+        }
+      },
+      "reason": "Paper reports approximately 2,000 DEGs (S3.5.p1); named genes from S3.5.p1/FIG6 (Ddit4, Cryab down; others up).",
+      "method": "llm",
+      "alternatives": [],
+      "evidence_ids": [
+        "SRC-0001",
+        "ART-0003"
+      ],
+      "confidence": 0.9,
+      "details": {
+        "decision_status": "valid",
+        "execution_status": "completed",
+        "stop_reason": null
+      },
+      "recorded_at": "2026-11-23T23:47:41"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-0001",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\paper_reconstruction.json",
+      "role": "paper_reconstruction",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "facb11692010e0d17eb42735ace84ea9c30a9e65ca6ce0c9139b2b24e3f2c06e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0002",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\paper_data_discrepancies.json",
+      "role": "paper_data_discrepancies",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "881803f8d97c01e4aa587a3cb49e6801a44ae45980a6afd1218ec8676609e519",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0003",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\aligned_matrix.csv",
+      "role": "aligned_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "342d6105c4b925fc1df80ef933caac2b1ba05dfc286b509f0fe137a5e7edac2b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0004",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\design_metadata.csv",
+      "role": "design_metadata",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "82767f942920920615ebb3fed0eaa03b51a36c2a75d685314d716f427aec13b3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0005",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\aligned\\alignment_map.csv",
+      "role": "alignment_map",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "4b5776e0417b37213920df64b2553ee2d1b2a2b041601497bf1eb8b5828d43e1",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0006",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\suitability\\suitability.json",
+      "role": "suitability_report",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "29095d4f5be2dae6804dff45b77e7a11e15f9c1d4c164d9bcc2d809cd1310156",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0007",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\transformed\\rounded_counts.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "3c0e44c4a976563656befe21f8bcfefc2e708fa3e7f36fb6cdb4b6c42dd4cd2e",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0008",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV\\input\\rounded_counts.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "8c60b16e5a9de78e496f30d55cf50505cbe2489960c7e47eb37c7f834625d702",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0009",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV\\DEG_results_DQ_vs_Veh.csv",
+      "role": "deg_trt_DQ_vs_Veh_MOV",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "f3cf3e862f98198246148766f6554e769b4b04b6380600d32b52299481316e7b",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0010",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV_filter_any10\\input\\rounded_counts.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "45cba38c6de7782b47d7426511681c96828409f5aedda78b2bfa2c0a8c4ab9e5",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0011",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\trt_DQ_vs_Veh_MOV_filter_any10\\DEG_results_DQ_vs_Veh.csv",
+      "role": "deg_trt_DQ_vs_Veh_MOV_filter_any10",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "53a5198ae1c320efee90199dbf262e8abd9ff75406d4ba33172ca3c9345a64e3",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0012",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\input\\rounded_counts.csv",
+      "role": "transformed_matrix",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "243609c53334c900d057c8297e73a8cc2659c0d4d8f3cd330ae0dab85806ff7a",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0013",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_DQ_vs_Veh_surg-MOV.csv",
+      "role": "deg_joint2x2/trt_DQ_vs_Veh_surg-MOV",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "941a844a4eefda201e177af4c6cb2851353eb4d2297f29b673a340c05b9960cf",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0014",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_DQ_vs_Veh_surg-Sham.csv",
+      "role": "deg_joint2x2/trt_DQ_vs_Veh_surg-Sham",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e9b2514666ebcb552e8e6d9341270177a1b30f6a9f40061d03e45a597309ea94",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0015",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_surg_MOV_vs_Sham_trt-DQ.csv",
+      "role": "deg_joint2x2/surg_MOV_vs_Sham_trt-DQ",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "371bda22bfce9fb029becbd170955f5ef1f844918a9cd6f8932e7f5dd0da8d16",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0016",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_surg_MOV_vs_Sham_trt-Veh.csv",
+      "role": "deg_joint2x2/surg_MOV_vs_Sham_trt-Veh",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "59596ad3e40074612f58b7261f093e42752624e45498f57fca7d96e03f3ee459",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0017",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\results\\joint2x2\\DEG_results_trt_surg_DQ_MOV_vs_Veh_Sham.csv",
+      "role": "deg_joint2x2/trt_surg_DQ_MOV_vs_Veh_Sham",
+      "produced_by": null,
+      "media_type": "text/csv",
+      "sha256": "e90453b0823545c174234195eedf56b8b3fa493ca3b2ebe8e7d0f22283f5a489",
+      "evidence_ids": [],
+      "attributes": {}
+    },
+    {
+      "artifact_id": "ART-0018",
+      "path": "test\\experiments\\large_run_pilot_20261019\\runs_claude\\PMID35325353\\GSE195707\\reproduction_summary.json",
+      "role": "reproduction_summary",
+      "produced_by": null,
+      "media_type": "application/json",
+      "sha256": "2c73ff312fb43a2fbed057ac6344e428e893250b0c62a12c0cea45ff97f0ffee",
+      "evidence_ids": [],
+      "attributes": {}
+    }
+  ]
+}

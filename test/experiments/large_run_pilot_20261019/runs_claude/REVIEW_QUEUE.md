@@ -700,3 +700,8 @@ One section per case; newest last.
 ## PMID31433691 / GSE122628 (2026-11-24)
 
 - policy: Paper threshold and DEG counts unverified: only the abstract was available; check against the full text if obtainable.
+
+## PMID35325353 / GSE195707 (2026-11-24)
+
+- policy: Which threshold to report when the paper's ~2,000 DEGs fit no stated rule (FDR<0.05 gives 13; raw p<0.05 gives 1,499): open policy question.
+- policy: Whether synergist-ablation MOV counts as an exercise model (resistance-exercise model per the paper): open policy question.

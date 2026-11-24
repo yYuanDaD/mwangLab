@@ -1,0 +1,89 @@
+{
+ "case": "GSE205907",
+ "reviewer": "Claude Sonnet 5.5 (read-only reviewer)",
+ "blind": {
+  "B1": "Yes. MPTP+EX (12-week treadmill) vs MPTP in mice (S2.3.p1, S2.5.p1); 4 animals per group, 4 regions each, 48 samples. Exercise factor carried by the EX group (E26-E29). No healthy exercise arm.",
+  "B2": "MPTP vs saline and MPTP+EX vs MPTP, within each of 4 regions (S3.2.p1, FIG2); n=4 per group per region. Reversal sets in SN and striatum (S3.3.p1).",
+  "B3": "Each animal contributes 4 regions (key `animal`, 12 animals, one per tissue level; expression check supported). Paper fits regions separately, so within a region samples are independent.",
+  "B4": "Paper does not say joint or pairwise within a region; it reports DEGs per brain region (S2.7.p1, S3.2.p1) using DESeq.",
+  "B5": "S2.7.p1: 'We used DESeq (V1.14.0) software to identify DEGs which FPKM > 1 and p < 0.05.' FIG3: FPKM > 1, P < 0.05. Raw p, no fold-change cutoff. Counts in text: SN reversal 155 down / 66 up; striatum 49 down / 185 up (S3.3.p1)."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper S2.3.p1/S2.5.p1: MPTP+EX arm (n=4 mice) vs MPTP; the run analyzed it. No healthy exercise arm; recorded in study caveats.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "agree",
+   "severity": "minor",
+   "evidence": "grp EX/MPTP/SAL = 16 each = 4 animals x 4 regions, matches S2.5.p1 n=4. Group labels decoded from matrix column prefixes (E/M/S), no GSM link; Saline corroborated by nigral Th/Slc6a3, but E vs M rests on the letters only. Recorded as medium-confidence alignment in HANDBACK deviation 4.",
+   "fix": "Optional: confirm E=MPTP+EX vs M=MPTP with the authors or GEO sample mapping."
+  },
+  {
+   "id": "direction",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Contrasts are EX vs MPTP (control MPTP) and MPTP vs SAL (control SAL), matching S3.2.p1/FIG2 'MPTP + EX vs. MPTP' and 'MPTP vs. saline'.",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper analyzes each region separately (S3.2.p1, S2.7.p1); within a region each animal contributes one sample (animal key has 0 duplicates per tissue level), so no blocking needed. Animal key across tissue is supported (r diff 0.131, p=0.0005) but irrelevant to per-region fits.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Per-region limma ~0+grp, three contrasts from one fit per region, consistent with per-brain-region DEG reporting (S3.2.p1). Paper does not state joint vs pairwise within region; the choice is declared.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Single sex (all female, S2.1.p1; suitability pass); animal nested in group; no batch field. E29Stria outlier handled as a labelled sensitivity refit without exclusion from primary.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Matrix is non-integer FPKM, max 8912, median 2.1; log2(x+1) + limma-trend, declared deviation from DESeq (which needs counts; S2.7.p1).",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "S2.7.p1 'FPKM > 1 and p < 0.05' and FIG3 legend 'P < 0.05': raw p<0.05, no FC cutoff, applied; FDR<0.05 as audit. FPKM>1 filter interpreted as >=1 in >=4/12 samples, declared.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Paper counts are reversal-set sizes (S3.3.p1: SN 155 down/66 up; striatum 49 down/185 up), compared post hoc against reversal sets from the two contrasts (SN 124/81; striatum 17/27, or 174/157 without E29). HANDBACK states striatum does not reproduce and exercise effect does not survive FDR; no overclaim.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No stop or refusal; the case completed.",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: which threshold to report is not in question here (paper rule applied, FDR audit given).",
+  "E vs M group decoding rests on matrix column letters; no GSM-level confirmation (declared, medium confidence)."
+ ],
+ "summary": "该案例按论文做法对每个脑区分别拟合 limma，对照为 MPTP+EX 对 MPTP，阈值为原始 p<0.05，均与论文一致。每个区域内每只动物只有一个样本，无需配对；方法偏离（FPKM 改用 limma）已声明。唯一的小问题是 E/M 组标签只由列名字母推断，已在交接中记录。"
+}

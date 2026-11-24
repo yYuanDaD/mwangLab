@@ -1,0 +1,160 @@
+{
+  "run_dir": "test/experiments/large_run_pilot_20261019/runs_claude/PMID35850762",
+  "request": "Analyze GSE185530 for PMID 35850762 (Long non-coding RNA Tug1 modulates mitochondrial and myogenic responses to exercise in skeletal muscle.): how exercise affects gene expression as the paper intends.",
+  "decision_maker": "Claude Opus 5.5 (claude-opus-5-5) Claude Code subagent session",
+  "platform": "claude-code",
+  "data_root": "E:/agent/mwangLab_pdf/data",
+  "cases": [
+    {
+      "case_id": "GSE185530",
+      "accession": "GSE185530",
+      "inputs": {
+        "paper": ["test/experiments/paper_screen_20261027/papers/PMC9295458.paper.md"],
+        "metadata": "GSE185530/GSE185530_metadata.csv",
+        "matrix": "GSE185530/GSE185530_AT_raw_gene_counts_matrix.txt.gz",
+        "raw_tar": false,
+        "prep_scripts": []
+      },
+      "gates": {
+        "paper_reconstruction": {
+          "final": {
+            "accessions": ["GSE185530"],
+            "assay": "bulk RNA-seq, poly-A stranded, NovaSeq 6000, C2C12 mouse myotubes (S5.8.p1)",
+            "primary_estimand": "Transcriptional response of control-LNA C2C12 myotubes to in-vitro simulated exercise (3 h electrical pulse stimulation), immediately after (EPS 0h) and after 3 h recovery (EPS 3h), each versus Rest (S2.5.p2, FIG7)",
+            "factors": {"LNA": ["Negative control", "Tug1 KD"], "EPS": ["Rest", "EPS 0h", "EPS 3h"]},
+            "sample_inclusion": "36 libraries = 2 LNA x 3 EPS conditions x 6 (triplicate wells from two independent experiments) (S5.8.p1, FIG7 legend)",
+            "planned_contrasts": [
+              "Control EPS 0h vs Control Rest (S2.5.p2; paper: 835 genes UP, log2FC>1, FDR<0.01)",
+              "Control EPS 3h vs Control Rest (S2.5.p2; paper: 1316 genes UP, log2FC>1, FDR<0.01)",
+              "Tug1 KD vs Control at Rest (S2.5.p1; 867 DEGs FDR<0.01) - not an exercise contrast, out of scope",
+              "EPS response in Tug1 KD vs control (FIG7E/F, blunted/augmented genes) - modulation of the exercise response, exploratory here"
+            ],
+            "repeated_measure_unit": "none; each library is one well (independent cultures); wells come from two independent experiments (S5.8.p1)",
+            "normalization": "Degust voom/limma; genes with >=1 RPM in >=12 of 36 libraries (S5.8.p2)",
+            "paper_method": "limma-voom in Degust v4.1.5 on the 36 libraries (S5.8.p2)",
+            "paper_threshold": {"metric": "FDR", "adjustment": "BH", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false, "direction": "up only counted", "source_locator": "S2.5.p2"},
+            "paper_results": {"EPS0_vs_Rest_control_up": 835, "EPS3_vs_Rest_control_up": 1316, "genes": "Hspa1a, Atf3, Nr4a3 up at EPS 0h; Gabpa up with EPS; Nrf1/Tfam not up; Ppargc1a not DE at FDR 0.05 (S2.5.p2, S2.5.p4)"}
+          },
+          "reasoning": "Exercise question = EPS vs Rest within control-LNA myotubes, the counts the paper reports in S2.5.p2. Threshold stated there: log2FC>1, FDR<0.01, upregulated genes only. FIG7 legend says FDR<0.001 for the volcano colouring and methods (S5.8.p2) give a general FDR<0.05; the text rule matches the reported counts, so it is used. KD-at-rest (867 DEGs) is not an exercise estimand.",
+          "confidence": "high",
+          "locator": "S2.5.p2"
+        },
+        "ownership": {
+          "final": {"owned": true, "checks": ["S11.p1 names GSE185530", "GEO metadata: C2C12 myotubes, LNA Negative control/Tug1 x EPS Rest/EPS 0h/EPS 3h, 6 per cell, 36 total = paper's 36 libraries", "matrix has 36 count columns AT19-AT54 matching metadata description field"]},
+          "reasoning": "Data availability statement S11.p1 cites GSE185530; sample structure matches S5.8.p1/S5.8.p2 (36 libraries).",
+          "confidence": "high"
+        },
+        "alignment": {
+          "key_column": "description",
+          "aliases": {"lna": "characteristics_ch1.2.treatment (lna)", "eps": "characteristics_ch1.3.treatment (eps)"},
+          "patterns": {"exp": ["title", "rep (\\d)$"]},
+          "combine": {"grp": ["lna", "eps"]},
+          "recode": {
+            "lna": {"Negative control": "NC", "Tug1": "KD"},
+            "eps": {"Rest": "Rest", "EPS 0h": "EPS0", "EPS 3h": "EPS3"},
+            "exp": {"1": "E1", "2": "E1", "3": "E1", "4": "E2", "5": "E2", "6": "E2"},
+            "grp": {"NC_Rest": "NCrest", "NC_EPS0": "NCeps0", "NC_EPS3": "NCeps3", "KD_Rest": "KDrest", "KD_EPS0": "KDeps0", "KD_EPS3": "KDeps3"}
+          },
+          "exclude_samples": {},
+          "reasoning": "Matrix columns (AT19..AT54) equal metadata 'description' exactly (inspect alignment_keys 36/36). grp combines LNA and EPS into six cells. exp (E1 = rep 1-3, E2 = rep 4-6) is an INFERRED experiment label from replicate numbering and library order (AT19-36 then AT37-54); used only in a sensitivity model.",
+          "confidence": "high"
+        },
+        "matrix": {
+          "matrix_type": "raw counts",
+          "recommended_method": "limma-voom",
+          "reasoning": "File named raw_gene_counts_matrix; all values integers 0..386893, median 0 over 55,416 Ensembl genes; data_processing: STAR 2-pass alignment with gene-level quantification; paper analysed with voom which takes raw counts (S5.8.p2).",
+          "confidence": "high"
+        },
+        "design": {
+          "factors": ["grp"],
+          "references": {"grp": "NCrest"},
+          "organism": "Mouse",
+          "planned": ["grp_NCeps0_vs_NCrest", "grp_NCeps3_vs_NCrest"],
+          "covariate_candidates": ["exp"],
+          "final": {
+            "analysis_type": "multi-group (6 cells, 2 LNA x 3 EPS); planned contrasts within control LNA",
+            "design_column": "grp",
+            "contrasts": [
+              {"name": "grp_NCeps0_vs_NCrest", "control": "NCrest", "treatment": "NCeps0", "role": "primary"},
+              {"name": "grp_NCeps3_vs_NCrest", "control": "NCrest", "treatment": "NCeps3", "role": "primary"},
+              {"name": "grp_KDeps0_vs_KDrest", "control": "KDrest", "treatment": "KDeps0", "role": "exploratory"},
+              {"name": "grp_KDeps3_vs_KDrest", "control": "KDrest", "treatment": "KDeps3", "role": "exploratory"}
+            ]
+          },
+          "candidates": [
+            {"value": "pool LNA arms for EPS vs Rest", "reason_rejected": "paper's EPS counts are within control myotubes (S2.5.p2); Tug1 KD changes the EPS response"},
+            {"value": "Tug1 KD vs control at Rest", "reason_rejected": "not an exercise estimand (knockdown effect)"}
+          ],
+          "reasoning": "Paper reports EPS 0h and EPS 3h vs Rest in control myotubes (S2.5.p2). One control level with two time points -> planned contrasts against the same Rest reference, never pooled. The EPS response in Tug1 KD myotubes is shown in FIG7E/F; run as exploratory.",
+          "confidence": "high"
+        },
+        "covariance": {
+          "final": {
+            "status": "not_required",
+            "blocking_terms": [],
+            "covariates": [{"name": "exp", "disposition": "excluded: experiment label inferred from replicate numbering, not documented in GEO; paper (Degust) did not adjust; balanced 3+3 in every cell; tested in a DESeq2 sensitivity model"}]
+          },
+          "confounding_candidates": ["exp"],
+          "reasoning": "Each library is a separate well; no subject pairing. Two independent experiments (S5.8.p1) are balanced across all six cells, so they cannot confound EPS; the paper did not block.",
+          "confidence": "medium"
+        },
+        "method": {
+          "final": {
+            "method": "limma-voom (R limma::voom + eBayes), two-arm fits",
+            "formula": "~ grp (two levels per fit)",
+            "paper_route": {"method": "limma-voom in Degust 4.1.5, TMM, one model on 36 libraries", "status": "blocked", "reason": "repository voom executor fits only the two contrast arms and uses colSums library sizes (no TMM; tools/limma_voom.R header); no multi-group voom executor exists"},
+            "deviations": [
+              "voom fitted per contrast on 12 samples instead of one 36-sample model (variance pooled over 12 samples)",
+              "library sizes = colSums, no TMM",
+              "low-count filter applied as in the paper (>=1 CPM in >=12 of 36 libraries) on all 36 samples before subsetting"
+            ]
+          },
+          "transform": null,
+          "reasoning": "Paper used voom on raw counts (S5.8.p2); raw counts allow it, so the paper's method family is reproduced with declared executor deviations. DESeq2 joint model on all 36 samples (with and without exp) runs as sensitivity.",
+          "confidence": "high"
+        },
+        "threshold": {
+          "final": {
+            "paper_threshold": {"metric": "FDR", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "threshold_source": "paper",
+            "applied_threshold": {"metric": "padj", "cutoff": 0.01, "effect_metric": "log2FoldChange", "effect_cutoff": 1.0, "inclusive": false},
+            "audit_threshold": {"metric": "padj", "cutoff": 0.05, "effect_cutoff": null},
+            "deviation_note": "Paper counts only upregulated genes; compare with our 'up' count. Audit = methods' general FDR<0.05 (S5.8.p2)."
+          },
+          "reasoning": "S2.5.p2: 'log2FC>1, FDR<0.01' for the EPS counts.",
+          "confidence": "high"
+        },
+        "study": {
+          "final": {"route": "declared_deviation", "caveats": ["paper counts are upregulated genes only", "voom executor without TMM and fitted on two arms", "exp batch label inferred, sensitivity only"]},
+          "paper_counts": {"voom_NCeps0_vs_NCrest": 835, "voom_NCeps3_vs_NCrest": 1316},
+          "paper_genes": {"voom_NCeps0_vs_NCrest": ["ENSMUSG00000091971", "ENSMUSG00000026628", "ENSMUSG00000028341"], "voom_NCeps3_vs_NCrest": ["ENSMUSG00000008976", "ENSMUSG00000029167", "ENSMUSG00000058440", "ENSMUSG00000003923"]},
+          "reasoning": "Paper genes given as Ensembl IDs (matrix IDs); symbols resolved in HANDBACK from Gene_name column.",
+          "confidence": "medium"
+        }
+      },
+      "discrepancies": [
+        {"item": "threshold", "paper": "S2.5.p2 log2FC>1 FDR<0.01; FIG7 legend FDR<0.001; S5.8.p2 FDR<0.05", "data": "n/a", "disposition": "text rule used (matches the reported counts); FDR<0.05 as audit"},
+        {"item": "model", "paper": "Degust voom, TMM, all 36 libraries", "data": "executor: two-arm voom, no TMM", "disposition": "declared deviation; DESeq2 36-sample joint model as sensitivity"}
+      ],
+      "executions": [
+        {"name": "voom_NCeps0_vs_NCrest", "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+         "args": {"design_column": "grp", "control_group": "NCrest", "treatment_group": "NCeps0"},
+         "filter_low_counts": {"min_cpm": 1, "min_samples": 12},
+         "role": "primary", "reasoning": "paper's voom route, control myotubes EPS 0h vs Rest"},
+        {"name": "voom_NCeps3_vs_NCrest", "tool": "tools.limma_voom_tools:run_limma_voom_analysis",
+         "args": {"design_column": "grp", "control_group": "NCrest", "treatment_group": "NCeps3"},
+         "filter_low_counts": {"min_cpm": 1, "min_samples": 12},
+         "role": "primary", "reasoning": "paper's voom route, control myotubes EPS 3h vs Rest"},
+        {"name": "deseq2_joint", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_NCeps0_vs_NCrest", "grp_NCeps3_vs_NCrest", "grp_KDeps0_vs_KDrest", "grp_KDeps3_vs_KDrest"]},
+         "filter_low_counts": {"min_cpm": 1, "min_samples": 12},
+         "role": "sensitivity", "reasoning": "one DESeq2 model on all 36 libraries (closer to the paper's single-model variance pooling); KD EPS contrasts exploratory"},
+        {"name": "deseq2_joint_exp", "tool": "tools.joint_contrasts:run_joint_deseq2",
+         "args": {"comparisons": ["grp_NCeps0_vs_NCrest", "grp_NCeps3_vs_NCrest"], "covariates": ["exp"]},
+         "filter_low_counts": {"min_cpm": 1, "min_samples": 12},
+         "role": "sensitivity", "reasoning": "adds the inferred independent-experiment label as a covariate"}
+      ],
+      "enrichment": []
+    }
+  ]
+}

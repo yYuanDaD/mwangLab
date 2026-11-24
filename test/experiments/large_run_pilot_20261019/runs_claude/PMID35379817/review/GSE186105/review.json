@@ -1,0 +1,88 @@
+{
+ "case": "GSE186105",
+ "reviewer": "Claude Sonnet 5.5 (decision-review)",
+ "blind": {
+  "B1": "No for an exercise question: RNA-seq is basal gastrocnemius, Sirt6 KO vs WT (S2.4.p1, FIG4a, S4.15.p1); no sample carries an exercise factor. The paper's exercise transcriptome is human GSE9103 (S4.16.p1).",
+  "B2": "KO vs WT gastrocnemius, 3 vs 3 (FIG4a 'analyzed in triplicate').",
+  "B3": "None: independent mice; the title suffix key only matches labels across genotypes.",
+  "B4": "Paper does not say for the model fit; FIG4 legend: 'Negative binomial Wald Test using DESeq2 (a)' for one two-group comparison.",
+  "B5": "'> 2-fold change and p < 0.05' (FIG4a legend), raw p, strict inequality; no DEG count reported."
+ },
+ "checks": [
+  {
+   "id": "run_or_refuse",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Packet A: no exercise words in any column; FIG4a/S4.15.p1 use basal 20-wk gastrocnemius, WT vs KO. Refusal at design matches B1.",
+   "fix": ""
+  },
+  {
+   "id": "grouping",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Refused before contrast; groups WT 3 / KO 3 match FIG4a triplicates.",
+   "fix": ""
+  },
+  {
+   "id": "direction",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No contrast run; paper direction is KO relative to WT (S2.4.p1).",
+   "fix": ""
+  },
+  {
+   "id": "pairing",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Packet A candidate key 'suffix of title' is only a WT1/KO3 label match across genotypes; expression check not_supported (p=0.51); paper has independent mice, no repeated measures.",
+   "fix": ""
+  },
+  {
+   "id": "model_fit",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "Only one contrast (KO vs WT); no pairwise/joint question.",
+   "fix": ""
+  },
+  {
+   "id": "confounding",
+   "verdict": "na",
+   "severity": "none",
+   "evidence": "No batch/housing data; sex unknown but paper says male mice. Not relevant since refused.",
+   "fix": ""
+  },
+  {
+   "id": "matrix_method",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Integer StringTie read counts, 45-63 M reads; DESeq2 route fits FIG4 legend. FPKM/TPM columns dropped.",
+   "fix": ""
+  },
+  {
+   "id": "threshold",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "FIG4a legend: '> 2-fold change and p < 0.05' = raw p, |log2FC|>1; HANDBACK transcribes this. Paper gives no DEG count.",
+   "fix": ""
+  },
+  {
+   "id": "paper_match",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "No ours-vs-paper comparison claimed; HANDBACK states no DE was run.",
+   "fix": ""
+  },
+  {
+   "id": "stop_reason",
+   "verdict": "agree",
+   "severity": "none",
+   "evidence": "Claim 'no exercise arm' is true and established from metadata, GEO design and paper text (no exercise words in any column; Methods describe untrained mice).",
+   "fix": ""
+  }
+ ],
+ "overall": "pass",
+ "human_items": [
+  "Open policy: whether a genotype-only series from an exercise paper should be refused (as done) or analyzed as a labelled non-exercise KO vs WT contrast."
+ ],
+ "summary": "该序列只有基础状态下的WT与Sirt6 KO腓肠肌(3 vs 3),没有运动因素,拒绝运行的理由属实,且检查范围足够。阈值转录正确(>2倍且原始p<0.05),不存在重复测量。无阻断或主要问题。"
+}
